@@ -809,6 +809,14 @@ Whether every configured router will be matched
 <!ATTLIST response-router transformers              IDREFS           #IMPLIED>
 
 <!--
+	This attribute can be used to change the default behavior of the respone router
+	regarding the processing of the received event. If set to false, the message
+	will be router in the outbound router instead of beeing sent back to the
+	inbound router.
+-->
+<!ATTLIST response-router stopProcessing        (true | false)           "true">
+	
+<!--
 A catch-all-strategy is invoked to route an event when an event is not accepted by any of the configured
 routers.
 -->

@@ -58,4 +58,8 @@ public interface UMOResponseMessageRouter  extends UMORouterCollection
     public UMOTransformer getTransformer();
 
     public void setTransformer(UMOTransformer transformer);
+    
+    public boolean isStopProcessing();
+    
+    public void setStopProcessing(boolean stopProcessing);
 }
