@@ -36,7 +36,6 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.DispatchException;
 import org.mule.util.ObjectPool;
 
 import java.util.Iterator;
@@ -174,7 +173,7 @@ public class MuleProxy implements Runnable, Lifecycle
         }
     }
 
-    public void dispose() throws UMOException
+    public void dispose()
     {
         checkDisposed();
         Iterator iter = interceptorList.iterator();
@@ -189,7 +188,7 @@ public class MuleProxy implements Runnable, Lifecycle
                     ((LifecycleInterceptor) temp).dispose();
                 } catch (Exception e)
                 {
-                    throw new ModelException(new Message(Messages.FAILED_TO_DISPOSE_X, "Interceptor '" + temp.getClass().getName() + "'"), e);                    
+                    logger.error(new Message(Messages.FAILED_TO_DISPOSE_X, "Interceptor '" + temp.getClass().getName() + "'"), e);
                 }
             }
         }
@@ -198,7 +197,7 @@ public class MuleProxy implements Runnable, Lifecycle
             umo.dispose();
         } catch (Exception e)
         {
-            throw new ModelException(new Message(Messages.FAILED_TO_DISPOSE_X, "Component '" + descriptor.getName() + "'"), e);
+            logger.error(new Message(Messages.FAILED_TO_DISPOSE_X, "Component '" + descriptor.getName() + "'"), e);
         }
     }
 

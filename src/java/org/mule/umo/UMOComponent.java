@@ -28,7 +28,7 @@ import java.io.Serializable;
  * @version $Revision$
  */
 
-public interface UMOComponent extends Runnable, Serializable, Lifecycle, Initialisable
+public interface UMOComponent extends Serializable, Lifecycle, Initialisable
 {
     /**
      * @return the UMODescriptor associated with the component

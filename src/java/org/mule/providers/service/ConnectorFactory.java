@@ -91,7 +91,10 @@ public class ConnectorFactory
 
         if (connector == null)
         {
-            throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Connector", "Protocol: " + scheme));
+            Message m = new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint", "Uri: " + uri);
+            m.setNextMessage(new Message(Messages.X_IS_NULL, "connector"));
+            throw new ConnectorFactoryException(m);
+
         }
 
         UMOEndpoint endpoint = new MuleEndpoint();

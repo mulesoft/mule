@@ -84,7 +84,7 @@ public class MuleAdminAgent implements UMOAgent
     {
     }
 
-    public void dispose() throws UMOException
+    public void dispose()
     {
     }
 

@@ -89,7 +89,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
     {
     }
 
-    public void dispose() throws UMOException
+    public void dispose()
     {
     }
 

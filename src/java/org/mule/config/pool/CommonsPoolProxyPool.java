@@ -65,8 +65,8 @@ public class CommonsPoolProxyPool implements ObjectPool
         config.maxIdle = descriptor.getPoolingProfile().getMaxIdle();
         config.maxActive = descriptor.getPoolingProfile().getMaxActive();
         config.maxWait = descriptor.getPoolingProfile().getMaxWait();
-        config.whenExhaustedAction = descriptor.getPoolingProfile().getExhaustedAction();
-        config.whenExhaustedAction = descriptor.getPoolingProfile().getExhaustedAction();
+        config.whenExhaustedAction = new Integer(descriptor.getPoolingProfile().getExhaustedAction()).byteValue();
+        config.whenExhaustedAction = new Integer(descriptor.getPoolingProfile().getExhaustedAction()).byteValue();
 
         init(descriptor, config);
 
@@ -155,16 +155,8 @@ public class CommonsPoolProxyPool implements ObjectPool
             MuleProxy proxy = null;
             for (int i = 0; i < components.size(); i++)
             {
-                try
-                {
-                    proxy = (MuleProxy)components.get(i);
-                    proxy.dispose();
-                } catch (UMOException e)
-                {
-                    logger.warn("failed to dispose object instance: " +
-                            proxy.getDescriptor().getName() + ". " + e.getMessage());
-                }
-
+                proxy = (MuleProxy)components.get(i);
+                proxy.dispose();
             }
         }
         components.clear();

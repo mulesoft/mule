@@ -302,10 +302,14 @@ public class MuleManager implements UMOManager
     /**
      * Destroys the MuleManager and all resources it maintains
      */
-    public synchronized void dispose() throws UMOException
+    public synchronized void dispose()
     {
         if (disposed.get()) return;
-        if (started.get()) stop();
+        try {
+            if (started.get()) stop();
+        } catch (UMOException e) {
+            logger.error("Failed to stop manager: "+ e.getMessage(), e);
+        }
         disposed.set(true);
         disposeConnectors();
 
@@ -344,13 +348,7 @@ public class MuleManager implements UMOManager
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
         {
             UMOConnector c =  (UMOConnector)iterator.next();
-            try
-            {
-                c.dispose();
-            } catch (UMOException e)
-            {
-                logger.error("Connector " + c.getName() + " failed to dispose: " + e.getMessage(), e);
-            }
+            c.dispose();
         }
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_DISPOSED_CONNECTORS));
     }
@@ -943,7 +941,7 @@ public class MuleManager implements UMOManager
     /**
      * {@inheritDoc}
      */
-    protected void disposeAgents() throws UMOException {
+    protected void disposeAgents() {
         UMOAgent umoAgent;
         logger.info("disposing agents...");
         for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
@@ -1087,14 +1085,7 @@ public class MuleManager implements UMOManager
         */
         public void run()
         {
-            try
-            {
-
-                dispose();
-            } catch (UMOException e)
-            {
-                logger.fatal("Exception caught while destroying the Server: " + e);
-            }
+            dispose();
             if (!aggressive)
             {
                 //FIX need to check if there are any outstanding

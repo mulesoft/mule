@@ -31,6 +31,7 @@ import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
+import org.mule.umo.model.UMOComponentFactory;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
@@ -73,6 +74,8 @@ public class MuleModel implements UMOModel
 
     private ServerEventManager listeners;
 
+    private UMOComponentFactory componentFactory;
+
     /**
      * Default constructor
      */
@@ -85,6 +88,7 @@ public class MuleModel implements UMOModel
         components = new ConcurrentHashMap();
         descriptors = new ConcurrentHashMap();
         exceptionListener = new DefaultComponentExceptionStrategy();
+        componentFactory = new MuleComponentFactory();
         name = "mule";
     }
 
@@ -160,7 +164,7 @@ public class MuleModel implements UMOModel
 
         if (component == null)
         {
-            component = new MuleComponent((MuleDescriptor)descriptor);
+            component = componentFactory.create(descriptor);
             descriptors.put(descriptor.getName(), descriptor);
             components.put(descriptor.getName(), component);
         }
@@ -282,7 +286,7 @@ public class MuleModel implements UMOModel
      * <p/>
      * //* @throws UMOException if the components don't destroy gracefully
      */
-    public void dispose() throws UMOException
+    public void dispose()
     {
         fireEvent(new ModelEvent(this, ModelEvent.MODEL_DISPOSING));
         UMOComponent temp = null;
@@ -529,5 +533,13 @@ public class MuleModel implements UMOModel
         if(listeners!=null) {
             listeners.fireEvent(event);
         }
+    }
+
+    public void setComponentFactory(UMOComponentFactory factory) {
+        this.componentFactory = factory;
+    }
+
+    public UMOComponentFactory getComponentFactory() {
+        return componentFactory;
     }
 }

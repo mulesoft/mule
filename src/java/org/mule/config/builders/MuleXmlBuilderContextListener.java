@@ -80,12 +80,6 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
 
     public void contextDestroyed(ServletContextEvent event)
     {
-        try
-        {
-            MuleManager.getInstance().dispose();
-        } catch (UMOException e)
-        {
-            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_DISPOSE_X, "Mule Manager"), e);
-        }
+        MuleManager.getInstance().dispose();
     }
 }

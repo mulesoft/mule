@@ -15,6 +15,8 @@
             <version>${concurrent_version}</version>
             <url>http://www.oswego.edu</url>
             <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
             </properties>
@@ -26,6 +28,8 @@
             <version>${commons_beanutils_version}</version>
             <url>http://jakarta.apache.org/commons/beanutils/index.html</url>
             <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
             </properties>
@@ -37,6 +41,8 @@
             <version>${commons_collections_version}</version>
             <url>http://jakarta.apache.org/commons/collections/index.html</url>
             <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
             </properties>
@@ -47,6 +53,8 @@
             <version>${commons_discovery_version}</version>
             <url>http://jakarta.apache.org/commons/discovery/index.html</url>
             <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
             </properties>
@@ -58,6 +66,8 @@
             <version>${commons_logging_version}</version>
             <url>http://jakarta.apache.org/commons/logging/index.html</url>
             <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
             </properties>
@@ -70,6 +80,8 @@
             <version>${commons_pool_version}</version>
             <url>http://jakarta.apache.org/commons/pool/index.html</url>
             <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
             </properties>
@@ -83,6 +95,8 @@
             <version>${commons_digester_version}</version>
             <url>http://jakarta.apache.org/commons/digester/index.html</url>
             <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
             </properties>
@@ -95,6 +109,8 @@
             <version>${commons_jxpath_version}</version>
             <url>http://jakarta.apache.org/commons/jxpath/index.html</url>
             <properties>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
@@ -107,6 +123,8 @@
             <version>${dom4j_version}</version>
             <url>http://www.dom4j.org</url>
             <properties>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
@@ -142,6 +160,8 @@
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
             </properties>
         </dependency>
 
@@ -152,8 +172,7 @@
             <version>${log4j_version}</version>
             <url>http://jakarta.apache.org/log4j/docs/index.html</url>
             <properties>
-                <mule.core.jar>true</mule.core.jar>
-                <mule.mini>true</mule.mini>
+                <ignore>true</ignore>
             </properties>
         </dependency>
 
@@ -166,6 +185,8 @@
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
             </properties>
         </dependency>
         <dependency>
@@ -175,16 +196,68 @@
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
             </properties>
         </dependency>
 
         <dependency>
             <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee</artifactId>
-            <version>${geronimo_spec_j2ee_version}</version>
+            <artifactId>geronimo-spec-jta</artifactId>
+            <version>${geronimo_spec_jta_version}</version>
+            <properties>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>false</mule.mini>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee-management</artifactId>
+            <version>${geronimo_spec_j2ee_management_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee-connector</artifactId>
+            <version>${geronimo_spec_j2ee_connector_version}</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>false</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <dependency>
+                    <groupId>geronimo-spec</groupId>
+                    <artifactId>geronimo-spec-j2ee-connector</artifactId>
+                    <version>${geronimo_spec_j2ee_connector_version}</version>
+                    <properties>
+                        <mule.core.jar>true</mule.core.jar>
+                        <mule.mini>false</mule.mini>
+                        <rar.bundle>false</rar.bundle>
+                        <war.bundle>true</war.bundle>
+                    </properties>
+                </dependency>
+
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-servlet</artifactId>
+            <version>${geronimo_spec_servlet_version}</version>
+            <properties>
+                <mule.core.jar>false</mule.core.jar>
+                <mule.mini>false</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>false</war.bundle>
             </properties>
         </dependency>
 
@@ -194,6 +267,8 @@
             <artifactId>jmxri</artifactId>
             <version>${jmxri_version}</version>
             <properties>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
@@ -203,7 +278,8 @@
             <artifactId>jmxtools</artifactId>
             <version>${jmxri_jmxtools_version}</version>
             <properties>
-                <ignore>false</ignore>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
@@ -214,6 +290,8 @@
             <version>${jmxri_jmxremoting_version}</version>
             <properties>
                 <ignore>true</ignore>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
@@ -226,6 +304,8 @@
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>false</war.bundle>
             </properties>
         </dependency>
         <dependency>
@@ -235,6 +315,8 @@
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>false</war.bundle>
             </properties>
         </dependency>
         <dependency>
@@ -244,6 +326,8 @@
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>false</war.bundle>
             </properties>
         </dependency>
     </dependencies>

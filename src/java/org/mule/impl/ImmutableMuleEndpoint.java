@@ -418,6 +418,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         }
         if(name==null) {
             name = "_" + endpointUri.getScheme() + "Endpoint#" + hashCode();
+            endpointUri.setEndpointName(name);
         }
 
         if(endpointUri.getTransformers()!=null) {
@@ -455,6 +456,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         if(properties!=null && endpointUri.getParams() != null) {
             properties.putAll(endpointUri.getParams());
         }
+        
     }
 
     /**

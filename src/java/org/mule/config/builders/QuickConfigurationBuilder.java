@@ -20,6 +20,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -173,15 +174,29 @@ public class QuickConfigurationBuilder
         descriptor.setInboundEndpoint(inboundProvider);
         descriptor.setOutboundEndpoint(outboundProvider);
 
-        //set the threading and pooling profile for a single object instance
-//        ThreadingProfile tp = new ThreadingProfile(1, 1, -1, ThreadingProfile.WHEN_EXHAUSTED_WAIT, null,null);
-//        PoolingProfile pp = new PoolingProfile(1, 1, -1, ObjectPool.WHEN_EXHAUSTED_BLOCK, PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-//        descriptor.setThreadingProfile(tp);
-//        descriptor.setPoolingProfile(pp);
-
         //register the components descriptor
         manager.getModel().registerComponent(descriptor);
         return descriptor;
+    }
+
+    public UMOComponent registerComponent(String implementation, String name, String inboundEndpoint, String outboundEndpoint, Map properties) throws UMOException
+    {
+        UMOEndpoint inEndpoint = null;
+        UMOEndpoint outEndpoint = null;
+        if(inboundEndpoint!=null) {
+            inEndpoint = manager.lookupEndpoint(inboundEndpoint);
+            if(inEndpoint==null) {
+                inEndpoint = createEndpoint(inboundEndpoint, null, true);
+            }
+        }
+        if(outboundEndpoint!=null) {
+            outEndpoint = manager.lookupEndpoint(outboundEndpoint);
+            if(outEndpoint==null) {
+                outEndpoint = createEndpoint(outboundEndpoint, null, false);
+            }
+        }
+        UMODescriptor d = createDescriptor(implementation, name, inEndpoint, outEndpoint, properties);
+        return registerComponent(d);
     }
 
     /**
@@ -199,9 +214,9 @@ public class QuickConfigurationBuilder
      * @throws UMOException the descriptor is invalid or cannot be initialised or started
      * @see org.mule.umo.model.UMOModel
      */
-    public void registerComponent(UMODescriptor descriptor) throws UMOException
+    public UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException
     {
-        manager.getModel().registerComponent(descriptor);
+        return manager.getModel().registerComponent(descriptor);
     }
 
     /**
@@ -311,6 +326,32 @@ public class QuickConfigurationBuilder
      */
     public UMODescriptor createDescriptor(String implementation, String name, UMOEndpointURI inboundEndpointUri, UMOEndpointURI outboundEndpointUri, Map properties) throws UMOException
     {
+        //Create the endpoints
+        UMOEndpoint inboundEndpoint = null;
+        UMOEndpoint outboundEndpoint = null;
+        if(inboundEndpointUri != null) {
+            inboundEndpoint = ConnectorFactory.createEndpoint(inboundEndpointUri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        }
+        if(outboundEndpointUri!=null) {
+            outboundEndpoint = ConnectorFactory.createEndpoint(outboundEndpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        }
+        return createDescriptor(implementation, name, inboundEndpoint,  outboundEndpoint,  properties);
+    }
+
+    /**
+     * Creates a Mule Descriptor that can be further maniputalted by the calling class before
+     * registering it with the UMOModel
+     * @param implementation either a container refernece to an object or a fully qualified class name
+     * to use as the component implementation
+     * which event to invoke based on the evnet payload type
+     * @param name The identifying name of the component.  This can be used to later unregister it
+     * @param inboundEndpoint The endpoint to listen to. Can be null
+     * @param outboundEndpoint The endpoint to dispatch to. Can be null
+     * @param properties properties to set on the component. Can be null
+     * @throws UMOException
+     */
+    public UMODescriptor createDescriptor(String implementation, String name, UMOEndpoint inboundEndpoint, UMOEndpoint outboundEndpoint, Map properties) throws UMOException
+    {
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setImplementation(implementation);
         descriptor.setName(name);
@@ -318,17 +359,9 @@ public class QuickConfigurationBuilder
             descriptor.getProperties().putAll(properties);
         }
 
-        //Create the endpoints
-        UMOEndpoint inboundProvider = null;
-        UMOEndpoint outboundProvider = null;
-        if(inboundEndpointUri != null) {
-            inboundProvider = ConnectorFactory.createEndpoint(inboundEndpointUri, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-        }
-        if(outboundEndpointUri!=null) {
-            outboundProvider = ConnectorFactory.createEndpoint(outboundEndpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        }
-        descriptor.setInboundEndpoint(inboundProvider);
-        descriptor.setOutboundEndpoint(outboundProvider);
+
+        descriptor.setInboundEndpoint(inboundEndpoint);
+        descriptor.setOutboundEndpoint(outboundEndpoint);
 
         return descriptor;
     }
@@ -361,5 +394,26 @@ public class QuickConfigurationBuilder
         if(descriptor!=null) {
             manager.getModel().unregisterComponent(descriptor);
         }
+    }
+
+    public UMOEndpoint createEndpoint(String uri, String name, boolean inbound) throws UMOException {
+        UMOEndpoint ep = MuleEndpoint.createEndpointFromUri(new MuleEndpointURI(uri), (inbound ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER));
+        ep.setName(name);
+        return ep;
+    }
+
+    public UMOEndpoint registerEndpoint(String uri, String name, boolean inbound) throws UMOException {
+       UMOEndpoint ep = createEndpoint(uri, name, inbound);
+       ep.initialise();
+        manager.registerEndpoint(ep);
+       return ep;
+    }
+
+    public UMOEndpoint registerEndpoint(String uri, String name, boolean inbound, Map properties) throws UMOException {
+       UMOEndpoint ep = createEndpoint(uri, name, inbound);
+       ep.getProperties().putAll(properties);
+        ep.initialise();
+       manager.registerEndpoint(ep);
+       return ep;
     }
 }

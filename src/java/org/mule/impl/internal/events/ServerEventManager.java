@@ -155,7 +155,7 @@ public class ServerEventManager implements Runnable, Disposable
         }
     }
 
-    public void dispose() throws UMOException
+    public void dispose()
     {
         clear();
         disposed = true;

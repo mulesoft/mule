@@ -140,7 +140,7 @@ public interface UMOModel extends Lifecycle, Initialisable
      * component.  A component can define it's own exception strategy, but if it doesn't this
      * implmentation will be used.
      * @return the default exception strategy for this model.
-     * @see UMOExceptionStrategy
+     * @see ExceptionListener
      */
     public ExceptionListener getExceptionListener();
 
@@ -150,7 +150,7 @@ public interface UMOModel extends Lifecycle, Initialisable
      * component.  A component can define it's own exception strategy, but if it doesn't this
      * implmentation will be used.
      * @param listener the default exception strategy for this model.
-     * @see UMOExceptionStrategy
+     * @see ExceptionListener
      */
     public void setExceptionListener(ExceptionListener listener);
 
@@ -212,4 +212,20 @@ public interface UMOModel extends Lifecycle, Initialisable
      * @return an iterator of all component names
      */
     public Iterator getComponentNames();
+
+    /**
+     * Sets the factory used to create component wrappers that are registered on the
+     * Model
+     * @param factory the factory used to create component wrappers that are
+     * registered on the Model
+     */
+    public void setComponentFactory(UMOComponentFactory factory);
+
+    /**
+     * Returns the factory used to create component wrappers that are registered on the
+     * Model
+     * @return the factory used to create component wrappers that are registered on the
+     * Model
+     */
+    public UMOComponentFactory getComponentFactory();
 }

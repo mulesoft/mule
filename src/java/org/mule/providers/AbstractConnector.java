@@ -282,7 +282,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 	 * (non-Javadoc)
 	 * @see org.mule.umo.provider.UMOConnector#shutdown()
 	 */
-    public final synchronized void dispose() throws UMOException
+    public final synchronized void dispose()
     {
         disposed.set(true);
         if (logger.isInfoEnabled())
@@ -567,9 +567,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * Template method to perform any work when destroying the connectoe
      *
-     * @throws UMOException if the method fails
      */
-    protected void disposeConnector() throws UMOException
+    protected void disposeConnector()
     {
     }
 

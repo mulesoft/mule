@@ -119,7 +119,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                 return null;
             }
         } else {
-            throw new MuleException(new Message(Messages.EVENT_PROPERTY_X_NOT_SAT_CANT_PROCESS_REQUEST, MuleProperties.COMPONENT_NAME_PROPERTY));
+            throw new MuleException(new Message(Messages.EVENT_PROPERTY_X_NOT_SET_CANT_PROCESS_REQUEST, MuleProperties.COMPONENT_NAME_PROPERTY));
         }
     }
 

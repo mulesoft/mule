@@ -17,7 +17,6 @@ package org.mule.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleException;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -29,12 +28,8 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.Startable;
-import org.mule.umo.lifecycle.Stoppable;
-import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.*;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.util.ClassHelper;
 
@@ -143,7 +138,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
     /* (non-Javadoc)
      * @see org.mule.umo.lifecycle.Disposable#dispose()
      */
-    public void dispose() throws UMOException
+    public void dispose()
     {
         if (isDisposable)
         {
@@ -153,7 +148,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             catch (Exception e)
             {
-                throw new MuleException(new Message(Messages.FAILED_TO_DISPOSE_X, "UMO Component: " + descriptor.getName()), e);
+                logger.error("failed to dispose: " + descriptor.getName(), e);
             }
         }
         disposed = true;
