@@ -18,6 +18,8 @@ import org.mule.transformers.simple.ByteArrayToString;
 import org.mule.transformers.simple.StringToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.Arrays;
+
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
@@ -42,5 +44,17 @@ public class StringByteArrayTransformersTestCase extends AbstractTransformerTest
     public Object getResultData()
     {
         return "Test".getBytes();
+    }
+
+    public boolean compareResults(Object src, Object result) {
+        if (src == null && result == null) return true;
+        if (src == null || result == null) return false;
+        return Arrays.equals((byte[])src, (byte[])result);
+    }
+
+    public boolean compareRoundtripResults(Object src, Object result) {
+        if (src == null && result == null) return true;
+        if (src == null || result == null) return false;
+        return src.equals(result);
     }
 }

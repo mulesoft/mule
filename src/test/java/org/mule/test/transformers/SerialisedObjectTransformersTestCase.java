@@ -21,6 +21,7 @@ import org.mule.umo.transformer.UMOTransformer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -61,6 +62,22 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
         } catch (IOException e)
         {
             throw new IllegalStateException(e.getMessage());
+        }
+    }
+
+    public boolean compareResults(Object src, Object result) {
+        if (src == null && result == null) return true;
+        if (src == null || result == null) return false;
+        return Arrays.equals((byte[]) src, (byte[]) result);
+    }
+
+    public boolean compareRoundtripResults(Object src, Object result) {
+        if (src == null && result == null) return true;
+        if (src == null || result == null) return false;
+        if (src instanceof Exception && result instanceof Exception) {
+            return ((Exception)src).getMessage().equals(((Exception) result).getMessage());
+        } else {
+            throw new IllegalStateException("arguments are not Exceptions");
         }
     }
 }
