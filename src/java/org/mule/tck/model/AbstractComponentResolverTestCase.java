@@ -15,14 +15,13 @@
 
 package org.mule.tck.model;
 
+import org.mule.config.ConfigurationException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.ObjectNotFoundException;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -30,7 +29,7 @@ import org.mule.umo.manager.ObjectNotFoundException;
  */
 public abstract class AbstractComponentResolverTestCase extends AbstractMuleTestCase
 {
-    public void testContainerContext()
+    public void testContainerContext() throws Exception
     {
         UMOContainerContext container = getContainerContext();
 
@@ -86,6 +85,6 @@ public abstract class AbstractComponentResolverTestCase extends AbstractMuleTest
         assertTrue(fruitBowl.hasBanana());
     }
 
-    public abstract UMOContainerContext getContainerContext();
+    public abstract UMOContainerContext getContainerContext() throws ConfigurationException;
 
 }
