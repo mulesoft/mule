@@ -10,6 +10,7 @@
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
+                <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
