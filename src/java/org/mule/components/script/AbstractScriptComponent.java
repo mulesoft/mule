@@ -108,7 +108,9 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
 
     public void stop() throws UMOException
     {
-        monitor.stop();
+        if(monitor!=null) {
+            monitor.stop();
+        }
     }
 
     public void dispose() throws UMOException
