@@ -16,6 +16,8 @@ package org.mule.samples.loanbroker;
 import org.mule.impl.UMODescriptorAware;
 import org.mule.samples.loanbroker.service.BankService;
 import org.mule.umo.UMODescriptor;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import java.io.Serializable;
 
@@ -30,6 +32,11 @@ import java.io.Serializable;
 
 public class Bank implements BankService, UMODescriptorAware, Serializable
 {
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(Bank.class);
+
     private String bankName;
     private String endpoint = "";
     private double primeRate;
@@ -56,6 +63,7 @@ public class Bank implements BankService, UMODescriptorAware, Serializable
         LoanQuote quote = new LoanQuote();
         quote.setBankName(getBankName());
         quote.setInterestRate(primeRate);
+        logger.info("Returning Rate is:" + quote);
         return quote;
     }
 
@@ -64,6 +72,7 @@ public class Bank implements BankService, UMODescriptorAware, Serializable
         LoanQuote quote = new LoanQuote();
         quote.setBankName(getBankName());
         quote.setInterestRate(primeRate);
+        logger.info("Returning Rate is:" + quote);
         return quote;
     }
 
