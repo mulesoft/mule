@@ -82,6 +82,10 @@
             <artifactId>spring</artifactId>
             <groupId>springframework</groupId>
             <version>${spring_version}</version>
+            <properties>
+                <!-- we already ship this with the spring extensions -->
+                <ignore>true</ignore>
+            </properties>
         </dependency>
         <dependency>
             <artifactId>oro</artifactId>
