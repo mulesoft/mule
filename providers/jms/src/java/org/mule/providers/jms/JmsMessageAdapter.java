@@ -216,7 +216,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     {
         Object replyTo = properties.remove("JMSReplyTo");
         if(replyTo==null) {
-            replyTo = properties.remove(MuleProperties.MULE_REPLY_TO_PROPERTY);
+            replyTo = properties.get(MuleProperties.MULE_REPLY_TO_PROPERTY);
         }
         return replyTo;
     }
