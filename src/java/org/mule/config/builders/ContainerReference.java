@@ -23,6 +23,7 @@ import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.container.ContainerKeyPair;
 
 import java.util.List;
 import java.util.Map;
@@ -44,13 +45,15 @@ public class ContainerReference
 
     private String propertyName;
     private String containerRef;
+    private String container;
     private Object object;
     private boolean required;
 
-    public ContainerReference(String propertyName, String containerRef, Object object, boolean required)
+    public ContainerReference(String propertyName, String containerRef, Object object, boolean required, String container)
     {
         this.propertyName = propertyName;
         this.containerRef = containerRef;
+        this.container = container;
         this.object = object;
         this.required = required;
     }
@@ -60,7 +63,7 @@ public class ContainerReference
         Object comp = null;
         try
         {
-            comp = ctx.getComponent(containerRef);
+            comp = ctx.getComponent(new ContainerKeyPair(container, containerRef));
         } catch (ObjectNotFoundException e)
         {
             if (required)

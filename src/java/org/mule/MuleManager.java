@@ -28,7 +28,9 @@ import org.mule.impl.internal.events.CustomEvent;
 import org.mule.impl.internal.events.ManagerEvent;
 import org.mule.impl.internal.events.ServerEventManager;
 import org.mule.management.stats.AllStatistics;
-import org.mule.model.MuleContainerContext;
+import org.mule.impl.container.MuleContainerContext;
+import org.mule.impl.container.MultiContainerContext;
+import org.mule.impl.container.MultiContainerContext;
 import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -168,8 +170,7 @@ public class MuleManager implements UMOManager
      */
     private ServerEventManager eventManager = null;
 
-    private UMOContainerContext containerContext = null;
-    private DocumentFragment containerContextConfiguration = null;
+    private MultiContainerContext containerContext = null;
 
     private UMOSecurityManager securityManager;
 
@@ -177,7 +178,6 @@ public class MuleManager implements UMOManager
      * logger used by this class
      */
     private static transient Log logger = LogFactory.getLog(MuleManager.class);
-    private boolean containerConfigured = false;
 
     /**
      * Default Constructor
@@ -186,10 +186,10 @@ public class MuleManager implements UMOManager
     {
         if(config==null) config = new MuleConfiguration();
         setModel(new MuleModel());
-        setContainerContext(new MuleContainerContext());
         if(!config.isClientMode()) {
             eventManager = new ServerEventManager();
         }
+        containerContext = new MultiContainerContext();
     }
 
     /**
@@ -319,10 +319,11 @@ public class MuleManager implements UMOManager
         transformers.clear();
         endpoints.clear();
         endpointIdentifiers.clear();
+        containerContext.dispose();
         //props.clear();
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_DISPOSED));
 
-                                                                              transformers = null;
+        transformers = null;
         endpoints = null;
         endpointIdentifiers = null;
         //props = null;
@@ -957,13 +958,19 @@ public class MuleManager implements UMOManager
      * associates a Dependency Injector container with Mule.  This can be used
      * to integrate container managed resources with Mule resources
      *
-     * @param context a Container context to use.  By default, there is a default
+     * @param container a Container context to use.  By default, there is a default
      *                Mule container <code>MuleContainerContext</code> that will assume that the
      *                reference key for an oblect is a classname and will try to instanciate it.
      */
-    public void setContainerContext(UMOContainerContext context)
+    public void setContainerContext(UMOContainerContext container) throws UMOException
     {
-        this.containerContext = context;
+        if(container==null) {
+            if(containerContext!=null) containerContext.dispose();
+            containerContext = new MultiContainerContext();
+        } else {
+            container.initialise();
+            containerContext.addContainer(container);
+        }
     }
 
     /**
@@ -972,20 +979,9 @@ public class MuleManager implements UMOManager
      *
      * @return the container associated with the Manager
      */
-    public UMOContainerContext getContainerContext() throws ContainerException
+    public UMOContainerContext getContainerContext()
     {
-        if (containerConfigured == false) {
-            Reader config = getContainerContextConfiguration();
-            if (config != null) {
-                containerContext.configure(config, Collections.EMPTY_MAP);
-            }
-            containerConfigured = true;
-        }
         return containerContext;
-    }
-
-    public void setContainerContextConfiguration(DocumentFragment containerContextConfiguration) {
-        this.containerContextConfiguration = containerContextConfiguration;
     }
 
     /**
@@ -1039,29 +1035,6 @@ public class MuleManager implements UMOManager
         } else {
             throw new UnsupportedOperationException(new Message(Messages.ONLY_CUSTOM_EVENTS_CAN_BE_FIRED).getMessage());
         }
-    }
-
-    /**
-     * The ContainerContextConfiguration is an inline configuration for a container, sent unparsed to the container
-     * for configuration.
-     *
-     * @return Reader container configuration embedded within mule config
-     */
-    protected Reader getContainerContextConfiguration() throws ContainerException {
-        StringReader result = null;
-        if (containerContextConfiguration != null) {
-            StringWriter s = new StringWriter();
-            StreamResult streamResult = new StreamResult(s);
-            TransformerFactory tFactory = TransformerFactory.newInstance();
-            try {
-                Transformer transformer = tFactory.newTransformer();
-                transformer.transform(new DOMSource(containerContextConfiguration), streamResult);
-            } catch (TransformerException e) {
-                throw new ContainerException(new Message(Messages.COULD_NOT_RECOVER_CONTIANER_CONFIG), e);
-            }
-            result = new StringReader(s.toString());
-        }
-        return result;
     }
 
     /**

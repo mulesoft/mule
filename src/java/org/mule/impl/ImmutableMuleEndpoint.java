@@ -19,7 +19,6 @@ package org.mule.impl;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
@@ -28,14 +27,15 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.ConnectorFactoryException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
@@ -120,6 +120,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      * thread
      */
     protected Boolean synchronous = null;
+
+    /**
+     * determines if a new connector should be created for this endpoint
+     */
+    protected int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
     /**
      * Default ctor
      */
@@ -250,19 +255,23 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return true;
     }
 
-        public String toString()
-        {
-            StringBuffer buf = new StringBuffer();
-            buf.append("Provider: ").append(name);
-            buf.append(", endpointUri=").append(endpointUri);
-            if(connector != null) {
-                buf.append(", connector=").append(connector.getName()).append(" (").append(connector.getProtocol()).append(")");
-            } else {
-                 buf.append(", connector=not set");
-            }
-            buf.append(", type=").append(type);
-            return buf.toString();
-        }
+    public String toString() {
+        return "ImmutableMuleEndpoint{" +
+                "connector=" + connector +
+                ", endpointUri=" + endpointUri +
+                ", transformer=" + transformer +
+                ", name='" + name + "'" +
+                ", type='" + type + "'" +
+                ", properties=" + properties +
+                ", transactionConfig=" + transactionConfig +
+                ", filter=" + filter +
+                ", deleteUnacceptedMessages=" + deleteUnacceptedMessages +
+                ", initialised=" + initialised +
+                ", securityFilter=" + securityFilter +
+                ", synchronous=" + synchronous +
+                ", createConnector=" + createConnector +
+                "}";
+    }
 
     /* (non-Javadoc)
      * @see org.mule.umo.endpoint.UMOImmutableEndpoint#getProtocol()
@@ -404,9 +413,17 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             } else {
                 try
                 {
-                    connector = MuleObjectHelper.getOrCreateConnectorByProtocol(endpointUri);
-
-                } catch (UMOException e)
+                    if(createConnector == ConnectorFactory.ALWAYS_CREATE_CONNECTOR) {
+                        connector = ConnectorFactory.createConnector(endpointUri);
+                    } else if(createConnector == ConnectorFactory.NEVER_CREATE_CONNECTOR) {
+                        connector = MuleObjectHelper.getConnectorByProtocol(endpointUri.getScheme());
+                        if(connector==null) {
+                            throw new InitialisationException(new Message(Messages.CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED, endpointUri.getScheme()), this);
+                        }
+                    } else {
+                        connector = MuleObjectHelper.getOrCreateConnectorByProtocol(endpointUri);
+                    }
+                } catch (ConnectorFactoryException e)
                 {
                     throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_CONNECTOR_FROM_URI_X, endpointUri), e, this);
                 }
@@ -492,4 +509,10 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public boolean isSynchronousExplicitlySet() {
         return synchronous != null;
     }
+
+    public int getCreateConnector() {
+        return createConnector;
+    }
+
+
 }

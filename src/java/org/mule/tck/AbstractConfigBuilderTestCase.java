@@ -21,9 +21,11 @@ import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.interceptors.LoggingInterceptor;
 import org.mule.interceptors.TimerInterceptor;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.service.ConnectorFactory;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
@@ -58,6 +60,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
     }
 
     protected void setUp() throws Exception {
+        super.setUp();
         if (!initialised) {
             System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
 
@@ -378,8 +381,9 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
     public void testEndpointProperties() throws Exception {
         //test transaction config
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent2");
-        UMOEndpoint inEndpoint = descriptor.getInboundRouter().getEndpoint("transactedInboundEndpoint");
+        MuleEndpoint inEndpoint = (MuleEndpoint)descriptor.getInboundRouter().getEndpoint("transactedInboundEndpoint");
         assertNotNull(inEndpoint);
+        assertEquals(ConnectorFactory.ALWAYS_CREATE_CONNECTOR, inEndpoint.getCreateConnector());
         assertNotNull(inEndpoint.getProperties());
         assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
     }

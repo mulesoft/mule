@@ -27,12 +27,12 @@ import org.mule.umo.manager.UMOContainerContext;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractComponentResolverTestCase extends AbstractMuleTestCase
+public abstract class AbstractContainerContextTestCase extends AbstractMuleTestCase
 {
     public void testContainerContext() throws Exception
     {
         UMOContainerContext container = getContainerContext();
-
+        container.initialise();
         assertNotNull(container);
 
         Object result = null;
@@ -74,11 +74,11 @@ public abstract class AbstractComponentResolverTestCase extends AbstractMuleTest
      */
     public void testExternalUMOReference() throws Exception
     {
-        UMOContainerContext ctx = getContainerContext();
-        assertNotNull(ctx);
-
+        UMOContainerContext container = getContainerContext();
+        assertNotNull(container);
+        container.initialise();
         UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
-        FruitBowl fruitBowl = (FruitBowl) ctx.getComponent(descriptor.getImplementation());
+        FruitBowl fruitBowl = (FruitBowl) container.getComponent(descriptor.getImplementation());
 
         assertNotNull(fruitBowl);
         assertTrue(fruitBowl.hasApple());

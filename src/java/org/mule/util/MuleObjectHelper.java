@@ -119,60 +119,6 @@ public class MuleObjectHelper
         return null;
     }
 
-//    public static UMOEndpoint getOrCreateProviderForUrl(UMOImmutableDescriptor descriptor, UMOEndpointURI url, boolean reciever) throws UMOException
-//    {
-//        UMOEndpoint endpoint = null;
-//        if(url.getEndpointName()!=null) {
-//            if(reciever) {
-//                endpoint = descriptor.getInboundEndpoint();
-//                if(provider!=null && ! url.getEndpointName().equals(provider.getName())) {
-//                    endpoint = descriptor.getInboundRouter().getEndpointURI(url.getEndpointName());
-//                }
-//            } else {
-//                endpoint = descriptor.getOutboundEndpoint();
-//            }
-//        }
-//        if(provider==null) {
-//            return getOrCreateProviderForUrl(url, reciever);
-//        } else {
-//            return endpoint;
-//        }
-//    }
-
-//    public static UMOEndpoint getOrCreateProviderForUrl(UMOEndpointURI url, boolean receiver) throws UMOException
-//    {
-//        UMOEndpoint endpoint = null;
-//        if(url.getEndpointName()!=null) {
-//            endpoint = MuleManager.getInstance().lookupEndpoint(url.getEndpointName());
-//            if(provider!=null && url.getEndpointURI()!=null && url.getEndpointURI().length() > 0) {
-//                endpoint.setEndpointURI(url);
-//            }
-//        }
-//        //as the endpoint name is not null, but there is no global
-//        //provider configured we will create a new on
-//        if(provider==null) {
-//            endpoint = ConnectorFactory.createProvider(url, receiver);
-//            if(url.getEndpointName()!=null) endpoint.setName(url.getEndpointName());
-//        }
-//        return endpoint;
-//    }
-
-//    public static UMOEndpoint createProviderForUrl(MuleEndpointURI url, String type, int createConnector) throws UMOException{
-//        UMOConnector connector = getConnectorByProtocol(url.getScheme());
-//        if(connector==null) {
-//            throw new MuleException("There is no connector registered that supports protocol:" + url.getScheme());
-//        }
-//        UMOEndpoint endpoint = new MuleEndpoint();
-//        endpoint.setName(url.getEndpointName());
-//        endpoint.setConnector(connector);
-//        endpoint.setEndpointURI(url.getEndpointURI());
-//
-//        if(type!=null) {
-//            endpoint.setType(type);
-//        }
-//        return endpoint;
-//    }
-
     public static UMOConnector getConnectorByProtocol(String protocol) {
         UMOConnector connector;
         Map connectors = MuleManager.getInstance().getConnectors();

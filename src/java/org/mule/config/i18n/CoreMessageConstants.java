@@ -170,5 +170,7 @@ public interface CoreMessageConstants
     public static final int AUTH_NO_CREDENTIALS = 152;
     public static final int X_IS_DISPOSED = 153;
     public static final int X_IS_INVALID = 154;
+    public static final int CONTAINER_X_ALREADY_REGISTERED = 155;
+    public static final int CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED = 156;
 
 }
