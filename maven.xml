@@ -48,13 +48,13 @@
             <copy file="${jarfile}" todir="${mule.release.dist.dir}"/>
             <!--unjar src="${jarfile}" dest="${mule.release.dist.dir}/temp"/-->
         </j:forEach>
-        
+
         <delete file="${mule.release.dist.dir}/mule-providers-${pom.currentVersion}.jar"/>
         <delete file="${mule.release.dist.dir}/mule-extras-${pom.currentVersion}.jar"/>
         <delete file="${mule.release.dist.dir}/mule-tests-${pom.currentVersion}.jar"/>
         <delete file="${mule.release.dist.dir}/mule-samples-${pom.currentVersion}.jar"/>
         <delete file="${mule.release.dist.dir}/mule-tools-${pom.currentVersion}.jar"/>
-        
+
         <fileScanner var="mulejars">
             <fileset dir="${mule.release.dist.dir}">
                 <include name="*"/>
@@ -158,10 +158,10 @@
             <j:expr value="${context.setVariable('maven.test.skip', 'true')}"/>
         </j:if>
     </postGoal>
-    
-    <goal name="mule:start-release" prereqs="mule:release-prepare,clean-build" 
+
+    <goal name="mule:start-release" prereqs="mule:release-prepare,clean-build"
         description="Creates and zips build for distribution"/>
-    
+
     <goal name="mule:release" description="Creates and zips build for distribution">
         <!-- for some reason the reactor is getting confused when these are set
         as prereqs?
@@ -389,6 +389,43 @@
         <property name="classpath" refid="cp"/>
     </goal>
 
+    <goal name="samples-classpath" prereqs="setvars">
+        <echo>Building samples classpath from ${mule.release.lib.dir}</echo>
+	<delete file="samplespath.txt"/>
+
+        <concat destfile="samplespath.txt" append="true">CLASSPATH=%CLASSPATH%%DIST_DIR%/mule-${pom.currentVersion}.jar;</concat>
+
+
+        <fileScanner var="mulejars">
+            <fileset dir="${mule.release.lib.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </fileScanner>
+
+        <j:forEach var="jarfile" items="${mulejars.iterator()}">
+            <echo>Jar is ${jarfile}</echo>
+            <concat destfile="samplespath.txt" append="true">CLASSPATH=%CLASSPATH%%LIB_DIR%/${jarfile.name};</concat>
+        </j:forEach>
+
+        <!-- include spring jars if they are there -->
+        <u:available file="${mule.release.lib.dir}/mule-extras-spring">
+            <fileScanner var="mulejars">
+                <fileset dir="${mule.release.lib.dir}/mule-extras-spring">
+                    <include name="*.jar"/>
+                </fileset>
+            </fileScanner>
+            <j:forEach var="jarfile" items="${mulejars.iterator()}">
+                <echo>Jar is ${jarfile}</echo>
+            <concat destfile="samplespath.txt" append="true">CLASSPATH=%CLASSPATH%%LIB_DIR%/mule-extras-spring/${jarfile.name};</concat>
+            </j:forEach>
+        </u:available>
+
+        <u:loadText var="samples.classpath" file="samplespath.txt"/>
+        <echo>samples.classpath is ${samples.classpath}</echo>
+	<delete file="samplespath.txt"/>
+
+    </goal>
+
     <goal name="dist-webapp-sample">
         <j:set var="mule.samples.dist.dir" value="${mule.samples.dist}/mule-webapp"/>
         <echo>WebApp dist dir is ${mule.samples.dist.dir}</echo>
@@ -462,7 +499,7 @@
             </copy>
         </j:if>
 
-        <attainGoal name="build-classpath"/>
+        <attainGoal name="samples-classpath"/>
 
         <j:file name="${mule.samples.dist.dir}/bin/run-with-classpath.bat"
             escapeText="false" omitXmlDeclaration="true">
@@ -483,14 +520,18 @@ goto end
 
 @SET POST_MULE_CLASSPATH=
 
-@SET MULE_BASE=${mule.base.context.path}
-@SET MULE_PATH=.;../classes;../conf;%MULE_BASE%/dist/mule-${pom.currentVersion}.jar;%MULE_BASE%/dist/mule-extras-spring-${pom.currentVersion}.jar;%PRE_MULE_CLASSPATH%${classpath};%POST_MULE_CLASSPATH%
-@%JAVA_HOME%\bin\java -classpath "%MULE_PATH%" ${mule.sample.main} %1 %2 %3 %4 %5 %6 %7 %8 %9
+@SET LIB_DIR=../../../lib
+@SET DIST_DIR=../../../dist
+@SET CLASSPATH=.;../classes;../conf;%PRE_MULE_CLASSPATH%;
+${samples.classpath}
+@SET CLASSPATH=%CLASSPATH%%POST_MULE_CLASSPATH%
+
+@%JAVA_HOME%\bin\java -classpath "%CLASSPATH%" ${mule.sample.main} %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 :end
         </j:file>
-        <echo>replacing token=${mule.release.lib.dir} with value=%MULE_BASE%/lib in file=${mule.samples.dist.dir}/bin/run-with-classpath.bat</echo>
-        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.bat" token="${mule.release.lib.dir}" value="%MULE_BASE%/lib"/>
+<!--        <echo>replacing token=${mule.release.lib.dir} with value=%MULE_BASE%/lib in file=${mule.samples.dist.dir}/bin/run-with-classpath.bat</echo>-->
+            <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.bat" token="CLASSPATH=%CLASSPATH%" value="@SET CLASSPATH=%CLASSPATH%"/>
 
         <j:file name="${mule.samples.dist.dir}/bin/run-with-classpath.sh"
             escapeText="false" omitXmlDeclaration="true">
@@ -513,30 +554,31 @@ PRE_MULE_CLASSPATH=
 
 POST_MULE_CLASSPATH=
 
+
+LIB_DIR=../../../lib
+DIST_DIR=../../../dist
+CLASSPATH=.;../classes;../conf;$$PRE_MULE_CLASSPATH:
+${samples.classpath}
+CLASSPATH=$$CLASSPATH$$POST_MULE_CLASSPATH%
+
 MULE_BASE=${mule.base.context.path}
 MULE_PATH=.:../classes:../conf:$$MULE_BASE/dist/mule-${pom.currentVersion}.jar:$$MULE_BASE/dist/mule-extras-spring-${pom.currentVersion}.jar:$$PRE_MULE_CLASSPATH${classpath}:$$POST_MULE_CLASSPATH
 
 #if using cygwin under windows we need to make the paths windows friendly
 case "`uname`" in
 CYGWIN*)
-  if [ -n "$PRE_MULE_CLASSPATH" ] ; then
-    PRE_MULE_CLASSPATH=`cygpath -pw $PRE_MULE_CLASSPATH`;
-  fi
-  if [ -n "$POST_MULE_CLASSPATH" ] ; then
-    POST_MULE_CLASSPATH=`cygpath -pw $POST_MULE_CLASSPATH`;
-  fi
-  if [ -n "$MULE_PATH" ] ; then
-    MULE_PATH=`cygpath -pw $MULE_PATH`;
+  if [ -n "$CLASSPATH" ] ; then
+    MULE_PATH=`cygpath -pw $CLASSPATH`;
   fi
 esac
 
-$$JAVA_HOME/bin/java -classpath $$MULE_PATH ${mule.sample.main} $$@
+$$JAVA_HOME/bin/java -classpath $$CLASSPATH ${mule.sample.main} $$@
 
         </j:file>
         <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token=";" value=":"/>
-        <echo>replacing token=${mule.release.lib.dir} with value=$MULE_BASE/lib in file=${mule.samples.dist.dir}/bin/run-with-classpath.sh</echo>
-        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="${mule.release.lib.dir}" value="$MULE_BASE/lib"/>
-
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="%LIB_DIR%" value="$LIB_DIR"/>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="%DIST_DIR%" value="$DIST_DIR"/>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="%CLASSPATH%" value="$CLASSPATH"/>
         <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="\" value="/"/>
     </goal>
 

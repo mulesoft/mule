@@ -4,11 +4,11 @@
     xmlns:ant="jelly:ant"
     xmlns:maven="jelly:maven">
 
-    <goal name="mule:mini" prereqs="clean,mule:release-prepare,mule:libs-copy,all-jars,mule:tools"
+    <goal name="mule:mini" prereqs="clean,mule:release-prepare,mule:libs-copy,all-jars,mule:samples"
         description="Creates and zips build for distribution">
 
         <copy todir="${mule.release.lib.dir}/licenses">
-            <fileset dir="${basedir}/../licenses"/>
+            <fileset dir="${root.dir}/licenses"/>
         </copy>
 
         <copy todir="${mule.release.dir}" file="${root.dir}/LICENSE.txt"/>
@@ -40,12 +40,18 @@
             </fileset>
         </fileScanner>
 
+        <delete>
+            <fileset dir="${mule.release.lib.dir}">
+                <include name="**/mule-*.jar"/>
+            </fileset>
+        </delete>
+
         <mkdir dir="${mule.release.dist.dir}/temp"/>
         <j:forEach var="jarfile" items="${mulejars.iterator()}">
             <echo>jar is ${jarfile}</echo>
             <copy file="${jarfile}" todir="${mule.release.dist.dir}"/>
             <unjar src="${jarfile}" dest="${mule.release.dist.dir}/temp"/>
-            <delete file="${jsrfile}"/>
+            <delete file="${jarfile}"/>
         </j:forEach>
 
         <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
@@ -55,7 +61,7 @@
         <delete dir="${mule.release.dist.dir}/temp"/>
 
         <copy todir="${mule.release.dist.dir}">
-            <fileset file="${basedir}/../mule/src/conf/mule-configuration.dtd"/>
+            <fileset file="${root.dir}/mule/src/conf/mule-configuration.dtd"/>
         </copy>
     </goal>
 
@@ -71,10 +77,10 @@
         <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
         <echo>Release dir is ${mule.release.dir}</echo>
         <j:set var="mule.base.context.path" value="../../.."/>
-        <j:set var="mule.samples.dist" value="${mule.release.dir}/samples"/>
-        <echo>Samples release dir is ${mule.samples.dist}</echo>
+        <j:set var="mule.release.samples.dir" value="${mule.release.dir}\samples"/>
+        <echo>Samples release dir is ${mule.release.samples.dir}</echo>
 
-        <j:set var="root.dir" value="${basedir}/.."/>
+        <j:set var="root.dir" value="${basedir}/../.."/>
         <j:set var="base.release.dir" value="${root.dir}/target/release"/>
 
     </goal>
@@ -103,6 +109,29 @@
                 <exclude name="*.iml"/>
             </fileset>
         </copy>
+    </goal>
+
+    <goal name="mule:samples" prereqs="setvars">
+        <echo>copying samples from ${root.dir}/target/release/samples to ${mule.release.samples.dir}</echo>
+        <copy todir="${mule.release.samples.dir}">
+            <fileset dir="${root.dir}/target/release/samples">
+                <include name="**/"/>
+                <exclude name="**/errorhandler"/>
+            </fileset>
+        </copy>
+        <delete dir="${mule.release.samples.dir}/errorhandler"/>
+
+        <!-- copy config overrides that do not use non-mini-mule jars -->
+        <echo>Copying smple config overrides from ${basedir}/samples</echo>
+        <copy overwrite="true" todir="${mule.release.samples.dir}/echo/conf" file="${basedir}/samples/echo/echo-mule-config.xml"/>
+
+        <copy overwrite="true" todir="${mule.release.samples.dir}/loanbroker/conf" file="${basedir}/samples/loanbroker/loan-broker-async-config.xml"/>
+        <copy overwrite="true" todir="${mule.release.samples.dir}/loanbroker/conf" file="${basedir}/samples/loanbroker/loan-broker-sync-config.xml"/>
+
+        <copy overwrite="true" todir="${mule.release.samples.dir}/mule-webapp" file="${basedir}/samples/mule-webapp/maven.xml"/>
+        <copy overwrite="true" todir="${mule.release.samples.dir}/mule-webapp" file="${basedir}/samples/mule-webapp/project.xml"/>
+        <copy overwrite="true" todir="${mule.release.samples.dir}/mule-webapp/webapp/WEB-INF" file="${basedir}/samples/mule-webapp/mule-loanbroker-config.xml"/>
+        <delete file="${mule.release.samples.dir}/mule-webapp/webapp/WEB-INF/mule-loanbroker-async-config.xml"/>
     </goal>
 
     <goal name="mule:zip-release" prereqs="setvars">

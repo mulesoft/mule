@@ -142,6 +142,14 @@
                 <mule.mini>true</mule.mini>
             </properties>
         </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-servlet</artifactId>
+            <version>${geronimo_spec_servlet_version}</version>
+            <properties>
+                <mule.mini>true</mule.mini>
+            </properties>
+        </dependency>
     </dependencies>
 </project>
 
