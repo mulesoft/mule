@@ -46,4 +46,8 @@ public class ActiveMQJmsTopicFunctionalTestCase extends AbstractJmsFunctionalTes
         connector.getDispatcherThreadingProfile().setDoThreading(false);
         return connector;
     }
+
+    public boolean useTopics() {
+        return true;
+    }
 }

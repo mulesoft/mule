@@ -62,4 +62,24 @@ public class JmsEndpointTestCase extends NamedTestCase
         assertEquals("jmsProvider", url.getEndpointName());
         assertEquals("jms://jmsProvider/queue1", url.toString());
     }
+
+    public void testJmsTopic() throws Exception
+    {
+        UMOEndpointURI url = new MuleEndpointURI("jms://topic:topic1");
+        assertEquals("jms", url.getScheme());
+        assertEquals("topic1", url.getAddress());
+        assertEquals("topic", url.getResourceInfo());
+        assertEquals(null, url.getEndpointName());
+        assertEquals("jms://topic:topic1", url.toString());
+    }
+
+    public void testJmsTopicWithProvider() throws Exception
+    {
+        UMOEndpointURI url = new MuleEndpointURI("jms://jmsProvider/topic:topic1");
+        assertEquals("jms", url.getScheme());
+        assertEquals("topic1", url.getAddress());
+        assertEquals("jmsProvider", url.getEndpointName());
+        assertEquals("topic", url.getResourceInfo());
+        assertEquals("jms://jmsProvider/topic:topic1", url.toString());
+    }
 }

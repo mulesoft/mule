@@ -13,6 +13,7 @@
  */
 package org.mule.providers.jms.functional;
 
+import EDU.oswego.cs.dl.util.concurrent.CountDown;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -53,13 +54,14 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     public static final String DEFAULT_MESSAGE = "Test Message";
     public static final String CONNECTOR_NAME = "testConnector";
 
+    public static final long LOCK_WAIT = 20000;
+
     private UMOConnector connector;
     private static UMOManager manager;
     private boolean callbackCalled = false;
-    private int eventCount = 0;
     private Connection cnn;
     private Message currentMsg;
-    private Object lock = new Object();
+
 
     protected void setUp() throws Exception
     {
@@ -73,8 +75,8 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
         manager.setModel(new MuleModel());
         callbackCalled = false;
-        eventCount = 0;
         cnn = getConnection();
+        cnn.start();
         drainDestinations();
         connector = createConnector();
         MuleManager.getInstance().registerConnector(connector);
@@ -113,12 +115,15 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
     public void testSend() throws Exception
     {
+        final CountDown countDown = new CountDown(2);
+
         EventCallback callback = new EventCallback()
         {
             public void eventReceived(UMOEventContext context, Object Component)
             {
                 callbackCalled = true;
                 assertNull(context.getCurrentTransaction());
+                countDown.release();
             }
         };
 
@@ -126,26 +131,42 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         //Start the server
         MuleManager.getInstance().start();
 
-        send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, null);
+        MessageConsumer mc;
+        //check replyTo
+        if(useTopics()) {
+            mc = JmsTestUtils.getTopicSubscriber((TopicConnection)cnn, getOutDest().getAddress());
+        } else {
+            mc = JmsTestUtils.getQueueReceiver((QueueConnection)cnn, getOutDest().getAddress());
+        }
+        mc.setMessageListener(new MessageListener(){
+            public void onMessage(Message message)
+            {
+                currentMsg = message;
+                countDown.release();
+            }
+        });
         afterInitialise();
+        send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, null);
+        assertTrue(countDown.attempt(LOCK_WAIT));
 
-        Message msg = receive();
+        assertNotNull(currentMsg);
+        assertTrue(currentMsg instanceof TextMessage);
+        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
 
-        assertNotNull(msg);
-        assertTrue(msg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) msg).getText());
         assertTrue(callbackCalled);
     }
 
 
     public void testSendWithReplyTo() throws Exception
     {
+        final CountDown countDown = new CountDown(2);
         EventCallback callback = new EventCallback()
         {
             public void eventReceived(UMOEventContext context, Object Component)
             {
                 callbackCalled = true;
                 assertNull(context.getCurrentTransaction());
+                countDown.release();
             }
         };
 
@@ -156,33 +177,8 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         Message msg = null;
 
         MessageConsumer mc;
-        if(cnn instanceof TopicConnection) {
-            mc = JmsTestUtils.getTopicSubscriber((TopicConnection)cnn, getOutDest().getAddress());
-        } else {
-            mc = JmsTestUtils.getQueueReceiver((QueueConnection)cnn, getOutDest().getAddress());
-        }
-        mc.setMessageListener(new MessageListener(){
-            public void onMessage(Message message)
-            {
-                currentMsg = message;
-                lock.notifyAll();
-            }
-        });
-        send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, "replyto");
-        afterInitialise();
-
-        synchronized(lock) {
-        lock.wait(20000);
-        }
-        msg = currentMsg;
-
-        assertNotNull(msg);
-        assertTrue(msg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) msg).getText());
-        assertTrue(callbackCalled);
-
         //check replyTo
-        if(cnn instanceof TopicConnection) {
+        if(useTopics()) {
             mc = JmsTestUtils.getTopicSubscriber((TopicConnection)cnn, "replyto");
         } else {
             mc = JmsTestUtils.getQueueReceiver((QueueConnection)cnn, "replyto");
@@ -191,20 +187,19 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
             public void onMessage(Message message)
             {
                 currentMsg = message;
-                lock.notifyAll();
+                countDown.release();
             }
         });
+
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, "replyto");
         afterInitialise();
 
-        synchronized(lock) {
-        lock.wait(20000);
-        }
-        msg = currentMsg;
+        assertTrue(countDown.attempt(LOCK_WAIT));
 
-        assertNotNull(msg);
-        assertTrue(msg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) msg).getText());
+        assertNotNull(currentMsg);
+        assertTrue(currentMsg instanceof TextMessage);
+        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
+        assertTrue(callbackCalled);
     }
 
     public void initialiseComponent(EventCallback callback) throws Exception
@@ -227,7 +222,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     {
         try
         {
-            if(cnn instanceof QueueConnection) {
+            if(!useTopics()) {
                 return new MuleEndpointURI(DEFAULT_IN_QUEUE);
             } else {
                 return new MuleEndpointURI(DEFAULT_IN_TOPIC);
@@ -243,7 +238,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     {
         try
         {
-            if(cnn instanceof QueueConnection) {
+            if(!useTopics()) {
                 return new MuleEndpointURI(DEFAULT_OUT_QUEUE);
             } else {
                 return new MuleEndpointURI(DEFAULT_OUT_TOPIC);
@@ -257,7 +252,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
     protected void send(String payload, boolean transacted, int ack, String replyTo) throws JMSException
     {
-        if(cnn instanceof QueueConnection) {
+        if(!useTopics()) {
             JmsTestUtils.queueSend((QueueConnection)cnn, getInDest().getAddress(), payload, transacted, ack, replyTo);
         } else {
             JmsTestUtils.topicPublish((TopicConnection)cnn, getInDest().getAddress(), payload, transacted, ack, replyTo);
@@ -273,6 +268,10 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
             msg = JmsTestUtils.topicSubscribe((TopicConnection)cnn, getOutDest().getAddress(), 20000);
         }
         return msg;
+    }
+
+    public boolean useTopics() {
+        return false;
     }
 
     public abstract UMOConnector createConnector() throws Exception;

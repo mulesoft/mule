@@ -25,8 +25,6 @@ import javax.jms.Message;
 
 
 /**
- * <code>JmsMessageAdapter</code> TODO (document class)
- *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
