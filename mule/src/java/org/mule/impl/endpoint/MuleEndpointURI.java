@@ -304,21 +304,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         return uri.getFragment();
     }
 
-    public boolean equals(Object ob)
-    {
-        return uri.equals(ob);
-    }
-
-    public int hashCode()
-    {
-        return uri.hashCode();
-    }
-
-    public int compareTo(Object ob)
-    {
-        return uri.compareTo((URI)ob);
-    }
-
     public String toString()
     {
         return uri.toASCIIString();
@@ -362,5 +347,40 @@ public class MuleEndpointURI implements UMOEndpointURI
     public void setEndpointName(String name)
     {
         endpointName = name;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MuleEndpointURI)) return false;
+
+        final MuleEndpointURI muleEndpointURI = (MuleEndpointURI) o;
+
+        if (createConnector != muleEndpointURI.createConnector) return false;
+        if (address != null ? !address.equals(muleEndpointURI.address) : muleEndpointURI.address != null) return false;
+        if (connectorName != null ? !connectorName.equals(muleEndpointURI.connectorName) : muleEndpointURI.connectorName != null) return false;
+        if (endpointName != null ? !endpointName.equals(muleEndpointURI.endpointName) : muleEndpointURI.endpointName != null) return false;
+        if (filterAddress != null ? !filterAddress.equals(muleEndpointURI.filterAddress) : muleEndpointURI.filterAddress != null) return false;
+        if (params != null ? !params.equals(muleEndpointURI.params) : muleEndpointURI.params != null) return false;
+        if (resourceInfo != null ? !resourceInfo.equals(muleEndpointURI.resourceInfo) : muleEndpointURI.resourceInfo != null) return false;
+        if (schemeMetaInfo != null ? !schemeMetaInfo.equals(muleEndpointURI.schemeMetaInfo) : muleEndpointURI.schemeMetaInfo != null) return false;
+        if (transformers != null ? !transformers.equals(muleEndpointURI.transformers) : muleEndpointURI.transformers != null) return false;
+        if (uri != null ? !uri.equals(muleEndpointURI.uri) : muleEndpointURI.uri != null) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result;
+        result = (address != null ? address.hashCode() : 0);
+        result = 29 * result + (filterAddress != null ? filterAddress.hashCode() : 0);
+        result = 29 * result + (endpointName != null ? endpointName.hashCode() : 0);
+        result = 29 * result + (connectorName != null ? connectorName.hashCode() : 0);
+        result = 29 * result + (transformers != null ? transformers.hashCode() : 0);
+        result = 29 * result + createConnector;
+        result = 29 * result + (params != null ? params.hashCode() : 0);
+        result = 29 * result + (uri != null ? uri.hashCode() : 0);
+        result = 29 * result + (schemeMetaInfo != null ? schemeMetaInfo.hashCode() : 0);
+        result = 29 * result + (resourceInfo != null ? resourceInfo.hashCode() : 0);
+        return result;
     }
 }
