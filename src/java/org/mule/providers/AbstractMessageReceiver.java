@@ -209,7 +209,10 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     }
 
     protected UMOMessage handleSecurtyException(UMOSecurityException e, UMOEvent event) {
-        return new MuleMessage(e.getMessage(), event.getProperties());
+        UMOMessage m  = new MuleMessage(e.getMessage(), event.getProperties());
+        //todo
+        m.setErrorCode(100);
+        return m;
     }
 
     protected UMOMessage handleUnacceptedFilter(UMOMessage message) {
