@@ -571,7 +571,7 @@ public class MuleClient
      *
      * @return the UMOManager to use
      */
-    protected UMOManager getManager()
+    public UMOManager getManager()
     {
         return MuleManager.getInstance();
     }
