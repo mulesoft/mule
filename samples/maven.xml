@@ -195,7 +195,7 @@ goto end
 ${samples.classpath}
 @SET CLASSPATH=%CLASSPATH%%POST_MULE_CLASSPATH%
 
-@%JAVA_HOME%\bin\java -classpath "%CLASSPATH%" ${mule.sample.main} %1 %2 %3 %4 %5 %6 %7 %8 %9
+"@%JAVA_HOME%\bin\java" -classpath "%CLASSPATH%" ${mule.sample.main} %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 :end
         </j:file>
