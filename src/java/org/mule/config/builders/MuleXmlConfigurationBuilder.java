@@ -83,9 +83,6 @@ import org.mule.util.Utility;
 import org.mule.util.queue.PersistenceStrategy;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
@@ -847,6 +844,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         if("outbound".equals(type)) {
             addEndpointRules(digester, path, "addEndpoint");
             addGlobalReferenceEndpointRules(digester, path, "addEndpoint");
+            addTransactionConfigRules(path, digester);
         }
         addFilterRules(digester, path);
 
@@ -946,14 +944,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         addSetPropertiesRule(path, digester, new String[]{"address", "transformers"}, new String[]{"endpointURI", "transformer"} );
         addMulePropertiesRule(path, digester, false);
-        digester.addObjectCreate(path + "/transaction", DEFAULT_TRANSACTION_CONFIG);
-        addSetPropertiesRule(path + "/transaction", digester, new String[] {"beginAction"},  new String[] {"beginActionAsString"});
-
-        digester.addObjectCreate(path + "/transaction/constraint", TRANSACTION_CONSTRAINT_INTERFACE, "className");
-        addSetPropertiesRule(path + "/transaction/constraint", digester);
-
-        digester.addSetNext(path + "/transaction/constraint", "setConstraint");
-        digester.addSetNext(path + "/transaction", "setTransactionConfig");
+        addTransactionConfigRules(path, digester);
 
         addFilterRules(digester, path);
         if(method!=null) {
@@ -965,6 +956,18 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         addMulePropertiesRule(path + "/security-filter", digester, true);
         digester.addSetNext(path + "/security-filter", "setSecurityFilter");
+    }
+
+    protected void addTransactionConfigRules(String path, Digester digester)
+    {
+        digester.addObjectCreate(path + "/transaction", DEFAULT_TRANSACTION_CONFIG);
+        addSetPropertiesRule(path + "/transaction", digester, new String[] {"beginAction"},  new String[] {"beginActionAsString"});
+
+        digester.addObjectCreate(path + "/transaction/constraint", TRANSACTION_CONSTRAINT_INTERFACE, "className");
+        addSetPropertiesRule(path + "/transaction/constraint", digester);
+
+        digester.addSetNext(path + "/transaction/constraint", "setConstraint");
+        digester.addSetNext(path + "/transaction", "setTransactionConfig");
     }
 
     protected void addExceptionStrategyRules(Digester digester, String path)

@@ -841,7 +841,7 @@ Is a fully qualified class name of the catch all strategy class
     event.  to chain routers you must define once router inside another.
 -->
 
-<!ELEMENT router ((endpoint)*,(global-endpoint)*,(filter)?,(properties)?)>
+<!ELEMENT router (endpoint*, global-endpoint*, transaction?, filter?, properties?)>
 
 <!--
     className

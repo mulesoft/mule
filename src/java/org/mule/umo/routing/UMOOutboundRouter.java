@@ -16,6 +16,7 @@ package org.mule.umo.routing;
 
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.util.List;
@@ -40,5 +41,9 @@ public interface UMOOutboundRouter extends UMORouter
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException;
 
     public boolean isMatch(UMOMessage message) throws RoutingException;
+
+    public UMOTransactionConfig getTransactionConfig();
+
+    public void setTransactionConfig(UMOTransactionConfig transactionConfig);
 
 }
