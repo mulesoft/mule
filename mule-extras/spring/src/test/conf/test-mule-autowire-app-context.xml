@@ -163,7 +163,7 @@
     <bean id="dummyTransactionFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory"/>
 
     <bean id="transactedInbound-transaction" class="org.mule.impl.MuleTransactionConfig">
-        <property name="actionAsString"><value>ALWAYS_BEGIN</value></property>
+        <property name="action"><value>1</value></property>
         <property name="factory"><ref local="dummyTransactionFactory"/></property>
     </bean>
 
