@@ -1,0 +1,214 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ *
+ */
+
+package org.mule.providers;
+
+import org.mule.config.MuleProperties;
+import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.UniqueIdNotSupportedException;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+/**
+ * <code>AbstractMessageAdapter</code> provides a base implementation for
+ * simple message types that maybe don't normally allow for meta information, such
+ * as File or tcp.
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+public abstract class AbstractMessageAdapter implements UMOMessageAdapter
+{
+    protected Map properties = new HashMap();
+
+    /**
+     * Removes an associated property from the message
+     * @param key the key of the property to remove
+     */
+    public Object removeProperty(Object key)
+    {
+        Object prop = properties.get(key);
+        if(prop!=null) properties.remove(key);
+        return prop;
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
+     */
+    public Object getProperty(Object key)
+    {
+        return properties.get(key);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.providers.UMOMessageAdapter#getPropertyNames()
+     */
+    public Iterator getPropertyNames()
+    {
+        return properties.keySet().iterator();
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.providers.UMOMessageAdapter#setProperty(java.lang.Object, java.lang.Object)
+     */
+    public void setProperty(Object key, Object value)
+    {
+        properties.put(key, value);
+    }
+
+    public String getUniqueId() throws UniqueIdNotSupportedException
+    {
+        throw new UniqueIdNotSupportedException(this);
+    }
+
+    public Object getProperty(String name, Object defaultValue)
+    {
+        Object result = properties.get(name);
+        if(result==null) {
+            return defaultValue;
+        }
+        return result;
+    }
+
+    public int getIntProperty(String name, int defaultValue)
+    {
+        Object result = properties.get(name);
+        if(result!=null && result instanceof Integer) {
+            return ((Integer)result).intValue();
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public long getLongProperty(String name, long defaultValue)
+    {
+        Object result = properties.get(name);
+        if(result!=null && result instanceof Long) {
+            return ((Long)result).longValue();
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public double getDoubleProperty(String name, double defaultValue)
+    {
+        Object result = properties.get(name);
+        if(result!=null && result instanceof Double) {
+            return ((Double)result).doubleValue();
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public boolean getBooleanProperty(String name, boolean defaultValue)
+    {
+        Object result = properties.get(name);
+        if(result!=null) {
+            if(result instanceof Boolean) {
+                return ((Boolean)result).booleanValue();
+            } else {
+                return Boolean.valueOf(result.toString()).booleanValue();
+            }
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public void setBooleanProperty(String name, boolean value)
+    {
+        properties.put(name, new Boolean(value));
+    }
+
+    public void setIntProperty(String name, int value)
+    {
+        properties.put(name, new Integer(value));
+    }
+
+    public void setLongProperty(String name, long value)
+    {
+        properties.put(name, new Long(value));
+    }
+
+    public void setDoubleProperty(String name, double value)
+    {
+        properties.put(name, new Double(value));
+    }
+
+    public Object getReplyTo()
+    {
+        return getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+    }
+
+    public void setReplyTo(Object replyTo)
+    {
+        setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
+    }
+
+    public String getCorrelationId()
+    {
+        return (String) getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+    }
+
+    public void setCorrelationId(String correlationId)
+    {
+        setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, correlationId);
+    }
+
+    /**
+     * Gets the sequence or ordering number for this message in the
+     * the correlation group (as defined by the correlationId)
+     *
+     * @return the sequence number  or -1 if the sequence is not important
+     */
+    public int getCorrelationSequence()
+    {
+        return getIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, -1);
+
+    }
+
+    /**
+     * Gets the sequence or ordering number for this message in the
+     * the correlation group (as defined by the correlationId)
+     *
+     * @param sequence the sequence number  or -1 if the sequence is not important
+     */
+    public void setCorrelationSequence(int sequence)
+    {
+        setIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
+    }
+
+    /**
+     * Determines how many messages are in the correlation group
+     *
+     * @return total messages in this group or -1 if the size is not known
+     */
+    public int getCorrelationGroupSize()
+    {
+        return getIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, -1);
+    }
+
+    /**
+     * Determines how many messages are in the correlation group
+     *
+     * @param size the total messages in this group or -1 if the size is not known
+     */
+    public void setCorrelationGroupSize(int size)
+    {
+        setIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
+    }
+}

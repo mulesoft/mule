@@ -1,0 +1,288 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.providers.service;
+
+import org.mule.MuleException;
+import org.mule.MuleManager;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.ClassHelper;
+import org.mule.util.MuleObjectHelper;
+import org.mule.util.ObjectFactory;
+import org.mule.util.SpiHelper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+/**
+ * <code>ConnectorFactory</code> can be used for generically creating endpoints from an url.  Note that for some
+ * endpoints, the url alone is not enough to create the endpoint if a connector for the endpoint  has not already
+ * been configured with the Mule Manager.
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+
+public class ConnectorFactory
+{
+    public static final String PROVIDER_SERVICES_PATH = "org/mule/providers";
+
+    public static final int GET_OR_CREATE_CONNECTOR = 0;
+    public static final int ALWAYS_CREATE_CONNECTOR = 1;
+    public static final int NEVER_CREATE_CONNECTOR = 2;
+    public static final int USE_CONNECTOR = 3;
+
+    private static Map csdCache = new HashMap();
+
+    public static UMOEndpoint createEndpoint(UMOEndpointURI uri, String type) throws EndpointException
+    {
+        String scheme = uri.getSchemeMetaInfo();
+        UMOConnector connector = null;
+        try
+        {
+            if (uri.getCreateConnector() == ALWAYS_CREATE_CONNECTOR)
+            {
+                connector = createConnector(uri);
+                MuleManager.getInstance().registerConnector(connector);
+            } else if (uri.getCreateConnector() == NEVER_CREATE_CONNECTOR)
+            {
+                connector = MuleObjectHelper.getConnectorByProtocol(scheme);
+            } else if (uri.getConnectorName() != null)
+            {
+                connector = MuleManager.getInstance().lookupConnector(uri.getConnectorName());
+                if (connector == null)
+                {
+                    throw new ConnectorFactoryException("No connector found called: " + uri.getConnectorName());
+                }
+            } else
+            {
+                connector = MuleObjectHelper.getConnectorByProtocol(scheme);
+                if (connector == null)
+                {
+                    connector = createConnector(uri);
+                    MuleManager.getInstance().registerConnector(connector);
+                }
+            }
+        } catch (Exception e)
+        {
+            throw new ConnectorFactoryException("Failed to get connector: " + e.getMessage(), e);
+        }
+
+        if (connector == null)
+        {
+            throw new ConnectorFactoryException("Failed to find/create connector for protocol: " + scheme);
+        }
+
+        UMOEndpoint endpoint = new MuleEndpoint();
+        endpoint.setConnector(connector);
+        endpoint.setEndpointURI(uri);
+        String name = uri.getEndpointName();
+        if(name == null) {
+            name = "_" + scheme + "Endpoint#" + endpoint.hashCode();
+        }
+        endpoint.setName(name);
+
+        if (type!=null)
+        {
+            endpoint.setType(type);
+            UMOTransformer trans = getTransformer(uri, connector, UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type));
+            endpoint.setTransformer(trans);
+        }
+        //RM* todo
+//        try
+//        {
+//            endpoint.initialise();
+//        } catch (InitialisationException e)
+//        {
+//            throw new ConnectorFactoryException(e.getMessage(), e);
+//        }
+        return endpoint;
+    }
+
+    private static UMOTransformer getTransformer(UMOEndpointURI url, UMOConnector cnn, boolean inbound) throws ConnectorFactoryException
+    {
+        UMOTransformer trans = null;
+        if (url.getTransformers() != null)
+        {
+            try
+            {
+                trans = MuleObjectHelper.getTransformer(url.getTransformers(), ",");
+            } catch (MuleException e)
+            {
+                throw new ConnectorFactoryException("Failed to load transformers for endpoint: " + e.getMessage(), e);
+            }
+        } else
+        {
+            //Get connector specific overrides to set on the descriptor
+            Properties overrides = new Properties();
+            if(cnn instanceof AbstractServiceEnabledConnector) {
+                Map so = ((AbstractServiceEnabledConnector)cnn).getServiceOverrides();
+                if(so!=null) overrides.putAll(so);
+            }
+
+            String scheme = url.getSchemeMetaInfo();
+
+            ConnectorServiceDescriptor csd = getServiceDescriptor(scheme, overrides);
+            if (inbound)
+            {
+                trans = csd.createInboundTransformer();
+            } else
+            {
+                trans = csd.createOutboundTransformer();
+            }
+        }
+        return trans;
+    }
+
+    /**
+     * Creates an uninitialied connector from the provided MuleEndpointURI.  The scheme is used to
+     * determine what kind of connector to create.  Any params set on the uri can be used to
+     * initialise bean properties on the created connector.
+     * <p/>
+     * Note that the initalise method will need to be called on the connector returned.  This is so
+     * that developers can control when the connector initialisation takes place as this is likely to
+     * initialse all connecotr resources.
+     *
+     * @param url the MuleEndpointURI url to create the connector with
+     * @return a new Connector
+     * @throws ConnectorFactoryException
+     */
+    public static UMOConnector createConnector(UMOEndpointURI url) throws ConnectorFactoryException
+    {
+        String scheme = url.getSchemeMetaInfo();
+
+        UMOConnector connector = null;
+        ConnectorServiceDescriptor psd;
+
+        psd = getServiceDescriptor(scheme);
+        //Make sure we can create the endpoint/connector using this service method
+        if (psd.getServiceError() != null)
+        {
+            throw new ConnectorServiceException(psd.getServiceError());
+        }
+        //if there is a factory, use it
+        try
+        {
+            if (psd.getConnectorFactory() != null)
+            {
+                ObjectFactory factory = (ObjectFactory) ClassHelper.loadClass(psd.getConnectorFactory(), ConnectorFactory.class).newInstance();
+                connector = (UMOConnector) factory.create();
+            } else
+            {
+                if (psd.getConnector() != null)
+                {
+                    connector = (UMOConnector) ClassHelper.loadClass(psd.getConnector(), ConnectorFactory.class).newInstance();
+                    if (connector instanceof AbstractServiceEnabledConnector)
+                    {
+                        ((AbstractServiceEnabledConnector) connector).initialiseFromUrl(url);
+                    }
+                } else
+                {
+                    throw new ConnectorFactoryException("connector property not set for endpoint service factory: " + scheme);
+                }
+            }
+        } catch (ConnectorFactoryException e)
+        {
+            throw e;
+        } catch (Exception e)
+        {
+            throw new ConnectorFactoryException("failed to create endpoint with url: " + url + ". Error was: " + e.getMessage(), e);
+        }
+
+        if (connector.getName() == null)
+        {
+            connector.setName("_" + scheme + "Connector#" + connector.hashCode());
+        }
+        return connector;
+    }
+
+    public static ConnectorServiceDescriptor getServiceDescriptor(String protocol) throws ConnectorFactoryException
+    {
+        return getServiceDescriptor(protocol, null);
+    }
+
+    public static ConnectorServiceDescriptor getServiceDescriptor(String protocol, Properties overrides) throws ConnectorFactoryException
+    {
+        ConnectorServiceDescriptor csd = (ConnectorServiceDescriptor) csdCache.get(new CSDKey(protocol, overrides));
+        if (csd == null)
+        {
+
+            String location = SpiHelper.SERVICE_ROOT + PROVIDER_SERVICES_PATH;
+            InputStream is = SpiHelper.findServiceDescriptor(PROVIDER_SERVICES_PATH, protocol, ConnectorFactory.class);
+            try
+            {
+                if (is != null)
+                {
+                    Properties props = new Properties();
+                    props.load(is);
+                    csd = new ConnectorServiceDescriptor(protocol, location, props);
+                    //set any overides on the descriptor
+                    csd.setOverrides(overrides);
+                    if(csd.getServiceFinder()!=null) {
+                        ConnectorServiceFinder finder = csd.createServiceFinder();
+                        csd = finder.findService(protocol);
+                    }
+                    csdCache.put(new CSDKey(csd.getProtocol(), overrides), csd);
+                } else
+                {
+                    throw new ConnectorServiceNotFoundException("Failed to create endpoint from service location: " + location + "/" + protocol);
+                }
+            } catch (IOException e)
+            {
+                throw new ConnectorFactoryException("Failed to create endpoint from service location: " + location + "/" + protocol + ". error is: " + e.getMessage(), e);
+            }
+        }
+        return csd;
+    }
+
+    private static class CSDKey {
+        private Map overrides;
+        private String protocol;
+
+        public CSDKey(String protocol, Map overrides)
+        {
+            this.overrides = overrides;
+            this.protocol = protocol;
+        }
+
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (!(o instanceof CSDKey)) return false;
+
+            final CSDKey csdKey = (CSDKey) o;
+
+            if (overrides != null ? !overrides.equals(csdKey.overrides) : csdKey.overrides != null) return false;
+            if (!protocol.equals(csdKey.protocol)) return false;
+
+            return true;
+        }
+
+        public int hashCode()
+        {
+            int result;
+            result = (overrides != null ? overrides.hashCode() : 0);
+            result = 29 * result + protocol.hashCode();
+            return result;
+        }
+    }
+}

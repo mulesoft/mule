@@ -1,0 +1,188 @@
+/* 
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ * 
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk 
+ * 
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file. 
+ *
+ */
+package org.mule.impl.endpoint;
+
+import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A endpoint is
+ * a grouping of an endpoint, an endpointUri and a transformer.
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
+{
+    /**
+     * Default constructor
+     * This is required right now for the Mule digester to set the properties through
+     * the classes mutators
+     */
+    public MuleEndpoint()
+    {
+        super(null, null, null, null, ENDPOINT_TYPE_SENDER_AND_RECEIVER, new HashMap());
+    }
+
+    public MuleEndpoint(String name, UMOEndpointURI endpointUri, UMOConnector connector,
+                                  UMOTransformer transformer, String type,
+                                  Map properties)
+    {
+        super(name, endpointUri, connector, transformer, type, properties);
+    }
+
+    public MuleEndpoint(UMOImmutableEndpoint endpoint)
+    {
+        super(endpoint);
+    }
+
+
+    public MuleEndpoint(String endpoint, boolean receiver)
+            throws UMOException
+    {
+        super(endpoint, (receiver ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER));
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.umo.endpoint.UMOEndpoint#setEndpointURI(java.lang.String)
+     */
+    public void setEndpointURI(UMOEndpointURI endpointUri) throws EndpointException
+    {
+        if(connector!=null  && endpointUri != null && !
+            endpointUri.getFullScheme().toLowerCase().startsWith(connector.getProtocol().toLowerCase())) {
+                throw new IllegalArgumentException("Endpoint scheme must be compatible with the connector scheme. Connector is: "
+                        + connector.getProtocol() + ", endpoint is: " + endpointUri);
+            }
+        this.endpointUri = endpointUri;
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.umo.endpoint.UMOEndpoint#setType(String)
+     */
+    public void setType(String type)
+    {
+        this.type = type;
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.umo.endpoint.UMOEndpoint#setConnector(org.mule.umo.provider.UMOConnector)
+     */
+    public void setConnector(UMOConnector connector)
+    {
+        if(connector!=null  && endpointUri != null && !
+            endpointUri.getFullScheme().toLowerCase().startsWith(connector.getProtocol().toLowerCase())) {
+                throw new IllegalArgumentException("Endpoint scheme must be compatible with the connector scheme. Connector is: "
+                        + connector.getProtocol() + ", endpoint is: " + endpointUri);
+            }
+        this.connector = connector;        
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.umo.endpoint.UMOEndpoint#setName(java.lang.String)
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.umo.endpoint.UMOEndpoint#setTransformer(org.mule.umo.transformer.UMOTransformer)
+     */
+    public void setTransformer(UMOTransformer trans)
+    {
+        transformer = trans;
+        if(transformer!=null) {
+            transformer.setEndpoint(this);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.umo.endpoint.UMOEndpoint#getPropertiesForURI(java.util.Map)
+     */
+    public void setProperties(Map props)
+    {
+        properties = props;
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.umo.endpoint.UMOEndpoint#isReadOnly()
+     */
+    public boolean isReadOnly()
+    {
+        return false;
+    }
+
+    /**
+     * Creates a read-only copy of the endpoint
+     *
+     * @return read-only copy
+     */
+    public UMOImmutableEndpoint getImmutableProvider()
+    {
+        UMOImmutableEndpoint result = new ImmutableMuleEndpoint(name, endpointUri, connector, transformer, type, properties);
+
+        return result;
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.mule.umo.endpoint.UMOEndpoint#setTransactionConfig(org.mule.umo.UMOTransactionConfig)
+     */
+    public void setTransactionConfig(UMOTransactionConfig config)
+    {
+        transactionConfig = config;
+    }
+
+    //todo RM*
+//    public void setEndpointUrl(String url) throws UMOException
+//    {
+//        String realUrl = MuleManager.getInstance().lookupEndpointIdentifier(url, url);
+//        UMOEndpointURI endpointUri = new MuleEndpointURI(realUrl);
+//        boolean receiver = (ENDPOINT_TYPE_RECEIVER.equals(type));
+//        UMOEndpoint endpoint = getOrCreateEndpointForUri(endpointUri, receiver);
+//        //If the value was an endpoint identifier reference then set the
+//        //reference as the name of the endpoint
+//        if(endpointUri.getEndpointName()==null && !realUrl.equals(url)) {
+//            endpoint.setName(url);
+//        }
+//        initFromDescriptor(endpoint);
+//    }
+
+    public void setFilter(UMOFilter filter) {
+        this.filter = filter;
+    }
+
+    /**
+     * If a filter is configured on this endpoint, this property will
+     * determine if message that are not excepted by the filter are deleted
+     *
+     * @param delete if message should be deleted, false otherwise
+     */
+    public void setDeleteUnacceptedMessages(boolean delete)
+    {
+        deleteUnacceptedMessages = delete;
+    }
+}

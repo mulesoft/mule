@@ -1,0 +1,2 @@
+connector=org.mule.tck.testmodels.mule.TestConnector
+endpoint.builder=org.mule.impl.endpoint.ResourceNameEndpointBuilder

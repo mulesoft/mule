@@ -1,0 +1,366 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.impl.endpoint;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.service.ConnectorFactoryException;
+import org.mule.providers.service.ConnectorServiceDescriptor;
+import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.util.PropertiesHelper;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Properties;
+
+
+/**
+ * <code>MuleEndpointURI</code>  is used to determine how a message is sent of received.
+ * The url defines the protocol, the endpointUri destination of the message and optionally the endpoint to
+ * use when dispatching the event. Mule urls take the form of -
+ *
+ * protocol://[host]:[port]/[provider]/endpointUri or protocol://[host]:[port]/endpointUri i.e.
+ *
+ * vm://localhost/vmProvider/my.object or vm://my.object
+ *
+ * The protocol can be any of any conector registered with Mule.  The endpoint name if specified must be the
+ * name of a register global endpoint
+ *
+ * The endpointUri can be any endpointUri recognised by the endpoint type.
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+
+public class MuleEndpointURI implements UMOEndpointURI
+{
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(MuleEndpointURI.class);
+
+    private String address;
+    private String filterAddress;
+    private String endpointName;
+    private String connectorName;
+    private String transformers;
+    private int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
+    private Properties params = new Properties();
+    private URI uri;
+    private String schemeMetaInfo;
+    private String resourceInfo;
+
+    public MuleEndpointURI(String address, String endpointName, String connectorName, String transformers, int createConnector, Properties properties, URI uri)
+    {
+        this.address = address;
+        this.endpointName = endpointName;
+        this.connectorName = connectorName;
+        this.transformers = transformers;
+        this.createConnector = createConnector;
+        this.params = properties;
+        this.uri = uri;
+        if(properties!=null) {
+            resourceInfo = (String)properties.remove("resourceInfo");
+        }
+    }
+
+    public MuleEndpointURI(UMOEndpointURI endpointUri)
+    {
+        initialise(endpointUri);
+    }
+
+    public MuleEndpointURI(UMOEndpointURI endpointUri, String filterAddress)
+    {
+        initialise(endpointUri);
+        this.filterAddress = filterAddress;
+    }
+
+    public MuleEndpointURI(String uri) throws MalformedEndpointException
+    {
+        String uriIdentifier = MuleManager.getInstance().lookupEndpointIdentifier(uri, uri);
+        if(!uriIdentifier.equals(uri)) {
+            endpointName = uri;
+            uri = uriIdentifier;
+        }
+
+        uri = uri.replaceAll(" ", "%20");
+
+        if(!validateUrl(uri)) {
+            throw new MalformedEndpointException("The endpointUri: " + uri + " is not a valid Mule uri endpointUri");
+        }
+        try
+        {
+            schemeMetaInfo = retrieveSchemeMetaInfo(uri);
+            if(schemeMetaInfo!=null) {
+                uri = uri.replaceFirst(schemeMetaInfo + ":", "");
+            }
+            this.uri = new URI(uri);
+        } catch (URISyntaxException e)
+        {
+            throw new MalformedEndpointException("Failed to parse Mule Url: " + uri + ". " + e.getMessage(), e);
+        }
+
+        try
+        {
+            EndpointBuilder builder = null;
+            String scheme = (schemeMetaInfo==null ? this.uri.getScheme() : schemeMetaInfo);
+            ConnectorServiceDescriptor csd = ConnectorFactory.getServiceDescriptor(scheme);
+            builder = csd.createEndpointBuilder();
+            UMOEndpointURI built = builder.build(this.uri);
+            initialise(built);
+        } catch (ConnectorFactoryException e)
+        {
+            throw new MalformedEndpointException("Failed to create endpointUri from uri: " + e.getMessage(), e);
+        }
+    }
+
+    private String retrieveSchemeMetaInfo(String url) {
+        int i =url.indexOf(":");
+        if(i==-1) return null;
+        if( url.charAt(i + 1) == '/') {
+            return null;
+        } else {
+            return url.substring(0, i);
+        }
+    }
+
+    protected boolean validateUrl(String url) {
+        return (url.indexOf(":/") > 0);
+    }
+
+    private void initialise(UMOEndpointURI endpointUri)
+    {
+        this.address = endpointUri.getAddress();
+        this.endpointName = endpointUri.getEndpointName();
+        this.connectorName = endpointUri.getConnectorName();
+        this.transformers = endpointUri.getTransformers();
+        this.createConnector = endpointUri.getCreateConnector();
+        this.params = endpointUri.getParams();
+        this.uri = endpointUri.getUri();
+        this.resourceInfo = endpointUri.getResourceInfo();
+    }
+
+    public String getAddress()
+    {
+        return address;
+    }
+
+    public String getEndpointName()
+    {
+        return endpointName;
+    }
+
+    public static boolean isMuleUri(String url) {
+        return url.indexOf(":/") !=-1;
+    }
+
+    public Properties getParams()
+    {
+        //todo fix this so that the query string properties are not lost.
+        //not sure whats causing this at the moment
+        if(params.size()==0 && getQuery()!=null) {
+            params = PropertiesHelper.getPropertiesFromQueryString(getQuery());
+        }
+        return params;
+    }
+
+    public Properties getUserParams() {
+        Properties p = new Properties();
+        p.putAll(params);
+        p.remove(PROPERTY_ENDPOINT_NAME);
+        p.remove(PROPERTY_ENDPOINT_URI);
+        p.remove(PROPERTY_CREATE_CONNECTOR);
+        p.remove(PROPERTY_TRANSFORMERS);
+        return p;
+    }
+
+    public URI parseServerAuthority() throws URISyntaxException
+    {
+        return uri.parseServerAuthority();
+    }
+
+    public URI normalize()
+    {
+        return uri.normalize();
+    }
+
+    public URI resolve(URI uri)
+    {
+        return uri.resolve(uri);
+    }
+
+    public URI resolve(String str)
+    {
+        return uri.resolve(str);
+    }
+
+    public URI relativize(URI uri)
+    {
+        return uri.relativize(uri);
+    }
+
+    public String getScheme()
+    {
+        return uri.getScheme();
+    }
+
+    public String getFullScheme()
+    {
+        return (schemeMetaInfo==null ? uri.getScheme() : schemeMetaInfo + ":" + uri.getScheme());
+
+    }
+
+    public boolean isAbsolute()
+    {
+        return uri.isAbsolute();
+    }
+
+    public boolean isOpaque()
+    {
+        return uri.isOpaque();
+    }
+
+    public String getRawSchemeSpecificPart()
+    {
+        return uri.getRawSchemeSpecificPart();
+    }
+
+    public String getSchemeSpecificPart()
+    {
+        return uri.getSchemeSpecificPart();
+    }
+
+    public String getRawAuthority()
+    {
+        return uri.getRawAuthority();
+    }
+
+    public String getAuthority()
+    {
+        return uri.getAuthority();
+    }
+
+    public String getRawUserInfo()
+    {
+        return uri.getRawUserInfo();
+    }
+
+    public String getUserInfo()
+    {
+        return uri.getUserInfo();
+    }
+
+    public String getHost()
+    {
+        return uri.getHost();
+    }
+
+    public int getPort()
+    {
+        return uri.getPort();
+    }
+
+    public String getRawPath()
+    {
+        return uri.getRawPath();
+    }
+
+    public String getPath()
+    {
+        return uri.getPath();
+    }
+
+    public String getRawQuery()
+    {
+        return uri.getRawQuery();
+    }
+
+    public String getQuery()
+    {
+        return uri.getQuery();
+    }
+
+    public String getRawFragment()
+    {
+        return uri.getRawFragment();
+    }
+
+    public String getFragment()
+    {
+        return uri.getFragment();
+    }
+
+    public boolean equals(Object ob)
+    {
+        return uri.equals(ob);
+    }
+
+    public int hashCode()
+    {
+        return uri.hashCode();
+    }
+
+    public int compareTo(Object ob)
+    {
+        return uri.compareTo((URI)ob);
+    }
+
+    public String toString()
+    {
+        return uri.toASCIIString();
+    }
+
+    public String getTransformers()
+    {
+        return transformers;
+    }
+
+    public int getCreateConnector()
+    {
+        return createConnector;
+    }
+
+    public URI getUri()
+    {
+        return uri;
+    }
+
+    public String getConnectorName()
+    {
+        return connectorName;
+    }
+
+    public String getSchemeMetaInfo()
+    {
+        return (schemeMetaInfo == null ? uri.getScheme() : schemeMetaInfo);
+    }
+
+    public String getResourceInfo()
+    {
+        return resourceInfo;
+    }
+
+    public String getFilterAddress()
+    {
+        return filterAddress;
+    }
+
+    public void setEndpointName(String name)
+    {
+        endpointName = name;
+    }
+}

@@ -1,0 +1,49 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.transformers;
+
+import org.mule.impl.MuleMessage;
+import org.mule.impl.RequestContext;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.transformer.TransformerException;
+
+/**
+ * <code>AbstractEventAwareTransformer</code> is a transformer that has a reference to
+ * the current message.  This message can be used obtains properties associated with the current message
+ * useful to the transform.
+ * 
+ * Note that when part of a transform chain, the Message payload reflects the pre-transform
+ * message state, unless there is no current event for this thread, then the message will be
+ * a new MuleMessage with the src as it's payload. Transformers should always work on the src object not the message payload.
+ * @see UMOMessage
+ * @see MuleMessage
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+
+public abstract class AbstractEventAwareTransformer extends AbstractTransformer
+{
+    public final Object doTransform(Object src) throws TransformerException
+    {
+        UMOEventContext event = RequestContext.getEventContext();
+        if(event==null) {
+            throw new TransformerException("This transformer can only be invoked when an event is being processed");
+        }
+        return transform(src, event);
+    }
+
+    public abstract Object transform(Object src, UMOEventContext context) throws TransformerException;
+}
