@@ -871,7 +871,7 @@ Is a fully qualified class name of the catch all strategy class
     This object will be used to extract properties such as CorrelationId from the incoming message
 -->
 
-<!ATTLIST router propertyExtractor           (ALWAYS | NEVER | IF_NOT_SET)           "IF_NOT_SET">
+<!ATTLIST router propertyExtractor           NMTOKEN                                #IMPLIED>
 
 <!--
     filters are used to determine whether the router should accept the current
