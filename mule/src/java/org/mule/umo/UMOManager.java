@@ -21,6 +21,7 @@ import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.model.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
 
 import javax.transaction.TransactionManager;
@@ -293,7 +294,33 @@ public interface UMOManager extends Lifecycle
      */
     public UMOContainerContext getContainerContext();
 
+    /**
+     * Sets the unique Id for this Manager instance.  this id can be used to assign
+     * an identy to the manager so it can be identified in a network of Mule nodes
+     * @param id the unique Id for this manager in the network
+     */
     public void setId(String id);
 
+    /**
+     * Gets the unique Id for this Manager instance.  this id can be used to assign
+     * an identy to the manager so it can be identified in a network of Mule nodes
+     * @return the unique Id for this manager in the network
+     */
     public String getId();
+
+    /**
+     * Sets the security manager used by this Mule instance to authenticate and authorise
+     * incoming and outgoing event traffic and service invocations
+     * @param securityManager the security manager used by this Mule instance to authenticate and authorise
+     * incoming and outgoing event traffic and service invocations
+     */
+    public void setSecurityManager(UMOSecurityManager securityManager) throws InitialisationException;
+
+    /**
+     * Gets the security manager used by this Mule instance to authenticate and authorise
+     * incoming and outgoing event traffic and service invocations
+     * @return he security manager used by this Mule instance to authenticate and authorise
+     * incoming and outgoing event traffic and service invocations
+     */
+    public UMOSecurityManager getSecurityManager();
 }

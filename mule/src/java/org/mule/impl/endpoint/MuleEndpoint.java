@@ -23,6 +23,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.HashMap;
@@ -184,5 +185,20 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setDeleteUnacceptedMessages(boolean delete)
     {
         deleteUnacceptedMessages = delete;
+    }
+
+    /**
+     * Sets an UMOEndpointSecurityFilter for this endpoint.  If a filter is
+     * set all traffice via this endpoint with be subject to authentication.
+     * @param filter the UMOSecurityFilter responsible for authenticating
+     * message flow via this endpoint.
+     * @see org.mule.umo.security.UMOEndpointSecurityFilter
+     */
+    public void setSecurityFilter(UMOEndpointSecurityFilter filter)
+    {
+        securityFilter = filter;
+        if(securityFilter!=null) {
+            securityFilter.setEndpoint(this);
+        }
     }
 }

@@ -38,6 +38,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.SpiHelper;
@@ -167,6 +168,8 @@ public class MuleManager implements UMOManager
     private ServerEventManager listeners = new ServerEventManager();
 
     private UMOContainerContext containerContext = null;
+
+    private UMOSecurityManager securityManager;
 
     /**
      * logger used by this class
@@ -1080,5 +1083,32 @@ public class MuleManager implements UMOManager
     public String getId()
     {
         return id;
+    }
+
+    /**
+     * Sets the security manager used by this Mule instance to authenticate and authorise
+     * incoming and outgoing event traffic and service invocations
+     *
+     * @param securityManager the security manager used by this Mule instance to authenticate and authorise
+     *                        incoming and outgoing event traffic and service invocations
+     */
+    public void setSecurityManager(UMOSecurityManager securityManager) throws InitialisationException
+    {
+        this.securityManager = securityManager;
+        if(securityManager!=null && isInitialised()) {
+            this.securityManager.initialise();
+        }
+    }
+
+    /**
+     * Gets the security manager used by this Mule instance to authenticate and authorise
+     * incoming and outgoing event traffic and service invocations
+     *
+     * @return he security manager used by this Mule instance to authenticate and authorise
+     *         incoming and outgoing event traffic and service invocations
+     */
+    public UMOSecurityManager getSecurityManager()
+    {
+        return securityManager;
     }
 }

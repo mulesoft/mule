@@ -33,6 +33,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
@@ -78,8 +79,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     protected String type = ENDPOINT_TYPE_SENDER_AND_RECEIVER;
 
-
-
     /**
      * Any additional properties for the endpoint
      */
@@ -95,6 +94,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     protected boolean deleteUnacceptedMessages = false;
 
     protected SynchronizedBoolean initialised = new SynchronizedBoolean(false);
+
+    protected UMOEndpointSecurityFilter securityFilter = null;
 
     private ImmutableMuleEndpoint() {
 
@@ -417,5 +418,24 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         if(transformer!=null) {
             transformer.setEndpoint(this);
         }
+
+        if(securityFilter!=null) {
+            securityFilter.setEndpoint(this);
+            securityFilter.initialise();
+        }
+    }
+
+    /**
+     * Returns an UMOEndpointSecurityFilter for this endpoint.  If one is
+     * not set, there will be no authentication
+     * on events sent via this endpoint
+     *
+     * @return UMOEndpointSecurityFilter responsible for authenticating
+     *         message flow via this endpoint.
+     * @see org.mule.umo.security.UMOEndpointSecurityFilter
+     */
+    public UMOEndpointSecurityFilter getSecurityFilter()
+    {
+        return securityFilter;
     }
 }

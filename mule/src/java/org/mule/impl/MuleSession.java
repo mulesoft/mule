@@ -18,8 +18,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.config.MuleProperties;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -31,6 +31,7 @@ import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
+import org.mule.umo.security.UMOSecurityContext;
 import org.mule.util.UUID;
 
 /**
@@ -60,6 +61,8 @@ public final class MuleSession implements UMOSession
     private UMOTransaction transaction;
 
     private String id;
+
+    private UMOSecurityContext securityContext;
 
     public MuleSession(UMOTransaction transaction)
     {
@@ -293,5 +296,29 @@ public final class MuleSession implements UMOSession
 
     void setComponent(UMOComponent component) {
         this.component = component;
+    }
+
+    /**
+     * The security context for this session.  If not null outbound, inbound
+     * and/or method invocations will be authenticated using this context
+     *
+     * @param context the context for this session or null if the request is not
+     *                secure.
+     */
+    public void setSecurityContext(UMOSecurityContext context)
+    {
+        securityContext = context;
+    }
+
+    /**
+     * The security context for this session.  If not null outbound, inbound
+     * and/or method invocations will be authenticated using this context
+     *
+     * @return the context for this session or null if the request is not
+     *         secure.
+     */
+    public UMOSecurityContext getSecurityContext()
+    {
+        return securityContext;
     }
 }
