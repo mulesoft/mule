@@ -28,9 +28,24 @@ public class SocketEndpointBuilder extends AbstractEndpointBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
-        this.address = uri.getScheme() + "://" + uri.getHost();
-        if(uri.getPort() != -1) {
-            this.address += ":" + uri.getPort();
+        //set the endpointUri to be a proper url if host and port are set
+        if(uri.getPort()==-1) {
+            //try the form tcp://6666
+            try
+            {
+                int port = Integer.parseInt(uri.getHost());
+                this.address = uri.getScheme() + "://localhost:" + port;
+            } catch (NumberFormatException e)
+            {
+                //ignore
+            }
+        }
+
+        if(address==null) {
+            this.address = uri.getScheme() + "://" + uri.getHost();
+            if(uri.getPort() != -1) {
+                this.address += ":" + uri.getPort();
+            }
         }
     }
 }
