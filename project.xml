@@ -314,7 +314,7 @@
         <nagEmailAddress>mule-developer@lists.sourceforge.net</nagEmailAddress>
         <sourceDirectory>${basedir}/src/java</sourceDirectory>
         <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
-<!--        <unitTest>-->
+        <unitTest>
 <!--            <includes>-->
 <!--                <include>**/*TestCase.*</include>-->
 <!--            </includes>-->
@@ -346,21 +346,21 @@
                         for you particular Jms server
                         -->
 <!---->
-<!--            <resources>-->
-<!--                <resource>-->
-<!--                    <directory>${basedir}/src/test/conf</directory>-->
-<!--                    <includes>-->
-<!--                        <include>**/*</include>-->
-<!--                    </includes>-->
-<!--                </resource>-->
-<!--                <resource>-->
-<!--                    <directory>${basedir}/src/conf</directory>-->
-<!--                    <includes>-->
-<!--                        <include>**/*</include>-->
-<!--                    </includes>-->
-<!--                </resource>-->
-<!--            </resources>-->
-<!--        </unitTest>-->
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/test/conf</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+                <resource>
+                    <directory>${basedir}/src/conf</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
         <resources>
             <resource>
                 <directory>${basedir}/src/conf</directory>
