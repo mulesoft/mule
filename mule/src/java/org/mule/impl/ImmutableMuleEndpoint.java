@@ -448,6 +448,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         if(sync!=null) {
             synchronous = Boolean.valueOf(sync);
         }
+        properties.putAll(endpointUri.getParams());
     }
 
     /**
