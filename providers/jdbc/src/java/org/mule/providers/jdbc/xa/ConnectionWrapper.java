@@ -1,8 +1,15 @@
 /*
- * Created on 21 févr. 2005
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
  */
 package org.mule.providers.jdbc.xa;
 
@@ -25,10 +32,8 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 /**
- * @author gnt
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * $Revision$
  */
 public class ConnectionWrapper implements Connection {
 
