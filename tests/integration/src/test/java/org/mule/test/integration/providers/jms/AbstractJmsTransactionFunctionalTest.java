@@ -16,18 +16,17 @@ package org.mule.test.integration.providers.jms;
 
 import EDU.oswego.cs.dl.util.concurrent.CountDown;
 import org.mule.MuleManager;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.jms.MessageRedeliveredException;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -543,12 +542,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                         fail("Failed to commit rolled back message");
                     }
                 }
-                return null;
             } else
             {
                 t.printStackTrace();
                 fail(t.getMessage());
-                return null;
             }
         }
     }
