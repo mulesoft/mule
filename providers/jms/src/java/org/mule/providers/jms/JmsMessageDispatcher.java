@@ -171,7 +171,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 try
                 {
                     int timeout = event.getTimeout();
-                    logger.debug("Waiting for return event for: " + timeout + " ms");
+                    logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
                     Message result = replyToConsumer.receive(timeout);
                     if(result==null){
                         logger.debug("No message was returned via replyTo destination");
