@@ -4,18 +4,8 @@
     xmlns:ant="jelly:ant"
     xmlns:maven="jelly:maven">
 
-    <goal name="mule:mini" prereqs="clean,mule:release-prepare,mule:libs-copy,all-jars,mule:samples"
-        description="Creates and zips build for distribution">
-
-        <copy todir="${mule.release.lib.dir}/licenses">
-            <fileset dir="${root.dir}/licenses"/>
-        </copy>
-
-        <copy todir="${mule.release.dir}" file="${root.dir}/LICENSE.txt"/>
-        <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
-
-        <attainGoal name="mule:zip-release"/>
-    </goal>
+    <goal name="mule:mini" prereqs="clean,mule:release-prepare,mule:libs-copy,all-jars,mule:samples,mule:zip-release"
+        description="Creates and zips build for distribution"/>
 
     <goal name="all-jars" prereqs="setvars">
 
@@ -57,12 +47,15 @@
         <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
 
         <echo>creating jar: ${mule.release.dist.dir}/mule-${pom.currentVersion}</echo>
-        <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.dist.dir}/mule-mini-${pom.currentVersion}.jar"/>
+        <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
         <delete dir="${mule.release.dist.dir}/temp"/>
 
         <copy todir="${mule.release.dist.dir}">
-            <fileset file="${root.dir}/mule/src/conf/mule-configuration.dtd"/>
+            <fileset file="${basedir}/../../mule/src/conf/mule-configuration.dtd"/>
         </copy>
+
+        <copy todir="${mule.release.dir}" file="${basedir}/../../LICENSE.txt"/>
+        <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
     </goal>
 
     <!--=================================================-->
@@ -70,19 +63,12 @@
     <!--=================================================-->
 
     <goal name="setvars">
-        <j:set var="mule.release.dir" value="${maven.build.dir}\mini-release"/>
+        <j:set var="mule.release.dir" value="${maven.build.dir}\release"/>
         <j:set var="mule.release.lib.dir" value="${mule.release.dir}\lib"/>
         <j:set var="mule.release.dist.dir" value="${mule.release.dir}\dist"/>
         <j:set var="mule.release.src.dir" value="${mule.release.dir}\src"/>
         <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
         <echo>Release dir is ${mule.release.dir}</echo>
-        <j:set var="mule.base.context.path" value="../../.."/>
-        <j:set var="mule.release.samples.dir" value="${mule.release.dir}\samples"/>
-        <echo>Samples release dir is ${mule.release.samples.dir}</echo>
-
-        <j:set var="root.dir" value="${basedir}/../.."/>
-        <j:set var="base.release.dir" value="${root.dir}/target/release"/>
-
     </goal>
 
     <goal name="mule:release-prepare" prereqs="setvars">
@@ -112,26 +98,43 @@
     </goal>
 
     <goal name="mule:samples" prereqs="setvars">
-        <echo>copying samples from ${root.dir}/target/release/samples to ${mule.release.samples.dir}</echo>
-        <copy todir="${mule.release.samples.dir}">
-            <fileset dir="${root.dir}/target/release/samples">
-                <include name="**/"/>
-                <exclude name="**/errorhandler"/>
-            </fileset>
-        </copy>
-        <delete dir="${mule.release.samples.dir}/errorhandler"/>
+        <maven:reactor
+            basedir="${basedir}/../../samples"
+            postProcessing="false"
+            includes="project.xml"
+            goals="dist-samples"
+            banner="Dist Samples"
+            ignoreFailures="false"/>
+
+        <!--        <echo>copying samples from ${root.dir}/target/release/samples to ${mule.release.samples.dir}</echo>-->
+        <!--        <copy todir="${mule.release.samples.dir}">-->
+        <!--            <fileset dir="${root.dir}/target/release/samples">-->
+        <!--                <include name="**/"/>-->
+        <!--                <exclude name="**/errorhandler"/>-->
+        <!--            </fileset>-->
+        <!--        </copy>-->
+        <!--        <delete dir="${mule.release.samples.dir}/errorhandler"/>-->
 
         <!-- copy config overrides that do not use non-mini-mule jars -->
         <echo>Copying smple config overrides from ${basedir}/samples</echo>
-        <copy overwrite="true" todir="${mule.release.samples.dir}/echo/conf" file="${basedir}/samples/echo/echo-mule-config.xml"/>
+        <j:set var="samples.dist" value="${maven.build.dir}/release/samples"/>
+        <copy overwrite="true" todir="${samples.dist}/echo/conf" file="${basedir}/samples/echo/echo-mule-config.xml"/>
 
-        <copy overwrite="true" todir="${mule.release.samples.dir}/loanbroker/conf" file="${basedir}/samples/loanbroker/loan-broker-async-config.xml"/>
-        <copy overwrite="true" todir="${mule.release.samples.dir}/loanbroker/conf" file="${basedir}/samples/loanbroker/loan-broker-sync-config.xml"/>
+        <copy overwrite="true" todir="${samples.dist}/loanbroker/conf" file="${basedir}/samples/loanbroker/loan-broker-async-config.xml"/>
+        <copy overwrite="true" todir="${samples.dist}/loanbroker/conf" file="${basedir}/samples/loanbroker/loan-broker-sync-config.xml"/>
 
-        <copy overwrite="true" todir="${mule.release.samples.dir}/mule-webapp" file="${basedir}/samples/mule-webapp/maven.xml"/>
-        <copy overwrite="true" todir="${mule.release.samples.dir}/mule-webapp" file="${basedir}/samples/mule-webapp/project.xml"/>
-        <copy overwrite="true" todir="${mule.release.samples.dir}/mule-webapp/webapp/WEB-INF" file="${basedir}/samples/mule-webapp/mule-loanbroker-config.xml"/>
-        <delete file="${mule.release.samples.dir}/mule-webapp/webapp/WEB-INF/mule-loanbroker-async-config.xml"/>
+        <copy overwrite="true" todir="${samples.dist}/mule-webapp" file="${basedir}/samples/mule-webapp/maven.xml"/>
+        <copy overwrite="true" todir="${samples.dist}/mule-webapp" file="${basedir}/samples/mule-webapp/project.xml"/>
+        <copy overwrite="true" todir="${samples.dist}/mule-webapp/webapp/WEB-INF" file="${basedir}/samples/mule-webapp/mule-loanbroker-config.xml"/>
+
+        <delete file="${samples.dist}/mule-webapp/webapp/WEB-INF/mule-loanbroker-async-config.xml"/>
+        <delete file="${samples.dist}/hello/bin/hello-spring.bat"/>
+        <delete file="${samples.dist}/hello/bin/hell-spring.sh"/>
+        <delete file="${samples.dist}/hello/bin/hello-http.sh"/>
+        <delete file="${samples.dist}/hello/bin/hello-http.bat"/>
+        <delete file="${samples.dist}/mule-webapp/webapp/WEB-INF/mule-loanbroker-async-config.xml"/>
+
+        <delete dir="${samples.dist}/errorhandler"/>
     </goal>
 
     <goal name="mule:zip-release" prereqs="setvars">
@@ -152,26 +155,34 @@
 
         <echo>Copying project dependencies for ${pom.artifactId}, package ${pom.package}</echo>
         <j:forEach var="lib" items="${pom.dependencies}">
-                <j:if test="${lib.getProperty('ignore')!='true'}">
-                        <j:if test="${lib.getProperty('mule.mini')=='true'}">
-                            <mkdir dir="${basedir}/../../target/release/lib/${pom.artifactId}"/>
-                            <copy todir="${mule.release.lib.dir}"
-                                file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
-                        </j:if>
+            <j:if test="${lib.getProperty('ignore')!='true'}">
+                <j:if test="${lib.getProperty('mule.mini')=='true'}">
+                    <mkdir dir="${basedir}/../../target/release/lib/${pom.artifactId}"/>
+                    <copy todir="${mule.release.lib.dir}"
+                        file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
+                    <j:if test="${lib.groupId != 'mule'}">
+                        <copy failonerror="false" todir="${mule.release.lib.dir}/licenses"
+                            file="${basedir}/../../licenses/${lib.groupId}.license"/>
+                    </j:if>
                 </j:if>
+            </j:if>
         </j:forEach>
+<!--        <copy todir="${mule.release.lib.dir}/licenses">-->
+<!--            <fileset dir="${basedir}/../../licenses"/>-->
+<!--        </copy>-->
+
     </goal>
     <!--=================================================-->
     <!--                DEPLY TARGETS                  -->
     <!--=================================================-->
     <goal name="mule:deploy" prereqs="mule:start-release,mule:release">
         <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
-              <arg line="${maven.scp.args} mule-${pom.currentVersion}-site.tag.gz ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}"/>
+            <arg line="${maven.scp.args} mule-${pom.currentVersion}-site.tag.gz ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}"/>
         </exec>
 
-            <exec dir="." executable="${maven.ssh.executable}">
-              <arg line="${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory} &amp;&amp; rm -fr doc &amp;&amp; tar zxvf mule-${pom.currentVersion}-site.tar.gz"/>
-            </exec>
+        <exec dir="." executable="${maven.ssh.executable}">
+            <arg line="${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory} &amp;&amp; rm -fr doc &amp;&amp; tar zxvf mule-${pom.currentVersion}-site.tar.gz"/>
+        </exec>
 
         <fileScanner var="mulejars">
             <fileset dir="${mule.release.dist.dir}">
@@ -181,16 +192,15 @@
 
         <j:forEach var="jarfile" items="${mulejars.iterator()}">
             <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
-              <arg line="${maven.scp.args} ${jarfile} ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/jars/"/>
-        </exec>
+                <arg line="${maven.scp.args} ${jarfile} ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/jars/"/>
+            </exec>
         </j:forEach>
 
         <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
-              <arg line="${maven.scp.args} mule-${pom.currentVersion}-dist.zip ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/distributions/"/>
+            <arg line="${maven.scp.args} mule-${pom.currentVersion}-dist.zip ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/distributions/"/>
         </exec>
 
         <j:set var="goal" value="jar:deploy"/>
         <attainGoal name="multiproject:goal"/>
-
-      </goal>
+    </goal>
 </project>

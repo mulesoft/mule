@@ -5,13 +5,247 @@
     xmlns:maven="jelly:maven"
     xmlns:deploy="deploy">
 
-    <goal name="dist-lib">
-        <j:forEach var="lib" items="${pom.dependencies}">
-            <j:if test="${lib.getProperty('mule.core.jar')!='true'}">
-                <echo>copying ${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()} to lib</echo>
-                <copy todir="../../target/release/lib"
-                    file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
-            </j:if>
-        </j:forEach>
+    <goal name="setvars">
+        <j:if test="${samples.vars.overriden=='null'}">
+            <echo>Samples vars are not overriden</echo>
+            <j:set var="root.dir" value="${basedir}\.."/>
+            <j:set var="samples.release.dir" value="${root.dir}\target\release"/>
+            <j:set var="samples.release.lib.dir" value="${samples.release.dir}\lib"/>
+            <j:set var="samples.dist" value="${samples.release.dir}/samples"/>
+        </j:if>
+        <echo>Root dir is ${root.dir}</echo>
+        <echo>Base dir is ${basedir}</echo>
+        <echo>Release dir is ${samples.release.dir}</echo>
+        <echo>Release lib dir is ${samples.release.lib.dir}</echo>
+        <echo>Samples release dir is ${samples.dist}</echo>
     </goal>
+
+    <!--=================================================-->
+    <!--                SAMPLES TARGETS                  -->
+    <!--=================================================-->
+
+    <goal name="dist-samples" prereqs="setvars,test">
+
+
+        <!-- dist Echo sample -->
+        <mkdir dir="${samples.dist}"/>
+        <j:set var="mule.sample.name" value="echo"/>
+        <j:set var="mule.sample.testdata" value="false"/>
+        <j:set var="mule.sample.main" value="org.mule.MuleServer"/>
+        <attainGoal name="dist-sample"/>
+
+        <!-- dist Hello sample -->
+        <mkdir dir="${samples.dist}"/>
+        <j:set var="mule.sample.name" value="hello"/>
+        <j:set var="mule.sample.testdata" value="false"/>
+        <j:set var="mule.sample.main" value="org.mule.MuleServer"/>
+        <attainGoal name="dist-sample"/>
+
+        <!-- Dist Error Handler sample -->
+        <j:set var="mule.sample.name" value="errorhandler"/>
+        <j:set var="mule.sample.testdata" value="true"/>
+        <j:set var="mule.sample.main" value="org.mule.MuleServer"/>
+        <attainGoal name="dist-sample"/>
+
+        <!-- dist loan broker sample -->
+        <mkdir dir="${samples.dist}"/>
+        <j:set var="mule.sample.name" value="loanbroker"/>
+        <j:set var="mule.sample.main" value="org.mule.samples.loanbroker.LoanConsumer"/>
+        <j:set var="mule.sample.testdata" value="false"/>
+        <attainGoal name="dist-sample"/>
+
+        <attainGoal name="dist-webapp-sample"/>
+    </goal>
+
+    <goal name="samples-classpath" prereqs="setvars">
+        <echo>Building samples classpath from ${samples.release.lib.dir}</echo>
+        <delete file="/tmp/samplespath.txt"/>
+
+        <concat destfile="/tmp/samplespath.txt" append="true">CLASSPATH=%CLASSPATH%%DIST_DIR%/mule-${pom.currentVersion}.jar;</concat>
+
+
+        <fileScanner var="mulejars">
+            <fileset dir="${samples.release.lib.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </fileScanner>
+
+        <j:forEach var="jarfile" items="${mulejars.iterator()}">
+            <echo>Jar lib is ${jarfile}</echo>
+            <concat destfile="/tmp/samplespath.txt" append="true">CLASSPATH=%CLASSPATH%%LIB_DIR%/${jarfile.name};</concat>
+        </j:forEach>
+
+        <!-- include spring jars if they are there -->
+        <u:available file="${samples.release.lib.dir}/mule-extras-spring">
+            <fileScanner var="mulejars">
+                <fileset dir="${samples.release.lib.dir}/mule-extras-spring">
+                    <include name="*.jar"/>
+                </fileset>
+            </fileScanner>
+            <j:forEach var="jarfile" items="${mulejars.iterator()}">
+                <echo>Jar spring is ${jarfile}</echo>
+                <concat destfile="/tmp/samplespath.txt" append="true">CLASSPATH=%CLASSPATH%%LIB_DIR%/mule-extras-spring/${jarfile.name};</concat>
+            </j:forEach>
+        </u:available>
+
+        <u:loadText var="samples.classpath" file="/tmp/samplespath.txt"/>
+        <echo>samples.classpath is ${samples.classpath}</echo>
+        <delete file="/tmp/samplespath.txt"/>
+
+    </goal>
+
+    <goal name="dist-webapp-sample">
+        <j:set var="mule.samples.dist.dir" value="${samples.dist}/mule-webapp"/>
+        <echo>WebApp dist dir is ${mule.samples.dist.dir}</echo>
+        <mkdir dir="${mule.samples.dist.dir}"/>
+        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/lib"/>
+        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello"/>
+        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest"/>
+
+        <copy todir="${mule.samples.dist.dir}" file="mule-webapp/maven.xml"/>
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes" file="${root.dir}/mule/src/conf/log4j.properties"/>
+
+        <replace token="@VERSION@" value="${pom.currentVersion}" file="${mule.samples.dist.dir}/maven.xml"/>
+
+        <copy todir="${mule.samples.dist.dir}/webapp">
+            <fileset dir="mule-webapp/webapp">
+                <include name="**/*.xml"/>
+                <include name="**/*.jsp"/>
+                <include name="**/*.html"/>
+                <include name="**/*.gif"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello">
+            <fileset dir="${maven.build.dir}/classes/org/mule/samples/hello">
+                <include name="**/*.class"/>
+            </fileset>
+        </copy>
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest">
+            <fileset dir="${maven.build.dir}/classes/org/mule/samples/rest">
+                <include name="**/*.class"/>
+            </fileset>
+        </copy>
+    </goal>
+
+    <goal name="dist-sample">
+        <j:set var="mule.samples.dist.dir" value="${samples.dist}/${mule.sample.name}"/>
+        <mkdir dir="${mule.samples.dist.dir}"/>
+        <mkdir dir="${mule.samples.dist.dir}/src"/>
+        <mkdir dir="${mule.samples.dist.dir}/conf"/>
+
+        <copy todir="${mule.samples.dist.dir}/conf" file="../mule/src/conf/log4j.properties"/>
+
+        <echo>Looking for src in ${basedir}/${mule.sample.name}/src/java</echo>
+        <u:available file="${basedir}/${mule.sample.name}/src/java">
+            <copy todir="${mule.samples.dist.dir}/src">
+                <fileset dir="${basedir}/${mule.sample.name}/src/java"/>
+            </copy>
+        </u:available>
+
+        <mkdir dir="${mule.samples.dist.dir}/bin"/>
+        <chmod file="${mule.samples.dist.dir}/bin" perm="ugo+rx"/>
+        <copy todir="${mule.samples.dist.dir}/bin">
+            <fileset dir="${mule.sample.name}/bin"/>
+        </copy>
+
+        <u:available file="${basedir}/target/classes/org/mule/samples/${mule.sample.name}">
+            <mkdir dir="${mule.samples.dist.dir}/classes"/>
+            <copy todir="${mule.samples.dist.dir}/classes/org/mule/samples/${mule.sample.name}">
+                <fileset dir="${basedir}/target/classes/org/mule/samples/${mule.sample.name}">
+                    <include name="**/*.class"/>
+                </fileset>
+            </copy>
+        </u:available>
+        <copy todir="${mule.samples.dist.dir}/conf">
+            <fileset dir="${basedir}/${mule.sample.name}/conf">
+                <exclude name="test-*.*"/>
+            </fileset>
+        </copy>
+        <j:if test="${mule.sample.testdata}">
+            <copy todir="${mule.samples.dist.dir}/test-data">
+                <fileset dir="${basedir}/${mule.sample.name}/test-data"/>
+            </copy>
+        </j:if>
+
+        <attainGoal name="samples-classpath"/>
+
+        <j:file name="${mule.samples.dist.dir}/bin/run-with-classpath.bat"
+            escapeText="false" omitXmlDeclaration="true">
+@REM Make sure prerequisite environment variables are set
+if not "%JAVA_HOME%" == "" goto gotJavaHome
+echo The JAVA_HOME environment variable is not defined
+echo This environment variable is needed to run this program
+goto end
+:gotJavaHome
+@REM Setup Environment variables for Mule
+@REM Set any jars you want to appear at the begining of the classpath here
+@REM remember to terminate with a ;
+
+@SET PRE_MULE_CLASSPATH=
+
+@REM Set any jars you want to appear at the end of the classpath here
+@REM remember to terminate with a ;
+
+@SET POST_MULE_CLASSPATH=
+
+@SET LIB_DIR=../../../lib
+@SET DIST_DIR=../../../dist
+@SET CLASSPATH=.;../classes;../conf;%PRE_MULE_CLASSPATH%;
+${samples.classpath}
+@SET CLASSPATH=%CLASSPATH%%POST_MULE_CLASSPATH%
+
+@%JAVA_HOME%\bin\java -classpath "%CLASSPATH%" ${mule.sample.main} %1 %2 %3 %4 %5 %6 %7 %8 %9
+
+:end
+        </j:file>
+        <!--        <echo>replacing token=${samples.release.lib.dir} with value=%MULE_BASE%/lib in file=${mule.samples.dist.dir}/bin/run-with-classpath.bat</echo>-->
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.bat" token="CLASSPATH=%CLASSPATH%" value="@SET CLASSPATH=%CLASSPATH%"/>
+
+        <j:file name="${mule.samples.dist.dir}/bin/run-with-classpath.sh"
+            escapeText="false" omitXmlDeclaration="true">
+#!/bin/sh
+#Make sure prerequisite environment variables are set
+if [ "$JAVA_HOME" = "" ]
+then
+    echo "The JAVA_HOME environment variable is not defined"
+    echo "This environment variable is needed to run this program"
+fi
+
+#Setup Environment variables for Mule
+# Set any jars you want to appear at the begining of the classpath here
+# remember to terminate with a :
+
+PRE_MULE_CLASSPATH=
+
+#Set any jars you want to appear at the end of the classpath here
+#remember to terminate with a :
+
+POST_MULE_CLASSPATH=
+
+
+LIB_DIR=../../../lib
+DIST_DIR=../../../dist
+CLASSPATH=.;../classes;../conf;$$PRE_MULE_CLASSPATH:
+${samples.classpath}
+CLASSPATH=$$CLASSPATH$$POST_MULE_CLASSPATH%
+
+#if using cygwin under windows we need to make the paths windows friendly
+case "`uname`" in
+CYGWIN*)
+  if [ -n "$CLASSPATH" ] ; then
+    MULE_PATH=`cygpath -pw $CLASSPATH`;
+  fi
+esac
+
+$$JAVA_HOME/bin/java -classpath $$CLASSPATH ${mule.sample.main} $$@
+
+        </j:file>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token=";" value=":"/>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="%LIB_DIR%" value="$LIB_DIR"/>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="%DIST_DIR%" value="$DIST_DIR"/>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="%CLASSPATH%" value="$CLASSPATH"/>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="\" value="/"/>
+    </goal>
+
 </project>
