@@ -32,7 +32,6 @@ package org.mule.providers.jms;
 
 import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleDescriptor;
-import org.mule.providers.jms.support.JmsTestUtils;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -40,6 +39,8 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
+import javax.jms.ConnectionFactory;
+import javax.jms.Connection;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -84,11 +85,17 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         if (connector == null)
         {
-
-            Properties jndi = JmsTestUtils.getJmsProperties();
             connector = new JmsConnector();
             connector.setName("TestConnector");
-            connector.setProviderProperties(new HashMap(jndi));
+            connector.setSpecification("1.1");
+
+            Mock connectionFactory = new Mock(ConnectionFactory.class);
+            Mock connection = new Mock(Connection.class);
+            connectionFactory.expectAndReturn("createConnection", (Connection)connection.proxy());
+            connection.expect("close");
+            connection.expect("start");
+            connection.expect("stop");
+            connector.setConnectionFactory((ConnectionFactory) connectionFactory.proxy());
             connector.initialise();
         }
         return connector;
@@ -96,6 +103,6 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public Object getValidMessage() throws Exception
     {
-        return JmsTestUtils.getTextMessage(JmsTestUtils.getQueueConnection(), "Test JMS Message");
+        return JmsConnectorTestCase.getMessage();
     }
 }

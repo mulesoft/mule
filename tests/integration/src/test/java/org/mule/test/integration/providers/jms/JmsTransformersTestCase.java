@@ -26,14 +26,17 @@
 
  */
 
-package org.mule.providers.jms.transformers;
+package org.mule.test.integration.providers.jms;
 
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.RequestContext;
-import org.mule.providers.jms.support.JmsTestUtils;
+import org.mule.providers.jms.transformers.AbstractJmsTransformer;
+import org.mule.providers.jms.transformers.JMSMessageToObject;
+import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 
 import javax.jms.BytesMessage;
 import javax.jms.MapMessage;

@@ -13,14 +13,14 @@
 package org.mule.providers.jms;
 
 
-import org.mule.providers.jms.support.JmsTestUtils;
+import com.mockobjects.dynamic.Mock;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.ObjectFactory;
 
-import javax.naming.InitialContext;
-import java.util.HashMap;
-import java.util.Properties;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.TextMessage;
+import java.util.Enumeration;
 
 
 /**
@@ -40,11 +40,17 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
     {
         if (connector == null)
         {
-            Properties jndi = JmsTestUtils.getJmsProperties();
             connector = new JmsConnector();
             connector.setName("TestConnector");
-            connector.setProviderProperties(new HashMap(jndi));
-            connector.setConnectionFactoryJndiName(jndi.getProperty("connectionFactoryJNDIName"));
+            connector.setSpecification("1.1");
+
+            Mock connectionFactory = new Mock(ConnectionFactory.class);
+            Mock connection = new Mock(Connection.class);
+            connectionFactory.expectAndReturn("createConnection", (Connection)connection.proxy());
+            connection.expect("close");
+            connection.expect("start");
+            connection.expect("stop");
+            connector.setConnectionFactory((ConnectionFactory) connectionFactory.proxy());
             connector.initialise();
         }
         return connector;
@@ -57,17 +63,34 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
 
     public Object getValidMessage() throws Exception
     {
-        return JmsTestUtils.getTextMessage(JmsTestUtils.getQueueConnection(), "Test JMS Message");
+        return getMessage();
     }
 
-    public static class ConnectionFactoryFactory implements ObjectFactory
+    public static Object getMessage() throws Exception
     {
-        public Object create() throws Exception
-        {
-            Properties p = JmsTestUtils.getJmsProperties();
-            InitialContext ctx = new InitialContext(p);
-            return ctx.lookup(p.getProperty("connectionFactoryJNDIName"));
-        }
+        Mock message = new Mock(TextMessage.class);
+        message.expectAndReturn("getText","Test JMS Message");
+        message.expectAndReturn("getText","Test JMS Message");
+        message.expectAndReturn("getJMSCorrelationID",null);
+        message.expectAndReturn("getJMSMessageID", "1234567890");
+        message.expectAndReturn("getJMSDeliveryMode", new Integer(1));
+        message.expectAndReturn("getJMSDestination", null);
+        message.expectAndReturn("getJMSPriority", new Integer(4));
+        message.expectAndReturn("getJMSRedelivered", new Boolean(false));
+        message.expectAndReturn("getJMSReplyTo", null);
+        message.expectAndReturn("getJMSExpiration", new Long(0));
+        message.expectAndReturn("getJMSTimestamp", new Long(0));
+        message.expectAndReturn("getJMSType", null);
+        message.expectAndReturn("getPropertyNames", new Enumeration(){
+            public boolean hasMoreElements()
+            {
+                return false;
+            }
+            public Object nextElement()
+            {
+                return null;
+            }
+        });
+        return (TextMessage)message.proxy();
     }
-
 }

@@ -17,7 +17,6 @@
 package org.mule.providers.jms;
 
 
-import org.mule.providers.jms.support.JmsTestUtils;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
 
@@ -31,8 +30,6 @@ import javax.jms.Message;
 
 public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
-    protected String messageContent = "Test JMS Message";
-
     /* (non-Javadoc)
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
      */
@@ -43,8 +40,6 @@ public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 
     public Object getValidMessage() throws Exception
     {
-        return JmsTestUtils.getTextMessage(
-                JmsTestUtils.getQueueConnection(JmsTestUtils.getJmsProperties()),
-                "Test JMS Message");
+        return JmsConnectorTestCase.getMessage();
     }
 }
