@@ -407,10 +407,10 @@
             <fileset dir="samples/${mule.sample.name}/bin"/>
         </copy>
 
-	<u:available file="${maven.src.dir}/samples/target/classes/org/mule/samples/${mule.sample.name}">
+	<u:available file="${basedir}/samples/target/classes/org/mule/samples/${mule.sample.name}">
         <mkdir dir="${mule.samples.dist.dir}/classes"/>
         <copy todir="${mule.samples.dist.dir}/classes/org/mule/samples/${mule.sample.name}">
-            <fileset dir="${maven.src.dir}/samples/target/classes/org/mule/samples/${mule.sample.name}">
+            <fileset dir="${basedir}/samples/target/classes/org/mule/samples/${mule.sample.name}">
                 <include name="**/*.class"/>
             </fileset>
         </copy>
