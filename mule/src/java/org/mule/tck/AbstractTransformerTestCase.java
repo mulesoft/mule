@@ -27,14 +27,20 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 {
     public void testTransform() throws Exception
     {
-        doTransform(getTransformer(), getTestData(), getResultData());
+        Object result = getTransformer().transform(getTestData());
+        assertNotNull(result);
+        boolean b = compareResults(getResultData(), result);
+        assertTrue(b);
     }
 
     public void testRoundtripTransform() throws Exception
     {
         if (getRoundTripTransformer() != null)
         {
-            doTransform(getRoundTripTransformer(), getResultData(), getTestData());
+            Object result = getRoundTripTransformer().transform(getResultData());
+            assertNotNull(result);
+            boolean b = compareRoundtripResults(getTestData(), result);
+            assertTrue(b);
         }
     }
 
@@ -56,18 +62,10 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         if (getRoundTripTransformer() != null)
         {
             UMOTransformer trans = getTransformer();
-            UMOTransformer trans2 = getRoundTripTransformer();
-            trans.setTransformer(trans2);
+            trans.setTransformer(getRoundTripTransformer());
             Object result = trans.transform(getTestData());
-            compareResults(getTestData(), result);
+            compareRoundtripResults(getTestData(), result);
         }
-    }
-
-    public void doTransform(UMOTransformer trans, Object src, Object expectedResult) throws Exception
-    {
-        Object result = trans.transform(src);
-        assertNotNull(result);
-        assertTrue(compareResults(expectedResult, result));
     }
 
     public void doTestBadReturnType(UMOTransformer tran, Object src) throws Exception
@@ -98,4 +96,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         return src.equals(result);
     }
 
+    public boolean compareRoundtripResults(Object src, Object result) {
+        return compareResults(src, result);
+    }
 }
