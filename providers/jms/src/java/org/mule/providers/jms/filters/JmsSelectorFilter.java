@@ -29,7 +29,8 @@ public class JmsSelectorFilter implements UMOFilter
 
     public boolean accept(Object object)
     {
-        throw new UnsupportedOperationException("This filter cannot be called directly");
+        //If we have received the message the selector has been honoured
+        return true;
     }
 
     public String getExpression()
