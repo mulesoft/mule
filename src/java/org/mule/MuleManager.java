@@ -37,6 +37,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.model.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
+import org.mule.umo.model.ComponentResolverException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
@@ -44,8 +45,14 @@ import org.mule.util.PropertiesHelper;
 import org.mule.util.SpiHelper;
 import org.mule.util.StringMessageHelper;
 import org.mule.util.Utility;
+import org.w3c.dom.DocumentFragment;
 
 import javax.transaction.TransactionManager;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -56,6 +63,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.IOException;
+import java.io.StringWriter;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule instance.
@@ -168,6 +179,7 @@ public class MuleManager implements UMOManager
     private ServerEventManager listeners = new ServerEventManager();
 
     private UMOContainerContext containerContext = null;
+    private DocumentFragment containerContextConfiguration = null;
 
     private UMOSecurityManager securityManager;
 
@@ -175,6 +187,7 @@ public class MuleManager implements UMOManager
      * logger used by this class
      */
     private static transient Log logger = LogFactory.getLog(MuleManager.class);
+    private boolean containerConfigured = false;
 
     /**
      * Default Constructor
@@ -847,7 +860,7 @@ public class MuleManager implements UMOManager
         message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
         message.add(" ");
         if(agents.size()==0) {
-            message.add("Agents Running: None");            
+            message.add("Agents Running: None");
         } else {
             message.add("Agents Running:");
             UMOAgent umoAgent;
@@ -973,9 +986,20 @@ public class MuleManager implements UMOManager
      *
      * @return the container associated with the Manager
      */
-    public UMOContainerContext getContainerContext()
+    public UMOContainerContext getContainerContext() throws ComponentResolverException
     {
+        if (containerConfigured == false) {
+            Reader config = getContainerContextConfiguration();
+            if (config != null) {
+                containerContext.configure(config, Collections.EMPTY_MAP);
+            }
+            containerConfigured = true;
+        }
         return containerContext;
+    }
+
+    public void setContainerContextConfiguration(DocumentFragment containerContextConfiguration) {
+        this.containerContextConfiguration = containerContextConfiguration;
     }
 
     /**
@@ -1016,6 +1040,25 @@ public class MuleManager implements UMOManager
         } else {
             throw new UnsupportedOperationException("Only CustomEvent events can be fired through the MuleManager");
         }
+    }
+
+    /**
+     * The ContainerContextConfiguration is an inline configuration for a container, sent unparsed to the container
+     * for configuration.
+     *
+     * @return Reader container configuration embedded within mule config
+     */
+    protected Reader getContainerContextConfiguration() throws ConfigurationException {
+        StringWriter s = new StringWriter();
+        StreamResult result = new StreamResult(s);
+        TransformerFactory tFactory = TransformerFactory.newInstance();
+        try {
+            Transformer transformer = tFactory.newTransformer();
+            transformer.transform(new DOMSource(containerContextConfiguration), result);
+        } catch (TransformerException e) {
+            throw new ConfigurationException("could not recover container configuration from fragment", e);
+        }
+        return new StringReader(s.toString());
     }
 
     /**

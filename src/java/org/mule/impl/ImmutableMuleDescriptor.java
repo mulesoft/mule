@@ -29,6 +29,7 @@ import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.model.ComponentNotFoundException;
+import org.mule.umo.model.ComponentResolverException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
@@ -335,7 +336,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * @param reference the reference to use when resolving the component
      * @return the Implementation of the component
      */
-    protected Class getImplementationForReference(String reference) throws ComponentNotFoundException
+    protected Class getImplementationForReference(String reference) throws ComponentNotFoundException, ComponentResolverException
     {
         Class clazz = null;
         try

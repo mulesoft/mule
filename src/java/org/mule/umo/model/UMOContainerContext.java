@@ -14,6 +14,9 @@
  */
 package org.mule.umo.model;
 
+import java.io.Reader;
+import java.util.Map;
+
 /**
  * @author ROSS
  *         <p/>
@@ -23,4 +26,5 @@ package org.mule.umo.model;
 public interface UMOContainerContext
 {
     public Object getComponent(Object key) throws ComponentNotFoundException;
+    public void configure(Reader configuration, Map configurationProperties) throws ComponentResolverException;
 }
