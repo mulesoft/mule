@@ -31,8 +31,8 @@ import EDU.oswego.cs.dl.util.concurrent.ThreadFactory;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
 import org.mule.InitialisationException;
-import org.mule.config.ThreadingProfile;
 import org.mule.config.MuleProperties;
+import org.mule.config.ThreadingProfile;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
@@ -40,14 +40,14 @@ import org.mule.providers.AbstractConnector;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.security.UMOSecurityException;
-import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.security.UMOSecurityException;
+import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
@@ -82,7 +82,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         super(connector, component, endpoint);
         if (((HttpConnector) connector).isKeepAlive())
         {
-            //keepAliveMonitor = new ExpiryMonitor(1000);
+            keepAliveMonitor = new ExpiryMonitor(1000);
         }
         responseTransformer = getResponseTransformer();
     }
