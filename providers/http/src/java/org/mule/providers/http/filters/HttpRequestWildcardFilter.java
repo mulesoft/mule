@@ -18,7 +18,10 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>HttpRequestWildcardFilter</code> TODO
+ * <code>HttpRequestWildcardFilter</code> filters out wildcard Url expressions.
+ * you can use a comma separated list of url patterns such as-
+ *
+ * *.gif, *blah*
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
