@@ -649,4 +649,9 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         return new DefaultReplyToHandler(defaultResponseTransformer);
     }
+
+    public Map getDispatchers()
+    {
+        return dispatchers;
+    }
 }

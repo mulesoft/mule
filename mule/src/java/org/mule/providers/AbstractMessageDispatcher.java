@@ -212,7 +212,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 doDispose();
             } finally
             {
-               connector.dispatchers.values().remove(this);
+               connector.getDispatchers().values().remove(this);
                disposed = true;
             }
         }
