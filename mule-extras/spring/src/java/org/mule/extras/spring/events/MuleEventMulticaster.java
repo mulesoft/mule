@@ -25,6 +25,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
+import org.mule.impl.MuleEventContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
@@ -53,6 +54,7 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
+import javax.naming.event.EventContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -257,12 +259,12 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             {
                 try
                 {
-                    dispatchEvent(muleEventContext, muleEvent);
+                    dispatchEvent(RequestContext.getEventContext(), muleEvent);
                 } catch (ApplicationEventException e1)
                 {
                     logger.error("failed to dispatch event: " + e.toString(), e1);
                 }finally {
-                    RequestContext.clear();
+                    //RequestContext.clear();
                 }
                 return;
             }
