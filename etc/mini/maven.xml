@@ -1,0 +1,167 @@
+<project default="multiproject:install-snapshot"
+    xmlns:j="jelly:core"
+    xmlns:u="jelly:util"
+    xmlns:ant="jelly:ant"
+    xmlns:maven="jelly:maven">
+
+    <goal name="mule:mini" prereqs="clean,mule:release-prepare,mule:libs-copy,all-jars,mule:tools"
+        description="Creates and zips build for distribution">
+
+        <copy todir="${mule.release.lib.dir}/licenses">
+            <fileset dir="${basedir}/../licenses"/>
+        </copy>
+
+        <copy todir="${mule.release.dir}" file="${root.dir}/LICENSE.txt"/>
+        <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
+
+        <attainGoal name="mule:zip-release"/>
+    </goal>
+
+    <goal name="all-jars" prereqs="setvars">
+
+        <echo>Base dir is ${basedir}</echo>
+        <echo>Copying Mule libs from ${mule.release.lib.dir} to ${mule.release.dist.dir}</echo>
+        <copy todir="${mule.release.dist.dir}">
+            <fileset dir="${mule.release.lib.dir}">
+                <include name="mule-*"/>
+            </fileset>
+        </copy>
+
+        <delete>
+            <fileset dir="${base.release.lib.dir}" includes="mule-*"/>
+        </delete>
+
+        <echo>About to copy Mule jars to ${mule.release.dist.dir}</echo>
+        <mkdir dir="${mule.release.dist.dir}"/>
+        <mkdir dir="${mule.release.dist.dir}/temp"/>
+        <fileScanner var="mulejars">
+            <fileset dir="${mule.release.dist.dir}">
+                <include name="**/mule-*${pom.currentVersion}.jar"/>
+            </fileset>
+        </fileScanner>
+
+        <mkdir dir="${mule.release.dist.dir}/temp"/>
+        <j:forEach var="jarfile" items="${mulejars.iterator()}">
+            <echo>jar is ${jarfile}</echo>
+            <copy file="${jarfile}" todir="${mule.release.dist.dir}"/>
+            <unjar src="${jarfile}" dest="${mule.release.dist.dir}/temp"/>
+            <delete file="${jsrfile}"/>
+        </j:forEach>
+
+        <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
+
+        <echo>creating jar: ${mule.release.dist.dir}/mule-${pom.currentVersion}</echo>
+        <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.dist.dir}/mule-mini-${pom.currentVersion}.jar"/>
+        <delete dir="${mule.release.dist.dir}/temp"/>
+
+        <copy todir="${mule.release.dist.dir}">
+            <fileset file="${basedir}/../mule/src/conf/mule-configuration.dtd"/>
+        </copy>
+    </goal>
+
+    <!--=================================================-->
+    <!--          Mule Release TARGETS                   -->
+    <!--=================================================-->
+
+    <goal name="setvars">
+        <j:set var="mule.release.dir" value="${maven.build.dir}\mini-release"/>
+        <j:set var="mule.release.lib.dir" value="${mule.release.dir}\lib"/>
+        <j:set var="mule.release.dist.dir" value="${mule.release.dir}\dist"/>
+        <j:set var="mule.release.src.dir" value="${mule.release.dir}\src"/>
+        <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
+        <echo>Release dir is ${mule.release.dir}</echo>
+        <j:set var="mule.base.context.path" value="../../.."/>
+        <j:set var="mule.samples.dist" value="${mule.release.dir}/samples"/>
+        <echo>Samples release dir is ${mule.samples.dist}</echo>
+
+        <j:set var="root.dir" value="${basedir}/.."/>
+        <j:set var="base.release.dir" value="${root.dir}/target/release"/>
+
+    </goal>
+
+    <goal name="mule:release-prepare" prereqs="setvars">
+        <echo>About to create lib and bin directories in ${mule.release.dir}</echo>
+        <mkdir dir="${mule.release.dir}"/>
+        <mkdir dir="${mule.release.dist.dir}"/>
+        <mkdir dir="${mule.release.lib.dir}"/>
+        <mkdir dir="${mule.release.lib.dir}/licenses"/>
+        <delete dir="${maven.build.dir}"/>
+    </goal>
+
+    <postGoal name="test:test">
+        <j:if test="${context.getVariable('maven.test.skip') == null || context.getVariable('maven.test.skip') == 'false'}">
+            <echo>Setting maven.test.skip to true, so that tests do not run again!</echo>
+            <j:expr value="${context.setVariable('maven.test.skip', 'true')}"/>
+        </j:if>
+    </postGoal>
+
+    <goal name="mule:tools" prereqs="setvars">
+        <mkdir dir="${mule.release.tools.dir}/benchmark"/>
+        <copy todir="${mule.release.tools.dir}/benchmark">
+            <fileset dir="${root.dir}/tools/benchmark">
+                <exclude name="target/"/>
+                <exclude name="*.iml"/>
+            </fileset>
+        </copy>
+    </goal>
+
+    <goal name="mule:zip-release" prereqs="setvars">
+        <mkdir dir="${maven.build.dir}/distributions"/>
+        <!--<zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dist.zip">
+            <zipfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
+        </zip>-->
+        <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-dist.tar.gz" longfile="gnu">
+            <tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
+        </tar>
+        <!-- zip up  -->
+        <zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dist.zip">
+            <zipfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
+        </zip>
+    </goal>
+
+    <goal name="mule:libs-copy">
+
+        <echo>Copying project dependencies for ${pom.artifactId}, package ${pom.package}</echo>
+        <j:forEach var="lib" items="${pom.dependencies}">
+                <j:if test="${lib.getProperty('ignore')!='true'}">
+                        <j:if test="${lib.getProperty('mule.mini')=='true'}">
+                            <mkdir dir="${basedir}/../../target/release/lib/${pom.artifactId}"/>
+                            <copy todir="${mule.release.lib.dir}"
+                                file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
+                        </j:if>
+                </j:if>
+        </j:forEach>
+    </goal>
+    <!--=================================================-->
+    <!--                DEPLY TARGETS                  -->
+    <!--=================================================-->
+    <goal name="mule:deploy" prereqs="mule:start-release,mule:release">
+        <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
+              <arg line="${maven.scp.args} mule-${pom.currentVersion}-site.tag.gz ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}"/>
+        </exec>
+
+            <exec dir="." executable="${maven.ssh.executable}">
+              <arg line="${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory} &amp;&amp; rm -fr doc &amp;&amp; tar zxvf mule-${pom.currentVersion}-site.tar.gz"/>
+            </exec>
+
+        <fileScanner var="mulejars">
+            <fileset dir="${mule.release.dist.dir}">
+                <include name="*"/>
+            </fileset>
+        </fileScanner>
+
+        <j:forEach var="jarfile" items="${mulejars.iterator()}">
+            <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
+              <arg line="${maven.scp.args} ${jarfile} ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/jars/"/>
+        </exec>
+        </j:forEach>
+
+        <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
+              <arg line="${maven.scp.args} mule-${pom.currentVersion}-dist.zip ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/distributions/"/>
+        </exec>
+
+        <j:set var="goal" value="jar:deploy"/>
+        <attainGoal name="multiproject:goal"/>
+
+      </goal>
+</project>
