@@ -135,7 +135,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         if(is!=null) {
             fileProvider.setInputStream(is);
         } else {
-            throw new InitialisationException("Unable ot find/load axis configuration: " + serverConfig);
+            throw new InitialisationException("Unable ot find/load axis configuration: " + config);
         }
         /* Wrap the FileProvider with a SimpleProvider so we can prgrammatically
          * configure the Axis server (you can only use wsdd descriptors with the
