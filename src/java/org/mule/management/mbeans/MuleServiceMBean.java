@@ -41,6 +41,8 @@ public interface MuleServiceMBean
 
     public void stop() throws UMOException;
 
+    public void dispose() throws UMOException;
+
     boolean isSynchronous();
 
     void setSynchronous(boolean synchronous);
