@@ -576,7 +576,7 @@ A fully qualified classname of the security filter to use on this endpoint
 	
 -->
 
-<!ATTLIST transaction commitAction 		(NONE | ALWAYS_COMMIT | COMMIT_IF_POSSIBLE )    		#IMPLIED>
+<!--<!ATTLIST transaction commitAction 		(NONE | ALWAYS_COMMIT | COMMIT_IF_POSSIBLE )    		#IMPLIED>-->
 
 <!--
 	Transaction timeout for transactions initiated from the endpoint associated with

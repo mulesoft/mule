@@ -567,17 +567,6 @@ A fully qualified classname of the security filter to use on this endpoint
 										JOIN_IF_POSSIBLE )     			#IMPLIED>
 
 <!--
-	The commitAction attribute determines how transactions are managed when an event is published.
-	
-	NONE - tells the provider not to do anything regarding transaction management.
-	ALWAYS_COMMIT - Will expect a transaction to be in process and will commit it.
-	JOIN_IF_POSSIBLE - Will commit a transaction if one is in progress others just continues processing.
-	
--->
-
-<!ATTLIST transaction commitAction 		(NONE | ALWAYS_COMMIT | COMMIT_IF_POSSIBLE )    		#IMPLIED>
-
-<!--
 	Transaction timeout for transactions initiated from the endpoint associated with
     this transaction config.
 -->

@@ -476,13 +476,6 @@
                         </value>
                     </property>
                 </xsl:if>
-                <xsl:if test="@commitAction">
-                    <property name="commitActionAsString">
-                        <value>
-                            <xsl:value-of select="@commitAction"/>
-                        </value>
-                    </property>
-                </xsl:if>
                 <xsl:if test="@factory">
                     <property name="factory">
                         <bean class="{@factory}"/>
