@@ -285,4 +285,14 @@ public class ThreadingProfile
     {
         this.doThreading = doThreading;
     }
+
+    public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("ThreadingProfile: maxActive=").append(maxThreadsActive);
+        buffer.append(", maxIdle=").append(maxThreadsIdle);
+        buffer.append(", threadTTL=").append(threadTTL);
+        buffer.append(", poolExhaustPolicy=").append(this.poolExhaustPolicy);
+        return buffer.toString();
+
+    }
 }
