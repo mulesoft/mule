@@ -184,8 +184,8 @@
         <!-- Mini Mule Build -->
         <attainGoal name="mini:mule"/>
         <ant:copy todir="${maven.build.dir}/distributions">
-	    <ant:fileset dir="${basedir}/etc/mini/target/distributions" includes="mini-mule*"/>
-	</ant:copy>
+            <ant:fileset dir="${basedir}/etc/mini/target/distributions" includes="mini-mule*"/>
+        </ant:copy>
     </goal>
 
     <goal name="build-classpath" prereqs="setvars">
