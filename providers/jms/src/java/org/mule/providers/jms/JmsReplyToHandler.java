@@ -60,18 +60,15 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 super.processReplyTo(event, returnMessage, replyTo);
                 return;
             }
-//            if(replyToDestination instanceof TemporaryQueue ||
-//                    replyToDestination instanceof TemporaryTopic) {
-//                        return;
-//                    }
             Object payload = returnMessage.getPayload();
             if(getTransformer()!=null) {
                 payload = getTransformer().transform(payload);
             }
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);
-            //replyToMessage.setJMSDeliveryMode(Session.AUTO_ACKNOWLEDGE);
 
-            logger.info("Sending jms reply to: " + replyToDestination);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Sending jms reply to: " + replyToDestination + "(" + replyToDestination.getClass().getName() + ")");
+            }
             if (replyToProducer == null)
             {
                 replyToProducer = ((JmsConnector) connector).getJmsSupport().createProducer(session, replyToDestination);
