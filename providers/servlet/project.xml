@@ -9,15 +9,6 @@
     <url>http://www.muleumo.org/doc/providers/servlet/</url>
     <dependencies>
         <dependency>
-                <artifactId>mule</artifactId>
-                <groupId>mule</groupId>
-                <version>${pom.currentVersion}</version>
-                <url>http://www.muleumo.org</url>
-            <properties>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
                 <artifactId>mule-http-provider</artifactId>
                 <groupId>mule</groupId>
                 <version>${pom.currentVersion}</version>

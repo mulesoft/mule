@@ -5,7 +5,7 @@
     <pomVersion>3</pomVersion>
     <name>Mule</name>
     <groupId>mule</groupId>
-    <artifactId>mule</artifactId>
+    <artifactId>mule-core</artifactId>
     <package>org.mule</package>
     <dependencies>
         <!-- required: used by the core server -->
@@ -313,7 +313,7 @@
     <build>
         <nagEmailAddress>mule-developer@lists.sourceforge.net</nagEmailAddress>
         <sourceDirectory>${basedir}/src/java</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
         <unitTest>
 <!--            <includes>-->
 <!--                <include>**/*TestCase.*</include>-->

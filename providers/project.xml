@@ -2,146 +2,16 @@
     <extend>${basedir}/../mule/project.xml</extend>
     <name>Mule Providers</name>
     <id>mule-providers</id>
+    <package>org.mule.providers</package>
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>concurrent</groupId>-->
-<!--            <artifactId>concurrent</artifactId>-->
-<!--            <version>1.3.4</version>-->
-<!--            <url>http://g.oswego.edu</url>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>commons-logging</groupId>-->
-<!--            <artifactId>commons-logging</artifactId>-->
-<!--            <version>1.0.3</version>-->
-<!--            <url>http://jakarta.apache.org/commons/logging/index.html</url>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>mockobjects</groupId>-->
-<!--            <artifactId>mockobjects</artifactId>-->
-<!--            <version>core-0.09</version>-->
-<!--            <properties>-->
-<!--                <ignore>true</ignore>-->
-<!--            </properties>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>commons-collections</groupId>-->
-<!--            <artifactId>commons-collections</artifactId>-->
-<!--            <version>2.1</version>-->
-<!--            <url>http://jakarta.apache.org/commons/collections/index.html</url>-->
-<!--            <properties>-->
-<!--                <mule.core.jar>true</mule.core.jar>-->
-<!--                <war.bundle>true</war.bundle>-->
-<!--            </properties>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>commons-discovery</groupId>-->
-<!--            <artifactId>commons-discovery</artifactId>-->
-<!--            <version>0.2-dev</version>-->
-<!--            <url>http://jakarta.apache.org/commons/discovery/index.html</url>-->
-<!--            <properties>-->
-<!--                <mule.core.jar>true</mule.core.jar>-->
-<!--                <war.bundle>true</war.bundle>-->
-<!--            </properties>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>jug</groupId>-->
-<!--            <artifactId>jug</artifactId>-->
-<!--            <version>1.0.3</version>-->
-<!--            <url>http://www.doomdark.org/doomdark/proj/jug/index.html</url>-->
-<!--            <properties>-->
-<!--                <mule.core.jar>true</mule.core.jar>-->
-<!--                <war.bundle>true</war.bundle>-->
-<!--            </properties>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>commons-beanutils</groupId>-->
-<!--            <artifactId>commons-beanutils</artifactId>-->
-<!--            <version>1.6.1</version>-->
-<!--            <url>http://jakarta.apache.org/commons/beanutils/index.html</url>-->
-<!--            <properties>-->
-<!--                <mule.core.jar>true</mule.core.jar>-->
-<!--                <war.bundle>true</war.bundle>-->
-<!--            </properties>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>geronimo-spec</groupId>-->
-<!--            <artifactId>geronimo-spec-j2ee</artifactId>-->
-<!--            <version>1.4-rc2</version>-->
-<!--            <properties>-->
-<!--                <ignore>true</ignore>-->
-<!--            </properties>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>commons-digester</groupId>-->
-<!--            <artifactId>commons-digester</artifactId>-->
-<!--            <version>1.5</version>-->
-<!--            <url>http://jakarta.apache.org/commons/digester/index.html</url>-->
-<!--            <properties>-->
-<!--                <mule.core.jar>true</mule.core.jar>-->
-<!--                <war.bundle>true</war.bundle>-->
-<!--            </properties>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>junit</groupId>-->
-<!--            <artifactId>junit</artifactId>-->
-<!--            <version>3.8.1</version>-->
-<!--            <url>http://junit.sourceforge.net/index.html</url>-->
-<!--            <properties>-->
-<!--                <ignore>true</ignore>-->
-<!--            </properties>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
     </dependencies>
-    <build>
-        <sourceDirectory>${basedir}/src/java</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
-        <unitTest>
-            <includes>
-                <include>**/*TestCase.*</include>
-            </includes>
-            <excludes>
-                <exclude>**/Abstract*.*</exclude>
-                <!-- need to have a Jms server running to include these -->
-                <exclude>**/*Jms*.*</exclude>
-                <exclude>**/*JMS*.*</exclude>
-                <exclude>**/ActiveMQ*.*</exclude>
-                <exclude>**/OpenJms*.*</exclude>
-                <exclude>**/Joram*.*</exclude>
-                <exclude>**/SpiritWave*.*</exclude>
-
-                <!-- Fails as mail folder cannot be null, but can't mock a mail folder... -->
-                <exclude>**/MailMessageReceiverTestCase.*</exclude>
-
-                <!-- tests fails on Linux jdk -->
-                <exclude>**/CompressionTransformerTestCase.*</exclude>
-
-                <!-- Disable Multicast tests unless configured -->
-                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
-
-                <!-- sometimes fails failing to bind -->
-                <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
-
-            </excludes>
-<!--
-            If you have included the Jms Tests above you can also include tests
-            for you particular Jms server
-            -->
-
-            <resources>
-                <resource>
-                    <directory>${basedir}/src/test/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-            </resources>
-        </unitTest>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/conf</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-        </resources>
-    </build>
 </project>

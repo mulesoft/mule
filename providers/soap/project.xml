@@ -13,15 +13,6 @@
     <url>http://www.muleumo.org/doc/providers/soap/</url>
     <dependencies>
         <dependency>
-            <artifactId>mule</artifactId>
-            <groupId>mule</groupId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
             <artifactId>glue</artifactId>
             <groupId>glue</groupId>
             <version>5.0.2</version>

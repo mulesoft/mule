@@ -13,7 +13,7 @@
     <dependencies>
         <dependency>
             <groupId>mule</groupId>
-            <artifactId>mule</artifactId>
+            <artifactId>mule-core</artifactId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
         </dependency>
