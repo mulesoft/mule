@@ -82,8 +82,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         super(connector, component, endpoint);
         if (((HttpConnector) connector).isKeepAlive())
         {
-            keepAliveMonitor = new ExpiryMonitor(1000);
+            //keepAliveMonitor = new ExpiryMonitor(1000);
         }
+        responseTransformer = getResponseTransformer();
     }
 
     protected ThreadFactory getThreadFactory()
@@ -221,7 +222,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             returnMessage = new MuleMessage("", null);
                         }
                         RequestContext.rewriteEvent(returnMessage);
-                        Object response = getResponseTransformer().transform(returnMessage.getPayload());
+                        Object response = responseTransformer.transform(returnMessage.getPayload());
                         if(response instanceof byte[]) {
                             dataOut.write((byte[])response);
                         } else {

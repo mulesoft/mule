@@ -30,6 +30,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.transformers.HttpClientMethodResponseToObject;
+import org.mule.providers.http.transformers.ObjectToHttpClientMethodRequest;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -149,9 +150,11 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             PostMethod postMethod = new PostMethod(uri.toString());
 
             if(body instanceof String) {
-                postMethod.setRequestBody(body.toString());
-                postMethod.setRequestContentLength(body.toString().length());
-                httpMethod = postMethod;
+                ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
+                httpMethod = (HttpMethod)trans.transform(body.toString());
+//                postMethod.setRequestBody(body.toString());
+//                postMethod.setRequestContentLength(body.toString().length());
+//                httpMethod = postMethod;
             } else if (body instanceof HttpMethod) {
                 httpMethod= (HttpMethod)body;
             } else {
