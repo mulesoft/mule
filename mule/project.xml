@@ -12,7 +12,7 @@
         <dependency>
             <groupId>concurrent</groupId>
             <artifactId>concurrent</artifactId>
-            <version>${concurrent-version}</version>
+            <version>${concurrent_version}</version>
             <url>http://www.oswego.edu</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>${commons-beanutils-version}</version>
+            <version>${commons_beanutils_version}</version>
             <url>http://jakarta.apache.org/commons/beanutils/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>${commons-collections-version}</version>
+            <version>${commons_collections_version}</version>
             <url>http://jakarta.apache.org/commons/collections/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
-            <version>${commons-discovery-version}</version>
+            <version>${commons_discovery_version}</version>
             <url>http://jakarta.apache.org/commons/discovery/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>${commons-logging-version}</version>
+            <version>${commons_logging_version}</version>
             <url>http://jakarta.apache.org/commons/logging/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
-            <version>${commons-pool-version}</version>
+            <version>${commons_pool_version}</version>
             <url>http://jakarta.apache.org/commons/pool/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
-            <version>${commons-digester-version}</version>
+            <version>${commons_digester_version}</version>
             <url>http://jakarta.apache.org/commons/digester/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>commons-jxpath</groupId>
             <artifactId>commons-jxpath</artifactId>
-            <version>${commons-jxpath-version}</version>
+            <version>${commons_jxpath_version}</version>
             <url>http://jakarta.apache.org/commons/jxpath/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -104,7 +104,7 @@
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
-            <version>${dom4j-version}</version>
+            <version>${dom4j_version}</version>
             <url>http://www.dom4j.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -116,7 +116,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit-version}</version>
+            <version>${junit_version}</version>
             <url>http://junit.sourceforge.net/index.html</url>
             <properties>
                 <ignore>true</ignore>
@@ -126,7 +126,7 @@
         <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects</artifactId>
-            <version>${mockobjects-version}</version>
+            <version>${mockobjects_version}</version>
             <properties>
                 <ignore>true</ignore>
             </properties>
@@ -137,7 +137,7 @@
         <dependency>
             <groupId>jug</groupId>
             <artifactId>jug</artifactId>
-            <version>${jug-version}</version>
+            <version>${jug_version}</version>
             <url>http://www.doomdark.org/doomdark/proj/jug/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -149,7 +149,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>${log4j-version}</version>
+            <version>${log4j_version}</version>
             <url>http://jakarta.apache.org/log4j/docs/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -161,7 +161,7 @@
         <dependency>
             <groupId>xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>${xstream-version}</version>
+            <version>${xstream_version}</version>
             <url>http://xstream.codehaus.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -171,7 +171,7 @@
         <dependency>
             <groupId>xpp3</groupId>
             <artifactId>xpp3</artifactId>
-            <version>${xpp3-version}</version>
+            <version>${xpp3_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
@@ -181,7 +181,7 @@
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-j2ee</artifactId>
-            <version>${geronimo-spec-j2ee-version}</version>
+            <version>${geronimo_spec_j2ee_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
@@ -192,7 +192,7 @@
         <dependency>
             <groupId>jmxri</groupId>
             <artifactId>jmxri</artifactId>
-            <version>${jmxri-version}</version>
+            <version>${jmxri_version}</version>
             <properties>
                 <mule.core.jar>false</mule.core.jar>
                 <mule.mini>false</mule.mini>
@@ -201,7 +201,7 @@
         <dependency>
             <groupId>jmxri</groupId>
             <artifactId>jmxtools</artifactId>
-            <version>${jmxri-jmxtools-version}</version>
+            <version>${jmxri_jmxtools_version}</version>
             <properties>
                 <ignore>false</ignore>
                 <mule.core.jar>false</mule.core.jar>
@@ -211,7 +211,7 @@
         <dependency>
             <groupId>jmxri</groupId>
             <artifactId>jmxremoting</artifactId>
-            <version>${jmxri-jmxremoting-version}</version>
+            <version>${jmxri_jmxremoting_version}</version>
             <properties>
                 <ignore>true</ignore>
                 <mule.core.jar>false</mule.core.jar>
@@ -222,7 +222,7 @@
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-jmx</artifactId>
-            <version>${mx4j-jmx-version}</version>
+            <version>${mx4j_jmx_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
@@ -231,7 +231,7 @@
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-tools</artifactId>
-            <version>${mx4j-tools-version}</version>
+            <version>${mx4j_tools_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
@@ -240,7 +240,7 @@
         <dependency>
             <groupId>mx4j</groupId>
             <artifactId>mx4j-remote</artifactId>
-            <version>${mx4j-remote-version}</version>
+            <version>${mx4j_remote_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>

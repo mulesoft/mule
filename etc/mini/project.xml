@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <extend>${basedir}/../mule/project.xml</extend>
+    <extend>${basedir}/../../mule/project.xml</extend>
     <pomVersion>3</pomVersion>
     <id>mini-mule</id>
     <artifactId>mini-mule</artifactId>
@@ -121,7 +121,7 @@
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jms</artifactId>
-            <version>${geronimo-spec-jms-version}</version>
+            <version>${geronimo_spec_jms_version}</version>
             <properties>
                 <mule.mini>true</mule.mini>
             </properties>
@@ -129,7 +129,7 @@
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jta</artifactId>
-            <version>${geronimo-spec-jta-version}</version>
+            <version>${geronimo_spec_jta_version}</version>
             <properties>
                 <mule.mini>true</mule.mini>
             </properties>
@@ -137,7 +137,7 @@
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-j2ee-management</artifactId>
-            <version>${geronimo-spec-j2ee-management-version}</version>
+            <version>${geronimo_spec_j2ee_management_version}</version>
             <properties>
                 <mule.mini>true</mule.mini>
             </properties>
