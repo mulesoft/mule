@@ -22,13 +22,17 @@
         providing a simple component interface.</description>
     <url>http://www.muleumo.org</url>
     <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
-    <siteAddress>www.muleumo.org</siteAddress>
-    <siteDirectory>/var/www/html/muleumo.org/</siteDirectory>
-    <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
+<!--    <siteAddress>www.muleumo.org</siteAddress>-->
+<!--    <siteDirectory>/var/www/html/muleumo.org/</siteDirectory>-->
+    <distributionSite>dist.codehaus.org</distributionSite>
+    <distributionDirectory>/dist</distributionDirectory>
+    <siteAddress>mule.codehaus.org</siteAddress>
+    <siteDirectory>/home/projects/mule/public_html</siteDirectory>
+
     <repository>
         <connection>scm:cvs:pserver:anonymous@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</connection>
         <developerConnection>scm:cvs:ext:${maven.username}@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</developerConnection>
-        <url>http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/mule</url>
+        <url>http://cvs.mule.codehaus.org/</url>
     </repository>
     <mailingLists>
         <mailingList>

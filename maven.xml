@@ -299,6 +299,39 @@
     </goal>
 
     <!--=================================================-->
+    <!--                DEPLY TARGETS                  -->
+    <!--=================================================-->
+    <goal name="mule:deploy" prereqs="mule:start-release,mule:release">
+        <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
+              <arg line="${maven.scp.args} mule-${pom.currentVersion}-site.tag.gz ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}"/>
+        </exec>
+
+            <exec dir="." executable="${maven.ssh.executable}">
+              <arg line="${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory} &amp;&amp; rm -fr doc &amp;&amp; tar zxvf mule-${pom.currentVersion}-site.tar.gz"/>
+            </exec>
+
+        <fileScanner var="mulejars">
+            <fileset dir="${mule.release.dist.dir}">
+                <include name="*"/>
+            </fileset>
+        </fileScanner>
+
+        <j:forEach var="jarfile" items="${mulejars.iterator()}">
+            <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
+              <arg line="${maven.scp.args} ${jarfile} ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/jars/"/>
+        </exec>
+        </j:forEach>
+
+        <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
+              <arg line="${maven.scp.args} mule-${pom.currentVersion}-dist.zip ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/distributions/"/>
+        </exec>
+
+        <j:set var="goal" value="jar:deploy"/>
+        <attainGoal name="multiproject:goal"/>
+
+      </goal>
+
+<!--=================================================-->
     <!--                SAMPLES TARGETS                  -->
     <!--=================================================-->
 
