@@ -34,7 +34,8 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-tcp-provider</id>
+            <artifactId>mule-tcp-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -43,7 +44,8 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-http-provider</id>
+            <artifactId>mule-http-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -52,7 +54,8 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-vm-provider</id>
+            <artifactId>mule-vm-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -61,29 +64,13 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-stream-provider</id>
+            <artifactId>mule-stream-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <url>http://junit.sourceforge.net/index.html</url>
-            <properties>
-                <ignore>true</ignore>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>mockobjects</groupId>
-            <artifactId>mockobjects</artifactId>
-            <version>core-0.09</version>
-            <properties>
-                <ignore>true</ignore>
             </properties>
         </dependency>
     </dependencies>

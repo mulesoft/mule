@@ -6,7 +6,7 @@
     <id>mule</id>
     <groupId>mule</groupId>
     <artifactId>mule</artifactId>
-    <currentVersion>SNAPSHOT</currentVersion>
+    <currentVersion>1.0-rc3-SNAPSHOT</currentVersion>
     <organization>
         <name>SymphonySoft Limited</name>
 <!--url>http://www.cubis.co.uk/</url>
@@ -36,10 +36,25 @@
     </repository>
     <mailingLists>
         <mailingList>
-            <name>Mule Developer List</name>
-            <subscribe>http://lists.sourceforge.net/lists/listinfo/mule-developer</subscribe>
-            <unsubscribe>http://lists.sourceforge.net/lists/listinfo/mule-developer</unsubscribe>
-            <archive>http://sourceforge.net/mailarchive/forum.php?forum=mule-developer</archive>
+          <name>Mule User List</name>
+          <subscribe>user-subscribe@mule.codehaus.org</subscribe>
+          <unsubscribe>user-unsubscribe@mule.codehaus.org</unsubscribe>
+          <archive>http://archive.mule.codehaus.org/user/</archive>
+    <!--      <archive>http://dir.gmane.org/gmane.comp.java.mule.user</archive>-->
+        </mailingList>
+        <mailingList>
+          <name>Mule Developer List</name>
+          <subscribe>dev-subscribe@mule.codehaus.org</subscribe>
+          <unsubscribe>dev-unsubscribe@mule.codehaus.org</unsubscribe>
+          <archive>http://archive.mule.codehaus.org/dev/</archive>
+    <!--      <archive>http://dir.gmane.org/gmane.comp.java.mule.devel</archive>-->
+        </mailingList>
+        <mailingList>
+          <name>Mule SCM List</name>
+          <subscribe>scm-subscribe@mule.codehaus.org</subscribe>
+          <unsubscribe>scm-unsubscribe@mule.codehaus.org</unsubscribe>
+          <archive>http://archive.mule.codehaus.org/scm/</archive>
+    <!--      <archive>http://dir.gmane.org/gmane.comp.java.mule.scm</archive>-->
         </mailingList>
     </mailingLists>
     <developers>

@@ -249,7 +249,7 @@
     </dependencies>
 
     <build>
-        <nagEmailAddress>mule-developer@lists.sourceforge.net</nagEmailAddress>
+        <nagEmailAddress>scm@mule.codehaus.org</nagEmailAddress>
         <sourceDirectory>${basedir}/src/java</sourceDirectory>
         <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
         <unitTest>
