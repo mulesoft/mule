@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
+import java.net.MalformedURLException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -260,6 +261,18 @@ public class Utility
             url = callingClass.getClassLoader().getResource(resourceName);
         }
 
+        if(url == null) {
+            File f = new File(resourceName);
+            if(f.exists()) {
+                try
+                {
+                    url = f.toURL();
+                } catch (MalformedURLException e)
+                {
+                    return null;
+                }
+            }
+        }
         return url;
     }
 
