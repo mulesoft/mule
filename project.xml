@@ -6,7 +6,7 @@
     <id>mule</id>
     <groupId>mule</groupId>
     <artifactId>mule</artifactId>
-    <currentVersion>1.0-rc3</currentVersion>
+    <currentVersion>1.0-SNAPSHOT</currentVersion>
     <organization>
         <name>SymphonySoft Limited</name>
 <!--url>http://www.cubis.co.uk/</url>
