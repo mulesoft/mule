@@ -60,6 +60,7 @@ public class JmsMessageReceiver extends
     	this.frequency = 10000;
     	this.reuseConsumer = true;
     	this.reuseSession = true;
+        receiveMessagesInTransaction = (endpoint.getTransactionConfig() != null);
     }
 	
     /**
