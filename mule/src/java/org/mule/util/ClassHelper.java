@@ -183,7 +183,7 @@ public class ClassHelper
                 }
             }
         } else {
-            args = null;
+            args = new Class[0];
         }
         Constructor ctor = getConstructor(clazz, args);
         if (ctor == null)
