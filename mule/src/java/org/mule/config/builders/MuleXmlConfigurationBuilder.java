@@ -18,11 +18,10 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.digester.CallMethodRule;
 import org.apache.commons.digester.Digester;
+import org.apache.commons.digester.NodeCreateRule;
 import org.apache.commons.digester.ObjectCreateRule;
 import org.apache.commons.digester.Rule;
-import org.apache.commons.digester.SetNextRule;
 import org.apache.commons.digester.SetPropertiesRule;
-import org.apache.commons.digester.NodeCreateRule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.InitialisationException;
@@ -45,8 +44,8 @@ import org.mule.impl.DefaultLifecycleAdapter;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleModel;
 import org.mule.impl.MuleTransactionConfig;
-import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.security.MuleSecurityManager;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.model.MuleContainerContext;
 import org.mule.providers.AbstractConnector;
@@ -57,16 +56,13 @@ import org.mule.routing.response.ResponseMessageRouter;
 import org.mule.transaction.constraints.BatchConstraint;
 import org.mule.umo.UMOAgent;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOManager;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.UMOTransactionManagerFactory;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.security.UMOSecurityProvider;
-import org.mule.umo.security.UMOEndpointSecurityFilter;
-import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.model.ComponentResolverException;
@@ -77,24 +73,28 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
+import org.mule.umo.security.UMOEndpointSecurityFilter;
+import org.mule.umo.security.UMOSecurityManager;
+import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
 import org.mule.util.queue.PersistenceStrategy;
+import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.SAXException;
-import org.w3c.dom.Node;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -176,7 +176,6 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 logger.error(exception.getMessage(), exception);
             }
 
-
             public void fatalError(SAXParseException exception) throws SAXException
             {
                 logger.fatal(exception.getMessage(), exception);
@@ -184,7 +183,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
             public void warning(SAXParseException exception) throws SAXException
             {
-                logger.warn(exception.getMessage(), exception);
+                logger.warn(exception.getMessage());
             }
         });
 
@@ -254,7 +253,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         Reader[] readers = new Reader[resources.length];
         for (int i = 0; i < resources.length; i++)
         {
-            readers[i] = new InputStreamReader(loadConfig(resources[i].trim()));
+            try
+            {
+                readers[i] = new InputStreamReader(loadConfig(resources[i].trim()), "UTF-8");
+            } catch (UnsupportedEncodingException e)
+            {
+                throw new ConfigurationException(e.getMessage(), e);
+            }
         }
         return configure(readers);
     }
