@@ -34,6 +34,17 @@ public class JdbcEndpointTestCase extends NamedTestCase {
         assertEquals("jdbc:/?sql=SELECT%20*%20FROM%20TABLE", url.toString());
     }
     
+    public void testWithoutEndpointName2() throws Exception
+    {
+        UMOEndpointURI url = new MuleEndpointURI("jdbc://?sql=SELECT * FROM TABLE");
+        assertEquals("jdbc", url.getScheme());
+        assertEquals("", url.getAddress());
+        assertNull(url.getEndpointName());
+        assertNotNull(url.getParams());
+        assertEquals("SELECT * FROM TABLE", url.getParams().get("sql"));
+        assertEquals("jdbc://?sql=SELECT%20*%20FROM%20TABLE", url.toString());
+    }
+    
     public void testWithEndpointName() throws Exception {
         UMOEndpointURI url = new MuleEndpointURI("jdbc://history/writeTests?type=2");
         assertEquals("jdbc", url.getScheme());

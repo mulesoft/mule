@@ -34,6 +34,22 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  */
 public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunctionalTestCase {
 
+    public void testDirectSql() throws Exception {
+        //Start the server
+        MuleManager.getInstance().start();
+        
+        MuleEndpointURI muleEndpoint = new MuleEndpointURI("jdbc://?sql=SELECT * FROM TEST");
+        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOMessage message;
+        
+        message = endpoint.getConnector().getDispatcher(muleEndpoint.getAddress()).receive(muleEndpoint, 1000);
+        assertNull(message);
+        
+        execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '" + DEFAULT_MESSAGE + "', NULL, NULL)");
+        message = endpoint.getConnector().getDispatcher(muleEndpoint.getAddress()).receive(muleEndpoint, 1000);
+        assertNotNull(message);
+    }
+
     public void testSend() throws Exception {
         //Start the server
         MuleManager.getInstance().start();
@@ -92,7 +108,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         assertEquals(1, obj2.length);
         assertEquals(DEFAULT_MESSAGE + " Received", obj2[0]);
     }
-
+    
     public void initialiseComponent(EventCallback callback) throws Exception
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
