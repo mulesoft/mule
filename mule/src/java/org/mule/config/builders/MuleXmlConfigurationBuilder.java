@@ -1245,7 +1245,11 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                     if(logger.isDebugEnabled()) {
                         logger.debug("Param is '" + value + "', Property key is '" + key + "', Property value is '" + realValue + "'");
                     }
-                    att.setValue(i, realValue);
+                    if(realValue!=null) {
+                        att.setValue(i, realValue);
+                    } else {
+                        logger.info("Property for placeholder: '" + value + "' was not found.  Leaving place holder as is");
+                    }
                 }
             }
             return att;
