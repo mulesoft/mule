@@ -17,6 +17,7 @@ package org.mule.providers.http;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
+import org.mule.MuleRuntimeException;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessageException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
@@ -28,7 +29,7 @@ import java.io.InputStream;
 
 /**
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making
- * the payload and heads available a standard message adapter 
+ * the payload and heads available a standard message adapter
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
@@ -36,20 +37,26 @@ import java.io.InputStream;
 public class HttpMessageAdapter extends AbstractMessageAdapter
 {
     private Object message = null;
+    private String method = null;
+    private String request = null;
+    private String httpVersion = null;
 
     public HttpMessageAdapter(Object message) throws MessageException
     {
         if (message instanceof InputStream)
         {
             setMessage((InputStream) message);
-        } else if (message instanceof String) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(((String)message).getBytes());
+        } else if (message instanceof String)
+        {
+            ByteArrayInputStream bais = new ByteArrayInputStream(((String) message).getBytes());
             setMessage(bais);
             try
             {
                 bais.close();
-            } catch (IOException e) {}
-        } else
+            } catch (IOException e)
+            {
+            }
+        }  else
         {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
@@ -103,20 +110,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
     {
         try
         {
-            String firstLine = HttpParser.readLine(message);
-            int space1 = firstLine.indexOf(" ");
-            int space2 = firstLine.indexOf(" ", space1 + 1);
-            if (space1 == -1 || space2 == -1)
-            {
-                throw new MessageException("Http message header line is malformed: " + firstLine);
-            }
-            String method = firstLine.substring(0, space1);
-            String request = firstLine.substring(space1 + 1, space2);
-            String httpVersion = firstLine.substring(space2 + 1);
-
-            setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
-            setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request);
-            setProperty(HttpConnector.HTTP_VERSION_PROPERTY, httpVersion);
+            setRequestLine(message);
 
             //Read headers from the request as set them as properties on the event
             Header[] headers = HttpParser.parseHeaders(message);
@@ -131,7 +125,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
             } else
             {
                 boolean contentLengthNotSet = getProperty(HttpConstants.HEADER_CONTENT_LENGTH, null) == null;
-                int contentLength = Integer.parseInt((String)getProperty(HttpConstants.HEADER_CONTENT_LENGTH, String.valueOf(1024 * 32)));
+                int contentLength = Integer.parseInt((String) getProperty(HttpConstants.HEADER_CONTENT_LENGTH, String.valueOf(1024 * 32)));
 
                 byte[] buffer = new byte[contentLength];
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -143,16 +137,16 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
                 while (bytesWritten != contentLength)
                 {
                     len = message.read(buffer);
-                    if(len!=-1) {
+                    if (len != -1)
+                    {
                         baos.write(buffer, 0, len);
-                        bytesWritten+=len;
-                        if(contentLengthNotSet) {
-                            contentLength=bytesWritten;
+                        bytesWritten += len;
+                        if (contentLengthNotSet)
+                        {
+                            contentLength = bytesWritten;
                         }
-
                     }
                 }
-
                 if (isText((String) getProperty(HttpConstants.HEADER_CONTENT_TYPE)))
                 {
                     this.message = new String(baos.toByteArray());
@@ -166,6 +160,31 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         {
             throw new MessageException("Failed to parse Http Headers: " + e, e);
         }
+    }
+
+    protected void setRequestLine(InputStream is) throws MessageException, IOException
+    {
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+//        String line = reader.readLine();
+        String line = HttpParser.readLine(is);
+        if (line == null)
+        {
+            throw new MuleRuntimeException("End of Stream");
+        }
+
+        int space1 = line.indexOf(" ");
+        int space2 = line.indexOf(" ", space1 + 1);
+        if (space1 == -1 || space2 == -1)
+        {
+            throw new MessageException("Http message header line is malformed: " + line);
+        }
+        method = line.substring(0, space1);
+        request = line.substring(space1 + 1, space2);
+        httpVersion = line.substring(space2 + 1);
+
+        setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
+        setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request);
+        setProperty(HttpConnector.HTTP_VERSION_PROPERTY, httpVersion);
     }
 
     protected boolean isText(String contentType)
