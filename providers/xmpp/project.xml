@@ -20,14 +20,14 @@
         <dependency>
             <groupId>smack</groupId>
             <artifactId>smack</artifactId>
-            <jar>smack.jar</jar>
-            <url>http://www.jivesoftware.com</url>
+            <version>1.4.1</version>
+            <url>http://www.jivesoftware.org</url>
         </dependency>
         <dependency>
             <groupId>smack</groupId>
             <artifactId>smackx</artifactId>
-            <jar>smackx.jar</jar>
-            <url>http://www.jivesoftware.com</url>
+            <version>1.4.1</version>
+            <url>http://www.jivesoftware.org</url>
         </dependency>
     </dependencies>
 </project>
