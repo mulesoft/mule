@@ -340,7 +340,7 @@
         </exec>
     </goal>
 
-    <goal name="dist:nightly" prereqs="setvars">
+    <goal name="dist:nightly" prereqs="setvars,clean, multiproject:install-snapshot">
         <echo> Copying Nightly distribution jars from ${mule.release.dist.dir}</echo>
         <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
             <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.jar ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/nightly/"/>
