@@ -79,12 +79,6 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         try
         {
             String correlationId = message.getJMSCorrelationID();
-            //If the reply to is set we need to send a response
-            //so make this a synchronous call
-            boolean synchronous =  endpoint.isSynchronous();
-            if(message.getJMSReplyTo()!=null) {
-                synchronous = true;
-            }
 
             logger.debug("Message CorrelationId is: " + correlationId);
             logger.info("Jms Message Id is: " + message.getJMSMessageID());
@@ -107,7 +101,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
             }
             UMOMessageAdapter adapter = connector.getMessageAdapter(message);
             
-            routeMessage(new MuleMessage(adapter), trans, synchronous);
+            routeMessage(new MuleMessage(adapter), trans, endpoint.isSynchronous());
 
         }
         catch (Exception e1)

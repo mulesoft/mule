@@ -35,11 +35,11 @@
             <inbound-router>
                 <endpoint address="jms://InputQueue"/>
             </inbound-router>
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://ResultQueue"/>
-                </router>
-            </outbound-router>
+<!--            <outbound-router>-->
+<!--                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">-->
+<!--                    <endpoint address="jms://ResultQueue"/>-->
+<!--                </router>-->
+<!--            </outbound-router>-->
         </mule-descriptor>
     </model>
 </mule-configuration>
