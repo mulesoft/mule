@@ -179,12 +179,12 @@
     </bean>
 
     <bean id="transactedOutbound-transaction" class="org.mule.impl.MuleTransactionConfig">
-        <property name="commitActionAsString"><value>ALWAYS_COMMIT</value></property>
-        <property name="constraint">
-            <bean id="batchConstraint" class="org.mule.transaction.constraints.BatchConstraint">
-                <property name="batchSize"><value>3</value></property>
-            </bean>
-        </property>
+<!--        <property name="commitActionAsString"><value>ALWAYS_COMMIT</value></property>-->
+<!--        <property name="constraint">-->
+<!--            <bean id="batchConstraint" class="org.mule.transaction.constraints.BatchConstraint">-->
+<!--                <property name="batchSize"><value>3</value></property>-->
+<!--            </bean>-->
+<!--        </property>-->
     </bean>
 
     <bean id="muleInterceptorStacks" class="java.util.HashMap">
