@@ -17,10 +17,12 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.transaction.constraints.ConstraintFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
+import org.mule.MuleManager;
 
 /**
  * <p/>
- * <code>MuleTransactionConfig</code> TODO (document class)
+ * <code>MuleTransactionConfig</code> defines transaction configuration for
+ * a transactional endpoint.
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
@@ -48,6 +50,14 @@ public class MuleTransactionConfig implements UMOTransactionConfig
     private byte commitAction = ACTION_NONE;
 
     private ConstraintFilter constraint = null;
+
+    private int timeout;
+
+    public MuleTransactionConfig()
+    {
+        timeout = MuleManager.getConfiguration().getTransactionTimeout();
+
+    }
 
     /*
 	 * (non-Javadoc)
@@ -188,5 +198,15 @@ public class MuleTransactionConfig implements UMOTransactionConfig
     public void setConstraint(ConstraintFilter constraint)
     {
         this.constraint = constraint;
+    }
+
+    public int getTimeout()
+    {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout)
+    {
+        this.timeout = timeout;
     }
 }
