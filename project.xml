@@ -194,7 +194,7 @@
             <artifactId>jmxri</artifactId>
             <version>${jmxri_version}</version>
             <properties>
-                <mule.core.jar>false</mule.core.jar>
+                <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
         </dependency>
@@ -204,7 +204,7 @@
             <version>${jmxri_jmxtools_version}</version>
             <properties>
                 <ignore>false</ignore>
-                <mule.core.jar>false</mule.core.jar>
+                <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
         </dependency>
@@ -214,7 +214,7 @@
             <version>${jmxri_jmxremoting_version}</version>
             <properties>
                 <ignore>true</ignore>
-                <mule.core.jar>false</mule.core.jar>
+                <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
         </dependency>
