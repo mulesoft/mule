@@ -58,7 +58,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(AbstractConnector.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     public static final long DEFAULT_RETRY_FREQUENCY = 1000;
 
