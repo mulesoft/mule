@@ -184,7 +184,7 @@
         <!-- Mini Mule Build -->
         <attainGoal name="mini:mule"/>
         <ant:copy todir="${maven.build.dir}/distributions">
-	    <ant:fileset dir="${basedir}/etc/mini/target/release/" includes="mini-mule*"/>
+	    <ant:fileset dir="${basedir}/etc/mini/target/distributions" includes="mini-mule*"/>
 	</ant:copy>
     </goal>
 
@@ -352,6 +352,11 @@
     </goal>
 
     <goal name="mini:mule">
+        <j:set var="samples.vars.overriden" value="true"/>
+        <j:set var="samples.release.dir" value="${basedir}/etc/mini/target/release"/>
+        <j:set var="samples.release.lib.dir" value="${samples.release.dir}/lib"/>
+        <j:set var="samples.dist" value="${samples.release.dir}/samples"/>
+
         <maven:reactor
             basedir="${basedir}/etc/mini"
             postProcessing="false"
