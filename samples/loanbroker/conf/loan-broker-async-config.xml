@@ -22,19 +22,6 @@ the different components are made from the loan broker component (a la hub and s
         <queue-profile maxOutstandingMessages="500"/>
     </mule-environment-properties>
 
-    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
-        <properties>
-            <property name="serverConfig" value="C:/dev/projects/mule/src/providers/soap/src/conf/mule-axis-server-config.wsdd"/>
-            <property name="synchronous" value="false"/>
-<!--            <list name="beanTypes">-->
-<!--                <entry value="org.mule.samples.loanbroker.CreditProfile"/>-->
-<!--                <entry value="org.mule.samples.loanbroker.Customer"/>-->
-<!--                <entry value="org.mule.samples.loanbroker.LoanRequest"/>-->
-<!--                <entry value="org.mule.samples.loanbroker.Bank"/>-->
-<!--                <entry value="org.mule.samples.loanbroker.LoanQuote"/>-->
-<!--            </list>-->
-        </properties>
-    </connector>
     <!--
     Setting global endpoints can help simplify configuration by defining an actual
     url endpointUri in one place. The endpointUri name can be used in place of the url.
