@@ -37,8 +37,9 @@ import java.util.Properties;
 public interface UMOEndpointURI extends Serializable
 {
     public static final String PROPERTY_ENDPOINT_NAME = "endpointName";
-    public static final String PROPERTY_ENDPOINT_URI = "endpointUri";
+    public static final String PROPERTY_ENDPOINT_URI = "address";
     public static final String PROPERTY_CREATE_CONNECTOR = "createConnector";
+    public static final String PROPERTY_CONNECTOR_NAME = "connector";
     public static final String PROPERTY_TRANSFORMERS = "transformers";
 
     String getAddress();
