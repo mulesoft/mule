@@ -19,6 +19,7 @@ import org.mule.MuleManager;
 import org.mule.providers.tcp.TcpConnectorFunctionalTestCase;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.ResponseOutputStream;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -47,7 +48,7 @@ import java.net.URI;
  * @version $Revision$
  */
 
-public class SslConnectorFunctionalTestCase  extends TcpConnectorFunctionalTestCase
+public class SslConnectorFunctionalTestCase  extends AbstractProviderFunctionalTestCase
 {
     /**
      * logger used by this class
@@ -55,6 +56,7 @@ public class SslConnectorFunctionalTestCase  extends TcpConnectorFunctionalTestC
     protected static transient Log logger = LogFactory.getLog(SslConnectorFunctionalTestCase.class);
 
     private int port = 61655;
+    private Socket s;
 
     protected UMOEndpointURI getInDest()
     {
@@ -82,5 +84,72 @@ public class SslConnectorFunctionalTestCase  extends TcpConnectorFunctionalTestC
     protected Socket createSocket(URI uri) throws IOException
     {
         return SSLSocketFactory.getDefault().createSocket(uri.getHost(), uri.getPort());
+    }
+
+    protected void tearDown() throws Exception
+    {
+        if(s!=null)s.close();
+        super.tearDown();
+    }
+
+    protected void sendTestData(int iterations) throws Exception
+    {
+        MuleManager.getConfiguration().setSynchronous(false);
+        URI uri = getInDest().getUri();
+        for(int i=0;i<iterations;i++) {
+            s = createSocket(uri);
+            DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
+            dos.write("Hello".getBytes());
+            dos.flush();
+            logger.info("Sent message: " + i);
+            dos.close();
+        }
+    }
+
+    protected void receiveAndTestResults() throws Exception
+    {
+        Thread.sleep(3000);
+        assertEquals(100, callbackCount);
+
+    }
+
+    public void testDispatchAndReply() throws Exception
+    {
+        MuleManager.getConfiguration().setSynchronous(false);
+        descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
+
+        initialiseComponent(descriptor, UMOTransactionConfig.ACTION_NONE, UMOTransactionConfig.ACTION_NONE,
+                new EventCallback() {
+                    public void eventReceived(UMOEventContext context, Object Component) throws Exception
+                    {
+                        callbackCount++;
+                        String result = "Received Async event: " + context.getMessageAsString();
+                        assertNotNull(context.getOutputStream());
+
+                        if(!((ResponseOutputStream)context.getOutputStream()).getSocket().isClosed()) {
+                            context.getOutputStream().write(result.getBytes());
+                            context.getOutputStream().flush();
+                        };
+                        callbackCalled = true;
+                    }
+                });
+        //Start the server
+        MuleManager.getInstance().start();
+
+        URI uri = getInDest().getUri();
+        s = createSocket(uri);
+        DataOutputStream dos = new DataOutputStream((s.getOutputStream()));
+        dos.write("Hello".getBytes());
+        dos.flush();
+
+        afterInitialise();
+
+        DataInputStream dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+        byte[] buf = new byte[32];
+        int x = dis.read(buf);
+        assertTrue(x > -1);
+        assertTrue(new String(buf, 0, x).startsWith("Received Async event"));
+        assertEquals(1, callbackCount);
+
     }
 }

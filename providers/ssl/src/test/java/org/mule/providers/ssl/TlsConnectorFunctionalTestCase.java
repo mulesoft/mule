@@ -47,7 +47,7 @@ import java.net.URI;
  * @version $Revision$
  */
 
-public class TlsConnectorFunctionalTestCase  extends TcpConnectorFunctionalTestCase
+public class TlsConnectorFunctionalTestCase  extends SslConnectorFunctionalTestCase
 {
     /**
      * logger used by this class
