@@ -22,7 +22,7 @@ import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.security.MuleUserAuthenticationToken;
+import org.mule.impl.security.MuleCredentials;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
@@ -95,7 +95,7 @@ public class MuleClient
     //configuration helper for the client
     QuickConfigurationBuilder builder = null;
 
-    private MuleUserAuthenticationToken user;
+    private MuleCredentials user;
 
     private UMOEncryptionStrategy encryption;
 
@@ -113,7 +113,7 @@ public class MuleClient
     public MuleClient(String user, String password) throws UMOException
     {
         this(MuleManager.getConfiguration().isSynchronous());
-        this.user = new MuleUserAuthenticationToken(user, password.toCharArray());
+        this.user = new MuleCredentials(user, password.toCharArray());
     }
 
     public MuleClient(boolean synchronous) throws UMOException
@@ -124,7 +124,7 @@ public class MuleClient
     public MuleClient(boolean synchronous, String user, String password) throws UMOException
     {
         init(synchronous);
-        this.user = new MuleUserAuthenticationToken(user, password.toCharArray());
+        this.user = new MuleCredentials(user, password.toCharArray());
     }
 
     /**

@@ -22,6 +22,7 @@ import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.security.UMOSecurityException;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UMOCredentialsAccessor;
 import org.mule.util.Utility;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -46,6 +47,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
     private UMOImmutableEndpoint endpoint;
     private boolean inbound = false;
     private boolean authenticate;
+    private UMOCredentialsAccessor credentialsAccessor;
 
     public final void initialise() throws InitialisationException
     {
@@ -146,6 +148,16 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         {
             authenticateOutbound(event);
         }
+    }
+
+    public UMOCredentialsAccessor getCredentialsAccessor()
+    {
+        return credentialsAccessor;
+    }
+
+    public void setCredentialsAccessor(UMOCredentialsAccessor credentialsAccessor)
+    {
+        this.credentialsAccessor = credentialsAccessor;
     }
 
     protected abstract void authenticateInbound(UMOEvent event) throws UMOSecurityException;

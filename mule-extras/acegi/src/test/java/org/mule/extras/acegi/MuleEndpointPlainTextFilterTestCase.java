@@ -30,7 +30,7 @@ import org.mule.config.MuleProperties;
 import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.security.MuleSecurityManager;
-import org.mule.impl.security.MuleUserAuthenticationToken;
+import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpConnector;
 import org.mule.tck.NamedTestCase;

@@ -14,15 +14,8 @@
                 <container-property name="delegate" reference="daoAuthenticationProvider"/>
             </properties>
         </security-provider>
-        <encryption-strategy name="PBE" className="org.mule.impl.security.PasswordBasedEncryptionStrategy">
-            <properties>
-                <property name="salt" value="1234"/>
-                <property name="iterations" value="20"/>
-                <property name="password" value="mule"/>
-            </properties>
-        </encryption-strategy>
     </security-manager>
-    
+
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
             <property name="configFile" value="securityContext.xml"/>

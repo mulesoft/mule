@@ -15,16 +15,18 @@ package org.mule.impl.security.filters;
 
 import org.mule.InitialisationException;
 import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
 import org.mule.impl.security.AbstractEndpointSecurityFilter;
 import org.mule.impl.security.MuleAuthentication;
-import org.mule.impl.security.MuleUserAuthenticationToken;
+import org.mule.impl.security.MuleHeaderCredentialsAccessor;
+import org.mule.impl.security.MuleCredentials;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.security.UMOAuthentication;
+import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UMOSecurityException;
 import org.mule.umo.security.UnauthorisedException;
+import org.mule.umo.security.CredentialsNotSetException;
 
 /**
  * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based encription
@@ -37,12 +39,17 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
     private UMOEncryptionStrategy strategy;
     private String strategyName;
 
+    public MuleEncryptionEndpointSecurityFilter()
+    {
+        setCredentialsAccessor(new MuleHeaderCredentialsAccessor());
+    }
+
     protected final void authenticateInbound(UMOEvent event) throws UMOSecurityException
     {
-        String userHeader = (String) event.getProperty(MuleProperties.MULE_USER_PROPERTY);
+        String userHeader = (String)getCredentialsAccessor().getCredentials(event);
         if (userHeader == null)
         {
-            throw new UnauthorisedException(event.getSession().getSecurityContext(), getEndpoint(), this);
+            throw new CredentialsNotSetException(event.getSession().getSecurityContext(), event.getEndpoint(), this);
         }
         byte[] creds = null;
         if(userHeader.startsWith("Plain ")) {
@@ -50,8 +57,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         } else {
             creds = strategy.decrypt(userHeader.getBytes());
         }
-
-        MuleUserAuthenticationToken user = new MuleUserAuthenticationToken(new String(creds));
+        UMOCredentials user = new MuleCredentials(new String(creds));
 
         UMOAuthentication authResult;
         UMOAuthentication umoAuthentication = new MuleAuthentication(user);
@@ -103,7 +109,8 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
 
         String token = auth.getCredentials().toString();
         String header = new String(strategy.encrypt(token.getBytes()));
-        event.setProperty(MuleProperties.MULE_USER_PROPERTY, header);
+        getCredentialsAccessor().setCredentials(event, header);
+
     }
 
     protected void doInitialise() throws InitialisationException

@@ -30,7 +30,7 @@ import org.mule.config.MuleProperties;
 import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.security.MuleSecurityManager;
-import org.mule.impl.security.MuleUserAuthenticationToken;
+import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpConnector;
 import org.mule.tck.NamedTestCase;
@@ -78,7 +78,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String user = new MuleUserAuthenticationToken("anonX", "anonX".toCharArray()).getToken();
+        String user = new MuleCredentials("anonX", "anonX".toCharArray()).getToken();
         user = new String(strategy.encrypt(user.getBytes()));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
@@ -95,7 +95,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String user = new MuleUserAuthenticationToken("anon", "anon".toCharArray()).getToken();
+        String user = new MuleCredentials("anon", "anon".toCharArray()).getToken();
         user = new String(strategy.encrypt(user.getBytes()));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
@@ -110,7 +110,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String user = new MuleUserAuthenticationToken("anonX", "anonX".toCharArray()).getToken();
+        String user = new MuleCredentials("anonX", "anonX".toCharArray()).getToken();
         user = new String(strategy.encrypt(user.getBytes()));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
@@ -127,7 +127,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String user = new MuleUserAuthenticationToken("anon", "anon".toCharArray()).getToken();
+        String user = new MuleCredentials("anon", "anon".toCharArray()).getToken();
         user = new String(strategy.encrypt(user.getBytes()));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
