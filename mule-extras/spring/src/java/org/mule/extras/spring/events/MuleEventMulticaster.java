@@ -396,7 +396,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 }
 
                 MuleMessage message = new MuleMessage(applicationEvent.getSource(), applicationEvent.getProperties());
-                //has dispatch been triggered using applicationContext.publish() without
+                //has dispatch been triggered using beanFactory.publish() without
                 //a current event?
                 if (RequestContext.getEvent() != null)
                 {
@@ -459,7 +459,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             }
             //tell mule to load component definitions from spring
             SpringContainerContext containerContext = new SpringContainerContext();
-            containerContext.setApplicationContext(applicationContext);
+            containerContext.setBeanFactory(applicationContext);
             manager.setContainerContext(containerContext);
 
             //see if there are any UMOConnectors to register
@@ -615,7 +615,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 
     protected UMODescriptor getDefaultDescriptor() throws UMOException
     {
-        //When the the applicationContext is refreshed all the beans get
+        //When the the beanFactory is refreshed all the beans get
         //reloaded so we need to unregister the component from Mule
         UMOModel model = MuleManager.getInstance().getModel();
         UMODescriptor descriptor = model.getDescriptor(EVENT_MULTICASTER_DESCRIPTOR_NAME);

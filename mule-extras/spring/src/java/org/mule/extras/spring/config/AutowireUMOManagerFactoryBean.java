@@ -57,7 +57,7 @@ import java.util.Map;
  * Apart from removing the need to explicitly wire the MuleManager instance together there another advantage to using
  * the AutowireUMOManagerFactoryBean. There is no need to declare a UMOModel instance in the configuration. If the
  * factory doesn't find a UMOModel implementation it creates a default one of type <i>org.mule.impl.model.MuleModel</i>.
- * The model is automatically initialised with a SpringContainercontext using the current applicationContext and
+ * The model is automatically initialised with a SpringContainercontext using the current beanFactory and
  * defaults are used for the other Model properties. If you want to override the defaults, such as define your own
  * exception strategy, (which you will most likely want to do) simply declare your exception strategy bean in the
  * container and it will automatically be set on the model.
@@ -224,7 +224,7 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
         if(containers.size() == 0) {
             //Use this as the default container
             SpringContainerContext container = new SpringContainerContext();
-            container.setApplicationContext(context);
+            container.setBeanFactory(context);
             manager.setContainerContext(container);
         } else if (containers.size() == 1) {
             manager.setContainerContext((UMOContainerContext)containers.values().iterator().next());

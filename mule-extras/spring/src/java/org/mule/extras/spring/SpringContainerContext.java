@@ -21,6 +21,9 @@ import org.mule.umo.model.ComponentNotFoundException;
 import org.mule.umo.model.UMOContainerContext;
 import org.mule.util.ClassHelper;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -33,7 +36,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class SpringContainerContext implements UMOContainerContext, ApplicationContextAware
+public class SpringContainerContext implements UMOContainerContext, BeanFactoryAware
 {
     /**
      * logger used by this class
@@ -43,25 +46,25 @@ public class SpringContainerContext implements UMOContainerContext, ApplicationC
     /**
      * the application contect to use when resolving components
      */
-    protected ApplicationContext applicationContext;
+    protected BeanFactory beanFactory;
 
-    protected ApplicationContext externalContext;
+    protected BeanFactory externalBeanFactory;
 
     protected String configFile;
 
     /**
      * Sets the spring application context used to build components
      *
-     * @param applicationContext the context to use
+     * @param beanFactory the context to use
      */
-    public void setApplicationContext(ApplicationContext applicationContext)
+    public void setBeanFactory(BeanFactory beanFactory)
     {
-        this.applicationContext = applicationContext;
+        this.beanFactory = beanFactory;
     }
 
-    public void setExternalApplicationContext(ApplicationContext applicationContext)
+    public void setExternalBeanFactory(BeanFactory factory)
     {
-        this.externalContext = applicationContext;
+        this.externalBeanFactory = factory;
     }
 
     /**
@@ -69,10 +72,10 @@ public class SpringContainerContext implements UMOContainerContext, ApplicationC
      *
      * @return spring application context
      */
-    public ApplicationContext getApplicationContext()
+    public BeanFactory getBeanFactory()
     {
-        if(externalContext !=null) return externalContext;
-        return applicationContext;
+        if(externalBeanFactory !=null) return externalBeanFactory;
+        return beanFactory;
     }
 
     /* (non-Javadoc)
@@ -80,7 +83,7 @@ public class SpringContainerContext implements UMOContainerContext, ApplicationC
      */
     public Object getComponent(Object key) throws ComponentNotFoundException
     {
-        if (getApplicationContext() == null)
+        if (getBeanFactory() == null)
         {
             throw new IllegalStateException("Spring Application context has not been set");
         }
@@ -93,21 +96,20 @@ public class SpringContainerContext implements UMOContainerContext, ApplicationC
         {
             //We will assume that there should only be one object of
             //this class in the container for now
-            String[] names = getApplicationContext().getBeanDefinitionNames((Class) key);
-            if (names == null || names.length == 0 || names.length > 1)
-            {
+//            String[] names = getBeanFactory().getBeanDefinitionNames((Class) key);
+//            if (names == null || names.length == 0 || names.length > 1)
+//            {
                 throw new ComponentNotFoundException("The container is unable to build single instance of " +
-                        ((Class) key).getName() + " number of instances found was: " +
-                        names.length);
-            }
-            else
-            {
-                key = names[0];
-            }
+                        ((Class) key).getName() + " number of instances found was: 0");
+//            }
+//            else
+//            {
+//                key = names[0];
+//            }
         }
         try
         {
-            return getApplicationContext().getBean(key.toString());
+            return getBeanFactory().getBean(key.toString());
         }
         catch (BeansException e)
         {
@@ -130,10 +132,10 @@ public class SpringContainerContext implements UMOContainerContext, ApplicationC
         {
             if(ClassHelper.getResource(configFile, getClass())==null) {
                 logger.warn("Spring config resource: " + configFile + " not found on class path, attempting to load it from local file");
-                setExternalApplicationContext(new FileSystemXmlApplicationContext(configFile));
+                setExternalBeanFactory(new FileSystemXmlApplicationContext(configFile));
             } else {
                 logger.info("Loading Spring config from classpath, resource is: " + configFile);
-                setExternalApplicationContext(new ClassPathXmlApplicationContext(configFile));
+                setExternalBeanFactory(new ClassPathXmlApplicationContext(configFile));
             }
         } catch (BeansException e)
         {
