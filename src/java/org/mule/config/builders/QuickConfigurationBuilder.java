@@ -15,10 +15,9 @@ package org.mule.config.builders;
 
 import org.mule.InitialisationException;
 import org.mule.MuleManager;
-import org.mule.config.PoolingProfile;
-import org.mule.config.ThreadingProfile;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleModel;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -28,7 +27,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.model.UMOContainerContext;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.ObjectPool;
 
 import java.util.Map;
 
@@ -251,6 +249,7 @@ public class QuickConfigurationBuilder
     {
         return registerComponent(implementation, name, inboundEndpointUri, outboundEndpointUri, null);
     }
+
     /**
      * Registers a java object as a Umo pcomponent that listens for and sends events on the
      * given urls. By default the ThreadingProfile for the components will be set so that
@@ -265,6 +264,49 @@ public class QuickConfigurationBuilder
      * @throws UMOException
      */
     public UMOComponent registerComponent(String implementation, String name, UMOEndpointURI inboundEndpointUri, UMOEndpointURI outboundEndpointUri, Map properties) throws UMOException
+    {
+        UMODescriptor d = createDescriptor(implementation, name, inboundEndpointUri, outboundEndpointUri, properties);
+        return manager.getModel().registerComponent(d);
+    }
+
+    /**
+     * Creates a Mule Descriptor that can be further maniputalted by the calling class before
+     * registering it with the UMOModel
+     * @param implementation either a container refernece to an object or a fully qualified class name
+     * to use as the component implementation
+     * which event to invoke based on the evnet payload type
+     * @param name The identifying name of the component.  This can be used to later unregister it
+     * @param inboundEndpointUri The url endpointUri to listen to. Can be null
+     * @param outboundEndpointUri The url endpointUri to dispatch to. Can be null
+     * @param properties properties to set on the component. Can be null
+     * @throws UMOException
+     */
+    public UMODescriptor createDescriptor(String implementation, String name, String inboundEndpointUri, String outboundEndpointUri, Map properties) throws UMOException
+    {
+        UMOEndpointURI inEndpointUri = null;
+        UMOEndpointURI outEndpointUri = null;
+        if(inboundEndpointUri!=null) {
+            inEndpointUri = new MuleEndpointURI(inboundEndpointUri);
+        }
+        if(outboundEndpointUri!=null) {
+            outEndpointUri = new MuleEndpointURI(outboundEndpointUri);
+        }
+
+        return createDescriptor(implementation, name, inEndpointUri, outEndpointUri, properties);
+    }
+    /**
+     * Creates a Mule Descriptor that can be further maniputalted by the calling class before
+     * registering it with the UMOModel
+     * @param implementation either a container refernece to an object or a fully qualified class name
+     * to use as the component implementation
+     * which event to invoke based on the evnet payload type
+     * @param name The identifying name of the component.  This can be used to later unregister it
+     * @param inboundEndpointUri The url endpointUri to listen to. Can be null
+     * @param outboundEndpointUri The url endpointUri to dispatch to. Can be null
+     * @param properties properties to set on the component. Can be null
+     * @throws UMOException
+     */
+    public UMODescriptor createDescriptor(String implementation, String name, UMOEndpointURI inboundEndpointUri, UMOEndpointURI outboundEndpointUri, Map properties) throws UMOException
     {
         MuleDescriptor descriptor = new MuleDescriptor();
         descriptor.setImplementation(implementation);
@@ -285,14 +327,7 @@ public class QuickConfigurationBuilder
         descriptor.setInboundEndpoint(inboundProvider);
         descriptor.setOutboundEndpoint(outboundProvider);
 
-        //set the threading and pooling profile for a single object instance
-        ThreadingProfile tp = new ThreadingProfile(1, 1, -1, ThreadingProfile.WHEN_EXHAUSTED_WAIT, null,null);
-        PoolingProfile pp = new PoolingProfile(1, 1, -1, ObjectPool.WHEN_EXHAUSTED_BLOCK, PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-        descriptor.setThreadingProfile(tp);
-        descriptor.setPoolingProfile(pp);
-
-        //register the components descriptor
-        return manager.getModel().registerComponent(descriptor);
+        return descriptor;
     }
 
     /**
