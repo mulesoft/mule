@@ -56,7 +56,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(AbstractMessageReceiver.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     /**
      * The Component with which this receiver is associated with
