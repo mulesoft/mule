@@ -158,12 +158,15 @@
             <j:expr value="${context.setVariable('maven.test.skip', 'true')}"/>
         </j:if>
     </postGoal>
-
-    <goal name="mule:release" prereqs="mule:release-prepare" description="Creates and zips build for distribution">
+    
+    <goal name="mule:start-release" prereqs="mule:release-prepare,clean-build" 
+        description="Creates and zips build for distribution"/>
+    
+    <goal name="mule:release" description="Creates and zips build for distribution">
         <!-- for some reason the reactor is getting confused when these are set
         as prereqs?
         -->
-        <attainGoal name="clean-build"/>
+
         <attainGoal name="mule:libs"/>
         <attainGoal name="mule:src"/>
         <attainGoal name="mule:site"/>
