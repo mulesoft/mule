@@ -312,7 +312,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         {
             //Map.Entry entry;
             logger.debug("Disposing Dispatchers");
-            Object entry = null;
             for (Iterator iterator = dispatchers.values().iterator(); iterator.hasNext();)
             {
                 UMOMessageDispatcher umoMessageDispatcher = (UMOMessageDispatcher) iterator.next();
@@ -406,12 +405,18 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         checkDisposed();
         UMOMessageDispatcher dispatcher = null;
         if(endpoint==null || "".equals(endpoint)) endpoint= "ANY";
-        if ("ANY".equals(endpoint))
+        if ("ANY".equals(endpoint) && dispatchers.size() > 0)
         {
-            dispatcher = (UMOMessageDispatcher) dispatchers.values().iterator().next();
-            while(dispatcher!=null && dispatcher.isDisposed()) {
-                dispatchers.values().remove(dispatcher);
-                dispatcher = (UMOMessageDispatcher) dispatchers.values().iterator().next();
+            Map.Entry entry;
+            for (Iterator iterator = dispatchers.entrySet().iterator(); iterator.hasNext();)
+            {
+                entry = (Map.Entry)iterator.next();
+                if(((UMOMessageDispatcher)entry.getValue()).isDisposed()) {
+                    dispatchers.remove(entry.getKey());
+                } else {
+                    dispatcher = (UMOMessageDispatcher)entry.getValue();
+                    break;
+                }
             }
         } else
         {
