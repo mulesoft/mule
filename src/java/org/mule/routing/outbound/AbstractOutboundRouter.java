@@ -20,6 +20,7 @@ import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.PropertyExtractor;
 import org.mule.management.stats.RouterStatistics;
+import org.mule.routing.DefaultPropertiesExtractor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -40,6 +41,9 @@ import java.util.List;
 
 public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 {
+    public static final int ENABLE_CORREATION_IF_NOT_SET = 0;
+    public static final int ENABLE_CORREATION_ALWAYS = 1;
+    public static final int ENABLE_CORREATION_NEVER = 2;
     /**
      * logger used by this class
      */
@@ -48,11 +52,10 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     protected List endpoints = new CopyOnWriteArrayList();
 
     protected String replyTo = null;
-    protected boolean correlationId = false;
 
-    protected PropertyExtractor correlationIdExtractor = null;
-    protected PropertyExtractor correlationSequenceExtractor = null;
-    protected PropertyExtractor correlationGroupExtractor = null;
+    protected int enableCorrelation = ENABLE_CORREATION_IF_NOT_SET;
+
+    protected PropertyExtractor propertyExtractor = new DefaultPropertiesExtractor();
 
     protected RouterStatistics routerStatistics;
 
@@ -63,8 +66,10 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     {
         setMessageProperties(session, message, endpoint);
         session.dispatchEvent(message, endpoint);
-        if(routerStatistics!=null) {
-            if(routerStatistics.isEnabled() ) {
+        if (routerStatistics != null)
+        {
+            if (routerStatistics.isEnabled())
+            {
                 routerStatistics.incrementRoutedMessage(endpoint);
             }
         }
@@ -73,14 +78,17 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     public UMOMessage send(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
         setMessageProperties(session, message, endpoint);
-        if(replyTo!=null) {
+        if (replyTo != null)
+        {
             dispatch(session, message, endpoint);
             return null;
         }
 
         UMOMessage result = session.sendEvent(message, endpoint);
-        if(routerStatistics!=null) {
-            if(routerStatistics.isEnabled() ) {
+        if (routerStatistics != null)
+        {
+            if (routerStatistics.isEnabled())
+            {
                 routerStatistics.incrementRoutedMessage(endpoint);
             }
         }
@@ -89,62 +97,70 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     protected void setMessageProperties(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UniqueIdNotSupportedException
     {
-        if(replyTo!=null) {
+        if (replyTo != null)
+        {
+            //if replyTo is set we'll probably want the correlationId set as well
             message.setReplyTo(replyTo);
             message.setProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY, session.getComponent().getDescriptor().getName());
-            if(logger.isDebugEnabled()) logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: " + endpoint.getEndpointURI());
+            if (logger.isDebugEnabled()) logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: " + endpoint.getEndpointURI());
         }
-        if(correlationId) {
-            String correlation = null;
-            if(correlationIdExtractor==null) {
-                correlation = message.getUniqueId();
-            } else {
-                Object o = correlationIdExtractor.getPropertry(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
-                if(logger.isDebugEnabled()) logger.debug("Extracted correlation Id as: " + o);
-                correlation = o.toString();
-            }
-            int seq = 1;
-            if(correlationSequenceExtractor!=null) {
-                Object o = correlationSequenceExtractor.getPropertry(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, message);
-                if(logger.isDebugEnabled()) logger.debug("Extracted correlation sequence as: " + o);
-                if(o!=null) {
-                    try
-                    {
-                        seq = Integer.parseInt(o.toString());
-                    } catch (NumberFormatException e)
-                    {
-                        if(logger.isDebugEnabled()) logger.debug("Invalid Correlation sequence value: " + o.toString() + ". Defaulting to 1");
-                        seq=1;
-                    }
-                }
+        if (enableCorrelation != ENABLE_CORREATION_NEVER)
+        {
+            boolean correlationSet = message.getCorrelationId()!=null;
+            if(correlationSet && (enableCorrelation == ENABLE_CORREATION_IF_NOT_SET)) {
+                logger.debug("CorrelationId is already set, not setting it again");
+                return;
+            } else if(correlationSet) {
+                logger.debug("CorrelationId is already set, but router is configured to overwrite it");
             }
 
+            String correlation = null;
+            Object o = propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+            if(logger.isDebugEnabled()) logger.debug("Extracted correlation Id as: " + o);
+            correlation = o.toString();
+
+            int seq = 1;
+//            o = propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, message);
+//            if (logger.isDebugEnabled()) logger.debug("Extracted correlation sequence as: " + o);
+//            if (o != null)
+//            {
+//                try
+//                {
+//                    seq = Integer.parseInt(o.toString());
+//                } catch (NumberFormatException e)
+//                {
+//                    if (logger.isDebugEnabled()) logger.debug("Invalid Correlation sequence value: " + o.toString() + ". Defaulting to 1");
+//                    seq = 1;
+//                }
+//            }
+
             int group = 1;
-            if(correlationGroupExtractor!=null) {
-                Object o = correlationGroupExtractor.getPropertry(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, message);
-                if(logger.isDebugEnabled()) logger.debug("Extracted correlation Group size as: " + o);
-                if(o!=null) {
-                    try
-                    {
-                        group = Integer.parseInt(o.toString());
-                    } catch (NumberFormatException e)
-                    {
-                        if(logger.isDebugEnabled()) logger.debug("Invalid Correlation group value: " + o.toString() + ". Defaulting to 1");
-                        group=1;
-                    }
-                }
-            }
-            if(logger.isDebugEnabled()) {
+//            o = propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, message);
+//            if (logger.isDebugEnabled()) logger.debug("Extracted correlation Group size as: " + o);
+//            if (o != null)
+//            {
+//                try
+//                {
+//                    group = Integer.parseInt(o.toString());
+//                } catch (NumberFormatException e)
+//                {
+//                    if (logger.isDebugEnabled()) logger.debug("Invalid Correlation group value: " + o.toString() + ". Defaulting to 1");
+//                    group = 1;
+//                }
+//            }
+
+            if (logger.isDebugEnabled())
+            {
                 StringBuffer buf = new StringBuffer();
-                buf.append("Setting Correlation info form Outbound router for endpoint: ").append(endpoint.getEndpointURI());
+                buf.append("Setting Correlation info on Outbound router for endpoint: ").append(endpoint.getEndpointURI());
                 buf.append("\n").append("Id=").append(correlation);
-                buf.append(", ").append("Seq=").append(seq);
-                buf.append(", ").append("Group Size=").append(group);
+//                buf.append(", ").append("Seq=").append(seq);
+//                buf.append(", ").append("Group Size=").append(group);
                 logger.debug(buf.toString());
             }
             message.setCorrelationId(correlation);
-            message.setCorrelationGroupSize(group);
-            message.setCorrelationSequence(seq);
+//            message.setCorrelationGroupSize(group);
+//            message.setCorrelationSequence(seq);
         }
     }
 
@@ -176,9 +192,11 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     public void setReplyTo(String replyTo)
     {
-        if(replyTo!=null) {
+        if (replyTo != null)
+        {
             this.replyTo = MuleManager.getInstance().lookupEndpointIdentifier(replyTo, replyTo);
-        } else {
+        } else
+        {
             this.replyTo = null;
         }
     }
@@ -193,44 +211,39 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         this.routerStatistics = routerStatistics;
     }
 
-    public boolean isCorrelationId()
+    public int getEnableCorrelation()
     {
-        return correlationId;
+        return enableCorrelation;
     }
 
-    public void setCorrelationId(boolean correlationId)
+    public void setEnableCorrelation(int enableCorrelation)
     {
-        this.correlationId = correlationId;
+        this.enableCorrelation = enableCorrelation;
     }
 
-    public PropertyExtractor getCorrelationIdExtractor()
+    public void setEnableCorrelationAsString(String enableCorrelation)
     {
-        return correlationIdExtractor;
+        if(enableCorrelation!=null) {
+            if(enableCorrelation.equals("ALWAYS")) {
+                this.enableCorrelation = ENABLE_CORREATION_ALWAYS;
+            } else if(enableCorrelation.equals("NEVER")) {
+                this.enableCorrelation = ENABLE_CORREATION_NEVER;
+            } else if(enableCorrelation.equals("IF_NOT_SET")) {
+                this.enableCorrelation = ENABLE_CORREATION_IF_NOT_SET;
+            } else {
+                throw new IllegalArgumentException("Value for enableCorrelation not recognised: " + enableCorrelation);
+            }
+        }
     }
 
-    public void setCorrelationIdExtractor(PropertyExtractor correlationIdExtractor)
+    public PropertyExtractor getPropertyExtractor()
     {
-        this.correlationIdExtractor = correlationIdExtractor;
+        return propertyExtractor;
     }
 
-    public PropertyExtractor getCorrelationSequenceExtractor()
+    public void setPropertyExtractor(PropertyExtractor propertyExtractor)
     {
-        return correlationSequenceExtractor;
-    }
-
-    public void setCorrelationSequenceExtractor(PropertyExtractor correlationSequenceExtractor)
-    {
-        this.correlationSequenceExtractor = correlationSequenceExtractor;
-    }
-
-    public PropertyExtractor getCorrelationGroupExtractor()
-    {
-        return correlationGroupExtractor;
-    }
-
-    public void setCorrelationGroupExtractor(PropertyExtractor correlationGroupExtractor)
-    {
-        this.correlationGroupExtractor = correlationGroupExtractor;
+        this.propertyExtractor = propertyExtractor;
     }
 
     public UMOTransactionConfig getTransactionConfig()

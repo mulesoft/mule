@@ -840,6 +840,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             digester.addObjectCreate(path, OUTBOUND_MESSAGE_ROUTER_INTERFACE, "className");
         }
 
+        addSetPropertiesRule(path, digester, new String[]{"enableCorrelation"}, new String[]{"enableCorrelationAsString"});
         addMulePropertiesRule(path, digester, true);
         if("outbound".equals(type)) {
             addEndpointRules(digester, path, "addEndpoint");
@@ -992,11 +993,9 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
     protected void addMulePropertiesRule(String path, Digester digester, final boolean setAsBeanProperties)
     {
-        boolean envProps = false;
         //small hack to allow the same property rules to be used but the environment-properties elements
         if(!path.endsWith("environment-properties")) {
             path += "/properties";
-            envProps = true;
         }
         digester.addRule(path, new ObjectCreateRule(path , HashMap.class){
             //This will set the properties on the top object as bean setters if the flag is set

@@ -49,7 +49,11 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
      */
     public String getPayloadAsString() throws Exception
     {
-        return message.toString();
+        if(message instanceof byte[]) {
+            return new String((byte[])message);
+        } else {
+            return message.toString();
+        }
     }
 
     /**

@@ -13,7 +13,9 @@
  */
 package org.mule.routing.response;
 
+import org.mule.config.PropertyExtractor;
 import org.mule.management.stats.RouterStatistics;
+import org.mule.routing.DefaultPropertiesExtractor;
 import org.mule.umo.routing.UMOResponseRouter;
 
 /**
@@ -27,6 +29,8 @@ public abstract class AbstractResponseRouter implements UMOResponseRouter
 {
     private RouterStatistics routerStatistics;
 
+    protected PropertyExtractor correlationExtractor = new DefaultPropertiesExtractor();
+
     public RouterStatistics getRouterStatistics()
     {
         return routerStatistics;
@@ -35,5 +39,15 @@ public abstract class AbstractResponseRouter implements UMOResponseRouter
     public void setRouterStatistics(RouterStatistics routerStatistics)
     {
         this.routerStatistics = routerStatistics;
+    }
+
+    public PropertyExtractor getCorrelationExtractor()
+    {
+        return correlationExtractor;
+    }
+
+    public void setCorrelationExtractor(PropertyExtractor correlationExtractor)
+    {
+        this.correlationExtractor = correlationExtractor;
     }
 }

@@ -26,7 +26,6 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
@@ -57,16 +56,14 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
     {
         List list = getRecipients(message);
         List results = new ArrayList();
-        try
-        {
-            //synchronized(message) {
-                message.setCorrelationId(message.getUniqueId());
+        if(enableCorrelation != ENABLE_CORREATION_NEVER) {
+            boolean correlationSet = message.getCorrelationId()!=null;
+            if(correlationSet && (enableCorrelation == ENABLE_CORREATION_IF_NOT_SET)) {
+                logger.debug("CorrelationId is already set, not setting Correlation group size");
+            } else {
+                //the correlationId will be set by the AbstractOutboundRouter
                 message.setCorrelationGroupSize(list.size());
-            //}
-            logger.debug("set correlationId to: " + message.getCorrelationId());
-        } catch (UniqueIdNotSupportedException e)
-        {
-            throw new RoutingException("Cannot use recipientList router with transports that do not support a unique id", e, message);
+            }
         }
 
         UMOMessage result = null;

@@ -19,6 +19,7 @@ import EDU.oswego.cs.dl.util.concurrent.Sync;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.config.MuleProperties;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -40,12 +41,10 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(AbstractResponseAggregator.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     private Map responseEvents = new ConcurrentHashMap();
     private Map locks = new ConcurrentHashMap();
-
-    protected static final String NO_CORRELATION_ID = "no-id";
 
     protected long timeout = 0;
 
@@ -88,11 +87,14 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      * @param event
      * @return
      */
-    protected EventGroup addEvent(UMOEvent event)
+    protected EventGroup addEvent(UMOEvent event) throws RoutingException
     {
-        String cId = event.getMessage().getCorrelationId();
-        if (cId == null) cId = NO_CORRELATION_ID;
+        String cId = (String)correlationExtractor.getPropertry(MuleProperties.MULE_CORRELATION_ID_PROPERTY, event.getMessage());
+        if (cId == null) {
+            throw new RoutingException("There is no Correlation Id set on the current event: " + event);
+        }
         EventGroup eg = (EventGroup) eventGroups.get(cId);
+        logger.debug("\n\nAdding event to response aggregator group: " + cId);
         if (eg == null)
         {
             eg = new EventGroup(cId);
@@ -125,14 +127,17 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         }
         Sync s = (Sync)locks.get(messageId);
         if(s==null) {
-    		logger.debug("Creating latch for " + messageId + " in " + this);
+    		logger.debug("Got response but no one is waiting for it yet. Creating latch for " + messageId + " in " + this);
             s = new Latch();
             locks.put(messageId, s);
+        } else {
+            logger.debug("Got latch for message: " + messageId);
         }
 
         boolean b = false;
         try
         {
+            logger.debug("Waiting for response to message: " + messageId);
             if(timeout>=0) {
                 s.acquire();
                 b = true;
