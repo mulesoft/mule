@@ -22,15 +22,15 @@
         LoanConsumer consumer = new LoanConsumer();
         int requests = Integer.parseInt(random);
         //to get all the result and print them out
-//        List results = consumer.requestSend(requests, "vm://LoanBrokerRequests");
-        consumer.requestDispatch(requests, "vm://LoanBrokerRequests");
+        List results = consumer.requestSend(requests, "vm://LoanBrokerRequests");
+        //consumer.requestDispatch(requests, "vm://LoanBrokerRequests");
         %>
         <b>You have just made <%=requests%> Loan Requests!</b>
-<%--        <ol>--%>
-<%--        <% for(Iterator iter = results.iterator(); iter.hasNext();) {--%>
-<%--            %><li><%=iter.next().toString()%></li><%--%>
-<%--        }%>--%>
-<%--        </ol>--%>
+        <ol>
+        <% for(Iterator iter = results.iterator(); iter.hasNext();) {
+            %><li><%=iter.next().toString()%></li><%
+        }%>
+        </ol>
         <p/>You can view the statistics for these requests <a href="http://localhost:9092/InvokeAction//Mule%3Atype%3Dstatistics/action=printHtmlSummary?action=printHtmlSummary">here</a>.</b>
         <%
     } else if(amountString!=null && durationString!=null && name!=null) {

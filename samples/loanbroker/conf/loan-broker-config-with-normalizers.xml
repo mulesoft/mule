@@ -13,6 +13,7 @@ the different components are made from the loan broker component (a la hub and s
 
 <mule-configuration id="Loan_broker_Async" version="1.0">
 
+    <mule-environment-properties serverUrl=""/> 
     <!--
     Setting global endpoints can help simplify configuration by defining an actual
     url endpointUri in one place. The endpointUri name can be used in place of the url.
