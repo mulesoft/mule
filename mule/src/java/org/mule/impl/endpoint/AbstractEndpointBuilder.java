@@ -32,9 +32,9 @@ import java.util.Properties;
 public abstract class AbstractEndpointBuilder implements EndpointBuilder
 {
     public static final String PROPERTY_ENDPOINT_NAME = "endpointName";
-    public static final String PROPERTY_ENDPOINT_URI = "endpointUri";
+    public static final String PROPERTY_ENDPOINT_URI = "address";
     public static final String PROPERTY_CREATE_CONNECTOR = "createConnector";
-    public static final String PROPERTY_CONNECTOR_NAME = "connectorName";
+    public static final String PROPERTY_CONNECTOR_NAME = "connector";
     public static final String PROPERTY_TRANSFORMERS = "transformers";
     protected String address;
     protected String endpointName;
