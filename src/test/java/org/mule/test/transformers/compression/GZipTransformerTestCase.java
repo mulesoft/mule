@@ -13,16 +13,19 @@
  *
  */
 
-package org.mule.test.transformers.encryption;
+package org.mule.test.transformers.compression;
 
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.util.compression.CompressionHelper;
+import org.mule.util.compression.GZipCompression;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.transformers.encryption.EncryptionTransformer;
 import org.mule.transformers.encryption.DecryptionTransformer;
+import org.mule.transformers.compression.GZipCompressTransformer;
+import org.mule.transformers.compression.GZipUncompressTransformer;
 import org.mule.InitialisationException;
 
 import java.util.Arrays;
@@ -31,16 +34,14 @@ import java.util.Arrays;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
+public class GZipTransformerTestCase extends AbstractTransformerTestCase
 {
-    private PasswordBasedEncryptionStrategy strat;
+    private GZipCompression strat;
 
     protected void setUp() throws Exception
     {
         super.setUp();
-        strat = new PasswordBasedEncryptionStrategy();
-        strat.setPassword("mule");
-        strat.initialise();
+        strat = new GZipCompression();
     }
 
 
@@ -51,8 +52,8 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     {
         try
         {
-            return strat.encrypt(getTestData().toString().getBytes());
-        } catch (CryptoFailureException e)
+            return strat.compressByteArray(getTestData().toString().getBytes());
+        } catch (Exception e)
         {
             fail(e.getMessage());
             return null;
@@ -72,15 +73,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
      */
     public UMOTransformer getTransformer()
     {
-        EncryptionTransformer transformer = new EncryptionTransformer();
-        transformer.setStrategy(strat);
-        try
-        {
-            transformer.initialise();
-        } catch (InitialisationException e)
-        {
-            fail(e.getMessage());
-        }
+        GZipCompressTransformer transformer = new GZipCompressTransformer();
         return transformer;
     }
 
@@ -94,8 +87,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
      */
     public UMOTransformer getRoundTripTransformer()
     {
-        DecryptionTransformer transformer = new DecryptionTransformer();
-        transformer.setStrategy(strat);
+        GZipUncompressTransformer transformer = new GZipUncompressTransformer();
         transformer.setReturnClass(String.class);
         try
         {

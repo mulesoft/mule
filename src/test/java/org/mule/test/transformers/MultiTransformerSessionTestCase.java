@@ -14,12 +14,11 @@ package org.mule.test.transformers;
 
 import junit.framework.TestCase;
 import org.mule.transformers.MultiTransformerSession;
+import org.mule.transformers.codec.Base64Encoder;
+import org.mule.transformers.codec.Base64Decoder;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <p/>
- * <code>MultiTransformerTestCase</code> TODO (document class)
- *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
@@ -27,7 +26,8 @@ public class MultiTransformerSessionTestCase extends TestCase
 {
     private static final String TEST_DATA = "the quick brown fox jumped over the lazy dog";
 
-    private ReverseCompressionTransformer trans;
+    private Base64Encoder trans;
+    private Base64Decoder roundtripTrans;
 
     public void testBeginCommitBehaviour() throws Exception
     {
@@ -38,19 +38,18 @@ public class MultiTransformerSessionTestCase extends TestCase
         assertTrue(mts.isInSession());
         Object result = mts.transform(trans, TEST_DATA);
         assertTrue(mts.isInSession());
-        assertEquals(TEST_DATA, new StringBuffer(result.toString()).reverse().toString());
-        result = mts.transform(trans, result);
+        assertEquals(TEST_DATA, new String(roundtripTrans.transform(result).toString()));
+        result = mts.transform(roundtripTrans, result);
         assertEquals(TEST_DATA, result.toString());
 
         assertEquals(3, mts.getStackSize());
         assertEquals(TEST_DATA, mts.getFromStack(0));
-        assertEquals(new StringBuffer(TEST_DATA).reverse().toString(), mts.getFromStack(1));
+        assertEquals(mts.getFromStack(1), new String(trans.transform(result).toString()));
         assertEquals(TEST_DATA, mts.getFromStack(2));
 
         result = mts.transform(trans, TEST_DATA);
         assertEquals(4, mts.getStackSize());
         assertEquals(result, mts.getData());
-        assertEquals(new StringBuffer(TEST_DATA).reverse().toString(), mts.getData());
 
         mts.commit();
         assertEquals(0, mts.getStackSize());
@@ -66,19 +65,18 @@ public class MultiTransformerSessionTestCase extends TestCase
         //Test default session start on transform
         Object result = mts.transform(trans, TEST_DATA);
         assertTrue(mts.isInSession());
-        assertEquals(TEST_DATA, new StringBuffer(result.toString()).reverse().toString());
-        result = mts.transform(trans, result);
+        result = mts.transform(roundtripTrans, result);
         assertEquals(TEST_DATA, result.toString());
 
         assertEquals(3, mts.getStackSize());
         assertEquals(TEST_DATA, mts.getFromStack(0));
-        assertEquals(new StringBuffer(TEST_DATA).reverse().toString(), mts.getFromStack(1));
+        assertEquals(mts.getFromStack(1), new String(trans.transform(result).toString()));
         assertEquals(TEST_DATA, mts.getFromStack(2));
 
         result = mts.transform(trans, TEST_DATA);
         assertEquals(4, mts.getStackSize());
         assertEquals(result, mts.getData());
-        assertEquals(new StringBuffer(TEST_DATA).reverse().toString(), mts.getData());
+        assertEquals(mts.getData(), result);
 
         mts.rollback();
         assertEquals(0, mts.getStackSize());
@@ -131,7 +129,8 @@ public class MultiTransformerSessionTestCase extends TestCase
 	 */
     protected void setUp() throws Exception
     {
-        trans = new ReverseCompressionTransformer();
+        trans = new Base64Encoder();
+        roundtripTrans = new Base64Decoder();
     }
 
 }

@@ -30,21 +30,22 @@ public class XsltTransaformerTestCase extends AbstractTransformerTestCase {
     protected void setUp() throws Exception
     {
         super.setUp();
-        srcData = Utility.fileToString("src/test/conf/cdcatalog.xml");
-        resultData = Utility.fileToString("src/test/conf/cdcatalog.html");
+
+        srcData = Utility.loadResourceAsString("cdcatalog.xml", getClass());
+        resultData = Utility.loadResourceAsString("cdcatalog.html", getClass());
     }
 
     public UMOTransformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-		transformer.setXslFile("src/test/conf/cdcatalog.xsl");
+		transformer.setXslFile("cdcatalog.xsl");
 		transformer.initialise();
         return transformer;
     }
 
     public UMOTransformer getRoundTripTransformer() throws Exception
     {
-        throw new UnsupportedOperationException("Round trip not implemented");
+        return null;
     }
 
     public void testRoundtripTransform() throws Exception {
@@ -59,31 +60,6 @@ public class XsltTransaformerTestCase extends AbstractTransformerTestCase {
     public Object getResultData()
     {
         return resultData;
-    }
-
-    public void testRoundTripSessionTransform() throws Exception
-    {
-        //noop
-    }
-
-    public void testRoundTripBadSessionCalls() throws Exception
-    {
-        //noop
-    }
-
-    public void testRoundtripBadReturnType() throws Exception
-    {
-        //noop
-    }
-
-    public void testRoundTrip() throws Exception
-    {
-        //noop
-    }
-
-    public void testRoundtripAutoCommitTransform() throws Exception
-    {
-        //noop
     }
 
     public boolean compareResults(Object src, Object result) {
