@@ -25,6 +25,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
+import sun.misc.BASE64Encoder;
+
 /**
  * <code>PasswordBasedEncryptionStrategy</code> uses password-based encryption to
  * encrypt and decrypt data.  Developers can set the salt, iternationCount
@@ -49,12 +51,12 @@ public class PasswordBasedEncryptionStrategy implements UMOEncryptionStrategy
     private Cipher decryptCipher;
 
     private String algorithm = "PBEWithMD5AndDES";
-    private byte[] salt = null; //new byte[]{
-        //(byte)0xc7, (byte)0x73, (byte)0x21, (byte)0x8c,
-        //(byte)0x7e, (byte)0xc8, (byte)0xee, (byte)0x99};
+    private byte[] salt = null;
 
     private int iterationCount = 20;
     private char[] password;
+
+    private boolean base64Encoding = true;
 
 
     public void initialise() throws InitialisationException
@@ -66,8 +68,7 @@ public class PasswordBasedEncryptionStrategy implements UMOEncryptionStrategy
         }
         if(salt==null) {
             salt = new byte[]{(byte)0xc7, (byte)0x73, (byte)0x21, (byte)0x8c,
-        (byte)0x7e, (byte)0xc8, (byte)0xee, (byte)0x99};
-            //throw new InitialisationException("PBE salt cannot be null");
+                                (byte)0x7e, (byte)0xc8, (byte)0xee, (byte)0x99};
         }
 
         if(password==null) {
@@ -95,7 +96,12 @@ public class PasswordBasedEncryptionStrategy implements UMOEncryptionStrategy
     {
         try
         {
-            return encryptCipher.doFinal(data);
+            byte[] buf = encryptCipher.doFinal(data);
+            if(base64Encoding) {
+                return new BASE64Encoder().encode(buf).getBytes();
+            } else {
+                return buf;
+            }
         } catch (Exception e)
         {
             throw new CryptoFailureException(e.getMessage(), e, this);
@@ -106,7 +112,11 @@ public class PasswordBasedEncryptionStrategy implements UMOEncryptionStrategy
     {
         try
         {
-            return decryptCipher.doFinal(data);
+            byte[] dec = data;
+            if(base64Encoding) {
+                dec = new sun.misc.BASE64Decoder().decodeBuffer(new String(data));
+            }
+            return decryptCipher.doFinal(dec);
         } catch (Exception e)
         {
             throw new CryptoFailureException(e.getMessage(), e, this);
@@ -170,5 +180,15 @@ public class PasswordBasedEncryptionStrategy implements UMOEncryptionStrategy
 //        buf.append("Salt length=").append(salt.length);
 //        buf.append("Iterations=").append(iterationCount);
         return buf.toString();
+    }
+
+    public boolean isBase64Encoding()
+    {
+        return base64Encoding;
+    }
+
+    public void setBase64Encoding(boolean base64Encoding)
+    {
+        this.base64Encoding = base64Encoding;
     }
 }
