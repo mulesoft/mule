@@ -1049,16 +1049,20 @@ public class MuleManager implements UMOManager
      * @return Reader container configuration embedded within mule config
      */
     protected Reader getContainerContextConfiguration() throws ConfigurationException {
-        StringWriter s = new StringWriter();
-        StreamResult result = new StreamResult(s);
-        TransformerFactory tFactory = TransformerFactory.newInstance();
-        try {
-            Transformer transformer = tFactory.newTransformer();
-            transformer.transform(new DOMSource(containerContextConfiguration), result);
-        } catch (TransformerException e) {
-            throw new ConfigurationException("could not recover container configuration from fragment", e);
+        StringReader result = null;
+        if (containerContextConfiguration != null) {
+            StringWriter s = new StringWriter();
+            StreamResult streamResult = new StreamResult(s);
+            TransformerFactory tFactory = TransformerFactory.newInstance();
+            try {
+                Transformer transformer = tFactory.newTransformer();
+                transformer.transform(new DOMSource(containerContextConfiguration), streamResult);
+            } catch (TransformerException e) {
+                throw new ConfigurationException("could not recover container configuration from fragment", e);
+            }
+            result = new StringReader(s.toString());
         }
-        return new StringReader(s.toString());
+        return result;
     }
 
     /**
