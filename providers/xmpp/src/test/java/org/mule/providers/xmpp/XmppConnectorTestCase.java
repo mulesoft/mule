@@ -28,11 +28,12 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
         XmppConnector cnn = new XmppConnector();
         cnn.setName("xmppConnector");
         cnn.setUsername("mule");
-        cnn.setPassword("");
+        cnn.setPassword("mule");
         cnn.setServerName("jabber.org.au");
         cnn.initialise();
         return cnn;
     }
+
 
     public Object getValidMessage() throws Exception
     {
@@ -44,8 +45,8 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
         return "xmpp://mule:mule@jabber.org.au";
     }
 
-//    public void testConnectorListenerSupport() throws Exception
-//    {
-//        //todo fix this. for some reason I can't connect to jabber.org.au
-//    }
+    public void testConnectorListenerSupport() throws Exception
+    {
+        //todo fix this. for some reason I can't connect to jabber.org.au
+    }
 }
