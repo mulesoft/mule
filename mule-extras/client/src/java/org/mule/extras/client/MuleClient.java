@@ -145,7 +145,7 @@ public class MuleClient
         if (!MuleManager.isInstanciated())
         {
             MuleManager.getConfiguration().setServerUrl("");
-            MuleManager.getConfiguration().setClientMode(true);
+            //MuleManager.getConfiguration().setClientMode(true);
         }
 
         manager = MuleManager.getInstance();
