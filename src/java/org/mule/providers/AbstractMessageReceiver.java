@@ -162,7 +162,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
                 Map.Entry entry = (Map.Entry)iterator.next();
                 buf.append("  ").append(entry.getKey()).append("=").append(entry.getValue()).append("\n");
             }
-            logger.debug("Message properties: " + buf.toString());
+            logger.debug("Message properties:\n" + buf.toString());
         }
 
         ResponseOutputStream ros=null;
