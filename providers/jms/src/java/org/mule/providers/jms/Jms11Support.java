@@ -23,6 +23,7 @@ import javax.jms.MessageProducer;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.jms.TopicSession;
+import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
@@ -79,7 +80,13 @@ public class Jms11Support implements JmsSupport
 
     public MessageConsumer createConsumer(Session session, Destination destination, String messageSelector, boolean noLocal, String durableName) throws JMSException
     {
-		return session.createConsumer(destination, messageSelector, noLocal);
+        if(durableName==null) {
+		    return session.createConsumer(destination, messageSelector, noLocal);
+        } else if(destination instanceof Topic) {
+            return session.createDurableSubscriber((Topic)destination, durableName, messageSelector, noLocal);
+        } else {
+            throw new JMSException("adurable subscriber name was set but the destination was not a Topic");
+        }
 	}
 
     public Destination createDestination(Session session, String name, boolean topic) throws JMSException {

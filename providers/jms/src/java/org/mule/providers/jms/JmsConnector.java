@@ -70,7 +70,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 
     private int acknowledgementMode = Session.AUTO_ACKNOWLEDGE;
 
-    private String durableName;
+    private String clientId;
 
     private boolean durable;
 
@@ -188,6 +188,11 @@ public class JmsConnector extends AbstractServiceEnabledConnector
             connection = jmsSupport.createConnection(connectionFactory);
         }
 
+        if(clientId==null) {
+            setClientId("mule." + getName());
+            logger.debug("Jms clientId is not set defaulting to: " + getClientId());
+        }
+        connection.setClientID(getClientId());
         return connection;
     }
 
@@ -328,23 +333,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     public void setDurable(boolean durable)
     {
         this.durable = durable;
-    }
-
-    /**
-     * @return Returns the durableName.
-     */
-    public String getDurableName()
-    {
-        return durableName;
-    }
-
-
-    /**
-     * @param durableName The durableName to set.
-     */
-    public void setDurableName(String durableName)
-    {
-        this.durableName = durableName;
     }
 
     /**
@@ -523,4 +511,14 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 	public Connection getConnection() {
 		return connection;
 	}
+
+    public String getClientId()
+    {
+        return clientId;
+    }
+
+    public void setClientId(String clientId)
+    {
+        this.clientId = clientId;
+    }
 }

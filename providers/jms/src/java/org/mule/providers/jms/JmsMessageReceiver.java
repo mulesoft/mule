@@ -21,6 +21,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.mule.InitialisationException;
 import org.mule.impl.MuleMessage;
@@ -174,13 +175,20 @@ public class JmsMessageReceiver extends
             //to be backward compatable
             selector = (String) endpoint.getProperties().get(JmsConnector.JMS_SELECTOR_PROPERTY);
         }
+        String tempDurable = (String)endpoint.getProperties().get("durable");
+        boolean durable = connector.isDurable();
+        if(tempDurable!=null) durable = Boolean.valueOf(tempDurable).booleanValue();
+
+        //Get the durable subscriber name if there is one
+        String durableName = (String)endpoint.getProperties().get("durableName");
+        if(durableName==null && durable && dest instanceof Topic)
+        {
+            durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
+            logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: " + durableName);
+        }
 
         // Create consumer
-        if (this.connector.isDurable()) {
-            consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), connector.getDurableName());
-        } else {
-            consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), null);
-        }
+        consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName);
 	}
 	
 	/**
