@@ -5,6 +5,7 @@
    <bean id="jmsConnector" class="org.mule.providers.jms.JmsConnector">
        <property name="connectionFactoryJndiName"><value>ConnectionFactory</value></property>
        <property name="jndiInitialFactory"><value>org.codehaus.activemq.jndi.ActiveMQInitialContextFactory</value></property>
+       <property name="specification"><value>1.1</value></property>
    </bean>
 
    <!-- The Mule implementation of the Spring ApplicationEventMulticaster.  On startup the

@@ -310,12 +310,12 @@
         </dependency>
     </dependencies>
     <build>
-        <sourceDirectory>${basedir}/src/test/java</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+        <sourceDirectory>src/test/java</sourceDirectory>
+        <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
         <unitTest>
             <resources>
                 <resource>
-                    <directory>${basedir}/src/test/conf</directory>
+                    <directory>src/test/conf</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>
