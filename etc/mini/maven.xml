@@ -4,7 +4,7 @@
     xmlns:ant="jelly:ant"
     xmlns:maven="jelly:maven">
 
-    <goal name="mule:mini" prereqs="clean,mule:release-prepare,mule:libs-copy,all-jars,mule:samples,mule:zip-release"
+    <goal name="minimule" prereqs="clean,mule:release-prepare,mule:libs-copy,all-jars,mule:samples,mule:zip-release"
         description="Creates and zips build for distribution"/>
 
     <goal name="all-jars" prereqs="setvars">
@@ -67,11 +67,13 @@
     <!--=================================================-->
 
     <goal name="setvars">
+        <j:set var="samples.vars.overriden" value="true"/>
         <j:set var="mule.release.dir" value="${maven.build.dir}\release"/>
         <j:set var="mule.release.lib.dir" value="${mule.release.dir}\lib"/>
         <j:set var="mule.release.dist.dir" value="${mule.release.dir}\dist"/>
         <j:set var="mule.release.src.dir" value="${mule.release.dir}\src"/>
         <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
+        <j:set var="samples.dist" value="${samples.release.dir}/samples"/>
         <echo>Release dir is ${mule.release.dir}</echo>
     </goal>
 
