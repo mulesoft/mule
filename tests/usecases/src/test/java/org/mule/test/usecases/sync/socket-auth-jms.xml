@@ -4,7 +4,7 @@
 
 <mule-configuration id="test" version="1.0">
 
-    <mule-environment-properties synchronous="true" synchronousReceive="true" synchronousEventTimeout="5000"/>
+    <mule-environment-properties synchronous="false" synchronousEventTimeout="5000"/>
 
    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
@@ -17,7 +17,11 @@
         <mule-descriptor name="LdapUMO"
             implementation="org.mule.test.usecases.sync.TestAuthenticationUMO">
             <inbound-router>
-                <endpoint address="tcp://localhost:4444"/>
+                <endpoint synchronous="true" address="tcp://localhost:4444">
+<!--                    <properties>-->
+<!--                        <property name="SYNC_RECEIVE" value="true"/>-->
+<!--                    </properties>-->
+                </endpoint>
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">

@@ -42,6 +42,6 @@ public class TestAuthenticationUMO implements Callable
         UMOMessage message = eventContext.receiveEvent("jms://ResultQueue", 5000);
         //Calling this tells mule not to go any further and return
         eventContext.setStopFurtherProcessing(true);
-        return "Received: " + message.getPayloadAsString();
+        return message.getPayloadAsString();
     }
 }
