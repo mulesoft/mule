@@ -134,7 +134,7 @@
         <echo>Samples release dir is ${mule.samples.dist}</echo>
     </goal>
 
-    <goal name="mule:release-prepare" prereqs="setvars">
+    <goal name="mule:release-prepare" prereqs="clean, multiproject:clean, setvars">
         <echo>About to create lib and bin directories in ${mule.release.dir}</echo>
         <mkdir dir="${mule.release.dir}"/>
         <mkdir dir="${mule.release.dist.dir}"/>
@@ -181,7 +181,11 @@
         </copy>
 
         <attainGoal name="mule:zip-release"/>
+        <!-- Mini Mule Build -->
         <attainGoal name="mini:mule"/>
+        <ant:copy todir="${maven.build.dir}/distributions">
+	    <ant:fileset dir="${basedir}/etc/mini/target/release/" includes="mini-mule*"/>
+	</ant:copy>
     </goal>
 
     <goal name="build-classpath" prereqs="setvars">
@@ -240,18 +244,17 @@
 
     <goal name="mule:zip-release" prereqs="setvars">
         <mkdir dir="${maven.build.dir}/distributions"/>
-        <!--<zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dist.zip">
+        <zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dist.zip">
             <zipfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
-        </zip>-->
+        </zip>
         <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-dist.tar.gz" longfile="gnu">
             <tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
         </tar>
-        <!-- zip up site -->
-        <zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-site.zip">
-            <zipfileset dir="${maven.build.dir}/docs" prefix="docs"/>
-        </zip>
+        <!-- tar up site -->
+        <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-site.tar.gz" longfile="gnu">
+            <tarfileset dir="${maven.build.dir}/docs" prefix="docs"/>
+        </tar>
     </goal>
-
 
     <goal name="mule:site" prereqs="mule:dtds, multiproject:site"/>
 
@@ -357,8 +360,11 @@
             banner="Create Mini Mule Distribution"
             ignoreFailures="false"/>
 
-            <ant:copy todir="${maven.build.dir}/distributions">
-	        <ant:fileset dir="${basedir}/etc/mini/target/release/" includes="mini-mule*"/>
-	    </ant:copy>
     </goal>
+
+    <postGoal name="test">
+        <j:set var="goal" value="test"/>
+        <attainGoal name="multiproject:goal"/>
+    </postGoal>
+
 </project>
