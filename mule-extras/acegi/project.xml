@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <id>mule-extras-acegi</id>
+    <artifactId>mule-extras-acegi</artifactId>
+    <name>Mule Acegi Security</name>
+    <shortDescription>acegi</shortDescription>
+    <description>Mule Acegi Support exposes Acegi Authentication providers and Method interceptors to authentication event traffic via endpoints and method level authorisation on components. for more information see
+        <a href="http://wiki.muleumo.org/display/MULE/Mule+Security">Mule Security</a>.
+    </description>
+    <dependencies>
+        <!-- optional: used by the http remoting test case -->
+        <dependency>
+            <artifactId>mule-http-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org/providers/http</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <artifactId>commons-httpclient</artifactId>
+            <groupId>commons-httpclient</groupId>
+            <version>2.0.2</version>
+            <url>http://jakarta.apache.org/commons/httpclient/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <artifactId>acegi-security</artifactId>
+            <groupId>acegisecurity</groupId>
+            <version>0.7.0</version>
+            <url>http://acegi.sourceforge.net</url>
+        </dependency>
+        <dependency>
+            <artifactId>aopalliance</artifactId>
+            <groupId>aopalliance</groupId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>aspectjrt</artifactId>
+            <groupId>aspectj</groupId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <artifactId>commons-attributes-api</artifactId>
+            <groupId>commons-attributes</groupId>
+            <version>2.1</version>
+        </dependency>
+       <dependency>
+            <artifactId>commons-codec</artifactId>
+            <groupId>commons-codec</groupId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
+            <artifactId>ehcache</artifactId>
+            <groupId>ehcache</groupId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring</artifactId>
+            <groupId>springframework</groupId>
+            <version>1.1.3</version>
+        </dependency>
+        <dependency>
+            <artifactId>oro</artifactId>
+            <groupId>oro</groupId>
+            <version>2.0.7</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+    </build>
+</project>
