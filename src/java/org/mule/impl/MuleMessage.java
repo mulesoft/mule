@@ -318,4 +318,27 @@ public class MuleMessage implements UMOMessage
     {
         adapter.setCorrelationGroupSize(size);
     }
+
+    /**
+     * If an error occurred during the processing of this message this
+     * will return a value greater than zero
+     *
+     * @return
+     */
+    public int getErrorCode()
+    {
+        return adapter.getErrorCode();
+    }
+
+    /**
+     * If an error occurs while processing this message, this error code
+     * should be set to a value greater than zero and the palyoad of the this
+     * message should contain the error details
+     *
+     * @param code
+     */
+    public void setErrorCode(int code)
+    {
+        adapter.setErrorCode(code);
+    }
 }

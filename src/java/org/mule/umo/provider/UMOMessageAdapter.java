@@ -240,4 +240,19 @@ public interface UMOMessageAdapter extends Serializable
      * @return the endpointUri url to reply to or null if one has not been set
      */
     public Object getReplyTo();
+
+    /**
+     * If an error occurred during the processing of this message this
+     * will return a value greater than zero
+     * @return
+     */
+    public int getErrorCode();
+
+    /**
+     * If an error occurs while processing this message, this error code
+     * should be set to a value greater than zero and the palyoad of the this
+     * message should contain the error details
+     * @param code
+     */
+    public void setErrorCode(int code);
 }

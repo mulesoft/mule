@@ -253,4 +253,27 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     {
         setIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
     }
+
+    /**
+     * If an error occurred during the processing of this message this
+     * will return a value greater than zero
+     *
+     * @return
+     */
+    public int getErrorCode()
+    {
+        return getIntProperty(MuleProperties.MULE_ERROR_CODE_PROPERTY, 0);
+    }
+
+    /**
+     * If an error occurs while processing this message, this error code
+     * should be set to a value greater than zero and the palyoad of the this
+     * message should contain the error details
+     *
+     * @param code
+     */
+    public void setErrorCode(int code)
+    {
+        setIntProperty(MuleProperties.MULE_ERROR_CODE_PROPERTY, code);
+    }
 }
