@@ -15,6 +15,7 @@
 package org.mule.umo;
 
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.security.UMOSecurityContext;
 
 import java.io.Serializable;
 
@@ -191,4 +192,21 @@ public interface UMOSession extends Serializable
      * @return the unique id for this session
      */
     public String getId();
+
+    /**
+     * The security context for this session.  If not null outbound, inbound
+     * and/or method invocations will be authenticated using this context
+     * @param context the context for this session or null if the request is not
+     * secure.
+     */
+    public void setSecurityContext(UMOSecurityContext context);
+
+    /**
+     * The security context for this session.  If not null outbound, inbound
+     * and/or method invocations will be authenticated using this context
+     * @return the context for this session or null if the request is not
+     * secure.
+     */
+    public UMOSecurityContext getSecurityContext();
+
 }

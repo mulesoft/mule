@@ -19,6 +19,7 @@ import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.Serializable;
@@ -170,4 +171,14 @@ public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialis
      * @return true if message should be deleted, false otherwise
      */ 
     public boolean isDeleteUnacceptedMessages();
+
+    /**
+     * Returns an UMOEndpointSecurityFilter for this endpoint.  If one is
+     * not set, there will be no authentication
+     * on events sent via this endpoint
+     * @return UMOEndpointSecurityFilter responsible for authenticating
+     * message flow via this endpoint.
+     * @see UMOEndpointSecurityFilter
+     */
+    public UMOEndpointSecurityFilter getSecurityFilter();
 }

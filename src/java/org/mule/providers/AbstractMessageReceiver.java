@@ -21,7 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -36,6 +38,7 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
+import org.mule.umo.security.UMOSecurityException;
 
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -74,6 +77,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
      * the endpoint to receive events on
      */
     protected UMOConnector connector = null;
+
+    protected boolean serverSide = true;
 
     protected SynchronizedBoolean disposing = new SynchronizedBoolean(false);
 
@@ -147,14 +152,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     public final  UMOMessage routeMessage(UMOMessage message, UMOTransaction trans, boolean synchronous, OutputStream outputStream) throws UMOException
     {
-        //Apply the endpoint filter if one is configured
-        if(endpoint.getFilter()!=null) {
-            if(!endpoint.getFilter().accept(message)) {
-                handleUnacceptedFilter(message);
-                return null;
-            }
-        }
-
         if(logger.isDebugEnabled()) {
             logger.debug("Received message from: " + endpoint.getEndpointURI().getAddress());
             logger.debug("Payload is of type: " + message.getPayload().getClass().getName());
@@ -168,8 +165,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             logger.debug("Message properties: " + buf.toString());
         }
 
-        UMOSession session = new MuleSession(component, trans);
-        ResponseOutputStream ros  =null;
+        ResponseOutputStream ros=null;
         if(outputStream!=null) {
             if(outputStream instanceof ResponseOutputStream) {
                 ros = (ResponseOutputStream)outputStream;
@@ -177,7 +173,30 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
                 ros = new ResponseOutputStream(outputStream);
             }
         }
+
+        //Apply the endpoint filter if one is configured
+        if(endpoint.getFilter()!=null) {
+            if(!endpoint.getFilter().accept(message)) {
+                handleUnacceptedFilter(message);
+                return null;
+            }
+        }
+        UMOSession session = new MuleSession(component, trans);
         UMOEvent muleEvent = new MuleEvent(message, endpoint, session, synchronous, ros);
+        RequestContext.setEvent(muleEvent);
+
+        //Apple Security filter if one is set
+        if(endpoint.getSecurityFilter()!=null) {
+            try
+            {
+                endpoint.getSecurityFilter().authenticate(muleEvent);
+            } catch (UMOSecurityException e)
+            {
+                logger.warn("Request was made but was not authenticated: " + e.getMessage());
+                return new MuleMessage(e.getMessage(), muleEvent.getProperties());
+            }
+        }
+
         UMOMessage resultMessage = null;
         //This is a replyTo event for a current request
         if(UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType())) {
@@ -255,7 +274,17 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     protected boolean allowFilter(UMOFilter filter) throws UnsupportedOperationException
     {
-        //By default we dont support filters on endpoints
+        //By default we  support all filters on endpoints
         return true;
+    }
+
+    public boolean isServerSide()
+    {
+        return serverSide;
+    }
+
+    public void setServerSide(boolean serverSide)
+    {
+        this.serverSide = serverSide;
     }
 }
