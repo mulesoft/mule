@@ -76,7 +76,7 @@ public class HttpConnector extends TcpConnector
 
     private String proxyPassword = null;
 
-    private long keepAliveTimeout = 60000;
+    private long keepAliveTimeout = 120000;
 
     private boolean keepAlive = true;
 

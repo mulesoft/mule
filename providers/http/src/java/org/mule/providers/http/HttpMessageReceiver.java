@@ -41,6 +41,7 @@ import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
@@ -109,9 +110,18 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return true;
     }
 
+    public void doDispose() throws UMOException
+    {
+        if(keepAliveMonitor!=null) {
+            keepAliveMonitor.dispose();
+        }
+        super.doDispose();
+    }
+
     private class HttpWorker extends TcpWorker implements Expirable
     {
         private boolean keepAlive = false;
+        private boolean keepAliveRegistered = false;
 
         public HttpWorker(Socket socket)
         {
@@ -122,7 +132,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         {
             try
             {
-
                 int counter = 0;
                 do
                 {
@@ -164,14 +173,16 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             keepAlive = true;
                         }
                     }
-                    if (keepAlive)
+                    if (keepAlive && !keepAliveRegistered)
                     {
+                        keepAliveRegistered = true;
                         if (keepAliveMonitor != null)
                         {
-                            keepAliveMonitor.addExpirable(((HttpConnector) connector).getKeepAliveTimeout(), this);
+                            keepAliveMonitor.addExpirable(((HttpConnector)connector).getKeepAliveTimeout(), this);
                         } else
                         {
                             logger.info("Request has Keep alive set but the HttpConnector has keep alive disables");
+                            keepAlive = false;
                         }
                     }
 
