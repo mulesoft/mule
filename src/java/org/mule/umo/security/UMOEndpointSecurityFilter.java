@@ -42,5 +42,9 @@ public interface UMOEndpointSecurityFilter extends Initialisable
 
     public UMOImmutableEndpoint getEndpoint();
 
+    public void setCredentialsAccessor(UMOCredentialsAccessor accessor);
+
+    public UMOCredentialsAccessor getCredentialsAccessor();
+
     public void authenticate(UMOEvent event) throws UMOSecurityException;
 }

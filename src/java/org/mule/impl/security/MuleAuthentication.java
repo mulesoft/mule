@@ -14,6 +14,7 @@
 package org.mule.impl.security;
 
 import org.mule.umo.security.UMOAuthentication;
+import org.mule.umo.security.UMOCredentials;
 
 /**
  * <code>MuleAuthentication</code> TODO
@@ -28,7 +29,7 @@ public class MuleAuthentication implements UMOAuthentication
     private String user;
     private Object details;
 
-    public MuleAuthentication(MuleUserAuthenticationToken credentials)
+    public MuleAuthentication(UMOCredentials credentials)
     {
         this.user = credentials.getUsername();
         this.credentials = credentials.getPassword();
