@@ -45,7 +45,7 @@ public class EndpointAbstractEventLoggerAgent extends AbstractEventLoggerAgent
             if(endpointAddress!=null) {
                 logEndpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointAddress, UMOEndpoint.ENDPOINT_TYPE_SENDER);
                 //Create a dummy session for sending events
-                session = new MuleSession(null);
+                session = new MuleSession();
             }
         } catch (Exception e)
         {

@@ -942,7 +942,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         addSetPropertiesRule(path, digester, new String[]{"address", "transformers"}, new String[]{"endpointURI", "transformer"} );
         addMulePropertiesRule(path, digester, false);
         digester.addObjectCreate(path + "/transaction", DEFAULT_TRANSACTION_CONFIG);
-        addSetPropertiesRule(path + "/transaction", digester, new String[] {"beginAction", "commitAction"},  new String[] {"beginActionAsString", "commitActionAsString"});
+        addSetPropertiesRule(path + "/transaction", digester, new String[] {"beginAction"},  new String[] {"beginActionAsString"});
 
         digester.addObjectCreate(path + "/transaction/constraint", TRANSACTION_CONSTRAINT_INTERFACE, "className");
         addSetPropertiesRule(path + "/transaction/constraint", digester);

@@ -25,6 +25,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -135,9 +136,15 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         return component;
     }
 
+    public final UMOMessage routeMessage(UMOMessage message) throws UMOException
+    {
+        return routeMessage(message, endpoint.isSynchronous());
+    }
+
     public final UMOMessage routeMessage(UMOMessage message, boolean synchronous) throws UMOException
     {
-        return routeMessage(message, null, synchronous, null);
+    	UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+        return routeMessage(message, tx, tx != null || synchronous, null);
     }
 
     public final UMOMessage routeMessage(UMOMessage message, UMOTransaction trans, boolean synchronous) throws UMOException
@@ -145,9 +152,15 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         return routeMessage(message, trans, synchronous, null);
     }
 
+    public final UMOMessage routeMessage(UMOMessage message, OutputStream outputStream) throws UMOException
+    {
+        return routeMessage(message, endpoint.isSynchronous(), outputStream);
+    }
+
     public final UMOMessage routeMessage(UMOMessage message, boolean synchronous, OutputStream outputStream) throws UMOException
     {
-        return routeMessage(message, null, synchronous, outputStream);
+    	UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+        return routeMessage(message, tx, tx != null || synchronous, outputStream);
     }
 
     public final  UMOMessage routeMessage(UMOMessage message, UMOTransaction trans, boolean synchronous, OutputStream outputStream) throws UMOException

@@ -15,9 +15,8 @@ package org.mule.test.transaction;
 
 import com.mockobjects.dynamic.Mock;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionProxy;
-import org.mule.transaction.constraints.ConstraintFilter;
 import org.mule.umo.UMOTransaction;
 
 /**
@@ -34,56 +33,76 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        Object x = TransactionCoordination.getInstance().unbindTransaction();
-        TransactionCoordination.setInstance(null);
         tc = TransactionCoordination.getInstance();
     }
 
     protected void tearDown() throws Exception
     {
         super.tearDown();
+        tc.unbindTransaction(tc.getTransaction());
         TransactionCoordination.setInstance(null);
     }
 
-    public void testTransactionCoordination() throws Exception
+    public void testBindTransaction() throws Exception
     {
         assertNull(tc.getTransaction());
-        Mock trans = new Mock(UMOTransaction.class, "trans");
-        TransactionProxy tp = new TransactionProxy((UMOTransaction)trans.proxy(), null);
+        Mock mockTx = new Mock(UMOTransaction.class, "trans");
+        UMOTransaction tx = (UMOTransaction) mockTx.proxy();
 
-        trans.expectAndReturn("getResource", new String("dummy resource"));
-
-        tc.bindTransaction(tp);
-        UMOTransaction tx = tc.getTransaction();
-        assertNotNull(tx);
-
-        tx = null;
-        tx = tc.getTransactionProxy();
-        assertNotNull(tx);
-        Object resource = tc.getTransactionSession();
-        assertNotNull(resource);
-        assertEquals(resource, "dummy resource");
-
-        tx = tc.unbindTransaction();
-        assertNotNull(tx);
+        tc.bindTransaction(tx);
+        assertEquals(tx, tc.getTransaction());
+        tc.unbindTransaction(tx);
+    }
+    
+    public void testBindTransactionWithAlreadyBound() throws Exception
+    {
         assertNull(tc.getTransaction());
-        assertNull(tc.getTransactionProxy());
+        Mock mockTx = new Mock(UMOTransaction.class, "trans");
+        UMOTransaction tx = (UMOTransaction) mockTx.proxy();
 
-        tc.bindTransaction((UMOTransaction)trans.proxy(), new ConstraintFilter());
-        tp = tc.getTransactionProxy();
-        assertNotNull(tp);
-        assertNotNull(tp.getConstraint());
+        tc.bindTransaction(tx);
+        assertEquals(tx, tc.getTransaction());
+        
+        try {
+        	UMOTransaction tx2 = (UMOTransaction) new Mock(UMOTransaction.class, "trans").proxy();
+        	tc.bindTransaction(tx2);
+        	fail();
+        } catch (IllegalTransactionStateException e) {
+        	// expected
+        }
+        	
+        tc.unbindTransaction(tx);
+    }
+    
 
-        try
-        {
-            TransactionCoordination.setInstance(null);
-            fail("shouldn't be able to replace the tc if there are transactions in progress");
-        } catch (IllegalStateException e)
-        {
-            //expected
+    public void testUnbindTransactionWithoutBound() throws Exception 
+    {
+        assertNull(tc.getTransaction());
+        try {
+            Mock mockTx = new Mock(UMOTransaction.class, "trans");
+            UMOTransaction tx = (UMOTransaction) mockTx.proxy();
+        	tc.unbindTransaction(tx);
+        	fail();
+        } catch (IllegalTransactionStateException e) {
+        	// expected
+        }
+    }    	
+    
+    public void testSetInstanceWithBound() throws Exception {
+        assertNull(tc.getTransaction());
+        Mock mockTx = new Mock(UMOTransaction.class, "trans");
+        UMOTransaction tx = (UMOTransaction) mockTx.proxy();
+
+        tc.bindTransaction(tx);
+        try {
+        	TransactionCoordination.setInstance(null);
+        	fail();
+        } catch (IllegalStateException e) {
+        	// expected
         }
 
-        tc.unbindTransaction();
+        tc.unbindTransaction(tx);
         TransactionCoordination.setInstance(null);
     }
+
 }

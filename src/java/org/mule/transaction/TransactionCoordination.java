@@ -17,13 +17,14 @@ package org.mule.transaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.transaction.constraints.ConstraintFilter;
 import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionException;
 
 /**
  * <p><code>TransactionCoordination</code> TODO (document class)
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author Guillaume Nodet
  * @version $Revision$
  */
 public class TransactionCoordination
@@ -33,13 +34,12 @@ public class TransactionCoordination
 
     private static TransactionCoordination instance;
 
-    private static int txCounter = 0;
+    private int txCounter = 0;
 
-    private static ThreadLocal transactions = new ThreadLocal();
-
+    private ThreadLocal transactions = new ThreadLocal();
+    
     private TransactionCoordination()
     {
-        transactions = new ThreadLocal();
         txCounter = 0;
     }
 
@@ -54,85 +54,50 @@ public class TransactionCoordination
 
     public static void setInstance(TransactionCoordination txSync) throws IllegalStateException
     {
-        if (txCounter == 0)
+        if (instance == null || instance.txCounter == 0)
         {
             instance = txSync;
         }
         else
         {
-            throw new IllegalStateException("there are currently " + txCounter + "transactions associated with this manager, cannot replace the manager");
+            throw new IllegalStateException("there are currently " + instance.txCounter + "transactions associated with this manager, cannot replace the manager");
         }
     }
 
-    public final TransactionProxy getTransactionProxy()
+    public UMOTransaction getTransaction()
     {
-        return (TransactionProxy) transactions.get();
+        return (UMOTransaction) transactions.get();
     }
 
-    public final UMOTransaction getTransaction()
+    public void unbindTransaction(UMOTransaction transaction) throws UMOTransactionException
     {
-        TransactionProxy trans = (TransactionProxy) transactions.get();
-        if(trans != null)
-        {
-            return trans.getTransaction();
-        } else {
-            return null;
-        }
-    }
-
-    public final TransactionProxy unbindTransaction()
-    {
-        TransactionProxy trans = (TransactionProxy) transactions.get();
-
+    	UMOTransaction oldTx = (UMOTransaction) transactions.get();
+    	if (oldTx != transaction) {
+    		throw new IllegalTransactionStateException("Trying to unbind an unbounded transaction");
+    	}
         transactions.set(null);
         decrementCounter();
-        return trans;
     }
 
-    public final void bindTransaction(TransactionProxy transaction)
+    public void bindTransaction(UMOTransaction transaction) throws UMOTransactionException
     {
-        TransactionProxy proxy = (TransactionProxy)transactions.get();
-        if(proxy != null) {
-            logger.debug("Binding transaction to existing (" + txCounter + ")");
-            proxy.setTransaction(transaction.getTransaction());
-        } else {
-            transactions.set(transaction);
-            incrementCounter();
-            logger.debug("Binding new transaction (" + txCounter + ")");
+    	UMOTransaction oldTx = (UMOTransaction) transactions.get();
+    	if (oldTx != null) {
+    		throw new IllegalTransactionStateException("A transaction is already bound to the current thread");
+    	}
+    	transactions.set(transaction);
+        incrementCounter();
+        logger.debug("Binding new transaction (" + txCounter + ")");
+    }
+
+    private synchronized void decrementCounter()
+    {
+        if (txCounter > 0) {
+        	txCounter--;
         }
     }
 
-    public final TransactionProxy bindTransaction(UMOTransaction transaction, ConstraintFilter constraint)
-    {
-        TransactionProxy proxy = (TransactionProxy)transactions.get();
-        if(proxy != null) {
-            logger.debug("Binding transaction to existing (" + txCounter + ")");
-            proxy.setTransaction(transaction);
-        } else {
-            proxy = new TransactionProxy(transaction,  constraint);
-            transactions.set(proxy);
-            incrementCounter();
-            logger.debug("Binding new transaction (" + txCounter + ")");
-        }
-        return proxy;
-    }
-
-    public Object getTransactionSession()
-    {
-        UMOTransaction tx = getTransaction();
-        if (tx != null)
-        {
-            return tx.getResource();
-        }
-        return null;
-    }
-
-    private final synchronized void decrementCounter()
-    {
-        if(txCounter > 0) txCounter--;
-    }
-
-    private final synchronized void incrementCounter()
+    private synchronized void incrementCounter()
     {
         txCounter++;
     }

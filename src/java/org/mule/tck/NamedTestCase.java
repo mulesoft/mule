@@ -14,7 +14,9 @@
 package org.mule.tck;
 
 import junit.framework.TestCase;
+
 import org.mule.config.MuleProperties;
+import org.mule.util.StringMessageHelper;
 
 /**
  * <code>NamedTestCase</code> provides readable testcase names.
@@ -36,4 +38,12 @@ public abstract class NamedTestCase extends TestCase
         return super.getName().substring(4).replaceAll("([A-Z])", " $1").toLowerCase();
     }
 
+    /**
+     * Print the name of this test to standard output
+     */
+    protected void setUp() throws Exception
+    {
+        System.out.println(StringMessageHelper.getBoilerPlate("Testing: " + toString(), '=', 80));;
+    }
+    
 }

@@ -47,8 +47,6 @@ public class MuleTransactionConfig implements UMOTransactionConfig
 
     private byte beginAction = ACTION_NONE;
 
-    private byte commitAction = ACTION_NONE;
-
     private ConstraintFilter constraint = null;
 
     private int timeout;
@@ -104,26 +102,6 @@ public class MuleTransactionConfig implements UMOTransactionConfig
 
     }
 
-    /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.umo.UMOTransactionConfig#getCommitAction()
-	 */
-    public byte getCommitAction()
-    {
-        return commitAction;
-    }
-
-    /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.umo.UMOTransactionConfig#setCommitAction(byte)
-	 */
-    public void setCommitAction(byte action)
-    {
-        commitAction = action;
-    }
-
     public void setBeginActionAsString(String action)
     {
         if (ACTION_ALWAYS_BEGIN_STRING.equals(action))
@@ -152,34 +130,15 @@ public class MuleTransactionConfig implements UMOTransactionConfig
         }
     }
 
-    public void setCommitActionAsString(String action)
-    {
-        if (ACTION_ALWAYS_COMMIT_STRING.equals(action))
-        {
-            commitAction = ACTION_ALWAYS_COMMIT;
-        }
-        else if (ACTION_COMMIT_IF_POSSIBLE_STRING.equals(action))
-        {
-            commitAction = ACTION_COMMIT_IF_POSSIBLE;
-        }
-        else if (ACTION_NONE_STRING.equals(action))
-        {
-            commitAction = ACTION_NONE;
-        }
-        else
-        {
-            throw new IllegalArgumentException("Action " + action + " is not recognised as a commit action.");
-        }
-    }
-
     public boolean isTransacted()
     {
-        if(factory != null) {
-            if(!factory.isTransacted()) return false;
+        if (factory != null) {
+            if (!factory.isTransacted()) {
+            	return false;
+            }
             return beginAction != ACTION_NONE;
-        } else {
-            return commitAction != ACTION_NONE;
         }
+        return false;
     }
 
     public ConstraintFilter getConstraint()

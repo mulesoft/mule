@@ -40,14 +40,6 @@ public interface UMOSession extends Serializable
      */
     public UMOComponent getComponent();
 
-
-    /**
-     * Returns the current transaction (if any) for the session
-     * @return the current transaction for the session or null if there is no
-     * transaction in progress
-     */
-    public UMOTransaction getTransaction();
-
     /**
      * This will send an event via the configured outbound endpoint on the component
      * for this session

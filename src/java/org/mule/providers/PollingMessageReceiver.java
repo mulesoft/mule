@@ -20,11 +20,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.timer.EventTimerTask;
-import org.mule.util.timer.TimeEvent;
-import org.mule.util.timer.TimeEventListener;
-
-import java.util.Timer;
 
 /**
  * <p><code>PollingMessageReceiver</code> implements a polling message receiver.
@@ -33,42 +28,50 @@ import java.util.Timer;
  * connector is not started.
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author Guillaume Nodet
  * @version $Revision$
  */
-public abstract class PollingMessageReceiver extends AbstractMessageReceiver implements TimeEventListener
+public abstract class PollingMessageReceiver extends AbstractMessageReceiver implements Runnable
 {
     public static final long DEFAULT_POLL_FREQUENCY = 1000;
-    public static final long STARTUP_DELAY = 4000;
+    public static final long STARTUP_DELAY = 1000;
 
-    private Timer timer;
     private long frequency = DEFAULT_POLL_FREQUENCY;
+    private Thread thread;
 
+    public PollingMessageReceiver() {
+    }
+    
     public PollingMessageReceiver(UMOConnector connector,
                                   UMOComponent component,
                                   final UMOEndpoint endpoint, Long frequency) throws InitialisationException
     {
         create(connector, component, endpoint);
         this.frequency = frequency.longValue();
-        timer = new Timer();
-
-        EventTimerTask task = new EventTimerTask(this);
-        timer.schedule(task, STARTUP_DELAY, this.frequency);
-        task.start();
+        thread = new Thread(this, getClass().getName());
+        thread.start();
     }
-
-    /* (non-Javadoc)
-     * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
-     */
-    public void timeExpired(TimeEvent event)
-    {
-        if(endpoint.getConnector().isDisposed() || disposing.get()) {
-            timer.cancel();
-            return;
-        }
-        if (endpoint.getConnector().isStarted())
-        {
-            poll();
-        }
+    
+    public void run() {
+    	try {
+    		Thread.sleep(STARTUP_DELAY);
+	    	while (!connector.isDisposed() && !disposing.get()) {
+	            if (connector.isStarted()) {
+    	            poll();
+	            }
+	            Thread.sleep(frequency);
+	    	}
+    	} catch (Exception e) {
+    		// Only handle exception if it was not due to the connector stopping
+    		if (!disposing.get()) {
+	   			logger.error("An error occurred when polling", e);
+	            try {
+	                connector.stop();
+	            } catch (Exception e2) {
+	                logger.error("Failed to stop endpoint: " + e2.getMessage(), e2);
+	            }
+    		}
+    	}
     }
 
     public void setFrequency(long l)
@@ -90,9 +93,10 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
 
     protected void doDispose() throws UMOException
     {
-        if(timer!=null) timer.cancel();
-        timer=null;
+    	if (thread != null) {
+    		thread.interrupt();
+    	}
     }
 
-    public abstract void poll();
+    public abstract void poll() throws Exception;
 }

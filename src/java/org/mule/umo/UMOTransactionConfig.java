@@ -32,9 +32,6 @@ public interface UMOTransactionConfig
     public static final byte ACTION_ALWAYS_JOIN = 3;
     public static final byte ACTION_JOIN_IF_POSSIBLE = 4;
 
-    public static final byte ACTION_ALWAYS_COMMIT = 5;
-    public static final byte ACTION_COMMIT_IF_POSSIBLE = 6;
-
     public UMOTransactionFactory getFactory();
 
     public void setFactory(UMOTransactionFactory factory);
@@ -42,10 +39,6 @@ public interface UMOTransactionConfig
     public byte getBeginAction();
 
     public void setBeginAction(byte action);
-
-    public byte getCommitAction();
-
-    public void setCommitAction(byte action);
 
     public boolean isTransacted();
 

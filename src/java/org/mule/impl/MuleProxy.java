@@ -257,7 +257,6 @@ public class MuleProxy implements Runnable, Lifecycle
             {
                 RequestContext.setEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
-                ReplyToHandler replyToHandler = ((AbstractConnector)event.getEndpoint().getConnector()).getReplyToHandler();
                 InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor, event.getMessage());
 
                  //stats
@@ -287,6 +286,7 @@ public class MuleProxy implements Runnable, Lifecycle
                 if(result != null && replyTo!=null) {
                     String requestor = (String)result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
 
+                    ReplyToHandler replyToHandler = ((AbstractConnector)event.getEndpoint().getConnector()).getReplyToHandler();
                     if(replyToHandler!=null) {
                         if((requestor!=null && !requestor.equals(descriptor.getName())) ||
                                 requestor == null)

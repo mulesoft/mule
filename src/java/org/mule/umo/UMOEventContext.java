@@ -13,14 +13,12 @@
  */
 package org.mule.umo;
 
-import org.mule.transaction.TransactionInProgressException;
-import org.mule.transaction.TransactionRollbackException;
+import java.io.OutputStream;
+import java.util.Map;
+
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
-
-import java.io.OutputStream;
-import java.util.Map;
 
 /**
  * <code>UMOEventContext</code> is the context object for the current
@@ -100,17 +98,12 @@ public interface UMOEventContext
      */
     public UMOTransaction getCurrentTransaction();
 
-    public void beginTransaction() throws TransactionInProgressException;
-
-    public void beginOrJoinTransaction();
-
-    public void beginTransaction(UMOTransactionFactory factory) throws UMOTransactionException;
-
-    public void commitTransaction() throws UMOTransactionException;
-
-    public void rollbackTransaction() throws TransactionRollbackException;
-
-    public void markTransactionForRollback();
+    /**
+     * Mark the current transaction (if any) for rollback
+     * 
+     * @throws UMOTransactionException
+     */
+    public void markTransactionForRollback() throws UMOTransactionException;
 
 
     /**
