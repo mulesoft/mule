@@ -62,6 +62,8 @@
             <unjar src="${jarfile}" dest="${mule.release.dist.dir}/temp"/>
         </j:forEach>
 
+        <!-- unjar the core jar again to overlay the correct manifest -->
+        <unjar src="${mule.release.dist.dir}/mule-core-${pom.currentVersion}.jar" dest="${mule.release.dist.dir}/temp"/>
         <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
 
         <echo>creating jar: ${mule.release.dist.dir}/mule-${pom.currentVersion}</echo>
@@ -182,10 +184,10 @@
 
         <attainGoal name="mule:zip-release"/>
         <!-- Mini Mule Build -->
-        <attainGoal name="mini:mule"/>
-        <ant:copy todir="${maven.build.dir}/distributions">
-            <ant:fileset dir="${basedir}/etc/mini/target/distributions" includes="mini-mule*"/>
-        </ant:copy>
+<!--        <attainGoal name="mini:mule"/>-->
+<!--        <ant:copy todir="${maven.build.dir}/distributions">-->
+<!--            <ant:fileset dir="${basedir}/etc/mini/target/distributions" includes="mini-mule*"/>-->
+<!--        </ant:copy>-->
     </goal>
 
     <goal name="build-classpath" prereqs="setvars">
