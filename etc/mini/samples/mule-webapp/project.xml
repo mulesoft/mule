@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <extend>../../../project.xml</extend>
+    <extend>../../../../project.xml</extend>
     <id>mule-webapp</id>
     <groupId>mule</groupId>
     <pomVersion>3</pomVersion>
@@ -13,13 +13,12 @@
     <distributionDirectory>/var/www/html/muleumo.org/samples/</distributionDirectory>
     <dependencies>
         <dependency>
-            <artifactId>mule-mini</artifactId>
+            <artifactId>mule</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>false</mule.core.jar>
-                <war.bundle>true</war.bundle>
             </properties>
         </dependency>
         <dependency>

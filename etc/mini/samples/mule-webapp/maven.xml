@@ -14,7 +14,7 @@
                 <include name="*.jar"/>
             </fileset>
         </copy>
-        <copy todir="webapp/WEB-INF/lib" file="../../dist/mule-mini-@VERSION@.jar"/>
+        <copy todir="webapp/WEB-INF/lib" file="../../dist/mule-@VERSION@.jar"/>
 
         <copy todir="webapp/WEB-INF/classes">
             <fileset dir="../hello/classes"/>
@@ -23,6 +23,13 @@
         <copy todir="webapp/WEB-INF/classes">
             <fileset dir="../loanbroker/classes"/>
         </copy>
+        
+        <j:forEach var="lib" items="${pom.dependencies}">
+            <j:if test="${lib.getProperty('war.bundle')=='true'}">
+                <copy todir="webapp/WEB-INF/lib"
+                    file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
+            </j:if>
+        </j:forEach>
 
         <!-- create the war -->
         <zip zipfile="mule.war">

@@ -120,32 +120,8 @@
         </dependency>
         <dependency>
             <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jms</artifactId>
-            <version>${geronimo_spec_jms_version}</version>
-            <properties>
-                <mule.mini>true</mule.mini>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jta</artifactId>
-            <version>${geronimo_spec_jta_version}</version>
-            <properties>
-                <mule.mini>true</mule.mini>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee-management</artifactId>
-            <version>${geronimo_spec_j2ee_management_version}</version>
-            <properties>
-                <mule.mini>true</mule.mini>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-servlet</artifactId>
-            <version>${geronimo_spec_servlet_version}</version>
+            <artifactId>geronimo-spec-j2ee</artifactId>
+            <version>${geronimo_spec_j2ee_version}</version>
             <properties>
                 <mule.mini>true</mule.mini>
             </properties>

@@ -29,7 +29,7 @@ the different components are made from the loan broker component (a la hub and s
     <mule-descriptor name="LoanBroker"
         implementation="org.mule.samples.loanbroker.SyncLoanBroker">
         <inbound-router>
-            <endpoint address="LoanBroker"/>
+            <endpoint address="LoanBrokerRequests"/>
         </inbound-router>
         <response-router>
             <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
@@ -54,7 +54,7 @@ the different components are made from the loan broker component (a la hub and s
     </mule-descriptor>
 
     <mule-descriptor name="CreditAgencyService"
-        inboundEndpoint="CreditAgencyReceiver"
+        inboundEndpoint="CreditAgency"
         implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
     </mule-descriptor>
 

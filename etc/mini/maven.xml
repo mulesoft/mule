@@ -45,6 +45,9 @@
 
         <!-- unjar the core jar again to overlay the correct manifest -->
         <unjar src="${mule.release.dist.dir}/mule-core-${pom.currentVersion}.jar" dest="${mule.release.dist.dir}/temp"/>
+        <!-- Mark the mini distrobution -->
+        <replace file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" token="Universal Message Objects" value="Universal Message Objects (mini)"/>
+
         <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
 
         <delete>
@@ -67,13 +70,10 @@
     <!--=================================================-->
 
     <goal name="setvars">
-        <j:set var="samples.vars.overriden" value="true"/>
         <j:set var="mule.release.dir" value="${maven.build.dir}\release"/>
         <j:set var="mule.release.lib.dir" value="${mule.release.dir}\lib"/>
+        <j:set var="mule.release.samples.dir" value="${mule.release.dir}\samples"/>
         <j:set var="mule.release.dist.dir" value="${mule.release.dir}\dist"/>
-        <j:set var="mule.release.src.dir" value="${mule.release.dir}\src"/>
-        <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
-        <j:set var="samples.dist" value="${samples.release.dir}/samples"/>
         <echo>Release dir is ${mule.release.dir}</echo>
     </goal>
 
@@ -81,6 +81,7 @@
         <echo>About to create lib and bin directories in ${mule.release.dir}</echo>
         <mkdir dir="${mule.release.dir}"/>
         <mkdir dir="${mule.release.dist.dir}"/>
+        <mkdir dir="${mule.release.samples.dir}"/>
         <mkdir dir="${mule.release.lib.dir}"/>
         <mkdir dir="${mule.release.lib.dir}/licenses"/>
         <delete dir="${maven.build.dir}"/>
@@ -104,22 +105,12 @@
     </goal>
 
     <goal name="mule:samples" prereqs="setvars">
-        <maven:reactor
-            basedir="${basedir}/../../samples"
-            postProcessing="false"
-            includes="project.xml"
-            goals="dist-samples"
-            banner="Dist Samples"
-            ignoreFailures="false"/>
 
-        <!--        <echo>copying samples from ${root.dir}/target/release/samples to ${mule.release.samples.dir}</echo>-->
-        <!--        <copy todir="${mule.release.samples.dir}">-->
-        <!--            <fileset dir="${root.dir}/target/release/samples">-->
-        <!--                <include name="**/"/>-->
-        <!--                <exclude name="**/errorhandler"/>-->
-        <!--            </fileset>-->
-        <!--        </copy>-->
-        <!--        <delete dir="${mule.release.samples.dir}/errorhandler"/>-->
+        <echo>copying samples from ${basedir}/../../target/release/samples to ${mule.release.samples.dir}</echo>
+        <copy todir="${mule.release.samples.dir}">
+            <fileset dir="${basedir}/../../target/release/samples"/>
+        </copy>
+        <delete dir="${mule.release.samples.dir}/errorhandler"/>
 
         <!-- copy config overrides that do not use non-mini-mule jars -->
         <echo>Copying smple config overrides from ${basedir}/samples</echo>
@@ -133,14 +124,16 @@
         <copy overwrite="true" todir="${samples.dist}/mule-webapp" file="${basedir}/samples/mule-webapp/project.xml"/>
         <copy overwrite="true" todir="${samples.dist}/mule-webapp/webapp/WEB-INF" file="${basedir}/samples/mule-webapp/mule-loanbroker-config.xml"/>
 
-        <delete file="${samples.dist}/mule-webapp/webapp/WEB-INF/mule-loanbroker-async-config.xml"/>
-        <delete file="${samples.dist}/hello/bin/hello-spring.bat"/>
-        <delete file="${samples.dist}/hello/bin/hell-spring.sh"/>
-        <delete file="${samples.dist}/hello/bin/hello-http.sh"/>
-        <delete file="${samples.dist}/hello/bin/hello-http.bat"/>
-        <delete file="${samples.dist}/mule-webapp/webapp/WEB-INF/mule-loanbroker-async-config.xml"/>
+	<replace file="${samples.dist}/mule-webapp/maven.xml" token="@VERSION@" value="${pom.currentVersion}"/>
 
-        <delete dir="${samples.dist}/errorhandler"/>
+        <delete file="${samples.dist}/mule-webapp/webapp/WEB-INF/mule-loanbroker-async-config.xml"/>
+        <delete>
+            <fileset dir="${samples.dist}/hello">
+                <includes name="*spring*"/>
+                <includes name="*http*"/>
+            </fileset>
+        </delete>
+      
     </goal>
 
     <goal name="mule:zip-release" prereqs="setvars">
@@ -185,32 +178,9 @@
     <!--=================================================-->
     <!--                DEPLY TARGETS                  -->
     <!--=================================================-->
-    <goal name="mule:deploy" prereqs="mule:start-release,mule:release">
+    <goal name="mule:deploy">
         <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
-            <arg line="${maven.scp.args} mule-${pom.currentVersion}-site.tag.gz ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}"/>
+            <arg line="${maven.scp.args} * ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/distributions/"/>
         </exec>
-
-        <exec dir="." executable="${maven.ssh.executable}">
-            <arg line="${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory} &amp;&amp; rm -fr doc &amp;&amp; tar zxvf mule-${pom.currentVersion}-site.tar.gz"/>
-        </exec>
-
-        <fileScanner var="mulejars">
-            <fileset dir="${mule.release.dist.dir}">
-                <include name="*"/>
-            </fileset>
-        </fileScanner>
-
-        <j:forEach var="jarfile" items="${mulejars.iterator()}">
-            <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
-                <arg line="${maven.scp.args} ${jarfile} ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/jars/"/>
-            </exec>
-        </j:forEach>
-
-        <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
-            <arg line="${maven.scp.args} mule-${pom.currentVersion}-dist.zip ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/distributions/"/>
-        </exec>
-
-        <j:set var="goal" value="jar:deploy"/>
-        <attainGoal name="multiproject:goal"/>
     </goal>
 </project>
