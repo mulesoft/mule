@@ -51,9 +51,9 @@ public interface JmsSupport
 
     void send(MessageProducer producer, Message message) throws JMSException;
 
-    void send(MessageProducer producer, Message message, int ackMode, int priority, long ttl) throws JMSException;
+    void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl) throws JMSException;
 
     void send(MessageProducer producer, Message message, Destination dest) throws JMSException;
 
-    void send(MessageProducer producer, Message message, Destination dest, int ackMode, int priority, long ttl) throws JMSException;
+    void send(MessageProducer producer, Message message, Destination dest, boolean persistent, int priority, long ttl) throws JMSException;
 }

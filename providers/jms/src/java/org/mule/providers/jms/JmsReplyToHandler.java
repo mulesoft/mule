@@ -22,6 +22,7 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 
+import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -54,7 +55,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposab
         try
         {
             // now we need to send the response
-            if(replyTo instanceof Destination) {
+            if (replyTo instanceof Destination)
+            {
                 replyToDestination = (Destination) replyTo;
             }
             if (replyToDestination == null)
@@ -63,35 +65,40 @@ public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposab
                 return;
             }
             Object payload = returnMessage.getPayload();
-            if(getTransformer()!=null) {
+            if (getTransformer() != null)
+            {
                 payload = getTransformer().transform(payload);
             }
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);
 
-            if(logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled())
+            {
                 logger.debug("Sending jms reply to: " + replyToDestination + "(" + replyToDestination.getClass().getName() + ")");
             }
             if (replyToProducer == null)
             {
                 replyToProducer = ((JmsConnector) connector).getJmsSupport().createProducer(session, replyToDestination);
             }
+
             //QoS support
-            String ttlString = (String)event.removeProperty("TimeToLive");
-            String priorityString = (String)event.removeProperty("Priority");
-            String deliveryModeString = (String)event.removeProperty("DeliveryMode");
+            String ttlString = (String) event.removeProperty("TimeToLive");
+            String priorityString = (String) event.removeProperty("Priority");
+            String persistentDeliveryString = (String) event.removeProperty("PersistentDelivery");
 
-            if(ttlString==null && priorityString==null && deliveryModeString == null) {
-                replyToProducer.send(replyToMessage);
-            } else {
+            if (ttlString == null && priorityString == null && persistentDeliveryString == null)
+            {
+                connector.getJmsSupport().send(replyToProducer, replyToMessage);
+            } else
+            {
                 long ttl = Message.DEFAULT_TIME_TO_LIVE;
-                int priority  = Message.DEFAULT_PRIORITY;
-                int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
+                int priority = Message.DEFAULT_PRIORITY;
+                boolean persistent = Message.DEFAULT_DELIVERY_MODE == DeliveryMode.PERSISTENT;
 
-                if(ttlString!=null) ttl = Long.parseLong(ttlString);
-                if(priorityString!=null) priority = Integer.parseInt(priorityString);
-                if(deliveryModeString!=null) deliveryMode = Integer.parseInt(deliveryModeString);
+                if (ttlString != null) ttl = Long.parseLong(ttlString);
+                if (priorityString != null) priority = Integer.parseInt(priorityString);
+                if (persistentDeliveryString != null) persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
 
-                replyToProducer.send(replyToMessage, deliveryMode, priority, ttl);
+                connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl);
             }
 
             //connector.getJmsSupport().send(replyToProducer, replyToMessage, replyToDestination);
@@ -100,8 +107,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposab
         } catch (Exception e)
         {
             throw new DispatchException("Failed to create and dispatch response event from message: " + e.getMessage(), e);
-        } finally {
-                dispose();
+        } finally
+        {
+            dispose();
         }
     }
 
@@ -109,7 +117,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposab
     {
         try
         {
-            if(replyToProducer!=null) replyToProducer.close();
+            if (replyToProducer != null) replyToProducer.close();
         } catch (JMSException e)
         {
             logger.error("Failed to close replyTo producer: " + e.getMessage(), e);

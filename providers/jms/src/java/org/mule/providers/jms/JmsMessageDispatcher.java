@@ -14,12 +14,6 @@
  */
 package org.mule.providers.jms;
 
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
@@ -34,6 +28,13 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching
@@ -138,20 +139,20 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         //QoS support
         String ttlString = (String)event.removeProperty("TimeToLive");
         String priorityString = (String)event.removeProperty("Priority");
-        String deliveryModeString = (String)event.removeProperty("DeliveryMode");
+        String persistentDeliveryString = (String)event.removeProperty("PersistentDelivery");
 
-        if(ttlString==null && priorityString==null && deliveryModeString == null) {
+        if(ttlString==null && priorityString==null && persistentDeliveryString == null) {
             connector.getJmsSupport().send(producer, msg);
         } else {
             long ttl = Message.DEFAULT_TIME_TO_LIVE;
             int priority  = Message.DEFAULT_PRIORITY;
-            int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
+            boolean persistent = Message.DEFAULT_DELIVERY_MODE==DeliveryMode.PERSISTENT;
 
             if(ttlString!=null) ttl = Long.parseLong(ttlString);
             if(priorityString!=null) priority = Integer.parseInt(priorityString);
-            if(deliveryModeString!=null) deliveryMode = Integer.parseInt(deliveryModeString);
+            if(persistentDeliveryString!=null) persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
 
-            connector.getJmsSupport().send(producer, msg, deliveryMode, priority, ttl);
+            connector.getJmsSupport().send(producer, msg, persistent, priority, ttl);
         }
 
         if(replyToConsumer!=null && event.isSynchronous()) {

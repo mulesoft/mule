@@ -15,6 +15,7 @@ package org.mule.providers.jms;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -43,9 +44,9 @@ import javax.naming.Context;
 
 public class Jms102bSupport extends Jms11Support
 {
-    public Jms102bSupport(Context context, boolean jndiDestinations, boolean forceJndiDestinations)
+    public Jms102bSupport(JmsConnector connector, Context context, boolean jndiDestinations, boolean forceJndiDestinations)
     {
-        super(context, jndiDestinations, forceJndiDestinations);
+        super(connector, context, jndiDestinations, forceJndiDestinations);
     }
 
     public Connection createConnection(ConnectionFactory connectionFactory, String username, String password) throws JMSException
@@ -147,39 +148,21 @@ public class Jms102bSupport extends Jms11Support
         throw new IllegalArgumentException("Session and domain type do not match");
     }
 
-    public void send(MessageProducer producer, Message message) throws JMSException
+    public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl) throws JMSException
     {
         if(producer instanceof QueueSender) {
-            ((QueueSender)producer).send(message);
+            ((QueueSender)producer).send(message, (persistent? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
         } else {
-            ((TopicPublisher)producer).publish(message);
+            ((TopicPublisher)producer).publish(message, (persistent? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
         }
     }
 
-    public void send(MessageProducer producer, Message message, Destination dest) throws JMSException
+    public void send(MessageProducer producer, Message message, Destination dest, boolean persistent, int priority, long ttl) throws JMSException
     {
         if(producer instanceof QueueSender) {
-            ((QueueSender)producer).send((Queue)dest, message);
+            ((QueueSender)producer).send((Queue)dest, message, (persistent? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
         } else {
-            ((TopicPublisher)producer).publish((Topic)dest, message);
-        }
-    }
-
-    public void send(MessageProducer producer, Message message, int ackMode, int priority, long ttl) throws JMSException
-    {
-        if(producer instanceof QueueSender) {
-            ((QueueSender)producer).send(message, ackMode, priority, ttl);
-        } else {
-            ((TopicPublisher)producer).publish(message, ackMode, priority, ttl);
-        }
-    }
-
-    public void send(MessageProducer producer, Message message, Destination dest, int ackMode, int priority, long ttl) throws JMSException
-    {
-        if(producer instanceof QueueSender) {
-            ((QueueSender)producer).send((Queue)dest, message, ackMode, priority, ttl);
-        } else {
-            ((TopicPublisher)producer).publish((Topic)dest, message, ackMode, priority, ttl);
+            ((TopicPublisher)producer).publish((Topic)dest, message, (persistent? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
         }
     }
 }

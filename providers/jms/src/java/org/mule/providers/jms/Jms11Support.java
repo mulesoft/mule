@@ -15,6 +15,7 @@ package org.mule.providers.jms;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -22,8 +23,8 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.QueueSession;
 import javax.jms.Session;
-import javax.jms.TopicSession;
 import javax.jms.Topic;
+import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
@@ -40,9 +41,11 @@ public class Jms11Support implements JmsSupport
     protected Context context;
     protected boolean jndiDestinations = false;
     protected boolean forceJndiDestinations = false;
+    protected JmsConnector connector;
 
-    public Jms11Support(Context context, boolean jndiDestinations, boolean forceJndiDestinations)
+    public Jms11Support(JmsConnector connector, Context context, boolean jndiDestinations, boolean forceJndiDestinations)
     {
+        this.connector = connector;
         this.context = context;
         this.jndiDestinations = jndiDestinations;
         this.forceJndiDestinations = forceJndiDestinations;
@@ -167,21 +170,25 @@ public class Jms11Support implements JmsSupport
         }
     }
 
-    public void send(MessageProducer producer, Message message) throws JMSException {
-	    producer.send(message);
-	}
-
-    public void send(MessageProducer producer, Message message, int ackMode, int priority, long ttl) throws JMSException
+    public void send(MessageProducer producer, Message message) throws JMSException
     {
-        producer.send(message, ackMode, priority, ttl);
+        send(producer, message, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
     }
 
-    public void send(MessageProducer producer, Message message, Destination dest) throws JMSException {
-	    producer.send(dest, message);
-	}
-
-    public void send(MessageProducer producer, Message message, Destination dest, int ackMode, int priority, long ttl) throws JMSException
+    public void send(MessageProducer producer, Message message, Destination dest) throws JMSException
     {
-        producer.send(dest, message, ackMode, priority, ttl);
+        send(producer, message, dest, connector.isPersistentDelivery(), Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
+    }
+
+
+
+    public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl) throws JMSException
+    {
+        producer.send(message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
+    }
+
+    public void send(MessageProducer producer, Message message, Destination dest, boolean persistent, int priority, long ttl) throws JMSException
+    {
+        producer.send(dest, message, (persistent ? DeliveryMode.PERSISTENT : DeliveryMode.NON_PERSISTENT), priority, ttl);
     }
 }

@@ -20,7 +20,7 @@ import org.mule.umo.UMOTransactionException;
 import org.mule.umo.UMOTransactionFactory;
 
 /**
- * <p><code>JmsTransactionFactory</code> TODO (document class)
+ * <p><code>JmsTransactionFactory</code> Creates a Jms local transaction
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @author Guillaume Nodet

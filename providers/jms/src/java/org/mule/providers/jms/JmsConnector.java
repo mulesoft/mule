@@ -15,20 +15,10 @@
 package org.mule.providers.jms;
 
 
-import java.util.Hashtable;
-import java.util.Map;
-
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import javax.jms.XAConnectionFactory;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import org.mule.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.MuleRuntimeException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.ReplyToHandler;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
@@ -39,7 +29,16 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.jms.XAConnectionFactory;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.util.Hashtable;
+import java.util.Map;
 
 
 /**
@@ -122,9 +121,9 @@ public class JmsConnector extends AbstractServiceEnabledConnector
             }
 
             if(JMS_SPECIFICATION_102B.equals(specification)) {
-                jmsSupport = new Jms102bSupport(jndiContext, jndiDestinations, forceJndiDestinations);
+                jmsSupport = new Jms102bSupport(this, jndiContext, jndiDestinations, forceJndiDestinations);
             } else {
-                jmsSupport = new Jms11Support(jndiContext, jndiDestinations, forceJndiDestinations);
+                jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);
             }
             connection = createConnection();
         } catch (Exception e)
@@ -207,8 +206,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     public Object getSessionFactory(UMOEndpoint endpoint) {
     	if (endpoint.getTransactionConfig() != null &&
     		endpoint.getTransactionConfig().getFactory() instanceof JmsClientAcknowledgeTransactionFactory) {
-    		// TODO: return the current Message 
-    		throw new RuntimeException();
+    		throw new MuleRuntimeException("Unable to obtain session factory for JmsClient Ack");
     	} else {
     		return connection;
     	}
