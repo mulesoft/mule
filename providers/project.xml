@@ -93,7 +93,7 @@
     </dependencies>
     <build>
         <sourceDirectory>${basedir}/src/java</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
         <unitTest>
             <includes>
                 <include>**/*TestCase.*</include>
@@ -129,12 +129,6 @@
             <resources>
                 <resource>
                     <directory>${basedir}/src/test/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-                <resource>
-                    <directory>${basedir}/src/conf</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>

@@ -71,7 +71,7 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
     /* (non-Javadoc)
      * @see org.mule.umo.UMOEventListener#onEvent(org.mule.umo.UMOEvent)
      */
-    public synchronized void onEvent(UMOEvent event) throws UMOException
+    public void onEvent(UMOEvent event) throws UMOException
     {
         if(queue!=null) {
             try
@@ -90,7 +90,7 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
     /* (non-Javadoc)
      * @see org.mule.umo.UMOSyncChainSupport#onCall(org.mule.umo.UMOEvent)
      */
-    public synchronized Object onCall(UMOEvent event) throws UMOException
+    public Object onCall(UMOEvent event) throws UMOException
     {
         UMOMessageAdapter adapter = connector.getMessageAdapter(new MuleMessage(event.getTransformedMessage(), event.getProperties()));
         return routeMessage(new MuleMessage(adapter), event.isSynchronous());

@@ -11,7 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.test.providers.xmpp;
+package org.mule.providers.xmpp;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.NamedTestCase;

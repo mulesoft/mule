@@ -17,11 +17,17 @@
             <artifactId>mule</artifactId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-udp-provider</artifactId>
             <version>${pom.currentVersion}</version>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
     </dependencies>
 </project>
