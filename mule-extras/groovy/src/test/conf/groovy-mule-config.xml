@@ -17,7 +17,7 @@
         </mule-descriptor>
         <mule-descriptor name="GroovyUMO2"
             inboundEndpoint="vm://localhost/groovy.2"
-            outboundEndpoint="stream://localhost/system"
+            outboundEndpoint="vm://localhost/system"
             implementation="org.mule.extras.groovy.GroovyComponent">
         </mule-descriptor>
     </model>
