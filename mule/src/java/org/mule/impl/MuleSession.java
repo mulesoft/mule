@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOComponent;
@@ -218,7 +219,8 @@ public final class MuleSession implements UMOSession
      */
     public UMOMessage receiveEvent(String endpointName, long timeout) throws UMOException
     {
-        return receiveEvent(MuleManager.getInstance().lookupEndpoint(endpointName), timeout);
+        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointName, UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+        return receiveEvent(endpoint, timeout);
     }
 
     /* (non-Javadoc)

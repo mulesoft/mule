@@ -110,37 +110,35 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         if (message instanceof Message)
         {
             Message msg = (Message) message;
-            Destination replyTo;
-            if(!event.isSynchronous()) {
-                Object tempReplyTo = event.removeProperty("JMSReplyTo");
-                if(tempReplyTo!=null)
-                {
-                    if(tempReplyTo instanceof Destination) {
-                        replyTo = (Destination)tempReplyTo;
-                    } else {
-                        boolean replyToTopic = false;
-                        String reply = tempReplyTo.toString();
-                        int i = reply.indexOf(":");
-                        if(i > -1) {
-                            String qtype = reply.substring(0, i);
-                            replyToTopic = "topic".equalsIgnoreCase(qtype);
-                            reply = reply.substring(i+1);
-                        }
-                        replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
+            Destination replyTo = null;
+
+            Object tempReplyTo = event.removeProperty("JMSReplyTo");
+            if(tempReplyTo!=null)
+            {
+                if(tempReplyTo instanceof Destination) {
+                    replyTo = (Destination)tempReplyTo;
+                } else {
+                    boolean replyToTopic = false;
+                    String reply = tempReplyTo.toString();
+                    int i = reply.indexOf(":");
+                    if(i > -1) {
+                        String qtype = reply.substring(0, i);
+                        replyToTopic = "topic".equalsIgnoreCase(qtype);
+                        reply = reply.substring(i+1);
                     }
-                    msg.setJMSReplyTo(replyTo);
+                    replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
                 }
+                msg.setJMSReplyTo(replyTo);
+             }
                 //Are we going to wait for a return event?
-            } else if(syncReceive) {
+             if(syncReceive && replyTo==null) {
                 replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
                 msg.setJMSReplyTo(replyTo);
-                replyToConsumer = connector.getJmsSupport().createConsumer(session, replyTo);
+            }
+            if(replyTo!=null) {
+                replyToConsumer = connector.getJmsSupport().createConsumer(session, replyTo);                
             }
 
-//            String correlationId = (String)event.getProperty("JMSCorrelationID");
-//            if(correlationId != null) {
-//                msg.setJMSCorrelationID(correlationId);
-//            }
             if(producer==null) {
                 producer = connector.getJmsSupport().createProducer(session, dest);
             }

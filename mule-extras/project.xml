@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <!--
-    This assumes you have the mule module and mule-extras module checked out
-    at the same directory level.  If this is not the case you will need to set the
-    extend tag accordingly.
-    -->
-    <extend>${basedir}/../project.xml</extend>
+   
+    <extend>${basedir}/../mule/project.xml</extend>
     <pomVersion>3</pomVersion>
     <name>Mule Extras</name>
     <groupId>mule</groupId>
@@ -73,6 +69,23 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <url>http://junit.sourceforge.net/index.html</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects</artifactId>
+            <version>core-0.09</version>
+            <properties>
+                <ignore>true</ignore>
             </properties>
         </dependency>
     </dependencies>

@@ -10,21 +10,21 @@
     JmsConnector is used to send and receive information via the Jms channel
     -->
     <!-- Testing with ActiveMq -->
-    <!--<connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
             <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
             <property name="jndiInitialFactory" value="org.codehaus.activemq.jndi.ActiveMQInitialContextFactory"/>
         </properties>
-    </connector>-->
+    </connector>
 
     <!-- testing with OpenJms -->
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
-        <properties>
-            <property name="connectionFactoryJndiName" value="JmsQueueConnectionFactory"/>
-            <property name="jndiInitialFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>
-            <property name="jndiProviderUrl" value="tcp://localhost:3035"/>
-        </properties>
-    </connector>
+<!--    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
+<!--        <properties>-->
+<!--            <property name="connectionFactoryJndiName" value="JmsQueueConnectionFactory"/>-->
+<!--            <property name="jndiInitialFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>-->
+<!--            <property name="jndiProviderUrl" value="tcp://localhost:3035"/>-->
+<!--        </properties>-->
+<!--    </connector>-->
 
     <!--
     All transformers must be defined here.  For this example we have two transformers

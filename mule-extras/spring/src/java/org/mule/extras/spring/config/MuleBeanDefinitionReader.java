@@ -13,7 +13,6 @@
  */
 package org.mule.extras.spring.config;
 
-import org.apache.xml.serialize.DOMWriterImpl;
 import org.mule.config.MuleDtdResolver;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
@@ -33,7 +32,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -87,12 +85,12 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
             DOMResult result = new DOMResult();
             transformer.transform(new DOMSource(document), result);
             //if(logger.isDebugEnabled()) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                DOMWriterImpl writer = new DOMWriterImpl();
-                writer.writeNode(baos, result.getNode());
-                System.out.println(baos.toString());
-                logger.debug("Transformed document is:\n" + baos.toString());
-                baos.close();
+//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                DOMWriterImpl writer = new DOMWriterImpl();
+//                writer.writeNode(baos, result.getNode());
+//                System.out.println(baos.toString());
+//                logger.debug("Transformed document is:\n" + baos.toString());
+//                baos.close();
             //}
             return (Document) result.getNode();
         } else

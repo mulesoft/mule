@@ -14,8 +14,8 @@
 package org.mule.providers.file;
 
 import org.mule.umo.UMOEvent;
-import org.mule.util.UUID;
 import org.mule.util.Utility;
+import org.mule.util.UUID;
 
 /**
  * <code>SimpleFilenameParser</code> understands a limited set of tokens, namely

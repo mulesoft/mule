@@ -237,38 +237,21 @@
         </dependency>
 
         <!-- Jms tests using ActiveMq -->
-<!--<dependency>
-          <groupId>geronimo-spec</groupId>
-          <artifactId>geronimo-spec-j2ee</artifactId>
-          <version>1.4-rc2</version>
-          <properties>
-            <ignore>true</ignore>
-          </properties>
-        </dependency>
         <dependency>
-          <artifactId>activemq</artifactId>
-          <version>1.1</version>
-          <properties>
-            <ignore>true</ignore>
-          </properties>
-        </dependency>-->
-        <!-- testing with Open jms -->
-        <dependency>
-            <groupId>exolabcore</groupId>
-            <artifactId>exolabcore</artifactId>
-            <version>0.3.7</version>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee</artifactId>
+            <version>1.4-rc2</version>
             <properties>
                 <ignore>true</ignore>
-                <mule.core.jar>true</mule.core.jar>
             </properties>
         </dependency>
+
         <dependency>
-            <groupId>openjms</groupId>
-            <artifactId>openjms</artifactId>
-            <version>0.7.6.1</version>
+            <artifactId>activemq</artifactId>
+            <groupId>activemq</groupId>
+            <version>2.0</version>
             <properties>
                 <ignore>true</ignore>
-                <mule.core.jar>true</mule.core.jar>
             </properties>
         </dependency>
 
@@ -331,53 +314,53 @@
         <nagEmailAddress>mule-developer@lists.sourceforge.net</nagEmailAddress>
         <sourceDirectory>${basedir}/src/java</sourceDirectory>
         <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
-        <unitTest>
-            <includes>
-                <include>**/*TestCase.*</include>
-            </includes>
-            <excludes>
-                <exclude>**/Abstract*.*</exclude>
-                <!-- need to have a Jms server running to include these -->
-                <exclude>**/*Jms*.*</exclude>
-                <exclude>**/*JMS*.*</exclude>
-                <exclude>**/ActiveMQ*.*</exclude>
-                <exclude>**/OpenJms*.*</exclude>
-                <exclude>**/Joram*.*</exclude>
-                <exclude>**/SpiritWave*.*</exclude>
-
+<!--        <unitTest>-->
+<!--            <includes>-->
+<!--                <include>**/*TestCase.*</include>-->
+<!--            </includes>-->
+<!--            <excludes>-->
+<!--                <exclude>**/Abstract*.*</exclude>-->
+              <!-- need to have a Jms server running to include these -->
+<!--                <exclude>**/*Jms*.*</exclude>-->
+<!--                <exclude>**/*JMS*.*</exclude>-->
+<!--                <exclude>**/ActiveMQ*.*</exclude>-->
+<!--                <exclude>**/OpenJms*.*</exclude>-->
+<!--                <exclude>**/Joram*.*</exclude>-->
+<!--                <exclude>**/SpiritWave*.*</exclude>-->
+<!---->
                 <!-- Fails as mail folder cannot be null, but can't mock a mail folder... -->
-                <exclude>**/MailMessageReceiverTestCase.*</exclude>
-
-                <!-- tests fails on Linux jdk -->
-                <exclude>**/CompressionTransformerTestCase.*</exclude>
-
+<!--                <exclude>**/MailMessageReceiverTestCase.*</exclude>-->
+<!---->
+               <!-- tests fails on Linux jdk -->
+<!--                <exclude>**/CompressionTransformerTestCase.*</exclude>-->
+<!---->
                 <!-- Disable Multicast tests unless configured -->
-                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
-
+<!--                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>-->
+<!---->
                 <!-- sometimes fails failing to bind -->
-                <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
-
-            </excludes>
-<!--
-            If you have included the Jms Tests above you can also include tests
-            for you particular Jms server
-            -->
-
-            <resources>
-                <resource>
-                    <directory>${basedir}/src/test/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-                <resource>
-                    <directory>${basedir}/src/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-            </resources>
-        </unitTest>
+<!--                <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>-->
+<!---->
+<!--            </excludes>-->
+            <!--
+                        If you have included the Jms Tests above you can also include tests
+                        for you particular Jms server
+                        -->
+<!---->
+<!--            <resources>-->
+<!--                <resource>-->
+<!--                    <directory>${basedir}/src/test/conf</directory>-->
+<!--                    <includes>-->
+<!--                        <include>**/*</include>-->
+<!--                    </includes>-->
+<!--                </resource>-->
+<!--                <resource>-->
+<!--                    <directory>${basedir}/src/conf</directory>-->
+<!--                    <includes>-->
+<!--                        <include>**/*</include>-->
+<!--                    </includes>-->
+<!--                </resource>-->
+<!--            </resources>-->
+<!--        </unitTest>-->
         <resources>
             <resource>
                 <directory>${basedir}/src/conf</directory>
@@ -393,15 +376,15 @@
         </resources>
     </build>
     <reports>
-<!--report>maven-pmd-plugin</report>
-        <report>maven-simian-plugin</report-->
+        <!--report>maven-pmd-plugin</report>
+                <report>maven-simian-plugin</report-->
         <report>maven-jdepend-plugin</report>
         <report>maven-jxr-plugin</report>
         <!--report>maven-javadoc-plugin</report-->
-<!-- The Clover report MUST be before the JUnit report as the test:test
-            target is run only ONCE (due to the test:test postGoal) and clover needs to
-            "watch" the tests run, while JUnit report simply analyses the output from
-            the tests -->
+        <!-- The Clover report MUST be before the JUnit report as the test:test
+                    target is run only ONCE (due to the test:test postGoal) and clover needs to
+                    "watch" the tests run, while JUnit report simply analyses the output from
+                    the tests -->
         <!--        <report>maven-clover-plugin</report>-->
         <!--report>maven-junit-report-plugin</report-->
     </reports>

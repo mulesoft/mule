@@ -154,7 +154,7 @@ public class LoanConsumer
                 }
                 boolean sync = false;
                 if(args.length > 2) {
-                    sync = Boolean.valueOf(args[2]);
+                    sync = Boolean.valueOf(args[2]).booleanValue();
                 }
                 if(sync) {
                     long start = System.currentTimeMillis();
@@ -164,7 +164,7 @@ public class LoanConsumer
                     int x=1;
                     for (Iterator iterator = results.iterator(); iterator.hasNext();x++)
                     {
-                        LoanQuote quote = (LoanQuote) iterator.next();
+                        org.mule.samples.loanbroker.LoanQuote quote = (org.mule.samples.loanbroker.LoanQuote) iterator.next();
                         output.add(x + ". " + quote.toString());
                     }
                     System.out.println(StringMessageHelper.getBoilerPlate(output, '*', 80));
