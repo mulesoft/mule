@@ -152,12 +152,18 @@
         <mkdir dir="${mule.release.src.dir}"/>
     </goal>
 
+    <postGoal name="test:test">
+        <j:if test="${context.getVariable('maven.test.skip') == null || context.getVariable('maven.test.skip') == 'false'}">
+            <echo>Setting maven.test.skip to true, so that tests do not run again!</echo>
+            <j:expr value="${context.setVariable('maven.test.skip', 'true')}"/>
+        </j:if>
+    </postGoal>
+
     <goal name="mule:release" prereqs="mule:release-prepare" description="Creates and zips build for distribution">
         <!-- for some reason the reactor is getting confused when these are set
         as prereqs?
         -->
         <attainGoal name="clean-build"/>
-        <j:set var="maven.test.skip" value="true"/>
         <attainGoal name="mule:libs"/>
         <attainGoal name="mule:src"/>
         <attainGoal name="mule:site"/>
