@@ -266,7 +266,7 @@ threading in every connector
     validate user credentials
 
   -->
-<!ELEMENT security-manager (security-provider+)>
+<!ELEMENT security-manager (security-provider*, encryption-strategy*)>
 
 <!--
 	The <i>className</i> is optional and specifies the security manager to use.
@@ -289,6 +289,24 @@ threading in every connector
  A unique name that identifies the security provider
  -->
 <!ATTLIST security-provider name        		ID         		#REQUIRED>
+
+<!--
+   A encryption strategy is a encryption configuration object that
+   can be used by mule components to perform en/decryption.  The main
+   components that will use these strategies are security filters and
+   transformers
+-->
+<!ELEMENT encryption-strategy (properties?)>
+
+<!--
+ A fully qualified class name of the encryption strategy to use
+ -->
+<!ATTLIST encryption-strategy className        		NMTOKEN         		#REQUIRED>
+
+<!--
+ A unique name that identifies the encryption strategy
+ -->
+<!ATTLIST encryption-strategy name        		ID         		#REQUIRED>
 
 <!--
 The <i>connection-descriptor</i> element specifies one or more message

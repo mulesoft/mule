@@ -192,8 +192,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
                 endpoint.getSecurityFilter().authenticate(muleEvent);
             } catch (UMOSecurityException e)
             {
-                logger.warn("Request was made but was not authenticated: " + e.getMessage());
-                return new MuleMessage(e.getMessage(), muleEvent.getProperties());
+                logger.warn("Request was made but was not authenticated: " + e.getMessage(), e);
+                return handleSecurtyException(e, muleEvent);
             }
         }
 
@@ -206,6 +206,10 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             resultMessage = component.getDescriptor().getInboundRouter().route(muleEvent);
         }
         return resultMessage;
+    }
+
+    protected UMOMessage handleSecurtyException(UMOSecurityException e, UMOEvent event) {
+        return new MuleMessage(e.getMessage(), event.getProperties());
     }
 
     protected UMOMessage handleUnacceptedFilter(UMOMessage message) {

@@ -42,6 +42,9 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.security.UMOSecurityException;
+import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
@@ -116,6 +119,16 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             keepAliveMonitor.dispose();
         }
         super.doDispose();
+    }
+
+    protected UMOMessage handleSecurtyException(UMOSecurityException e, UMOEvent event) {
+        UMOMessage result = super.handleSecurtyException(e, event);
+        if(e instanceof UnauthorisedException) {
+            result.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_UNAUTHORIZED);
+        } else {
+            result.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_INTERNAL_SERVER_ERROR);            
+        }
+        return result;
     }
 
     private class HttpWorker extends TcpWorker implements Expirable

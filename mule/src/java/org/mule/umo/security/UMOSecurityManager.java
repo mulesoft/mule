@@ -14,6 +14,7 @@
 package org.mule.umo.security;
 
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.UMOEncryptionStrategy;
 
 import java.util.List;
 
@@ -39,9 +40,11 @@ public interface UMOSecurityManager extends Initialisable
 
     public void setProviders(List providers);
 
-    public UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException;
+    public UMOSecurityContext createSecurityContext(UMOAuthentication authentication) throws UnknownAuthenticationTypeException;
 
-    public void addSecurityContextFactory(Class type, UMOSecurityContextFactory factory);
+    public UMOEncryptionStrategy getEncryptionStrategy(String name);
 
-    public UMOSecurityContextFactory removeSecurityContextFactory(Class type);
+    public void addEncryptionStrategy(String name, UMOEncryptionStrategy strategy);
+
+    public UMOEncryptionStrategy removeEncryptionStrategy(String name);
 }

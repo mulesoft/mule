@@ -37,12 +37,13 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     /**
      * Removes an associated property from the message
+     *
      * @param key the key of the property to remove
      */
     public Object removeProperty(Object key)
     {
         Object prop = properties.get(key);
-        if(prop!=null) properties.remove(key);
+        if (prop != null) properties.remove(key);
         return prop;
     }
 
@@ -79,7 +80,8 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     public Object getProperty(String name, Object defaultValue)
     {
         Object result = properties.get(name);
-        if(result==null) {
+        if (result == null)
+        {
             return defaultValue;
         }
         return result;
@@ -88,8 +90,21 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     public int getIntProperty(String name, int defaultValue)
     {
         Object result = properties.get(name);
-        if(result!=null && result instanceof Integer) {
-            return ((Integer)result).intValue();
+        if (result != null)
+        {
+            if (result instanceof Integer)
+            {
+                return ((Integer) result).intValue();
+            } else
+            {
+                try
+                {
+                    return Integer.parseInt(result.toString());
+                } catch (NumberFormatException e)
+                {
+                    return defaultValue;
+                }
+            }
         } else {
             return defaultValue;
         }
@@ -98,9 +113,20 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     public long getLongProperty(String name, long defaultValue)
     {
         Object result = properties.get(name);
-        if(result!=null && result instanceof Long) {
-            return ((Long)result).longValue();
-        } else {
+        if (result != null) {
+            if(result instanceof Long) {
+                return ((Long) result).longValue();
+            } else
+            {
+                try
+                {
+                    return Long.parseLong(result.toString());
+                } catch (NumberFormatException e)
+                {
+                    return defaultValue;
+                }
+            }
+        }else {
             return defaultValue;
         }
     }
@@ -108,8 +134,20 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     public double getDoubleProperty(String name, double defaultValue)
     {
         Object result = properties.get(name);
-        if(result!=null && result instanceof Double) {
-            return ((Double)result).doubleValue();
+        if (result != null) {
+            if( result instanceof Double)
+            {
+                return ((Double) result).doubleValue();
+            } else
+            {
+                try
+                {
+                    return Double.parseDouble(result.toString());
+                } catch (NumberFormatException e)
+                {
+                    return defaultValue;
+                }
+            }
         } else {
             return defaultValue;
         }
@@ -118,13 +156,17 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
         Object result = properties.get(name);
-        if(result!=null) {
-            if(result instanceof Boolean) {
-                return ((Boolean)result).booleanValue();
-            } else {
+        if (result != null)
+        {
+            if (result instanceof Boolean)
+            {
+                return ((Boolean) result).booleanValue();
+            } else
+            {
                 return Boolean.valueOf(result.toString()).booleanValue();
             }
-        } else {
+        } else
+        {
             return defaultValue;
         }
     }

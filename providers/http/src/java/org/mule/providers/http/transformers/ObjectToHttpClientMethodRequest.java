@@ -91,29 +91,34 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     postMethod.setRequestContentLength(buffer.length);
                 }
                 httpMethod = postMethod;
-                //Standard headers
-                String headerName;
-                String value;
-                for (Iterator iterator = headers.iterator(); iterator.hasNext();)
-                {
-                    headerName = (String) iterator.next();
-                    value = (String)context.getProperty(headerName);
-                    if(value!=null) {
-                        httpMethod.addRequestHeader(headerName, value);
-                    }
-                }
-
-                //Custom headers
-                Map customHeaders = (Map)context.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
-                if(customHeaders!=null) {
-                    Map.Entry entry;
-                    for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
-                    {
-                        entry =  (Map.Entry)iterator.next();
-                        httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
-                    }
+            }
+            //Standard headers
+            String headerName;
+            String value;
+            for (Iterator iterator = headers.iterator(); iterator.hasNext();)
+            {
+                headerName = (String) iterator.next();
+                value = (String)context.getProperty(headerName);
+                if(value!=null) {
+                    httpMethod.addRequestHeader(headerName, value);
                 }
             }
+
+            //Custom headers
+            Map customHeaders = (Map)context.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+            if(customHeaders!=null) {
+                Map.Entry entry;
+                for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
+                {
+                    entry =  (Map.Entry)iterator.next();
+                    httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
+                }
+            }
+            String user = (String)context.getProperty(MuleProperties.MULE_USER_PROPERTY);
+            if(user!=null) {
+                httpMethod.addRequestHeader(MuleProperties.MULE_USER_PROPERTY, user);
+            }
+
             return httpMethod;
         } catch (Exception e)
         {

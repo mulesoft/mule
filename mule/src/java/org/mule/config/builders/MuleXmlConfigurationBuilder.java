@@ -62,8 +62,10 @@ import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOManager;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.UMOTransactionManagerFactory;
+import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
+import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.model.ComponentResolverException;
@@ -134,6 +136,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public static final String TRANSFORMER_INTERFACE = UMOTransformer.class.getName();
     public static final String TRANSACTION_MANAGER_FACTORY_INTERFACE = UMOTransactionManagerFactory.class.getName();
     public static final String SECURITY_PROVIDER_INTERFACE = UMOSecurityProvider.class.getName();
+    public static final String ENCRYPTION_STRATEGY_INTERFACE = UMOEncryptionStrategy.class.getName();
     public static final String ENDPOINT_SECURITY_FILTER_INTERFACE = UMOEndpointSecurityFilter.class.getName();
     public static final String AGENT_INTERFACE = UMOAgent.class.getName();
     public static final String TRANSACTION_FACTORY_INTERFACE = UMOTransactionFactory.class.getName();
@@ -393,12 +396,32 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         //Create container Context
         path += "/security-manager";
         digester.addObjectCreate(path, DEFAULT_SECURITY_MANAGER, "className");
-        digester.addObjectCreate(path + "/security-provider", SECURITY_PROVIDER_INTERFACE, "className");
 
+        //Add propviders
+        digester.addObjectCreate(path + "/security-provider", SECURITY_PROVIDER_INTERFACE, "className");
         addSetPropertiesRule(path + "/security-provider", digester);
         addMulePropertiesRule(path + "/security-provider", digester, true);
         digester.addSetNext(path + "/security-provider", "addProvider");
-        digester.addSetRoot(path, "setSecurityManager");
+
+        //Add encryption strategies
+        digester.addObjectCreate(path + "/encryption-strategy", ENCRYPTION_STRATEGY_INTERFACE, "className");
+        addSetPropertiesRule(path + "/encryption-strategy", digester);
+        addMulePropertiesRule(path + "/encryption-strategy", digester, true);
+        digester.addRule(path  + "/encryption-strategy", new Rule(){
+            private String name;
+
+            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception
+            {
+                name = attributes.getValue("name");
+            }
+
+            public void end(String endpointName, String endpointName1) throws Exception
+            {
+                UMOEncryptionStrategy s = (UMOEncryptionStrategy)digester.peek();
+                ((UMOSecurityManager)digester.peek(1)).addEncryptionStrategy(name, s);
+            }
+        });
+        digester.addSetNext(path, "setSecurityManager");
 
     }
 

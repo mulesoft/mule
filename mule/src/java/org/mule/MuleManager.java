@@ -556,6 +556,9 @@ public class MuleManager implements UMOManager
             }
             try
             {
+                if(securityManager!=null) {
+                    securityManager.initialise();
+                }
                 //Allows users to disable all server components and connections
                 //this can be useful for testing
                 boolean disable = PropertiesHelper.getBooleanProperty(System.getProperties(),

@@ -23,6 +23,8 @@ import org.mule.umo.security.UMOSecurityException;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.util.Utility;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation for all security filters,
@@ -34,6 +36,11 @@ import org.mule.util.Utility;
 
 public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecurityFilter
 {
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     private UMOSecurityManager securityManager;
     private String securityProviders;
     private UMOImmutableEndpoint endpoint;

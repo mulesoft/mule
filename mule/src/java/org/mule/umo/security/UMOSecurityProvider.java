@@ -32,4 +32,6 @@ public interface UMOSecurityProvider extends Initialisable
     public UMOAuthentication authenticate(UMOAuthentication authentication) throws UMOSecurityException;
 
     public boolean supports(Class aClass);
+
+    public UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException;
 }

@@ -17,13 +17,13 @@ import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.InitialisationException;
+import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.security.SecurityProviderNotFoundException;
 import org.mule.umo.security.UMOAuthentication;
-import org.mule.umo.security.UMOSecurityContext;
-import org.mule.umo.security.UMOSecurityContextFactory;
 import org.mule.umo.security.UMOSecurityException;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     private Map providers = new ConcurrentHashMap();
 
-    private Map contextFactories = new ConcurrentHashMap();
+    private Map cryptoStrategies = new ConcurrentHashMap();
 
     public void initialise() throws InitialisationException
     {
@@ -57,6 +57,12 @@ public class MuleSecurityManager implements UMOSecurityManager
         {
             UMOSecurityProvider provider = (UMOSecurityProvider) iterator.next();
             provider.initialise();
+        }
+
+        for (Iterator iterator = cryptoStrategies.values().iterator(); iterator.hasNext();)
+        {
+            UMOEncryptionStrategy strategy = (UMOEncryptionStrategy) iterator.next();
+            strategy.initialise();
         }
     }
 
@@ -118,26 +124,40 @@ public class MuleSecurityManager implements UMOSecurityManager
         }
     }
 
-    public UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException
+    public UMOSecurityContext createSecurityContext(UMOAuthentication authentication) throws UnknownAuthenticationTypeException
     {
-        UMOSecurityContextFactory factory = (UMOSecurityContextFactory)contextFactories.get(auth.getClass());
-        if(factory==null) {
-            throw new UnknownAuthenticationTypeException(auth);
-        } else {
-            return factory.create(auth);
+        Iterator iter = providers.values().iterator();
+
+        Class toTest = authentication.getClass();
+
+        while (iter.hasNext()) {
+            UMOSecurityProvider provider = (UMOSecurityProvider) iter.next();
+
+            if (provider.supports(toTest)) {
+                return provider.createSecurityContext(authentication);
+            }
         }
+        throw new UnknownAuthenticationTypeException(authentication);
     }
 
-    public void addSecurityContextFactory(Class type, UMOSecurityContextFactory factory)
+    public UMOEncryptionStrategy getEncryptionStrategy(String name)
     {
-        if(contextFactories.get(type)!=null) {
-            throw new IllegalArgumentException("Factory for type already registered: " + type.getName());
-        }
-        contextFactories.put(type, factory);
+        return (UMOEncryptionStrategy)cryptoStrategies.get(name);
     }
 
-    public UMOSecurityContextFactory removeSecurityContextFactory(Class type)
+    public void addEncryptionStrategy(String name, UMOEncryptionStrategy strategy)
     {
-        return (UMOSecurityContextFactory)contextFactories.remove(type);
+        cryptoStrategies.put(name, strategy);
+    }
+
+    public UMOEncryptionStrategy removeEncryptionStrategy(String name)
+    {
+        return (UMOEncryptionStrategy)cryptoStrategies.remove(name);
+
+    }
+
+    public void setEncryptionStrategies(Map strategies)
+    {
+        cryptoStrategies.putAll(strategies);
     }
 }

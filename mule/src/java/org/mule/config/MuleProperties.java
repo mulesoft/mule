@@ -38,6 +38,7 @@ public interface MuleProperties
     public static final String MULE_METHOD_PROPERTY = PROPERTY_PREFIX + "METHOD";
     public static final String MULE_ENDPOINT_PROPERTY = PROPERTY_PREFIX + "ENDPOINT";
     public static final String MULE_REPLY_TO_PROPERTY = PROPERTY_PREFIX + "REPLYTO";
+    public static final String MULE_USER_PROPERTY = PROPERTY_PREFIX + "USER";
     public static final String MULE_REPLY_TO_REQUESTOR_PROPERTY = PROPERTY_PREFIX + "REPLYTO_REQUESTOR";
     public static final String MULE_CORRELATION_ID_PROPERTY = PROPERTY_PREFIX + "CORRELATION_ID";
     public static final String MULE_CORRELATION_GROUP_SIZE_PROPERTY = PROPERTY_PREFIX + "CORRELATION_GROUP";

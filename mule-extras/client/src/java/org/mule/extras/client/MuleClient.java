@@ -22,6 +22,7 @@ import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.security.MuleUserAuthenticationToken;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
@@ -32,6 +33,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManager;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -93,6 +95,10 @@ public class MuleClient
     //configuration helper for the client
     QuickConfigurationBuilder builder = null;
 
+    private MuleUserAuthenticationToken user;
+
+    private UMOEncryptionStrategy encryption;
+
     /**
      * Creates a default Mule client that will use the default serverEndpoint
      * to connect to a remote server instance.
@@ -104,9 +110,21 @@ public class MuleClient
         this(MuleManager.getConfiguration().isSynchronous());
     }
 
+    public MuleClient(String user, String password) throws UMOException
+    {
+        this(MuleManager.getConfiguration().isSynchronous());
+        this.user = new MuleUserAuthenticationToken(user, password.toCharArray());
+    }
+
     public MuleClient(boolean synchronous) throws UMOException
     {
         init(synchronous);
+    }
+
+    public MuleClient(boolean synchronous, String user, String password) throws UMOException
+    {
+        init(synchronous);
+        this.user = new MuleUserAuthenticationToken(user, password.toCharArray());
     }
 
     /**
@@ -460,7 +478,11 @@ public class MuleClient
         try
         {
             MuleSession session = new MuleSession(null);
+            if(user!=null) {
+                message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + user.getToken());
+            }
             MuleEvent event = new MuleEvent(message, endpoint, session, synchronous);
+
             return event;
         } catch (Exception e)
         {

@@ -16,6 +16,7 @@
 package org.mule.providers.http;
 
 import org.apache.commons.httpclient.ConnectMethod;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpState;
@@ -39,6 +40,7 @@ import org.mule.umo.transformer.UMOTransformer;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 /**
  * <p><code>HttpClientMessageDispatcher</code> dispatches Mule events over http.
@@ -133,13 +135,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
      */
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
-//        String endpointUri = event.getEndpointName().getEndpointURI();
-//        if(endpointUri==null) endpointUri = "";
-//        if (endpointUri.trim().length()==0)
-//        {
-//            //if no endpointUri, we can treat this as request/response
-//            return new MuleMessage(event.getTransformedMessage(), event.getProperties());
-//        }
         String method = (String) event.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
         URI uri = event.getEndpoint().getEndpointURI().getUri();
         HttpMethod httpMethod = null;
@@ -176,19 +171,19 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             {
                 httpMethod = new ConnectMethod(httpMethod);
             }
+            httpMethod.setDoAuthentication(true);
             httpMethod.execute(state, connection);
 
-            if (httpMethod.getStatusCode() < 400)
+            Properties h = new Properties();
+            Header[] headers = httpMethod.getRequestHeaders();
+            for (int i = 0; i < headers.length; i++)
             {
-                //todo set response headers
-                return new MuleMessage(httpMethod.getResponseBodyAsString(), null);
-            } else
-            {
-                throw new MuleException("HTTP request failed with return code: " + httpMethod.getStatusLine().toString());
+                h.setProperty(headers[i].getName(), headers[i].getValue());
             }
-        } catch (MuleException e)
-        {
-            throw e;
+            String status = String.valueOf(httpMethod.getStatusCode());
+            h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
+            logger.debug("Http response is: " + status);
+            return new MuleMessage(httpMethod.getResponseBodyAsString(), h);
         } catch (Exception e)
         {
             throw new MuleException("HTTP endpoint failed to make request: " + e, e);
