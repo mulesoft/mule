@@ -76,14 +76,16 @@ public class HttpConnector extends TcpConnector
 
     private String proxyPassword = null;
 
-    private boolean secure = false;
+    private long keepAliveTimeout = 60000;
+
+    private boolean keepAlive = true;
 
     /* (non-Javadoc)
      * @see org.mule.umo.provider.UMOConnector#getProtocol()
      */
     public String getProtocol()
     {
-        return (secure ? "https" : "http");
+        return "http";
     }
 
     /**
@@ -150,13 +152,23 @@ public class HttpConnector extends TcpConnector
         proxyUsername = string;
     }
 
-    public boolean isSecure()
+    public long getKeepAliveTimeout()
     {
-        return secure;
+        return keepAliveTimeout;
     }
 
-    public void setSecure(boolean secure)
+    public void setKeepAliveTimeout(long keepAliveTimeout)
     {
-        this.secure = secure;
+        this.keepAliveTimeout = keepAliveTimeout;
+    }
+
+    public boolean isKeepAlive()
+    {
+        return keepAlive;
+    }
+
+    public void setKeepAlive(boolean keepAlive)
+    {
+        this.keepAlive = keepAlive;
     }
 }

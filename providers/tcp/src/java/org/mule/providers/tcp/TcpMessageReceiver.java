@@ -77,7 +77,17 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                               UMOEndpoint endpoint) throws InitialisationException
     {
         create(connector, component, endpoint);
-        connector.getReceiverThreadingProfile().setThreadFactory(new ThreadFactory() {
+        connector.getReceiverThreadingProfile().setThreadFactory(getThreadFactory());
+        threadPool = connector.getReceiverThreadingProfile().createPool(connector.getName());
+        URI uri = endpoint.getEndpointURI().getUri();
+
+        connect(uri);
+        worker = new Thread(this, connector.getName() + ".receiver");
+        worker.start();
+    }
+
+    protected ThreadFactory getThreadFactory() {
+            return new ThreadFactory() {
             public Thread newThread(Runnable runnable)
             {
                 Thread thread = new Thread(runnable, toString());
@@ -89,13 +99,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                 }
                 return thread;
             }
-        });
-        threadPool = connector.getReceiverThreadingProfile().createPool(connector.getName());
-        URI uri = endpoint.getEndpointURI().getUri();
-
-        connect(uri);
-        worker = new Thread(this, connector.getName() + ".receiver");
-        worker.start();
+        };
     }
 
     protected void connect(URI uri) throws InitialisationException
@@ -239,7 +243,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
             try
             {
                 if (socket != null) {
-                    logger.info("Closing listener: " + socket.getLocalAddress());
+                    logger.debug("Closing listener: " + socket.getInetAddress());
                     socket.close();
                 }
             } catch (IOException e)
@@ -271,7 +275,9 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                     if (b == null) break;
 
                     byte[] result = processData(b);
-                    dataOut.write(result);
+                    if(result!=null) {
+                        dataOut.write(result);
+                    }
                     dataOut.flush();
                 }
             } catch (Exception e)
@@ -279,6 +285,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                 handleException("Failed to process tcp Request on: "
                         + (socket != null ? socket.getInetAddress().toString() : "null"),
                         e);
+            } finally {
                 dispose();
             }
         }

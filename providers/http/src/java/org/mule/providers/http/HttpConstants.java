@@ -74,6 +74,7 @@ public interface HttpConstants
     public static final String HEADER_IF_NONE_MATCH = "If-None-Match";// [Request]
     public static final String HEADER_IF_RANGE = "If-Range";// [Request]
     public static final String HEADER_IF_UNMODIFIED_SINCE = "If-Unmodified-Since";// [Request]
+    public static final String HEADER_KEEP_ALIVE = "Keep-Alive";// [Entity]
     public static final String HEADER_LAST_MODIFIED = "Last-Modified";// [Entity]
     public static final String HEADER_LOCATION = "Location";// [Response]
     public static final String HEADER_MAX_FORWARDS = "Max-Forwards";// [Request]

@@ -13,6 +13,7 @@
  */
 package org.mule.providers.http;
 
+import org.mule.InitialisationException;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.tcp.TcpConnector;
@@ -21,9 +22,7 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.InitialisationException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
@@ -59,8 +58,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
 
     public Object getValidMessage() throws Exception
     {
-        String msg = HttpConstants.HTTP11 + " 200 OK" + HttpConstants.HEADER_CONTENT_SEPARATOR + "Hello";
-        return new ByteArrayInputStream(msg.getBytes());
+        return "Hello".getBytes();
     }
 
     public void testValidListener() throws Exception

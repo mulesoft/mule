@@ -16,9 +16,6 @@ package org.mule.providers.http;
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
@@ -26,9 +23,9 @@ import java.io.InputStream;
 
 public class HttpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
-    protected static final String TEST_MESSAGE = HttpConstants.HTTP11 + " 200 OK" + HttpConstants.HEADER_CONTENT_SEPARATOR + "Hello";
+    protected static final String TEST_MESSAGE = "Hello";
 
-    private InputStream message = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
+    private byte[] message = TEST_MESSAGE.getBytes();
     public Object getValidMessage() throws Exception
     {
         return message;
@@ -46,7 +43,7 @@ public class HttpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 
 
 
-        assertEquals("Hello", adapter.getPayload());
+        assertEquals("Hello", adapter.getPayloadAsString());
         byte[] bytes = adapter.getPayloadAsBytes();
         assertNotNull(bytes);
 

@@ -22,8 +22,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
-import java.io.ByteArrayInputStream;
-
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
@@ -46,8 +44,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
 
     public Object getValidMessage() throws Exception
     {
-        String msg = HttpConstants.HTTP11 + " 200 OK" + HttpConstants.HEADER_CONTENT_SEPARATOR + "Hello";
-        return new ByteArrayInputStream(msg.getBytes());
+        return "Hello".getBytes();
     }
 
     public void testValidListener() throws Exception
