@@ -4,12 +4,6 @@
                                 "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
 
 <mule-configuration id="helloSampleProperties" version="1.0">
-    <connector name="SystemStreamConnector" className="org.mule.providers.stream.SystemStreamConnector">
-        <properties>
-            <property name="promptMessage" value="Please enter something: "/>
-            <property name="messageDelayTime" value="1000"/>
-        </properties>
-    </connector>
 
     <connector name="TestConnector"
         className="org.mule.extras.spring.events.TestConnectorWithContainerDependents">
@@ -28,8 +22,8 @@
 
     <model name="echoSample">
         <mule-descriptor name="EchoUMO"
-            inboundEndpoint="stream://localhost"
-            outboundEndpoint="stream://localhost"
+            inboundEndpoint="test://in"
+            outboundEndpoint="test://out"
             implementation="org.mule.components.simple.EchoComponent"
             containerManaged="false">
         </mule-descriptor>
