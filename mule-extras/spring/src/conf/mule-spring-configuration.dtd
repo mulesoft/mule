@@ -10,7 +10,7 @@
 	@root mule-configuration
 
 -->
-<!ELEMENT mule-configuration (description?,(mule-environment-properties)?,(environment-properties)?, (transaction-manager)?, (security-manager)?,
+<!ELEMENT mule-configuration (description?,(environment-properties)?, (mule-environment-properties)?, (transaction-manager)?, (security-manager)?,
             (agents)?,(connector)*,(endpoint-identifiers)?,(transformers)?,(global-endpoints)?,
 		    (interceptor-stack)*,(container-context)*,(model)+,(mule-descriptor)*,(bean)*)>
 
@@ -246,7 +246,7 @@ threading in every connector
     The environment-param element allows to add custom properties.  These are accessible
     from the MuleManager getProperty method
   -->
-<!ELEMENT environment-properties ((property | factory-property | system-property | map | list)+)>
+<!ELEMENT environment-properties ((property | factory-property | system-property | map | list | file-properties)+)>
 
 <!--
 	This element specifies the security manager to use (if any) for this Mule Server instance
@@ -959,7 +959,7 @@ or relax dtd validation on their parser
   		A collection of properties for the parent component
 -->
 
-<!ELEMENT properties ((bean | spring-property | property | factory-property | container-property | system-property | map | list)*)>
+<!ELEMENT properties ((bean | spring-property | property | factory-property | container-property | system-property | map | list | file-properties)*)>
 
 <!--
   		An property element allows arbitrary name/value pairs.
@@ -1041,7 +1041,7 @@ The system property key to use when lookin up the property
 <!--
 	Defines a set of properties for a map property	
 -->
-<!ELEMENT map ((property | factory-property | container-property | system-property | map | list)*)>
+<!ELEMENT map ((property | factory-property | container-property | system-property | map | list | file-properties)*)>
 
 <!-- 
 	the name of the map property
@@ -1108,6 +1108,23 @@ The system property key to use when lookin up the property
 	a default value if the property is not found
 -->
 <!ATTLIST system-entry defaultValue			CDATA		#IMPLIED>
+
+
+<!--
+	Loads properies from a java.properties file
+-->
+<!ELEMENT file-properties EMPTY>
+
+<!--
+	The path to the properties file on the classpath or local file system
+-->
+<!ATTLIST file-properties location					NMTOKEN		#REQUIRED>
+
+<!--
+Whether the properties in the file override properties already set on this object
+-->
+<!ATTLIST file-properties override					(true | false)		"true">
+
 <!--
 	Optional description of the enclosing element.
 	Used for user documentation of XML bean definition documents.
