@@ -4,4 +4,4 @@ message.receiver=org.mule.providers.email.MailMessageReceiver
 message.adapter=org.mule.providers.email.MailMessageAdapter
 inbound.transformer=org.mule.providers.email.transformers.EmailMessageToString
 outbound.transformer=org.mule.providers.email.transformers.StringToEmailMessage
-endpoint.builder=org.mule.providers.email.EmailEndpointBuilder
+endpoint.builder=org.mule.impl.endpoint.UserInfoEndpointBuilder
