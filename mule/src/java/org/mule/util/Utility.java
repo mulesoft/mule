@@ -318,6 +318,9 @@ public class Utility
         if(resource!=null && resource.startsWith("file:/")) {
             resource = resource.substring(6);
         }
+        if(!resource.startsWith(File.separator)) {
+            resource = File.separator + resource;
+        }
         return resource;
     }
 
