@@ -34,6 +34,7 @@ public class HttpRequestToString extends DefaultTransformer
     {
         super();
         this.registerSourceType(String.class);
+        this.registerSourceType(byte[].class);
     }
 
     /* (non-Javadoc)
@@ -41,7 +42,12 @@ public class HttpRequestToString extends DefaultTransformer
      */
     public Object doTransform(Object src) throws TransformerException
     {
-        String param = src.toString();
+    	String param;
+    	if (src instanceof byte[]) {
+    		param = new String((byte[]) src);
+    	} else {
+        	param = src.toString();
+    	}
         int equals = param.indexOf("=");
         if(equals > -1)
         {
