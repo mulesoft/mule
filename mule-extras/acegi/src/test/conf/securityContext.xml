@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+    <bean id="daoAuthenticationProvider" class="net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider">
+        <property name="authenticationDao">
+            <ref bean="inMemoryDaoImpl"/>
+        </property>
+    </bean>
+
+    <bean id="inMemoryDaoImpl" class="net.sf.acegisecurity.providers.dao.memory.InMemoryDaoImpl">
+        <property name="userMap">
+            <value>
+      ross=ross,ROLE_ADMIN
+      anon=anon,ROLE_ANONYMOUS
+            </value>
+        </property>
+    </bean>
+</beans>

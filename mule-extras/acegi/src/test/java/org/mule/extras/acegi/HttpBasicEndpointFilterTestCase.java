@@ -31,6 +31,7 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOManager;
+import org.mule.umo.security.UMOSecurityProvider;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -55,7 +56,8 @@ public class HttpBasicEndpointFilterTestCase extends NamedTestCase
     public void setUp() throws Exception
     {
         MuleSecurityManager sm = new MuleSecurityManager();
-        sm.addProvider(new org.mule.extras.acegi.AcegiProviderAdapter(getTestProvider(), "testProvider"));
+        UMOSecurityProvider provider = new AcegiProviderAdapter(getTestProvider(), "testProvider");
+        sm.addProvider(provider);
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         UMOManager manager = builder.createStartedManager(true, "");
         manager.setSecurityManager(sm);

@@ -44,6 +44,7 @@ import org.mule.impl.DefaultLifecycleAdapter;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleModel;
 import org.mule.impl.MuleTransactionConfig;
+import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.model.MuleContainerContext;
@@ -61,6 +62,8 @@ import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOManager;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.UMOTransactionManagerFactory;
+import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.model.ComponentResolverException;
@@ -77,6 +80,9 @@ import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
 import org.mule.util.queue.PersistenceStrategy;
 import org.xml.sax.Attributes;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -110,6 +116,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public static final String DEFAULT_ENDPOINT = MuleEndpoint.class.getName();
     public static final String DEFAULT_TRANSACTION_CONFIG = MuleTransactionConfig.class.getName();
     public static final String DEFAULT_DESCRIPTOR = MuleDescriptor.class.getName();
+    public static final String DEFAULT_SECURITY_MANAGER = MuleSecurityManager.class.getName();
     public static final String DEFAULT_OUTBOUND_MESSAGE_ROUTER = OutboundMessageRouter.class.getName();
     public static final String DEFAULT_INBOUND_MESSAGE_ROUTER = InboundMessageRouter.class.getName();
     public static final String DEFAULT_RESPONSE_MESSAGE_ROUTER = ResponseMessageRouter.class.getName();
@@ -126,6 +133,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public static final String OUTBOUND_MESSAGE_ROUTER_INTERFACE = UMOOutboundMessageRouter.class.getName();
     public static final String TRANSFORMER_INTERFACE = UMOTransformer.class.getName();
     public static final String TRANSACTION_MANAGER_FACTORY_INTERFACE = UMOTransactionManagerFactory.class.getName();
+    public static final String SECURITY_PROVIDER_INTERFACE = UMOSecurityProvider.class.getName();
+    public static final String ENDPOINT_SECURITY_FILTER_INTERFACE = UMOEndpointSecurityFilter.class.getName();
     public static final String AGENT_INTERFACE = UMOAgent.class.getName();
     public static final String TRANSACTION_FACTORY_INTERFACE = UMOTransactionFactory.class.getName();
     public static final String TRANSACTION_CONSTRAINT_INTERFACE = BatchConstraint.class.getName();
@@ -152,13 +161,31 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester = new Digester();
         digester.setEntityResolver(new MuleDtdResolver());
 
+        digester.setErrorHandler(new ErrorHandler() {
 
+            public void error(SAXParseException exception) throws SAXException
+            {
+                logger.error(exception.getMessage(), exception);
+            }
+
+
+            public void fatalError(SAXParseException exception) throws SAXException
+            {
+                logger.fatal(exception.getMessage(), exception);
+            }
+
+            public void warning(SAXParseException exception) throws SAXException
+            {
+                logger.warn(exception.getMessage(), exception);
+            }
+        });
 
         String path = "mule-configuration";
         addMuleConfigurationRules(digester, path);
         addContainerContextRules(digester, path);
         addTransformerRules(digester, path);
         addMuleEnvironmentPropertiesRules(digester, path);
+        addSecurityManagerRules(digester, path);
         addTransactionManagerRules(digester, path);
         addGlobalEndpointRules(digester, path);
         addEndpointIdentfierRules(digester, path);
@@ -359,6 +386,20 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 super.end(s, s1);
             }
         });
+    }
+
+    protected void addSecurityManagerRules(Digester digester, String path) throws ConfigurationException
+    {
+        //Create container Context
+        path += "/security-manager";
+        digester.addObjectCreate(path, DEFAULT_SECURITY_MANAGER, "className");
+        digester.addObjectCreate(path + "/security-provider", SECURITY_PROVIDER_INTERFACE, "className");
+
+        addSetPropertiesRule(path + "/security-provider", digester);
+        addMulePropertiesRule(path + "/security-provider", digester, true);
+        digester.addSetNext(path + "/security-provider", "addProvider");
+        digester.addSetRoot(path, "setSecurityManager");
+
     }
 
     protected void addContainerContextRules(Digester digester, String path) throws ConfigurationException
@@ -810,13 +851,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         path += "/filter";
         digester.addObjectCreate(path, FILTER_INTERFACE, "className");
         addSetPropertiesRule(path, digester);
-        digester.addRule(path, new SetNextRule("setFilter")
-        {
-            public void end(String s, String s1) throws Exception
-            {
-                super.end(s, s1);
-            }
-        });
+        digester.addSetNext(path, "setFilter");
     }
 
     protected void addEndpointRules(Digester digester, String path, String method)
@@ -867,6 +902,12 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         if(method!=null) {
             digester.addSetNext(path, method);
         }
+
+        //Add security filter rules
+        digester.addObjectCreate(path + "/security-filter", ENDPOINT_SECURITY_FILTER_INTERFACE, "className");
+
+        addMulePropertiesRule(path + "/security-filter", digester, true);
+        digester.addSetNext(path + "/security-filter", "setSecurityFilter");
     }
 
     protected void addExceptionStrategyRules(Digester digester, String path)

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-spring-configuration.dtd">
+
+
+<mule-configuration id="Test_Mule_Properties" version="1.0">
+
+    <mule-environment-properties serverUrl=""/>
+
+    <security-manager>
+        <security-provider name="memory-dao" className="org.mule.extras.acegi.AcegiProviderAdapter">
+            <properties>
+                <container-property name="delegate" reference="daoAuthenticationProvider"/>
+            </properties>
+        </security-provider>
+    </security-manager>
+    
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="securityContext.xml"/>
+        </properties>
+    </container-context>
+    
+    <model name="test">
+        <mule-descriptor name="echo" 
+            implementation="org.mule.components.simple.EchoComponent"
+            containerManaged="false">
+            <inbound-router>
+                <endpoint address="http://localhost:4567">
+                    <security-filter className="org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter">
+                        <properties>
+                            <property name="realm" value="mule-realm"/>
+                        </properties>
+                    </security-filter>
+                </endpoint>
+            </inbound-router>
+        </mule-descriptor> 
+    </model>
+
+</mule-configuration>

@@ -51,7 +51,7 @@ public class UnauthorisedException extends UMOSecurityException
 
         StringBuffer buf = new StringBuffer();
         if(context==null) {
-            buf.append("Regired authentication is set on ").append(filter.getClass().getName());
+            buf.append("Registered authentication is set to ").append(filter.getClass().getName());
             buf.append(" but there was no security context on the session.");
         } else {
             buf.append("User authentication failed for: " + context.getAuthentication().getPrincipal());

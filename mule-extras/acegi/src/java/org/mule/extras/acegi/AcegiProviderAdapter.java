@@ -51,15 +51,8 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
 
     public void initialise() throws InitialisationException
     {
-        try
-        {
-            if(delegate instanceof InitializingBean) {
-                ((InitializingBean)delegate).afterPropertiesSet();
-            }
-        } catch (Exception e)
-        {
-            throw new InitialisationException(e.getMessage(), e);
-        }
+//      //all initialisation should be handled in the spring
+        //intitialisation hook afterPropertiesSet()
     }
 
     public void setName(String name)
