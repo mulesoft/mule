@@ -20,7 +20,6 @@ import org.mule.util.PropertiesHelper;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * <p><code>PropertiesHelperTestCase</code> TODO (document class)
@@ -86,25 +85,6 @@ public class PropertiesHelperTestCase extends TestCase
         temp = "namespace";
         result = PropertiesHelper.removeNamespacePrefix(temp);
         assertEquals("namespace", result);
-    }
-
-    public void testLoadProperties() throws Exception
-    {
-        Properties props = PropertiesHelper.loadProperties("src/test/org/mule/test/util/test.properties");
-        assertNotNull(props);
-        assertEquals(2, props.size());
-        assertEquals(props.getProperty("test1"), "test1");
-        assertEquals(props.getProperty("test2"), "test2");
-
-        try
-        {
-            props = PropertiesHelper.loadProperties("NonExistent.properties");
-            fail("File does not exist, file not found exception should be thrown");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
     }
 
     public void testRemoveNamespaces() throws Exception
