@@ -19,11 +19,6 @@
         <endpoint-identifier name="Bank5" value="vm://Bank5"/>
     </endpoint-identifiers>
 
-    <!--agents>
-        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
-        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
-    </agents-->
-
     <model name="loan-broker">
         <mule-descriptor name="LoanBroker" 
             implementation="org.mule.samples.loanbroker.SyncLoanBroker">
@@ -56,24 +51,11 @@
         <mule-descriptor name="CreditAgencyService"
             inboundEndpoint="CreditAgency"
             implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
-
-<!--            <interceptor className="org.mule.interceptors.JXPathNormalizerInterceptor">-->
-<!--                <properties>-->
-<!--                    <property name="beforeExpressions" value="loanRequest/customer"/>-->
-<!--                    <property name="afterExpression" value="loanRequest/creditProfile"/>-->
-<!--                </properties>-->
-<!--            </interceptor>-->
         </mule-descriptor>
 
         <mule-descriptor name="LenderService"
             inboundEndpoint="LenderService"
             implementation="org.mule.samples.loanbroker.DefaultLenderService">
-<!--            <interceptor className="org.mule.interceptors.JXPathNormalizerInterceptor">-->
-<!--                <properties>-->
-<!--                    <property name="beforeExpressions" value="loanRequest/creditProfile,loanRequest/loanAmount"/>-->
-<!--                    <property name="afterExpression" value="lenders"/>-->
-<!--                </properties>-->
-<!--            </interceptor>-->
         </mule-descriptor>
 
         <mule-descriptor name="Bank1"
