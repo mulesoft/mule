@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <id>mule-xa-transactions</id>
+    <artifactId>mule-xa-transactions</artifactId>
+    <name>XA Transactions support</name>
+    <shortDescription>xa</shortDescription>
+    <description>Mule XA Transactions support
+    </description>
+    <dependencies>
+        <!-- optional: used by the http remoting test case -->
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee</artifactId>
+            <version>${geronimo_spec_j2ee_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jug</groupId>
+            <artifactId>jug</artifactId>
+            <version>${jug_version}</version>
+            <url>http://www.doomdark.org/doomdark/proj/jug/index.html</url>
+        </dependency>
+        <dependency>
+            <groupId>concurrent</groupId>
+            <artifactId>concurrent</artifactId>
+            <version>${concurrent_version}</version>
+            <url>http://www.oswego.edu</url>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>${commons_logging_version}</version>
+            <url>http://jakarta.apache.org/commons/logging/index.html</url>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j_version}</version>
+            <url>http://jakarta.apache.org/log4j/docs/index.html</url>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm</artifactId>
+            <version>${jotm_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://jotm.objectweb.org</url>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm-carol</artifactId>
+            <version>${jotm_carol_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://jotm.objectweb.org</url>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm-jrmp-stubs</artifactId>
+            <version>${jotm_jrmp_stubs_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://jotm.objectweb.org</url>
+        </dependency>
+        <dependency>
+            <groupId>howl</groupId>
+            <artifactId>howl</artifactId>
+            <version>${howl_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://howl.objectweb.org</url>
+        </dependency>
+    </dependencies>
+    <build>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+    </build>
+</project>

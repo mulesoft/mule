@@ -1,0 +1,199 @@
+/* 
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ * 
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk 
+ * 
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file. 
+ *
+ */
+package org.mule.transaction.xa.queue;
+
+import java.util.Random;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.logging.Log;
+import org.mule.transaction.xa.AbstractResourceManager;
+
+/**
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @version $Revision$
+ */
+public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
+
+	private Log logger = getLogger();
+	
+	protected abstract TransactionalQueueManager createQueueManager() throws Exception;
+	
+	protected abstract boolean isPersistent();
+	
+	protected abstract Log getLogger();
+	
+	public void testPutTake() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+
+		TransactionalQueueManager mgr = createQueueManager();
+		mgr.start();
+		
+		TransactionalQueue q = mgr.getQueue("queue1");
+
+		assertEquals(0, q.size());
+		Object o = q.take();
+		assertNull(o);
+		q.put("String1");
+		assertEquals(1, q.size());
+		o = q.take();
+		assertNotNull(o);
+		assertEquals("String1", o);
+		assertEquals(0, q.size());
+		
+		mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+	}
+	
+	public void testPutWithPersistence() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+		if (isPersistent()) {
+			TransactionalQueueManager mgr = createQueueManager();
+			
+			try {
+				mgr.start();
+				
+				TransactionalQueue q = mgr.getQueue("queue1");
+				q.put("String1");
+				assertEquals(1, q.size());
+				
+				q = mgr.getQueue("queue1");
+				assertEquals(1, q.size());
+			} finally {		
+				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+			}
+	
+			mgr = createQueueManager();
+			try {
+				mgr.start();
+				TransactionalQueue q = mgr.getQueue("queue1");
+				assertEquals(1, q.size());
+			} finally {
+				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+			}
+		} else {
+			logger.info("Ignoring test because queue manager is not persistent");
+		}
+	}
+	
+	public void testTransactedPutCommitWithPersistence() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+		if (isPersistent()) {
+			TransactionalQueueManager mgr = createQueueManager();
+			
+			try {
+				mgr.start();
+				
+				TransactionalQueue q = mgr.getQueue("queue1");
+				q.begin();
+				q.put("String1");
+				assertEquals(1, q.size());
+				q.commit();
+				assertEquals(1, q.size());
+				
+				q = mgr.getQueue("queue1");
+				assertEquals(1, q.size());
+		
+				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+		
+				mgr = createQueueManager();
+				mgr.start();
+				q = mgr.getQueue("queue1");
+				assertEquals(1, q.size());
+			} finally {
+				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+			}
+		} else {
+			logger.info("Ignoring test because queue manager is not persistent");
+		}
+	}
+	
+	public void testTransactedPutRollbackWithPersistence() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+		if (isPersistent()) {
+			TransactionalQueueManager mgr = createQueueManager();
+			
+			try {
+				mgr.start();
+				
+				TransactionalQueue q = mgr.getQueue("queue1");
+				q.begin();
+				q.put("String1");
+				assertEquals(1, q.size());
+				q.rollback();
+				assertEquals(0, q.size());
+				
+				q = mgr.getQueue("queue1");
+				assertEquals(0, q.size());
+		
+				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+		
+				mgr = createQueueManager();
+				mgr.start();
+				q = mgr.getQueue("queue1");
+				assertEquals(0, q.size());
+				
+			} finally {
+
+				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+				
+			}
+		} else {
+			logger.info("Ignoring test because queue manager is not persistent");
+		}
+	}
+	
+	public void testBench() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+
+		TransactionalQueueManager mgr = createQueueManager();
+		
+		try {
+			mgr.start();
+		
+			TransactionalQueue q = mgr.getQueue("queue1");
+	
+			
+			Random rnd = new Random();
+			long t0 = System.currentTimeMillis();
+			for (int i = 0; i < 1; i++) {
+				for (int j = 0; j < 500; j++) {
+					byte[] o = new byte[2048];
+					rnd.nextBytes(o);
+					q.put(o);
+				}
+				while (q.size() > 0) {
+					q.take();
+				}
+			}
+			long t1 = System.currentTimeMillis();
+	
+			logger.info("Time: " + (t1 - t0) + " ms");
+			
+		} finally {			
+			mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+		}
+	}
+	
+}
