@@ -29,6 +29,7 @@ package org.mule.providers.tcp;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import EDU.oswego.cs.dl.util.concurrent.ThreadFactory;
 import org.mule.DisposeException;
 import org.mule.InitialisationException;
 import org.mule.impl.MuleMessage;
@@ -76,6 +77,19 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                               UMOEndpoint endpoint) throws InitialisationException
     {
         create(connector, component, endpoint);
+        connector.getReceiverThreadingProfile().setThreadFactory(new ThreadFactory() {
+            public Thread newThread(Runnable runnable)
+            {
+                Thread thread = new Thread(runnable, toString());
+                if (isServerSide()) {
+                    thread.setDaemon(true);
+                }
+                else {
+                    thread.setPriority(Thread.NORM_PRIORITY + 2);
+                }
+                return thread;
+            }
+        });
         threadPool = connector.getReceiverThreadingProfile().createPool(connector.getName());
         URI uri = endpoint.getEndpointURI().getUri();
 
@@ -207,12 +221,12 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
     }
 
 
-    private class TcpWorker implements Runnable, Disposable
+    protected class TcpWorker implements Runnable, Disposable
     {
-        Socket socket = null;
-        DataInputStream dataIn;
-        DataOutputStream dataOut;
-        SynchronizedBoolean closed = new SynchronizedBoolean(false);
+        protected Socket socket = null;
+        protected DataInputStream dataIn;
+        protected DataOutputStream dataOut;
+        protected SynchronizedBoolean closed = new SynchronizedBoolean(false);
 
         public TcpWorker(Socket socket)
         {
@@ -244,27 +258,21 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
             {
                 dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-                while (!disposing.get() || !closed.get())
+                int counter=0;
+                while (!socket.isClosed() && !disposing.get())
                 {
-                    if (socket.isClosed())
-                    {
-                        logger.info("Connection reset by peer");
-                        break;
+                    if (isServerSide() && ++counter > 500) {
+                        counter = 0;
+                        Thread.yield();
                     }
 
                     byte[] b = readStream(dataIn);
                     //end of stream
                     if (b == null) break;
 
-                    UMOMessageAdapter adapter = connector.getMessageAdapter(b);
-                    OutputStream os = new ResponseOutputStream(socket.getOutputStream(), socket);
-                    UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), connector.isSynchronous(), os);
-                    if (returnMessage != null)
-                    {
-                        byte[] data = returnMessage.getPayloadAsBytes();
-                        dataOut.write(data);
-                        dataOut.flush();
-                    }
+                    byte[] result = processData(b);
+                    dataOut.write(result);
+                    dataOut.flush();
                 }
             } catch (Exception e)
             {
@@ -272,6 +280,19 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                         + (socket != null ? socket.getInetAddress().toString() : "null"),
                         e);
                 dispose();
+            }
+        }
+
+        protected byte[] processData(byte[] data) throws Exception
+        {
+            UMOMessageAdapter adapter = connector.getMessageAdapter(data);
+            OutputStream os = new ResponseOutputStream(socket.getOutputStream(), socket);
+            UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), connector.isSynchronous(), os);
+            if (returnMessage != null)
+            {
+                return returnMessage.getPayloadAsBytes();
+            } else {
+                return null;
             }
         }
 

@@ -38,13 +38,10 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -89,76 +86,31 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return true;
     }
 
-    private class HttpWorker implements Runnable, Disposable
+    private class HttpWorker extends TcpWorker
     {
-        Socket socket = null;
-
         public HttpWorker(Socket socket)
         {
-            super();
-            this.socket = socket;
+            super(socket);
         }
 
-        public void dispose()
+        protected byte[] processData(byte[] data) throws Exception
         {
-            try
+            UMOMessageAdapter adapter = connector.getMessageAdapter(new ByteArrayInputStream(data));
+            UMOMessage message = new MuleMessage(adapter);
+
+            if (logger.isDebugEnabled())
             {
-                if (socket != null) {
-                    logger.info("Closing listener: " + socket.getLocalAddress());
-                    socket.close();
-                }
-            } catch (IOException e)
-            {
-                logger.error("Socket close failed with: " + e);
+                logger.debug((String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
             }
-            socket = null;
-        }
-
-        /**
-         * Accept requests from a given TCP port
-         */
-        public void run()
-        {
-            DataInputStream dataIn = null;
-            DataOutputStream dataOut = null;
-            try
+            OutputStream os = new ResponseOutputStream(dataOut, socket);
+            UMOMessage returnMessage = routeMessage(message, connector.isSynchronous(), os);
+            if (returnMessage == null)
             {
-                dataIn = new DataInputStream(socket.getInputStream());
-                dataOut = new DataOutputStream(socket.getOutputStream());
-                UMOMessageAdapter adapter = connector.getMessageAdapter(dataIn);
-                UMOMessage message = new MuleMessage(adapter);
-
-                if(logger.isDebugEnabled()) {
-                    logger.debug((String)message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
-                }
-                OutputStream os = new ResponseOutputStream(dataOut, socket);
-                UMOMessage returnMessage = routeMessage(message, connector.isSynchronous(), os);
-                if (returnMessage == null)
-                {
-                    returnMessage = new MuleMessage("", null);
-                }
+                return new byte[]{};
+            } else {
                 RequestContext.rewriteEvent(returnMessage);
-                String responseText = (String)getResponseTransformer().transform(returnMessage.getPayload());
-                dataOut.write(responseText.getBytes());
-                dataOut.flush();
-
-            } catch (Exception e)
-            {
-                handleException("Failed to process Http Request on: "
-                        + (socket != null ? socket.getInetAddress().toString() : "null"),
-                        e);
-            } finally
-            {
-                try
-                {
-                    if (dataIn != null) dataIn.close();
-                    if (dataOut != null) dataOut.close();
-                    socket.close();
-
-                } catch (Exception e)
-                {
-                    logger.error("Socket close failed with: " + e);
-                }
+                String responseText = (String) getResponseTransformer().transform(returnMessage.getPayload());
+                return responseText.getBytes();
             }
         }
     }

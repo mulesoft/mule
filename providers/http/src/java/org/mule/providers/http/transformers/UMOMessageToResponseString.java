@@ -52,7 +52,7 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
 
     public Object transform(Object src, UMOEventContext context) throws TransformerException
     {
-        String status = (String)context.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(HttpConstants.SC_OK) + " OK");
+        int status = context.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
         String version = (String)context.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
         String date = format.format(new Date());
 
