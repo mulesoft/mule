@@ -1,6 +1,0 @@
-<project default="jar:install">
-    <!-- http provider depends on this so we build it first -->
-    <postGoal name="clean">
-        <attainGoal name="jar:install"/>
-    </postGoal>
-</project>

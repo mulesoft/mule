@@ -1,3 +1,7 @@
 classes
 .classpath
 .project
+mule-extras-client.iml
+mule-extras-client.ipr
+mule-extras-client.iws
+target

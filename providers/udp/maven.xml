@@ -1,6 +1,0 @@
-<project default="jar:install">
-    <!-- multicast provider depends on this so we build it first -->
-    <postGoal name="clean">
-        <attainGoal name="jar:install"/>
-    </postGoal>
-</project>
