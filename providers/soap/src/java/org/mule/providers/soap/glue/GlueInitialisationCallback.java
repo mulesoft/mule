@@ -19,8 +19,10 @@ import electric.registry.RegistryException;
 import electric.service.IService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.InitialisationCallback;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>GlueInitialisationCallback</code> is invoked when an Glue service component is
@@ -64,7 +66,7 @@ public class GlueInitialisationCallback implements InitialisationCallback
             Registry.publish(servicePath, service, context);
         } catch (RegistryException e)
         {
-            throw new InitialisationException("Failed to register component as a service: " + e.getMessage(), e);
+            throw new InitialisationException(new Message("soap", 3, component.getClass().getName()), e, this);
         }
     }
 }

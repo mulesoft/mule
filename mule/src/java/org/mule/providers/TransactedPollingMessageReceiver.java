@@ -17,10 +17,11 @@ package org.mule.providers;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 

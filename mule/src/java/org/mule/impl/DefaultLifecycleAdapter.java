@@ -17,9 +17,11 @@ package org.mule.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleException;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.model.DynamicEntryPoint;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.umo.Invocation;
@@ -32,6 +34,7 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.util.ClassHelper;
 
@@ -112,7 +115,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             catch (Exception e)
             {
-                throw new MuleException("Failed to start Mule UMO: " + descriptor.getName(), e);
+                throw new MuleException(new Message(Messages.FAILED_TO_START_X, "UMO Component: " + descriptor.getName()), e);
             }
         }
         started = true;
@@ -131,7 +134,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             catch (Exception e)
             {
-                throw new MuleException("Failed to stop Mule UMO: " + descriptor.getName(), e);
+                throw new MuleException(new Message(Messages.FAILED_TO_STOP_X, "UMO Component: " + descriptor.getName()), e);
             }
         }
         started = false;
@@ -150,7 +153,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             catch (Exception e)
             {
-                throw new MuleException("Failed to dispose Mule UMO: " + descriptor.getName(), e);
+                throw new MuleException(new Message(Messages.FAILED_TO_DISPOSE_X, "UMO Component: " + descriptor.getName()), e);
             }
         }
         disposed = true;
@@ -215,7 +218,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         }
         catch (Exception e)
         {
-            throw new MuleException("Failed to invoke event: " + e.getMessage(), e);
+            throw new MuleException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: " + descriptor.getName()), e);                            
         }
     }
 
@@ -241,9 +244,9 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         return descriptor;
     }
 
-    public void handleException(Object message, Throwable t)
+    public void handleException(Object message, Exception e)
     {
-        descriptor.getExceptionStrategy().handleException(message, t);
+        descriptor.getExceptionListener().exceptionThrown(e);
     }
 
     /* (non-Javadoc)

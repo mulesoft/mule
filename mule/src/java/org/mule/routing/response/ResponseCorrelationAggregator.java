@@ -16,6 +16,8 @@ package org.mule.routing.response;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.routing.RoutingException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>ResponseCorrelationAggregator</code> Correlates one or more events on a response
@@ -64,7 +66,7 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
         String cId = event.getMessage().getCorrelationId();
         int groupSize = event.getMessage().getCorrelationGroupSize();
         if (cId == null) {
-            throw new RoutingException("The ere is no Correlation Id set on the current event: " + event);
+            throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event.getEndpoint());
         }
         EventGroup eg = (EventGroup) eventGroups.get(cId);
         if (eg == null)

@@ -16,6 +16,8 @@ package org.mule.extras.client;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.MuleException;
+import org.mule.config.i18n.Message;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -111,7 +113,7 @@ public class MuleProxyListener implements InvocationHandler
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
         if(args.length==0) {
-            throw new MuleClientException("There is not event specified in the inoke args. args length is zero");
+            throw new MuleException(new Message("client", 2));
         }
         UMOMessage message = eventTransformer.transform(args[0], method);
         if(!"void".equals(method.getReturnType().getName()))

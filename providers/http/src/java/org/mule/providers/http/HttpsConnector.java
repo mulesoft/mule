@@ -13,13 +13,18 @@
  */
 package org.mule.providers.http;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.Utility;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import javax.net.ssl.KeyManagerFactory;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
+import java.security.NoSuchAlgorithmException;
+import java.security.KeyStoreException;
+import java.security.UnrecoverableKeyException;
 import java.io.InputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,7 +35,6 @@ import java.io.IOException;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-
 public class HttpsConnector extends HttpConnector
 {
     public static final String DEFAULT_KEYSTORE = ".keystore";
@@ -59,30 +63,39 @@ public class HttpsConnector extends HttpConnector
 
     public void doInitialise() throws InitialisationException
     {
-        if(getProvider()==null)  throw new NullPointerException("The security provider cannot be null");
-        if(getKeyStore()==null)  throw new NullPointerException("The KeyStore location cannot be null");
-        if(getKeyPassword()==null)  throw new NullPointerException("The Key password cannot be null");
-        if(getStorePassword()==null)  throw new NullPointerException("The KeyStore password cannot be null");
-        if(getKeyManagerAlgorithm()==null)  throw new NullPointerException("The Key Manager Algorithm cannot be null");
+        if (getProvider() == null) throw new NullPointerException("The security provider cannot be null");
+        if (getKeyStore() == null) throw new NullPointerException("The KeyStore location cannot be null");
+        if (getKeyPassword() == null) throw new NullPointerException("The Key password cannot be null");
+        if (getStorePassword() == null) throw new NullPointerException("The KeyStore password cannot be null");
+        if (getKeyManagerAlgorithm() == null) throw new NullPointerException("The Key Manager Algorithm cannot be null");
 
+        KeyStore keystore = null;
         try
         {
             Security.addProvider(getProvider());
             //Create keyStore
-            KeyStore keystore = KeyStore.getInstance(keystoreType);
+            keystore = KeyStore.getInstance(keystoreType);
             InputStream is = Utility.loadResource(getKeyStore(), getClass());
-            if(is==null) {
-                throw new FileNotFoundException("Failed to load keystore from classpath or local file: " + getKeyStore());
+            if (is == null)
+            {
+                throw new FileNotFoundException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, "Keystore: " + getKeyStore()).getMessage());
             }
             keystore.load(is, getKeyPassword().toCharArray());
+        } catch (Exception e)
+        {
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "KeyStore: " + getKeyStore()), e, this);
+        }
+        try
+                {
             //Get key manager
             keyManagerFactory = KeyManagerFactory.getInstance(getKeyManagerAlgorithm());
             // Initialize the KeyManagerFactory to work with our keyStore
             keyManagerFactory.init(keystore, getStorePassword().toCharArray());
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to load the KeyStore and manager: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager"), e, this);
         }
+
         super.doInitialise();
 
         if (protocolHandler != null)
@@ -94,8 +107,9 @@ public class HttpsConnector extends HttpConnector
             try
             {
                 String clientPath = Utility.getResourcePath(clientKeyStore, getClass());
-                if(clientPath==null) {
-                    throw new InitialisationException("Failed to find client key store: " + clientKeyStore);
+                if (clientPath == null)
+                {
+                    throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "ClientKeyStore: " + clientKeyStore), this);
                 }
                 System.setProperty("javax.net.ssl.keyStore", clientPath);
                 System.setProperty("javax.net.ssl.keyStorePassword", clientKeyStorePassword);
@@ -103,16 +117,17 @@ public class HttpsConnector extends HttpConnector
                 logger.info("Set Client Key store: javax.net.ssl.keyStore=" + clientPath);
             } catch (IOException e)
             {
-                throw new InitialisationException("Failed to locate Client keystore with: " +
-                                clientKeyStore + ". Error is: " + e.getMessage(), e);
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "ClientKeyStore: " + clientKeyStore), this);
             }
         }
 
-        if(trustStore!=null) {
+        if (trustStore != null)
+        {
             System.setProperty("javax.net.ssl.trustStore", getTrustStore());
             System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword());
             logger.debug("Set Trust store: javax.net.ssl.trustStore=" + getTrustStore());
-        } else if(!isExplicitTrustStoreOnly()) {
+        } else if (!isExplicitTrustStoreOnly())
+        {
             logger.info("Defaulting trust store to client Key Store");
             trustStore = getClientKeyStore();
             trustStorePassword = getClientKeyStorePassword();
@@ -231,7 +246,8 @@ public class HttpsConnector extends HttpConnector
     public void setClientKeyStore(String clientKeyStore) throws IOException
     {
         this.clientKeyStore = clientKeyStore;
-        if(this.clientKeyStore!=null) {
+        if (this.clientKeyStore != null)
+        {
             this.clientKeyStore = Utility.getResourcePath(clientKeyStore, getClass());
             logger.debug("Normalised clientKeyStore path to: " + getClientKeyStore());
         }
@@ -255,7 +271,8 @@ public class HttpsConnector extends HttpConnector
     public void setTrustStore(String trustStore) throws IOException
     {
         this.trustStore = trustStore;
-        if(this.trustStore!=null) {
+        if (this.trustStore != null)
+        {
             this.trustStore = Utility.getResourcePath(trustStore, getClass());
             logger.debug("Normalised trustStore path to: " + getTrustStore());
         }

@@ -23,7 +23,7 @@ import java.util.Iterator;
 
 
 /**
- *  <code>AbstractExceptionHandler</code> TODO (document class)
+ *  <code>AbstractExceptionListener</code> TODO (document class)
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$

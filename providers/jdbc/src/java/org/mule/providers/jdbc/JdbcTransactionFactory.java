@@ -14,7 +14,7 @@
 package org.mule.providers.jdbc;
 
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransactionFactory;
 
 /**
@@ -26,7 +26,7 @@ public class JdbcTransactionFactory implements UMOTransactionFactory {
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransactionFactory#beginTransaction()
 	 */
-	public UMOTransaction beginTransaction() throws UMOTransactionException {
+	public UMOTransaction beginTransaction() throws TransactionException {
         JdbcTransaction tx = new JdbcTransaction();
         tx.begin();
         return tx;

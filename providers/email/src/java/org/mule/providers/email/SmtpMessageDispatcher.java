@@ -17,6 +17,7 @@ package org.mule.providers.email;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -106,7 +107,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
                     }
                     else
                     {
-                        throw new MuleException("The to Address: " + endpoint + " is invalid");
+                        throw new MuleException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "To Address"));
                     }
                 }
 
@@ -155,8 +156,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         }
         catch (Exception e)
         {
-            connector.handleException("Failed to send email to " + endpoint + ", cc: " + cc + ", bcc: " + bcc + ", from: " + from,
-                    e);
+            connector.handleException(e);
         }
     }
 
@@ -184,18 +184,10 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         return event.getMessage();
     }
 
-    protected void sendMailMessage(String to, String cc, String bcc, String subject, String body) throws MuleException
+    protected void sendMailMessage(String to, String cc, String bcc, String subject, String body) throws MuleException, MessagingException
     {
-        try
-        {
-            Message msg = connector.createMessage(connector.getFromAddress(), to, cc, bcc, subject, body, session);
-            sendMailMessage(msg);
-        }
-        catch (Exception e)
-        {
-            throw new MuleException("Failed to send Mail Message: " + e, e);
-        }
-
+        Message msg = connector.createMessage(connector.getFromAddress(), to, cc, bcc, subject, body, session);
+        sendMailMessage(msg);
     }
 
     protected void sendMailMessage(Message message) throws MessagingException

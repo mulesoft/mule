@@ -34,6 +34,7 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
@@ -250,14 +251,14 @@ public class RemoteDispatcher
 
         } catch (Exception e)
         {
-            throw new MuleClientException("Failed to send remote event: " + e.getMessage(), e);
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
 
         logger.debug("Result of MuleClient remote call is: " + (result==null ? "null" : result.getPayload()));
         return result;
     }
 
-    public void close() throws MuleClientException {
+    public void close() throws UMOException {
 
     }
 }

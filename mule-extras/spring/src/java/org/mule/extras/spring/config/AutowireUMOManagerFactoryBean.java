@@ -16,7 +16,7 @@ package org.mule.extras.spring.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.extras.spring.SpringContainerContext;
@@ -24,12 +24,11 @@ import org.mule.impl.MuleModel;
 import org.mule.umo.UMOAgent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.UMOManager;
 import org.mule.umo.UMOTransactionManagerFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
@@ -47,6 +46,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.beans.ExceptionListener;
 
 /**
  * <code>UMOManagerFactoryBean</code> is a MuleManager factory bean that is used to configure the
@@ -201,8 +201,8 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
         if (lcaf.size() > 0) model.setLifecycleAdapterFactory((UMOLifecycleAdapterFactory) lcaf.values().iterator().next());
 
         //Model exception strategy
-        Object es = getBean(MULE_MODEL_EXCEPTION_STRATEGY_BEAN_NAME, UMOExceptionStrategy.class);
-        if (es != null) model.setExceptionStrategy((UMOExceptionStrategy) es);
+        Object listener = getBean(MULE_MODEL_EXCEPTION_STRATEGY_BEAN_NAME, ExceptionListener.class);
+        if (listener != null) model.setExceptionListener((ExceptionListener) listener);
 
         manager.setModel(model);
 

@@ -248,17 +248,25 @@
     <xsl:template match="model/exception-strategy">
         <bean name="muleModelExceptionStrategy" class="{@className}">
             <xsl:apply-templates select="properties"/>
-            <xsl:apply-templates select="endpoint" mode="propertyEndpoint"/>
-            <xsl:apply-templates select="global-endpoint" mode="propertyEndpoint"/>
+            <property name="endpoints">
+                <list>
+                    <xsl:apply-templates select="endpoint"/>
+                    <xsl:apply-templates select="global-endpoint"/>
+                </list>
+            </property>
         </bean>
     </xsl:template>
 
     <xsl:template match="exception-strategy">
-        <property name="exceptionStrategy">
+        <property name="exceptionListener">
             <bean class="{@className}">
                 <xsl:apply-templates select="properties"/>
-                <xsl:apply-templates select="endpoint" mode="propertyEndpoint"/>
-                <xsl:apply-templates select="global-endpoint" mode="propertyEndpoint"/>
+                <property name="endpoints">
+                    <list>
+                        <xsl:apply-templates select="endpoint"/>
+                        <xsl:apply-templates select="global-endpoint"/>
+                    </list>
+                </property>
             </bean>
         </property>
     </xsl:template>

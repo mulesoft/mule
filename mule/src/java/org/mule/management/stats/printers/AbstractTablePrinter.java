@@ -63,8 +63,8 @@ public abstract class AbstractTablePrinter extends PrintWriter
         column[12] = "ReplyTo Events Sent";
         column[13] = "Total Events Sent";
         column[14] = "Executed Events";
-        column[15] = "Execution Errors";
-        column[16] = "Fatal Errors";
+        column[15] = "Execution Messages";
+        column[16] = "Fatal Messages";
         column[17] = "Min Execution Time";
         column[18] = "Max Execution Time";
         column[19] = "Avg Execution Time";

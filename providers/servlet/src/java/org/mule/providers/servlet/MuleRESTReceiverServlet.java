@@ -16,6 +16,7 @@ package org.mule.providers.servlet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.UMOMessage;
@@ -23,7 +24,6 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.NoEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.umo.provider.UMOConnector;
@@ -248,7 +248,7 @@ public class MuleRESTReceiverServlet extends HttpServlet
         String uri = httpServletRequest.getPathInfo();
         if (uri == null)
         {
-            throw new NoEndpointException("Unable to get endpointUri from HttpServletRequest.  Uri is:" + httpServletRequest.getRequestURI());
+            throw new EndpointException(new Message("servlet", 1, httpServletRequest.getRequestURI()));
         }
         if (uri.startsWith("/"))
         {
@@ -259,7 +259,7 @@ public class MuleRESTReceiverServlet extends HttpServlet
         {
             UMOSession session = MuleManager.getInstance().getModel().getComponentSession(uri);
             if(session==null) {
-                throw new NoEndpointException("No endpointUri could be found on Uri: " + uri + ". Format is /provider/endpointUri");
+                throw new EndpointException(new Message("servlet", 2, uri));
             }
         }
         String endpointName = uri.substring(0, i);
@@ -274,7 +274,7 @@ public class MuleRESTReceiverServlet extends HttpServlet
             endpoint = MuleObjectHelper.getEndpointByProtocol(endpointName);
             if (endpoint == null)
             {
-                throw new EndpointNotFoundException("Endpoint not found: " + endpointName);
+                throw new EndpointNotFoundException(endpointName);
             }
         }
         if(endpointAddress!=null) {
@@ -289,7 +289,7 @@ public class MuleRESTReceiverServlet extends HttpServlet
         String uri = httpServletRequest.getPathInfo();
         if (uri == null)
         {
-            throw new NoEndpointException("Unable to get endpointUri from HttpServletRequest.  Uri is:" + httpServletRequest.getRequestURI());
+            throw new EndpointException(new Message("servlet", 1, httpServletRequest.getRequestURI()));
         }
         if (uri.startsWith("/"))
         {

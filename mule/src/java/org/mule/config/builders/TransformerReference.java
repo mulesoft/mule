@@ -16,9 +16,12 @@ package org.mule.config.builders;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.MuleObjectHelper;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>TransformerReference</code> maintains a transformer reference.
@@ -65,11 +68,12 @@ public class TransformerReference
 
     public void resolveTransformer() throws InitialisationException
     {
+        UMOTransformer trans = null;
         try
         {
-            UMOTransformer trans =  MuleObjectHelper.getTransformer(transformerName, " ");
+            trans = MuleObjectHelper.getTransformer(transformerName, " ");
             if(trans == null) {
-                throw new InitialisationException("Failed to find transformer with name: " + transformerName);
+                throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Transformer '" + transformerName + "'"), object);
             }
             logger.info("Setting transformer: " + transformerName + " on " + object.getClass().getName() + "." + propertyName);
 
@@ -79,8 +83,7 @@ public class TransformerReference
            throw e;
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to set transformer on bean: " +
-                    object.getClass().getName() + "." + propertyName + "(...).  Error is: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.CANT_SET_PROP_X_ON_X_OF_TYPE_X, propertyName, object.getClass().getName(), trans.getClass().getName()), e);
         }
     }
 }

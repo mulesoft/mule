@@ -15,7 +15,7 @@ package org.mule.providers.email;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -112,7 +112,7 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
             inbox = store.getFolder(getMailBox());
         } catch (MessagingException e)
         {
-            throw new InitialisationException("Failed to connector Pop3 message store: " + e.getMessage(), e);
+            throw new InitialisationException(e, this);
         }
     }
 

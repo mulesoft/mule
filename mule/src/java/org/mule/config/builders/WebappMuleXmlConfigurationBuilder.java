@@ -31,8 +31,7 @@ public class WebappMuleXmlConfigurationBuilder extends MuleXmlConfigurationBuild
 {
     private ServletContext context;
 
-    public WebappMuleXmlConfigurationBuilder(ServletContext context)
-    {
+    public WebappMuleXmlConfigurationBuilder(ServletContext context) throws ConfigurationException {
         super();
         this.context = context;
     }

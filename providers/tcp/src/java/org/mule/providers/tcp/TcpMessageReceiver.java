@@ -30,8 +30,8 @@ package org.mule.providers.tcp;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import EDU.oswego.cs.dl.util.concurrent.ThreadFactory;
-import org.mule.DisposeException;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.DisposeException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.providers.AbstractConnector;
@@ -41,7 +41,10 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.config.i18n.Message;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -127,7 +130,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                     }
                 } else
                 {
-                    throw new InitialisationException("Unable to bind to uri: " + uri + ". Reason: " + e);
+                    throw new InitialisationException(new Message("tcp", 1, uri), e, this);
                 }
             }
         }
@@ -180,7 +183,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                     if (!connector.isDisposed() && !disposing.get())
                     {
                         logger.warn("Accept failed on socket: " + e, e);
-                        handleException(null, e);
+                        handleException(e);
                     }
                 }
                 if (socket != null)
@@ -214,7 +217,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
 
         } catch (Exception e)
         {
-            throw new DisposeException("Failed to close http port: " + e.getMessage(), e);
+            throw new DisposeException(new Message("tcp", 2), e);
         }
         logger.info("Closed Tcp port");
     }
@@ -281,9 +284,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                 }
             } catch (Exception e)
             {
-                handleException("Failed to process tcp Request on: "
-                        + (socket != null ? socket.getInetAddress().toString() : "null"),
-                        e);
+                handleException(e);
             } finally {
                 dispose();
             }

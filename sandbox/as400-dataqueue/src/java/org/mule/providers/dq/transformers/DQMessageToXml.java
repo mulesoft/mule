@@ -64,7 +64,7 @@ public class DQMessageToXml extends AbstractTransformer {
             return document.asXML();
 
         } catch (Exception e) {
-            throw new TransformerException("Failed to transform ", e);
+            throw new TransformerException(this, e);
         }
     }
 

@@ -27,6 +27,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.ReceiveException;
 
 import java.util.Map;
 
@@ -88,7 +89,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
             }
         } catch (Throwable t)
         {
-            throw new DispatchException("Failed ot make ws call: " + t.getMessage(), t);
+            throw new DispatchException(event.getMessage(),  event.getEndpoint(), t);
         }
     }
 
@@ -105,7 +106,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
             return new MuleMessage(result, null);
         } catch (Throwable t)
         {
-            throw new DispatchException("Failed ot make ws call: " + t.getMessage(), t);
+            throw new ReceiveException(endpointUri, timeout, t);
         }
     }
 

@@ -13,7 +13,7 @@
  */
 package org.mule.providers.multicast;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.udp.UdpMessageReceiver;
 import org.mule.umo.UMOComponent;

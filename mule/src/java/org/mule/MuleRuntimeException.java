@@ -14,6 +14,8 @@
  */
 package org.mule;
 
+import org.mule.config.i18n.Message;
+
 /**
  * <code>MuleRuntimeException</code> Is the base runtime exception type for the Mule Server
  * any other runtimes exceptions thrown by Mule code will use or be based on this exception. Runtime
@@ -29,17 +31,17 @@ public class MuleRuntimeException extends RuntimeException
     /**
      * @param message the exception message
      */
-    public MuleRuntimeException(String message)
+    public MuleRuntimeException(Message message)
     {
-        super(message);
+        super(message.getMessage());
     }
 
     /**
      * @param message the exception message
      * @param cause   the exception that triggered this exception
      */
-    public MuleRuntimeException(String message, Throwable cause)
+    public MuleRuntimeException(Message message, Throwable cause)
     {
-        super(message, cause);
+        super(message.getMessage(), cause);
     }
 }

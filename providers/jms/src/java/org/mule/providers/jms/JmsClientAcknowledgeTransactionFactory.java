@@ -14,7 +14,7 @@
 package org.mule.providers.jms;
 
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransactionFactory;
 
 /**
@@ -31,7 +31,7 @@ public class JmsClientAcknowledgeTransactionFactory implements UMOTransactionFac
     /* (non-Javadoc)
      * @see org.mule.umo.UMOTransactionFactory#beginTransaction(java.lang.Object)
      */
-    public UMOTransaction beginTransaction() throws UMOTransactionException
+    public UMOTransaction beginTransaction() throws TransactionException
     {
         JmsClientAcknowledgeTransaction tx = new JmsClientAcknowledgeTransaction();
         tx.begin();

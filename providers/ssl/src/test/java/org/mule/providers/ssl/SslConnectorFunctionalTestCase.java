@@ -28,6 +28,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.SocketFactory;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -76,7 +77,8 @@ public class SslConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
 
     protected Socket createSocket(URI uri) throws IOException
     {
-        return SSLSocketFactory.getDefault().createSocket(uri.getHost(), uri.getPort());
+        SocketFactory factory = SSLSocketFactory.getDefault();
+        return factory.createSocket(uri.getHost(), uri.getPort());
     }
 
     protected void tearDown() throws Exception

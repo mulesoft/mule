@@ -17,7 +17,7 @@ import java.util.List;
 
 import EDU.oswego.cs.dl.util.concurrent.CountDown;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.providers.jms.JmsMessageReceiver;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;

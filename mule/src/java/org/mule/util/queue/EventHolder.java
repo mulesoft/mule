@@ -13,8 +13,10 @@
  */
 package org.mule.util.queue;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -54,13 +56,13 @@ import java.io.Serializable;
         public UMOEvent getEvent() throws InitialisationException {
             UMOSession session = MuleManager.getInstance().getModel().getComponentSession(componentName);
             if(session==null) {
-                throw new InitialisationException("Failed to obtain session for component: " + componentName + " while reloading persistent queue");
+                throw new InitialisationException(new Message(Messages.NO_SESSION_FOR_COMPONENT_X, componentName), this);
             }
             UMOEndpoint endpoint = session.getComponent().getDescriptor().getInboundRouter().getEndpoint(endpointName);
             if(endpoint == null) {
                 endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
                 if(endpoint == null) {
-                    throw new InitialisationException("Failed to find endpoint: " + endpointName + " for component: " + componentName + " while reloading persistent queue");
+                    throw new InitialisationException(new Message(Messages.NO_ENDPOINT_X_FOR_COMPONENT_X, componentName), this);
                 }
             }
             UMOEvent event = new MuleEvent(message, endpoint, session, eventId, synchronous);

@@ -13,7 +13,6 @@
  */
 package org.mule.impl.internal.admin;
 
-import org.mule.InitialisationException;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -22,6 +21,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOServerEvent;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
 /**
@@ -49,7 +49,7 @@ public class EndpointAbstractEventLoggerAgent extends AbstractEventLoggerAgent
             }
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to get Event logger endpoint: " + e.getMessage(),e);
+            throw new InitialisationException(e, this);
         }
     }
 

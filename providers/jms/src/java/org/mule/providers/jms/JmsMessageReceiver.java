@@ -23,7 +23,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.Topic;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.TransactedPollingMessageReceiver;
 import org.mule.providers.jms.filters.JmsSelectorFilter;
@@ -194,9 +194,6 @@ public class JmsMessageReceiver extends
 	
 	/**
 	 * Process a redelivered message
-	 * 
-	 * TODO: if messages are redelivered due to a previous transaction rollback,
-	 *       why handle them differently ?
 	 */
     protected void handleMessageRedelivered(Message message, Session session)
     {
@@ -210,10 +207,9 @@ public class JmsMessageReceiver extends
             corrId = "could not read id: " + e.getMessage();
         }
 
-        String msg = "Message was redelivered, most likely due to a transaction rollback. " +
-                "Correlation id was: " + corrId;
-        logger.warn(msg);
-        MessageRedeliveredException exception = new MessageRedeliveredException(msg, session);
-        handleException(message, exception);
+        logger.warn("Message was redelivered, most likely due to a transaction rollback. " +
+                "Correlation id was: " + corrId);
+        MessageRedeliveredException exception = new MessageRedeliveredException(message, session);
+        handleException(exception);
     }
 }

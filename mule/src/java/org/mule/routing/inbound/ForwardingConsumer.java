@@ -16,6 +16,7 @@ package org.mule.routing.inbound;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
@@ -30,7 +31,7 @@ import org.mule.umo.routing.UMOOutboundMessageRouter;
  */
 public class ForwardingConsumer extends SelectiveConsumer
 {
-    public UMOEvent[] process(UMOEvent event) throws RoutingException
+    public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         if(super.process(event)!=null) {
 
@@ -59,7 +60,7 @@ public class ForwardingConsumer extends SelectiveConsumer
                     }
                 } catch (UMOException e)
                 {
-                    throw new RoutingException("Failed to route event through " + endpoint, e);
+                    throw new RoutingException(event.getMessage(), endpoint, e);
                 }
             }
         }

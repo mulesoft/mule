@@ -53,7 +53,7 @@ public class TestAggregator extends CorrelationAggregator
                 buffer.append(event.getTransformedMessageAsString());
             } catch (TransformerException e)
             {
-                throw new RoutingException(e.getMessage(), e);
+                throw new RoutingException(event.getMessage(),  event.getEndpoint(), e);
             }
         }
         System.out.println("event payload is: " + buffer.toString());

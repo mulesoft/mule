@@ -21,7 +21,9 @@ import javax.sql.DataSource;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionRollbackException;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * @author Guillaume Nodet
@@ -35,9 +37,9 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction {
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#bindResource(java.lang.Object, java.lang.Object)
 	 */
-	public void bindResource(Object key, Object resource) throws UMOTransactionException {
+	public void bindResource(Object key, Object resource) throws TransactionException {
 		if (!(key instanceof DataSource) || !(resource instanceof Connection)) {
-			throw new IllegalTransactionStateException("Can only bind javax.sql.DataSource/java.sql.Connection resources");
+			throw new IllegalTransactionStateException(new Message(Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES, "javax.sql.DataSource/java.sql.Connection"));
 		}
 		Connection con = (Connection) resource;
 		try {
@@ -45,7 +47,7 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction {
 				con.setAutoCommit(false);
 			}
 		} catch (SQLException e) {
-			throw new UMOTransactionException("Could not set autoCommit", e);
+			throw new TransactionException(new Message(Messages.TX_SET_AUTO_COMMIT_FAILED), e);
 		}
 		super.bindResource(key, resource);
 	}
@@ -53,31 +55,31 @@ public class JdbcTransaction extends AbstractSingleResourceTransaction {
 	/* (non-Javadoc)
 	 * @see org.mule.transaction.AbstractSingleResourceTransaction#doBegin()
 	 */
-	protected void doBegin() throws UMOTransactionException {
+	protected void doBegin() throws TransactionException {
 		// Do nothing
 	}
 
 	/* (non-Javadoc)
 	 * @see org.mule.transaction.AbstractSingleResourceTransaction#doCommit()
 	 */
-	protected void doCommit() throws UMOTransactionException {
+	protected void doCommit() throws TransactionException {
 		try {
 			((Connection) resource).commit();
 			((Connection) resource).close();
 		} catch (SQLException e) {
-			throw new UMOTransactionException("Could not commit transaction", e);
+			throw new TransactionException(new Message(Messages.TX_COMMIT_FAILED), e);
 		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.mule.transaction.AbstractSingleResourceTransaction#doRollback()
 	 */
-	protected void doRollback() throws UMOTransactionException {
+	protected void doRollback() throws TransactionException {
 		try {
 			((Connection) resource).rollback();
 			((Connection) resource).close();
 		} catch (SQLException e) {
-			throw new TransactionRollbackException("Could not rollback transaction", e);
+			throw new TransactionRollbackException(new Message(Messages.TX_ROLLBACK_FAILED), e);
 		}
 	}
 

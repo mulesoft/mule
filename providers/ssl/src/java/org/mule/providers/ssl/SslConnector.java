@@ -13,14 +13,16 @@
  */
 package org.mule.providers.ssl;
 
-import org.mule.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.tcp.TcpConnector;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.Utility;
 
 import javax.net.ssl.KeyManagerFactory;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
@@ -63,24 +65,32 @@ public class SslConnector extends TcpConnector
         if(getStorePassword()==null)  throw new NullPointerException("The KeyStore password cannot be null");
         if(getKeyManagerAlgorithm()==null)  throw new NullPointerException("The Key Manager Algorithm cannot be null");
 
+        KeyStore keystore = null;
         try
         {
             Security.addProvider(getProvider());
             //Create keyStore
-            KeyStore keystore = KeyStore.getInstance(keystoreType);
+            keystore = KeyStore.getInstance(keystoreType);
             InputStream is = Utility.loadResource(getKeyStore(), getClass());
             if(is==null) {
                 throw new FileNotFoundException("Failed to load keystore from classpath or local file: " + getKeyStore());
             }
             keystore.load(is, getKeyPassword().toCharArray());
-            //Get key manager
+        } catch (Exception e)
+        {
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "KeyStore: " + getKeyStore()), e, this);
+        }
+        try
+        {
+//Get key manager
             keyManagerFactory = KeyManagerFactory.getInstance(getKeyManagerAlgorithm());
             // Initialize the KeyManagerFactory to work with our keyStore
             keyManagerFactory.init(keystore, getStorePassword().toCharArray());
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to load the KeyStore and manager: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager (" + getKeyManagerAlgorithm() + ")"), e, this);
         }
+
         super.doInitialise();
 
         if (protocolHandler != null)
@@ -98,8 +108,7 @@ public class SslConnector extends TcpConnector
                 logger.info("Set Client Key store: javax.net.ssl.keyStore=" + clientPath);
             } catch (IOException e)
             {
-                throw new InitialisationException("Failed to locate Client keystore with: " +
-                                clientKeyStore + ". Error is: " + e.getMessage(), e);
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Client KeyStore: " + clientKeyStore), e, this);
             }
         }
 

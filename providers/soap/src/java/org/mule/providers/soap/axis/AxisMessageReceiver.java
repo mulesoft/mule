@@ -13,9 +13,10 @@
  */
 package org.mule.providers.soap.axis;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 

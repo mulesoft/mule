@@ -18,7 +18,9 @@ package org.mule.transaction;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <p><code>TransactionCoordination</code> TODO (document class)
@@ -69,21 +71,21 @@ public class TransactionCoordination
         return (UMOTransaction) transactions.get();
     }
 
-    public void unbindTransaction(UMOTransaction transaction) throws UMOTransactionException
+    public void unbindTransaction(UMOTransaction transaction) throws TransactionException
     {
     	UMOTransaction oldTx = (UMOTransaction) transactions.get();
     	if (oldTx != transaction) {
-    		throw new IllegalTransactionStateException("Trying to unbind an unbounded transaction");
+    		throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_UNBIND));
     	}
         transactions.set(null);
         decrementCounter();
     }
 
-    public void bindTransaction(UMOTransaction transaction) throws UMOTransactionException
+    public void bindTransaction(UMOTransaction transaction) throws TransactionException
     {
     	UMOTransaction oldTx = (UMOTransaction) transactions.get();
     	if (oldTx != null) {
-    		throw new IllegalTransactionStateException("A transaction is already bound to the current thread");
+    		throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_ALREADY_BOUND));
     	}
     	transactions.set(transaction);
         incrementCounter();

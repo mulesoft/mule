@@ -16,10 +16,13 @@ package org.mule.extras.groovy;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyObject;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.components.script.AbstractScriptComponent;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassHelper;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +57,7 @@ public class GroovyComponent extends AbstractScriptComponent
                 GroovyClassLoader loader = new GroovyClassLoader(Thread.currentThread().getContextClassLoader());
                 URL url = ClassHelper.getResource(script, getClass());
                 if(url==null) {
-                    throw new InitialisationException("Could not find script: " + script);
+                    throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Groovy script: " + script), this);
                 }
                 Class groovyClass = loader.parseClass(new GroovyCodeSource(url));
                 component = (GroovyObject) groovyClass.newInstance();
@@ -62,7 +65,7 @@ public class GroovyComponent extends AbstractScriptComponent
         } catch (Exception e)
         {
             if(e instanceof InitialisationException) throw (InitialisationException)e;
-            throw new InitialisationException("Failed to load groovy component: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Groovy component"), e, this);
         }
     }
 
@@ -114,7 +117,7 @@ public class GroovyComponent extends AbstractScriptComponent
      *         <li>the <code>setStopFurtherProcessing(true)</code> wasn't called on the previous context.</li>
      *         </ol>
      * @throws Exception if the context fails to process properly. If exceptions aren't handled by the implementation
-     *                   they will be handled by the exceptionStrategy associated with the components
+     *                   they will be handled by the exceptionListener associated with the components
      */
     public Object onCall(UMOEventContext context) throws Exception
     {

@@ -16,11 +16,12 @@ package org.mule.impl.security;
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.security.SecurityProviderNotFoundException;
 import org.mule.umo.security.UMOAuthentication;
-import org.mule.umo.security.UMOSecurityException;
+import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UMOSecurityContext;
@@ -51,7 +52,7 @@ public class MuleSecurityManager implements UMOSecurityManager
 
     private Map cryptoStrategies = new ConcurrentHashMap();
 
-    public void initialise() throws InitialisationException
+    public void initialise() throws InitialisationException, RecoverableException
     {
         for (Iterator iterator = providers.values().iterator(); iterator.hasNext();)
         {
@@ -66,7 +67,7 @@ public class MuleSecurityManager implements UMOSecurityManager
         }
     }
 
-    public UMOAuthentication authenticate(UMOAuthentication authentication) throws UMOSecurityException
+    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException, SecurityProviderNotFoundException
     {
         Iterator iter = providers.values().iterator();
 
@@ -87,8 +88,7 @@ public class MuleSecurityManager implements UMOSecurityManager
             }
         }
 
-        throw new SecurityProviderNotFoundException("No authentication provider for "
-            + toTest.getName());
+        throw new SecurityProviderNotFoundException(toTest.getName());
     }
 
     public void addProvider(UMOSecurityProvider provider)

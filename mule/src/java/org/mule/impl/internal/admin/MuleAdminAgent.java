@@ -15,14 +15,16 @@ package org.mule.impl.internal.admin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.AlreadyInitialisedException;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOAgent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManager;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.MuleObjectHelper;
@@ -108,7 +110,7 @@ public class MuleAdminAgent implements UMOAgent
             {
                 if (manager.lookupConnector(DEFAULT_MANAGER_PROVIDER) != null)
                 {
-                    throw new InitialisationException("Server components are already initialised");
+                    throw new AlreadyInitialisedException("Server Components", this);
                 }
 
                 UMOEndpointURI endpointUri = new MuleEndpointURI(serverEndpoint);
@@ -128,7 +130,15 @@ public class MuleAdminAgent implements UMOAgent
             }
         } catch (UMOException e)
         {
-            throw new InitialisationException(e.getMessage(), e);
+            throw new InitialisationException(e, this);
         }
+    }
+
+
+    public String toString()
+    {
+        return "MuleAdminAgent{" +
+                "serverEndpoint='" + serverEndpoint + "'" +
+                "}";
     }
 }

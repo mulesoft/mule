@@ -21,6 +21,9 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
+import org.mule.umo.routing.RoutePathNotFoundException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>ChainingRouter</code> is used to pass a Mule event through multiple endpoints
@@ -42,7 +45,7 @@ public class ChainingRouter extends FilteringOutboundRouter
         UMOMessage result = null;
         if (endpoints == null || endpoints.size() == 0)
         {
-            throw new RoutingException("No endpoints are set on this router, cannot route message");
+            throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
         }
         try
         {
@@ -61,7 +64,7 @@ public class ChainingRouter extends FilteringOutboundRouter
             }
         } catch (UMOException e)
         {
-            throw new CouldNotRouteOutboundMessageException(e.getMessage(), e, message);
+            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint)endpoints.get(0), e);
         }
         return result;
     }

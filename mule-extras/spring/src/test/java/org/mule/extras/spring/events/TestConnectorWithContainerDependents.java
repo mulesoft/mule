@@ -1,7 +1,7 @@
 //COPYRIGHT
 package org.mule.extras.spring.events;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestConnector;
 

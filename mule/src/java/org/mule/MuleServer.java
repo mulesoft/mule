@@ -18,15 +18,17 @@ package org.mule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ExceptionHelper;
+import org.mule.config.ConfigurationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.util.ClassHelper;
 import org.mule.util.StringMessageHelper;
+import org.mule.umo.UMOException;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * <code>MuleServer</code> is a simple application that represents a local
@@ -97,11 +99,8 @@ public class MuleServer implements Runnable
 
         if(config==null)
         {
-            System.out.println("No config file was specified and no config by the name of mule-config.xml was found on the classpath");
-            System.out.println("Usage: MuleServer -config <mule-configuration> [-builder <config-builder>]");
-            System.out.println("   mule-configuration = a URL for the Mule Config XML to use, if not specified the config will be loaded from the class path");
-            System.out.println("   config-builder = a fully qualified class name of the builder to use to configure Mule");
-
+            Message message = new Message(Messages.CONFIG_NOT_FOUND_USAGE);
+            logger.fatal(message.toString());
             System.exit(0);
         }
 
@@ -113,12 +112,16 @@ public class MuleServer implements Runnable
             }
             catch (Exception e)
             {
-                e.printStackTrace();
-                System.out.println("Failed to load builder: " + builder);
+                logger.fatal(new Message(Messages.FAILED_LOAD_X, "Builder: " + builder), e);
             }
         } else {
             //use this by default
-            configBuilder = new MuleXmlConfigurationBuilder();
+            try {
+                configBuilder = new MuleXmlConfigurationBuilder();
+            } catch (ConfigurationException e) {
+                logger.fatal(e.getMessage(), e);
+                System.exit(0);
+            }
         }
 
         server.start(false);
@@ -212,7 +215,7 @@ public class MuleServer implements Runnable
      */
     protected void initialize() throws Exception
     {
-        System.out.println("Mule Server starting...");
+        logger.info("Mule Server starting...");
 
         //registerShutdownHook();
         // install an RMI security manager in case we expose any RMI objects
@@ -235,7 +238,7 @@ public class MuleServer implements Runnable
                 configBuilder.configure(DEFAULT_CONFIGURATION);
             }
         }
-        System.out.println("Mule Server initialized.");
+        logger.info("Mule Server initialized.");
     }
 
     /**
@@ -245,26 +248,25 @@ public class MuleServer implements Runnable
      */
     void shutdown(Throwable e)
     {
-        logger.fatal(e, e);
-        List msgs = new ArrayList();
-        msgs.add("A Fatal error has occurred while the server was running-");
-        msgs.add(" ");
-        msgs.add(e.getMessage() + "[" + e.getClass().getName() + "]");
-
-        Throwable cause = e.getCause();
-        while (cause != null)
-        {
-            msgs.add("Caused by: " + cause.getMessage() + "[" + cause.getClass().getName() + "]");
-            cause = cause.getCause();
+        Message msg = new Message(Messages.FATAL_ERROR_WHILE_RUNNING);
+        UMOException muleException = ExceptionHelper.getRootMuleException(e);
+        if(muleException!=null) {
+            logger.fatal(muleException.getDetailedMessage());
+        } else {
+            logger.fatal(msg.toString() + " " + e.getMessage(), e);
         }
-        msgs.add("The error is fatal, the system must shutdown.");
-        msgs.add("The system was started at : " + new Date(MuleManager.getInstance().getStartDate()));        
-        msgs.add("The system shutdown at : " + new Date().toString());
+        List msgs = new ArrayList();
+        msgs.add(msg.getMessage());
+        Throwable root = ExceptionHelper.getRootException(e);
+        msgs.add(root.getMessage() + " (" + root.getClass().getName() + ")");
+        msgs.add(" ");
+        msgs.add(new Message(Messages.FATAL_ERROR_SHUTDOWN));
+        msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(MuleManager.getInstance().getStartDate())));
+        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()));
 
         shutdownMessage = StringMessageHelper.getBoilerPlate(msgs, '*', 80);
         logger.fatal(shutdownMessage);
         System.exit(0);
-
     }
 
     /**
@@ -274,9 +276,9 @@ public class MuleServer implements Runnable
     {
         logger.info("Mule server shutting dow due to normal shutdown request");
         List msgs = new ArrayList();
-        msgs.add("Mule server shutting dow due to normal shutdown request");
-        msgs.add("The system was started at : " + new Date(MuleManager.getInstance().getStartDate()));
-        msgs.add("The system shutdown at : " + new Date().toString());
+        msgs.add(new Message(Messages.NORMAL_SHUTDOWN).getMessage());
+        msgs.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(MuleManager.getInstance().getStartDate())).getMessage());
+        msgs.add(new Message(Messages.SERVER_SHUTDOWN_AT_X, new Date().toString()).getMessage());
         shutdownMessage = StringMessageHelper.getBoilerPlate(msgs, '*', 80);
 
         System.exit(0);

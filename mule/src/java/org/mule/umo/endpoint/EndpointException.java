@@ -13,7 +13,10 @@
  */
 package org.mule.umo.endpoint;
 
+import org.mule.umo.routing.RoutingException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOException;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>EndpointException</code> is an abstract exception extended by endpoint specific
@@ -25,13 +28,25 @@ import org.mule.umo.UMOException;
 
 public class EndpointException extends UMOException
 {
-    public EndpointException(String message)
+    /**
+     * @param message the exception message
+     */
+    public EndpointException(Message message)
     {
         super(message);
     }
 
-    public EndpointException(String message, Throwable cause)
+    /**
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
+     */
+    public EndpointException(Message message, Throwable cause)
     {
         super(message, cause);
+    }
+
+    public EndpointException(Throwable cause)
+    {
+        super(cause);
     }
 }

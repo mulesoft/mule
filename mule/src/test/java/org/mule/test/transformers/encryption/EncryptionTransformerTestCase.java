@@ -23,7 +23,7 @@ import org.mule.util.compression.CompressionHelper;
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.transformers.encryption.EncryptionTransformer;
 import org.mule.transformers.encryption.DecryptionTransformer;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.Arrays;
 
@@ -51,7 +51,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     {
         try
         {
-            return strat.encrypt(getTestData().toString().getBytes());
+            return strat.encrypt(getTestData().toString().getBytes(), null);
         } catch (CryptoFailureException e)
         {
             fail(e.getMessage());

@@ -26,6 +26,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.mule.MuleException;
+import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
@@ -36,6 +37,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.ByteArrayInputStream;
@@ -117,14 +120,14 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 return (UMOMessage)receiveTransformer.transform(httpMethod);
             } else
             {
-                throw new MuleException("HTTP request failed with return code: " + httpMethod.getStatusLine().toString());
+                throw new ReceiveException(new Message("http", 3, httpMethod.getStatusLine().toString()), endpointUri, timeout);
             }
-        } catch (MuleException e)
+        } catch (ReceiveException e)
         {
             throw e;
         } catch (Exception e)
         {
-            throw new MuleException("HTTP endpoint failed to make request: " + e, e);
+            throw new ReceiveException(endpointUri, timeout, e);
         } finally
         {
             if (httpMethod != null) httpMethod.releaseConnection();
@@ -189,7 +192,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             return new MuleMessage(httpMethod.getResponseBodyAsString(), h);
         } catch (Exception e)
         {
-            throw new MuleException("HTTP endpoint failed to make request: " + e, e);
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         } finally
         {
             if (httpMethod != null) httpMethod.releaseConnection();

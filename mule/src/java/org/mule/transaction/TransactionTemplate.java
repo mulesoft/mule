@@ -18,6 +18,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * @author Guillaume Nodet
@@ -41,11 +43,11 @@ public class TransactionTemplate {
 			UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
 			
 			if (action == UMOTransactionConfig.ACTION_NONE && tx != null) {
-	            throw new IllegalTransactionStateException("A transaction is available for this session, but transaction action is none");
+	            throw new IllegalTransactionStateException(new Message(Messages.TX_AVAILABLE_BUT_ACTION_IS_X, "None"));
 			} else if (action == UMOTransactionConfig.ACTION_ALWAYS_BEGIN && tx != null) {
-				throw new IllegalTransactionStateException("A transaction is available for this session, but transaction action is always begin");
+				throw new IllegalTransactionStateException(new Message(Messages.TX_AVAILABLE_BUT_ACTION_IS_X, "Always Begin"));
 			} else if (action == UMOTransactionConfig.ACTION_ALWAYS_JOIN && tx == null) {
-				throw new IllegalTransactionStateException("A transaction is not available for this session, but transaction action is always join");
+				throw new IllegalTransactionStateException(new Message(Messages.TX_NOT_AVAILABLE_BUT_ACTION_IS_X, "Always Join"));
 			}
 			
 			if (action == UMOTransactionConfig.ACTION_ALWAYS_BEGIN || action == UMOTransactionConfig.ACTION_BEGIN_OR_JOIN) {

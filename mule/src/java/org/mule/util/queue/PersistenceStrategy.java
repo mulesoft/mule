@@ -14,7 +14,7 @@
 package org.mule.util.queue;
 
 import EDU.oswego.cs.dl.util.concurrent.BoundedChannel;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.UMOEvent;
 
 /**

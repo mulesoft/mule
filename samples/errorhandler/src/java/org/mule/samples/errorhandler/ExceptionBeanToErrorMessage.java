@@ -15,19 +15,14 @@
  
 package org.mule.samples.errorhandler;
 
-import org.mule.MuleRuntimeException;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-import java.beans.ExceptionListener;
-
 /**
- *  <code>XmlToBean</code> TODO (document class)
- *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class ExceptionBeanToErrorMessage extends AbstractTransformer implements ExceptionListener
+public class ExceptionBeanToErrorMessage extends AbstractTransformer
 {
     public ExceptionBeanToErrorMessage()
     {
@@ -45,14 +40,8 @@ public class ExceptionBeanToErrorMessage extends AbstractTransformer implements 
         }
         catch (InstantiationException e)
         {
-            throw new TransformerException("Failed to transformer: " + e.getMessage(), e);
+            throw new TransformerException(this, e);
         }
     }
-    /* (non-Javadoc)
-     * @see java.beans.ExceptionListener#exceptionThrown(java.lang.Exception)
-     */
-    public void exceptionThrown(Exception e)
-    {
-        throw new MuleRuntimeException("Failed to decode bean xml: " + e.getMessage(), e);
-    }
+
 }

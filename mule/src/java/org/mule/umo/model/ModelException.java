@@ -15,26 +15,26 @@
 package org.mule.umo.model;
 
 import org.mule.umo.UMOException;
+import org.mule.config.i18n.Message;
 
 /**
  * @author Ross Mason
  */
 public class ModelException extends UMOException
 {
-
     /**
-     * @param message
+     * @param message the exception message
      */
-    public ModelException(String message)
+    public ModelException(Message message)
     {
         super(message);
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
      */
-    public ModelException(String message, Throwable cause)
+    public ModelException(Message message, Throwable cause)
     {
         super(message, cause);
     }

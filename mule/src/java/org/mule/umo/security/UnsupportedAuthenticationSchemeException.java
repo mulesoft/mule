@@ -13,6 +13,9 @@
  */
 package org.mule.umo.security;
 
+import org.mule.config.i18n.Message;
+import org.mule.umo.UMOMessage;
+
 /**
  * <code>UnsupportedAuthenticationSchemeException</code> is thrown when a authentication scheme
  * is being used on the message that the Security filter does not understand
@@ -20,22 +23,15 @@ package org.mule.umo.security;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class UnsupportedAuthenticationSchemeException extends UMOSecurityException
+public class UnsupportedAuthenticationSchemeException extends SecurityException
 {
-    /**
-     * @param message the exception message
-     */
-    public UnsupportedAuthenticationSchemeException(String message)
+    public UnsupportedAuthenticationSchemeException(Message message, UMOMessage umoMessage)
     {
-        super(message);
+        super(message, umoMessage);
     }
 
-    /**
-     * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
-     */
-    public UnsupportedAuthenticationSchemeException(String message, Throwable cause)
+    public UnsupportedAuthenticationSchemeException(Message message, UMOMessage umoMessage, Throwable cause)
     {
-        super(message, cause);
+        super(message, umoMessage, cause);
     }
 }

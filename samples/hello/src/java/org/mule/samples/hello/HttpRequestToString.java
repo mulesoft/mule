@@ -17,6 +17,7 @@ package org.mule.samples.hello;
 
 import org.mule.transformers.DefaultTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>NameStringToChatString</code> This is test class only for use with the Hello world
@@ -53,7 +54,7 @@ public class HttpRequestToString extends DefaultTransformer
         {
             return param.substring(equals + 1);
         } else {
-            throw new TransformerException("Failed to parse param string: " + param);
+            throw new TransformerException(Message.createStaticMessage("Failed to parse param string: " + param), this);
         }
     }
 }

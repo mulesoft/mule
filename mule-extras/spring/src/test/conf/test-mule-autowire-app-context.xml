@@ -60,7 +60,7 @@
     <bean id="jmxAgent" class="org.mule.management.agents.JmxAgent"/>
 
     <bean id="dummyConnector" class="org.mule.tck.testmodels.mule.TestConnector">
-        <property name="exceptionStrategy">
+        <property name="exceptionListener">
             <bean id="connectorES" class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
         </property>
         <property name="dispatcherThreadingProfile">
@@ -74,7 +74,8 @@
     <bean id="defaultExceptionStrategy" class="org.mule.impl.DefaultExceptionStrategy"/>
 
     <bean id="dummyExceptionStrategy" class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-        <property name="endpoint">
+        <property name="endpoints">
+            <list>
             <bean class="org.mule.impl.endpoint.MuleEndpoint">
                 <property name="endpointURI">
                     <bean class="org.mule.impl.endpoint.MuleEndpointURI">
@@ -82,6 +83,7 @@
                     </bean>
                </property>
             </bean>
+            </list>
         </property>
     </bean>
 
@@ -327,9 +329,10 @@
                 </entry>
             </map>
         </property>
-        <property name="exceptionStrategy">
+        <property name="exceptionListener">
             <bean class="org.mule.impl.DefaultComponentExceptionStrategy">
-                <property name="endpoint">
+                <property name="endpoints">
+                    <list>
                     <bean class="org.mule.impl.endpoint.MuleEndpoint">
                         <property name="endpointURI">
                             <bean class="org.mule.impl.endpoint.MuleEndpointURI">
@@ -337,6 +340,7 @@
                             </bean>
                        </property>
                     </bean>
+                    </list>
                 </property>
             </bean>
         </property>
@@ -354,7 +358,7 @@
         <property name="outboundRouter"><ref local="testOutboundMessageRouter"/></property>
         <property name="inboundRouter"><ref local="testInboundMessageRouter"/></property>
         
-        <property name="exceptionStrategy"><bean class="org.mule.impl.DefaultExceptionStrategy"/></property>
+        <property name="exceptionListener"><bean class="org.mule.impl.DefaultExceptionStrategy"/></property>
    </bean>
 
     <bean id="appleComponent2" class="org.mule.impl.MuleDescriptor">
@@ -477,7 +481,7 @@
     <bean id="test-model" class="org.mule.impl.MuleModel">
         <property name="entryPointResolver"><ref local="entryPointResolver"/></property>
         <property name="lifecycleAdapterFactory"><ref local="lifecycleAdapterFactory"/></property>
-        <property name="exceptionStrategy"><ref local="dummyExceptionStrategy"/></property>
+        <property name="exceptionListener"><ref local="dummyExceptionStrategy"/></property>
 	</bean>
 
     <!-- components that are used by referencing the container throught the builder -->

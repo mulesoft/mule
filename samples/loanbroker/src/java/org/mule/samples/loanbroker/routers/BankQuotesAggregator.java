@@ -21,6 +21,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.config.i18n.Message;
 
 import java.util.Iterator;
 import java.util.List;
@@ -79,7 +80,7 @@ public class BankQuotesAggregator extends CorrelationAggregator
             //}
         } catch (TransformerException e)
         {
-            throw new RoutingException("Failed to get lowest quote", e, events);
+            throw new RoutingException(Message.createStaticMessage("Failed to get lowest quote"), new MuleMessage(events, null), null, e);
         }
     }
 

@@ -20,6 +20,7 @@ import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -27,13 +28,13 @@ import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
 import java.util.HashMap;
+import java.beans.ExceptionListener;
 
 
 /**
@@ -73,26 +74,26 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         assertNotNull(connector);
 
         //Text exception handler
-        Mock ehandlerMock = new Mock(UMOExceptionStrategy.class, "exceptionHandler");
+        Mock ehandlerMock = new Mock(ExceptionListener.class, "exceptionHandler");
 
-        ehandlerMock.expect("handleException", C.ANY_ARGS);
+        ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
 
-        assertNotNull(connector.getExceptionStrategy());
-        connector.setExceptionStrategy((UMOExceptionStrategy) ehandlerMock.proxy());
-        connector.handleException("Dummy exception", new MuleException("Dummy"));
+        assertNotNull(connector.getExceptionListener());
+        connector.setExceptionListener((ExceptionListener) ehandlerMock.proxy());
+        connector.handleException(new MuleException(Message.createStaticMessage("Dummy")));
 
         if (connector instanceof AbstractConnector)
         {
-            ehandlerMock.expect("handleException", C.ANY_ARGS);
-            ((AbstractConnector) connector).exceptionThrown(new MuleException("Dummy"));
+            ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
+            ((AbstractConnector) connector).exceptionThrown(new MuleException(Message.createStaticMessage("Dummy")));
         }
 
         ehandlerMock.verify();
 
-        connector.setExceptionStrategy(null);
+        connector.setExceptionListener(null);
         try
         {
-            connector.handleException("Dummy exception", new MuleException("Dummy"));
+            connector.handleException(new MuleException(Message.createStaticMessage("Dummy")));
             fail("Should have thrown exception as no strategy is set");
         }
         catch (RuntimeException e)

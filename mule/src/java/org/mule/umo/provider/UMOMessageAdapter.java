@@ -14,6 +14,8 @@
  */
 package org.mule.umo.provider;
 
+import org.mule.umo.UMOExceptionPayload;
+
 import java.io.Serializable;
 import java.util.Iterator;
 
@@ -243,16 +245,17 @@ public interface UMOMessageAdapter extends Serializable
 
     /**
      * If an error occurred during the processing of this message this
-     * will return a value greater than zero
+     * will return a ErrorPayload that contains the root exception and
+     * Mule error code, plus any otherr releated info
      * @return
      */
-    public int getErrorCode();
+    public UMOExceptionPayload getExceptionPayload();
 
     /**
-     * If an error occurs while processing this message, this error code
-     * should be set to a value greater than zero and the palyoad of the this
-     * message should contain the error details
-     * @param code
+     * If an error occurs while processing this message, a ErrorPayload is
+     * attached which contains the root exception and
+     * Mule error code, plus any otherr releated info
+     * @param payload The exception payloaad to attach to this message
      */
-    public void setErrorCode(int code);
+    public void setExceptionPayload(UMOExceptionPayload payload);
 }

@@ -16,10 +16,13 @@ package org.mule.config.pool;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.pool.PoolableObjectFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ObjectPool;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>CommonsPoolProxyFactory</code> is used to create MuleProxies for use in a proxy pool.
@@ -101,7 +104,7 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
         }
         catch (Exception e)
         {
-            throw new InitialisationException("Failed to set properties on component: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Component '" + descriptor.getName() + "'"), e, descriptor);
         }
     }
 

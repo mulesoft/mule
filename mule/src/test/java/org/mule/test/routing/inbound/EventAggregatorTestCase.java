@@ -102,7 +102,7 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
                     newPayload.append(event.getMessageAsString()).append(" ");
                 } catch (UMOException e)
                 {
-                    throw new RoutingException(e.getMessage(), e);
+                    throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
                 }
             }
             return new MuleMessage(newPayload.toString(), event.getProperties());

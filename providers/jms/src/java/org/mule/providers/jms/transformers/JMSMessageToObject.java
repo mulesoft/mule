@@ -51,11 +51,6 @@ public class JMSMessageToObject extends AbstractJmsTransformer
     {
         Object result = null;
 
-        if (!(src instanceof Message))
-        {
-            throw new TransformerException("Source message must be of type javax.jms.Message. Instead it is of type: " + src.getClass().getName());
-        }
-
         try
         {
             logger.debug("Source object is " + src.getClass().getName());
@@ -64,7 +59,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(e.getMessage());
+            throw new TransformerException(this, e);
         }
         return result;
     }

@@ -21,6 +21,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
+import org.mule.umo.routing.ComponentRoutingException;
 
 /**
  * <code>ComponentCatchAllStrategy</code> is used to catch any events and forward
@@ -43,10 +44,9 @@ public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
 
     public synchronized UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
-        //synchronized(lock){
+        UMOEvent event = RequestContext.getEvent();
         try
         {
-            UMOEvent event = RequestContext.getEvent();
             event = new MuleEvent(message, event.getEndpoint(), session.getComponent(), event);
             if (synchronous)
             {
@@ -61,8 +61,7 @@ public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
             }
         } catch (UMOException e)
         {
-            throw new RoutingException(e.getMessage(), e);
+            throw new ComponentRoutingException(event.getMessage(), event.getEndpoint(), session.getComponent(), e);
         }
-       // }
     }
 }

@@ -31,6 +31,8 @@ package org.mule.providers.vm;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -38,6 +40,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.DispatchException;
 import org.mule.util.queue.BoundedPersistentQueue;
 
 /**
@@ -104,7 +107,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
         if(endpointUri==null) {
-            throw new MuleException("Endpoint is null for endpoint: " + event.getEndpoint() + ". Event is: "+ event);
+            throw new DispatchException(new Message(Messages.X_IS_NULL, "Endpoint"), event.getMessage(), event.getEndpoint());
         }
         if(connector.isQueueEvents()) {
             BoundedPersistentQueue queue = connector.getQueue(endpointUri.getAddress());
@@ -140,7 +143,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
                 doDispatch(event);
                 return null;
             } else {
-                throw new NoReceiverForEndpointException("There is no receiver on connector: " + connector.getName() + ", for endpointUri: " + event.getEndpoint().getEndpointURI());
+                throw new NoReceiverForEndpointException(new Message(Messages.NO_RECEIVER_X_FOR_ENDPOINT_X, connector.getName(), event.getEndpoint().getEndpointURI()));
             }
         }
         retMessage = (UMOMessage) receiver.onCall(event);

@@ -15,7 +15,7 @@ package org.mule.providers.xmpp;
 
 import org.jivesoftware.smack.packet.Message;
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /**
@@ -28,7 +28,7 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
 {
     private Message message;
 
-    public XmppMessageAdapter(Object message) throws MessageException
+    public XmppMessageAdapter(Object message) throws MessagingException
     {
         if (message instanceof Message)
         {

@@ -15,7 +15,7 @@
     <mule-descriptor name="appleComponent3"
         implementation="org.mule.tck.testmodels.fruit.Apple">
 
-        <bean name="exceptionStrategy" class="org.mule.impl.DefaultExceptionStrategy"/>
+        <bean name="exceptionListener" class="org.mule.impl.DefaultExceptionStrategy"/>
 
         <bean name="version" class="java.lang.String">
             <constructor-arg><value>1.1</value></constructor-arg>

@@ -15,6 +15,8 @@ package org.mule.providers.http.transformers;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
@@ -71,7 +73,7 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
                 response = Utility.objectToByteArray(src);
             } catch (IOException e)
             {
-                throw new TransformerException("Failed to convert object to byte array: " + e.getMessage(), e);
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "Object", "byte[]"), this, e);
             }
         }
 

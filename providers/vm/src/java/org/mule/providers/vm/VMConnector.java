@@ -30,16 +30,19 @@ package org.mule.providers.vm;
 
 
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.config.QueueProfile;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -88,8 +91,8 @@ public class VMConnector extends AbstractServiceEnabledConnector
             adapterClass = ClassHelper.loadClass(serviceDescriptor.getMessageAdapter(), getClass());
         } catch (ClassNotFoundException e)
         {
-            throw new InitialisationException("could not load message adapter class: " +
-                    serviceDescriptor.getMessageAdapter() + ". Error is: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Message Adapter: " +
+                    serviceDescriptor.getMessageAdapter()), e);
         }
     }
 
@@ -109,7 +112,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
     /* (non-Javadoc)
      * @see org.mule.umo.provider.UMOConnector#getMessageAdapter(java.lang.Object)
      */
-    public UMOMessageAdapter getMessageAdapter(Object message) throws MessageException
+    public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
     {
         if(message==null) {
             throw new MessageTypeNotSupportedException(null, adapterClass);

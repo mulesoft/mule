@@ -13,7 +13,7 @@
  */
 package org.mule.providers.http;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;

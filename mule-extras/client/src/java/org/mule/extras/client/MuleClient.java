@@ -18,6 +18,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -34,10 +36,14 @@ import org.mule.umo.UMOManager;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.MessagingException;
+import org.mule.umo.routing.ComponentRoutingException;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.ReceiveException;
+import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
@@ -139,6 +145,7 @@ public class MuleClient
         if (!MuleManager.isInstanciated())
         {
             MuleManager.getConfiguration().setServerUrl("");
+            MuleManager.getConfiguration().setClientMode(true);
         }
 
         manager = MuleManager.getInstance();
@@ -170,9 +177,12 @@ public class MuleClient
         try
         {
             event.getSession().dispatchEvent(event);
+        } catch (UMOException e)
+        {
+            throw e;
         } catch (Exception e)
         {
-            throw new MuleClientException("Failed to dispatch client event: " + e.getMessage(), e);
+            throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
         }
     }
 
@@ -196,7 +206,7 @@ public class MuleClient
 //        } else
         if (!compregistered)
         {
-            throw new MuleClientException("Cannot find components '" + component + "' in local server");
+            throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Component '" + component + "'"), payload, null);
         }
         UMOTransformer trans = null;
         if (transformers != null)
@@ -210,7 +220,7 @@ public class MuleClient
         }
         UMOMessage message = new MuleMessage(payload, messageProperties);
         UMOSession session = getManager().getModel().getComponentSession(component);
-        UMOEndpoint endpoint = getDefaultClientProvider(session.getComponent().getDescriptor(), payload);
+        UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(), payload);
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
 
         logger.debug("MuleClient sending event direct to: " + component + ". Event is: " + event);
@@ -245,11 +255,11 @@ public class MuleClient
 //        } else
         if (!compregistered)
         {
-            throw new MuleClientException("Cannot find components '" + component + "' in local server");
+            throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Component '" + component + "'"), payload, null);
         }
         UMOMessage message = new MuleMessage(payload, messageProperties);
         UMOSession session = getManager().getModel().getComponentSession(component);
-        UMOEndpoint endpoint = getDefaultClientProvider(session.getComponent().getDescriptor(), payload);
+        UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(), payload);
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
 
         logger.debug("MuleClient dispatching event direct to: " + component + ". Event is: " + event);
@@ -390,7 +400,7 @@ public class MuleClient
             throw e;
         } catch (Exception e)
         {
-            throw new MuleClientException("Failed to dispatch client event: " + e.getMessage(), e);
+            throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
         }
         return result;
     }
@@ -415,7 +425,7 @@ public class MuleClient
             return message;
         } catch (Exception e)
         {
-            throw new MuleClientException("Failed to receive message: " + e.getMessage(), e);
+            throw new ReceiveException(muleEndpoint, timeout, e);
         }
     }
 
@@ -486,11 +496,11 @@ public class MuleClient
             return event;
         } catch (Exception e)
         {
-            throw new MuleClientException("Failed to create client event: " + e.getMessage(), e);
+            throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Client event"), message, endpoint, e);
         }
     }
 
-    protected UMOEndpoint getDefaultClientProvider(UMODescriptor descriptor, Object payload) throws MuleClientException, UMOException
+    protected UMOEndpoint getDefaultClientEndpoint(UMODescriptor descriptor, Object payload) throws UMOException
     {
         //as we are bypassing the message transport layer we need to check that
         UMOEndpoint endpoint = descriptor.getInboundEndpoint();
@@ -515,16 +525,10 @@ public class MuleClient
         {
             UMOConnector connector = null;
             UMOEndpointURI defaultEndpointUri = new MuleEndpointURI("vm://localhost/mule.client");
-            try
-            {
-                connector = ConnectorFactory.createConnector(defaultEndpointUri);
-                connector.initialise();
-                manager.registerConnector(connector);
-                connector.start();
-            } catch (Exception e)
-            {
-                throw new MuleClientException("Failed to create default connector for MuleClient: " + e.getMessage(), e);
-            }
+            connector = ConnectorFactory.createConnector(defaultEndpointUri);
+            connector.initialise();
+            manager.registerConnector(connector);
+            connector.start();
             endpoint = new MuleEndpoint("muleClientProvider",
                     defaultEndpointUri, connector, null,
                     UMOEndpoint.ENDPOINT_TYPE_RECEIVER, null);
@@ -562,7 +566,7 @@ public class MuleClient
             throw e;
         } catch (Exception e)
         {
-            throw new MuleClientException("Failed to dispatch client event: " + e.getMessage(), e);
+            throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
         }
     }
 

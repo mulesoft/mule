@@ -18,6 +18,8 @@ import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>AbstractEventAwareTransformer</code> is a transformer that has a reference to
@@ -40,7 +42,7 @@ public abstract class AbstractEventAwareTransformer extends AbstractTransformer
     {
         UMOEventContext event = RequestContext.getEventContext();
         if(event==null) {
-            throw new TransformerException("This transformer can only be invoked when an event is being processed");
+            throw new TransformerException(new Message(Messages.NO_CURRENT_EVENT_FOR_TRANSFORMER), this);
         }
         return transform(src, event);
     }

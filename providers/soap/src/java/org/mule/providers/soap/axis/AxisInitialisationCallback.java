@@ -16,7 +16,8 @@ package org.mule.providers.soap.axis;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.InitialisationCallback;
 
 /**

@@ -88,29 +88,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException("Failed to create email message: " + e, e);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.mule.umo.transformer.UMOTransformer#setConnector(org.mule.umo.provider.Connector)
-     */
-    public void setEndpoint(UMOImmutableEndpoint endpoint)
-    {
-        if (endpoint == null)
-        {
-            super.setEndpoint(endpoint);
-        } else if( endpoint.getConnector() instanceof MailConnector || endpoint.getConnector() instanceof SmtpConnector
-         || endpoint.getConnector() instanceof Pop3Connector)
-        {
-            super.setEndpoint(endpoint);
-        }
-        else
-        {
-            throw new IllegalArgumentException("The endpoint connector for an Email transfromer must be of type: " + MailConnector.class.getName() +
-                    " or " + SmtpConnector.class.getName() +
-                    " or " + Pop3Connector.class.getName() +
-                    " not " + (endpoint.getConnector() == null ? "null" : endpoint.getConnector().getClass().getName()));
+            throw new TransformerException(this, e);
         }
     }
 
@@ -135,7 +113,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             }
             catch (AddressException e)
             {
-                throw new TransformerException("Failed to parse the from address: " + fromAddress + ". " + e.getMessage(), e);
+                throw new TransformerException(new org.mule.config.i18n.Message("email", 1, fromAddress), this, e);
             }
         }
         this.fromAddress = fromAddress;
@@ -184,7 +162,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
             }
             catch (AddressException e)
             {
-                throw new TransformerException("Failed to parse the to addresses: " + toAddress + ". " + e.getMessage(), e);
+                throw new TransformerException(new org.mule.config.i18n.Message("email", 2, toAddress), this, e);                
             }
         }
         this.toAddresses = toAddress;

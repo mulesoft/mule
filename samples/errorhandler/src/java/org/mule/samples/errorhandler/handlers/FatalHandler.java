@@ -18,8 +18,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.samples.errorhandler.ErrorMessage;
 import org.mule.samples.errorhandler.HandlerException;
-import org.mule.samples.errorhandler.exceptions.FatalException;
+import org.mule.umo.lifecycle.FatalException;
 import org.mule.util.StringMessageHelper;
+import org.mule.umo.lifecycle.FatalException;
 
 /**
  *  <code>FatalBehaviour</code> TODO (document class)

@@ -14,7 +14,7 @@
 package org.mule.providers.udp;
 
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 import java.io.ByteArrayInputStream;
@@ -34,7 +34,7 @@ public class UdpMessageAdapter extends AbstractMessageAdapter
 
     private byte[] message;
 
-    public UdpMessageAdapter(Object message) throws MessageException {
+    public UdpMessageAdapter(Object message) throws MessagingException {
         if(message instanceof DatagramPacket) {
             DatagramPacket dp = (DatagramPacket)message;
             this.message = new byte[dp.getLength()];

@@ -18,9 +18,12 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.MessagingException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>SelectiveConsumer</code> is an inbound router used to filter out unwanted events.
@@ -44,7 +47,7 @@ public class SelectiveConsumer implements UMOInboundRouter
 
     private RouterStatistics routerStatistics;
 
-    public boolean isMatch(UMOEvent event) throws RoutingException
+    public boolean isMatch(UMOEvent event) throws MessagingException
     {
         if(filter==null) return true;
         Object payload = null;
@@ -54,7 +57,7 @@ public class SelectiveConsumer implements UMOInboundRouter
                 payload = event.getTransformedMessage();
             } catch (TransformerException e)
             {
-                throw new RoutingException("Failed to transform message before applying the filter: " + e.getMessage(), e);
+                throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), event.getMessage(), event.getEndpoint(), e);
             }
         } else {
             payload = event.getMessage().getPayload();
@@ -62,7 +65,7 @@ public class SelectiveConsumer implements UMOInboundRouter
         return filter.accept(payload);
     }
 
-    public UMOEvent[] process(UMOEvent event) throws RoutingException
+    public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         if(isMatch(event)) {
             return new UMOEvent[]{event};

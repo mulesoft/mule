@@ -43,7 +43,7 @@ public class XmlToDomDocument extends AbstractTransformer
             return x3cDoc;
         } catch (Exception e)
         {
-            throw new TransformerException("Failed to create DOM Document: " + e, e);
+            throw new TransformerException(this, e);
         }
     }
 

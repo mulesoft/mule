@@ -147,7 +147,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 	 */
     public void exceptionThrown(Exception e)
     {
-        getConnector().handleException("Exception caught in ThreadPool: " + e.getMessage(), e);
+        getConnector().handleException(e);
 
     }
 
@@ -178,7 +178,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             {
                 //ignore
             }
-            getConnector().handleException("Failed to intercept doDispatch: " + e.getMessage(), e);
+            getConnector().handleException(e);
         } finally
         {
             if (disposeOnCompletion)

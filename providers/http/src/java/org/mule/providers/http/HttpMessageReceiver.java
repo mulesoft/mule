@@ -30,9 +30,11 @@ package org.mule.providers.http;
 import EDU.oswego.cs.dl.util.concurrent.ThreadFactory;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.ExceptionHelper;
+import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
@@ -44,9 +46,10 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.security.UMOSecurityException;
+import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.monitor.Expirable;
@@ -99,14 +102,13 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             responseTransformer = (AbstractEventAwareTransformer) ((AbstractConnector) connector).getDefaultResponseTransformer();
             if (responseTransformer == null)
             {
-                throw new InitialisationException("Response transformer is required for the http endpoint. Check the connector service descriptor");
+                throw new InitialisationException(new Message("http", 1), this);
             }
         }
         if(!responseTransformer.getReturnClass().equals(String.class) &&
                 !responseTransformer.getReturnClass().equals(byte[].class) &&
                 !responseTransformer.getReturnClass().equals(Object.class)) {
-            throw new InitialisationException("Response transformer for " + connector.getName() + " must return either " +
-                    "a String or byte[]");
+            throw new InitialisationException(new Message("http", 2, getConnector().getName()), this);
         }
         return responseTransformer;
     }
@@ -129,15 +131,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         super.doDispose();
     }
 
-    protected UMOMessage handleSecurtyException(UMOSecurityException e, UMOEvent event) {
-        UMOMessage result = super.handleSecurtyException(e, event);
-        if(e instanceof UnauthorisedException) {
-            result.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_UNAUTHORIZED);
-        } else {
-            result.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_INTERNAL_SERVER_ERROR);            
-        }
-        return result;
-    }
 
     private class HttpWorker extends TcpWorker implements Expirable
     {
@@ -221,7 +214,16 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         {
                             returnMessage = new MuleMessage("", null);
                         }
+
+                        //Do response code mapping
+                        //This is handled generically by handleExcetion method
+//                        if(returnMessage.getExceptionPayload()!=null) {
+//                            String responseCode = ExceptionHelper.getErrorMapping(connector.getProtocol(), returnMessage.getExceptionPayload().getCode());
+//                            returnMessage.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, Integer.parseInt(responseCode));
+//                            //returnMessage = new MuleMessage(returnMessage.getExceptionPayload().getMessage(), returnMessage.getProperties());
+//                        }
                         RequestContext.rewriteEvent(returnMessage);
+
                         Object response = responseTransformer.transform(returnMessage.getPayload());
                         if(response instanceof byte[]) {
                             dataOut.write((byte[])response);
@@ -238,9 +240,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             } catch (Exception e)
             {
                 keepAlive = false;
-                handleException("Failed to process tcp Request on: "
-                        + (socket != null ? socket.getInetAddress().toString() : "null"),
-                        e);
+                handleException(e);
             } finally
             {
                 if(keepAliveMonitor!=null) {

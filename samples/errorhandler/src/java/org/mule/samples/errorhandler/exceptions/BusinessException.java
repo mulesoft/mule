@@ -16,6 +16,7 @@
 package org.mule.samples.errorhandler.exceptions;
 
 import org.mule.umo.UMOException;
+import org.mule.config.i18n.Message;
 
 /**
  *  <code>BusinessException</code> TODO (document class)
@@ -39,7 +40,7 @@ public class BusinessException extends UMOException
      */
     public BusinessException(String message, Throwable cause)
     {
-        super(message, cause);
+        super(Message.createStaticMessage(message), cause);
     }
 
 }

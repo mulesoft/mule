@@ -13,7 +13,8 @@
  */
 package org.mule.config;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.queue.BoundedPersistentQueue;
 import org.mule.util.queue.PersistenceStrategy;
 

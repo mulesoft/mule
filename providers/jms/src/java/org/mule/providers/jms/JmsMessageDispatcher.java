@@ -17,6 +17,7 @@ package org.mule.providers.jms;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transaction.IllegalTransactionStateException;
@@ -28,6 +29,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.DispatchException;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -87,7 +89,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         boolean syncReceive = event.getBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY,
                         							   MuleManager.getConfiguration().isSynchronousReceive());
         if (tx != null && syncReceive) {
-        	throw new IllegalTransactionStateException("Jms connector does not support synchronous receive in transacted mode");
+        	throw new IllegalTransactionStateException(new org.mule.config.i18n.Message("jms", 2));
         }
 
         MessageConsumer replyToConsumer = null;
@@ -103,9 +105,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
          if (!(message instanceof Message))
         {
-            throw new MuleException("Message is not a JMS message, it is of type: "
-                    + message.getClass().getName()
-                    + ". Check the transformer for this Connector: "  + connector.getName());
+            throw new DispatchException(new org.mule.config.i18n.Message(Messages.MESSAGE_NOT_X_IT_IS_TYPE_X_CHECK_TRANSFORMER_ON_X,
+                            "JMS message", message.getClass().getName(), connector.getName()), event.getMessage(), event.getEndpoint());
         }
 
         Message msg = (Message) message;
@@ -243,7 +244,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         }
         catch (Exception e)
         {
-            throw new MuleException("Failed to get Jms session: " + e.getMessage(), e);
+            throw new MuleException(new org.mule.config.i18n.Message("jms", 3), e);
         }
     }
 

@@ -14,6 +14,7 @@
 package org.mule.util.queue;
 
 import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>PersistentQueueException</code> is thrown when a Mule persistent
@@ -26,12 +27,12 @@ import org.mule.MuleRuntimeException;
 
 public class PersistentQueueException extends MuleRuntimeException
 {
-    public PersistentQueueException(String message)
+    public PersistentQueueException(Message message)
     {
         super(message);
     }
 
-    public PersistentQueueException(String message, Throwable cause)
+    public PersistentQueueException(Message message, Throwable cause)
     {
         super(message, cause);
     }

@@ -96,7 +96,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends
 			throws Exception {
 
         UMODescriptor descriptor = new MuleDescriptor();
-        descriptor.setExceptionStrategy(new DefaultExceptionStrategy());
+        descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName("testComponent");
         descriptor.setImplementation(JdbcFunctionalTestComponent.class.getName());
 		

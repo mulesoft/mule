@@ -15,9 +15,10 @@ package org.mule.management.agents;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ModelEventListener;
 import org.mule.management.mbeans.ComponentService;
@@ -32,6 +33,7 @@ import org.mule.management.mbeans.StatisticsService;
 import org.mule.umo.UMOAgent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOServerEvent;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
@@ -107,7 +109,7 @@ public class JmxAgent implements UMOAgent
     {
         if (!locateServer && !createServer)
         {
-            throw new InitialisationException("At least one of createServer and locateServer property should be set to true");
+            throw new InitialisationException(new Message(Messages.JMX_CREATE_OR_LOCATE_SHOULD_BE_SET), this);
         }
         if (mBeanServer == null && locateServer)
         {
@@ -123,7 +125,7 @@ public class JmxAgent implements UMOAgent
         }
         if (mBeanServer == null)
         {
-            throw new InitialisationException("Could not locate nor create the MBeanServer");
+            throw new InitialisationException(new Message(Messages.JMX_CANT_LOCATE_CREATE_SERVER), this);
         }
         if (connectorServerUrl != null)
         {
@@ -133,7 +135,7 @@ public class JmxAgent implements UMOAgent
                 connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mBeanServer);
             } catch (Exception e)
             {
-                throw new InitialisationException("Could not create jmx connector", e);
+                throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jmx Connector"), e, this);
             }
         }
 
@@ -154,7 +156,7 @@ public class JmxAgent implements UMOAgent
                         registerComponentServices();
                     } catch (Exception e)
                     {
-                        throw new MuleRuntimeException("Could not register mbeans", e);
+                        throw new MuleRuntimeException(new Message(Messages.X_FAILED_TO_INITIALISE, "MBeans"), e);
                     }
                 }
             }
@@ -174,7 +176,7 @@ public class JmxAgent implements UMOAgent
                 connectorServer.start();
             } catch (Exception e)
             {
-                throw new JmxManagementException("Could not start jmx connector", e);
+                throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jmx Connector"), e);
             }
         }
     }
@@ -191,7 +193,7 @@ public class JmxAgent implements UMOAgent
                 connectorServer.stop();
             } catch (Exception e)
             {
-                throw new JmxManagementException("Could not stop jmx connector", e);
+                throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Jmx Connector"), e);                
             }
         }
     }

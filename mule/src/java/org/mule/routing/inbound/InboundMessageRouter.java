@@ -21,6 +21,7 @@ import org.mule.routing.AbstractRouterCollection;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.MessagingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
@@ -54,7 +55,7 @@ public class InboundMessageRouter extends AbstractRouterCollection implements
         super(RouterStatistics.TYPE_INBOUND);
     }
 
-    public UMOMessage route(UMOEvent event) throws RoutingException
+    public UMOMessage route(UMOEvent event) throws MessagingException
     {
         if (endpoints.size() > 0 && routers.size() == 0)
         {
@@ -149,8 +150,7 @@ public class InboundMessageRouter extends AbstractRouterCollection implements
                 }
             } catch (UMOException e)
             {
-                throw new RoutingException("Failed to send/dispatch event: "
-                        + e.getMessage(), e);
+                throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
             }
         }
         return (eventsToRoute != null && eventsToRoute.length > 0 ? eventsToRoute[eventsToRoute.length - 1].getMessage() : null);

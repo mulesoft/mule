@@ -29,17 +29,21 @@
 package org.mule.providers.vm;
 
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.provider.DispatchException;
 import org.mule.util.queue.BoundedPersistentQueue;
 
 
@@ -83,7 +87,7 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
                 }
             } catch (InterruptedException e)
             {
-                throw new MuleException("Failed to queue event: " + event.toString(), e);
+                throw new MuleException(new Message(Messages.INTERRUPTED_QUEUING_EVENT_FOR_X, this.endpoint.getEndpointURI()), e);
             }
         } else {
             //We get message duplication here without synchronization for some reason 3/100
@@ -128,7 +132,11 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
                 } catch (Exception e)
                 {
                     logger.error("Failed to dispatch event from VM receiver: " + e.getMessage(), e);
-                    connector.getExceptionStrategy().handleException("Failed to dispatch event from VM receiver: " + e.getMessage(), e);
+                    if(e instanceof UMOException) {
+                        connector.getExceptionListener().exceptionThrown(e);
+                    } else {
+                        connector.getExceptionListener().exceptionThrown(new DispatchException(event.getMessage(), event.getEndpoint(), e));
+                    }
                 } finally {
                     if(event!=null) {
                         queue.remove(event);

@@ -17,14 +17,18 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.DocumentResult;
 import org.dom4j.io.DocumentSource;
-import org.mule.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.Utility;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -62,7 +66,7 @@ public class XsltTransformer extends AbstractTransformer
             transformer = factory.newTransformer(source);
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to initialize XsltTransformer : " + e, e);
+            throw new InitialisationException(e, this);
         }
     }
 
@@ -100,7 +104,7 @@ public class XsltTransformer extends AbstractTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException("Failed to transform XML : " + e, e);
+            throw new TransformerException(this, e);
         }
     }
 
@@ -124,13 +128,13 @@ public class XsltTransformer extends AbstractTransformer
      * Returns the StreamSource corresponding to xslFile
      *
      * @return The StreamSource
-     * @throws Exception
+     * @throws InitialisationException
      */
-    private StreamSource getStreamSource() throws Exception
+    private StreamSource getStreamSource() throws InitialisationException
     {
 
         if (xslFile == null)
-            throw new TransformerException("Failed to initialize XsltTransformer : xslFile property is not set ");
+            throw new InitialisationException(new Message(Messages.X_IS_NULL, "xslFile"), this);
 
         File file = new File(xslFile);
         StreamSource source;
@@ -139,14 +143,15 @@ public class XsltTransformer extends AbstractTransformer
             source = new StreamSource(file);
         else
         {
-            InputStream stream = getClass().getClassLoader()
-                    .getResourceAsStream(xslFile);
-            if (stream != null)
-                source = new StreamSource(stream);
-            else
-                throw new TransformerException("Failed to initialize XsltTransformer : xslFile ("
-                        + getXslFile() + ") cannot be found ");
 
+            try
+            {
+                InputStream stream = Utility.loadResource(xslFile, getClass());
+                source = new StreamSource(stream);
+            } catch (IOException e)
+            {
+                 throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, xslFile), e, this);
+            }
         }
 
         return source;

@@ -31,7 +31,7 @@ import org.apache.axis.transport.http.ServletEndpointContextImpl;
 import org.apache.axis.utils.Admin;
 import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -45,6 +45,7 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.w3c.dom.Document;
 
 import javax.servlet.ServletException;
@@ -116,7 +117,7 @@ public class AxisServiceComponent implements Initialisable, Callable
      *         <li>the <code>setStopFurtherProcessing(true)</code> wasn't called on the previous context.</li>
      *         </ol>
      * @throws Exception if the context fails to process properly. If exceptions aren't handled by the implementation
-     *                   they will be handled by the exceptionStrategy associated with the component
+     *                   they will be handled by the exceptionListener associated with the component
      */
     public Object onCall(UMOEventContext context) throws Exception
     {

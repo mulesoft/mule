@@ -1,4 +1,4 @@
-connector=org.mule.providers.XmppConnector
+connector=org.mule.providers.xmpp.XmppConnector
 dispatcher.factory=org.mule.providers.xmpp.XmppMessageDispatcherFactory
 message.receiver=org.mule.providers.xmpp.XmppMessageReceiver
 message.adapter=org.mule.providers.xmpp.XmppMessageAdapter

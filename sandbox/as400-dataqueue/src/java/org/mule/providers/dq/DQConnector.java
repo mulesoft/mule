@@ -16,16 +16,19 @@ package org.mule.providers.dq;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.DataQueue;
@@ -188,7 +191,7 @@ public class DQConnector extends AbstractServiceEnabledConnector
                 format = DQMessageUtils.getRecordFormat(recordFormat, as400System);
             } catch (Exception e)
             {
-                throw new InitialisationException("Failed to load record format: " + recordFormat + ". Error is: " + e.getMessage(), e);
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Record Format: " + recordFormat), e, this);
             }
 
         }

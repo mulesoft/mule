@@ -18,18 +18,23 @@ import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.extras.acegi.AcegiAuthenticationAdapter;
 import org.mule.impl.security.AbstractEndpointSecurityFilter;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
-import org.mule.umo.security.UMOSecurityException;
+import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.security.UnsupportedAuthenticationSchemeException;
+import org.mule.umo.security.SecurityProviderNotFoundException;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
  * <code>HttpBasicAuthenticationFilter</code> TODO
@@ -62,7 +67,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
     {
         if(realm==null) {
             if(isRealmRequired()) {
-                throw new InitialisationException("The realm must be set on this security filter");
+                throw new InitialisationException(new Message(Messages.AUTH_REALM_MUST_SET_ON_FILTER), this);
             } else {
                 logger.warn("There is no security realm set, using default: null");
             }
@@ -94,10 +99,10 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
      * always populate the secure context in the session
      *
      * @param event the current message recieved
-     * @throws org.mule.umo.security.UMOSecurityException
+     * @throws org.mule.umo.security.SecurityException
      *          if authentication fails
      */
-    public void authenticateInbound(UMOEvent event) throws UMOSecurityException
+    public void authenticateInbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
     {
         String header = (String)event.getProperty(HttpConstants.HEADER_AUTHORIZATION);
 
@@ -135,7 +140,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
                         + " failed: " + e.toString());
                 }
                 setUnauthenticated(event);
-                throw new UnauthorisedException("Authentication failed for " + username + ": " + e.getMessage(),e);
+                throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, username),e);
             }
 
             // Authentication success
@@ -147,10 +152,10 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
             event.getSession().setSecurityContext(context);
         } else if(header==null) {
             setUnauthenticated(event);
-            throw new UnauthorisedException(event.getSession().getSecurityContext(), getEndpoint(), this);
+            throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(), getEndpoint(), this);
         } else {
             setUnauthenticated(event);
-            throw new UnsupportedAuthenticationSchemeException("Http Basic filter doesn't know how to handle header: " + header);
+            throw new UnsupportedAuthenticationSchemeException(new Message("acegi", 1, header), event.getMessage());
         }
     }
 
@@ -168,14 +173,14 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
      * always populate the secure context in the session
      *
      * @param event the current event being dispatched
-     * @throws org.mule.umo.security.UMOSecurityException
+     * @throws org.mule.umo.security.SecurityException
      *          if authentication fails
      */
-    public void authenticateOutbound(UMOEvent event) throws UMOSecurityException
+    public void authenticateOutbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException
     {
         if(event.getSession().getSecurityContext()==null) {
             if(isAuthenticate()) {
-                throw new UnauthorisedException(event.getSession().getSecurityContext(), event.getEndpoint(), this);
+                throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(), event.getEndpoint(), this);
             } else {
                 return;
             }

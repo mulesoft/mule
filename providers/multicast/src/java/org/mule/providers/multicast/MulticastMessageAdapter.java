@@ -14,7 +14,7 @@
 package org.mule.providers.multicast;
 
 import org.mule.providers.udp.UdpMessageAdapter;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 /**
  * <code>MulticastMessageAdapter</code> TODO
  *
@@ -24,7 +24,7 @@ import org.mule.umo.MessageException;
 
 public class MulticastMessageAdapter extends UdpMessageAdapter
 {
-    public MulticastMessageAdapter(Object message) throws MessageException {
+    public MulticastMessageAdapter(Object message) throws MessagingException {
         super(message);
     }
 }

@@ -13,8 +13,8 @@
     </stackTrace>
   </cause>
   <detailMessage>Some fatal exception</detailMessage>
-  <exceptionClass>org.mule.samples.errorhandler.exceptions.FatalException</exceptionClass>
-  <originalException class="org.mule.samples.errorhandler.exceptions.FatalException">
+  <exceptionClass>org.mule.umo.lifecycle.FatalException</exceptionClass>
+  <originalException class="org.mule.umo.lifecycle.FatalException">
     <cause class="java.io.IOException" reference="../../cause/originalException"/>
     <detailMessage>Some fatal exception</detailMessage>
   </originalException>

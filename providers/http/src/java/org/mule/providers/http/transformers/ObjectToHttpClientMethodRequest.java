@@ -17,6 +17,8 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
@@ -58,7 +60,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
     {
         String endpoint = (String) context.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
         if(endpoint==null) {
-            throw new TransformerException("Endpoint property is not set, this transformer should not be used before a dispatcher has been invoked");
+            throw new TransformerException(new Message(Messages.EVENT_PROPERTY_X_NOT_SAT_CANT_PROCESS_REQUEST, MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
         String method = (String) context.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
 
@@ -139,7 +141,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             return httpMethod;
         } catch (Exception e)
         {
-            throw new TransformerException("Failed to create Http request: " + e.getMessage(), e);
+            throw new TransformerException(this, e);
         }
     }
 }

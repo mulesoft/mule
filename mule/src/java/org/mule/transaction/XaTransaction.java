@@ -25,8 +25,10 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
 
 /**
  * <p><code>XaTransaction</code> represents an XA transaction in Mule.
@@ -57,25 +59,25 @@ public class XaTransaction extends AbstractTransaction implements UMOTransaction
     /* (non-Javadoc)
      * @see org.mule.umo.UMOTransaction#begin()
      */
-    protected void doBegin() throws UMOTransactionException
+    protected void doBegin() throws TransactionException
     {
         TransactionManager txManager = MuleManager.getInstance().getTransactionManager();
         if (txManager == null)
         {
-            throw new IllegalStateException("A transaction manager must be set on the Mule Manager");
+            throw new IllegalStateException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Transaction Manager").getMessage());
         }
     	try {
     		txManager.begin();
         	transaction = txManager.getTransaction();
     	} catch (Exception e) {
-    		throw new UMOTransactionException("Can not start xa transaction", e);
+    		throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "XA"), e);
     	}
     }
 
     /* (non-Javadoc)
      * @see org.mule.umo.UMOTransaction#commit()
      */
-    protected void doCommit() throws UMOTransactionException
+    protected void doCommit() throws TransactionException
     {
         try
         {
@@ -83,15 +85,15 @@ public class XaTransaction extends AbstractTransaction implements UMOTransaction
         }
         catch (RollbackException e)
         {
-            throw new TransactionRollbackException("transaction has already been marked for rollback", e);
+            throw new TransactionRollbackException(new Message(Messages.TX_MARKED_FOR_ROLLBACK), e);
         }
         catch (HeuristicRollbackException e)
         {
-            throw new TransactionRollbackException("transaction has already been marked for rollback", e);
+            throw new TransactionRollbackException(new Message(Messages.TX_MARKED_FOR_ROLLBACK), e);
         }
         catch (Exception e)
         {
-            throw new IllegalTransactionStateException("Transaction could not be committed: " + e, e);
+            throw new IllegalTransactionStateException(new Message(Messages.TX_COMMIT_FAILED), e);
         }
     }
 
@@ -106,7 +108,7 @@ public class XaTransaction extends AbstractTransaction implements UMOTransaction
         }
         catch (SystemException e)
         {
-            throw new TransactionRollbackException("Failed to roll back: " + e.getMessage(), e);
+            throw new TransactionRollbackException(e);
         }
 
     }
@@ -125,7 +127,7 @@ public class XaTransaction extends AbstractTransaction implements UMOTransaction
         }
         catch (SystemException e)
         {
-            throw new TransactionStatusException("Unable to read transaction state: " + e.getMessage(), e);
+            throw new TransactionStatusException(e);
         }
     }
 
@@ -161,12 +163,12 @@ public class XaTransaction extends AbstractTransaction implements UMOTransaction
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#enlistResource(java.lang.Object, java.lang.Object)
 	 */
-	public void bindResource(Object key, Object resource) throws UMOTransactionException {
+	public void bindResource(Object key, Object resource) throws TransactionException {
 		if (resources == null) {
 			resources = new HashMap();
 		}
 		if (resources.containsKey(key)) {
-			throw new IllegalTransactionStateException("A resource has already been enlisted for key: " + key);
+			throw new IllegalTransactionStateException(new Message(Messages.TX_RESOURCE_ALREADY_LISTED_FOR_KEY_X, key));
 		}
 		resources.put(key, resource);
 	}

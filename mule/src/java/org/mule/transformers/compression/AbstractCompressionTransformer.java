@@ -74,7 +74,7 @@ public abstract class AbstractCompressionTransformer extends AbstractTransformer
         }
         catch (IOException e)
         {
-            throw new TransformerException("Failed to compress message", e);
+            throw new TransformerException(this, e);
         }
 
     }

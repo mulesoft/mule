@@ -14,11 +14,16 @@
  */
 package org.mule.extras.picocontainer;
 
-import org.mule.umo.model.ComponentNotFoundException;
-import org.mule.umo.model.UMOContainerContext;
-import org.mule.umo.model.ComponentResolverException;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.ContainerException;
 import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.manager.ContainerException;
 import org.nanocontainer.integrationkit.ContainerBuilder;
 import org.nanocontainer.integrationkit.PicoCompositionException;
 import org.nanocontainer.script.ScriptedContainerBuilderFactory;
@@ -54,7 +59,7 @@ public class PicoContainerContext implements UMOContainerContext
     /* (non-Javadoc)
      * @see org.mule.model.UMOContainerContext#getComponent(java.lang.Object)
      */
-    public Object getComponent(Object key) throws ComponentNotFoundException
+    public Object getComponent(Object key) throws ObjectNotFoundException
     {
         if (container == null)
         {
@@ -62,7 +67,7 @@ public class PicoContainerContext implements UMOContainerContext
         }
         if (key == null)
         {
-            throw new ComponentNotFoundException("Component not found for null key");
+            throw new ObjectNotFoundException("Component not found for null key");
         }
         Object component = null;
         if (key instanceof String)
@@ -82,7 +87,7 @@ public class PicoContainerContext implements UMOContainerContext
 
         if (component == null)
         {
-            throw new ComponentNotFoundException("Component not found for key: " + key.toString());
+            throw new ObjectNotFoundException("Component not found for key: " + key.toString());
         }
         return component;
     }
@@ -124,7 +129,7 @@ public class PicoContainerContext implements UMOContainerContext
         }
     }
 
-    public void configure(Reader configuration, Map configurationProperties) throws ComponentResolverException {
+    public void configure(Reader configuration, Map configurationProperties) throws ContainerException {
         String extension = (String)configurationProperties.get(CONFIGEXTENSION);
         if (extension == null) {
             extension = ScriptedContainerBuilderFactory.XML;
@@ -134,7 +139,7 @@ public class PicoContainerContext implements UMOContainerContext
         doConfigure(configuration, className);
     }
 
-    protected void doConfigure(Reader configReader, String builderClassName) throws ComponentResolverException {
+    protected void doConfigure(Reader configReader, String builderClassName) throws ContainerException {
         org.picocontainer.defaults.ObjectReference containerRef = new SimpleReference();
         org.picocontainer.defaults.ObjectReference parentContainerRef = new SimpleReference();
         ScriptedContainerBuilderFactory scriptedContainerBuilderFactory =
@@ -142,7 +147,7 @@ public class PicoContainerContext implements UMOContainerContext
         try {
             scriptedContainerBuilderFactory = new ScriptedContainerBuilderFactory(configReader, builderClassName, Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
-            throw new ComponentResolverException("could not configure pico", e);
+            throw new ContainerException(new Message(Messages.FAILED_TO_CONFIGURE_CONTAINER), e);
         }
 
         ContainerBuilder builder = scriptedContainerBuilderFactory.getContainerBuilder();

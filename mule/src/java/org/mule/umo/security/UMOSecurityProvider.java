@@ -29,7 +29,7 @@ public interface UMOSecurityProvider extends Initialisable
 
     public String getName();
 
-    public UMOAuthentication authenticate(UMOAuthentication authentication) throws UMOSecurityException;
+    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException;
 
     public boolean supports(Class aClass);
 

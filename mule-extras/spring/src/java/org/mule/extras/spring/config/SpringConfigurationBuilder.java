@@ -17,6 +17,8 @@ package org.mule.extras.spring.config;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManager;
 import org.springframework.util.StringUtils;
@@ -39,6 +41,7 @@ import java.io.Reader;
 public class SpringConfigurationBuilder implements ConfigurationBuilder
 {
     /**
+     * 
      * Will configure a UMOManager based on the configurations made available through Readers
      *
      * @param configResources an array of Readers
@@ -54,7 +57,7 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
     public UMOManager configure(String configResource) throws ConfigurationException
     {
         if(configResource==null) {
-            throw new ConfigurationException("Configuration resource cannot be null");
+            throw new ConfigurationException(new Message(Messages.X_IS_NULL, "Configuration Resource"));
         }
         String[] resources = StringUtils.tokenizeToStringArray(configResource, ",;", true, true);
 
@@ -65,7 +68,7 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
             MuleManager.getInstance().start();
         } catch (UMOException e)
         {
-            throw new ConfigurationException("Failed to start Mule server from builder: " + e.getMessage(), e);
+            throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X, "Mule server from builder"), e);
         }
         return MuleManager.getInstance();
     }

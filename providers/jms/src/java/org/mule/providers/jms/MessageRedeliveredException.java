@@ -14,21 +14,22 @@
  */
 package org.mule.providers.jms;
 
-import org.mule.umo.UMOException;
+import org.mule.umo.MessagingException;
 
+import javax.jms.Message;
 import javax.jms.Session;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class MessageRedeliveredException extends UMOException
+public class MessageRedeliveredException extends MessagingException
 {
     private Session session;
 
-    public MessageRedeliveredException(String message, Session session)
+    public MessageRedeliveredException(Message jmsMessage, Session session)
     {
-        super(message);
+        super(new org.mule.config.i18n.Message("jms", 7), jmsMessage);
         this.session = session;
     }
 

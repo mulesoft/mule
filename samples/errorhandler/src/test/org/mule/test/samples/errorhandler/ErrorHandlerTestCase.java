@@ -13,11 +13,14 @@
 package org.mule.test.samples.errorhandler;
 
 import org.mule.MuleException;
+import org.mule.config.i18n.Message;
+import org.mule.umo.lifecycle.FatalException;
 import org.mule.samples.errorhandler.ExceptionBean;
 import org.mule.samples.errorhandler.exceptions.BusinessException;
-import org.mule.samples.errorhandler.exceptions.FatalException;
+import org.mule.umo.lifecycle.FatalException;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.lifecycle.FatalException;
 import org.mule.util.Utility;
 
 import java.io.IOException;
@@ -41,8 +44,8 @@ public class ErrorHandlerTestCase {
 
         ObjectToXml trans = new ObjectToXml();
         MuleException exception =
-            new MuleException("Some default exception");
-        FatalException fatal = new FatalException("Some fatal exception", new IOException("Some IO exception"));
+            new MuleException(Message.createStaticMessage("Some default exception"));
+        FatalException fatal = new FatalException(Message.createStaticMessage("Some fatal exception"), new IOException("Some IO exception"));
         BusinessException business = new BusinessException("Some business exception");
         
         ExceptionBean bean = new ExceptionBean(exception);

@@ -19,7 +19,7 @@ import org.mule.model.MuleContainerContext;
 import org.mule.tck.model.AbstractComponentResolverTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.manager.UMOContainerContext;
 
 /**
  * <p><code>MuleContainerContextTestCase</code> TODO (document class)
@@ -63,7 +63,7 @@ public class MuleContainerContextTestCase extends AbstractComponentResolverTestC
 //            resolver.resolveComponents(new Object(), d.getObjectReferences());
 //            fail("Should barf if component isn't a class name");
 //        }
-//        catch (ComponentResolverException e)
+//        catch (ContainerException e)
 //        {
 //            // expected
 //        }

@@ -14,7 +14,7 @@
 package org.mule.providers.soap.axis;
 
 import org.apache.axis.handlers.soap.SOAPService;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>AxisInitialisable</code> can be implemented by a Mule component that will

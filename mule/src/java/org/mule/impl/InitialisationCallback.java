@@ -13,7 +13,8 @@
  */
 package org.mule.impl;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>InitialisationCallback</code> is used to provide customised initialiation

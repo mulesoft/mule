@@ -13,8 +13,10 @@
  */
 package org.mule.config.pool;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleProxy;
 import org.mule.umo.UMOException;
@@ -65,8 +67,7 @@ public abstract class AbstractProxyFactory implements ObjectFactory
                 String refName = reference.substring(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL.length());
                 component = descriptor.getProperties().get(refName);
                 if(component==null) {
-                    throw new InitialisationException("Component implementation type is 'local' but no property called "
-                            + refName + " is set on the descriptor called " + descriptor.getName());
+                    throw new InitialisationException(new Message(Messages.NO_LOCAL_IMPL_X_SET_ON_DESCRIPTOR_X, refName, descriptor.getName()), this);
                 }
             }
 
@@ -82,7 +83,7 @@ public abstract class AbstractProxyFactory implements ObjectFactory
                         component = ClassHelper.instanciateClass(reference, new Object[]{});
                     } catch (Exception e)
                     {
-                        throw new InitialisationException("Failed to instanciate non-container managed object reference: " + reference + ". " + e.getMessage(), e);
+                        throw new InitialisationException(new Message(Messages.CANT_INSTANCIATE_NON_CONTAINER_REF_X, reference), e, descriptor);
                     }
                 }
             }

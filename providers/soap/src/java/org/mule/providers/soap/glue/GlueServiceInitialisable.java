@@ -15,7 +15,7 @@ package org.mule.providers.soap.glue;
 
 import electric.glue.context.ServiceContext;
 import electric.service.IService;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>GlueServiceInitialisable</code> registers your service component to be

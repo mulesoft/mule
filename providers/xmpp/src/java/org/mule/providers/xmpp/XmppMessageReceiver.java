@@ -25,16 +25,19 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
-import org.mule.DisposeException;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.DisposeException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.config.i18n.Messages;
 
 import java.net.URI;
 
@@ -104,7 +107,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements
 
         } catch (XMPPException e)
         {
-            throw new InitialisationException("Failed to make xmpp connection: " + e.getMessage(), e);
+            throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X, "Xmpp Connection"), e, this);
         }
     }
 
@@ -122,10 +125,9 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements
 
         } catch (Exception e)
         {
-            throw new DisposeException("Failed to close http port: "
-                    + e.getMessage(), e);
+            throw new DisposeException(e, this);
         }
-        logger.info("Closed Tcp port");
+        logger.info("Closed Xmpp connection");
     }
 
     protected Runnable createWorker(Message message)
@@ -183,8 +185,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements
                 }
             } catch (Exception e)
             {
-                handleException(
-                        "Something bad happened processing xmpp message: ", e);
+                handleException(e);
             }
         }
     }

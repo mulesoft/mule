@@ -16,9 +16,11 @@ package org.mule.extras.plexus;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.Embedder;
 import org.mule.config.ConfigurationException;
-import org.mule.umo.model.ComponentNotFoundException;
-import org.mule.umo.model.ComponentResolverException;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.Utility;
 
 import java.io.Reader;
@@ -47,11 +49,11 @@ public class PlexusContainerContext implements UMOContainerContext
         this.container = container;
     }
 
-    public Object getComponent(Object key) throws ComponentNotFoundException
+    public Object getComponent(Object key) throws ObjectNotFoundException
     {
         if (key == null)
         {
-            throw new ComponentNotFoundException("Component not found for null key");
+            throw new ObjectNotFoundException("Component not found for null key");
         }
         try
         {
@@ -59,11 +61,11 @@ public class PlexusContainerContext implements UMOContainerContext
             return container.lookup(compKey);
         } catch (ComponentLookupException e)
         {
-            throw new ComponentNotFoundException("could not load component", e);
+            throw new ObjectNotFoundException("could not load component", e);
         }
     }
 
-    public void configure(Reader configuration, Map configurationProperties) throws ComponentResolverException
+    public void configure(Reader configuration, Map configurationProperties) throws ContainerException
     {
         try
         {
@@ -71,7 +73,7 @@ public class PlexusContainerContext implements UMOContainerContext
             container.start();
         } catch (Exception e)
         {
-            throw new ComponentResolverException("problem configuring and starting container", e);
+            throw new ContainerException(new Message(Messages.FAILED_TO_CONFIGURE_CONTAINER), e);
         }
     }
 
@@ -89,7 +91,7 @@ public class PlexusContainerContext implements UMOContainerContext
             container.start();
         } catch (Exception e)
         {
-            throw new ConfigurationException("Failed to initialise plexus container using URL: " + this.configFile);
+            throw new ConfigurationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Plexus container", this.configFile));
         }
     }
 
@@ -101,7 +103,7 @@ public class PlexusContainerContext implements UMOContainerContext
         URL url = Utility.getResource(configFile, getClass());
         if (url == null)
         {
-            throw new ConfigurationException("Failed to load config from file or classpath: " + configFile);
+            throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configFile));
         }
         setConfigFile(url);
     }

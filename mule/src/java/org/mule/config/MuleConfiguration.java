@@ -161,6 +161,8 @@ public class MuleConfiguration
 
     private Manifest manifest = null;
 
+    private boolean clientMode = false;
+
     public MuleConfiguration()
     {
 
@@ -377,4 +379,11 @@ public class MuleConfiguration
         this.transactionTimeout = transactionTimeout;
     }
 
+    public boolean isClientMode() {
+        return clientMode;
+    }
+
+    public void setClientMode(boolean clientMode) {
+        this.clientMode = clientMode;
+    }
 }

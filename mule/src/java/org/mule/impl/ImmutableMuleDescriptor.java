@@ -16,20 +16,22 @@
 package org.mule.impl;
 
 import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
+import org.mule.umo.manager.ContainerException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.model.ComponentNotFoundException;
-import org.mule.umo.model.ComponentResolverException;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.ContainerException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
@@ -40,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.beans.ExceptionListener;
 
 /**
  * <code>MuleDescriptor</code>  describes all the properties for a Mule UMO.  New Mule UMOs
@@ -69,7 +72,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     /**
      * holds the exception stategy for this UMO
      */
-    protected UMOExceptionStrategy exceptionStrategy = null;
+    protected ExceptionListener exceptionListener = null;
 
     /**
      * The implementationReference used to create the Object UMO instance
@@ -165,7 +168,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         threadingProfile = descriptor.getThreadingProfile();
         poolingProfile = descriptor.getPoolingProfile();
         queueProfile = descriptor.getQueueProfile();
-        exceptionStrategy = descriptor.getExceptionStrategy();
+        exceptionListener = descriptor.getExceptionListener();
     }
 
     /**
@@ -179,11 +182,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     }
 
     /* (non-Javadoc)
-     * @see org.mule.umo.UMODescriptor#getExceptionStrategy()
+     * @see org.mule.umo.UMODescriptor#getExceptionListener()
      */
-    public UMOExceptionStrategy getExceptionStrategy()
+    public ExceptionListener getExceptionListener()
     {
-        return exceptionStrategy;
+        return exceptionListener;
     }
 
     /* (non-Javadoc)
@@ -316,7 +319,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
                     }
                 } else
                 {
-                    throw new MuleException("No component implementation found as local reference using: " + impl);
+                    throw new MuleException(new Message(Messages.NO_COMPONENT_FOR_LOCAL_REFERENCE, impl));
                 }
             } else {
                 implClass = getImplementationForReference(impl);
@@ -336,7 +339,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * @param reference the reference to use when resolving the component
      * @return the Implementation of the component
      */
-    protected Class getImplementationForReference(String reference) throws ComponentNotFoundException, ComponentResolverException
+    protected Class getImplementationForReference(String reference) throws ObjectNotFoundException, ContainerException
     {
         Class clazz = null;
         try

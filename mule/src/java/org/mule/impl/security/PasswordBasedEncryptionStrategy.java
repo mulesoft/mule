@@ -15,17 +15,18 @@ package org.mule.impl.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
+import sun.misc.BASE64Encoder;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
-
-import sun.misc.BASE64Encoder;
 
 /**
  * <code>PasswordBasedEncryptionStrategy</code> uses password-based encryption to
@@ -62,17 +63,18 @@ public class PasswordBasedEncryptionStrategy implements UMOEncryptionStrategy
     public void initialise() throws InitialisationException
     {
         if(algorithm==null) {
-            throw new InitialisationException("PBE algorithm cannot be null");
+            throw new InitialisationException(new Message(Messages.X_IS_NULL, "PBE Algorithm"), this);
         } else {
             logger.debug("Using encryption algorithm: " + algorithm);
         }
         if(salt==null) {
             salt = new byte[]{(byte)0xc7, (byte)0x73, (byte)0x21, (byte)0x8c,
                                 (byte)0x7e, (byte)0xc8, (byte)0xee, (byte)0x99};
+            logger.debug("Salt is not set. Using default salt");
         }
 
         if(password==null) {
-            throw new InitialisationException("PBE password cannot be null");
+            throw new InitialisationException(new Message(Messages.X_IS_NULL, "Password"), this);
         }
         pbeParamSpec = new PBEParameterSpec(salt, iterationCount);
         pbeKeySpec = new PBEKeySpec(password);
@@ -88,11 +90,11 @@ public class PasswordBasedEncryptionStrategy implements UMOEncryptionStrategy
             decryptCipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParamSpec);
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to create PBE encryption ciphers: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "PBE encryption ciphers"), e, this);
         }
     }
 
-    public byte[] encrypt(byte[] data) throws CryptoFailureException
+    public byte[] encrypt(byte[] data, Object info) throws CryptoFailureException
     {
         try
         {
@@ -104,11 +106,11 @@ public class PasswordBasedEncryptionStrategy implements UMOEncryptionStrategy
             }
         } catch (Exception e)
         {
-            throw new CryptoFailureException(e.getMessage(), e, this);
+            throw new CryptoFailureException(this, e);
         }
     }
 
-    public byte[] decrypt(byte[] data) throws CryptoFailureException
+    public byte[] decrypt(byte[] data, Object info) throws CryptoFailureException
     {
         try
         {
@@ -119,7 +121,7 @@ public class PasswordBasedEncryptionStrategy implements UMOEncryptionStrategy
             return decryptCipher.doFinal(dec);
         } catch (Exception e)
         {
-            throw new CryptoFailureException(e.getMessage(), e, this);
+            throw new CryptoFailureException(this, e);
         }
     }
 

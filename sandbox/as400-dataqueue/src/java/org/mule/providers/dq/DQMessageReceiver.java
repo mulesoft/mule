@@ -14,13 +14,16 @@
 package org.mule.providers.dq;
 
 import org.apache.commons.lang.StringUtils;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.DataQueue;
@@ -50,7 +53,7 @@ public class DQMessageReceiver extends PollingMessageReceiver
         if(recordDescriptor==null) {
             format = ((DQConnector)connector).getFormat();
             if(format==null) {
-                throw new InitialisationException("The recordDescriptor cannot be null and should be set on the endpoint of connector");
+                throw new InitialisationException(new Message("dq", 1), this);
             }
         } else {
             try
@@ -59,8 +62,7 @@ public class DQMessageReceiver extends PollingMessageReceiver
                 format = DQMessageUtils.getRecordFormat(recordDescriptor, pAs400);
             } catch (Exception e)
             {
-                throw new InitialisationException("Failed to load the recordDescriptor: " + recordDescriptor,
-                        e);
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "recordDescriptor: " + recordDescriptor), e, this);
             }
         }
     }
@@ -83,7 +85,7 @@ public class DQMessageReceiver extends PollingMessageReceiver
 
         } catch (Exception e)
         {
-            handleException("Exception occurred while polling", e);
+            handleException(e);
         }
 
     }

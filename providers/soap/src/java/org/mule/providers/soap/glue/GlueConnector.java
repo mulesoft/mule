@@ -15,9 +15,13 @@ package org.mule.providers.soap.glue;
 
 import electric.server.http.HTTP;
 import org.mule.MuleException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.LifecycleException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -65,7 +69,7 @@ public class GlueConnector extends AbstractServiceEnabledConnector
             serverEndpoints.clear();
         } catch (IOException e)
         {
-            throw new MuleException("Failed to shutdown server for url:" + endpoint + ": " + e.getMessage(), e);
+            throw new LifecycleException(new Message("soap", 1, endpoint), e, this);
         }
     }
 
@@ -76,7 +80,7 @@ public class GlueConnector extends AbstractServiceEnabledConnector
 
         if (endpoint.getEndpointURI() == null)
         {
-            throw new MuleException("Endpoint cannot be null when registering a listener");
+            throw new InitialisationException(new Message(Messages.ENDPOINT_NULL_FOR_LISTENER), this);
         }
         UMOMessageReceiver receiver = null;
 

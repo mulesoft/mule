@@ -63,7 +63,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         Mock connector = getMockConnector();
         Mock session = getMockSession();
         UMOEndpoint endpoint = getTestEndpoint("test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
-        connector.expectAndReturn("getExceptionStrategy", descriptor.getExceptionStrategy());
+        connector.expectAndReturn("getExceptionListener", descriptor.getExceptionListener());
         receiver.create((UMOConnector) connector.proxy(), getTestComponent(descriptor), endpoint);
         assertNotNull(receiver.getComponent());
         assertNotNull(receiver.getConnector());

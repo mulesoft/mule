@@ -250,7 +250,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         UMOConnector umoCnn = manager.lookupConnector(CONNECTOR_NAME);
         //Set the test Exception strategy
-        umoCnn.setExceptionStrategy(new RollbackExceptionHandler(countDown));
+        umoCnn.setExceptionListener(new RollbackExceptionListener(countDown));
 
         //Start the server
         manager.start();
@@ -358,7 +358,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
         UMOConnector umoCnn = manager.lookupConnector(CONNECTOR_NAME);
         //Set the test Exception strategy
-        umoCnn.setExceptionStrategy(new RollbackExceptionHandler(countDown));
+        umoCnn.setExceptionListener(new RollbackExceptionListener(countDown));
 
         //Start the server
         manager.start();
@@ -414,7 +414,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
     public static UMODescriptor getDescriptor(String name, String implementation)
     {
         UMODescriptor descriptor = new MuleDescriptor();
-        descriptor.setExceptionStrategy(new DefaultExceptionStrategy());
+        descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName(name);
         descriptor.setImplementation(implementation);
         return descriptor;
@@ -502,11 +502,11 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
     public abstract UMOConnector createConnector() throws Exception;
 
-    private class RollbackExceptionHandler extends DefaultExceptionStrategy
+    private class RollbackExceptionListener extends DefaultExceptionStrategy
     {
         private CountDown countDown;
 
-        public RollbackExceptionHandler(CountDown countDown)
+        public RollbackExceptionListener(CountDown countDown)
         {
             this.countDown = countDown;
         }

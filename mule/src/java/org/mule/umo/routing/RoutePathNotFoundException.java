@@ -13,6 +13,10 @@
  */
 package org.mule.umo.routing;
 
+import org.mule.config.i18n.Message;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+
 /**
  * <code>RoutePathNotFoundException</code> is thrown if a routing path for an event
  * cannot be found.  This can be caused if there is no (or no matching) endpoint for
@@ -23,13 +27,23 @@ package org.mule.umo.routing;
  */
 public class RoutePathNotFoundException extends RoutingException
 {
-    public RoutePathNotFoundException(String message)
+    public RoutePathNotFoundException(UMOMessage message, UMOEndpoint endpoint)
     {
-        super(message);
+        super(message, endpoint);
     }
 
-    public RoutePathNotFoundException(String message, Throwable cause)
+    public RoutePathNotFoundException(UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
     {
-        super(message, cause);
+        super(umoMessage, endpoint, cause);
+    }
+
+    public RoutePathNotFoundException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
+    {
+        super(message, umoMessage, endpoint);
+    }
+
+    public RoutePathNotFoundException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    {
+        super(message, umoMessage, endpoint, cause);
     }
 }

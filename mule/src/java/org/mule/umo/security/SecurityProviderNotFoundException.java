@@ -13,6 +13,11 @@
  */
 package org.mule.umo.security;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
+
 /**
  * <code>SecurityProviderNotFoundException</code> is thrown by the UMOSecurityManager
  * when an authentication request is made but no suitable security provider can be
@@ -21,22 +26,15 @@ package org.mule.umo.security;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class SecurityProviderNotFoundException extends UMOSecurityException
+public class SecurityProviderNotFoundException extends UMOException
 {
-    /**
-     * @param message the exception message
-     */
-    public SecurityProviderNotFoundException(String message)
+    public SecurityProviderNotFoundException(String providerName)
     {
-        super(message);
+        super(new Message(Messages.AUTH_NO_SECURITY_PROVIDER_X, providerName));
     }
 
-    /**
-     * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
-     */
-    public SecurityProviderNotFoundException(String message, Throwable cause)
+    public SecurityProviderNotFoundException(String providerName, Throwable cause)
     {
-        super(message, cause);
+        super(new Message(Messages.AUTH_NO_SECURITY_PROVIDER_X, providerName), cause);
     }
 }

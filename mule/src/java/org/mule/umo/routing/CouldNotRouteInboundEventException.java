@@ -14,6 +14,9 @@
 package org.mule.umo.routing;
 
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>CouldNotRouteInboundEventException</code> thrown if the current component cannot
@@ -25,24 +28,23 @@ import org.mule.umo.UMOEvent;
 
 public class CouldNotRouteInboundEventException extends RoutingException
 {
-    private UMOEvent event;
-
-    public CouldNotRouteInboundEventException(String message, UMOEvent event)
+    public CouldNotRouteInboundEventException(UMOMessage message, UMOEndpoint endpoint)
     {
-        super(message);
-        this.event = event;
+        super(message, endpoint);
     }
 
-    public CouldNotRouteInboundEventException(String message, Throwable cause, UMOEvent event)
+    public CouldNotRouteInboundEventException(UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
     {
-        super(message, cause);
-        this.event = event;
+        super(umoMessage, endpoint, cause);
     }
 
-    public UMOEvent getEvent()
+    public CouldNotRouteInboundEventException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
     {
-        return event;
+        super(message, umoMessage, endpoint);
     }
 
-
+    public CouldNotRouteInboundEventException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    {
+        super(message, umoMessage, endpoint, cause);
+    }
 }

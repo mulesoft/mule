@@ -101,9 +101,9 @@ public interface UMOEventContext
     /**
      * Mark the current transaction (if any) for rollback
      * 
-     * @throws UMOTransactionException
+     * @throws TransactionException
      */
-    public void markTransactionForRollback() throws UMOTransactionException;
+    public void markTransactionForRollback() throws TransactionException;
 
 
     /**

@@ -53,7 +53,7 @@ public class XmlToDQMessage extends AbstractTransformer {
 			return msg;
 
 		} catch (Exception e) {
-			throw new TransformerException("Failed to transform ", e);
+			throw new TransformerException(this, e);
 		}
 	}
 

@@ -17,6 +17,7 @@ package org.mule.providers.jms.transformers;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
@@ -65,7 +66,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
     {
         if (session == null && this.session == null)
         {
-            throw new TransformerException("AbstractMessageDispatcher cannot be null when transforming to a JMS payload");
+            throw new TransformerException(new org.mule.config.i18n.Message("jms", 1), this);
         }
         if (session != null)
         {
@@ -73,7 +74,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         }
         if (src == null)
         {
-            throw new TransformerException("Cannot transform 'null' JMS Message into an object");
+            throw new TransformerException(new org.mule.config.i18n.Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "null", "Object"), this);
         }
         Object ret = transform(src);
         if (logger.isDebugEnabled())
@@ -154,7 +155,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
          //   }
         } catch (Exception e)
         {
-            throw new TransformerException("Failed to transform message: " + e, e);
+            throw new TransformerException(this, e);
         }
     }
 
@@ -193,7 +194,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
             }
         } catch (Exception e)
         {
-            throw new TransformerException("Failed to transform message: " + e.getMessage());
+            throw new TransformerException(this, e);
         }
         return result;
     }

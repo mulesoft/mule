@@ -14,9 +14,12 @@
 package org.mule.management.agents;
 
 import org.apache.log4j.jmx.HierarchyDynamicMBean;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.UMOAgent;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.Message;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -64,7 +67,7 @@ public class Log4jAgent implements UMOAgent {
 			//mBeanServer.registerMBean(new HierarchyMBeanImpl(), new ObjectName("Log4j:type=Hierarchy"));
 			mBeanServer.registerMBean(new HierarchyDynamicMBean(), new ObjectName("log4j:type=Hierarchy"));
 		} catch (Exception e) {
-			throw new InitialisationException("Could not start mx4j agent", e);
+			throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "JMX Agent"), e);
 		}
 	}
 

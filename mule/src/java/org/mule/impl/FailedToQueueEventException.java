@@ -13,25 +13,30 @@
  */
 package org.mule.impl;
 
-import org.mule.MuleException;
+import org.mule.umo.ComponentException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOMessage;
+import org.mule.config.i18n.Message;
 
 /**
- * <code>FailedToQueueEventException</code> TODO
+ * <code>FailedToQueueEventException</code> is thrown when an event cannot be
+ * put on an internal component queue.
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
 
-public class FailedToQueueEventException extends MuleException
+public class FailedToQueueEventException extends ComponentException
 {
-    public FailedToQueueEventException(String message)
-    {
-        super(message);
+    public FailedToQueueEventException(Message message, UMOMessage umoMessage, UMOComponent component) {
+        super(message, umoMessage, component);
     }
 
-    public FailedToQueueEventException(String message, Throwable cause)
-    {
-        super(message, cause);
+    public FailedToQueueEventException(Message message, UMOMessage umoMessage, UMOComponent component, Throwable cause) {
+        super(message, umoMessage, component, cause);
     }
 
+    public FailedToQueueEventException(UMOMessage umoMessage, UMOComponent component, Throwable cause) {
+        super(umoMessage, component, cause);
+    }
 }

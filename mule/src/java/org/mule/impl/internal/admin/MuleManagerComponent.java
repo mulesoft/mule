@@ -17,10 +17,12 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
@@ -41,6 +43,8 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.PropertiesHelper;
 
@@ -115,7 +119,7 @@ public class MuleManagerComponent implements Callable, Initialisable
                 return null;
             }
         } else {
-            throw new MuleException("Event property " + MuleProperties.COMPONENT_NAME_PROPERTY +" not set, Mule can not foward request");
+            throw new MuleException(new Message(Messages.EVENT_PROPERTY_X_NOT_SAT_CANT_PROCESS_REQUEST, MuleProperties.COMPONENT_NAME_PROPERTY));
         }
     }
 
@@ -137,7 +141,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             }
         } catch (Exception e)
         {
-            throw new MuleException("Failed to send: " + e.getMessage(), e);
+            throw new DispatchException(action.getMessage(), new MuleEndpoint(action.getEndpoint(), true), e);
         }
 
     }
@@ -148,9 +152,10 @@ public class MuleManagerComponent implements Callable, Initialisable
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
         UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(action.getEndpoint());
+        long timeout = PropertiesHelper.getLongProperty(action.getProperties(), "timeout", MuleManager.getConfiguration().getSynchronousEventTimeout());
+
         try
         {
-            long timeout = PropertiesHelper.getLongProperty(action.getProperties(), "timeout", MuleManager.getConfiguration().getSynchronousEventTimeout());
             UMOEndpointURI ep = new MuleEndpointURI(action.getEndpoint());
             UMOMessage result = dispatcher.receive(ep, timeout);
             if(result!=null) {
@@ -166,7 +171,7 @@ public class MuleManagerComponent implements Callable, Initialisable
             }
         } catch (Exception e)
         {
-            throw new MuleException("Failed to recieve on endpointUri: " + action.getEndpoint() + ": " + e.getMessage(), e);
+            throw new ReceiveException(endpointUri, timeout, e);
         }
 
     }

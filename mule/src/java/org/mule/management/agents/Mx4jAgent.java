@@ -17,9 +17,12 @@ import mx4j.log.CommonsLogger;
 import mx4j.log.Log;
 import mx4j.tools.adaptor.http.HttpAdaptor;
 import mx4j.tools.adaptor.http.XSLTProcessor;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.UMOAgent;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -81,9 +84,9 @@ public class Mx4jAgent implements UMOAgent {
 		try {
 			mBeanServer.invoke(adaptorName, "start", null, null);
 		} catch (InstanceNotFoundException e) {
-			throw new JmxManagementException("failed to start agent", e, adaptorName);
+			throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"), adaptorName, e);
 		} catch (MBeanException e) {
-			throw new JmxManagementException("failed to start agent", e, adaptorName);
+			throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Mx4j agent"), adaptorName, e);
 		} catch (ReflectionException e) {
 			//ignore
 		}
@@ -128,7 +131,7 @@ public class Mx4jAgent implements UMOAgent {
 					+ adaptor.getClass().getName());
 			mBeanServer.registerMBean(adaptor, adaptorName);
 		} catch (Exception e) {
-			throw new InitialisationException("Could not start mx4j agent", e);
+			throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "mx4j agent"), e);
 		}
 	}
 

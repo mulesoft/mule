@@ -118,7 +118,7 @@
                             <property name="ccAddresses" value="anotheremail@cubis.co.uk"/>
                         </properties>
                     </endpoint>
-                    <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.samples.errorhandler.exceptions.FatalException"/>
+                    <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.umo.lifecycle.FatalException"/>
                 </router>
 
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">

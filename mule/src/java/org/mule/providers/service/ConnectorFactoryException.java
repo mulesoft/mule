@@ -14,6 +14,7 @@
 package org.mule.providers.service;
 
 import org.mule.umo.endpoint.EndpointException;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>ConnectorFactoryException</code> is thrown by the endpoint factory if the endpoint
@@ -26,13 +27,25 @@ import org.mule.umo.endpoint.EndpointException;
 
 public class ConnectorFactoryException extends EndpointException
 {
-    public ConnectorFactoryException(String message)
+    /**
+     * @param message the exception message
+     */
+    public ConnectorFactoryException(Message message)
     {
         super(message);
     }
 
-    public ConnectorFactoryException(String message, Throwable cause)
+    /**
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
+     */
+    public ConnectorFactoryException(Message message, Throwable cause)
     {
         super(message, cause);
+    }
+
+    public ConnectorFactoryException(Throwable cause)
+    {
+        super(cause);
     }
 }

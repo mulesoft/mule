@@ -20,7 +20,8 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
-import org.mule.impl.AlreadyInitialisedException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleModel;
 import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.internal.events.CustomEvent;
@@ -28,15 +29,12 @@ import org.mule.impl.internal.events.ManagerEvent;
 import org.mule.impl.internal.events.ServerEventManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.model.MuleContainerContext;
-import org.mule.umo.UMOAgent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOManager;
-import org.mule.umo.UMOServerEvent;
-import org.mule.umo.UMOServerEventListener;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.model.ComponentResolverException;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -56,14 +54,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -173,9 +164,9 @@ public class MuleManager implements UMOManager
     private AllStatistics stats = new AllStatistics();
 
     /**
-     * Manages all Server event listeners
+     * Manages all Server event eventManager
      */
-    private ServerEventManager listeners = new ServerEventManager();
+    private ServerEventManager eventManager = null;
 
     private UMOContainerContext containerContext = null;
     private DocumentFragment containerContextConfiguration = null;
@@ -201,7 +192,7 @@ public class MuleManager implements UMOManager
     /**
      * ObjectFactory method to create the singleton MuleManager instance
      */
-    protected static UMOManager createInstance() throws MuleRuntimeException
+    protected synchronized static UMOManager createInstance() throws MuleRuntimeException
     {
         Class clazz = SpiHelper.findService(UMOManager.class, MuleManager.class.getName(), MuleManager.class);
         Object obj = null;
@@ -210,11 +201,10 @@ public class MuleManager implements UMOManager
             obj = clazz.newInstance();
         } catch (Exception e)
         {
-            throw new MuleRuntimeException("Failed to create UMOManager instance: " + clazz.getName(), e);
+            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CREATE_MANAGER_INSTANCE_X, clazz.getName()), e);
         }
 
         MuleManager.setInstance((UMOManager) obj);
-
         return MuleManager.getInstance();
     }
 
@@ -223,7 +213,7 @@ public class MuleManager implements UMOManager
      *
      * @return the current singleton MuleManager
      */
-    public synchronized static UMOManager getInstance()
+    public static UMOManager getInstance()
     {
         if (instance == null)
         {
@@ -298,7 +288,7 @@ public class MuleManager implements UMOManager
     {
         if (config == null)
         {
-            throw new IllegalArgumentException("Configuration cannot be null");
+            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "MuleConfiguration object").getMessage());
         }
         MuleManager.config = config;
     }
@@ -317,9 +307,7 @@ public class MuleManager implements UMOManager
         disposeConnectors();
 
         model.dispose();
-        listeners.dispose();
         disposeAgents();
-
 
         transformers.clear();
         endpoints.clear();
@@ -327,21 +315,27 @@ public class MuleManager implements UMOManager
         //props.clear();
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_DISPOSED));
 
-        transformers = null;
+                                                                              transformers = null;
         endpoints = null;
         endpointIdentifiers = null;
         //props = null;
         initialised.set(false);
-        listeners.clear();
+        if(eventManager!=null) {
+            eventManager.dispose();
+
+        }
         instance = null;
-        listeners.dispose();
-        System.out.println(getEndSplash());
+        if(logger.isInfoEnabled()) {
+            logger.info("\n" + getEndSplash());
+        } else {
+            System.out.println(getEndSplash());
+        }
     }
 
     /**
      * Destroys all connectors
      */
-    private void disposeConnectors()
+    private synchronized void disposeConnectors()
     {
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_DISPOSING_CONNECTORS));
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
@@ -426,7 +420,7 @@ public class MuleManager implements UMOManager
                 return (UMOTransformer) trans.clone();
             } catch (Exception e)
             {
-                throw new NoSuchElementException("Failed to clone global transformer + " + trans.getName() + ": " + e.getMessage());
+                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CLONE_X, "Transformer: " + trans.getName()));
             }
         }
         return null;
@@ -440,16 +434,7 @@ public class MuleManager implements UMOManager
         connectors.put(connector.getName(), connector);
         if (initialised.get() || initialising.get())
         {
-            try
-            {
-                connector.initialise();
-            } catch (AlreadyInitialisedException e)
-            {
-                //ignore
-            } catch (Exception e)
-            {
-                throw new InitialisationException("Failed to initilaise Connector: " + e.getMessage(), e);
-            }
+            connector.initialise();
         }
         if ((started.get() || starting.get()) && !connector.isStarted())
         {
@@ -516,13 +501,7 @@ public class MuleManager implements UMOManager
      */
     public void registerTransformer(UMOTransformer transformer) throws InitialisationException
     {
-        try
-        {
-            transformer.initialise();
-        } catch (Exception e)
-        {
-            throw new InitialisationException("Failed to initialise transformer: " + transformer.getName() + ", " + e.getMessage(), e);
-        }
+        transformer.initialise();
         transformers.put(transformer.getName(), transformer);
         logger.info("Transformer" + transformer.getName() + " has been initialised successfully");
     }
@@ -550,7 +529,7 @@ public class MuleManager implements UMOManager
     {
         if (transactionManager != null)
         {
-            throw new ConfigurationException("The transaction manager on the MuleManager cannot be set one one has already been set");
+            throw new ConfigurationException(new Message(Messages.TX_MANAGER_ALREADY_SET));
         }
         transactionManager = newManager;
     }
@@ -563,6 +542,9 @@ public class MuleManager implements UMOManager
         if (!initialised.get())
         {
             initialising.set(true);
+            if(!config.isClientMode()) {
+                eventManager = new ServerEventManager();
+            }
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_INITIALISNG));
             if(id==null) {
                 logger.warn("No unique id has be set on this manager");
@@ -582,6 +564,9 @@ public class MuleManager implements UMOManager
                     logger.info("Server endpointUri is null, not registering Mule Admin agent");
                     disable=true;
                 }
+                if(config.isClientMode()) {
+                    disable = true;
+                }
 
                 if (!disable)
                 {
@@ -591,13 +576,7 @@ public class MuleManager implements UMOManager
                 initialiseConnectors();
                 initialiseEndpoints();
                 initialiseAgents();
-                try
-                {
-                    model.initialise();
-                } catch (Exception e)
-                {
-                    throw new InitialisationException("Failed to initialise the model: " + e.getMessage(), e);
-                }
+                model.initialise();
             } finally
             {
                 initialised.set(true);
@@ -635,7 +614,11 @@ public class MuleManager implements UMOManager
             model.start();
             started.set(true);
             starting.set(false);
-            System.out.println(getStartSplash());
+            if(logger.isInfoEnabled()) {
+                logger.info("\n" + getStartSplash());
+            } else {
+                System.out.println(getStartSplash());
+            }
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STARTED));
         }
     }
@@ -750,7 +733,7 @@ public class MuleManager implements UMOManager
     {
         this.model = model;
         if(model instanceof MuleModel) {
-            ((MuleModel)model).setListeners(listeners);
+            ((MuleModel)model).setListeners(eventManager);
         }
     }
 
@@ -843,26 +826,31 @@ public class MuleManager implements UMOManager
      */
     protected String getStartSplash()
     {
+        String notset = new Message(Messages.NOT_SET).getMessage();
+
         List message = new ArrayList();
         Manifest mf = config.getManifest();
         Map att = mf.getMainAttributes();
         if (att.values().size() > 0)
         {
-            message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Title"), "Not Set") + " version " + PropertiesHelper.getStringProperty(att, new Attributes.Name("Implementation-Version"), "Not Set"));
-            message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Vendor"), "Not Set"));
-            message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Implementation-Vendor"), "Not Set"));
+            message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Title"), notset)
+                    + new Message(Messages.VERSION).getMessage() + PropertiesHelper.getStringProperty(att,
+                            new Attributes.Name("Implementation-Version"), notset));
+
+            message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Vendor"), notset));
+            message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Implementation-Vendor"), notset));
         } else
         {
-            message.add("Mule Version Info not set");
+            message.add(new Message(Messages.VERSION_INFO_NOT_SET).getMessage());
         }
         message.add(" ");
-        message.add("Server started: " + new Date(getStartDate()).toString());
+        message.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(getStartDate())).getMessage());
         message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
         message.add(" ");
         if(agents.size()==0) {
-            message.add("Agents Running: None");
+            message.add(new Message(Messages.AGENTS_RUNNING).getMessage() + new Message(Messages.NONE).getMessage());
         } else {
-            message.add("Agents Running:");
+            message.add(new Message(Messages.AGENTS_RUNNING).getMessage());
             UMOAgent umoAgent;
             for (Iterator iterator = agents.values().iterator(); iterator.hasNext();)
             {
@@ -876,12 +864,12 @@ public class MuleManager implements UMOManager
     private String getEndSplash() {
         List message = new ArrayList(2);
         long currentTime = System.currentTimeMillis();
-        message.add("Mule shut down normally on: " + new Date());
+        message.add(new Message(Messages.SHUTDOWN_NORMALLY_ON_X, new Date()).getMessage());
         long duration = currentTime;
         if(startDate > 0) duration = currentTime -startDate;
-        message.add("Server was up for: " + Utility.getFormattedDuration(duration));
+        message.add(new Message(Messages.SERVER_WAS_UP_FOR_X, Utility.getFormattedDuration(duration)).getMessage());
 
-        return StringMessageHelper.getBoilerPlate(message, '*', 70);
+        return StringMessageHelper.getBoilerPlate(message, '*', 80);
     }
 
     /**
@@ -986,7 +974,7 @@ public class MuleManager implements UMOManager
      *
      * @return the container associated with the Manager
      */
-    public UMOContainerContext getContainerContext() throws ComponentResolverException
+    public UMOContainerContext getContainerContext() throws ContainerException
     {
         if (containerConfigured == false) {
             Reader config = getContainerContextConfiguration();
@@ -1006,14 +994,14 @@ public class MuleManager implements UMOManager
      * {@inheritDoc}
      */
     public void registerListener(UMOServerEventListener l) {
-        listeners.registerListener(l);
+        eventManager.registerListener(l);
     }
 
     /**
      * {@inheritDoc}
      */
     public void unregisterListener(UMOServerEventListener l) {
-        listeners.unregisterListener(l);
+        eventManager.unregisterListener(l);
     }
 
     /**
@@ -1023,12 +1011,16 @@ public class MuleManager implements UMOManager
      * @param e the event that occurred
      */
     protected void fireSystemEvent(UMOServerEvent e) {
-        listeners.fireEvent(e);
+        if(eventManager!=null) {
+            eventManager.fireEvent(e);
+        } else if(logger.isDebugEnabled()) {
+            logger.debug("Event Manager is not enabled, ignoring event: " + e);
+        }
     }
 
     /**
      * Fires a server event to all registered {@link org.mule.impl.internal.events.CustomEventListener}
-     * listeners.
+     * eventManager.
      * @param event the event to fire.  This must be of type {@link org.mule.impl.internal.events.CustomEvent}
      * otherwise an exception will be thrown.
      * @throws UnsupportedOperationException if the event fired is not a {@link org.mule.impl.internal.events.CustomEvent}
@@ -1036,9 +1028,13 @@ public class MuleManager implements UMOManager
     public void fireEvent(UMOServerEvent event)
     {
         if(event instanceof CustomEvent) {
-            listeners.fireEvent(event);
+            if(eventManager!=null) {
+                eventManager.fireEvent(event);
+            } else if(logger.isDebugEnabled()) {
+                logger.debug("Event Manager is not enabled, ignoring event: " + event);
+            }
         } else {
-            throw new UnsupportedOperationException("Only CustomEvent events can be fired through the MuleManager");
+            throw new UnsupportedOperationException(new Message(Messages.ONLY_CUSTOM_EVENTS_CAN_BE_FIRED).getMessage());
         }
     }
 
@@ -1048,7 +1044,7 @@ public class MuleManager implements UMOManager
      *
      * @return Reader container configuration embedded within mule config
      */
-    protected Reader getContainerContextConfiguration() throws ConfigurationException {
+    protected Reader getContainerContextConfiguration() throws ContainerException {
         StringReader result = null;
         if (containerContextConfiguration != null) {
             StringWriter s = new StringWriter();
@@ -1058,7 +1054,7 @@ public class MuleManager implements UMOManager
                 Transformer transformer = tFactory.newTransformer();
                 transformer.transform(new DOMSource(containerContextConfiguration), streamResult);
             } catch (TransformerException e) {
-                throw new ConfigurationException("could not recover container configuration from fragment", e);
+                throw new ContainerException(new Message(Messages.COULD_NOT_RECOVER_CONTIANER_CONFIG), e);
             }
             result = new StringReader(s.toString());
         }
@@ -1161,4 +1157,5 @@ public class MuleManager implements UMOManager
     {
         return securityManager;
     }
+
 }

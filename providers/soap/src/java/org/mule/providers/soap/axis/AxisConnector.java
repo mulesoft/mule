@@ -30,8 +30,10 @@ import org.apache.axis.providers.java.RPCProvider;
 import org.apache.axis.server.AxisServer;
 import org.apache.axis.wsdl.fromJava.Namespaces;
 import org.apache.axis.wsdl.fromJava.Types;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -45,6 +47,7 @@ import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOServerEvent;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -135,7 +138,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         if(is!=null) {
             fileProvider.setInputStream(is);
         } else {
-            throw new InitialisationException("Unable ot find/load axis configuration: " + config);
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Axis Configuration: " + config), this);
         }
         /* Wrap the FileProvider with a SimpleProvider so we can prgrammatically
          * configure the Axis server (you can only use wsdd descriptors with the
@@ -443,7 +446,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
                     MuleManager.getInstance().getModel().registerComponent(axisDescriptor);
                 } catch (UMOException e)
                 {
-                    handleException("Failed to register Axis service Component: " + e.getMessage(), e);
+                    handleException(e);
                 }
             }
         }

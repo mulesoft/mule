@@ -14,7 +14,8 @@
 package org.mule.extras.plexus;
 
 import org.mule.tck.model.AbstractComponentResolverTestCase;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOContainerContext;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>

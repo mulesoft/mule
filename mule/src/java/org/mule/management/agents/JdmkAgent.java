@@ -14,9 +14,11 @@
 package org.mule.management.agents;
 
 import com.sun.jdmk.comm.HtmlAdaptorServer;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.UMOAgent;
 import org.mule.umo.UMOException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -76,9 +78,9 @@ public class JdmkAgent implements UMOAgent {
 		try {
 			mBeanServer.invoke(adaptorName, "start", null, null);
 		} catch (InstanceNotFoundException e) {
-			throw new JmxManagementException("failed to start agent", e, adaptorName);
+			throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"), adaptorName, e);
 		} catch (MBeanException e) {
-			throw new JmxManagementException("failed to start agent", e, adaptorName);
+			throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"), adaptorName, e);
 		} catch (ReflectionException e) {
 			//ignore
 		}
@@ -123,7 +125,7 @@ public class JdmkAgent implements UMOAgent {
 					+ adaptor.getClass().getName());
 			mBeanServer.registerMBean(adaptor, adaptorName);
 		} catch (Exception e) {
-			throw new InitialisationException("Could not start jdmk agent", e);
+			throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "Jdmk Agent"), e);
 		}
 	}
 

@@ -6,6 +6,7 @@ import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.PoolingProfile;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.ConfigurationException;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.impl.MuleDescriptor;
@@ -35,7 +36,12 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public ConfigurationBuilder getConfigBuilder()
     {
-        return new MuleXmlConfigurationBuilder();
+        try {
+            return new MuleXmlConfigurationBuilder();
+        } catch (ConfigurationException e) {
+            fail(e.getMessage());
+            return null;
+        }
     }
 
     public void testPropertyTypesConfig() throws Exception

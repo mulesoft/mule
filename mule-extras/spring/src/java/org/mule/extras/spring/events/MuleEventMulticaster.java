@@ -15,28 +15,24 @@ package org.mule.extras.spring.events;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.config.i18n.Message;
 import org.mule.extras.spring.SpringContainerContext;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
-import org.mule.impl.MuleEventContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOManager;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
@@ -54,14 +50,7 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
-import javax.naming.event.EventContext;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <code>MuleEventMulticaster</code> is an implementation of a Spring ApplicationeventMulticaster.
@@ -160,11 +149,6 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     private UMODescriptor descriptor;
 
     /**
-     * The current Mule context for the event
-     */
-    private UMOEventContext muleEventContext;
-
-    /**
      * The filter used to match subscriptions
      */
     private Class subscriptionFilter = WildcardFilter.class;
@@ -243,7 +227,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     registerMulticasterDescriptor();
                 } catch (UMOException ex)
                 {
-                    throw new MuleRuntimeException("Failed to reinitialise Mule after the context was refreshed: " + ex.getMessage(), ex);
+                    throw new MuleRuntimeException(new Message("spring", 1), ex);
                 }
             } else {
                 initMule();
@@ -365,7 +349,6 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      */
     public void onMuleEvent(UMOEventContext context) throws TransformerException, MalformedEndpointException
     {
-        muleEventContext = context;
         multicastEvent(new MuleApplicationEvent(context.getTransformedMessage(), context, applicationContext));
         context.setStopFurtherProcessing(true);
     }
@@ -476,7 +459,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             if (!manager.isStarted()) manager.start();
         } catch (UMOException e)
         {
-            throw new MuleRuntimeException("Failed to reinitialise Mule after the context was refreshed: " + e.getMessage(), e);
+            throw new MuleRuntimeException(new Message("spring", 1), e);
         }
     }
 

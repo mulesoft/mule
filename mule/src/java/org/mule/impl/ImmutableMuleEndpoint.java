@@ -19,9 +19,11 @@ package org.mule.impl;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
@@ -29,6 +31,8 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -391,7 +395,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return deleteUnacceptedMessages;
     }
 
-    public void initialise() throws InitialisationException
+    public void initialise() throws InitialisationException, RecoverableException
     {
         if(connector==null) {
             if(endpointUri.getConnectorName()!=null) {
@@ -404,7 +408,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
                 } catch (UMOException e)
                 {
-                    throw new InitialisationException("Failed to create connector from Uri: " + e.getMessage(), e);
+                    throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_CONNECTOR_FROM_URI_X, endpointUri), e, this);
                 }
             }
 
@@ -422,7 +426,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 transformer = MuleObjectHelper.getTransformer(endpointUri.getTransformers(), ",");
             } catch (MuleException e)
             {
-                throw new InitialisationException(e.getMessage(), e);
+                throw new InitialisationException(e, this);
             }
         }
 

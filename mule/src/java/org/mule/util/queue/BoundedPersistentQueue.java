@@ -14,10 +14,11 @@
 package org.mule.util.queue;
 
 import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * <code>BoundedPersistentQueue</code> is a UMOEvent queue implementation that can automatically

@@ -123,7 +123,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             method = (String) event.getEndpoint().getProperties().get("method");
             if (method == null)
             {
-                throw new DispatchException("Cannot invoke axis call without an Operation. Set the method param on your axis endpointUri");
+                throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),  event.getEndpoint());
             }
         }
         Call call = (Call) service.createCall();

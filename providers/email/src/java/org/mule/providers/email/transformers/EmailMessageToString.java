@@ -35,6 +35,7 @@ public class EmailMessageToString extends AbstractTransformer
     public EmailMessageToString()
     {
         registerSourceType(Message.class);
+        registerSourceType(String.class);
         setReturnClass(String.class);
     }
 
@@ -65,18 +66,15 @@ public class EmailMessageToString extends AbstractTransformer
             Object result =  msg.getContent();
             if(result instanceof String) {
                 return (String)result;
-            } else if (result instanceof MimeMultipart) {
+            } else {
                 //very simplisitic, only gets first part
                 MimeMultipart part = (MimeMultipart)result;
                 String transMsg = (String)part.getBodyPart(0).getContent();
                 return transMsg;
-            } else {
-                throw new TransformerException("Message has an unknown payload: " + result.getClass().getName());
             }
-
         } catch (Exception e)
         {
-            throw new TransformerException("Failed to read incoming mail message: " + e, e);
+            throw new TransformerException(this, e);
         }
     }
 

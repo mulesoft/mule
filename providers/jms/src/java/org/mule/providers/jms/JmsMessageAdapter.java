@@ -18,7 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
@@ -42,7 +42,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
 
     private Message message = null;
 
-    public JmsMessageAdapter(Object message) throws MessageException
+    public JmsMessageAdapter(Object message) throws MessagingException
     {
         setMessage(message);
     }
@@ -80,7 +80,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     /**
      * @param message new value for the message
      */
-    private void setMessage(Object message) throws MessageException
+    private void setMessage(Object message) throws MessagingException
     {
         if(message instanceof Message) {
             this.message = (Message) message;

@@ -27,6 +27,8 @@ import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.util.Iterator;
 import java.util.List;
@@ -102,7 +104,7 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
                 result = new MuleMessage(transformer.transform(result.getPayload()), result.getProperties());
             } catch (TransformerException e)
             {
-                throw new RoutingException("Failed to transform response message: " + e.getMessage(), e);
+                throw new RoutingException(result, null);
             }
         }
         return result;

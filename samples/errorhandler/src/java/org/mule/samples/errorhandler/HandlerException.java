@@ -3,6 +3,7 @@
 package org.mule.samples.errorhandler;
 
 import org.mule.umo.UMOException;
+import org.mule.config.i18n.Message;
 
 /**
  *  <code>HandlerException</code> TODO (document class)
@@ -13,10 +14,10 @@ import org.mule.umo.UMOException;
 public class HandlerException extends UMOException {
 
 	public HandlerException(String message) {
-		super(message);
+		super(Message.createStaticMessage(message));
 	}
 	
 	public HandlerException(String message, Throwable cause) {
-		super(message, cause);
+		super(Message.createStaticMessage(message), cause);
 	}
 }

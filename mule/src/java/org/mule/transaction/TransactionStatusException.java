@@ -6,17 +6,31 @@
  */
 package org.mule.transaction;
 
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
-public class TransactionStatusException extends UMOTransactionException
+public class TransactionStatusException extends TransactionException
 {
-    public TransactionStatusException(String message)
+    /**
+     * @param message the exception message
+     */
+    public TransactionStatusException(Message message)
     {
         super(message);
     }
 
-    public TransactionStatusException(String message, Throwable cause)
+    /**
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
+     */
+    public TransactionStatusException(Message message, Throwable cause)
     {
         super(message, cause);
+    }
+
+    public TransactionStatusException(Throwable cause)
+    {
+        super(new Message(Messages.TX_CANT_READ_STATE), cause);
     }
 }

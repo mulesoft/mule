@@ -61,7 +61,7 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
 
         } catch (Exception e)
         {
-            getConnector().handleException(event, e);
+            getConnector().handleException(e);
         }
         if (logger.isDebugEnabled())
         {

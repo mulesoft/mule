@@ -26,7 +26,7 @@ import org.mule.transformers.encryption.EncryptionTransformer;
 import org.mule.transformers.encryption.DecryptionTransformer;
 import org.mule.transformers.compression.GZipCompressTransformer;
 import org.mule.transformers.compression.GZipUncompressTransformer;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.Arrays;
 

@@ -30,13 +30,15 @@
 package org.mule.providers.email;
 
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.routing.RoutingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.UUID;
@@ -99,7 +101,7 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
     public void messagesAdded(MessageCountEvent event)
     {
         Message messages[] = event.getMessages();
-        Object msg = null;
+        UMOMessage message = null;
         for (int i = 0; i < messages.length; i++)
         {
             try
@@ -108,16 +110,18 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
                 {
                     MimeMessage mimeMessage = new MimeMessage((MimeMessage)messages[i]);
                     storeMessage(mimeMessage);
-                    UMOMessage message = new MuleMessage(connector.getMessageAdapter(mimeMessage));
+                    message = new MuleMessage(connector.getMessageAdapter(mimeMessage));
 
                     // Mark as deleted
                     messages[i].setFlag(Flags.Flag.DELETED, true);
                     routeMessage(message, endpoint.isSynchronous());
                 }
             }
-            catch (Exception e)
+            catch (UMOException e)
             {
-                handleException(msg, e);
+                handleException(e);
+            } catch(Exception e) {
+                handleException(new RoutingException(new org.mule.config.i18n.Message(Messages.ROUTING_ERROR), message, endpoint, e));
             }
         }
     }
@@ -262,8 +266,7 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
         }
         catch (MessagingException e)
         {
-            handleException("Failed to read messages from folder: " + folder.getFullName(),
-                    e);
+            handleException(e);
         }
     }
 

@@ -106,7 +106,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposab
             ((MuleComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
         } catch (Exception e)
         {
-            throw new DispatchException("Failed to create and dispatch response event from message: " + e.getMessage(), e);
+            throw new DispatchException(new org.mule.config.i18n.Message("jms", 8, replyToDestination), returnMessage, null);
         } finally
         {
             dispose();

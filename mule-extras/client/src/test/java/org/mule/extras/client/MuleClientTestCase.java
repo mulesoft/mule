@@ -89,12 +89,7 @@ public class MuleClientTestCase extends AbstractMuleTestCase
         System.out.println(i + " took " + time + "ms to process");
         Thread.sleep(1000);
     }
-    public void testExceptions()
-    {
-        MuleClientException e = new MuleClientException("test");
-        e = new MuleClientException("test", new Exception());
-        assertEquals("test", e.getMessage());
-    }
+   
 
     public String getDispatchUrl()
     {

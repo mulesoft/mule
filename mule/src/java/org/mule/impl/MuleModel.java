@@ -17,24 +17,22 @@ import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
-import org.mule.MuleException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ServerEventManager;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOExceptionStrategy;
-import org.mule.umo.UMOServerEvent;
-import org.mule.umo.UMOSession;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 
+import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -71,7 +69,7 @@ public class MuleModel implements UMOModel
 
     private SynchronizedBoolean started = new SynchronizedBoolean(false);
 
-    private UMOExceptionStrategy exceptionStrategy;
+    private ExceptionListener exceptionListener;
 
     private ServerEventManager listeners;
 
@@ -86,7 +84,7 @@ public class MuleModel implements UMOModel
         lifecycleAdapterFactory = new DefaultLifecycleAdapterFactory();
         components = new ConcurrentHashMap();
         descriptors = new ConcurrentHashMap();
-        exceptionStrategy = new DefaultComponentExceptionStrategy();
+        exceptionListener = new DefaultComponentExceptionStrategy();
         name = "mule";
     }
 
@@ -149,13 +147,13 @@ public class MuleModel implements UMOModel
     {
         if (descriptor == null)
         {
-            throw new MuleException("Mule UMO descriptor to register was null");
+            throw new ModelException(new Message(Messages.X_IS_NULL, "UMO Descriptor"));
         }
 
         //Set the es if one wasn't set in the configuration
-        if (descriptor.getExceptionStrategy() == null)
+        if (descriptor.getExceptionListener() == null)
         {
-            descriptor.setExceptionStrategy(exceptionStrategy);
+            descriptor.setExceptionListener(exceptionListener);
         }
 
         UMOComponent component = (UMOComponent) components.get(descriptor.getName());
@@ -170,14 +168,8 @@ public class MuleModel implements UMOModel
         logger.debug("Added Mule UMO: " + descriptor.getName());
 
         if(initialised.get()) {
-            try
-            {
-                logger.info("Initialising component: " + descriptor.getName());
-                component.initialise();
-            } catch (Exception e)
-            {
-                throw new InitialisationException("Failed to start component: " + descriptor.getName() + ". Error is: " + e.getMessage(),e);
-            }
+            logger.info("Initialising component: " + descriptor.getName());
+            component.initialise();
         }
         if(started.get()) {
             logger.info("Starting component: " + descriptor.getName());
@@ -191,11 +183,11 @@ public class MuleModel implements UMOModel
     {
         if (descriptor == null)
         {
-            throw new ModelException("Mule UMO descriptor to unregister was null");
+            throw new ModelException(new Message(Messages.X_IS_NULL, "UMO Descriptor"));
         }
 
         if(!isComponentRegistered(descriptor.getName())) {
-            throw new ModelException("Component not registered: " + descriptor.getName());
+            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, descriptor.getName()));
         }
         UMOComponent component = (UMOComponent) components.remove(descriptor.getName());
 
@@ -206,8 +198,6 @@ public class MuleModel implements UMOModel
             descriptors.remove(descriptor.getName());
             component.dispose();
             logger.info("The component: " + descriptor.getName() + " has been unregistered and disposing");
-        } else {
-            throw new MuleException("component: "  + descriptor.getName() + "is not registered with this model");
         }
     }
 
@@ -231,10 +221,13 @@ public class MuleModel implements UMOModel
             try
             {
                 endpoint.getConnector().registerListener(component, endpoint);
+            } catch (UMOException e)
+            {
+                throw e;
             } catch (Exception e)
             {
-                throw new MuleException("Failed to register Component: " + component.getDescriptor().getName() +
-                        " as a listener on connector: " + endpoint.getConnector().getName() + ". Error is: " + e, e);
+                throw new ModelException(new Message(Messages.FAILED_TO_REGISTER_X_ON_ENDPOINT_X,
+                                component.getDescriptor().getName(),endpoint.getEndpointURI()), e);
             }
         }
     }
@@ -253,10 +246,13 @@ public class MuleModel implements UMOModel
             try
             {
                 endpoint.getConnector().unregisterListener(component, endpoint);
+            } catch (UMOException e)
+            {
+                throw e;
             } catch (Exception e)
             {
-                throw new MuleException("Failed to unregister Component: " + component.getDescriptor().getName() +
-                        " as a listener on connector: " + endpoint.getConnector().getName() + ". Error is: " + e, e);
+                throw new ModelException(new Message(Messages.FAILED_TO_UNREGISTER_X_ON_ENDPOINT_X,
+                                component.getDescriptor().getName(),endpoint.getEndpointURI()), e);
             }
         }
     }
@@ -344,14 +340,7 @@ public class MuleModel implements UMOModel
         for (Iterator i = components.values().iterator(); i.hasNext();)
         {
             temp = (UMOComponent) i.next();
-            try
-            {
-                temp.stop();
-            } catch (Exception e)
-            {
-                throw new MuleException("Failed to stop Component: " + e.getMessage(), e);
-            }
-
+            temp.stop();
             logger.info("Component " + temp + " has been stopped successfully");
         }
         fireEvent(new ModelEvent(this, ModelEvent.MODEL_STOPPED));
@@ -366,13 +355,7 @@ public class MuleModel implements UMOModel
     {
         if (!initialised.get())
         {
-            try
-            {
-                initialise();
-            } catch (Exception e)
-            {
-                throw new InitialisationException("Failed to initialise Model: " + e.getMessage(), e);
-            }
+            initialise();
         }
 
         if(!started.get()) {
@@ -382,14 +365,8 @@ public class MuleModel implements UMOModel
             for (Iterator i = components.values().iterator(); i.hasNext();)
             {
                 temp = (UMOComponent) i.next();
-                try
-                {
-                    registerListeners(temp);
-                    temp.start();
-                } catch (Exception e)
-                {
-                    throw new MuleException("Failed to start component: " + e.getMessage(), e);
-                }
+                registerListeners(temp);
+                temp.start();
 
                 logger.info("Component " + temp + " has been started successfully");
             }
@@ -412,18 +389,11 @@ public class MuleModel implements UMOModel
         UMOComponent component = (UMOComponent)components.get(name);
         if (component == null)
         {
-            throw new ModelException("Cannot find Mule Component " + name);
+            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
         } else
         {
-            try
-            {
-                unregisterListeners(component);
-                component.stop();
-
-            } catch (Exception e)
-            {
-                throw new MuleException("Failed to stop Mule session: " + name, e);
-            }
+            unregisterListeners(component);
+            component.stop();
             logger.info("mule " + name + " has been stopped successfully");
         }
     }
@@ -440,17 +410,11 @@ public class MuleModel implements UMOModel
         UMOComponent component = (UMOComponent)components.get(name);
         if (component == null)
         {
-            throw new MuleException("Cannot find mule " + name);
+            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
         } else
         {
-            try
-            {
-                registerListeners(component);
-                component.start();
-            } catch (Exception e)
-            {
-                throw new MuleException("Failed to start Mule Component: " + name, e);
-            }
+            registerListeners(component);
+            component.start();
             logger.info("Mule " + component.toString() + " has been started successfully");
         }
     }
@@ -474,16 +438,10 @@ public class MuleModel implements UMOModel
         UMOComponent component = (UMOComponent)components.get(name);
         if (component == null)
         {
-            throw new MuleException("Cannot find Mule Component " + name);
+            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
         } else
         {
-            try
-            {
-                component.pause();
-            } catch (Exception e)
-            {
-                throw new MuleException("Failed to stop Mule session: " + name, e);
-            }
+            component.pause();
             logger.info("Mule Component " + name + " has been paused successfully");
         }
     }
@@ -500,16 +458,10 @@ public class MuleModel implements UMOModel
         UMOComponent component = (UMOComponent)components.get(name);
         if (component == null)
         {
-            throw new MuleException("Cannot find Mule Component " + name);
+            throw new ModelException(new Message(Messages.COMPONENT_X_NOT_REGISTERED, name));
         } else
         {
-            try
-            {
-                component.resume();
-            } catch (Exception e)
-            {
-                throw new MuleException("Failed to stop Mule session: " + name, e);
-            }
+            component.resume();
             logger.info("Mule Component " + name + " has been resumed successfully");
         }
     }
@@ -523,7 +475,7 @@ public class MuleModel implements UMOModel
         }
     }
 
-    public void initialise() throws InitialisationException
+    public void initialise() throws InitialisationException, RecoverableException
     {
         if(!initialised.get()) {
             fireEvent(new ModelEvent(this, ModelEvent.MODEL_INITIALISING));
@@ -543,14 +495,14 @@ public class MuleModel implements UMOModel
         }
     }
 
-    public UMOExceptionStrategy getExceptionStrategy()
+    public ExceptionListener getExceptionListener()
     {
-        return exceptionStrategy;
+        return exceptionListener;
     }
 
-    public void setExceptionStrategy(UMOExceptionStrategy exceptionStrategy)
+    public void setExceptionListener(ExceptionListener exceptionListener)
     {
-        this.exceptionStrategy = exceptionStrategy;
+        this.exceptionListener = exceptionListener;
     }
 
     public UMODescriptor getDescriptor(String name)

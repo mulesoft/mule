@@ -13,8 +13,10 @@
  */
 package org.mule.config.builders;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -23,9 +25,10 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManager;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.Map;
@@ -89,7 +92,7 @@ public class QuickConfigurationBuilder
     public UMOManager createStartedManager(boolean synchronous, String serverUrl) throws UMOException
     {
         if(manager.isStarted()) {
-            throw new InitialisationException("Manager already started");
+            throw new InitialisationException(new Message(Messages.MANAGER_ALREADY_STARTED), this);
         }
         if(serverUrl==null) serverUrl = "";
         MuleManager.getConfiguration().setServerUrl(serverUrl);

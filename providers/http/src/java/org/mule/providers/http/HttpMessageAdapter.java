@@ -16,7 +16,7 @@
 package org.mule.providers.http;
 
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 import java.util.Map;
@@ -32,7 +32,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
 {
     private byte[] message = null;
 
-    public HttpMessageAdapter(Object message) throws MessageException
+    public HttpMessageAdapter(Object message) throws MessagingException
     {
         if (message instanceof Object[])
         {

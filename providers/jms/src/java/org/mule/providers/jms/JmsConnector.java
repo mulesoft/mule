@@ -16,9 +16,12 @@ package org.mule.providers.jms;
 
 
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.MuleException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.ReplyToHandler;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
@@ -26,7 +29,9 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import javax.jms.Connection;
@@ -128,7 +133,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
             connection = createConnection();
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to create Jms Connector: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jms Connector"), e, this);
         }
     }
 
@@ -164,7 +169,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         {
             return (ConnectionFactory)temp;
         } else {
-            throw new InitialisationException("No Connection factory was found for name: " + connectionFactoryJndiName);
+            throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND, connectionFactoryJndiName), this);
         }
     }
 
@@ -190,8 +195,9 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         if(clientId==null) {
             setClientId("mule." + getName());
             logger.debug("Jms clientId is not set defaulting to: " + getClientId());
+        } else if (clientId.length() > 0) {
+            connection.setClientID(getClientId());
         }
-        connection.setClientID(getClientId());
         return connection;
     }
 
@@ -206,7 +212,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     public Object getSessionFactory(UMOEndpoint endpoint) {
     	if (endpoint.getTransactionConfig() != null &&
     		endpoint.getTransactionConfig().getFactory() instanceof JmsClientAcknowledgeTransactionFactory) {
-    		throw new MuleRuntimeException("Unable to obtain session factory for JmsClient Ack");
+    		throw new MuleRuntimeException(new org.mule.config.i18n.Message("jms", 9));
     	} else {
     		return connection;
     	}
@@ -227,7 +233,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 			logger.debug("Binding session to current transaction");
 			try {
 				tx.bindResource(connection, session);
-			} catch (UMOTransactionException e) {
+			} catch (TransactionException e) {
 				throw new RuntimeException("Could not bind session to current transaction", e);
 			}
 		}
@@ -242,7 +248,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         }
         catch (JMSException e)
         {
-            throw new InitialisationException("Failed to stop Jms Connection", e);
+            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jms Connection"), e);
         }
     }
 
@@ -255,7 +261,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         }
         catch (JMSException e)
         {
-            throw new InitialisationException("Failed to start Jms Connection", e);
+            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jms Connection"), e);
         }
     }
 

@@ -17,9 +17,11 @@ package org.mule.transformers;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
@@ -73,10 +75,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         {
             if (!returnClass.isInstance(object))
             {
-                throw new TransformerException("The object transformed is of type: "
-                        + object.getClass().getName()
-                        + ", but the expected return type is: "
-                        + returnClass.getName());
+                throw new TransformerException(new Message(Messages.TRANSFORM_X_UNEXPECTED_TYPE_X, object.getClass().getName(), returnClass.getName()), this);
             }
         }
         logger.debug("The transformed object is of expected type. Type is: " + object.getClass().getName());
@@ -173,7 +172,8 @@ public abstract class AbstractTransformer implements UMOTransformer
         
         if (!isSourceTypeSupported(src.getClass()))
         {
-            throw new TransformerException("This transformer: " + getName() + " does not support this source type: " + src.getClass().getName() + ". Endpoint is: " + endpoint.getEndpointURI());
+            throw new TransformerException(new Message(Messages.TRANSFORM_X_UNSUPORTED_TYPE_X_ENDPOINT_X,
+                            getName(), src.getClass().getName(), endpoint.getEndpointURI()), this);
         } else {
             result = doTransform(src);
             result = checkReturnClass(result);

@@ -30,7 +30,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
@@ -152,7 +152,7 @@ public class MuleEventContext implements UMOEventContext
         return TransactionCoordination.getInstance().getTransaction();
     }
 
-    public void markTransactionForRollback() throws UMOTransactionException
+    public void markTransactionForRollback() throws TransactionException
     {
         if (getCurrentTransaction() != null) {
             getCurrentTransaction().setRollbackOnly();

@@ -22,15 +22,18 @@ import electric.service.virtual.VirtualService;
 import electric.util.Context;
 import electric.util.interceptor.ReceiveThreadContext;
 import electric.util.interceptor.SendThreadContext;
-import org.mule.DisposeException;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.DisposeException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.ServiceProxy;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
@@ -57,7 +60,7 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
         {
             Class[] interfaces = ServiceProxy.getInterfacesForComponent(component);
             if(interfaces.length==0) {
-                throw new InitialisationException("No service interfaces could be found for component: " + component.getDescriptor().getName());
+                throw new InitialisationException(new Message("soap", 2, component.getDescriptor().getName()), this);
             }
             VirtualService.enable();
             //this is always initialisaed as synchronous as ws invocations should
@@ -88,13 +91,13 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
 
         } catch (ClassNotFoundException e)
         {
-            throw new InitialisationException("Failed to load component class: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.CLASS_X_NOT_FOUND, e.getMessage()), e, this);
         }  catch (UMOException e)
         {
-            throw new InitialisationException("Failed to register component as a service: " + e.getMessage(), e);
+            throw new InitialisationException(new Message("soap", 3, component.getDescriptor().getName()), e, this);
         }catch (Exception e)
         {
-            throw new InitialisationException("Failed to start soap server: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "Soap Server"), e, this);
         }
     }
 
@@ -125,7 +128,7 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
             Registry.unpublish(component.getDescriptor().getName());
         } catch (RegistryException e)
         {
-            throw new DisposeException("Failed to unregister soap service: " + e.getMessage(), e);
+            throw new DisposeException(new Message(Messages.FAILED_TO_UNREGISTER_X_ON_ENDPOINT_X, component.getDescriptor().getName(), endpoint.getEndpointURI()), e);
         }
     }
 

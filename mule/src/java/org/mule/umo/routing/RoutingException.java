@@ -14,7 +14,11 @@
 
 package org.mule.umo.routing;
 
-import org.mule.umo.UMOException;
+import org.mule.umo.MessagingException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>RoutingException</code> is a base class for al routing exceptions.  Routing
@@ -25,23 +29,46 @@ import org.mule.umo.UMOException;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class RoutingException extends UMOException
+public class RoutingException extends MessagingException
 {
-    private Object event;
+    protected transient UMOEndpoint endpoint;
 
-    public RoutingException(String message)
+    public RoutingException(UMOMessage message, UMOEndpoint endpoint)
     {
-        super(message);
+        super(generateMessage(null, endpoint), message);
+        this.endpoint = endpoint;
     }
 
-    public RoutingException(String message, Throwable cause)
+    public RoutingException(UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
     {
-        super(message, cause);
+        super(generateMessage(null, endpoint), umoMessage, cause);
+        this.endpoint = endpoint;
     }
 
-    public RoutingException(String message, Throwable cause, Object event)
+    public RoutingException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
     {
-        super(message, cause);
-        this.event = event;
+        super(generateMessage(message, endpoint), umoMessage);
+        this.endpoint = endpoint;
+    }
+
+    public RoutingException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    {
+        super(generateMessage(message, endpoint), umoMessage, cause);
+        this.endpoint = endpoint;
+    }
+
+    public UMOEndpoint getEndpoint()
+    {
+        return endpoint;
+    }
+
+     private static Message generateMessage(Message message, UMOEndpoint endpoint) {
+         Message m = new Message(Messages.FAILED_TO_ROUTER_VIA_ENDPOINT, endpoint);
+         if(message!=null) {
+             message.setNextMessage(m);
+             return message;
+         } else {
+             return m;
+         }
     }
 }

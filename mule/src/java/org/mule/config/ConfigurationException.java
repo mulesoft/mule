@@ -15,6 +15,8 @@
 package org.mule.config;
 
 import org.mule.MuleRuntimeException;
+import org.mule.MuleException;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>ConfigurationException</code> TODO (document class)
@@ -22,15 +24,17 @@ import org.mule.MuleRuntimeException;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class ConfigurationException extends MuleRuntimeException
+public class ConfigurationException extends MuleException
 {
-    public ConfigurationException(String message)
-    {
+    public ConfigurationException(Message message) {
         super(message);
     }
 
-    public ConfigurationException(String message, Throwable cause)
-    {
+    public ConfigurationException(Message message, Throwable cause) {
         super(message, cause);
+    }
+
+    public ConfigurationException(Throwable cause) {
+        super(cause);
     }
 }

@@ -31,6 +31,7 @@ package org.mule.providers.email;
 
 
 import org.mule.MuleException;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -147,7 +148,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
             }
             else
             {
-                throw new MuleException("The to Address: " + to + " is invalid");
+                throw new MuleException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "toAddress"));
             }
             //sent date
             msg.setSentDate(Calendar.getInstance().getTime());
@@ -196,7 +197,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
         }
         catch (MessagingException e)
         {
-            throw new MuleException("Failed to set one or more properties on the Email message: " + e, e);
+            throw new MuleException(new org.mule.config.i18n.Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Email message"), e);
         }
     }
 

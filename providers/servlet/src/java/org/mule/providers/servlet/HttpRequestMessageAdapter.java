@@ -13,14 +13,17 @@
  */
 package org.mule.providers.servlet;
 
+import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.http.HttpConstants;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
+import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.IteratorAdapter;
 import org.mule.util.Utility;
-import org.mule.config.MuleProperties;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -40,9 +43,11 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
 
     private Object message = null;
 
+    protected UMOExceptionPayload exceptionPayload;
+
     private HttpServletRequest request;
 
-    public HttpRequestMessageAdapter(Object message) throws MessageException
+    public HttpRequestMessageAdapter(Object message) throws MessagingException
     {
         setPayload(message);
     }
@@ -86,7 +91,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
     /* (non-Javadoc)
      * @see org.mule.umo.providers.UMOMessageAdapter#setMessage(java.lang.Object)
      */
-    private void setPayload(Object message) throws MessageException
+    private void setPayload(Object message) throws MessagingException
     {
         if (message instanceof HttpServletRequest)
         {
@@ -110,7 +115,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
                 }
             } catch (IOException e)
             {
-                throw new MessageException("Failed to read HttpRequest payload. Request is: " + request.getRequestURL().toString(), e);
+                throw new MessagingException(new Message("servlet", 3, request.getRequestURL().toString()), e);
             }
 
         }else
@@ -159,7 +164,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
     public String getUniqueId() throws UniqueIdNotSupportedException
     {
         if(getRequest().getSession()==null) {
-            throw new UniqueIdNotSupportedException(this, "http session is null");
+            throw new UniqueIdNotSupportedException(this, new Message(Messages.X_IS_NULL, "Http session"));
         }
         return getRequest().getSession().getId();
     }
@@ -347,26 +352,11 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
         setIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
     }
 
-    /**
-     * If an error occurred during the processing of this message this
-     * will return a value greater than zero
-     *
-     * @return
-     */
-    public int getErrorCode()
-    {
-        return getIntProperty(MuleProperties.MULE_ERROR_CODE_PROPERTY, 0);
+    public UMOExceptionPayload getExceptionPayload() {
+        return exceptionPayload;
     }
 
-    /**
-     * If an error occurs while processing this message, this error code
-     * should be set to a value greater than zero and the palyoad of the this
-     * message should contain the error details
-     *
-     * @param code
-     */
-    public void setErrorCode(int code)
-    {
-        setIntProperty(MuleProperties.MULE_ERROR_CODE_PROPERTY, code);
+    public void setExceptionPayload(UMOExceptionPayload exceptionPayload) {
+        this.exceptionPayload = exceptionPayload;
     }
 }

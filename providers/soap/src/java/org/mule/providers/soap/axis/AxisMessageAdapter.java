@@ -16,8 +16,9 @@ package org.mule.providers.soap.axis;
 import org.apache.axis.MessageContext;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerialisableToByteArray;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.config.i18n.Message;
 
 import javax.xml.soap.SOAPException;
 
@@ -32,7 +33,7 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
     private Object message;
     private UMOTransformer trans = new SerialisableToByteArray();
 
-    public AxisMessageAdapter(Object message) throws MessageException
+    public AxisMessageAdapter(Object message) throws MessagingException
     {
         this.message = message;
         try
@@ -60,7 +61,7 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
             }
         } catch (SOAPException e)
         {
-            throw new MessageException("Failed to process Soap Header: " + e.getMessage(), e);
+            throw new MessagingException(new Message("soap", 5), message, e);
         }
     }
 

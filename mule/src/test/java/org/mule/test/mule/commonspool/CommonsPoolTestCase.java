@@ -16,12 +16,13 @@
 package org.mule.test.mule.commonspool;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.config.pool.CommonsPoolProxyPool;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.model.AbstractPoolTestCase;
 import org.mule.umo.model.UMOPoolFactory;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ObjectPool;
 
 /**

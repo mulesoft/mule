@@ -17,7 +17,7 @@ import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOManager;
-import org.mule.umo.model.ComponentNotFoundException;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.springframework.context.support.AbstractApplicationContext;
 
 /**

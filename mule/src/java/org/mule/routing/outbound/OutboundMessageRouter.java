@@ -21,6 +21,7 @@ import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.MessagingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
@@ -56,7 +57,7 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
     }
 
     public UMOMessage route(final UMOMessage message, final UMOSession session, final boolean synchronous)
-            throws RoutingException
+            throws MessagingException
     {
 
         UMOMessage result = null;
@@ -84,7 +85,7 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
                     result = (UMOMessage) tt.execute(cb);
                 } catch (Exception e)
                 {
-                    throw new RoutingException(e.getMessage(), e);
+                    throw new RoutingException(message, null, e);
                 }
 
                 if (!isMatchAll())
@@ -117,7 +118,7 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
      * @return an array of UMOEndpoint objects or an empty array
      * @throws RoutingException
      */
-    public UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws RoutingException
+    public UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws MessagingException
     {
         List endpoints = new ArrayList();
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)

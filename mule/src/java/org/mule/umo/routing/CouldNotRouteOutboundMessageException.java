@@ -14,6 +14,9 @@
 package org.mule.umo.routing;
 
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.DispatchException;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>CouldNotRouteOutboundMessageException</code> thrown if Mule fails to
@@ -25,23 +28,23 @@ import org.mule.umo.UMOMessage;
 
 public class CouldNotRouteOutboundMessageException extends RoutingException
 {
-    private UMOMessage umoMessage;
-    public CouldNotRouteOutboundMessageException(String errorMessage, UMOMessage message)
+    public CouldNotRouteOutboundMessageException(UMOMessage message, UMOEndpoint endpoint)
     {
-        super(errorMessage);
-        umoMessage = message;
+        super(message, endpoint);
     }
 
-    public CouldNotRouteOutboundMessageException(String errorMessage, Throwable cause, UMOMessage message)
+    public CouldNotRouteOutboundMessageException(UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
     {
-        super(errorMessage, cause);
-        umoMessage = message;
+        super(umoMessage, endpoint, cause);
     }
 
-    public UMOMessage getUmoMessage()
+    public CouldNotRouteOutboundMessageException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
     {
-        return umoMessage;
+        super(message, umoMessage, endpoint);
     }
 
-
+    public CouldNotRouteOutboundMessageException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    {
+        super(message, umoMessage, endpoint, cause);
+    }
 }

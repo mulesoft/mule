@@ -16,9 +16,11 @@ package org.mule.util.queue;
 import EDU.oswego.cs.dl.util.concurrent.BoundedChannel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,7 +70,7 @@ public class SerialisationPersistence implements PersistenceStrategy
 
             } catch (IOException e)
             {
-                throw new PersistentQueueException("Failed to persist queued event: " + event.getId(), e);
+                throw new PersistentQueueException(new Message(Messages.FAILED_TO_PERSIST_EVENT_X, event.getId()), e);
             }
         }
     }
@@ -90,7 +92,7 @@ public class SerialisationPersistence implements PersistenceStrategy
     {
         if (queue == null)
         {
-            throw new InitialisationException("Queue cannot be null");
+            throw new InitialisationException(new Message(Messages.X_IS_NULL, "Queue"), this);
         }
         if (store == null)
         {
@@ -118,7 +120,7 @@ public class SerialisationPersistence implements PersistenceStrategy
             {
                 if (!componentStore.mkdirs())
                 {
-                    throw new InitialisationException("Could not create queue store: " + store.getAbsolutePath());
+                    throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Queue Store: " + store.getAbsolutePath()), this);
                 }
             }
         } catch (InitialisationException e)
@@ -126,7 +128,7 @@ public class SerialisationPersistence implements PersistenceStrategy
             throw e;
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to initialise queue persistent store: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Queue Persistent Store"), e, this);
         }
     }
 

@@ -14,8 +14,8 @@
 package org.mule.providers.udp;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
-import org.mule.DisposeException;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.DisposeException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
@@ -24,7 +24,10 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -69,7 +72,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
             inetAddress = InetAddress.getByName(uri.getHost());
         } catch (UnknownHostException e)
         {
-            throw new InitialisationException("Failed to locate host: " + e.getMessage(), e);
+            throw new InitialisationException(new Message("udp", 2, uri), e, this);
         }
         connect(uri);
         worker = new Thread(this);
@@ -106,7 +109,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
                     }
                 } else
                 {
-                    throw new InitialisationException("Unable to bind to uri: " + uri + ". Reason: " + e);
+                    throw new InitialisationException(new Message("udp", 1, uri), e, this);
                 }
             }
         }
@@ -163,7 +166,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
                 {
                     if(!connector.isDisposed() && ! disposing.get()) {
                         logger.debug("Accept failed on socket: " + e, e);
-                        handleException(null, e);
+                        handleException(e);
                     }
                 }
             }
@@ -179,7 +182,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
 
         } catch (Exception e)
         {
-            throw new DisposeException("Failed to close udp socket: " + e.getMessage(), e);
+            throw new DisposeException(new Message("udp", 3, socket), e);
         }
         logger.info("Closed Udp connection: " + uri);
     }
@@ -212,10 +215,11 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
          */
         public void run()
         {
+            UMOMessage returnMessage = null;
             try
             {
                 UMOMessageAdapter adapter = connector.getMessageAdapter(packet);
-                UMOMessage returnMessage = routeMessage(new MuleMessage(adapter),  endpoint.isSynchronous());
+                returnMessage = routeMessage(new MuleMessage(adapter),  endpoint.isSynchronous());
 
                 if (returnMessage != null)
                 {
@@ -225,9 +229,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
                 }
             } catch (Exception e)
             {
-                handleException("Failed to process Udp Request on: "
-                        + (socket != null ? socket.getInetAddress().toString() : "null"),
-                        e);
+                handleException(e);
             } finally
             {
                 try

@@ -19,6 +19,8 @@ import groovy.lang.Script;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManager;
 import org.mule.util.ClassHelper;
@@ -67,7 +69,7 @@ public class GroovyConfigurationBuilder implements ConfigurationBuilder
                 } else {
                     URL url = ClassHelper.getResource(script, getClass());
                     if(url == null) {
-                        throw new ConfigurationException("Config resource: " + script + " was not found on the file system of classpath");
+                        throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, script));
                     }
                     s = shell.parse(new GroovyCodeSource(url));
                 }
@@ -75,14 +77,14 @@ public class GroovyConfigurationBuilder implements ConfigurationBuilder
             }
         } catch (Exception e)
         {
-            throw new ConfigurationException("Failed to load script: " + script + ", " + e.getMessage(), e);
+            throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X, "Script: " + script), e);
         }
         try
         {
             MuleManager.getInstance().start();
         } catch (UMOException e)
         {
-            throw new ConfigurationException("Failed to start Mule server from builder: " + e.getMessage(), e);
+            throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X, "Mule Server from builder"), e);
         }
         return MuleManager.getInstance();
     }

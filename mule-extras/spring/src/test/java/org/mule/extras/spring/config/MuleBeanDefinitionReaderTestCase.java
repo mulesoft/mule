@@ -67,7 +67,7 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("appleComponent3");
         assertNotNull(d);
 
-        assertTrue(d.getExceptionStrategy() instanceof DefaultExceptionStrategy);
+        assertTrue(d.getExceptionListener() instanceof DefaultExceptionStrategy);
 
         //assertEquals("1.1", d.getVersion());
     }

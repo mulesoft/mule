@@ -17,8 +17,10 @@ package org.mule.extras.spring;
 
 import org.mule.tck.model.AbstractComponentResolverTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.model.UMOContainerContext;
-import org.mule.umo.model.ComponentNotFoundException;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.ObjectNotFoundException;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -57,9 +59,9 @@ public class SpringContainerContextTestCase extends AbstractComponentResolverTes
         try
         {
             result = container.getComponent(null);
-            fail("Should throw ComponentNotFoundException for null key");
+            fail("Should throw ObjectNotFoundException for null key");
         }
-        catch (ComponentNotFoundException e)
+        catch (ObjectNotFoundException e)
         {
             // expected
         }
@@ -67,9 +69,9 @@ public class SpringContainerContextTestCase extends AbstractComponentResolverTes
         try
         {
             result = container.getComponent("abcdefg123456!£$%^n");
-            fail("Should throw ComponentNotFoundException for a key that doesn't exist");
+            fail("Should throw ObjectNotFoundException for a key that doesn't exist");
         }
-        catch (ComponentNotFoundException e)
+        catch (ObjectNotFoundException e)
         {
             // expected
         }
@@ -78,7 +80,7 @@ public class SpringContainerContextTestCase extends AbstractComponentResolverTes
         {
             result = container.getComponent(Apple.class.getName());
             assertNotNull("Component should exist in container", result);
-        } catch (ComponentNotFoundException e)
+        } catch (ObjectNotFoundException e)
         {
             fail("Component should exist in the container");
         }

@@ -14,7 +14,7 @@
 package org.mule.providers.tcp;
 
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 /**
  * <code>TcpMessageAdapter</code> TODO
@@ -27,7 +27,7 @@ public class TcpMessageAdapter extends AbstractMessageAdapter
 {
     private byte[] message;
 
-    public TcpMessageAdapter(Object message) throws MessageException {
+    public TcpMessageAdapter(Object message) throws MessagingException {
         if(message instanceof byte[]) {
             this.message = (byte[])message;
         } else{

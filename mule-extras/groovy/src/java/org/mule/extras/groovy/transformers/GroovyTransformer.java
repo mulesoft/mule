@@ -18,9 +18,12 @@ import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.io.File;
 import java.net.URL;
@@ -67,7 +70,7 @@ public class GroovyTransformer extends AbstractTransformer
             logger.debug("Groovy transform Result " + result);
         } catch (Exception e)
         {
-            throw new TransformerException("Failed groovy transform: " + e.getMessage(), e);
+            throw new TransformerException(this, e);
         }
         return result;
     }
@@ -91,7 +94,7 @@ public class GroovyTransformer extends AbstractTransformer
                 if(file.exists()) {
                     scriptLocation = file.toURL();
                 } else {
-                    throw new InitialisationException("Failed to load groovy script on classpath or fs: " + script);
+                    throw new InitialisationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, "Groovy Script: " + script), this);
                 }
             }
             logger.info("Loading Groovy transformer with script " + scriptLocation.toExternalForm());
@@ -99,7 +102,7 @@ public class GroovyTransformer extends AbstractTransformer
             transformer = (GroovyObject) groovyClass.newInstance();
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to create Groovy transformer: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Groovy transformer"), e, this);
         } 
     }
 

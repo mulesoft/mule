@@ -52,7 +52,7 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException(e.getMessage(), e);
+            throw new TransformerException(this, e);
         }
         return result;
     }

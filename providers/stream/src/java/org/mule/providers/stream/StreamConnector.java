@@ -59,14 +59,7 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
      */
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        if (component != null)
-        {
-            return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{getInputStream(), new Long(1000)});
-        }
-        else
-        {
-            throw new MuleException("Listener cannot be null on the StreamConnector");
-        }
+         return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{getInputStream(), new Long(1000)});
     }
 
     /* (non-Javadoc)

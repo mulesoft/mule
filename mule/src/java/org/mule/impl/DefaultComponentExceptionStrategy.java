@@ -16,11 +16,10 @@ package org.mule.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * <code>DefaultComponentExceptionStrategy</code> is the default exception
@@ -70,17 +69,7 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
         return component;
     }
 
-    /**
-     * This is called when an exception occurs. By implementing this you can provide different stratgies
-     * for handling exceptions
-     *
-     * @param message Can be anthing, but is usually The message being processed when
-     *                the exception occurred.  The message could be an event and implmenting methods
-     *                should expect that an UMOEvent maybe passed to this method from the
-     *                framework.
-     * @param t       The Throwable exception that occurred
-     */
-    public void handleException(Object message, Throwable t)
+    public void defaultHandler(Throwable t)
     {
         if(component==null) {
             UMOEvent event = RequestContext.getEvent();
@@ -98,33 +87,26 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
 
         if(component!=null) {
             logger.error("Caught exception in Exception Strategy for: " + component.getDescriptor().getName() + ": " + t, t);
-        }
-
-        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if(tx!=null) {
-            handleTransaction(tx);
-        }
-
-        try
-        {
-            routeException(message, t);
-        } catch (UMOException e)
-        {
-            logger.fatal("Failed to route Exception message, this may result in unexpected message loss");
-            if(statistics!=null) {
-                statistics.incFatalError();
-            }
+        } else {
+            super.defaultHandler(t);
         }
     }
 
-    protected void routeException(Object message, Throwable t) throws UMOException
-    {
-        if(getEndpoint()!=null) {
-            super.routeException(message, t);
-                statistics.getOutboundRouterStat().incrementRoutedMessage(getEndpoint());
-            }
+    protected void logFatal(UMOMessage message, Throwable t) {
+        super.logFatal(message, t);
+        if(statistics!=null) {
+            statistics.incFatalError();
         }
+    }
 
+    protected void routeException(UMOMessage message, UMOEndpoint failedEndpoint, Throwable t) {
+
+        UMOEndpoint ep = getEndpoint(t);
+        if(ep!=null) {
+            super.routeException(message, failedEndpoint, t);
+            statistics.getOutboundRouterStat().incrementRoutedMessage(ep);
+        }
+    }
 
     public void setComponent(UMOComponent component)
     {

@@ -14,8 +14,10 @@
 package org.mule.routing.inbound;
 
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.Utility;
 
@@ -55,52 +57,52 @@ public class IdempotentReceiver extends SelectiveConsumer
         setStorePath(DEFAULT_STORE_PATH);
     }
 
-    public boolean isMatch(UMOEvent event) throws RoutingException
+    public boolean isMatch(UMOEvent event) throws MessagingException
     {
         if(idStore==null) {
             //we need to load this of fist request as we need the component name
-            load(event.getComponent().getDescriptor().getName());
+            load(event);
         }
-
-
-        try
-        {
-            return !messageIds.contains(event.getMessage().getUniqueId());
-        } catch (UniqueIdNotSupportedException e)
-        {
-            throw new RoutingException(e.getMessage(), e);
-        }
+        return !messageIds.contains(event.getMessage().getUniqueId());
     }
 
-    public UMOEvent[] process(UMOEvent event) throws RoutingException
+    public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         if(isMatch(event)) {
-            checkComponentName(event.getComponent().getDescriptor().getName());
             try
             {
-                storeId(event.getMessage().getUniqueId());
-                return new UMOEvent[]{event};
-            } catch (UniqueIdNotSupportedException e)
+                checkComponentName(event.getComponent().getDescriptor().getName());
+            } catch (IllegalArgumentException e)
             {
-                throw new RoutingException(e.getMessage(), e);
+                throw new RoutingException(event.getMessage(),  event.getEndpoint());
+            }
+            String id = event.getMessage().getUniqueId();
+            try
+            {
+                storeId(id);
+                return new UMOEvent[]{event};
+            } catch (IOException e)
+            {
+                 throw new RoutingException(new Message(Messages.FAILED_TO_WRITE_X_TO_STORE_X, id,
+                    idStore.getAbsolutePath()), event.getMessage(), event.getEndpoint(), e);
             }
         } else {
             return null;
         }
     }
 
-    private void checkComponentName(String name) throws RoutingException
+    private void checkComponentName(String name) throws IllegalArgumentException
     {
         if(!componentName.equals(name)) {
-            throw new RoutingException("This receiver is assigned to component: " + componentName +
+            throw new IllegalArgumentException("This receiver is assigned to component: " + componentName +
                     " but has received an event for component: " + name + ". Please check your config to make sure each component" +
                     "has its own instance of IdempotentReceiver");
         }
     }
 
-    protected synchronized void load(String componentName) throws RoutingException
+    protected synchronized void load(UMOEvent event) throws RoutingException
     {
-        this.componentName = componentName;
+        this.componentName = event.getComponent().getDescriptor().getName();
         idStore = new File(storePath + "/muleComponent_" + componentName + ".store");
         if(disablePersistence) return;
         try
@@ -123,23 +125,15 @@ public class IdempotentReceiver extends SelectiveConsumer
             }
         } catch (IOException e)
         {
-            throw new RoutingException("Failed to load Idempotent receiver message id store from: " +
-                    idStore.getAbsolutePath() + ". " + e.getMessage(), e);
+            throw new RoutingException(new Message(Messages.FAILED_TO_READ_FROM_STORE_X, idStore.getAbsolutePath()),
+                    event.getMessage(), event.getEndpoint(), e);
         }
     }
-    protected synchronized void storeId(Object id) throws RoutingException
+    protected synchronized void storeId(Object id) throws IOException
     {
         messageIds.add(id);
         if(disablePersistence) return;
-
-        try
-        {
-            Utility.stringToFile(idStore.getAbsolutePath(), id.toString(), true, true);
-        } catch (IOException e)
-        {
-            throw new RoutingException("Failed to write message id: " + id + " to Idempotent receiver store at: " +
-                    idStore.getAbsolutePath() + ". " + e.getMessage(), e);
-        }
+        Utility.stringToFile(idStore.getAbsolutePath(), id.toString(), true, true);
     }
 
     public boolean isDisablePersistence()

@@ -23,10 +23,12 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.net.SocketAppender;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.UMOServerEvent;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,7 +115,7 @@ public class Log4jAbstractEventLoggerAgent extends AbstractEventLoggerAgent
                 }
             } catch (IOException e)
             {
-                throw new InitialisationException("Failed to load Log4j info: " + e.getMessage(), e);
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Log4j configuration"), e, this);
             }
         }
     }

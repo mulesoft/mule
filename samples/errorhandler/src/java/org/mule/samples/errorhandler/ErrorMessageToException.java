@@ -37,7 +37,7 @@ public class ErrorMessageToException extends AbstractTransformer
             return ((ErrorMessage)src).getException().toException();
         } catch (InstantiationException e)
         {
-            throw new TransformerException("Failed to transform to Exception: " + e, e);
+            throw new TransformerException(this, e);
         }
     }
 }

@@ -17,10 +17,14 @@ package org.mule.extras.spring;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.extras.spring.config.ReaderInputStream;
-import org.mule.umo.model.ComponentNotFoundException;
-import org.mule.umo.model.ComponentResolverException;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassHelper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -85,7 +89,7 @@ public class SpringContainerContext implements UMOContainerContext, BeanFactoryA
     /* (non-Javadoc)
      * @see org.mule.umo.model.UMOContainerContext#getComponent(java.lang.Object)
      */
-    public Object getComponent(Object key) throws ComponentNotFoundException
+    public Object getComponent(Object key) throws ObjectNotFoundException
     {
         if (getBeanFactory() == null)
         {
@@ -93,7 +97,7 @@ public class SpringContainerContext implements UMOContainerContext, BeanFactoryA
         }
         if (key == null)
         {
-            throw new ComponentNotFoundException("Component not found for null key");
+            throw new ObjectNotFoundException("Component not found for null key");
         }
 
         if (key instanceof Class)
@@ -103,7 +107,7 @@ public class SpringContainerContext implements UMOContainerContext, BeanFactoryA
 //            String[] names = getBeanFactory().getBeanDefinitionNames((Class) key);
 //            if (names == null || names.length == 0 || names.length > 1)
 //            {
-                throw new ComponentNotFoundException("The container is unable to build single instance of " +
+                throw new ObjectNotFoundException("The container is unable to build single instance of " +
                         ((Class) key).getName() + " number of instances found was: 0");
 //            }
 //            else
@@ -117,7 +121,7 @@ public class SpringContainerContext implements UMOContainerContext, BeanFactoryA
         }
         catch (BeansException e)
         {
-            throw new ComponentNotFoundException("Component not found for key: " + key.toString(), e);
+            throw new ObjectNotFoundException("Component not found for key: " + key.toString(), e);
         }
     }
 
@@ -143,11 +147,11 @@ public class SpringContainerContext implements UMOContainerContext, BeanFactoryA
             }
         } catch (BeansException e)
         {
-            throw new ConfigurationException("Failed to load Application Context: " + e.getMessage(), e);
+            throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X, "Application Context: " + configFile), e);
         }
     }
 
-    public void configure(Reader configuration, Map configurationProperties) throws ComponentResolverException {
+    public void configure(Reader configuration, Map configurationProperties) throws ContainerException {
         BeanFactory bf = new XmlBeanFactory(new InputStreamResource(new ReaderInputStream(configuration)));
     }
 }

@@ -27,6 +27,7 @@ import org.mule.components.simple.EchoComponent;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.MuleProperties;
+import org.mule.config.ExceptionHelper;
 import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.security.MuleSecurityManager;
@@ -39,6 +40,8 @@ import org.mule.umo.UMOManager;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UnauthorisedException;
+import org.mule.umo.security.CredentialsNotSetException;
 import org.mule.MuleManager;
 
 import java.util.Map;
@@ -69,7 +72,8 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         System.out.println(m.getPayload());
-        assertEquals(100, m.getErrorCode());
+        assertNotNull(m.getExceptionPayload());
+        assertEquals(ExceptionHelper.getErrorCode(CredentialsNotSetException.class), m.getExceptionPayload().getCode());
 
     }
 
@@ -79,14 +83,16 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
         String user = new MuleCredentials("anonX", "anonX".toCharArray()).getToken();
-        user = new String(strategy.encrypt(user.getBytes()));
+        user = new String(strategy.encrypt(user.getBytes(), null));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
         UMOMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         System.out.println(m.getPayload());
-        assertEquals(100, m.getErrorCode());
+        assertNotNull(m.getExceptionPayload());
+        assertEquals(ExceptionHelper.getErrorCode(UnauthorisedException.class), m.getExceptionPayload().getCode());
+
     }
 
     public void testAuthenticationAuthorised() throws Exception
@@ -96,12 +102,13 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
         String user = new MuleCredentials("anon", "anon".toCharArray()).getToken();
-        user = new String(strategy.encrypt(user.getBytes()));
+        user = new String(strategy.encrypt(user.getBytes(), null));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
         UMOMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
-        assertEquals(0, m.getErrorCode());
+        assertNull(m.getExceptionPayload());
+
         System.out.println(m.getPayload());
     }
 
@@ -111,7 +118,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
         String user = new MuleCredentials("anonX", "anonX".toCharArray()).getToken();
-        user = new String(strategy.encrypt(user.getBytes()));
+        user = new String(strategy.encrypt(user.getBytes(), null));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
         UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
@@ -128,7 +135,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
         String user = new MuleCredentials("anon", "anon".toCharArray()).getToken();
-        user = new String(strategy.encrypt(user.getBytes()));
+        user = new String(strategy.encrypt(user.getBytes(), null));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
         UMOMessage m = client.send("http://localhost:4567/index.html", "", props);

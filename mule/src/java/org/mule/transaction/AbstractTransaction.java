@@ -17,7 +17,9 @@ package org.mule.transaction;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * This base class provides low level features for transactions
@@ -32,14 +34,14 @@ public abstract class AbstractTransaction implements UMOTransaction {
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#isRollbackOnly()
 	 */
-	public boolean isRollbackOnly() throws UMOTransactionException {
+	public boolean isRollbackOnly() throws TransactionException {
         return getStatus() == STATUS_MARKED_ROLLBACK;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#isBegun()
 	 */
-	public boolean isBegun() throws UMOTransactionException {
+	public boolean isBegun() throws TransactionException {
 		int status = getStatus();
 		return status != STATUS_NO_TRANSACTION && status != STATUS_UNKNOWN;
 	}
@@ -47,21 +49,21 @@ public abstract class AbstractTransaction implements UMOTransaction {
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#isRolledBack()
 	 */
-	public boolean isRolledBack() throws UMOTransactionException {
+	public boolean isRolledBack() throws TransactionException {
         return getStatus() == STATUS_ROLLEDBACK;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#isCommitted()
 	 */
-	public boolean isCommitted() throws UMOTransactionException {
+	public boolean isCommitted() throws TransactionException {
 		return getStatus() == STATUS_COMMITTED;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#begin()
 	 */
-	public void begin() throws UMOTransactionException {
+	public void begin() throws TransactionException {
         logger.debug("Beginning transaction");
         doBegin();
         TransactionCoordination.getInstance().bindTransaction(this);
@@ -70,10 +72,10 @@ public abstract class AbstractTransaction implements UMOTransaction {
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#commit()
 	 */
-	public void commit() throws UMOTransactionException {
+	public void commit() throws TransactionException {
         logger.debug("Committing transaction");
         if (isRollbackOnly()) {
-        	throw new IllegalTransactionStateException("Transaction is marked for rollback");
+        	throw new IllegalTransactionStateException(new Message(Messages.TX_MARKED_FOR_ROLLBACK));
         }
 	    doCommit();
 		TransactionCoordination.getInstance().unbindTransaction(this);
@@ -82,7 +84,7 @@ public abstract class AbstractTransaction implements UMOTransaction {
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#rollback()
 	 */
-	public void rollback() throws UMOTransactionException {
+	public void rollback() throws TransactionException {
 		try {
 	        logger.debug("Rolling back transaction");
 	        setRollbackOnly();
@@ -95,20 +97,20 @@ public abstract class AbstractTransaction implements UMOTransaction {
 	/**
 	 * Really begin the transaction.
 	 * Note that resources are enlisted yet. 
-	 * @throws UMOTransactionException
+	 * @throws TransactionException
 	 */
-	protected abstract void doBegin() throws UMOTransactionException;
+	protected abstract void doBegin() throws TransactionException;
 
 	/**
 	 * Commit the transaction on the underlying resource 
-	 * @throws UMOTransactionException
+	 * @throws TransactionException
 	 */
-	protected abstract void doCommit() throws UMOTransactionException;
+	protected abstract void doCommit() throws TransactionException;
 
 	/**
 	 * Rollback the transaction on the underlying resource 
-	 * @throws UMOTransactionException
+	 * @throws TransactionException
 	 */
-	protected abstract void doRollback() throws UMOTransactionException;
+	protected abstract void doRollback() throws TransactionException;
 	
 }

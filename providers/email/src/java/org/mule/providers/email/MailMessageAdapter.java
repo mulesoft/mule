@@ -16,14 +16,14 @@
 package org.mule.providers.email;
 
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.Utility;
+import org.mule.config.i18n.Messages;
 
 import javax.mail.Address;
 import javax.mail.Header;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import java.util.Enumeration;
 
 /**
@@ -45,7 +45,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter
     Message message = null;
 
 
-    public MailMessageAdapter(Object message) throws MessageException
+    public MailMessageAdapter(Object message) throws MessagingException
     {
         setMessage(message);
     }
@@ -79,7 +79,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter
     /* (non-Javadoc)
      * @see org.mule.providers.UMOMessageAdapter#setMessage(java.lang.Object)
      */
-    private void setMessage(Object message) throws MessageException
+    private void setMessage(Object message) throws MessagingException
     {
         if(message instanceof Message) {
             this.message = (Message)message;
@@ -108,9 +108,9 @@ public class MailMessageAdapter extends AbstractMessageAdapter
             }
 
         }
-        catch (MessagingException e)
+        catch (javax.mail.MessagingException e)
         {
-            throw new MessageException("Failed to create message adapter for message: " + e, e);
+            throw new MessagingException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X, "Message Adapter"), e);
         }
     }
 }

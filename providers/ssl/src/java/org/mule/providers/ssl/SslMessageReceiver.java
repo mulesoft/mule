@@ -27,10 +27,11 @@
  */
 package org.mule.providers.ssl;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import javax.net.ServerSocketFactory;

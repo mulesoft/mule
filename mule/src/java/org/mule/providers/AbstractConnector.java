@@ -16,19 +16,20 @@ import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.DisposeException;
-import org.mule.InitialisationException;
-import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.DisposeException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
@@ -82,7 +83,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * The exception strategy used by this endpoint
      */
-    protected UMOExceptionStrategy exceptionStrategy = null;
+    protected ExceptionListener exceptionListener = null;
 
     /**
      * Determines in the endpoint is alive and well
@@ -152,7 +153,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     public AbstractConnector()
     {
         //make sure we always have an exception strategy
-        exceptionStrategy = new DefaultExceptionStrategy();
+        exceptionListener = new DefaultExceptionStrategy();
         dispatchers = new ConcurrentHashMap();
         receivers = new ConcurrentHashMap();
     }
@@ -192,7 +193,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         if (initialised.get())
         {
-            throw new AlreadyInitialisedException("Connector: " + getName() + " is already initialised");
+            throw new AlreadyInitialisedException("Connector '" + getName() + "'", this);
         }
         if (logger.isInfoEnabled())
             logger.info("Initialising " + getClass().getName());
@@ -236,7 +237,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         if (isDisposed())
         {
-            throw new MuleException("Cannot start an endpoint once it has been disposing");
+            throw new ConnectorException(new Message(Messages.CANT_START_DISPOSED_CONNECTOR), this);
         }
         if (!started.get())
         {
@@ -342,18 +343,14 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 	 * @see org.mule.umo.provider.UMOConnector#handleException(java.lang.Object,
 	 *      java.lang.Throwable)
 	 */
-    public void handleException(Object message, Throwable exception)
+    public void handleException(Exception exception)
     {
-        if (exceptionStrategy == null)
+        if (exceptionListener == null)
         {
-            throw new MuleRuntimeException("Exception occurred in endpoint: "
-                    + getName()
-                    + ". Exception handler is not set. Message is: "
-                    + message,
-                    exception);
+            throw new MuleRuntimeException(new Message(Messages.EXCEPTION_ON_CONNECTOR_X_NO_EXCEPTION_LISTENER, getName()), exception);
         } else
         {
-            exceptionStrategy.handleException(message, exception);
+            exceptionListener.exceptionThrown(exception);
         }
     }
 
@@ -363,25 +360,25 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 	 */
     public void exceptionThrown(Exception e)
     {
-        handleException("Dispatcher failed while processing event: " + e, e);
+        handleException(e);
     }
 
     /**
      * @return the ExceptionStrategy for this endpoint
-     * @see UMOExceptionStrategy
+     * @see ExceptionListener
      */
-    public UMOExceptionStrategy getExceptionStrategy()
+    public ExceptionListener getExceptionListener()
     {
-        return exceptionStrategy;
+        return exceptionListener;
     }
 
     /**
-     * @param strategy the ExceptionStrategy to use with this endpoint
-     * @see UMOExceptionStrategy
+     * @param listener the ExceptionStrategy to use with this endpoint
+     * @see ExceptionListener
      */
-    public void setExceptionStrategy(UMOExceptionStrategy strategy)
+    public void setExceptionListener(ExceptionListener listener)
     {
-        exceptionStrategy = strategy;
+        exceptionListener = listener;
     }
 
     /**
@@ -440,13 +437,13 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     protected void checkDisposed() throws DisposeException
     {
-        if(isDisposed()) throw new DisposeException("Cannot perform action, connector is disposed");
+        if(isDisposed()) throw new DisposeException(new Message(Messages.CANT_START_DISPOSED_CONNECTOR), this);
     }
 
     protected UMOMessageDispatcher createDispatcher() throws UMOException
     {
         if(dispatcherFactory==null) {
-            throw new InitialisationException("Connector: " + name + " has not been started. Cannot create dispatcher");
+            throw new ConnectorException(new Message(Messages.CONNECTOR_NOT_STARTED, name), this);
         }
         UMOMessageDispatcher dispatcher = dispatcherFactory.create(this);
         return dispatcher;
@@ -460,14 +457,14 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         UMOEndpointURI endpointUri = endpoint.getEndpointURI();
         if (endpointUri == null)
         {
-            throw new MuleException("Endpoint cannot be null when registering a listener");
+            throw new ConnectorException(new Message(Messages.ENDPOINT_NULL_FOR_LISTENER), this);
         }
         logger.info("registering listener: " + component.getDescriptor().getName() + " on endpointUri: " + endpointUri.toString());
 
         UMOMessageReceiver receiver = (UMOMessageReceiver) receivers.get(getReceiverKey(component, endpoint));
         if (receiver != null)
         {
-            throw new MuleException("There is already a listener registered on this connector on endpointUri: " + endpointUri);
+            throw new ConnectorException(new Message(Messages.LISTENER_ALREADY_REGISTERED, endpointUri), this);
         } else
         {
             receiver = createReceiver(component, endpoint);

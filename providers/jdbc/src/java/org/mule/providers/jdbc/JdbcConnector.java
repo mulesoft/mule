@@ -22,15 +22,18 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * @author Guillaume Nodet
@@ -83,7 +86,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector {
         if (temp instanceof DataSource) {
             dataSource = (DataSource) temp;
         } else {
-            throw new InitialisationException("No Connection factory was found for name: " + this.dataSourceJndiName);
+            throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND, this.dataSourceJndiName), this);
         }
     }
 
@@ -102,7 +105,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector {
                 createDataSource();
             }
         } catch (Exception e) {
-            throw new InitialisationException("Failed to create Jdbc Connector: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jdbc Connector"), e, this);
         }
     }
 
@@ -284,7 +287,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector {
 			logger.debug("Binding connection to current transaction");
 			try {
 				tx.bindResource(dataSource, con);
-			} catch (UMOTransactionException e) {
+			} catch (TransactionException e) {
 				throw new RuntimeException("Could not bind connection to current transaction", e);
 			}
 		}
