@@ -961,7 +961,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     protected void addTransactionConfigRules(String path, Digester digester)
     {
         digester.addObjectCreate(path + "/transaction", DEFAULT_TRANSACTION_CONFIG);
-        addSetPropertiesRule(path + "/transaction", digester, new String[] {"beginAction"},  new String[] {"beginActionAsString"});
+        addSetPropertiesRule(path + "/transaction", digester, new String[] {"action"},  new String[] {"actionAsString"});
 
         digester.addObjectCreate(path + "/transaction/constraint", TRANSACTION_CONSTRAINT_INTERFACE, "className");
         addSetPropertiesRule(path + "/transaction/constraint", digester);

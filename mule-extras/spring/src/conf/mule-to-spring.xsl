@@ -469,10 +469,10 @@
     <xsl:template match="transaction">
         <property name="transactionConfig">
             <bean class="org.mule.impl.MuleTransactionConfig">
-                <xsl:if test="@beginAction">
-                    <property name="beginActionAsString">
+                <xsl:if test="@action">
+                    <property name="actionAsString">
                         <value>
-                            <xsl:value-of select="@beginAction"/>
+                            <xsl:value-of select="@action"/>
                         </value>
                     </property>
                 </xsl:if>

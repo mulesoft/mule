@@ -14,10 +14,10 @@ package org.mule.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.transaction.constraints.ConstraintFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
-import org.mule.MuleManager;
 
 /**
  * <p/>
@@ -40,12 +40,9 @@ public class MuleTransactionConfig implements UMOTransactionConfig
     public static final String ACTION_ALWAYS_JOIN_STRING = "ALWAYS_JOIN";
     public static final String ACTION_JOIN_IF_POSSIBLE_STRING = "JOIN_IF_POSSIBLE";
 
-    public static final String ACTION_ALWAYS_COMMIT_STRING = "ALWAYS_COMMIT";
-    public static final String ACTION_COMMIT_IF_POSSIBLE_STRING = "COMMIT_IF_POSSIBLE";
-
     private UMOTransactionFactory factory;
 
-    private byte beginAction = ACTION_NONE;
+    private byte action = ACTION_NONE;
 
     private ConstraintFilter constraint = null;
 
@@ -84,45 +81,45 @@ public class MuleTransactionConfig implements UMOTransactionConfig
     /*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.mule.umo.UMOTransactionConfig#getBeginAction()
+	 * @see org.mule.umo.UMOTransactionConfig#getAction()
 	 */
-    public byte getBeginAction()
+    public byte getAction()
     {
-        return beginAction;
+        return action;
     }
 
     /*
 	 * (non-Javadoc)
 	 *
-	 * @see org.mule.umo.UMOTransactionConfig#setBeginAction(byte)
+	 * @see org.mule.umo.UMOTransactionConfig#setAction(byte)
 	 */
-    public void setBeginAction(byte action)
+    public void setAction(byte action)
     {
-        beginAction = action;
+        this.action = action;
 
     }
 
-    public void setBeginActionAsString(String action)
+    public void setActionAsString(String action)
     {
         if (ACTION_ALWAYS_BEGIN_STRING.equals(action))
         {
-            beginAction = ACTION_ALWAYS_BEGIN;
+            this.action = ACTION_ALWAYS_BEGIN;
         }
         else if (ACTION_BEGIN_OR_JOIN_STRING.equals(action))
         {
-            beginAction = ACTION_BEGIN_OR_JOIN;
+            this.action = ACTION_BEGIN_OR_JOIN;
         }
         else if (ACTION_ALWAYS_JOIN_STRING.equals(action))
         {
-            beginAction = ACTION_ALWAYS_JOIN;
+            this.action = ACTION_ALWAYS_JOIN;
         }
         else if (ACTION_JOIN_IF_POSSIBLE_STRING.equals(action))
         {
-            beginAction = ACTION_JOIN_IF_POSSIBLE;
+            this.action = ACTION_JOIN_IF_POSSIBLE;
         }
         else if (ACTION_NONE_STRING.equals(action))
         {
-            beginAction = ACTION_NONE;
+            this.action = ACTION_NONE;
         }
         else
         {
@@ -136,7 +133,7 @@ public class MuleTransactionConfig implements UMOTransactionConfig
             if (!factory.isTransacted()) {
             	return false;
             }
-            return beginAction != ACTION_NONE;
+            return action != ACTION_NONE;
         }
         return false;
     }

@@ -437,7 +437,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
 
         assertNotNull(outEndpoint);
         assertNotNull(inEndpoint.getTransactionConfig());
-        assertEquals(UMOTransactionConfig.ACTION_ALWAYS_BEGIN, inEndpoint.getTransactionConfig().getBeginAction());
+        assertEquals(UMOTransactionConfig.ACTION_ALWAYS_BEGIN, inEndpoint.getTransactionConfig().getAction());
         assertTrue(inEndpoint.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
         assertNull(inEndpoint.getTransactionConfig().getConstraint());
     }

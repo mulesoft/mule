@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+    <mule-environment-properties synchronous="false" synchronousEventTimeout="5000"/>
+
+    <!-- Transaction manager -->
+    <transaction-manager
+        factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
+
+    <!-- Testing with ActiveMq -->
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
+            <property name="jndiInitialFactory" value="org.codehaus.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <property name="specification" value="1.1"/>
+        </properties>
+    </connector>
+
+    <model name="model">
+
+        <mule-descriptor name="component1"
+            implementation="org.mule.test.integration.service.TestReceiver">
+            <inbound-router>
+                <endpoint address="vm://component1"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.MulticastingRouter">
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    <endpoint address="jms://my.queue1"/>
+                    <endpoint address="jms://my.queue2"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="component2"
+            implementation="org.mule.test.integration.service.TestReceiver">
+            <inbound-router>
+                <endpoint address="jms://component2">
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                </endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.MulticastingRouter">
+                    <transaction action="ALWAYS_JOIN"/>
+                    <endpoint address="jms://my.queue3"/>
+                    <endpoint address="jms://my.queue4"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

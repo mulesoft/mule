@@ -12,7 +12,7 @@
 -->
 <!ELEMENT mule-configuration (description?,(mule-environment-properties)?,(environment-properties)?, (transaction-manager)?, (security-manager)?,
             (agents)?,(connector)*,(endpoint-identifiers)?,(transformers)?,(global-endpoints)?,
-		    (interceptor-stack)*,(container-context)?,(model)+,(mule-descriptor)*,(bean)*)>
+		    (interceptor-stack)*,(container-context)*,(model)+,(mule-descriptor)*,(bean)*)>
 
 <!--
     The id attribute allows for a unique id for this file as it is often the case that
@@ -551,7 +551,7 @@ A fully qualified classname of the security filter to use on this endpoint
 <!ATTLIST transaction factory 		NMTOKEN    		#IMPLIED>
 
 <!--
-	The beginAction attribute determise the way that the provider demarcates 
+	The Action attribute determise the way that the provider demarcates
 	transactions when it receives an event.
 	
 	NONE - tells the provider not to do anything regarding transaction management.
@@ -562,7 +562,7 @@ A fully qualified classname of the security filter to use on this endpoint
 	
 -->
 
-<!ATTLIST transaction beginAction 		(NONE | ALWAYS_BEGIN |
+<!ATTLIST transaction action 		(NONE | ALWAYS_BEGIN |
 										BEGIN_OR_JOIN | ALWAYS_JOIN |
 										JOIN_IF_POSSIBLE )     			#IMPLIED>
 
@@ -653,6 +653,11 @@ Agents is a collection of one or more agent configurations
     element.
 -->
 <!ATTLIST container-context className  	NMTOKEN		#REQUIRED>
+
+<!--
+    The name of this container context
+-->
+<!ATTLIST container-context name  	NMTOKEN		#IMPLIED>
 
 <!--
 	The <i>model</i> defines the components and interations between components in the Mule

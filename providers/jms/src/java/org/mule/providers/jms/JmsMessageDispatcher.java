@@ -73,7 +73,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     {
     	// If a jms session can be bound to the current transaction,
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-    	Session session = connector.getSession(tx instanceof XaTransaction);
+        boolean transacted = false;
+        if(tx==null) {
+            transacted = event.getEndpoint().getTransactionConfig()!=null;
+        } else {
+            transacted = (tx instanceof XaTransaction);
+        }
+    	Session session = connector.getSession(tx!=null);
 
         boolean syncReceive = event.getBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY,
                         							   MuleManager.getConfiguration().isSynchronousReceive());

@@ -13,8 +13,7 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import java.util.HashMap;
-
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.MuleManager;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
@@ -29,7 +28,7 @@ import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.util.HashMap;
 
 /**
  * @author Guillaume Nodet
@@ -108,7 +107,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends
 		UMOTransactionFactory tf = getTransactionFactory(); 
 		UMOTransactionConfig txConfig = new MuleTransactionConfig();
 		txConfig.setFactory(tf);
-		txConfig.setBeginAction(txBeginAction);
+		txConfig.setAction(txBeginAction);
 
 		UMOEndpoint outProvider = new MuleEndpoint("testOut", getOutDest(),
 				connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, null);
