@@ -36,6 +36,7 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -55,6 +56,7 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
 {
     private BoundedPersistentQueue queue;
     private Thread worker;
+    private Object lock = new Object();
 
     public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint, BoundedPersistentQueue queue) throws InitialisationException
     {
@@ -76,14 +78,23 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
         if(queue!=null) {
             try
             {
-                queue.put(event);
+                synchronized(queue) {
+                    queue.put(event);
+                }
             } catch (InterruptedException e)
             {
                 throw new MuleException("Failed to queue event: " + event.toString(), e);
             }
         } else {
+            //We get message duplication here without synchronization for some reason 3/100
+            //need to investigate
+
             UMOMessageAdapter adapter = connector.getMessageAdapter(new MuleMessage(event.getTransformedMessage(), event.getProperties()));
-            routeMessage(new MuleMessage(adapter), event.isSynchronous());
+            UMOMessage message = new MuleMessage(adapter);
+
+            synchronized(lock) {
+                routeMessage(message, event.isSynchronous());
+            }
         }
     }
 
