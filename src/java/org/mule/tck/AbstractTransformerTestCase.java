@@ -15,6 +15,7 @@
 
 package org.mule.tck;
 
+import org.mule.impl.RequestContext;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
@@ -25,6 +26,19 @@ import org.mule.umo.transformer.UMOTransformer;
  */
 public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 {
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        //setup a dummy context for transformers that are event aware
+        RequestContext.setEvent(getTestEvent("test"));
+    }
+
+    protected void tearDown() throws Exception
+    {
+        RequestContext.setEvent(null);
+        super.tearDown();
+    }
+
     public void testTransform() throws Exception
     {
         Object result = getTransformer().transform(getTestData());
