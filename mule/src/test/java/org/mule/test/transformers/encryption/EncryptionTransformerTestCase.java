@@ -1,0 +1,120 @@
+/* 
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ * 
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk 
+ * 
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file. 
+ *
+ */
+
+package org.mule.test.transformers.encryption;
+
+import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.security.CryptoFailureException;
+import org.mule.util.compression.CompressionHelper;
+import org.mule.test.transformers.ReverseCompressionTransformer;
+import org.mule.impl.security.PasswordBasedEncryptionStrategy;
+import org.mule.transformers.encryption.EncryptionTransformer;
+import org.mule.transformers.encryption.DecryptionTransformer;
+import org.mule.InitialisationException;
+
+import java.util.Arrays;
+
+/**
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
+{
+    private PasswordBasedEncryptionStrategy strat;
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        strat = new PasswordBasedEncryptionStrategy();
+        strat.setPassword("mule");
+        strat.initialise();
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
+     */
+    public Object getResultData()
+    {
+        try
+        {
+            return strat.encrypt(getTestData().toString().getBytes());
+        } catch (CryptoFailureException e)
+        {
+            fail(e.getMessage());
+            return null;
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
+     */
+    public Object getTestData()
+    {
+        return "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.tck.AbstractTransformerTestCase#getTransformers()
+     */
+    public UMOTransformer getTransformer()
+    {
+        EncryptionTransformer transformer = new EncryptionTransformer();
+        transformer.setStrategy(strat);
+        try
+        {
+            transformer.initialise();
+        } catch (InitialisationException e)
+        {
+            fail(e.getMessage());
+        }
+        return transformer;
+    }
+
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#setUp()
+     */
+
+
+    /* (non-Javadoc)
+     * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
+     */
+    public UMOTransformer getRoundTripTransformer()
+    {
+        DecryptionTransformer transformer = new DecryptionTransformer();
+        transformer.setStrategy(strat);
+        transformer.setReturnClass(String.class);
+        try
+        {
+            transformer.initialise();
+        } catch (InitialisationException e)
+        {
+            fail(e.getMessage());
+        }
+        return transformer;
+    }
+
+    public boolean compareResults(Object src, Object result) {
+        if(src instanceof byte[]) {
+            if(src==null && result ==null) return true;
+            if(src==null || result ==null) return false;
+            return Arrays.equals((byte[])src, (byte[])result);
+        } else {
+            return super.compareResults(src, result);
+        }
+    }
+}

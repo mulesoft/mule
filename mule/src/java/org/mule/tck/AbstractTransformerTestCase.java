@@ -20,49 +20,21 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**
- * <p><code>AbstractTransformerTestCase</code> TODO (document class)
- *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
 public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 {
-    public void testSessionTransform() throws Exception
+    public void testTransform() throws Exception
     {
-        doTestSessionTransform(getTransformer(), getTestData(), getResultData());
+        doTransform(getTransformer(), getTestData(), getResultData());
     }
 
-    public void testRoundTripSessionTransform() throws Exception
+    public void testRoundtripTransform() throws Exception
     {
         if (getRoundTripTransformer() != null)
         {
-            doTestSessionTransform(getRoundTripTransformer(), getResultData(), getTestData());
-        }
-    }
-
-    public void testAutoCommitTransform() throws Exception
-    {
-        doTestAutoCommitTransform(getTransformer(), getTestData(), getResultData());
-    }
-
-    public void testRoundtripAutoCommitTransform() throws Exception
-    {
-        if (getRoundTripTransformer() != null)
-        {
-            doTestAutoCommitTransform(getRoundTripTransformer(), getResultData(), getTestData());
-        }
-    }
-
-    public void testBadSessionCalls() throws Exception
-    {
-        doTestBadSessionCalls(getTransformer());
-    }
-
-    public void testRoundTripBadSessionCalls() throws Exception
-    {
-        if (getRoundTripTransformer() != null)
-        {
-            doTestBadSessionCalls(getRoundTripTransformer());
+            doTransform(getRoundTripTransformer(), getResultData(), getTestData());
         }
     }
 
@@ -83,85 +55,19 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     {
         if (getRoundTripTransformer() != null)
         {
-//            UMOTransformer trans = getTransformer();
-//            UMOTransformer trans2 = getRoundTripTransformer();
-//            trans.setAutoCommit(false);
-//            assertTrue(!trans.isInSession());
-//            trans.setTransformer(trans2);
-//            trans.startSession();
-//            trans.transform(getTestData());
-//            Object result = trans.commitSession();
-//            compareResults(getTestData(), result);
+            UMOTransformer trans = getTransformer();
+            UMOTransformer trans2 = getRoundTripTransformer();
+            trans.setTransformer(trans2);
+            Object result = trans.transform(getTestData());
+            compareResults(getTestData(), result);
         }
     }
 
-    public void doTestSessionTransform(UMOTransformer trans, Object src, Object expectedResult) throws Exception
+    public void doTransform(UMOTransformer trans, Object src, Object expectedResult) throws Exception
     {
-//        trans.setAutoCommit(false);
-//        assertTrue(!trans.isInSession());
-//        trans.startSession();
-//        Object result = trans.transform(src);
-//        assertNotNull(result);
-//        assertTrue(!result.equals(src));
-//        assertTrue(compareResults(expectedResult, result));
-//        result = trans.rollbackSession();
-//        assertEquals(src, result);
-//        assertTrue(!trans.isInSession());
-//
-//        result = trans.sessionTransform(src);
-//        assertTrue(compareResults(expectedResult, result));
-//        assertTrue(trans.isInSession());
-//        Object result2 = trans.commitSession();
-//        assertEquals(result, result2);
-//        assertTrue(!trans.isInSession());
-    }
-
-    public void doTestAutoCommitTransform(UMOTransformer trans, Object src, Object expectedResult) throws Exception
-    {
-//        trans.setAutoCommit(true);
-//        assertTrue(trans.isAutoCommit());
-//
-//        assertTrue(!trans.isInSession());
-//        trans.startSession();
-//        Object result = trans.transform(src);
-//        assertNotNull(result);
-//        assertTrue(compareResults(expectedResult, result));
-//        assertTrue(!trans.isInSession());
-    }
-
-    public void doTestBadSessionCalls(UMOTransformer tran) throws Exception
-    {
-//        tran.startSession();
-//        assertTrue(tran.isInSession());
-//        try
-//        {
-//            tran.startSession();
-//            fail("Should throw exception session is already in a transaction");
-//        }
-//        catch (TransformerException e)
-//        {
-//            // expected
-//        }
-//
-//        tran.rollbackSession();
-//        try
-//        {
-//            tran.rollbackSession();
-//            fail("Transformer should not be in a session");
-//        }
-//        catch (TransformerException e1)
-//        {
-//            // expected
-//        }
-//        try
-//        {
-//            tran.commitSession();
-//            fail("Transformer should not be in a session");
-//        }
-//        catch (TransformerException e2)
-//        {
-//            // expected
-//        }
+        Object result = trans.transform(src);
+        assertNotNull(result);
+        assertTrue(compareResults(expectedResult, result));
     }
 
     public void doTestBadReturnType(UMOTransformer tran, Object src) throws Exception
