@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
-    <handler type="java:org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler"
-                name="MuleSoapHeadersHandler"/>
-       <transport name="http"
-                  pivot="java:org.apache.axis.transport.http.HTTPSender">
+    <handler type="java:org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler" name="MuleSoapHeadersHandler"/>
+       <transport name="http" pivot="java:org.mule.providers.soap.axis.extensions.MuleHttpSender">
          <requestFlow><handler type="MuleSoapHeadersHandler"/></requestFlow>
          <responseFlow><handler type="MuleSoapHeadersHandler"/></responseFlow>
-       </transport>"
+       </transport>
 </deployment>
 

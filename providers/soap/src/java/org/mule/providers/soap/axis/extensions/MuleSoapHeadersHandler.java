@@ -16,6 +16,8 @@ package org.mule.providers.soap.axis.extensions;
 import org.apache.axis.AxisFault;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.BasicHandler;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.mule.config.MuleProperties;
 import org.mule.providers.soap.axis.MuleSoapHeaders;
 import org.mule.umo.UMOEvent;
@@ -33,6 +35,11 @@ import javax.xml.soap.SOAPMessage;
  */
 public class MuleSoapHeadersHandler extends BasicHandler
 {
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(MuleSoapHeadersHandler.class);
+
     public void invoke(MessageContext msgContext) throws AxisFault {
         boolean setMustUnderstand =
             msgContext.isPropertyTrue("MULE_HEADER_MUST_UNDERSTAND");
@@ -41,14 +48,26 @@ public class MuleSoapHeadersHandler extends BasicHandler
             if (msgContext.isClient()) {
                 if (!msgContext.getPastPivot()) {
                     processClientRequest(msgContext, setMustUnderstand);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("After Client Request, Message is:\n" + msgContext.getRequestMessage().getSOAPPartAsString());
+                    }
                 } else {
                    processClientResponse(msgContext);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("After Client Response, Message is:\n" + msgContext.getRequestMessage().getSOAPPartAsString());
+                    }
                 }
             } else {
                 if (!msgContext.getPastPivot()) {
                     processServerRequest(msgContext);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("After Server Request, Message is:\n" + msgContext.getRequestMessage().getSOAPPartAsString());
+                    }
                 } else {
                     processServerResponse(msgContext, setMustUnderstand);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("After Server Response, Message is:\n" + msgContext.getRequestMessage().getSOAPPartAsString());
+                    }
                 }
             }
         } catch (Exception e) {

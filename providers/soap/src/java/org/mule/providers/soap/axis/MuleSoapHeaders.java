@@ -14,6 +14,7 @@
 package org.mule.providers.soap.axis;
 
 import org.apache.axis.MessageContext;
+import org.apache.axis.encoding.Base64;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.utils.XMLUtils;
 import org.mule.config.MuleProperties;
@@ -74,18 +75,30 @@ public class MuleSoapHeaders
             while(iter2.hasNext()) {
                 element = (SOAPElement)iter2.next();
                 if(MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(element.getElementName().getLocalName())) {
-                    correlationId = element.getValue();
+                    correlationId = getStringValue(element);
                 } else if(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(element.getElementName().getLocalName())) {
-                    correlationGroup = element.getValue();
+                    correlationGroup = getStringValue(element);
                 } else if(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(element.getElementName().getLocalName())) {
-                    correlationSequence = element.getValue();
+                    correlationSequence = getStringValue(element);
                 } else if(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(element.getElementName().getLocalName())) {
-                    replyTo = element.getValue();
+                    replyTo = getStringValue(element);
                 } else {
                     throw new SOAPException("Unrecognised Mule Soap header: " + element.getElementName().getQualifiedName());
                 }
             }
         }
+    }
+
+    private String getStringValue(SOAPElement e) {
+        String value = e.getValue();
+        if(value==null && e.hasChildNodes()) {
+            //see if the value is base64 ecoded
+            value = e.getChildNodes().item(0).getChildNodes().item(0).getNodeValue();
+            if(value!=null) {
+                value = new String(org.apache.axis.encoding.Base64.decode(value));
+            }
+        }
+        return value;
     }
 
     /**
