@@ -88,6 +88,11 @@ public class MuleService implements MuleServiceMBean
         MuleManager.getInstance().stop();
     }
 
+    public void dispose() throws UMOException
+    {
+        MuleManager.getInstance().dispose();
+    }
+
     public boolean isSynchronous()
     {
         return MuleManager.getConfiguration().isSynchronous();
