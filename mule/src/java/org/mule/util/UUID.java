@@ -27,11 +27,11 @@ import java.io.Serializable;
 
 public class UUID implements Serializable
 {
+    private static UUIDGenerator gen = UUIDGenerator.getInstance();
     String uuid = null;
 
     public UUID()
     {
-        UUIDGenerator gen = UUIDGenerator.getInstance();
         uuid = gen.generateTimeBasedUUID().toString();
     }
 
