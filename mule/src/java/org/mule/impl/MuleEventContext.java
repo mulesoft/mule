@@ -13,18 +13,15 @@
  */
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.Callable;
+import java.io.OutputStream;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.service.ConnectorFactory;
-import org.mule.providers.service.ConnectorServiceDescriptor;
-import org.mule.transaction.TransactionInProgressException;
-import org.mule.transaction.TransactionRollbackException;
-import org.mule.transaction.constraints.ManualConstraint;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
@@ -33,15 +30,12 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionException;
-import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
 
-import java.io.OutputStream;
-import java.util.Map;
+import EDU.oswego.cs.dl.util.concurrent.Callable;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current
@@ -60,8 +54,6 @@ public class MuleEventContext implements UMOEventContext
 
     private UMOEvent event;
     private UMOSession session;
-    private boolean beginTransaction = false;
-    private UMOTransactionFactory factory = null;
 
     MuleEventContext(UMOEvent event)
     {
@@ -157,74 +149,13 @@ public class MuleEventContext implements UMOEventContext
      */
     public UMOTransaction getCurrentTransaction()
     {
-        return session.getTransaction();
+        return TransactionCoordination.getInstance().getTransaction();
     }
 
-    public void beginTransaction() throws TransactionInProgressException
+    public void markTransactionForRollback() throws UMOTransactionException
     {
-        if(getCurrentTransaction()==null) {
-            beginTransaction=true;
-        } else {
-            throw new TransactionInProgressException("Transaction already in progress");
-        }
-    }
-
-    public void beginOrJoinTransaction()
-    {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    public void beginTransaction(UMOTransactionFactory factory) throws UMOTransactionException
-    {
-        if(getCurrentTransaction()==null) {
-            this.factory = factory;
-            this.beginTransaction = true;
-        } else {
-            throw new TransactionInProgressException("Transaction already in progress");
-        }
-    }
-
-    public void commitTransaction() throws UMOTransactionException
-    {
-        if(getCurrentTransaction()!=null) {
-            getCurrentTransaction().commit();
-        }
-    }
-
-    public void rollbackTransaction() throws TransactionRollbackException
-    {
-        if(getCurrentTransaction()!=null) {
-            getCurrentTransaction().rollback();
-        }
-    }
-
-    public void markTransactionForRollback()
-    {
-        if(getCurrentTransaction()!=null) {
+        if (getCurrentTransaction() != null) {
             getCurrentTransaction().setRollbackOnly();
-        }
-    }
-
-    protected void setTransactionAttributes(UMOEndpoint endpoint)  throws UMOException {
-        if(beginTransaction) {
-            UMOTransactionConfig config = new MuleTransactionConfig();
-            if(factory!=null) {
-                config.setFactory(factory);
-            } else {
-                //lookup tx config
-                UMOEndpointURI ep = new MuleEndpointURI(endpoint.getEndpointURI());
-                ConnectorServiceDescriptor csd = ConnectorFactory.getServiceDescriptor(ep.getSchemeMetaInfo());
-                UMOTransactionFactory txf = csd.createTransactionFactory();
-                if(txf==null) {
-                    logger.debug("Provider with protocol " + ep.getSchemeMetaInfo() + " doesn't have a transaction factory associated with it");
-                    return;
-                } else {
-                    config.setFactory(txf);
-                }
-            }
-            config.setConstraint(new ManualConstraint());
-            config.setBeginAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
-            endpoint.setTransactionConfig(config);
         }
     }
 
@@ -297,11 +228,6 @@ public class MuleEventContext implements UMOEventContext
     public UMOMessage sendEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        if(beginTransaction && factory==null) {
-            ConnectorServiceDescriptor csd = ConnectorFactory.getServiceDescriptor(endpointUri.getSchemeMetaInfo());
-            factory = csd.createTransactionFactory();
-        }
-        setTransactionAttributes(endpoint);
         
         //If synchronous receive has not been explicitly set, default it to true
         Object temp = message.getProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY);
@@ -463,7 +389,6 @@ public class MuleEventContext implements UMOEventContext
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
-        setTransactionAttributes(endpoint);
         return session.sendEvent(message, endpoint);
     }
 

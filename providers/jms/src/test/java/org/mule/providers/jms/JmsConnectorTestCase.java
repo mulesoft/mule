@@ -14,7 +14,7 @@ package org.mule.providers.jms;
 
 
 import org.mule.providers.jms.support.JmsTestUtils;
-import org.mule.tck.providers.AbstractTransactionEnabledConnectorTestCase;
+import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ObjectFactory;
 
@@ -27,7 +27,7 @@ import java.util.Properties;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class JmsConnectorTestCase extends AbstractTransactionEnabledConnectorTestCase
+public class JmsConnectorTestCase extends AbstractConnectorTestCase
 {
     private JmsConnector connector;
 

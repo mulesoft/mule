@@ -30,7 +30,7 @@ public interface UMOTransactionFactory
      * @return a new Transaction
      * @throws UMOTransactionException if the transaction cannot be created or begun
      */
-    public UMOTransaction beginTransaction(Object session) throws UMOTransactionException;
+    public UMOTransaction beginTransaction() throws UMOTransactionException;
 
     /**
      * Determines whether this transaction factory creates transactions that are really

@@ -58,21 +58,18 @@ public final class MuleSession implements UMOSession
      */
     private boolean valid = true;
 
-    private UMOTransaction transaction;
-
     private String id;
 
     private UMOSecurityContext securityContext;
 
-    public MuleSession(UMOTransaction transaction)
+    public MuleSession()
     {
-        this.transaction = transaction;
         this.id = new UUID().getUUID();
     }
 
     public MuleSession(UMOComponent component, UMOTransaction transaction)
     {
-        this(transaction);
+        this();
         if (component == null)
         {
             throw new IllegalArgumentException("Component cannot be null");
@@ -284,14 +281,6 @@ public final class MuleSession implements UMOSession
     public UMOComponent getComponent()
     {
         return component;
-    }
-
-    /* (non-Javadoc)
-     * @see org.mule.umo.UMOSession#beginTransaction()
-     */
-    public UMOTransaction getTransaction()
-    {
-        return transaction;
     }
 
     void setComponent(UMOComponent component) {

@@ -20,7 +20,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
 
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.mule.MuleManager;
@@ -28,6 +27,7 @@ import org.mule.config.PoolingProfile;
 import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.jdbc.JdbcConnector;
+import org.mule.providers.jdbc.JdbcUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
@@ -53,7 +53,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
 	
     protected UMOConnector connector;
     protected static UMOManager manager;
-    protected Object dataSource;
+    protected DataSource dataSource;
 
     protected void setUp() throws Exception {
     	// Create a new mule manager
@@ -88,7 +88,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     		con = getConnection();
     		return new QueryRunner().update(con, sql);
     	} finally {
-    		DbUtils.close(con);
+    		JdbcUtils.close(con);
     	}
     }
     
@@ -98,7 +98,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     		con = getConnection();
     		return (Object[]) new QueryRunner().query(con, sql, new ArrayHandler());
     	} finally {
-    		DbUtils.close(con);
+    		JdbcUtils.close(con);
     	}
     }
 
@@ -122,14 +122,14 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     	}
     }
 	
-	public Object getDataSource() throws Exception {
+	public DataSource getDataSource() throws Exception {
 		if (dataSource == null) {
 			dataSource = createDataSource();
 		}
 		return dataSource;
 	}
 	
-	protected abstract Object createDataSource() throws Exception;
+	protected abstract DataSource createDataSource() throws Exception;
 	
     public UMOConnector createConnector() throws Exception {
         JdbcConnector connector = new JdbcConnector();

@@ -13,9 +13,6 @@
  */
 package org.mule.providers.jdbc;
 
-import java.sql.Connection;
-
-import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionException;
 import org.mule.umo.UMOTransactionFactory;
@@ -27,16 +24,12 @@ import org.mule.umo.UMOTransactionFactory;
 public class JdbcTransactionFactory implements UMOTransactionFactory {
 
 	/* (non-Javadoc)
-	 * @see org.mule.umo.UMOTransactionFactory#beginTransaction(java.lang.Object)
+	 * @see org.mule.umo.UMOTransactionFactory#beginTransaction()
 	 */
-	public UMOTransaction beginTransaction(Object session) throws UMOTransactionException {
-		if (session instanceof Connection) {
-            JdbcTransaction tx = new JdbcTransaction((Connection) session);
-            tx.begin();
-            return tx;
-		} else {
-            throw new IllegalTransactionStateException("Session was not of expected type: " + Connection.class.getName());
-		}
+	public UMOTransaction beginTransaction() throws UMOTransactionException {
+        JdbcTransaction tx = new JdbcTransaction();
+        tx.begin();
+        return tx;
 	}
 
 	/* (non-Javadoc)

@@ -13,7 +13,14 @@
  */
 package org.mule.providers.jms;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 
 /**
  * <code>JmsSupport</code> is an interface that provides a polymorphic facade to the Jms 1.0.2b and 1.1

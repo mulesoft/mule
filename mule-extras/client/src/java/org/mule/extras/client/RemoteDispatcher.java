@@ -221,7 +221,7 @@ public class RemoteDispatcher
 
         message.addProperties(action.getProperties());
         UMOEndpoint endpoint = ConnectorFactory.createEndpoint(serverEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        UMOSession session = new MuleSession(null);
+        UMOSession session = new MuleSession();
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(timeout);
         logger.debug("MuleClient sending remote call to: " + action.getEndpoint() + ". At " + serverEndpoint.toString() + " .Event is: " + event);

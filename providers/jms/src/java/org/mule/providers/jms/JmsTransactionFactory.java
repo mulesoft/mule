@@ -15,17 +15,15 @@
 
 package org.mule.providers.jms;
 
-import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionException;
 import org.mule.umo.UMOTransactionFactory;
-
-import javax.jms.Session;
 
 /**
  * <p><code>JmsTransactionFactory</code> TODO (document class)
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author Guillaume Nodet
  * @version $Revision$
  */
 public class JmsTransactionFactory implements UMOTransactionFactory
@@ -33,18 +31,11 @@ public class JmsTransactionFactory implements UMOTransactionFactory
     /* (non-Javadoc)
      * @see org.mule.umo.UMOTransactionFactory#beginTransaction(org.mule.umo.provider.UMOMessageDispatcher)
      */
-    public UMOTransaction beginTransaction(Object session) throws UMOTransactionException
+    public UMOTransaction beginTransaction() throws UMOTransactionException
     {
-        if (session instanceof Session)
-        {
-            JmsTransaction tx = new JmsTransaction((Session) session);
-            tx.begin();
-            return tx;
-        }
-        else
-        {
-            throw new IllegalTransactionStateException("Session was not of expected type: " + Session.class.getName());
-        }
+		JmsTransaction tx = new JmsTransaction();
+		tx.begin();
+		return tx;
     }
 
     public boolean isTransacted()

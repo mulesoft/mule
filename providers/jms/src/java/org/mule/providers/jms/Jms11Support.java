@@ -13,7 +13,16 @@
  */
 package org.mule.providers.jms;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.QueueSession;
+import javax.jms.Session;
+import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
@@ -94,13 +103,13 @@ public class Jms11Support implements JmsSupport
         }
         
         if (!topic) {
-            if (session instanceof XAQueueSession || session instanceof QueueSession) {
+            if (session instanceof QueueSession) {
 				return ((QueueSession) session).createQueue(name);
 			}else {
 				return session.createQueue(name);
 			}
         } else {
-			if (session instanceof XATopicSession || session instanceof TopicSession) {
+			if (session instanceof TopicSession) {
 				return ((TopicSession) session).createTopic(name);
 			} else {
 				return session.createTopic(name);
@@ -135,14 +144,14 @@ public class Jms11Support implements JmsSupport
         }
 
         if(!topic) {
-            if (session instanceof XAQueueSession || session instanceof QueueSession)
+            if (session instanceof QueueSession)
             {
                 return ((QueueSession) session).createTemporaryQueue();
             } else {
                 return session.createTemporaryQueue();
             }
         } else {
-            if (session instanceof XATopicSession || session instanceof TopicSession)
+            if (session instanceof TopicSession)
             {
                 return ((TopicSession) session).createTemporaryTopic();
             } else {

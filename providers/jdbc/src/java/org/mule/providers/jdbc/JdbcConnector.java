@@ -14,25 +14,20 @@
 package org.mule.providers.jdbc;
 
 import java.sql.Connection;
-import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import javax.sql.XADataSource;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.mule.InitialisationException;
-import org.mule.providers.TransactionEnabledConnector;
-import org.mule.transaction.XaTransactionFactory;
+import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOMessageReceiver;
@@ -41,10 +36,10 @@ import org.mule.umo.provider.UMOMessageReceiver;
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class JdbcConnector extends TransactionEnabledConnector {
+public class JdbcConnector extends AbstractServiceEnabledConnector {
 
     private long pollingFrequency = 0;
-    private Object dataSource;
+    private DataSource dataSource;
     private String dataSourceJndiName;
     private Context jndiContext;
     private String jndiInitialFactory;
@@ -85,8 +80,8 @@ public class JdbcConnector extends TransactionEnabledConnector {
     protected void createDataSource() throws InitialisationException, NamingException
     {
         Object temp =  this.jndiContext.lookup(this.dataSourceJndiName);
-        if (temp instanceof DataSource || temp instanceof XADataSource) {
-            dataSource = temp;
+        if (temp instanceof DataSource) {
+            dataSource = (DataSource) temp;
         } else {
             throw new InitialisationException("No Connection factory was found for name: " + this.dataSourceJndiName);
         }
@@ -174,18 +169,14 @@ public class JdbcConnector extends TransactionEnabledConnector {
 	/**
 	 * @return Returns the dataSource.
 	 */
-	public Object getDataSource() {
+	public DataSource getDataSource() {
 		return dataSource;
 	}
 	/**
 	 * @param dataSource The dataSource to set.
 	 */
-	public void setDataSource(Object dataSource) {
-		if (dataSource instanceof DataSource || dataSource instanceof XADataSource) {
-			this.dataSource = dataSource;
-		} else {
-			throw new IllegalArgumentException("dataSource should be an instance of DataSource of XADataSource");
-		}
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 	/**
 	 * @return Returns the pollingFrequency.
@@ -273,74 +264,31 @@ public class JdbcConnector extends TransactionEnabledConnector {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mule.providers.TransactionEnabledConnector#getSession(org.mule.umo.endpoint.UMOEndpoint)
+	 * @see org.mule.providers.TransactionEnabledConnector#getSessionFactory(org.mule.umo.endpoint.UMOEndpoint)
 	 */
-	public Object getSession(UMOEndpoint endpoint) throws Exception {
-		if (endpoint.getTransactionConfig() != null &&
-			endpoint.getTransactionConfig().getFactory() instanceof XaTransactionFactory) {
-			if (dataSource instanceof XADataSource) {
-				return ((XADataSource) dataSource).getXAConnection();
-			} else {
-				throw new IllegalStateException("dataSource should be an instance of XADataSource");
-			}
-		} else {
-			if (dataSource instanceof DataSource) {
-				Connection con = ((DataSource) dataSource).getConnection();
-				con.setAutoCommit(false);
-				return con;
-			} else {
-				throw new IllegalStateException("dataSource should be an instance of DataSource");
+	public Object getSessionFactory(UMOEndpoint endpoint) throws Exception {
+		return dataSource;
+	}
+	
+	public Connection getConnection() throws Exception {
+		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+		if (tx != null) {
+			if (tx.hasResource(dataSource)) {
+				logger.debug("Retrieving connection from current transaction");
+				return (Connection) tx.getResource(dataSource);
 			}
 		}
+		logger.debug("Retrieving new connection from data source");
+		Connection con = dataSource.getConnection();
+		if (tx != null) {
+			logger.debug("Binding connection to current transaction");
+			try {
+				tx.bindResource(dataSource, con);
+			} catch (UMOTransactionException e) {
+				throw new RuntimeException("Could not bind connection to current transaction", e);
+			}
+		}
+		return con;
 	}
 
-	/**
-	 * Parse the given statement filling the parameter list and return
-	 * the ready to use statement.
-	 * 
-	 * @param stmt
-	 * @param params
-	 * @return
-	 */
-	public static String parseStatement(String stmt, List params) {
-		if (stmt == null) {
-			return stmt;
-		}
-		Pattern p = Pattern.compile("\\$\\{[^\\}]*\\}");
-		Matcher m = p.matcher(stmt);
-		StringBuffer sb = new StringBuffer();
-	    while (m.find()) {
-	    	String key = m.group();
-	    	m.appendReplacement(sb, "?");
-	    	params.add(key);
-	    }
-	    m.appendTail(sb);
-	    return sb.toString();
-	}
-	
-	public static Object[] getParams(UMOEndpointURI uri, List paramNames, Object root) throws Exception {
-		Object[] params = new Object[paramNames.size()];
-		for (int i = 0; i < paramNames.size(); i++) {
-			String param = (String) paramNames.get(i);
-			String name  = param.substring(2, param.length() - 1);
-			Object value = null;
-			if ("NOW".equals(name)) {
-				value = new Timestamp(Calendar.getInstance().getTimeInMillis());
-			} else {
-				try {
-					value = BeanUtils.getProperty(root, name);
-				} catch (Exception ignored) {
-				}
-			}
-			if (value == null) {
-				value = uri.getParams().getProperty(name);
-			}
-			if (value == null) {
-				throw new IllegalArgumentException("Can not retrieve argument " + name);
-			}
-			params[i] = value;
-		}
-		return params;
-	}
-	
 }

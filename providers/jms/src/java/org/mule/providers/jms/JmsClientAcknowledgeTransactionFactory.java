@@ -13,38 +13,29 @@
  */
 package org.mule.providers.jms;
 
-import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionException;
 import org.mule.umo.UMOTransactionFactory;
-
-import javax.jms.Message;
 
 /**
  * <code>JmsClientAcknowledgeTransactionFactory</code> creates a Jms Client Acknowledge transaction
  * using a Jms message.
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author Guillaume Nodet
  * @version $Revision$
  */
 
 public class JmsClientAcknowledgeTransactionFactory implements UMOTransactionFactory
 {
     /* (non-Javadoc)
-     * @see org.mule.umo.UMOTransactionFactory#beginTransaction(org.mule.umo.provider.UMOMessageDispatcher)
+     * @see org.mule.umo.UMOTransactionFactory#beginTransaction(java.lang.Object)
      */
-    public UMOTransaction beginTransaction(Object message) throws UMOTransactionException
+    public UMOTransaction beginTransaction() throws UMOTransactionException
     {
-        if (message instanceof Message)
-        {
-            JmsClientAcknowledgeTransaction tx = new JmsClientAcknowledgeTransaction((Message) message);
-            tx.begin();
-            return tx;
-        }
-        else
-        {
-            throw new IllegalTransactionStateException("Argument was not of expected type: " + Message.class.getName());
-        }
+        JmsClientAcknowledgeTransaction tx = new JmsClientAcknowledgeTransaction();
+        tx.begin();
+        return tx;
     }
 
     public boolean isTransacted()

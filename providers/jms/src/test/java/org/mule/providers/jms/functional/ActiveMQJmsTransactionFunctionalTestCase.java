@@ -24,6 +24,7 @@ import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author Guillaume Nodet
  * @version $Revision$
  */
 
@@ -62,8 +63,4 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
         //todo there seems to be a problem with activeMQ rollback
     }
 
-    public void testSendBatchTransactedRollback() throws Exception
-    {
-       //todo there seems to be a problem with activeMQ rollback
-    }
 }

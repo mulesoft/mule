@@ -43,7 +43,6 @@ import org.mule.tck.testmodels.mule.TestEntryPointResolver;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
-import org.mule.transaction.constraints.BatchConstraint;
 import org.mule.umo.UMOAgent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -439,14 +438,6 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
         assertEquals(UMOTransactionConfig.ACTION_ALWAYS_BEGIN, inEndpoint.getTransactionConfig().getBeginAction());
         assertTrue(inEndpoint.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
         assertNull(inEndpoint.getTransactionConfig().getConstraint());
-
-        assertNotNull(outEndpoint.getTransactionConfig());
-        assertEquals(UMOTransactionConfig.ACTION_ALWAYS_COMMIT, outEndpoint.getTransactionConfig().getCommitAction());
-        assertNull(outEndpoint.getTransactionConfig().getFactory());
-        assertNotNull(outEndpoint.getTransactionConfig().getConstraint());
-        assertTrue(outEndpoint.getTransactionConfig().getConstraint() instanceof BatchConstraint);
-        BatchConstraint constraint = (BatchConstraint) outEndpoint.getTransactionConfig().getConstraint();
-        assertEquals(3, constraint.getBatchSize());
     }
 
     public void testObjectReferences() throws UMOException

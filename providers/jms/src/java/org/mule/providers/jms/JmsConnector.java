@@ -15,24 +15,31 @@
 package org.mule.providers.jms;
 
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.jms.XAConnectionFactory;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.mule.InitialisationException;
+import org.mule.MuleManager;
+import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.ReplyToHandler;
-import org.mule.providers.TransactionEnabledConnector;
-import org.mule.providers.jms.filters.JmsSelectorFilter;
+import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOMessageReceiver;
 
-import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.util.Hashtable;
-import java.util.Map;
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -41,11 +48,12 @@ import java.util.Map;
  * subscribers, acknowledgement modes, loacal transactions
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author Guillaume Nodet
  * @version $Revision$
  */
 
 
-public class JmsConnector extends TransactionEnabledConnector
+public class JmsConnector extends AbstractServiceEnabledConnector
 {
 
     public static final String JMS_SELECTOR_PROPERTY = "selector";
@@ -101,6 +109,7 @@ public class JmsConnector extends TransactionEnabledConnector
         super.doInitialise();
         try
         {
+        	setDisposeDispatcherOnCompletion(true);
             //If we have a connection factory, there is no need to initialise
             //the JndiContext
             if(connectionFactory==null || (connectionFactory!=null && jndiInitialFactory!=null)) {
@@ -167,6 +176,11 @@ public class JmsConnector extends TransactionEnabledConnector
         {
             connectionFactory = createConnectionFactory();
         }
+        if (connectionFactory != null && connectionFactory instanceof XAConnectionFactory) {
+        	if (MuleManager.getInstance().getTransactionManager() != null) {
+        		connectionFactory = new ConnectionFactoryWrapper((XAConnectionFactory) connectionFactory, MuleManager.getInstance().getTransactionManager());
+        	}
+        }
 
         if(username!=null) {
             connection = jmsSupport.createConnection(connectionFactory, username, password);
@@ -182,41 +196,39 @@ public class JmsConnector extends TransactionEnabledConnector
         return component.getDescriptor().getName() + "~" + endpoint.getEndpointURI().getAddress();
     }
 
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
-    {
-        Session session = getSession(endpoint.getTransactionConfig().isTransacted());
-        boolean topic = false;
-
-        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-        topic = (resourceInfo!=null && "topic".equalsIgnoreCase(resourceInfo));
-
-        Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
-
-        MessageConsumer consumer = null;
-        String selector=null;
-
-        //Set the slector
-        if(endpoint.getFilter()!=null && endpoint.getFilter() instanceof JmsSelectorFilter) {
-            selector = ((JmsSelectorFilter)endpoint.getFilter()).getExpression();
-        }else if(endpoint.getProperties() != null) {
-            //still allow the selector to be set as a property on the endpoint
-            //to be backward compatable
-            selector = (String)endpoint.getProperties().get(JMS_SELECTOR_PROPERTY);
-        }
-
-        if(durable) {
-            consumer = jmsSupport.createConsumer(session, dest, selector, noLocal, durableName);
-        } else {
-            consumer = jmsSupport.createConsumer(session, dest, selector, noLocal, null);
-        }
-        UMOMessageReceiver receiver = serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{consumer, session});
-        return receiver;
+	/* (non-Javadoc)
+	 * @see org.mule.providers.TransactionEnabledConnector#getSessionFactory(org.mule.umo.endpoint.UMOEndpoint)
+	 */
+    public Object getSessionFactory(UMOEndpoint endpoint) {
+    	if (endpoint.getTransactionConfig() != null &&
+    		endpoint.getTransactionConfig().getFactory() instanceof JmsClientAcknowledgeTransactionFactory) {
+    		// TODO: return the current Message 
+    		throw new RuntimeException();
+    	} else {
+    		return connection;
+    	}
     }
-
-    Session getSession(boolean transacted) throws JMSException
+    
+    public Session getSession(boolean transacted) throws JMSException
     {
-        Session session = jmsSupport.createSession(connection, transacted, acknowledgementMode, noLocal);
-        return session;
+		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+		if (tx != null) {
+			if (tx.hasResource(connection)) {
+				logger.debug("Retrieving jms session from current transaction");
+				return (Session) tx.getResource(connection);
+			}
+		}
+		logger.debug("Retrieving new jms session from connection");
+    	Session session = jmsSupport.createSession(connection, transacted, acknowledgementMode, noLocal);
+		if (tx != null) {
+			logger.debug("Binding session to current transaction");
+			try {
+				tx.bindResource(connection, session);
+			} catch (UMOTransactionException e) {
+				throw new RuntimeException("Could not bind session to current transaction", e);
+			}
+		}
+		return session;
     }
 
     public void stopConnector() throws UMOException
@@ -387,15 +399,6 @@ public class JmsConnector extends TransactionEnabledConnector
         this.providerProperties = endpointProperties;
     }
 
-    /**
-     * @return Returns the isQueue.
-     */
-    public boolean isQueue()
-    {
-        return ((connection instanceof QueueConnection ||
-                connection instanceof XAQueueConnection));
-    }
-
     public String getJndiInitialFactory()
     {
         return jndiInitialFactory;
@@ -418,11 +421,7 @@ public class JmsConnector extends TransactionEnabledConnector
 
     public Object getSession(UMOEndpoint endpoint) throws Exception
     {
-        if(endpoint.getTransactionConfig().getFactory() instanceof JmsClientAcknowledgeTransactionFactory) {
-            return getSession(false);
-        } else {
-            return getSession(endpoint.getTransactionConfig().isTransacted());
-        }
+        return getSession(endpoint.getTransactionConfig().isTransacted());
     }
 
     public ConnectionFactory getConnectionFactory()
@@ -489,13 +488,7 @@ public class JmsConnector extends TransactionEnabledConnector
     {
         try
         {
-            UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-            Session session;
-            if(tx!=null && tx instanceof JmsTransaction) {
-                session = (Session)tx.getResource();
-            } else {
-                session = getSession(false);
-            }
+            Session session = getSession(false);
             return new JmsReplyToHandler(this, session, defaultResponseTransformer);
         } catch (JMSException e)
         {
@@ -524,4 +517,10 @@ public class JmsConnector extends TransactionEnabledConnector
         this.password = password;
     }
 
+	/**
+	 * @return Returns the connection.
+	 */
+	public Connection getConnection() {
+		return connection;
+	}
 }

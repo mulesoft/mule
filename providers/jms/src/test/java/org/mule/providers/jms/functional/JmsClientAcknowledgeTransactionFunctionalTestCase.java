@@ -62,18 +62,11 @@ public class JmsClientAcknowledgeTransactionFunctionalTestCase extends AbstractJ
 
     public void testSendTransactedRollback() throws Exception
     {
-//        try
-//        {
-//            super.testSendTransactedRollback();
-//            fail("Cant roll back client acknowledge transactions");
-//        } catch (UnsupportedOperationException e)
-//        {
-//            //expected
-//        }
+    	// Rollback not allowed for client acknowledge
     }
 
-    public void testSendBatchTransactedRollback() throws Exception
-    {
+//    public void testSendBatchTransactedRollback() throws Exception
+//    {
 //        try
 //        {
 //            super.testSendTransactedRollback();
@@ -82,5 +75,5 @@ public class JmsClientAcknowledgeTransactionFunctionalTestCase extends AbstractJ
 //        {
 //            //expected
 //        }
-    }
+//    }
 }

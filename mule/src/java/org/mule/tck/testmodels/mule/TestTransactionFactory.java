@@ -27,7 +27,7 @@ import org.mule.umo.UMOTransactionFactory;
 
 public class TestTransactionFactory implements UMOTransactionFactory
 {
-    public UMOTransaction beginTransaction(Object session) throws UMOTransactionException
+    public UMOTransaction beginTransaction() throws UMOTransactionException
     {
         return (UMOTransaction)new Mock(UMOTransaction.class).proxy();
     }

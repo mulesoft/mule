@@ -477,7 +477,7 @@ public class MuleClient
 
         try
         {
-            MuleSession session = new MuleSession(null);
+            MuleSession session = new MuleSession();
             if(user!=null) {
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + user.getToken());
             }

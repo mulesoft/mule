@@ -14,13 +14,18 @@
  */
 package org.mule.providers.jms;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.XaTransaction;
 import org.mule.umo.UMOEvent;
@@ -30,9 +35,6 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.jms.*;
-import javax.transaction.xa.XAResource;
-
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching
  * messages to Jms destinations. All Jms sematics apply and settings such
@@ -40,14 +42,11 @@ import javax.transaction.xa.XAResource;
  * are used (according to the Jms specification) 
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author Guillaume Nodet
  * @version $Revision$
  */
 public class JmsMessageDispatcher extends AbstractMessageDispatcher
 {
-    /**
-     * logger used by this class
-     */
-    protected static transient Log logger = LogFactory.getLog(JmsMessageDispatcher.class);
 
     private JmsConnector connector;
     private Session session;
@@ -72,30 +71,15 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     private UMOMessage dispatchMessage(UMOEvent event) throws Exception
     {
-//        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-//        if(tx != null && (tx instanceof JmsTransaction || tx instanceof XaTransaction))
-//        {
-//            session = (Session)tx.getResource();
-//        } else if(session==null) {
-//            session = connector.getSession(false);
-//        }
-
+    	// If a jms session can be bound to the current transaction,
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        XaTransaction xaTransaction = null;
-        if(tx instanceof XaTransaction)
-        {
-            xaTransaction = (XaTransaction)tx;
-            session = connector.getSession(false);
-            xaTransaction.enlistResource(((XASession)session).getXAResource());
-        } else if(tx instanceof JmsTransaction )
-        {
-           session = (Session)tx.getResource();
-        } else if (session==null) {
-             session = connector.getSession(false);
-        }
+    	Session session = connector.getSession(tx instanceof XaTransaction);
 
         boolean syncReceive = event.getBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY,
-                        MuleManager.getConfiguration().isSynchronousReceive());
+                        							   MuleManager.getConfiguration().isSynchronousReceive());
+        if (tx != null && syncReceive) {
+        	throw new IllegalTransactionStateException("Jms connector does not support synchronous receive in transacted mode");
+        }
 
         MessageConsumer replyToConsumer = null;
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
@@ -161,11 +145,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
                 connector.getJmsSupport().send(producer, msg, deliveryMode, priority, ttl);
             }
-            if(xaTransaction!=null)
-            {
-                xaTransaction.delistResource(((XASession)session).getXAResource(), XAResource.TMSUCCESS);
-            }
-            connector.commitTransaction(event);
 
             if(replyToConsumer!=null && event.isSynchronous()) {
                 try
@@ -191,7 +170,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new MuleException("Message is not a JMS message, it is of type: "
                     + message.getClass().getName()
-                    + ". Check the transformer for this Connector: "  +connector.getName());
+                    + ". Check the transformer for this Connector: "  + connector.getName());
         }
     }
 
@@ -210,30 +189,19 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+    	Session receiveSession = connector.getSession(tx instanceof XaTransaction);
+        
         Destination dest = null;
         boolean topic = false;
         String resourceInfo = endpointUri.getResourceInfo();
         topic = (resourceInfo!=null && "topic".equalsIgnoreCase(resourceInfo));
 
-        if(tx != null )
-        {
-            receiveSession = (Session)tx.getResource();
-            dest = connector.getJmsSupport().createDestination(receiveSession, endpointUri.getAddress(), topic);
-            consumer = connector.getJmsSupport().createConsumer(receiveSession, dest);
-        } else if(receiveSession==null) {
-            receiveSession = connector.getSession(false);
-            dest = connector.getJmsSupport().createDestination(receiveSession, endpointUri.getAddress(), topic);
-            consumer = connector.getJmsSupport().createConsumer(receiveSession, dest);
-        }
-
         dest = connector.getJmsSupport().createDestination(receiveSession, endpointUri.getAddress(), topic);
-        Message message = null;
+        consumer = connector.getJmsSupport().createConsumer(receiveSession, dest);
 
+        Message message = null;
         try
         {
-            if(consumer==null) {
-                consumer = connector.getJmsSupport().createConsumer(receiveSession, dest);
-            }
             if(timeout == RECEIVE_NO_WAIT) {
                 message = consumer.receiveNoWait();
             } else if(timeout == RECEIVE_WAIT_INDEFINITELY) {
@@ -254,12 +222,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
      */
     public Object getDelegateSession() throws UMOException
     {
-        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-        if (tx != null && tx instanceof JmsTransaction)
-        {
-            return ((JmsTransaction) tx).getResource();
-        }
-
         try
         {
             if(session==null )
@@ -284,36 +246,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     public void doDispose() throws UMOException
     {
-        try
-        {
-            if(producer!=null) producer.close();
-        } catch (JMSException e)
-        {
-            logger.error("failed to close producer for Jms Message Dispatcher: " + e.getMessage());
-        }
-        producer=null;
-        try
-        {
-            if(consumer!=null) consumer.close();
-        } catch (JMSException e)
-        {
-            logger.error("Failed to close Jms Receiver for endpointUri: " + e.getMessage());
-        }
-
-        try
-        {
-            if(receiveSession!=null) receiveSession.close();
-        } catch (JMSException e)
-        {
-            logger.error("failed to close producer for Jms Message Dispatcher: " + e.getMessage());
-        }
-        try
-        {
-            if(session!=null) session.close();
-        } catch (JMSException e)
-        {
-            logger.error("failed to close producer for Jms Message Dispatcher: " + e.getMessage());
-        }
-        session=null;
+    	JmsUtils.closeQuietly(producer);
+    	JmsUtils.closeQuietly(consumer);
+    	JmsUtils.closeQuietly(receiveSession);
+    	JmsUtils.closeQuietly(session);
+        producer = null;
+        consumer = null;
+        receiveSession = null;
+        session = null;
     }
 }

@@ -13,11 +13,19 @@
  */
 package org.mule.providers.jms.functional;
 
+import java.util.List;
+
 import EDU.oswego.cs.dl.util.concurrent.CountDown;
+
+import org.mule.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.providers.jms.JmsMessageReceiver;
 import org.mule.providers.jms.support.JmsTestUtils;
 import org.mule.tck.functional.EventCallback;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOConnector;
 
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -34,9 +42,12 @@ import javax.jms.TopicConnection;
 
 public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunctionalTestCase
 {
+	protected static CountDown receiverIsUp;
+	
     public void testSend() throws Exception
     {
         final CountDown countDown = new CountDown(2);
+        receiverIsUp = new CountDown(1);
 
         EventCallback callback = new EventCallback()
         {
@@ -66,7 +77,11 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
                 countDown.release();
             }
         });
-        afterInitialise();
+
+		logger.debug("Waiting for coutdown isReceiverUp");
+        assertTrue(receiverIsUp.attempt(LOCK_WAIT));
+        receiverIsUp = null;
+        
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, null);
         assertTrue(countDown.attempt(LOCK_WAIT));
 
@@ -81,6 +96,8 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
     public void testSendWithReplyTo() throws Exception
     {
         final CountDown countDown = new CountDown(2);
+        receiverIsUp = new CountDown(1);
+        
         EventCallback callback = new EventCallback()
         {
             public void eventReceived(UMOEventContext context, Object Component)
@@ -112,8 +129,11 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
             }
         });
 
+		logger.debug("Waiting for coutdown isReceiverUp");
+        assertTrue(receiverIsUp.attempt(LOCK_WAIT));
+        receiverIsUp = null;
+        
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, "replyto");
-        afterInitialise();
 
         assertTrue(countDown.attempt(LOCK_WAIT));
 
@@ -125,5 +145,21 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 
     public boolean useTopics() {
         return false;
+    }
+
+
+    protected static class JmsMessageReceiverSynchronous extends JmsMessageReceiver {
+        public JmsMessageReceiverSynchronous(UMOConnector connector,
+				  UMOComponent component,
+				  UMOEndpoint endpoint) throws InitialisationException {
+        	super(connector, component, endpoint);
+        }
+    	protected List getMessages() throws Exception {
+    		if (receiverIsUp != null) {
+    			logger.debug("Releasing coutdown isReceiverUp");
+    			receiverIsUp.release();
+    		}
+    		return super.getMessages();
+    	}
     }
 }

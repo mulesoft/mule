@@ -13,6 +13,8 @@
  */
 package org.mule.providers.jdbc.functional;
 
+import javax.sql.DataSource;
+
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.mule.providers.jdbc.JdbcTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
@@ -31,7 +33,7 @@ public class JdbcTransactionalJdbcFunctionalTestCase extends AbstractJdbcTransac
         return new JdbcTransactionFactory();
     }
     
-	protected Object createDataSource() throws Exception {
+	protected DataSource createDataSource() throws Exception {
 		StandardDataSource ds = new StandardDataSource();
 		ds.setDriverName("org.hsqldb.jdbcDriver");
         ds.setUrl("jdbc:hsqldb:mem:.");

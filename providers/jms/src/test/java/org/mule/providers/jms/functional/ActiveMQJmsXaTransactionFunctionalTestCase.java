@@ -14,47 +14,43 @@
 
 package org.mule.providers.jms.functional;
 
-import org.mule.config.MuleProperties;
+import javax.transaction.TransactionManager;
+
+import org.mule.MuleManager;
 import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.XaJmsMessageReceiver;
-import org.mule.providers.jms.support.JmsTestUtils;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.provider.UMOConnector;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import org.objectweb.jotm.Current;
+import org.objectweb.jotm.Jotm;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author Guillaume Nodet
  * @version $Revision$
  */
 public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTransactionFunctionalTestCase
 {
+	private TransactionManager txManager;
+	
     protected void setUp() throws Exception
     {
-        super.setUp();
-        //As there is no default tx manager impl shipped with the core distribution
-        //this test cannot currently run!  Need to move it to the integration test suite
-        //MuleManager.getInstance().setTransactionManager(new JotmTransactionManagerFactory().create());
+		// check for already active JOTM instance
+    	txManager = Current.getCurrent();
+		// if none found, create new local JOTM instance
+		if (txManager == null) {
+			new Jotm(true, false);
+			txManager = Current.getCurrent();
+		}
+		txManager.setTransactionTimeout(15000);
+    	super.setUp();
+    	MuleManager.getInstance().setTransactionManager(txManager);
     }
 
     public UMOConnector createConnector() throws Exception
     {
-        JmsConnector connector = new JmsConnector();
-        connector.setSpecification(JmsConnector.JMS_SPECIFICATION_11);
-        Properties props = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
-
+        JmsConnector connector = (JmsConnector) super.createConnector();
         connector.setConnectionFactoryJndiName("XAJmsQueueConnectionFactory");
-        connector.setProviderProperties(props);
-        connector.setName(CONNECTOR_NAME);
-        connector.setDisposeDispatcherOnCompletion(true);
-        connector.getDispatcherThreadingProfile().setDoThreading(false);
-
-        Map serviceOverrides = new HashMap();
-        serviceOverrides.put(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, XaJmsMessageReceiver.class.getName());
-        connector.setServiceOverrides(serviceOverrides);
         return connector;
     }
 

@@ -13,6 +13,8 @@
  */
 package org.mule.providers.jms.functional;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -54,10 +56,13 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     protected Connection cnn;
     protected Message currentMsg;
     protected int eventCount = 0;
+    
+    protected final transient Log logger = LogFactory.getLog(getClass());  
 
 
     protected void setUp() throws Exception
     {
+    	super.setUp();
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         //By default the JmsTestUtils use the openjms config, though you can pass
         //in other configs using the property below
@@ -123,7 +128,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     {
         try
         {
-            if(!useTopics()) {
+            if(!useTopics()) {	
                 return new MuleEndpointURI(DEFAULT_IN_QUEUE);
             } else {
                 return new MuleEndpointURI(DEFAULT_IN_TOPIC);

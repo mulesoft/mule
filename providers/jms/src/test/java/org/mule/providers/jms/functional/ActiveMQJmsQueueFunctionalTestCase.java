@@ -18,6 +18,8 @@ import org.mule.providers.jms.support.JmsTestUtils;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.jms.Connection;
+
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -44,6 +46,10 @@ public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunction
         connector.setProviderProperties(props);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
+        
+        HashMap overrides = new HashMap();
+        overrides.put("message.receiver", JmsMessageReceiverSynchronous.class.getName());
+        connector.setServiceOverrides(overrides);
         return connector;
     }
 }

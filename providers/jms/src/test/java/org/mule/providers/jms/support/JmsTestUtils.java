@@ -99,7 +99,7 @@ public class JmsTestUtils
     public static void fixProviderUrl(Properties props) throws IOException
     {
         String providerUrl = props.getProperty(Context.PROVIDER_URL);
-        if(providerUrl!=null && !providerUrl.startsWith("file:")) {
+        if(providerUrl!=null && !providerUrl.startsWith("file:") && providerUrl.indexOf(':') < 0) {
             providerUrl = "file:" + File.separator + Utility.getResourcePath(providerUrl, JmsTestUtils.class);
             System.out.println("Setting provider url to: " + providerUrl);
             props.setProperty(Context.PROVIDER_URL, providerUrl);
@@ -148,7 +148,8 @@ public class JmsTestUtils
             throw new IOException("You must set the property " + DEFAULT_JNDI_CONECTION_NAME_PROPERTY + "in the JNDI property file");
         }
         Context ctx = new InitialContext(props);
-        QueueConnectionFactory qcf = (QueueConnectionFactory) ctx.lookup(cnnFactoryName);
+        Object obj = ctx.lookup(cnnFactoryName);
+        QueueConnectionFactory qcf = (QueueConnectionFactory) obj;
         QueueConnection cnn;
         String username = (String)props.get("username");
 
@@ -240,9 +241,11 @@ public class JmsTestUtils
 
     public static void drainQueue(QueueConnection cnn, String queue) throws Exception
     {
-        QueueSession session = cnn.createQueueSession(false, Session.DUPS_OK_ACKNOWLEDGE);
+        QueueSession session = cnn.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue q = session.createQueue(queue);
         QueueReceiver receiver = session.createReceiver(q);
+        // Add a delay so that activeMQ can fetch messages from the broker
+        Thread.sleep(5000);
         Message msg = null;
         while ((msg = receiver.receive(1000)) != null)
         {

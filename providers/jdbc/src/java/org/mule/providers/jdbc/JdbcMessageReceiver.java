@@ -15,20 +15,14 @@ package org.mule.providers.jdbc;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.sql.XAConnection;
-import javax.sql.XADataSource;
-import javax.transaction.TransactionManager;
-
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.mule.InitialisationException;
-import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.PollingMessageReceiver;
+import org.mule.providers.TransactedPollingMessageReceiver;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
@@ -40,7 +34,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class JdbcMessageReceiver extends PollingMessageReceiver {
+public class JdbcMessageReceiver extends TransactedPollingMessageReceiver {
 
 	private JdbcConnector connector;
 	private String readStmt;
@@ -54,104 +48,47 @@ public class JdbcMessageReceiver extends PollingMessageReceiver {
                                String readStmt,
                                String ackStmt) throws InitialisationException {
         super(connector, component, endpoint, new Long(((JdbcConnector) connector).getPollingFrequency()));
+        this.receiveMessagesInTransaction = false;
         this.connector = (JdbcConnector) connector;
 
         this.readParams = new ArrayList();
-        this.readStmt = JdbcConnector.parseStatement(readStmt, this.readParams);
+        this.readStmt = JdbcUtils.parseStatement(readStmt, this.readParams);
         this.ackParams = new ArrayList();
-        this.ackStmt = JdbcConnector.parseStatement(ackStmt, this.ackParams);
-
-		if (this.connector.getDataSource() instanceof XADataSource) {
-			TransactionManager transactionManager = MuleManager.getInstance().getTransactionManager();
-			if (transactionManager == null) {
-				throw new InitialisationException("A transaction manager must be set on mule manager");
-			}
-		}
+        this.ackStmt = JdbcUtils.parseStatement(ackStmt, this.ackParams);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.mule.providers.PollingMessageReceiver#poll()
-	 */
-	synchronized public void poll() {
+	public void processMessage(Object message) throws Exception {
+		Connection con = null;
+		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction(); 
 		try {
-			List results = getResults();
-			for (Iterator it = results.iterator(); it.hasNext();) {
-				Object session = null;
-				UMOTransaction tx = null;
-				Connection con = null;
-				Object result = it.next();
-				try {
-					session = this.connector.getSession(endpoint);
-					if (session instanceof Connection) {
-						con = (Connection) session;
-					} else {
-						con = ((XAConnection) session).getConnection();
-					}
-					if (this.connector.getDataSource() instanceof XADataSource) {
-						TransactionManager transactionManager = MuleManager.getInstance().getTransactionManager();
-				        while (transactionManager.getTransaction() != null) {
-				            Thread.sleep(100);
-				        }
-				        logger.debug("starting Xa Transaction");
-				        transactionManager.begin();
-					}
-					tx = this.connector.beginTransaction(endpoint, session);
-					if (this.ackStmt != null) {
-						Object[] ackParams = JdbcConnector.getParams(getEndpointURI(), this.ackParams, result);
-						int nbRows = new QueryRunner().update(con, this.ackStmt, ackParams);
-						if (nbRows != 1) {
-							logger.warn("Row count for ack should be 1 and not " + nbRows);
-						}
-					}
-		            UMOMessageAdapter msgAdapter = this.connector.getMessageAdapter(result);
-		            UMOMessage message = new MuleMessage(msgAdapter);
-		            routeMessage(message, tx, tx != null || endpoint.isSynchronous());
-		            if (tx == null) {
-		            	DbUtils.commitAndClose(con);
-		            }
-				} catch (Exception e) {
-					rollback(tx, con);
-					throw e;
+			con = this.connector.getConnection();
+			if (this.ackStmt != null) {
+				Object[] ackParams = JdbcUtils.getParams(getEndpointURI(), this.ackParams, message);
+				int nbRows = new QueryRunner().update(con, this.ackStmt, ackParams);
+				if (nbRows != 1) {
+					logger.warn("Row count for ack should be 1 and not " + nbRows);
 				}
 			}
-		} catch (Exception e) {
-            logger.error(e);
-            try {
-                endpoint.getConnector().stop();
-            }
-            catch (Exception e2) {
-                logger.error("Failed to stop endpoint: " + e2.getMessage(), e2);
-            }
+            UMOMessageAdapter msgAdapter = this.connector.getMessageAdapter(message);
+            UMOMessage umoMessage = new MuleMessage(msgAdapter);
+            routeMessage(umoMessage, tx, tx != null || endpoint.isSynchronous());
+		} finally {
+			if (tx == null) {
+				JdbcUtils.close(con);
+			}
 		}
-		
 	}
 	
-	protected List getResults() throws Exception {
+	public List getMessages() throws Exception {
 		Connection con = null;
 		try {
-			Object session = this.connector.getSession(endpoint);
-			if (session instanceof Connection) {
-				con = (Connection) session;
-			} else {
-				con = ((XAConnection) session).getConnection();
-			}
-			Object[] readParams = JdbcConnector.getParams(getEndpointURI(), this.readParams, null);
+			con = this.connector.getConnection();
+			Object[] readParams = JdbcUtils.getParams(getEndpointURI(), this.readParams, null);
 			Object results = new QueryRunner().query(con, this.readStmt, readParams, new MapListHandler());
 			return (List) results;
 		} finally {
-			DbUtils.close(con);
+			JdbcUtils.close(con);
 		}
 	}
 	
-	protected void rollback(UMOTransaction tx, Connection con) throws Exception {
-		if (tx != null) {
-			tx.rollback();
-		} else {
-			DbUtils.rollback(con);
-		}
-		if (con != null) {
-			DbUtils.close(con);
-		}
-	}
-
 }

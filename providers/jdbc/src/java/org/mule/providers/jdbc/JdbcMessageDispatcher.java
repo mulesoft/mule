@@ -17,19 +17,11 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-import javax.sql.XAConnection;
-import javax.sql.XADataSource;
-import javax.transaction.xa.XAResource;
-
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.XaTransaction;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -80,51 +72,27 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher {
 			throw new IllegalArgumentException("Write statement should be an insert / update / delete sql statement");
 		}
 		List paramNames = new ArrayList();
-		writeStmt = JdbcConnector.parseStatement(writeStmt, paramNames);
-		Object[] paramValues = JdbcConnector.getParams(endpointURI, paramNames, event.getMessage());
+		writeStmt = JdbcUtils.parseStatement(writeStmt, paramNames);
+		Object[] paramValues = JdbcUtils.getParams(endpointURI, paramNames, event.getMessage());
 		
+		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
 		Connection con = null;
-		XAConnection xaCon = null;
-		UMOTransaction tx = null;
 		try {
-			QueryRunner runner = new QueryRunner();
-
-	        tx = TransactionCoordination.getInstance().getTransaction();
-	        XaTransaction xaTransaction = null;
-	        if (tx instanceof XaTransaction) {
-	            xaCon = (XAConnection) connector.getSession(endpoint);
-				con = xaCon.getConnection();
-	            xaTransaction = (XaTransaction) tx;
-	            xaTransaction.enlistResource(xaCon.getXAResource());
-	        } else if(tx instanceof JdbcTransaction) {
-				con = (Connection) tx.getResource();
-	        } else if (tx == null) {
-				con = (Connection) connector.getSession(endpoint);
-	        } else {
-	        	throw new IllegalStateException("Unknown transaction running: " + tx.getClass().getName());
-	        }
+			con = this.connector.getConnection();
 	        
-			int nbRows = runner.update(con, writeStmt, paramValues);
+			int nbRows = new QueryRunner().update(con, writeStmt, paramValues);
 			if (nbRows != 1) {
 				logger.warn("Row count for write should be 1 and not " + nbRows);
 			}
             if (tx == null) {
-            	DbUtils.commitAndClose(con);
-            } else {
-                if (xaTransaction != null) {
-                    xaTransaction.delistResource(xaCon.getXAResource(), XAResource.TMSUCCESS);
-                }
-            	connector.commitTransaction(event);
+            	JdbcUtils.commitAndClose(con);
             }
             logger.debug("Event dispatched succesfuly");
 		} catch (Exception e) {
             logger.debug("Error dispatching event: " + e.getMessage(), e);
-			if (tx != null) {
-				tx.rollback();
-			} else {
-				DbUtils.rollback(con);
+            if (tx == null) {
+            	JdbcUtils.rollbackAndClose(con);
 			}
-			DbUtils.close(con);
 			throw e;
 		}
 	}
@@ -149,26 +117,19 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher {
 		String ackStmt = stmts[1];
         List readParams = new ArrayList();
         List ackParams = new ArrayList();
-        readStmt = JdbcConnector.parseStatement(readStmt, readParams);
-        ackStmt = JdbcConnector.parseStatement(ackStmt, ackParams);
+        readStmt = JdbcUtils.parseStatement(readStmt, readParams);
+        ackStmt = JdbcUtils.parseStatement(ackStmt, ackParams);
 
 		Connection con = null;
-        QueryRunner runner = new QueryRunner();
-		ResultSetHandler handler = new MapHandler();
 		long t0 = System.currentTimeMillis();
 		try {
-			Object ds = this.connector.getDataSource();
-			if (ds instanceof XADataSource) {
-				con = ((XADataSource) ds).getXAConnection().getConnection();
-			} else {
-				con = ((DataSource) ds).getConnection();
-			}
+			con = this.connector.getConnection();
 			if (timeout < 0) {
 				timeout = Long.MAX_VALUE;
 			}
 			Object result = null;
 			do {
-				result = runner.query(con, readStmt, JdbcConnector.getParams(endpointUri, readParams, null), handler);
+				result = new QueryRunner().query(con, readStmt, JdbcUtils.getParams(endpointUri, readParams, null), new MapHandler());
 				if (result != null) {
 					logger.debug("Received: " + result);
 					break;
@@ -183,17 +144,17 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher {
 				}
 			} while (true);
 			if (result != null && ackStmt != null) {
-				int nbRows = runner.update(con, ackStmt, JdbcConnector.getParams(endpointUri, ackParams, result));
+				int nbRows = new QueryRunner().update(con, ackStmt, JdbcUtils.getParams(endpointUri, ackParams, result));
 				if (nbRows != 1) {
 					logger.warn("Row count for ack should be 1 and not " + nbRows);
 				}
 			}
             UMOMessageAdapter msgAdapter = this.connector.getMessageAdapter(result);
             UMOMessage message = new MuleMessage(msgAdapter);
-            DbUtils.commitAndClose(con);
+            JdbcUtils.commitAndClose(con);
             return message;
 		} catch (Exception e) {
-			DbUtils.closeQuietly(con);
+			JdbcUtils.rollbackAndClose(con);
 			throw e;
 		}
 	}

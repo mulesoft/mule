@@ -18,12 +18,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.message.ExceptionMessage;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transaction.TransactionRollbackException;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
@@ -111,13 +111,11 @@ public class DefaultExceptionStrategy implements UMOExceptionStrategy
 
     protected void handleTransaction(UMOTransaction tx)
     {
-        logger.warn("Rolling back current transaction: " + tx);
-        try
-        {
-            tx.rollback();
-        } catch (TransactionRollbackException e)
-        {
-            logger.fatal("Transaction rollback failed: " + e.getMessage(), e);
+        logger.warn("Marking current transaction for rollback: " + tx);
+        try {
+        	tx.setRollbackOnly();
+        } catch (UMOTransactionException e) {
+        	logger.error("Could not mark transaction for rollback", e);
         }
     }
 }

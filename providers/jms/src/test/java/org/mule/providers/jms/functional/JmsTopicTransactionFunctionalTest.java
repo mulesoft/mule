@@ -58,4 +58,5 @@ public abstract class JmsTopicTransactionFunctionalTest extends AbstractJmsTrans
     {
         Thread.sleep(1000);
     }
+    
 }

@@ -15,6 +15,8 @@ package org.mule.providers.jdbc.functional;
 
 import java.util.HashMap;
 
+import javax.sql.DataSource;
+
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -57,7 +59,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(DEFAULT_OUT_URI);
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOMessage message = new MuleMessage(DEFAULT_MESSAGE, null);
-        MuleSession session = new MuleSession(null);
+        MuleSession session = new MuleSession();
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
         session.dispatchEvent(event);
 
@@ -119,7 +121,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
                 "testComponent", getInDest(), getOutDest(), props);
     }
     
-	protected Object createDataSource() throws Exception {
+	protected DataSource createDataSource() throws Exception {
 		StandardDataSource ds = new StandardDataSource();
 		ds.setDriverName("org.hsqldb.jdbcDriver");
         ds.setUrl("jdbc:hsqldb:mem:.");

@@ -13,7 +13,11 @@
  */
 package org.mule.providers.jdbc.functional;
 
+import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
+
 import org.enhydra.jdbc.standard.StandardXADataSource;
+import org.mule.providers.jdbc.xa.DataSourceWrapper;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
 import org.objectweb.jotm.Current;
@@ -25,29 +29,32 @@ import org.objectweb.jotm.Jotm;
  */
 public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase {
 
+	private TransactionManager txManager;
+	
     protected void setUp() throws Exception {
-    	super.setUp();
 		// check for already active JOTM instance
-		Current jotmCurrent = Current.getCurrent();
+    	txManager = Current.getCurrent();
 		// if none found, create new local JOTM instance
-		if (jotmCurrent == null) {
+		if (txManager == null) {
 			new Jotm(true, false);
-			jotmCurrent = Current.getCurrent();
+			txManager = Current.getCurrent();
 		}
-    	manager.setTransactionManager(jotmCurrent);
+    	super.setUp();
+    	manager.setTransactionManager(txManager);
     }
 
     protected UMOTransactionFactory getTransactionFactory() {
         return new XaTransactionFactory();
     }
     
-	protected Object createDataSource() throws Exception {
+	protected DataSource createDataSource() throws Exception {
 		StandardXADataSource ds = new StandardXADataSource();
 		ds.setDriverName("org.hsqldb.jdbcDriver");
         ds.setUrl("jdbc:hsqldb:mem:.");
         ds.setUser("sa");
         ds.setPassword("");
-    	return ds;
+        ds.setTransactionManager(txManager);
+        return new DataSourceWrapper(ds, txManager);
 	}
 	
 	

@@ -67,7 +67,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends
 		};
 
 		//Start the server
-		initialiseComponent(UMOTransactionConfig.ACTION_ALWAYS_BEGIN, UMOTransactionConfig.ACTION_ALWAYS_COMMIT, callback);
+		initialiseComponent(UMOTransactionConfig.ACTION_ALWAYS_BEGIN, callback);
 		MuleManager.getInstance().start();
 
 		execSqlUpdate("INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES (NULL, 1, '"
@@ -93,7 +93,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends
 		assertNull(obj[0]);
 	}
 
-	public UMOComponent initialiseComponent(byte txBeginAction, byte txCommitAction, EventCallback callback)
+	public UMOComponent initialiseComponent(byte txBeginAction, EventCallback callback)
 			throws Exception {
 
         UMODescriptor descriptor = new MuleDescriptor();
@@ -113,12 +113,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends
 		UMOEndpoint outProvider = new MuleEndpoint("testOut", getOutDest(),
 				connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, null);
 
-		UMOTransactionConfig txConfig2 = new MuleTransactionConfig();
-		txConfig2.setFactory(tf);
-		txConfig2.setCommitAction(txCommitAction);
-
 		endpoint.setTransactionConfig(txConfig);
-		outProvider.setTransactionConfig(txConfig2);
 
 		descriptor.setOutboundEndpoint(outProvider);
 		descriptor.setInboundEndpoint(endpoint);

@@ -13,7 +13,24 @@
  */
 package org.mule.providers.jms;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.Session;
+import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicPublisher;
+import javax.jms.TopicSession;
 import javax.naming.Context;
 
 /**
@@ -69,15 +86,9 @@ public class Jms102bSupport extends Jms11Support
 
     public Session createSession(Connection connection, boolean transacted, int ackMode, boolean noLocal) throws JMSException
     {
-        if (connection instanceof XAQueueConnection)
-        {
-            return ((XAQueueConnection) connection).createXAQueueSession();
-        } else if (connection instanceof QueueConnection)
+        if (connection instanceof QueueConnection)
         {
             return ((QueueConnection) connection).createQueueSession(transacted, ackMode);
-        } else if (connection instanceof XATopicConnection)
-        {
-            return ((XATopicConnection) connection).createXATopicSession();
         } else if (connection instanceof TopicConnection)
         {
             return ((TopicConnection) connection).createTopicSession(noLocal, ackMode);
@@ -92,7 +103,7 @@ public class Jms102bSupport extends Jms11Support
     {
         if (destination instanceof Queue)
         {
-            if (session instanceof XAQueueSession || session instanceof QueueSession)
+            if (session instanceof QueueSession)
             {
                 if (messageSelector != null)
                 {
@@ -104,7 +115,7 @@ public class Jms102bSupport extends Jms11Support
             }
         } else
         {
-            if (session instanceof XATopicSession || session instanceof TopicSession)
+            if (session instanceof TopicSession)
             {
                 if (durableName == null)
                 {
@@ -122,13 +133,13 @@ public class Jms102bSupport extends Jms11Support
     {
         if (dest instanceof Queue)
         {
-            if (session instanceof XAQueueSession || session instanceof QueueSession)
+            if (session instanceof QueueSession)
             {
                 return ((QueueSession) session).createSender((Queue) dest);
             }
         } else
         {
-            if (session instanceof XATopicSession || session instanceof TopicSession)
+            if (session instanceof TopicSession)
             {
                 return ((TopicSession) session).createPublisher((Topic) dest);
             }
