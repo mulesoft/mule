@@ -7,49 +7,49 @@
     <dependencies>
         <dependency>
             <id>mule</id>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-jms-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/jms/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-email-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/email/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-file-provider</artifactId>
-           <version>SNAPSHOT</version>
+           <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/file/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-vm-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/vm/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-http-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/http/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-stream-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/stream/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-extras-spring</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <!-- Mule core jars are ignored and spring will be distributed with the extras so ignore it here -->
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-extras-client</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <!-- Mule core jars are ignored and spring will be distributed with the extras so ignore it here -->
             <properties>
                 <mule.core.jar>true</mule.core.jar>

@@ -15,13 +15,13 @@
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-tcp-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
         </dependency>
     </dependencies>
 </project>

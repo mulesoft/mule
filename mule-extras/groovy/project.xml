@@ -25,7 +25,7 @@
         </dependency>
          <dependency>
             <id>mule:mule-extras-client</id>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>

@@ -15,7 +15,7 @@
         <dependency>
             <artifactId>mule</artifactId>
             <groupId>mule</groupId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
         </dependency>
         <dependency>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-http-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -72,7 +72,7 @@
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-tcp-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>

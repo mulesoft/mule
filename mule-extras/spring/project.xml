@@ -18,7 +18,7 @@
         <dependency>
             <artifactId>mule-vm-provider</artifactId>
             <groupId>mule</groupId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -27,7 +27,7 @@
         <dependency>
             <artifactId>mule-jms-provider</artifactId>
             <groupId>mule</groupId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -36,7 +36,7 @@
         <dependency>
             <artifactId>mule-soap-provider</artifactId>
             <groupId>mule</groupId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-http-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -87,7 +87,7 @@
         <dependency>
             <artifactId>mule-extras-client</artifactId>
             <groupId>mule</groupId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>

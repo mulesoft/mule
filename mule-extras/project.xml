@@ -25,7 +25,7 @@
     <dependencies>
         <dependency>
             <id>mule</id>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -33,7 +33,7 @@
         </dependency>
         <dependency>
             <id>mule:mule-tcp-provider</id>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <id>mule:mule-http-provider</id>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -49,7 +49,7 @@
         </dependency>
         <dependency>
             <id>mule:mule-vm-provider</id>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -57,7 +57,7 @@
         </dependency>
         <dependency>
             <id>mule:mule-jms-provider</id>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <id>mule:mule-stream-provider</id>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>

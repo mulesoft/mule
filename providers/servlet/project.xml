@@ -11,13 +11,13 @@
         <dependency>
                 <artifactId>mule</artifactId>
                 <groupId>mule</groupId>
-                <version>SNAPSHOT</version>
+                <version>${pom.currentVersion}</version>
                 <url>http://www.muleumo.org</url>
         </dependency>
         <dependency>
                 <artifactId>mule-http-provider</artifactId>
                 <groupId>mule</groupId>
-                <version>SNAPSHOT</version>
+                <version>${pom.currentVersion}</version>
                 <url>http://www.muleumo.org</url>
         </dependency>
     </dependencies>

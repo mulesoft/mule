@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <id>mule</id>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>

@@ -25,7 +25,7 @@
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
         </dependency>
         <dependency>

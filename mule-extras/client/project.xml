@@ -14,12 +14,12 @@
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-vm-provider</artifactId>
-            <version>SNAPSHOT</version>
+            <version>${pom.currentVersion}</version>
         </dependency>
         <!-- optional: used by the http remoting test case -->
         <dependency>
