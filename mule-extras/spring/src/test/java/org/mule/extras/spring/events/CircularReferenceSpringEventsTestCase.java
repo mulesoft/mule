@@ -34,7 +34,7 @@ public class CircularReferenceSpringEventsTestCase extends AbstractMuleTestCase
         builder.configure("mule-events-with-manager.xml");
     }
 
-    public void testManagerIsInstanciated() throws ComponentNotFoundException
+    public void testManagerIsInstanciated() throws Exception
     {
         UMOManager m = MuleManager.getInstance();
         assertTrue(m.isInitialised());

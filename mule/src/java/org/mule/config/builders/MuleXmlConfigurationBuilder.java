@@ -22,6 +22,7 @@ import org.apache.commons.digester.ObjectCreateRule;
 import org.apache.commons.digester.Rule;
 import org.apache.commons.digester.SetNextRule;
 import org.apache.commons.digester.SetPropertiesRule;
+import org.apache.commons.digester.NodeCreateRule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.InitialisationException;
@@ -85,12 +86,15 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.SAXException;
+import org.w3c.dom.Node;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -245,29 +249,14 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
     public UMOManager configure(String configResources) throws ConfigurationException
     {
-        try
+        String[] resources = Utility.split(configResources, ",");
+        MuleManager.getConfiguration().setConfigResources(resources);
+        Reader[] readers = new Reader[resources.length];
+        for (int i = 0; i < resources.length; i++)
         {
-            String[] resources = Utility.split(configResources, ",");
-            InputStream is;
-            manager = MuleManager.getInstance();
-            MuleManager.getConfiguration().setConfigResources(resources);
-            
-            for (int i = 0; i < resources.length; i++)
-            {
-                digester.push(manager);
-                is = loadConfig(resources[i].trim());
-                manager = (UMOManager) digester.parse(is);
-            }
-            setContainerProperties();
-            setTransformers();
-            setGlobalEndpoints();
-            manager.start();
-            return manager;
+            readers[i] = new InputStreamReader(loadConfig(resources[i].trim()));
         }
-        catch (Exception e)
-        {
-            throw new ConfigurationException("Failed to parse configuration resource(s): " + e.getMessage(), e);
-        }
+        return configure(readers);
     }
 
     public UMOManager configure(Reader[] configResources) throws ConfigurationException
@@ -465,7 +454,15 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         addMulePropertiesRule(path, digester, true);
         digester.addSetRoot(path, "setContainerContext");
 
-    }
+        NodeCreateRule nodeCreateRule = null;
+        try {
+            nodeCreateRule = new NodeCreateRule(Node.DOCUMENT_FRAGMENT_NODE);
+        } catch (ParserConfigurationException e) {
+            throw new ConfigurationException("could not create NodeCreateRule", e);
+        }
+        digester.addRule(path + "/configuration", nodeCreateRule);
+        digester.addSetRoot(path + "/configuration", "setContainerContextConfiguration");
+   }
 
     protected void addTransformerRules(Digester digester, String path) throws ConfigurationException
     {

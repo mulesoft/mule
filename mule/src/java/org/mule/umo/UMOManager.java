@@ -16,10 +16,12 @@
 package org.mule.umo;
 
 import org.mule.InitialisationException;
+import org.mule.config.ConfigurationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.model.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
+import org.mule.umo.model.ComponentResolverException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
@@ -27,6 +29,7 @@ import org.mule.umo.transformer.UMOTransformer;
 import javax.transaction.TransactionManager;
 import java.util.List;
 import java.util.Map;
+import java.io.Reader;
 
 /**
  * <code>UMOManager</code> maintains and provides services for a UMO server
@@ -292,7 +295,7 @@ public interface UMOManager extends Lifecycle
      * to integrate container managed resources with Mule resources
      * @return the container associated with the Manager
      */
-    public UMOContainerContext getContainerContext();
+    public UMOContainerContext getContainerContext() throws ComponentResolverException;
 
     /**
      * Sets the unique Id for this Manager instance.  this id can be used to assign

@@ -16,6 +16,7 @@ package org.mule.extras.picocontainer;
 
 import org.mule.umo.model.ComponentNotFoundException;
 import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.model.ComponentResolverException;
 import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
 import org.nanocontainer.integrationkit.ContainerBuilder;
@@ -25,6 +26,8 @@ import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.SimpleReference;
 
 import java.io.StringReader;
+import java.io.Reader;
+import java.util.Map;
 
 /**
  * <code>PicoContainerContext</code> is a Pico Context that can expose pico-managed
@@ -36,6 +39,8 @@ import java.io.StringReader;
  */
 public class PicoContainerContext implements UMOContainerContext
 {
+    public static final String CONFIGEXTENSION = "CONFIG";
+
     /**
      * The url of the config file to use
      */
@@ -108,26 +113,41 @@ public class PicoContainerContext implements UMOContainerContext
         this.configFile = configFile;
         try
         {
-            org.picocontainer.defaults.ObjectReference containerRef = new SimpleReference();
-            org.picocontainer.defaults.ObjectReference parentContainerRef = new SimpleReference();
-
             String builderClassName = getBuilderClassName(configFile);
             String configString = Utility.loadResourceAsString(configFile, getClass());
-
-            ScriptedContainerBuilderFactory
-                    scriptedContainerBuilderFactory =
-                    new ScriptedContainerBuilderFactory(new StringReader(configString), builderClassName, Thread.currentThread().getContextClassLoader());
-
-            ContainerBuilder builder = scriptedContainerBuilderFactory.getContainerBuilder();
-
-
-            builder.buildContainer(containerRef, parentContainerRef, null, false);
-            setContainer((MutablePicoContainer) containerRef.get());
+            StringReader configReader = new StringReader(configString);
+            doConfigure(configReader, builderClassName);
 
         } catch (Exception e)
         {
             throw new PicoCompositionException(e);
         }
+    }
+
+    public void configure(Reader configuration, Map configurationProperties) throws ComponentResolverException {
+        String extension = (String)configurationProperties.get(CONFIGEXTENSION);
+        if (extension == null) {
+            extension = ScriptedContainerBuilderFactory.XML;
+        }
+
+        String className = ScriptedContainerBuilderFactory.getBuilderClassName(extension);
+        doConfigure(configuration, className);
+    }
+
+    protected void doConfigure(Reader configReader, String builderClassName) throws ComponentResolverException {
+        org.picocontainer.defaults.ObjectReference containerRef = new SimpleReference();
+        org.picocontainer.defaults.ObjectReference parentContainerRef = new SimpleReference();
+        ScriptedContainerBuilderFactory scriptedContainerBuilderFactory =
+                null;
+        try {
+            scriptedContainerBuilderFactory = new ScriptedContainerBuilderFactory(configReader, builderClassName, Thread.currentThread().getContextClassLoader());
+        } catch (ClassNotFoundException e) {
+            throw new ComponentResolverException("could not configure pico", e);
+        }
+
+        ContainerBuilder builder = scriptedContainerBuilderFactory.getContainerBuilder();
+        builder.buildContainer(containerRef, parentContainerRef, null, false);
+        setContainer((MutablePicoContainer) containerRef.get());
     }
 
     private String getBuilderClassName(String scriptName)

@@ -19,6 +19,9 @@ import org.mule.umo.model.ComponentNotFoundException;
 import org.mule.umo.model.UMOContainerContext;
 import org.mule.util.ClassHelper;
 
+import java.io.Reader;
+import java.util.Map;
+
 /**
  * <code>MuleContainerContext</code> is a default resolver that doesn't support external reference resolution.
  * It's function is to provide a complete implementation when a componenet resolver is not defined. The default (legacy)
@@ -58,4 +61,7 @@ public class MuleContainerContext implements UMOContainerContext
         }
     }
 
+    public void configure(Reader configuration, Map configurationProperties) {
+        // noop
+    }
 }

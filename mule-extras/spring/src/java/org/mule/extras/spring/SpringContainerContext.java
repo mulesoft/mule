@@ -19,7 +19,9 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
 import org.mule.umo.model.ComponentNotFoundException;
 import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.model.ComponentResolverException;
 import org.mule.util.ClassHelper;
+import org.mule.extras.spring.config.ReaderInputStream;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -28,6 +30,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+
+import java.io.Reader;
+import java.io.InputStreamReader;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * <code>SpringContainerContext</code> is a Spring Context that can expose spring-managed
@@ -141,5 +148,9 @@ public class SpringContainerContext implements UMOContainerContext, BeanFactoryA
         {
             throw new ConfigurationException("Failed to load Application Context: " + e.getMessage(), e);
         }
+    }
+
+    public void configure(Reader configuration, Map configurationProperties) throws ComponentResolverException {
+        BeanFactory bf = new XmlBeanFactory(new ReaderInputStream(configuration));
     }
 }
