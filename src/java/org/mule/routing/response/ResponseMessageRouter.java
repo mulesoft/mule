@@ -44,7 +44,7 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(org.mule.routing.inbound.InboundMessageRouter.class);
+    protected static transient Log logger = LogFactory.getLog(ResponseMessageRouter.class);
 
     private List endpoints = new CopyOnWriteArrayList();
 
