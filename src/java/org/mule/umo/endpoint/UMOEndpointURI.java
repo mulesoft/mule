@@ -34,7 +34,7 @@ import java.util.Properties;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOEndpointURI extends Comparable, Serializable
+public interface UMOEndpointURI extends Serializable
 {
     public static final String PROPERTY_ENDPOINT_NAME = "endpointName";
     public static final String PROPERTY_ENDPOINT_URI = "endpointUri";
