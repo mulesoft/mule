@@ -23,10 +23,10 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-import javax.jms.JMSException;
 
 /**
  * <code>JmsReplyToHandler</code> will process a Jms replyTo or hand off
@@ -75,7 +75,26 @@ public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposab
             {
                 replyToProducer = ((JmsConnector) connector).getJmsSupport().createProducer(session, replyToDestination);
             }
-            connector.getJmsSupport().send(replyToProducer, replyToMessage, replyToDestination);
+            //QoS support
+            String ttlString = (String)event.removeProperty("TimeToLive");
+            String priorityString = (String)event.removeProperty("Priority");
+            String deliveryModeString = (String)event.removeProperty("DeliveryMode");
+
+            if(ttlString==null && priorityString==null && deliveryModeString == null) {
+                replyToProducer.send(replyToMessage);
+            } else {
+                long ttl = Message.DEFAULT_TIME_TO_LIVE;
+                int priority  = Message.DEFAULT_PRIORITY;
+                int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
+
+                if(ttlString!=null) ttl = Long.parseLong(ttlString);
+                if(priorityString!=null) priority = Integer.parseInt(priorityString);
+                if(deliveryModeString!=null) deliveryMode = Integer.parseInt(deliveryModeString);
+
+                replyToProducer.send(replyToMessage, deliveryMode, priority, ttl);
+            }
+
+            //connector.getJmsSupport().send(replyToProducer, replyToMessage, replyToDestination);
             logger.info("Reply Message sent to: " + replyToDestination);
             ((MuleComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
         } catch (Exception e)
