@@ -13,7 +13,8 @@
     <distributionDirectory>/var/www/html/muleumo.org/samples/</distributionDirectory>
     <dependencies>
         <dependency>
-            <id>mule</id>
+            <artifactId>mule-core</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
