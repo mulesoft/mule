@@ -236,7 +236,7 @@ case "`uname`" in
 CYGWIN*)
   if [ -n "CLASSPATH" ]
   then
-   CLASSPATH=`cygpath -pw $$CLASSPATH
+   CLASSPATH=`cygpath -pw $$CLASSPATH`
   fi
 esac
 
