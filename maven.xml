@@ -136,7 +136,7 @@
         <echo>Samples release dir is ${mule.samples.dist}</echo>
     </goal>
 
-    <goal name="mule:release-prepare" prereqs="clean, multiproject:clean, setvars">
+    <goal name="mule:release-prepare" prereqs="clean, setvars">
         <echo>About to create lib and bin directories in ${mule.release.dir}</echo>
         <mkdir dir="${mule.release.dir}"/>
         <mkdir dir="${mule.release.dist.dir}"/>
@@ -385,9 +385,9 @@
         <attainGoal name="multiproject:goal"/>
     </postGoal>
 
-    <postGoal name="clean">
+    <goal name="cleanall" prereqs="clean">
         <j:set var="goal" value="clean"/>
         <attainGoal name="multiproject:goal"/>
-    </postGoal>
+    </goal>
 
 </project>

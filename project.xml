@@ -148,6 +148,7 @@
 
                 <!-- sometimes fails failing to bind -->
                 <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
+                <exclude>**/Plexus*.*</exclude>
 
                 <!-- need to have a Jms server running to include these -->
 <!--                <exclude>**/*Jms*.*</exclude>-->
@@ -178,16 +179,16 @@
         </unitTest>
     </build>
     <reports>
-<!--report>maven-pmd-plugin</report>
-        <report>maven-simian-plugin</report-->
+	<report>maven-pmd-plugin</report>
+        <report>maven-simian-plugin</report>
         <report>maven-jdepend-plugin</report>
         <report>maven-jxr-plugin</report>
-        <!--report>maven-javadoc-plugin</report-->
+        <report>maven-javadoc-plugin</report>
 <!-- The Clover report MUST be before the JUnit report as the test:test
             target is run only ONCE (due to the test:test postGoal) and clover needs to
             "watch" the tests run, while JUnit report simply analyses the output from
             the tests -->
         <!--        <report>maven-clover-plugin</report>-->
-        <!--report>maven-junit-report-plugin</report-->
+        <report>maven-junit-report-plugin</report>
     </reports>
 </project>
