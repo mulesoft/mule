@@ -83,4 +83,9 @@ public class RequestContext
         props.set(null);
         return p;
     }
+
+    public static void clear() {
+        setEvent(null);
+        clearProperties();
+    }
 }
