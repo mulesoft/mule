@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
 import org.mule.InitialisationException;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
@@ -278,9 +279,14 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         //Read headers from the request as set them as properties on the event
         Header[] headers = HttpParser.parseHeaders(is);
+        String name;
         for (int i = 0; i < headers.length; i++)
         {
-            p.setProperty(headers[i].getName(), headers[i].getValue());
+            name = headers[i].getName();
+            if(name.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
+                name = name.substring(2);
+            }
+            p.setProperty(name, headers[i].getValue());
         }
 
         if (method.equals(HttpConstants.METHOD_GET))

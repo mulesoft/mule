@@ -32,11 +32,6 @@ public interface HttpConstants
     public static final String METHOD_POST = "POST";
     public static final String METHOD_GET = "GET";
 
-    public static final String MULE_REPLY_TO = "X-Mule-ReplyTo";
-    public static final String MULE_CORRELATION_ID = "X-Mule-CorrelationId";
-    public static final String MULE_CORRELATION_SEQUENCE = "X-Mule-CorrelationSequence";
-    public static final String MULE_CORRELATION_GROUP = "X-Mule-CorrelationGroup";
-
     //Date header format
     public static final String DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss zzz";
 

@@ -20,6 +20,7 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.config.MuleProperties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,10 +54,17 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
         //Standard headers
         Map headerProps = new HashMap();
         Header[] headers = httpMethod.getRequestHeaders();
+        String name;
         for (int i=0;i < headers.length; i++)
         {
+            name = headers[i].getName();
+            if(name.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
+                name = name.substring(2);
+            }
             headerProps.put(headers[i].getName(), headers[i].getValue());
         }
+        //Set Mule Properties
+
         return new MuleMessage(msg, headerProps);
     }
 }

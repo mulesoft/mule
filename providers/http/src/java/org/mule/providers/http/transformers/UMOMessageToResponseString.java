@@ -14,10 +14,12 @@
 package org.mule.providers.http.transformers;
 
 import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
 import java.text.SimpleDateFormat;
@@ -105,6 +107,27 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
                 httpMessage.append(HttpConstants.CRLF);
             }
         }
+
+        //Mule properties
+        UMOMessage m = context.getMessage();
+        String user = (String)m.getProperty(MuleProperties.MULE_USER_PROPERTY);
+        if(user!=null) {
+            httpMessage.append("X-" + MuleProperties.MULE_USER_PROPERTY).append(": ").append(user);
+            httpMessage.append(HttpConstants.CRLF);
+        }
+        if(m.getCorrelationId()!=null) {
+            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_ID_PROPERTY).append(": ").append(m.getCorrelationId());
+            httpMessage.append(HttpConstants.CRLF);
+            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY).append(": ").append(m.getCorrelationGroupSize());
+            httpMessage.append(HttpConstants.CRLF);
+            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY).append(": ").append(m.getCorrelationSequence());
+            httpMessage.append(HttpConstants.CRLF);
+        }
+        if(m.getReplyTo()!=null) {
+            httpMessage.append("X-" + MuleProperties.MULE_REPLY_TO_PROPERTY).append(": ").append(m.getReplyTo().toString());
+            httpMessage.append(HttpConstants.CRLF);
+        }
+
         //End header
         httpMessage.append(HttpConstants.CRLF);
         httpMessage.append(response);

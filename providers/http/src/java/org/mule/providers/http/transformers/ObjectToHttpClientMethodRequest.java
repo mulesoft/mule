@@ -21,6 +21,7 @@ import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 
@@ -114,9 +115,19 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
                 }
             }
-            String user = (String)context.getProperty(MuleProperties.MULE_USER_PROPERTY);
+            //Mule properties
+            UMOMessage m = context.getMessage();
+            String user = (String)m.getProperty(MuleProperties.MULE_USER_PROPERTY);
             if(user!=null) {
-                httpMethod.addRequestHeader(MuleProperties.MULE_USER_PROPERTY, user);
+                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_USER_PROPERTY, user);
+            }
+            if(m.getCorrelationId()!=null) {
+                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_CORRELATION_ID_PROPERTY, m.getCorrelationId());
+                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String.valueOf(m.getCorrelationGroupSize()));
+                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String.valueOf(m.getCorrelationSequence()));
+            }
+            if(m.getReplyTo()!=null) {
+                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_REPLY_TO_PROPERTY, m.getReplyTo().toString());
             }
 
             return httpMethod;
