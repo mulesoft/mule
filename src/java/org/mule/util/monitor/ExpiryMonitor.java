@@ -14,6 +14,9 @@
 package org.mule.util.monitor;
 
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import org.mule.umo.lifecycle.Disposable;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -29,8 +32,13 @@ import java.util.TimerTask;
  * @version $Revision$
  */
 
-public class ExpiryMonitor extends TimerTask
+public class ExpiryMonitor extends TimerTask implements Disposable
 {
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(ExpiryMonitor.class);
+
     private Timer timer;
     private Map monitors;
 
@@ -41,26 +49,48 @@ public class ExpiryMonitor extends TimerTask
 
     public ExpiryMonitor(long monitorFrequency)
     {
+
         timer = new Timer(true);
         timer.schedule(this, monitorFrequency, monitorFrequency);
         monitors = new ConcurrentHashMap();
     }
 
 
+    /**
+     * Adds an expirable object to monitor.  If the Object is
+     * already being monitored it will be reset and the
+     * millisecond timeout will be ignored
+     * @param milliseconds
+     * @param expirable
+     */
     public void addExpirable(long milliseconds, Expirable expirable)
     {
-        monitors.put(expirable, new ExpriableHolder(milliseconds, expirable));
+        if(isRegistered(expirable)) {
+            resetExpirable(expirable);
+        } else {
+            if(logger.isDebugEnabled()) logger.debug("Adding new expirable: " + expirable);
+            monitors.put(expirable, new ExpriableHolder(milliseconds, expirable));
+        }
+    }
+
+    public boolean isRegistered( Expirable expirable)
+    {
+        return (monitors.get(expirable)!=null);
     }
 
     public void removeExpirable(Expirable expirable)
     {
+        if(logger.isDebugEnabled()) logger.debug("Removing expirable: " + expirable);
         monitors.remove(expirable);
     }
 
     public void resetExpirable(Expirable expirable)
     {
         ExpriableHolder eh = (ExpriableHolder)monitors.get(expirable);
-        if(eh!=null) eh.reset();
+        if(eh!=null) {
+            eh.reset();
+            if(logger.isDebugEnabled()) logger.debug("Reset expirable: " + expirable);
+        }
     }
 
     /**
@@ -75,6 +105,25 @@ public class ExpiryMonitor extends TimerTask
             if(holder.isExpired()) {
                 removeExpirable(holder.getExpirable());
                 holder.getExpirable().expired();
+            }
+        }
+    }
+
+    public void dispose()
+    {
+        logger.info("disposing monitor");
+        timer.cancel();
+        ExpriableHolder holder;
+        for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
+        {
+            holder = (ExpriableHolder)iterator.next();
+            removeExpirable(holder.getExpirable());
+            try
+            {
+                holder.getExpirable().expired();
+            } catch (Exception e)
+            {
+                logger.debug(e.getMessage());
             }
         }
     }
@@ -104,7 +153,7 @@ public class ExpiryMonitor extends TimerTask
 
         public boolean isExpired()
         {
-            return (created + milliseconds) > System.currentTimeMillis();
+            return  (System.currentTimeMillis() - milliseconds) > created;
         }
 
         public void reset() {
