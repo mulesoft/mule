@@ -340,6 +340,17 @@
         </exec>
     </goal>
 
+    <goal name="dist:nightly" prereqs="setvars">
+        <echo> Copying Nightly distribution jars from ${mule.release.dist.dir}</echo>
+        <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
+            <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.jar ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/nightly/"/>
+        </exec>
+        <echo> Copying dtds from ${mule.release.dist.dir}</echo>
+        <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
+            <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.dtd ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/dtds/"/>
+        </exec>
+    </goal>
+
     <goal name="dist-samples">
         <j:set var="root.dir" value="${basedir}"/>
         <maven:reactor
