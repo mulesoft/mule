@@ -231,10 +231,12 @@ ${samples.classpath}
 CLASSPATH=$$CLASSPATH$$POST_MULE_CLASSPATH%
 
 #if using cygwin under windows we need to make the paths windows friendly
+
 case "`uname`" in
 CYGWIN*)
-  if [ -n "$CLASSPATH" ] ; then
-    MULE_PATH=`cygpath -pw $CLASSPATH`;
+  if [ -n "CLASSPATH" ]
+  then
+   CLASSPATH=`cygpath -pw $$CLASSPATH
   fi
 esac
 
