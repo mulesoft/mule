@@ -50,13 +50,12 @@ public class TestExceptionStrategy extends DefaultExceptionStrategy
     /* (non-Javadoc)
      * @see org.mule.exception.UMOExceptionStrategy#handleException(java.lang.Object, java.lang.Throwable)
      */
-    public Throwable handleException(Object message, Throwable t)
+    public void handleException(Object message, Throwable t)
     {
         logger.info("*** Logging test exceptin in test Exception Strategy");
         logger.info("*** Message is: " + message);
         logger.info("*** Exception is: " + t, t);
 
-        return null;
     }
 
     /* (non-Javadoc)

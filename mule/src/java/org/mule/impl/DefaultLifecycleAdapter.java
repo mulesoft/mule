@@ -220,9 +220,9 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         return descriptor;
     }
 
-    public Throwable handleException(Object message, Throwable t)
+    public void handleException(Object message, Throwable t)
     {
-        return descriptor.getExceptionStrategy().handleException(message, t);
+        descriptor.getExceptionStrategy().handleException(message, t);
     }
 
     /* (non-Javadoc)

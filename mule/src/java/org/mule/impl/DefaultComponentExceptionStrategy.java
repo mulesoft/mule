@@ -79,14 +79,12 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
      *                should expect that an UMOEvent maybe passed to this method from the
      *                framework.
      * @param t       The Throwable exception that occurred
-     * @return java.lang.Throwable The user may wish to return any exception which could be thrown on
-     *         depending on implementation
      */
-    public Throwable handleException(Object message, Throwable t)
+    public void handleException(Object message, Throwable t)
     {
         if(component==null) {
             UMOEvent event = RequestContext.getEvent();
-            if(event==null) { //very bad unlikely to happen
+            if(event==null) { //very bad should not happen
                 logger.fatal("The Default Component Exception Strategy has been invoked but there is no current event on the context");
                 logger.fatal("The error is: " + t.getMessage(), t);
             } else {
@@ -117,7 +115,6 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
                 statistics.incFatalError();
             }
         }
-        return null;
     }
 
     protected void routeException(Object message, Throwable t) throws UMOException

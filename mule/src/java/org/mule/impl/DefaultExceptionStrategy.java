@@ -73,10 +73,8 @@ public class DefaultExceptionStrategy implements UMOExceptionStrategy
      *                should expect that an UMOEvent maybe passed to this method from the
      *                framework.
      * @param t       The Throwable exception that occurred
-     * @return java.lang.Throwable The user may wish to return any exception which could be thrown on
-     *         depending on implementation
      */
-    public Throwable handleException(Object message, Throwable t)
+     public void handleException(Object message, Throwable t)
     {
         logger.error("Caught exception in Exception Strategy: " + t.getMessage(), t);
 
@@ -95,7 +93,6 @@ public class DefaultExceptionStrategy implements UMOExceptionStrategy
             logger.fatal("Failed to route Exception message, this may result in unexpected message loss. Endpoint is: "
                     + (exceptionEndpoint==null ? null : exceptionEndpoint.getEndpointURI() ));
         }
-        return null;
     }
 
     protected void routeException(Object message, Throwable t) throws UMOException

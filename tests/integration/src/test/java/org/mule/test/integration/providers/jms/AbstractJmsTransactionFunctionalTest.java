@@ -512,7 +512,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
             this.countDown = countDown;
         }
 
-        public Throwable handleException(Object message, Throwable t)
+        public void handleException(Object message, Throwable t)
         {
             System.out.println("@@@@ ExceptionHandler Called @@@@");
             if (t instanceof MessageRedeliveredException)

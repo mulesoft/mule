@@ -36,10 +36,8 @@ public interface UMOExceptionStrategy
      *        should expect that an UMOEvent maybe passed to this method from the
      *        framework.
      * @param t       The Throwable exception that occurred
-     * @return java.lang.Throwable The user may wish to return any exception which could be thrown on
-     *         depending on implementation
      */
-    public Throwable handleException(Object message, Throwable t);
+    public void handleException(Object message, Throwable t);
 
     UMOEndpoint getEndpoint();
 
