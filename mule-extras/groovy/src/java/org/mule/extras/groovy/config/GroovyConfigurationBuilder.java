@@ -25,6 +25,7 @@ import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
 
 import java.io.File;
+import java.io.Reader;
 import java.net.URL;
 
 /**
@@ -84,5 +85,23 @@ public class GroovyConfigurationBuilder implements ConfigurationBuilder
             throw new ConfigurationException("Failed to start Mule server from builder: " + e.getMessage(), e);
         }
         return MuleManager.getInstance();
+    }
+
+    /**
+     * Will configure a UMOManager based on the configurations made available through Readers
+     *
+     * @param configResources an array of Readers
+     * @return A configured UMOManager
+     * @throws org.mule.config.ConfigurationException
+     *
+     */
+    public UMOManager configure(Reader[] configResources) throws ConfigurationException
+    {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    public boolean isConfigured()
+    {
+        return MuleManager.isInstanciated();
     }
 }

@@ -21,6 +21,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManager;
 import org.springframework.util.StringUtils;
 
+import java.io.Reader;
+
 /**
  * <code>SpringConfigurationBuilder</code> Enables Mule to be loaded from
  * as Spring context.  Multiple configuration files can be loaded from this
@@ -36,6 +38,19 @@ import org.springframework.util.StringUtils;
  */
 public class SpringConfigurationBuilder implements ConfigurationBuilder
 {
+    /**
+     * Will configure a UMOManager based on the configurations made available through Readers
+     *
+     * @param configResources an array of Readers
+     * @return A configured UMOManager
+     * @throws org.mule.config.ConfigurationException
+     *
+     */
+    public UMOManager configure(Reader[] configResources) throws ConfigurationException
+    {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
     public UMOManager configure(String configResource) throws ConfigurationException
     {
         if(configResource==null) {
@@ -53,5 +68,13 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
             throw new ConfigurationException("Failed to start Mule server from builder: " + e.getMessage(), e);
         }
         return MuleManager.getInstance();
+    }
+
+    /**
+     * Indicate whether this ConfigurationBulder has been configured yet
+     * @return <code>true</code> if this ConfigurationBulder has been configured
+     */
+    public boolean isConfigured() {
+        return MuleManager.isInstanciated();
     }
 }
