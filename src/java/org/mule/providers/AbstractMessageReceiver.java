@@ -166,7 +166,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     public final  UMOMessage routeMessage(UMOMessage message, UMOTransaction trans, boolean synchronous, OutputStream outputStream) throws UMOException
     {
         if(logger.isDebugEnabled()) {
-            logger.debug("Received message from: " + endpoint.getEndpointURI().getAddress());
+            logger.debug("Received message from: " + endpoint.getEndpointURI());
             logger.debug("Payload is of type: " + message.getPayload().getClass().getName());
             StringBuffer buf = new StringBuffer();
             Map props = message.getProperties();
