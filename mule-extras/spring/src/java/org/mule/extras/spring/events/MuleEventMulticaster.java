@@ -24,6 +24,7 @@ import org.mule.extras.spring.SpringContainerContext;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
@@ -260,6 +261,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 } catch (ApplicationEventException e1)
                 {
                     logger.error("failed to dispatch event: " + e.toString(), e1);
+                }finally {
+                    RequestContext.clear();
                 }
                 return;
             }
@@ -368,12 +371,12 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     /**
      * Will dispatch an application event through Mule
      *
-     * @param currentEvent     the event received before dispatching
+     * @param eventContext     the event received before dispatching
      * @param applicationEvent the Spring event to be dispatched
      * @throws ApplicationEventException if the event cannot be dispatched i.e.
      *                                   if the underlying transport throws an exception
      */
-    protected void dispatchEvent(UMOEventContext currentEvent, MuleApplicationEvent applicationEvent) throws ApplicationEventException
+    protected void dispatchEvent(UMOEventContext eventContext, MuleApplicationEvent applicationEvent) throws ApplicationEventException
     {
         UMOEndpoint endpoint = null;
         try
@@ -393,11 +396,13 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 }
 
                 MuleMessage message = new MuleMessage(applicationEvent.getSource(), applicationEvent.getProperties());
-                if (currentEvent != null)
+                //has dispatch been triggered using applicationContext.publish() without
+                //a current event?
+                if (RequestContext.getEvent() != null)
                 {
                     //tell mule not to try and route this event itself
-                    currentEvent.setStopFurtherProcessing(true);
-                    currentEvent.dispatchEvent(message, endpoint);
+                    eventContext.setStopFurtherProcessing(true);
+                    eventContext.dispatchEvent(message, endpoint);
                 } else
                 {
                     //transform if necessary

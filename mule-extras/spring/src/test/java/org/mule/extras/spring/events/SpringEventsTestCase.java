@@ -32,18 +32,13 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
     private static int eventCount = 0;
     private static int eventCount2 = 0;
     private static ClassPathXmlApplicationContext context;
+    public Object lock = new Object();
 
     protected void setUp() throws Exception
     {
-//        if (context == null)
-//        {
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         
-            context = new ClassPathXmlApplicationContext("mule-events-app-context.xml");
-//        } else
-//        {
-//            context.refresh();
-//        }
+        context = new ClassPathXmlApplicationContext("mule-events-app-context.xml");
         eventCount = 0;
         eventCount2 = 0;
     }
@@ -164,6 +159,9 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
             public void eventReceived(UMOEventContext context, Object o) throws Exception
             {
                 eventCount2++;
+                synchronized(lock) {
+                    lock.notifyAll();
+                }
             }
         };
         bean2.setEventCallback(callback2);
@@ -171,7 +169,9 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         client.send("vm://event.multicaster", "Test Spring Event", null);
         //give it a second for the event to process
-        Thread.sleep(1000);
+        synchronized(lock) {
+            lock.wait(3000);
+        }
         assertEquals(1, eventCount);
         assertEquals(1, eventCount2);
     }
@@ -189,13 +189,18 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
             public void eventReceived(UMOEventContext context, Object o) throws Exception
             {
                 eventCount++;
+                synchronized(lock) {
+                 lock.notifyAll();
+                }
             }
         };
         bean2.setEventCallback(callback);
 
         context.publishEvent(event);
         //give it some time for the event to process
-        Thread.sleep(2000);
+        synchronized(lock) {
+            lock.wait(3000);
+        }
         assertEquals(1, eventCount);
     }
 }
