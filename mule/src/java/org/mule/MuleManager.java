@@ -848,7 +848,7 @@ public class MuleManager implements UMOManager
         message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
         message.add(" ");
         if(agents.size()==0) {
-            message.add(new Message(Messages.AGENTS_RUNNING).getMessage() + new Message(Messages.NONE).getMessage());
+            message.add(new Message(Messages.AGENTS_RUNNING).getMessage() + " " + new Message(Messages.NONE).getMessage());
         } else {
             message.add(new Message(Messages.AGENTS_RUNNING).getMessage());
             UMOAgent umoAgent;
