@@ -224,14 +224,16 @@ public class MuleServer implements Runnable
         if(configBuilder == null) {
             configBuilder = new MuleXmlConfigurationBuilder();
         }
-        if (configurationResources != null)
-        {
-            configBuilder.configure(configurationResources);
-        }
-        else
-        {
-            logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
-            configBuilder.configure(DEFAULT_CONFIGURATION);
+        if (configBuilder.isConfigured() == false) {
+            if (configurationResources != null)
+            {
+                configBuilder.configure(configurationResources);
+            }
+            else
+            {
+                logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
+                configBuilder.configure(DEFAULT_CONFIGURATION);
+            }
         }
         System.out.println("Mule Server initialized.");
     }
