@@ -18,7 +18,8 @@ package org.mule.umo;
 import org.mule.transaction.constraints.ConstraintFilter;
 
 /**
- * <p><code>UMOTransactionConfig</code> TODO (document class)
+ * <p><code>UMOTransactionConfig</code> defines transaction configuration for
+ * a transactional endpoint.
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
@@ -51,4 +52,8 @@ public interface UMOTransactionConfig
     public ConstraintFilter getConstraint();
 
     public void setConstraint(ConstraintFilter constraint);
+
+    public void setTimeout(int timeout);
+
+    public int getTimeout();
 }

@@ -78,6 +78,8 @@ public class MuleConfiguration
 
     public static final int DEFAULT_SYNCHRONOUS_EVENT_TIMEOUT = 5000;
 
+    public static final int DEFAULT_TRANSACTION_TIMEOUT = 30000;
+
     /**
      * Where Mule stores any runtime files to disk
      */
@@ -116,6 +118,12 @@ public class MuleConfiguration
      * This property determines how long to wait for a receive
      */
     private int synchronousEventTimeout = DEFAULT_SYNCHRONOUS_EVENT_TIMEOUT;
+
+    /**
+     * The default transaction timeout value used if no specific transaction time out has been
+     * set on the transaction config
+     */
+    private int transactionTimeout = DEFAULT_TRANSACTION_TIMEOUT;
 
     /**
      * Determines whether when running synchronously, return events are received before
@@ -357,6 +365,16 @@ public class MuleConfiguration
 
     protected String getManifestProperty(String name) {
         return getManifest().getMainAttributes().getValue(new Attributes.Name(name));
+    }
+
+    public int getTransactionTimeout()
+    {
+        return transactionTimeout;
+    }
+
+    public void setTransactionTimeout(int transactionTimeout)
+    {
+        this.transactionTimeout = transactionTimeout;
     }
 
 }
