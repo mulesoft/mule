@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+   <mule-environment-properties synchronous="false" synchronousEventTimeout="5000"/>
+
+	<!-- Transaction manager -->
+	<transaction-manager 
+		factory="org.mule.extras.jotm.JotmTransactionManagerFactory" />
+
+	<connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+	        <property name="specification" value="1.1"/>
+	        <property name="connectionFactoryJndiName" value="XAJmsQueueConnectionFactory"/>
+	        <property name="jndiInitialFactory" value="com.sun.jndi.fscontext.RefFSContextFactory"/>
+	        <property name="jndiProviderUrl" value="file:\C:/dev/BOS/EAT/mule/tests/integration/target/classes/jndi/activemq"/>
+			<map name="providerProperties">
+				<property name="brokerUrl" value="tcp://localhost:61616"/>
+			</map>
+		</properties>
+    </connector>
+    <connector name="jdbcConnector" className="org.mule.providers.jdbc.JdbcConnector">
+    	<properties>
+			<property name="pollingFrequency" value="1000"/>
+			<container-property name="dataSource" reference="jdbcDataSource"/>
+			<map name="queries">
+				<property name="getTest" value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = ${type} AND ACK IS NULL"/>
+				<property name="getTest.ack" value="UPDATE TEST SET ACK = ${NOW} WHERE ID = ${id} AND TYPE = ${type} AND DATA = ${data}" />
+				<property name="writeTest" value="INSERT INTO TEST(ID, TYPE, DATA, ACK, RESULT) VALUES(NULL, ${type}, ${payload}, NULL, NULL)" />
+			</map>
+    	</properties>
+    </connector>
+
+	<!-- Container context -->
+	<container-context name="spring"  className="org.mule.extras.spring.SpringContainerContext">
+		<properties>
+			<property name="configFile" value="org/mule/test/integration/transaction/xabridge-spring.xml"/>
+		</properties>
+	</container-context>
+
+    <model name="model">
+		
+        <mule-descriptor name="JdbcToJms"
+            implementation="org.mule.test.integration.transaction.XABridgeComponent"
+			containerManaged="false">
+            <inbound-router>
+                <endpoint address="jdbc://getTest?type=1">
+					<transaction beginAction="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>					
+				</endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://my.queue" />
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="JmsToJdbc"
+            implementation="org.mule.test.integration.transaction.XABridgeComponent"
+			containerManaged="false">
+            <inbound-router>
+                <endpoint address="jms://my.queue">
+					<transaction beginAction="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>					
+				</endpoint>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jdbc://writeTest?type=2" />
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+		
+    </model>
+</mule-configuration>

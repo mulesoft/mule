@@ -1,0 +1,71 @@
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+	<!-- JOTM Transaction manager -->
+	<bean id="jotm"
+		class="org.springframework.transaction.jta.JotmFactoryBean"/>
+	<!--
+	<bean id="transactionManager"
+		class="org.mule.extras.spring.transaction.MuleJtaTransactionManager">
+		<property name="userTransaction">
+			<ref local="jotm"/>
+		</property>
+	</bean>
+	-->
+
+	<!-- Data Source -->
+	<bean id="innerDataSource"
+		class="org.enhydra.jdbc.standard.StandardXADataSource"
+		destroy-method="shutdown">
+		<property name="transactionManager">
+			<ref local="jotm"/>
+		</property>
+		<property name="driverName">
+			<value>org.hsqldb.jdbcDriver</value>
+		</property>
+		<property name="url">
+			<value>jdbc:hsqldb:mem:.</value>
+		</property>
+	</bean>
+	<!--
+	<bean id="jdbcDataSourceXa"
+		class="org.enhydra.jdbc.pool.StandardXAPoolDataSource"
+		destroy-method="shutdown">
+		<property name="dataSource">
+			<ref local="innerDataSource"/>
+		</property>
+		<property name="maxSize">
+			<value>10</value>
+		</property>
+	</bean>
+	-->
+	<bean id="jdbcDataSource"
+		   class="org.mule.providers.jdbc.xa.DataSourceWrapper">
+		<property name="xaDataSource">
+			<ref local="innerDataSource"/>
+		</property>
+		<property name="transactionManager">
+			<ref local="jotm"/>
+		</property>
+	</bean>
+
+	<!-- ActiveMQ -->
+	<bean id="jmsConnectionFactoryXa"
+		class="org.codehaus.activemq.ActiveMQXAConnectionFactory">
+		<property name="brokerURL">
+			<value>vm://localhost</value>
+		</property>
+		<property name="useEmbeddedBroker">
+			<value>true</value>
+		</property>
+	</bean>
+	<bean id="jmsConnectionFactory">
+		<property name="xaConnectionFactory">
+			<ref local="jmsConnectionFactoryXa"/>
+		</property>
+		<property name="transactionManager">
+			<ref local="jotm"/>
+		</property>
+	</bean>
+
+</beans>
