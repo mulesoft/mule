@@ -34,6 +34,10 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
     private AuthenticationProvider delegate;
     private String name;
 
+    public AcegiProviderAdapter()
+    {
+    }
+
     public AcegiProviderAdapter(AuthenticationProvider delegate)
     {
         this.delegate = delegate;
@@ -82,5 +86,15 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
     public boolean supports(Class aClass)
     {
         return aClass.isAssignableFrom(AcegiAuthenticationAdapter.class);
+    }
+
+    public AuthenticationProvider getDelegate()
+    {
+        return delegate;
+    }
+
+    public void setDelegate(AuthenticationProvider delegate)
+    {
+        this.delegate = delegate;
     }
 }
