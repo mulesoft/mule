@@ -44,17 +44,11 @@
         <mkdir dir="${mule.release.dist.dir}"/>
         <mkdir dir="${mule.release.dist.dir}/temp"/>
 
-        <copy todir="${mule.release.dist.dir}">
+        <copy todir="${mule.release.dist.dir}" flatten="true">
             <fileset dir="${basedir}">
                 <include name="**/mule-*${pom.currentVersion}.?ar"/>
             </fileset>
         </copy>
-
-        <fileScanner var="mulejars">
-            <fileset dir="${mule.release.dist.dir}">
-                <include name="*.jar"/>
-            </fileset>
-        </fileScanner>
 
         <delete file="${mule.release.dist.dir}/mule-providers-${pom.currentVersion}.jar"/>
         <delete file="${mule.release.dist.dir}/mule-extras-${pom.currentVersion}.jar"/>
@@ -64,7 +58,7 @@
 
         <fileScanner var="mulejars">
             <fileset dir="${mule.release.dist.dir}">
-                <include name="*"/>
+                <include name="*.jar"/>
             </fileset>
         </fileScanner>
 
