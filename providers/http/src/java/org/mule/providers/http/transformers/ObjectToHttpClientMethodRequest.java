@@ -43,13 +43,15 @@ import java.util.Map;
 
 public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransformer
 {
-    private List headers = null;
+    private List requestHeaders = null;
+    private List responseHeaders = null;
 
     public ObjectToHttpClientMethodRequest()
     {
         registerSourceType(String.class);
         setReturnClass(HttpMethod.class);
-        headers = new ArrayList(Arrays.asList(HttpConstants.REQUEST_HEADER_NAMES));
+        requestHeaders = new ArrayList(Arrays.asList(HttpConstants.REQUEST_HEADER_NAMES));
+        responseHeaders = new ArrayList(Arrays.asList(HttpConstants.RESPONSE_HEADER_NAMES));
     }
 
     public Object transform(Object src, UMOEventContext context) throws TransformerException
@@ -93,42 +95,46 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 }
                 httpMethod = postMethod;
             }
-            //Standard headers
+            //Standard requestHeaders
+            Map.Entry header;
             String headerName;
-            String value;
-            for (Iterator iterator = headers.iterator(); iterator.hasNext();)
+            Map p = context.getProperties();
+            for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();)
             {
-                headerName = (String) iterator.next();
-                value = (String)context.getProperty(headerName);
-                if(value!=null) {
-                    httpMethod.addRequestHeader(headerName, value);
+                header = (Map.Entry) iterator.next();
+                headerName = header.getKey().toString();
+                if(!responseHeaders.contains(headerName) && header.getValue() instanceof String) {
+                    if(headerName.startsWith(MuleProperties.PROPERTY_PREFIX)) {
+                        headerName = "X-" + headerName;
+                    }
+                    httpMethod.addRequestHeader(headerName, (String)header.getValue());
                 }
             }
 
-            //Custom headers
-            Map customHeaders = (Map)context.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
-            if(customHeaders!=null) {
-                Map.Entry entry;
-                for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
-                {
-                    entry =  (Map.Entry)iterator.next();
-                    httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
-                }
-            }
-            //Mule properties
-            UMOMessage m = context.getMessage();
-            String user = (String)m.getProperty(MuleProperties.MULE_USER_PROPERTY);
-            if(user!=null) {
-                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_USER_PROPERTY, user);
-            }
-            if(m.getCorrelationId()!=null) {
-                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_CORRELATION_ID_PROPERTY, m.getCorrelationId());
-                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String.valueOf(m.getCorrelationGroupSize()));
-                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String.valueOf(m.getCorrelationSequence()));
-            }
-            if(m.getReplyTo()!=null) {
-                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_REPLY_TO_PROPERTY, m.getReplyTo().toString());
-            }
+            //Custom requestHeaders
+//            Map customHeaders = (Map)context.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+//            if(customHeaders!=null) {
+//                Map.Entry entry;
+//                for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
+//                {
+//                    entry =  (Map.Entry)iterator.next();
+//                    httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
+//                }
+//            }
+//            //Mule properties
+//            UMOMessage m = context.getMessage();
+//            String user = (String)m.getProperty(MuleProperties.MULE_USER_PROPERTY);
+//            if(user!=null) {
+//                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_USER_PROPERTY, user);
+//            }
+//            if(m.getCorrelationId()!=null) {
+//                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_CORRELATION_ID_PROPERTY, m.getCorrelationId());
+//                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String.valueOf(m.getCorrelationGroupSize()));
+//                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String.valueOf(m.getCorrelationSequence()));
+//            }
+//            if(m.getReplyTo()!=null) {
+//                httpMethod.addRequestHeader("X-" + MuleProperties.MULE_REPLY_TO_PROPERTY, m.getReplyTo().toString());
+//            }
 
             return httpMethod;
         } catch (Exception e)
