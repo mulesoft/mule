@@ -13,48 +13,21 @@
     <siteDirectory>/home/http/cubis.co.uk/html/mule/reference/providers/jdbc/</siteDirectory>
     <dependencies>
         <dependency>
-            <groupId>mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>SNAPSHOT</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.0.3</version>
-            <url>http://jakarta.apache.org/commons/logging/index.html</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.6.1</version>
-            <url>http://jakarta.apache.org/commons/beanutils/index.html</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            </properties>
-        </dependency>
-        <dependency>
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
-            <version>1.0</version>
+            <version>${commons_dbutils_version}</version>
             <url>http://jakarta.apache.org/commons/dbutils/index.html</url>
         </dependency>
         <dependency>
         	<groupId>hsqldb</groupId>
         	<artifactId>hsqldb</artifactId>
-        	<version>1.7.3.0</version>
+        	<version>${hsqldb_version}</version>
         	<url>http://hsqldb.sourceforge.net/</url>
         </dependency>
         <dependency>
             <groupId>xapool</groupId>
             <artifactId>xapool</artifactId>
-            <version>1.4</version>
+            <version>${xapool_version}</version>
             <type>jar</type>
             <url>http://xapool.experlog.com/</url>
             <properties/>
@@ -62,30 +35,26 @@
         <dependency>
             <groupId>jotm</groupId>
             <artifactId>jotm</artifactId>
-            <version>1.5.3</version>
+            <version>${jotm_version}</version>
             <type>jar</type>
-            <url>http://jotm.objectweb.org/</url>
             <properties/>
+            <url>http://jotm.objectweb.org</url>
         </dependency>
         <dependency>
             <groupId>jotm</groupId>
             <artifactId>jotm-carol</artifactId>
-            <version>1.5.3</version>
+            <version>${jotm_carol_version}</version>
             <type>jar</type>
-            <url>http://jotm.objectweb.org/</url>
             <properties/>
+            <url>http://jotm.objectweb.org</url>
         </dependency>
         <dependency>
             <groupId>jotm</groupId>
             <artifactId>jotm-jrmp-stubs</artifactId>
-            <version>1.5.3</version>
+            <version>${jotm_jrmp_stubs_version}</version>
             <type>jar</type>
-            <url>http://jotm.objectweb.org/</url>
             <properties/>
+            <url>http://jotm.objectweb.org</url>
         </dependency>
     </dependencies>
-    <build>
-        <nagEmailAddress>mule-developer@lists.sourceforge.net</nagEmailAddress>
-        <sourceDirectory>src/java</sourceDirectory>
-    </build>
 </project>

@@ -11,7 +11,7 @@
         <dependency>
             <groupId>jotm</groupId>
             <artifactId>jotm</artifactId>
-            <version>1.5.3</version>
+            <version>${jotm_version}</version>
             <type>jar</type>
             <properties/>
             <url>http://jotm.objectweb.org</url>
@@ -19,7 +19,7 @@
         <dependency>
             <groupId>jotm</groupId>
             <artifactId>jotm-carol</artifactId>
-            <version>1.5.3</version>
+            <version>${jotm_carol_version}</version>
             <type>jar</type>
             <properties/>
             <url>http://jotm.objectweb.org</url>
@@ -27,18 +27,10 @@
         <dependency>
             <groupId>jotm</groupId>
             <artifactId>jotm-jrmp-stubs</artifactId>
-            <version>1.5.3</version>
+            <version>${jotm_jrmp_stubs_version}</version>
             <type>jar</type>
             <properties/>
             <url>http://jotm.objectweb.org</url>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee</artifactId>
-            <version>1.4-rc2</version>
-            <properties>
-                <ignore>true</ignore>
-            </properties>
         </dependency>
     </dependencies>
 </project>

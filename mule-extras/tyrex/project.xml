@@ -10,43 +10,34 @@
     <description>Provides access to the Tyrex transaction manager for User and Xa transactions.  for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
     <dependencies>
         <dependency>
-            <id>tyrex</id>
-            <version>1.0</version>
+            <artifactId>tyrex</artifactId>
+            <groupId>tyrex</groupId>
+            <version>${tyrex_version}</version>
             <url>http://www.exolab.org</url>
         </dependency>
         <dependency>
-            <id>ots-jts</id>
+            <artifactId>ots-jts</artifactId>
+            <groupId>ots-jts</groupId>
             <jar>ots-jts_1.0.jar</jar>
             <url>http://www.exolab.org/</url>
         </dependency>
         <dependency>
-            <id>castor</id>
-            <version>0.9.4.3</version>
+            <artifactId>castor</artifactId>
+            <groupId>castor</groupId>
+            <version>${castor_version}</version>
             <url>http://www.exolab.org/</url>
         </dependency>
         <dependency>
-            <id>xerces:xmlParserAPIs</id>
-            <version>2.2.1</version>
+            <artifactId>xmlParserAPIs</artifactId>
+            <groupId>xerces</groupId>
+            <version>${xmlparserapis_version}</version>
             <url>http://xml.apache.org/xerces2-j/index.html</url>
         </dependency>
         <dependency>
-            <id>xerces</id>
-            <version>2.2.1</version>
+            <artifactId>xerces</artifactId>
+            <groupId>xerces</groupId>
+            <version>${xerces_version}</version>
             <url>http://xml.apache.org/xerces2-j/index.html</url>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.0.3</version>
-            <url>http://jakarta.apache.org/commons/logging/index.html</url>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee</artifactId>
-            <version>1.4-rc2</version>
-            <properties>
-                <ignore>true</ignore>
-            </properties>
         </dependency>
     </dependencies>
 </project>

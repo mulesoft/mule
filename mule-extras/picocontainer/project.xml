@@ -12,37 +12,19 @@
         <dependency>
             <groupId>picocontainer</groupId>
             <artifactId>picocontainer</artifactId>
-            <version>1.1</version>
+            <version>${picocontainer_version}</version>
             <url>http://www.picocontainer.org</url>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.6.1</version>
-            <url>http://jakarta.apache.org/commons/beanutils</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            </properties>
-        </dependency>
-         <dependency>
-            <artifactId>commons-collections</artifactId>
-            <groupId>commons-collections</groupId>
-            <version>2.1</version>
-            <url>http://jakarta.apache.org/commons/collections/index.html</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            </properties>
         </dependency>
         <dependency>
             <artifactId>nanocontainer</artifactId>
             <groupId>nanocontainer</groupId>
-            <version>1.0-beta-3</version>
+            <version>${nanocontainer_version}</version>
             <url>http://www.picocontainer.org</url>
         </dependency>
         <dependency>
             <groupId>nanocontainer</groupId>
             <artifactId>nanocontainer-nanowar</artifactId>
-            <version>1.0-beta-4</version>
+            <version>${nanocontainer_nanowar_version}</version>
             <url>http://www.picocontainer.org</url>
         </dependency>
     </dependencies>

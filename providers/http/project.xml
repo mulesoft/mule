@@ -13,8 +13,9 @@
     <url>http://www.muleumo.org/doc/providers/http/</url>
     <dependencies>
         <dependency>
-            <id>commons-httpclient</id>
-            <version>2.0.2</version>
+            <artifactId>commons-httpclient</artifactId>
+            <groupId>commons-httpclient</groupId>
+            <version>${commons_httpclient_version}</version>
             <url>http://jakarta.apache.org/commons/httpclient/index.html</url>
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>

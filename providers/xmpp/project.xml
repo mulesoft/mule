@@ -12,21 +12,15 @@
     <url>http://www.muleumo.org/doc/providers/xmpp/</url>
     <dependencies>
         <dependency>
-            <groupId>mule</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-        </dependency>
-        <dependency>
             <groupId>smack</groupId>
             <artifactId>smack</artifactId>
-            <version>1.4.1</version>
+            <version>${smack_version}</version>
             <url>http://www.jivesoftware.org</url>
         </dependency>
         <dependency>
             <groupId>smack</groupId>
             <artifactId>smackx</artifactId>
-            <version>1.4.1</version>
+            <version>${smackx_version}</version>
             <url>http://www.jivesoftware.org</url>
         </dependency>
     </dependencies>

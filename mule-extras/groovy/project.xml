@@ -9,18 +9,21 @@
     <description>Groovy support currently provides transformers to enable Mule users to transform their objects using groovy scripts. for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
     <dependencies>
     	<dependency>
-            <id>groovy</id>
-            <version>1.0-beta-8</version>
+            <groupId>groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>${groovy_version}</version>
             <url>http://groovy.codehaus.org</url>
         </dependency>
         <dependency>
-            <id>asm</id>
-            <version>1.5.2</version>
+            <artifactId>asm</artifactId>
+            <groupId>asm</groupId>
+            <version>${asm_version}</version>
             <url></url>
         </dependency>
         <dependency>
-            <id>asm:asm-util</id>
-            <version>1.5.2</version>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>${asm_util_version}</version>
             <url></url>
         </dependency>
          <dependency>
@@ -31,12 +34,6 @@
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.0.3</version>
-            <url>http://jakarta.apache.org/commons/logging/index.html</url>
         </dependency>
     </dependencies>
 </project>

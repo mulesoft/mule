@@ -160,10 +160,14 @@
                     <mkdir dir="${basedir}/../../target/release/lib/${pom.artifactId}"/>
                     <copy todir="${mule.release.lib.dir}"
                         file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
-                    <j:if test="${lib.groupId != 'mule'}">
-                        <copy failonerror="false" todir="${mule.release.lib.dir}/licenses"
+                    <u:available file="${basedir}/../../licenses/${lib.artifactId}.license">
+                        <copy todir="${mule.release.lib.dir}/licenses"
+                            file="${basedir}/../../licenses/${lib.artifactId}.license"/>
+                    </u:available>
+                    <u:available file="${basedir}/../../licenses/${lib.groupId}.license">
+                        <copy todir="${mule.release.lib.dir}/licenses"
                             file="${basedir}/../../licenses/${lib.groupId}.license"/>
-                    </j:if>
+                    </u:available>
                 </j:if>
             </j:if>
         </j:forEach>

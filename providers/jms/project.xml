@@ -16,8 +16,7 @@
             <jar>fscontext.jar</jar>
             <url></url>
             <properties>
-                <mule.core.jar>true</mule.core.jar>
-                <war.bundle>true</war.bundle>
+                <ignore>true</ignore>
             </properties>
         </dependency>
         <dependency>
@@ -27,14 +26,13 @@
             <jar>providerutil.jar</jar>
             <url></url>
             <properties>
-                <mule.core.jar>true</mule.core.jar>
-                <war.bundle>true</war.bundle>
+                <ignore>true</ignore>
             </properties>
         </dependency>
         <dependency>
             <artifactId>activemq</artifactId>
             <groupId>activemq</groupId>
-            <version>2.0</version>
+            <version>${activemq_version}</version>
             <properties>
                 <ignore>true</ignore>
             </properties>

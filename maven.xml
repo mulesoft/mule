@@ -167,10 +167,6 @@
         <attainGoal name="mule:samples"/>
         <attainGoal name="mule:tools"/>
 
-        <copy todir="${mule.release.dir}/lib/licenses">
-            <fileset dir="${basedir}/licenses"/>
-        </copy>
-
         <copy todir="${mule.release.dir}" file="${basedir}/LICENSE.txt"/>
         <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
 
@@ -256,6 +252,7 @@
     <goal name="mule:site" prereqs="mule:dtds, multiproject:site"/>
 
     <goal name="mule:libs">
+        <mkdir dir="${mule.release.lib.dir}/licenses"/>
         <!-- copies artifact and deps -->
         <j:set var="goal" value="mule:libs-copy"/>
         <attainGoal name="multiproject:goal"/>
@@ -271,6 +268,14 @@
                         <mkdir dir="${basedir}/../../target/release/lib/${pom.artifactId}"/>
                         <copy todir="${basedir}/../../target/release/lib/${pom.artifactId}"
                             file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
+                        <u:available file="${basedir}/../../licenses/${lib.artifactId}.license">
+                            <copy todir="${mule.release.lib.dir}/licenses"
+                                file="${basedir}/../../licenses/${lib.artifactId}.license"/>
+                        </u:available>
+                        <u:available file="${basedir}/../../licenses/${lib.groupId}.license">
+                            <copy todir="${mule.release.lib.dir}/licenses"
+                                file="${basedir}/../../licenses/${lib.groupId}.license"/>
+                        </u:available>
                     </j:if>
                 </j:if>
                 <j:if test="${pom.package=='org.mule'}">
