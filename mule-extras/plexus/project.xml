@@ -23,7 +23,7 @@
         <dependency>
             <groupId>classworlds</groupId>
             <artifactId>classworlds</artifactId>
-            <version>${class_worlds_version}</version>
+            <version>${classworlds_version}</version>
             <url>http://classworlds.codehaus.org</url>
         </dependency>
     </dependencies>
