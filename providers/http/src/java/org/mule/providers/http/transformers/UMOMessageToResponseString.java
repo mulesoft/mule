@@ -46,6 +46,7 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
     public UMOMessageToResponseString()
     {
         registerSourceType(Object.class);
+        setReturnClass(Object.class);
 
         headers = new ArrayList(Arrays.asList(HttpConstants.RESPONSE_HEADER_NAMES));
         format = new SimpleDateFormat(HttpConstants.DATE_FORMAT);

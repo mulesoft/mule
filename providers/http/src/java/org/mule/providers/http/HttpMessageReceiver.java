@@ -102,7 +102,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
         }
         if(!responseTransformer.getReturnClass().equals(String.class) &&
-                !responseTransformer.getReturnClass().equals(byte[].class)) {
+                !responseTransformer.getReturnClass().equals(byte[].class) &&
+                !responseTransformer.getReturnClass().equals(Object.class)) {
             throw new InitialisationException("Response transformer for " + connector.getName() + " must return either " +
                     "a String or byte[]");
         }
@@ -221,10 +222,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         }
                         RequestContext.rewriteEvent(returnMessage);
                         Object response = getResponseTransformer().transform(returnMessage.getPayload());
-                        if(response instanceof String) {
-                            dataOut.write(response.toString().getBytes());
-                        } else {
+                        if(response instanceof byte[]) {
                             dataOut.write((byte[])response);
+                        } else {
+                            dataOut.write(response.toString().getBytes());
                         }
                         dataOut.flush();
                         if (keepAliveMonitor != null)
