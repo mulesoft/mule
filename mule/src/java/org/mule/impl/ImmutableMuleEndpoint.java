@@ -443,6 +443,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             securityFilter.setEndpoint(this);
             securityFilter.initialise();
         }
+
+        String sync = endpointUri.getParams().getProperty("synchronous", null);
+        if(sync!=null) {
+            synchronous = Boolean.valueOf(sync);
+        }
     }
 
     /**
@@ -470,8 +475,12 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public boolean isSynchronous()
     {
         if(synchronous==null) {
-            synchronous = new Boolean(MuleManager.getConfiguration().isSynchronous());
+            return MuleManager.getConfiguration().isSynchronous();
         }
         return synchronous.booleanValue();
+    }
+
+    public boolean isSynchronousExplicitlySet() {
+        return synchronous != null;
     }
 }

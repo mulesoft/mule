@@ -118,6 +118,26 @@ public class AxisConnectorFunctionalTestCase extends AbstractMuleTestCase
         UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38009/mycomponent3?method=getPeople"), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person[]);
-        assertEquals(3, ((Person[])result.getPayload()).length);
+        assertEquals(4, ((Person[])result.getPayload()).length);
+    }
+
+    public void testDispatchAsyncComplex() throws Throwable
+    {
+        UMOConnector c = MuleObjectHelper.getConnectorByProtocol("axis");
+        assertNotNull(c);
+        UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
+        UMOEndpoint endpoint = new MuleEndpoint("test",
+                new MuleEndpointURI("http://localhost:38010/mycomponent4?method=addPerson"),
+                        c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, null);
+        UMOEvent event = getTestEvent(new Person("Rossco", "Pico"), endpoint);
+
+        dispatcher.dispatch(event);
+        Thread.sleep(2000);
+        //lets get our newly added person
+        UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38009/mycomponent3?method=getPerson&param=Rossco"), 0);
+        assertNotNull(result);
+        assertTrue(result.getPayload() instanceof Person);
+        assertEquals("Rossco", ((Person)result.getPayload()).getFirstName());
+        assertEquals("Pico", ((Person)result.getPayload()).getLastName());
     }
 }

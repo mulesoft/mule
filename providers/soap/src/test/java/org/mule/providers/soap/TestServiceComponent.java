@@ -32,7 +32,7 @@ public class TestServiceComponent extends FunctionalTestComponent implements org
 {
     private static transient Log logger = LogFactory.getLog(FunctionalTestComponent.class);
 
-    private Map people = new HashMap();
+    private static Map people = new HashMap();
 
     public TestServiceComponent()
     {
@@ -70,12 +70,14 @@ public class TestServiceComponent extends FunctionalTestComponent implements org
     public void addPerson(Person person)
     {
         people.put(person.getFirstName(), person);
+        logger.info("Added Person: " + person);
     }
 
     public Person addPerson(String firstname, String surname)
     {
         Person p = new Person(firstname, surname);
         addPerson(p);
+        logger.info("Added Person: " + p);
         return p;
     }
 }

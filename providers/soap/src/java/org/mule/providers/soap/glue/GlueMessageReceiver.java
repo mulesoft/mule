@@ -26,6 +26,7 @@ import org.mule.DisposeException;
 import org.mule.InitialisationException;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.ServiceProxy;
 import org.mule.umo.UMOComponent;
@@ -59,6 +60,16 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
                 throw new InitialisationException("No service interfaces could be found for component: " + component.getDescriptor().getName());
             }
             VirtualService.enable();
+            //this is always initialisaed as synchronous as ws invocations should
+            //always execute in a single thread unless the endpont has explicitly
+            //been set to run asynchronously
+            if(endpoint instanceof ImmutableMuleEndpoint  &&
+                    !((ImmutableMuleEndpoint)endpoint).isSynchronousExplicitlySet()) {
+                if(!endpoint.isSynchronous()) {
+                    logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
+                    endpoint.setSynchronous(true);
+                }
+            }
             VirtualService vService = new VirtualService(interfaces, ServiceProxy.createGlueServiceHandler(this,  endpoint.isSynchronous()));
 
             if(createServer) {

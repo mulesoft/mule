@@ -34,6 +34,7 @@ import org.apache.axis.wsdl.fromJava.Types;
 import org.mule.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ModelEventListener;
@@ -160,10 +161,15 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        //todo May need to change this
-        if(!endpoint.isSynchronous()) {
-            logger.debug("overriding endpoint synchronicity and setting it to true for this Axis endpoint");
-            endpoint.setSynchronous(true);
+        //this is always initialisaed as synchronous as ws invocations should
+        //always execute in a single thread unless the endpont has explicitly
+        //been set to run asynchronously
+        if(endpoint instanceof ImmutableMuleEndpoint  &&
+                !((ImmutableMuleEndpoint)endpoint).isSynchronousExplicitlySet()) {
+            if(!endpoint.isSynchronous()) {
+                logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
+                endpoint.setSynchronous(true);
+            }
         }
 
         UMOMessageReceiver receiver = super.createReceiver(component, endpoint);
