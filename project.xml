@@ -179,30 +179,6 @@
             </properties>
         </dependency>
 
-        <!-- Optional file context jndi jars -->
-        <dependency>
-            <groupId>fscontext</groupId>
-            <artifactId>fscontext</artifactId>
-            <jar>fscontext.jar</jar>
-            <url></url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-                <war.bundle>true</war.bundle>
-            </properties>
-        </dependency>
-
-        <dependency>
-            <groupId>providerutil</groupId>
-            <artifactId>providerutil</artifactId>
-            <version></version>
-            <jar>providerutil.jar</jar>
-            <url></url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-                <war.bundle>true</war.bundle>
-            </properties>
-        </dependency>
-
         <!-- XStream for de/serialising objects -->
         <dependency>
             <groupId>xstream</groupId>
@@ -224,32 +200,10 @@
             </properties>
         </dependency>
 
-        <!-- used by Jms provider and jms related tests -->
-        <dependency>
-            <groupId>jms</groupId>
-            <artifactId>jms</artifactId>
-            <version>1.1</version>
-            <url></url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-                <war.bundle>true</war.bundle>
-            </properties>
-        </dependency>
-
-        <!-- Jms tests using ActiveMq -->
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-j2ee</artifactId>
             <version>1.4-rc2</version>
-            <properties>
-                <ignore>true</ignore>
-            </properties>
-        </dependency>
-
-        <dependency>
-            <artifactId>activemq</artifactId>
-            <groupId>activemq</groupId>
-            <version>2.0</version>
             <properties>
                 <ignore>true</ignore>
             </properties>
@@ -315,37 +269,6 @@
         <sourceDirectory>${basedir}/src/java</sourceDirectory>
         <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
         <unitTest>
-<!--            <includes>-->
-<!--                <include>**/*TestCase.*</include>-->
-<!--            </includes>-->
-<!--            <excludes>-->
-<!--                <exclude>**/Abstract*.*</exclude>-->
-              <!-- need to have a Jms server running to include these -->
-<!--                <exclude>**/*Jms*.*</exclude>-->
-<!--                <exclude>**/*JMS*.*</exclude>-->
-<!--                <exclude>**/ActiveMQ*.*</exclude>-->
-<!--                <exclude>**/OpenJms*.*</exclude>-->
-<!--                <exclude>**/Joram*.*</exclude>-->
-<!--                <exclude>**/SpiritWave*.*</exclude>-->
-<!---->
-                <!-- Fails as mail folder cannot be null, but can't mock a mail folder... -->
-<!--                <exclude>**/MailMessageReceiverTestCase.*</exclude>-->
-<!---->
-               <!-- tests fails on Linux jdk -->
-<!--                <exclude>**/CompressionTransformerTestCase.*</exclude>-->
-<!---->
-                <!-- Disable Multicast tests unless configured -->
-<!--                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>-->
-<!---->
-                <!-- sometimes fails failing to bind -->
-<!--                <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>-->
-<!---->
-<!--            </excludes>-->
-            <!--
-                        If you have included the Jms Tests above you can also include tests
-                        for you particular Jms server
-                        -->
-<!---->
             <resources>
                 <resource>
                     <directory>${basedir}/src/test/conf</directory>
