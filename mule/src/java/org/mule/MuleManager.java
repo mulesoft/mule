@@ -35,9 +35,9 @@ import org.mule.umo.UMOServerEvent;
 import org.mule.umo.UMOServerEventListener;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.model.ComponentResolverException;
 import org.mule.umo.model.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.model.ComponentResolverException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
@@ -48,11 +48,14 @@ import org.mule.util.Utility;
 import org.w3c.dom.DocumentFragment;
 
 import javax.transaction.TransactionManager;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -63,10 +66,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.IOException;
-import java.io.StringWriter;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule instance.
@@ -335,6 +334,7 @@ public class MuleManager implements UMOManager
         initialised.set(false);
         listeners.clear();
         instance = null;
+        listeners.dispose();
         System.out.println(getEndSplash());
     }
 
