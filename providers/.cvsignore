@@ -1,2 +1,4 @@
 target
 maven.log
+.classpath
+.project

@@ -5,7 +5,7 @@
     <name>Mule</name>
     <id>mule</id>
     <groupId>mule</groupId>
-    <currentVersion>1.0</currentVersion>
+    <currentVersion>SNAPSHOT</currentVersion>
     <organization>
         <name>Cubis Limited</name>
 <!--url>http://www.cubis.co.uk/</url>

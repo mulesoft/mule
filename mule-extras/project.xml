@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-   
+
     <extend>${basedir}/../mule/project.xml</extend>
     <pomVersion>3</pomVersion>
     <name>Mule Extras</name>
@@ -29,6 +29,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -37,6 +38,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -45,6 +47,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -53,6 +56,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -61,6 +65,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -69,6 +74,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>

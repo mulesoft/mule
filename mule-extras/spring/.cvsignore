@@ -1,3 +1,5 @@
 target
 spring.iml
 xdoc
+.classpath
+.project

@@ -15,11 +15,17 @@
             <groupId>mule</groupId>
             <artifactId>mule</artifactId>
             <version>${pom.currentVersion}</version>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-vm-provider</artifactId>
             <version>${pom.currentVersion}</version>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <!-- optional: used by the http remoting test case -->
         <dependency>

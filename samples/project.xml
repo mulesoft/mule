@@ -9,42 +9,63 @@
             <id>mule</id>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-jms-provider</artifactId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/jms/</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-email-provider</artifactId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/email/</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-file-provider</artifactId>
            <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/file/</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-vm-provider</artifactId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/vm/</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-http-provider</artifactId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/http/</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-stream-provider</artifactId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org/providers/stream/</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -53,6 +74,7 @@
             <!-- Mule core jars are ignored and spring will be distributed with the extras so ignore it here -->
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -62,6 +84,7 @@
             <!-- Mule core jars are ignored and spring will be distributed with the extras so ignore it here -->
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
