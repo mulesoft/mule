@@ -46,6 +46,22 @@
         <j:forEach var="jarfile" items="${mulejars.iterator()}">
             <echo>jar is ${jarfile}</echo>
             <copy file="${jarfile}" todir="${mule.release.dist.dir}"/>
+            <!--unjar src="${jarfile}" dest="${mule.release.dist.dir}/temp"/-->
+        </j:forEach>
+        
+        <delete file="${mule.release.dist.dir}/mule-providers-${pom.currentVersion}.jar"/>
+        <delete file="${mule.release.dist.dir}/mule-extras-${pom.currentVersion}.jar"/>
+        <delete file="${mule.release.dist.dir}/mule-tests-${pom.currentVersion}.jar"/>
+        <delete file="${mule.release.dist.dir}/mule-samples-${pom.currentVersion}.jar"/>
+        <delete file="${mule.release.dist.dir}/mule-tools-${pom.currentVersion}.jar"/>
+        
+        <fileScanner var="mulejars">
+            <fileset dir="${mule.release.dist.dir}">
+                <include name="*"/>
+            </fileset>
+        </fileScanner>
+
+        <j:forEach var="jarfile" items="${mulejars.iterator()}">
             <unjar src="${jarfile}" dest="${mule.release.dist.dir}/temp"/>
         </j:forEach>
 
