@@ -8,6 +8,16 @@
     <shortDescription>groovy</shortDescription>
     <description>Groovy support currently provides transformers to enable Mule users to transform their objects using groovy scripts. for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
     <dependencies>
+        <dependency>
+            <artifactId>mule-vm-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
     	<dependency>
             <groupId>groovy</groupId>
             <artifactId>groovy</artifactId>
