@@ -113,16 +113,7 @@
             </includes>
             <excludes>
                 <exclude>**/Abstract*.*</exclude>
-                <!-- need to have a Jms server running to include these -->
-<!--                <exclude>**/*Jms*.*</exclude>-->
-<!--                <exclude>**/*JMS*.*</exclude>-->
-<!--                <exclude>**/ActiveMQ*.*</exclude>-->
-                <exclude>**/OpenJms*.*</exclude>
-                <exclude>**/Joram*.*</exclude>
-                <exclude>**/SpiritWave*.*</exclude>
-
-                <!-- Active MQ rollback seems a little off need to investigate -->
-                <exclude>**/ActiveMQJmsXaTransactionFunctionalTestCase.*</exclude>
+                
                 <!-- Fails as mail folder cannot be null, but can't mock a mail folder... -->
                 <exclude>**/MailMessageReceiverTestCase.*</exclude>
 
@@ -136,10 +127,6 @@
                 <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
 
             </excludes>
-            <!--
-                        If you have included the Jms Tests above you can also include tests
-                        for you particular Jms server
-                        -->
 
             <resources>
                 <resource>
