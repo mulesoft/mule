@@ -704,7 +704,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
     {
-        RequestContext.getEvent().setStopFurtherProcessing(stopFurtherProcessing);
+        event.setStopFurtherProcessing(stopFurtherProcessing);
     }
 
     /**
