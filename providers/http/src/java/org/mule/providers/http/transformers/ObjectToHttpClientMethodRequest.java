@@ -60,7 +60,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
     {
         String endpoint = (String) context.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
         if(endpoint==null) {
-            throw new TransformerException(new Message(Messages.EVENT_PROPERTY_X_NOT_SAT_CANT_PROCESS_REQUEST, MuleProperties.MULE_ENDPOINT_PROPERTY), this);
+            throw new TransformerException(new Message(Messages.EVENT_PROPERTY_X_NOT_SET_CANT_PROCESS_REQUEST, MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
         String method = (String) context.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
 

@@ -23,7 +23,7 @@ import org.mule.providers.AbstractServiceEnabledConnector;
  */
 public class XmppConnector extends AbstractServiceEnabledConnector
 {
-    private String serverName = null;
+    private String hostname = null;
     
     private String username = null;
     
@@ -35,18 +35,18 @@ public class XmppConnector extends AbstractServiceEnabledConnector
     }
 
     /**
-     * @return Returns the serverName.
+     * @return Returns the hostname.
      */
-    public String getServerName()
+    public String getHostname()
     {
-        return serverName;
+        return hostname;
     }
     /**
-     * @param serverName The serverName to set.
+     * @param hostname The hostname to set.
      */
-    public void setServerName(String serverName)
+    public void setHostname(String hostname)
     {
-        this.serverName = serverName;
+        this.hostname = hostname;
     }
     /**
      * @return Returns the password.

@@ -36,6 +36,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
 
     protected void setUp() throws Exception
     {
+        super.setUp();
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         
         context = new ClassPathXmlApplicationContext("mule-events-app-context.xml");

@@ -112,7 +112,7 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
     }
 }

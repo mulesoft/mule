@@ -27,9 +27,9 @@ public interface ObjectPool
     /**
      * Constants used to determine the exhaused action of the pool
      */
-    public static final byte WHEN_EXHAUSTED_FAIL = 0;
-    public static final byte WHEN_EXHAUSTED_BLOCK = 1;
-    public static final byte WHEN_EXHAUSTED_GROW = 2;
+    public static final int WHEN_EXHAUSTED_FAIL = 0;
+    public static final int WHEN_EXHAUSTED_BLOCK = 1;
+    public static final int WHEN_EXHAUSTED_GROW = 2;
 
     public static final int DEFAULT_MAX_SIZE = 5;
     public static final int DEFAULT_MAX_WAIT = 4000;

@@ -107,6 +107,12 @@ public class AllStatistics {
             componentStat.put(stat.getName(), stat);
 
     }
+
+    public synchronized void remove(ComponentStatistics stat) {
+        if (stat != null) {
+            componentStat.remove(stat.getName());
+        }
+    }
     public synchronized Collection getComponentStatistics() {
         return componentStat.values();
     }

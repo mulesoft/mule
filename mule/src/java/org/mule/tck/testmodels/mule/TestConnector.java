@@ -48,7 +48,7 @@ public class TestConnector extends AbstractConnector
     /* (non-Javadoc)
      * @see org.mule.providers.AbstractConnector#disposeConnector()
      */
-    protected void disposeConnector() throws UMOException
+    protected void disposeConnector()
     {
 
     }

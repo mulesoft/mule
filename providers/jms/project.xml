@@ -9,5 +9,17 @@
     </description>
     <shortDescription>jms</shortDescription>
     <url>http://www.muleumo.org/doc/providers/jms/</url>
-    <dependencies/>
+    <dependencies>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jms</artifactId>
+            <version>${geronimo_spec_jms_version}</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>true</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+    </dependencies>
 </project>

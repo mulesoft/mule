@@ -270,7 +270,7 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
         }
     }
 
-    protected void doDispose() throws UMOException
+    protected void doDispose()
     {
         super.doDispose();
         if(folder!=null ) folder.removeMessageCountListener(this);

@@ -31,17 +31,17 @@ public class PoolingProfile
     /**
      * Tells the object pool not to initialise any components on startup
      */
-    public static final byte POOL_INITIALISE_NO_COMPONENTS = 0;
+    public static final int POOL_INITIALISE_NO_COMPONENTS = 0;
 
     /**
      * Tells the object pool only to initialise one component on startup
      */
-    public static final byte POOL_INITIALISE_ONE_COMPONENT = 1;
+    public static final int POOL_INITIALISE_ONE_COMPONENT = 1;
 
     /**
      * Tells the object pool not to initialise any components on startup
      */
-    public static final byte POOL_INITIALISE_ALL_COMPONENTS = 2;
+    public static final int POOL_INITIALISE_ALL_COMPONENTS = 2;
 
     /**
      * Controls the maximum number of Mule UMOs that can be borrowed from a component pool at one time.
@@ -87,7 +87,7 @@ public class PoolingProfile
      * <li>2 (POOL_INIT_ALL_COMPONENTS) : Will load all components in the pool on startup</li>
      * </ul>
      */
-    public static final byte DEFAULT_POOL_INITIALISATION_POLICY = POOL_INITIALISE_ONE_COMPONENT;
+    public static final int DEFAULT_POOL_INITIALISATION_POLICY = POOL_INITIALISE_ONE_COMPONENT;
 
 
     private int maxActive = DEFAULT_MAX_POOL_ACTIVE;
@@ -96,9 +96,9 @@ public class PoolingProfile
 
     private long maxWait = DEFAULT_MAX_POOL_WAIT;
 
-    private byte exhaustedAction = DEFAULT_POOL_EXHAUSTED_ACTION;
+    private int exhaustedAction = DEFAULT_POOL_EXHAUSTED_ACTION;
 
-    private byte initialisationPolicy = DEFAULT_POOL_INITIALISATION_POLICY;
+    private int initialisationPolicy = DEFAULT_POOL_INITIALISATION_POLICY;
 
     private UMOPoolFactory poolFactory = new CommonsPoolFactory();
 
@@ -115,7 +115,7 @@ public class PoolingProfile
         if(pp.getPoolFactory() != null) poolFactory = pp.getPoolFactory();
     }
 
-    public PoolingProfile(int maxActive, int maxIdle, long maxWait, byte exhaustedAction, byte initialisationPolicy)
+    public PoolingProfile(int maxActive, int maxIdle, long maxWait, int exhaustedAction, int initialisationPolicy)
     {
         this.maxActive = maxActive;
         this.maxIdle = maxIdle;
@@ -154,18 +154,18 @@ public class PoolingProfile
     /**
      * @return the action when the Mule UMO pool is exhaused for a component
      */
-    public byte getExhaustedAction()
+    public int getExhaustedAction()
     {
         return exhaustedAction;
     }
 
 
-    public byte getInitialisationPolicy()
+    public int getInitialisationPolicy()
     {
         return initialisationPolicy;
     }
 
-    public void setInitialisationPolicy(byte policy)
+    public void setInitialisationPolicy(int policy)
     {
         initialisationPolicy = policy;
     }
@@ -185,7 +185,7 @@ public class PoolingProfile
         this.maxWait = maxWait;
     }
 
-    public void setExhaustedAction(byte exhaustedAction)
+    public void setExhaustedAction(int exhaustedAction)
     {
         this.exhaustedAction = exhaustedAction;
     }

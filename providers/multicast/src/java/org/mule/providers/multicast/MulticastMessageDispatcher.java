@@ -46,7 +46,7 @@ public class MulticastMessageDispatcher extends UdpMessageDispatcher
         return socket;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         try
         {

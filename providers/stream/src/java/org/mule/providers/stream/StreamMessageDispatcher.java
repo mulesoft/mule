@@ -79,7 +79,7 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
     }
 }

@@ -69,7 +69,7 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
     {
     }
 
-    protected void disposeConnector() throws UMOException
+    protected void disposeConnector()
     {
     }
 

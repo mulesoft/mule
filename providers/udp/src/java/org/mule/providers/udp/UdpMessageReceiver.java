@@ -29,6 +29,9 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -43,19 +46,15 @@ import java.net.UnknownHostException;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class UdpMessageReceiver extends AbstractMessageReceiver implements Runnable
+public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     protected DatagramSocket socket = null;
-
-    protected PooledExecutor threadPool;
 
     protected InetAddress inetAddress;
 
     protected int bufferSize;
 
     private URI uri;
-
-    private Thread worker;
 
     public UdpMessageReceiver(AbstractConnector connector,
                               UMOComponent component,
@@ -64,7 +63,6 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
         create(connector, component, endpoint);
         bufferSize = ((UdpConnector) connector).getBufferSize();
 
-        threadPool = connector.getReceiverThreadingProfile().createPool(connector.getName());
         uri = endpoint.getEndpointURI().getUri();
 
         try
@@ -75,8 +73,11 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
             throw new InitialisationException(new Message("udp", 2, uri), e, this);
         }
         connect(uri);
-        worker = new Thread(this);
-        worker.start();
+        try {
+            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
+        } catch (WorkException e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
+        }
     }
 
     protected void connect(URI uri) throws InitialisationException
@@ -149,11 +150,11 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
                     {
                         socket.receive(packet);
                         logger.trace("Received packet on: " + inetAddress.toString());
-                        Runnable worker = createWorker(packet);
+                        Work work = createWork(packet);
                         try
                         {
-                            threadPool.execute(worker);
-                        } catch (InterruptedException e)
+                            getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, null);
+                        } catch (WorkException e)
                         {
                             logger.error("Udp receiver interrupted: " + e.getMessage(), e);
                         }
@@ -173,27 +174,23 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
         }
     }
 
-    public void doDispose() throws UMOException
-    {
-        try
-        {
-            threadPool.shutdownNow();
-            socket.close();
+    public void release() {
+        dispose();
+    }
 
-        } catch (Exception e)
-        {
-            throw new DisposeException(new Message("udp", 3, socket), e);
-        }
+    public void doDispose()
+    {
+        socket.close();
         logger.info("Closed Udp connection: " + uri);
     }
 
-    protected Runnable createWorker(DatagramPacket packet) throws IOException
+    protected Work createWork(DatagramPacket packet) throws IOException
     {
         return new UdpWorker(new DatagramSocket(0), packet);
     }
 
 
-    protected class UdpWorker implements Runnable, Disposable
+    protected class UdpWorker implements Work, Disposable
     {
         private DatagramSocket socket = null;
         private DatagramPacket packet;
@@ -202,6 +199,10 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
         {
             this.socket = socket;
             this.packet = packet;
+        }
+
+        public void release() {
+            dispose();
         }
 
         public void dispose()

@@ -88,11 +88,11 @@ public class ConnectorServiceOverridesTestCase extends AbstractMuleTestCase
         endpoint.initialise();
         assertNotNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
 
-        endpoint = new MuleEndpoint("file:///temp?connectorName=fileConnector3", true);
+        endpoint = new MuleEndpoint("file:///temp?connector=fileConnector3", true);
         endpoint.initialise();
         assertNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
 
-        endpoint = new MuleEndpoint("file:///temp?connectorName=fileConnector2", true);
+        endpoint = new MuleEndpoint("file:///temp?connector=fileConnector2", true);
         endpoint.initialise();
         assertNotNull(((AbstractServiceEnabledConnector)endpoint.getConnector()).getServiceOverrides());
 

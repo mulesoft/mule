@@ -14,9 +14,7 @@
 package org.mule.util.queue;
 
 import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.InitialisationException;
 
@@ -86,7 +84,7 @@ public class BoundedPersistentQueue extends BoundedBuffer implements Disposable
         return ps;
     }
 
-    public void dispose() throws UMOException
+    public void dispose()
     {
         if(ps!=null) ps.dispose();
     }

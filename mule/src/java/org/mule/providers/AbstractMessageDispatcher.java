@@ -12,20 +12,20 @@
 
 package org.mule.providers;
 
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleRuntimeException;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOTransaction;
+import org.mule.umo.*;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
+import javax.resource.spi.work.Work;
 import java.beans.ExceptionListener;
 
 /**
@@ -35,8 +35,7 @@ import java.beans.ExceptionListener;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher, ExceptionListener
-{
+public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher, ExceptionListener {
     /**
      * logger used by this class
      */
@@ -45,7 +44,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     /**
      * Thread pool of Connector sessions
      */
-    protected PooledExecutor threadPool = null;
+    protected UMOWorkManager workManager = null;
 
     protected boolean disposeOnCompletion = false;
 
@@ -55,20 +54,24 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     protected boolean doThreading = true;
 
-    public AbstractMessageDispatcher(AbstractConnector connector)
-    {
+    public AbstractMessageDispatcher(AbstractConnector connector) {
         init(connector);
         disposeOnCompletion = ((AbstractConnector) connector).isDisposeDispatcherOnCompletion();
     }
 
-    private void init(AbstractConnector connector)
-    {
+    private void init(AbstractConnector connector) {
         this.connector = connector;
-        if (connector instanceof AbstractConnector)
-        {
+        if (connector instanceof AbstractConnector) {
             ThreadingProfile profile = ((AbstractConnector) connector).getDispatcherThreadingProfile();
-            threadPool = profile.createPool(connector.getName());
             doThreading = profile.isDoThreading();
+            if (doThreading) {
+                workManager = profile.createWorkManager(connector.getName());
+                try {
+                    workManager.start();
+                } catch (UMOException e) {
+                    throw new MuleRuntimeException(new Message(Messages.FAILED_TO_START_X, "WorkManager"), e);
+                }
+            }
         }
     }
 
@@ -77,32 +80,24 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 	 * 
 	 * @see org.mule.umo.provider.UMOMessageDispatcher#dispatch(org.mule.umo.UMOEvent)
 	 */
-    public final void dispatch(UMOEvent event) throws Exception
-    {
-        try
-        {
+    public final void dispatch(UMOEvent event) throws Exception {
+        try {
             event.setSynchronous(false);
             event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
             RequestContext.setEvent(event);
             UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-            if (doThreading && !event.isSynchronous() && tx == null)
-            {
-                    threadPool.execute(new Worker(event));
-            } else
-            {
-                try
-                {
+            if (doThreading && !event.isSynchronous() && tx == null) {
+                workManager.scheduleWork(new Worker(event));
+            } else {
+                try {
                     doDispatch(event);
-                } finally
-                {
-                    if (disposeOnCompletion)
-                    {
+                } finally {
+                    if (disposeOnCompletion) {
                         dispose();
                     }
                 }
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             //automatically dispose if there were failures
             logger.info("Exception occurred while executing on this dispatcher. disposing before continuing");
             dispose();
@@ -111,29 +106,23 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
     }
 
 
-    public final UMOMessage send(UMOEvent event) throws Exception
-    {
-        try
-        {
-            try
-            {
+    public final UMOMessage send(UMOEvent event) throws Exception {
+        try {
+            try {
                 event.setSynchronous(true);
                 event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
                 RequestContext.setEvent(event);
                 UMOMessage result = doSend(event);
 
                 return result;
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 //automatically dispose if there were failures
                 logger.info("Exception occurred while executing on this dispatcher. disposing before continuing");
                 dispose();
                 throw e;
             }
-        } finally
-        {
-            if (disposeOnCompletion)
-            {
+        } finally {
+            if (disposeOnCompletion) {
                 dispose();
             }
         }
@@ -145,91 +134,69 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 	 * 
 	 * @see org.mule.util.ExceptionListener#onException(java.lang.Throwable)
 	 */
-    public void exceptionThrown(Exception e)
-    {
+    public void exceptionThrown(Exception e) {
         getConnector().handleException(e);
 
     }
 
-    private class Worker implements Runnable
-    {
-        private UMOEvent event;
-        public Worker(UMOEvent event) {
-            this.event = event;
-        }
-    /*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
-    public void run()
-    {
-        try
-        {
-            RequestContext.setEvent(event);
-            doDispatch(event);
-            
-        } catch (Exception e)
-        {
-            try
-            {
-                dispose();
-            } catch (UMOException e1)
-            {
-                //ignore
-            }
-            getConnector().handleException(e);
-        } finally
-        {
-            if (disposeOnCompletion)
-            {
-                try
-                {
-                    dispose();
-                } catch (UMOException e)
-                {
-                    logger.error("Failed to dispose dispatcher: " + e, e);
-                }
-            }
-        }
-
-    }
-    }
-
-    public boolean isDisposed()
-    {
+    public boolean isDisposed() {
         return disposed;
     }
 
     /**
      * Template method to destroy any resources.  some connector will want to cache
      * dispatchers and destroy them themselves
-     *
-     * @throws UMOException
      */
-    public final void dispose() throws UMOException
-    {
-        if(!disposed) {
-            try
-            {
+    public final void dispose() {
+        if (!disposed) {
+            try {
                 doDispose();
-            } finally
-            {
-               connector.getDispatchers().values().remove(this);
-               disposed = true;
+            } finally {
+                connector.getDispatchers().values().remove(this);
+                disposed = true;
             }
         }
 
     }
 
-    public UMOConnector getConnector()
-    {
+    public UMOConnector getConnector() {
         return connector;
     }
 
-    public abstract void doDispose() throws UMOException;
+    public abstract void doDispose();
 
     public abstract void doDispatch(UMOEvent event) throws Exception;
 
     public abstract UMOMessage doSend(UMOEvent event) throws Exception;
+
+    private class Worker implements Work {
+        private UMOEvent event;
+
+        public Worker(UMOEvent event) {
+            this.event = event;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.lang.Runnable#run()
+         */
+        public void run() {
+            try {
+                RequestContext.setEvent(event);
+                doDispatch(event);
+
+            } catch (Exception e) {
+                dispose();
+                getConnector().handleException(e);
+            } finally {
+                if (disposeOnCompletion) {
+                    dispose();
+                }
+            }
+        }
+
+        public void release() {
+        }
+    }
 }

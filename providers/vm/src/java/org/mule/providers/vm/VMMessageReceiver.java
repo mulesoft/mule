@@ -150,7 +150,7 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
         return queue;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         if(worker!=null) worker.interrupt();
         worker=null;

@@ -262,9 +262,13 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
 
      */
 
-    protected void disposeConnector() throws UMOException
+    protected void disposeConnector()
     {
-        stopConnector();
+        try {
+            stopConnector();
+        } catch (UMOException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     /**

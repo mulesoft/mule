@@ -53,11 +53,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
     protected static boolean initialised = false;
 
     protected AbstractConfigBuilderTestCase() {
-        try {
-            if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        } catch (UMOException e) {
-            fail(e.getMessage());
-        }
+        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         initialised = false;
     }
 

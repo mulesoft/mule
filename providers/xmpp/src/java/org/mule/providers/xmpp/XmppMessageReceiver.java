@@ -39,6 +39,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.config.i18n.Messages;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
 import java.net.URI;
 
 /**
@@ -52,17 +54,11 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements
 {
     private XMPPConnection xmppConnection = null;
 
-    private PooledExecutor threadPool;
-
-    private Thread worker;
-
     public XmppMessageReceiver(AbstractConnector connector,
             UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException
     {
         create(connector, component, endpoint);
-
-        threadPool = connector.getReceiverThreadingProfile().createPool();
         connect(endpoint.getEndpointURI().getUri());
     }
 
@@ -75,7 +71,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements
             logger.info("*************************************");
 
             XmppConnector cnn = (XmppConnector)connector;
-            String serverName = cnn.getServerName();
+            String serverName = cnn.getHostname();
             String userName = cnn.getUsername();
             String login = cnn.getPassword();
             
@@ -111,26 +107,12 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements
         }
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
-        if (worker != null)
-        {
-            worker.interrupt();
-            worker = null;
-        }
-        try
-        {
-            threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
-            threadPool.awaitTerminationAfterShutdown();
-
-        } catch (Exception e)
-        {
-            throw new DisposeException(e, this);
-        }
         logger.info("Closed Xmpp connection");
     }
 
-    protected Runnable createWorker(Message message)
+    protected Work createWork(Message message)
     {
         return new XMPPWorker(message);
     }
@@ -143,18 +125,17 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements
     public void processPacket(Packet arg0)
     {
         Message msg = (Message) arg0;
-        Runnable worker = createWorker(msg);
+        Work work = createWork(msg);
         try
         {
-            threadPool.execute(worker);
-        } catch (InterruptedException e)
+            getWorkManager().scheduleWork(work);
+        } catch (WorkException e)
         {
-            logger.error("Tcp Server receiver interrupted: " + e.getMessage(),
-                    e);
+            logger.error("Tcp Server receiver interrupted: " + e.getMessage(), e);
         }
     }
     
-    private class XMPPWorker implements Runnable
+    private class XMPPWorker implements Work
     {
         Message message = null;
 
@@ -187,6 +168,9 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements
             {
                 handleException(e);
             }
+        }
+
+        public void release() {
         }
     }
 }

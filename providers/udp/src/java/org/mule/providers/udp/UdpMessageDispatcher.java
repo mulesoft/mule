@@ -139,7 +139,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         initialised.set(false);
         if(socket!=null) socket.close();

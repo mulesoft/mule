@@ -113,7 +113,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposab
         }
     }
 
-    public void dispose() throws UMOException
+    public void dispose()
     {
         try
         {

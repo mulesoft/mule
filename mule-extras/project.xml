@@ -30,46 +30,9 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <artifactId>mule-tcp-provider</artifactId>
-            <groupId>mule</groupId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <artifactId>mule-http-provider</artifactId>
-            <groupId>mule</groupId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <artifactId>mule-vm-provider</artifactId>
-            <groupId>mule</groupId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <artifactId>mule-stream-provider</artifactId>
-            <groupId>mule</groupId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>true</mule.mini>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>

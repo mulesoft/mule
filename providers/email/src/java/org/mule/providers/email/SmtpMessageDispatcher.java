@@ -244,7 +244,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
         return result.substring(0, result.length() - 2);
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         session=null;
     }

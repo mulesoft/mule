@@ -228,7 +228,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         initialised.set(false);
         try

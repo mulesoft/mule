@@ -204,7 +204,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         return connector.getFilenameParser().getFilename(event, pattern);
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
     }
 

@@ -126,7 +126,7 @@ public interface CoreMessageConstants
     public static final int TX_CANT_BIND_ALREADY_BOUND = 108;
     public static final int METHOD_X_NOT_FOUND_ON_X = 109;
     public static final int TRANSFORM_FAILED_FROM_X_TO_X = 110;
-    public static final int EVENT_PROPERTY_X_NOT_SAT_CANT_PROCESS_REQUEST = 111;
+    public static final int EVENT_PROPERTY_X_NOT_SET_CANT_PROCESS_REQUEST = 111;
     public static final int CRYPTO_FAILURE = 112;
     public static final int JMX_CREATE_OR_LOCATE_SHOULD_BE_SET = 113;
     public static final int JMX_CANT_LOCATE_CREATE_SERVER = 114;
@@ -166,5 +166,9 @@ public interface CoreMessageConstants
     public static final int FAILED_TO_PERSIST_EVENT_X = 148;
     public static final int FILE_X_DOES_NTO_EXIST = 149;
     public static final int SERVER_EVENT_MANAGER_NOT_ENABLED = 150;
+    public static final int FAILED_TO_SCHEDULE_WORK = 151;
+    public static final int AUTH_NO_CREDENTIALS = 152;
+    public static final int X_IS_DISPOSED = 153;
+    public static final int X_IS_INVALID = 154;
 
 }

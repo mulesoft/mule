@@ -329,7 +329,7 @@ public class MailConnector extends AbstractConnector
     /* (non-Javadoc)
      * @see org.mule.providers.AbstractConnector#disposeConnector()
      */
-    protected void disposeConnector() throws UMOException
+    protected void disposeConnector()
     {
         //need to call base shutdown() method to make sure all
         //relivant code is called

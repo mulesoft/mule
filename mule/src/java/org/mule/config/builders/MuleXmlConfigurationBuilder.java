@@ -1232,13 +1232,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         private Attributes processAttributes(Attributes attributes)
         {
-            AttributesImpl att = (AttributesImpl)attributes;
+            AttributesImpl attribs = new AttributesImpl(attributes);
             String value = null;
             String realValue = null;
             String key = null;
             UMOManager manager = MuleManager.getInstance();
-            for(int i = 0; i < att.getLength(); i++) {
-                value = att.getValue(i);
+            for(int i = 0; i < attribs.getLength(); i++) {
+                value = attribs.getValue(i);
                 if(value.startsWith("${")) {
                     key = value.substring(2, value.length()-1);
                     realValue = (String)manager.getProperty(key);
@@ -1246,13 +1246,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                         logger.debug("Param is '" + value + "', Property key is '" + key + "', Property value is '" + realValue + "'");
                     }
                     if(realValue!=null) {
-                        att.setValue(i, realValue);
+                        attribs.setValue(i, realValue);
                     } else {
                         logger.info("Property for placeholder: '" + value + "' was not found.  Leaving place holder as is");
                     }
                 }
             }
-            return att;
+            return attribs;
         }
     }
 }

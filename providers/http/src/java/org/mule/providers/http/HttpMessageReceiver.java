@@ -27,13 +27,9 @@
  */
 package org.mule.providers.http;
 
-import EDU.oswego.cs.dl.util.concurrent.ThreadFactory;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.config.MuleProperties;
-import org.mule.config.ThreadingProfile;
-import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
@@ -42,27 +38,18 @@ import org.mule.providers.AbstractConnector;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.security.SecurityException;
-import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import javax.resource.spi.work.Work;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Properties;
@@ -90,11 +77,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         responseTransformer = getResponseTransformer();
     }
 
-    protected ThreadFactory getThreadFactory()
-    {
-        return new ThreadingProfile.NamedThreadFactory(connector.getName());
-    }
-
     private UMOTransformer getResponseTransformer() throws InitialisationException
     {
         if (responseTransformer == null)
@@ -113,7 +95,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return responseTransformer;
     }
 
-    protected Runnable createWorker(Socket socket)
+    protected Work createWork(Socket socket)
     {
         return new HttpWorker(socket);
     }
@@ -123,7 +105,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return true;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         if(keepAliveMonitor!=null) {
             keepAliveMonitor.dispose();

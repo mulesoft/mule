@@ -276,7 +276,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     /* (non-Javadoc)
      * @see org.mule.providers.AbstractConnector#disposeConnector()
      */
-    protected void disposeConnector() throws UMOException
+    protected void disposeConnector()
     {
         try
         {

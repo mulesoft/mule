@@ -83,7 +83,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
     }
 

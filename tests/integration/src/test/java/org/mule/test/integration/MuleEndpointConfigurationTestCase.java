@@ -36,13 +36,7 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
 
     public MuleEndpointConfigurationTestCase()
     {
-        try
-        {
-            if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        } catch (UMOException e)
-        {
-            fail(e.getMessage());
-        }
+        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
     }
 
     protected void setUp() throws Exception

@@ -29,7 +29,7 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
         cnn.setName("xmppConnector");
         cnn.setUsername("mule");
         cnn.setPassword("mule");
-        cnn.setServerName("jabber.org.au");
+        cnn.setHostname("jabber.org.au");
         cnn.initialise();
         return cnn;
     }

@@ -215,7 +215,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return connection;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         state = null;
     }

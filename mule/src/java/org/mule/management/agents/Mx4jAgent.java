@@ -101,7 +101,7 @@ public class Mx4jAgent implements UMOAgent {
 	/* (non-Javadoc)
 	 * @see org.mule.umo.lifecycle.Disposable#dispose()
 	 */
-	public void dispose() throws UMOException {
+	public void dispose() {
 	}
 
 /* (non-Javadoc)

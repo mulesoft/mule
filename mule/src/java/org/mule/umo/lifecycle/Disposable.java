@@ -28,5 +28,10 @@ import org.mule.umo.UMOException;
  */
 public interface Disposable
 {
-    public void dispose() throws UMOException;
+    /**
+     * A lifecycle method where implementor should fee up any resources
+     * If an exception is thrown it should just be logged and processing should
+     * continue.  This method should not throw Runtime exceptions
+     */
+    public void dispose();
 }

@@ -17,6 +17,10 @@ import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import EDU.oswego.cs.dl.util.concurrent.ThreadFactory;
 import org.mule.util.DisposableThreadPool;
+import org.mule.impl.work.MuleWorkManager;
+import org.mule.umo.UMOWorkManager;
+
+import javax.resource.spi.work.WorkManager;
 
 /**
  * <code>ThreadingProfile</code> is used to configure a thread pool. Mule uses a few
@@ -30,11 +34,11 @@ import org.mule.util.DisposableThreadPool;
 public class ThreadingProfile
 {
 
-    public static final byte WHEN_EXHAUSTED_WAIT = 0;
-    public static final byte WHEN_EXHAUSTED_DISCARD = 1;
-    public static final byte WHEN_EXHAUSTED_DISCARD_OLDEST = 2;
-    public static final byte WHEN_EXHAUSTED_ABORT = 3;
-    public static final byte WHEN_EXHAUSTED_RUN = 4;
+    public static final int WHEN_EXHAUSTED_WAIT = 0;
+    public static final int WHEN_EXHAUSTED_DISCARD = 1;
+    public static final int WHEN_EXHAUSTED_DISCARD_OLDEST = 2;
+    public static final int WHEN_EXHAUSTED_ABORT = 3;
+    public static final int WHEN_EXHAUSTED_RUN = 4;
     /**
      * Default value for MAX_THREADS_ACTIVE
      */
@@ -59,14 +63,17 @@ public class ThreadingProfile
     /**
      * Default value for POOL_INITIALISATION_POLICY
      */
-    public static final byte DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
+    public static final int DEFAULT_POOL_EXHAUST_ACTION = WHEN_EXHAUSTED_RUN;
 
     private int maxThreadsActive = DEFAULT_MAX_THREADS_ACTIVE;
     private int maxThreadsIdle = DEFAULT_MAX_THREADS_IDLE;
     private int maxBufferSize = DEFAULT_MAX_BUFFER_SIZE;
     private long threadTTL = DEFAULT_MAX_THREAD_TTL;
-    private byte poolExhaustPolicy = DEFAULT_POOL_EXHAUST_ACTION;
+    private int poolExhaustPolicy = DEFAULT_POOL_EXHAUST_ACTION;
     private boolean doThreading = DEFAULT_DO_THREADING;
+    private int threadPriority = Thread.NORM_PRIORITY;
+
+    private WorkManagerFactory workManagerFactory = new DefaultWorkManagerFactory();
 
     private PooledExecutor.BlockedExecutionHandler blockedExecutionHandler;
 
@@ -76,7 +83,7 @@ public class ThreadingProfile
     {
     }
 
-    public ThreadingProfile(int maxThreadsActive, int maxThreadsIdle, long threadTTL, byte poolExhaustPolicy,
+    public ThreadingProfile(int maxThreadsActive, int maxThreadsIdle, long threadTTL, int poolExhaustPolicy,
                             PooledExecutor.BlockedExecutionHandler blockedExecutionHandler,
                             ThreadFactory threadFactory)
     {
@@ -96,6 +103,9 @@ public class ThreadingProfile
         this.poolExhaustPolicy = tp.getPoolExhaustedAction();
         this.blockedExecutionHandler = tp.getBlockedExecutionHandler();
         this.threadFactory = tp.getThreadFactory();
+        this.workManagerFactory = tp.getWorkManagerFactory();
+        this.threadPriority = tp.getThreadPriority();
+
     }
 
     public int getMaxThreadsActive()
@@ -113,7 +123,15 @@ public class ThreadingProfile
         return threadTTL;
     }
 
-    public byte getPoolExhaustedAction()
+    public int getThreadPriority() {
+        return threadPriority;
+    }
+
+    public void setThreadPriority(int threadPriority) {
+        this.threadPriority = threadPriority;
+    }
+
+    public int getPoolExhaustedAction()
     {
         return poolExhaustPolicy;
     }
@@ -143,7 +161,7 @@ public class ThreadingProfile
         this.threadTTL = threadTTL;
     }
 
-    public void setPoolExhaustedAction(byte poolExhaustPolicy)
+    public void setPoolExhaustedAction(int poolExhaustPolicy)
     {
         this.poolExhaustPolicy = poolExhaustPolicy;
     }
@@ -191,6 +209,17 @@ public class ThreadingProfile
         this.maxBufferSize = maxBufferSize;
     }
 
+    public WorkManagerFactory getWorkManagerFactory() {
+        return workManagerFactory;
+    }
+
+    public void setWorkManagerFactory(WorkManagerFactory workManagerFactory) {
+        this.workManagerFactory = workManagerFactory;
+    }
+
+    public UMOWorkManager createWorkManager(String name) {
+        return workManagerFactory.createWorkManager(this, name);
+    }
 
     public PooledExecutor createPool()
     {
@@ -199,7 +228,7 @@ public class ThreadingProfile
 
     public PooledExecutor createPool(String name)
     {
-        threadFactory = new NamedThreadFactory(name);
+        threadFactory = new NamedThreadFactory(name, threadPriority);
         return configurePool();
     }
 
@@ -260,22 +289,6 @@ public class ThreadingProfile
         return pool;
     }
 
-    public static class NamedThreadFactory implements ThreadFactory
-    {
-        private String name;
-        private int counter = 1;
-
-        public NamedThreadFactory(String name)
-        {
-            this.name = name;
-        }
-
-        public Thread newThread(Runnable runnable)
-        {
-            return new Thread(runnable, name + "." + counter++);
-        }
-    }
-
     public boolean isDoThreading()
     {
         return doThreading;
@@ -293,6 +306,36 @@ public class ThreadingProfile
         buffer.append(", threadTTL=").append(threadTTL);
         buffer.append(", poolExhaustPolicy=").append(this.poolExhaustPolicy);
         return buffer.toString();
+    }
 
+    public static class NamedThreadFactory implements ThreadFactory
+    {
+        private String name;
+        private int priority;
+        private int counter = 1;
+
+        public NamedThreadFactory(String name, int priority)
+        {
+            this.name = name;
+            this.priority = priority;
+        }
+
+        public Thread newThread(Runnable runnable)
+        {
+            Thread t = new Thread(runnable, name + "." + counter++);
+            t.setPriority(priority);
+            return t;
+        }
+    }
+
+    public static interface WorkManagerFactory {
+        public UMOWorkManager createWorkManager(ThreadingProfile profile, String name);
+    }
+
+    private class DefaultWorkManagerFactory implements WorkManagerFactory
+    {
+        public UMOWorkManager createWorkManager(ThreadingProfile profile, String name) {
+            return new MuleWorkManager(profile, name);
+        }
     }
 }

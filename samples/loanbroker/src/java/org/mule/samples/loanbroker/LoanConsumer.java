@@ -68,13 +68,7 @@ public class LoanConsumer
 
     public void close()
     {
-        try
-        {
-            MuleManager.getInstance().dispose();
-        } catch (UMOException e)
-        {
-            //ignore
-        }
+        MuleManager.getInstance().dispose();
     }
 
     public LoanRequest createRequest()

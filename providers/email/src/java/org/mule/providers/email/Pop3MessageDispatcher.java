@@ -144,7 +144,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         initialised.set(false);
         //close and expunge deleted messages

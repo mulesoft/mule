@@ -69,7 +69,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
         if (!initialized.get())
         {
             XmppConnector cnn = (XmppConnector) connector;
-            String serverName = cnn.getServerName();
+            String serverName = cnn.getHostname();
             String userName = cnn.getUsername();
             String login = cnn.getPassword();
 
@@ -154,10 +154,9 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         xmppConnection.close();
-        initialized.set(false);
     }
 
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception

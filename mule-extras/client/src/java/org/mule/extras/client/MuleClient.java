@@ -684,12 +684,7 @@ public class MuleClient
 
     public void shutdownServer()
     {
-        try
-        {
-            manager.dispose();
-        } catch (UMOException e)
-        {
-            logger.error("Client initiated shutdown server with error: " + e.getMessage(), e);
-        }
+        manager.dispose();
+
     }
 }

@@ -16,7 +16,6 @@ package org.mule.util;
 import EDU.oswego.cs.dl.util.concurrent.Channel;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import org.mule.config.ThreadingProfile;
-import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Disposable;
 
 import java.util.ArrayList;
@@ -54,7 +53,7 @@ public class DisposableThreadPool extends PooledExecutor implements Disposable
 
     public DisposableThreadPool (String name) {
         super();
-        setThreadFactory(new ThreadingProfile.NamedThreadFactory(name));
+        setThreadFactory(new ThreadingProfile.NamedThreadFactory(name, Thread.NORM_PRIORITY));
     }
     public void dispose()
     {
@@ -64,13 +63,7 @@ public class DisposableThreadPool extends PooledExecutor implements Disposable
         {
               thread = (Thread)list.get(i);
               if(thread instanceof Disposable) {
-                try
-                {
-                    ((Disposable)thread).dispose();
-                } catch (UMOException e)
-                {
-                    //ignore
-                }
+                ((Disposable)thread).dispose();
             } else {
                 thread.interrupt();
             }

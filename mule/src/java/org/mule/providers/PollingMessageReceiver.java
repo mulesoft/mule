@@ -15,11 +15,16 @@
 
 package org.mule.providers;
 
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
 
 /**
  * <p><code>PollingMessageReceiver</code> implements a polling message receiver.
@@ -31,13 +36,12 @@ import org.mule.umo.provider.UMOConnector;
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public abstract class PollingMessageReceiver extends AbstractMessageReceiver implements Runnable
+public abstract class PollingMessageReceiver extends AbstractMessageReceiver implements Work
 {
     public static final long DEFAULT_POLL_FREQUENCY = 1000;
     public static final long STARTUP_DELAY = 1000;
 
     private long frequency = DEFAULT_POLL_FREQUENCY;
-    private Thread thread;
 
     public PollingMessageReceiver() {
     }
@@ -48,8 +52,13 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
     {
         create(connector, component, endpoint);
         this.frequency = frequency.longValue();
-        thread = new Thread(this, getClass().getName());
-        thread.start();
+
+        try {
+            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
+        } catch (WorkException e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
+        }
+
     }
     
     public void run() {
@@ -74,6 +83,10 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
     	}
     }
 
+    public void release() {
+        this.dispose();
+    }
+
     public void setFrequency(long l)
     {
         if (l <= 0)
@@ -91,11 +104,9 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
         return frequency;
     }
 
-    protected void doDispose() throws UMOException
+    protected void doDispose()
     {
-    	if (thread != null) {
-    		thread.interrupt();
-    	}
+  
     }
 
     public abstract void poll() throws Exception;

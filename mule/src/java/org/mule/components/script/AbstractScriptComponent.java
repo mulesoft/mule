@@ -15,14 +15,13 @@ package org.mule.components.script;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.UMODescriptorAware;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.util.monitor.FileListener;
 import org.mule.util.monitor.FileMonitor;
 
@@ -114,9 +113,13 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
         }
     }
 
-    public void dispose() throws UMOException
+    public void dispose()
     {
-        stop();
+        try {
+            stop();
+        } catch (UMOException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     protected abstract void loadInterpreter(String script) throws InitialisationException;

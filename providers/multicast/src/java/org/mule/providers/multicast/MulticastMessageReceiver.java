@@ -13,19 +13,15 @@
  */
 package org.mule.providers.multicast;
 
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.udp.UdpMessageReceiver;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 
+import javax.resource.spi.work.Work;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.URI;
+import java.net.*;
 
 /**
  * <code>MulticastMessageReceiver</code> TODO (document class)
@@ -50,12 +46,12 @@ public class MulticastMessageReceiver extends UdpMessageReceiver
         return socket;
     }
 
-    protected Runnable createWorker(DatagramPacket packet) throws IOException
+    protected Work createWork(DatagramPacket packet) throws IOException
     {
         return new UdpWorker(socket, packet);
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
         try
         {

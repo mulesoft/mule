@@ -256,7 +256,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
     	JmsUtils.closeQuietly(producer);
     	JmsUtils.closeQuietly(consumer);

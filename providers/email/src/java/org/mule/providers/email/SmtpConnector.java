@@ -250,9 +250,13 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
     /* (non-Javadoc)
      * @see org.mule.providers.AbstractConnector#disposeConnector()
      */
-    protected void disposeConnector() throws UMOException
+    protected void disposeConnector()
     {
-        stopConnector();
+        try {
+            stopConnector();
+        } catch (UMOException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     /**

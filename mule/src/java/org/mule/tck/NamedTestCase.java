@@ -17,6 +17,9 @@ import junit.framework.TestCase;
 
 import org.mule.config.MuleProperties;
 import org.mule.util.StringMessageHelper;
+import org.mule.util.Utility;
+
+import java.io.File;
 
 /**
  * <code>NamedTestCase</code> provides readable testcase names.
@@ -45,5 +48,15 @@ public abstract class NamedTestCase extends TestCase
     {
         System.out.println(StringMessageHelper.getBoilerPlate("Testing: " + toString(), '=', 80));;
     }
-    
+
+    protected void tearDown() throws Exception {
+        File f = new File(".mule");
+        try {
+            if(f.exists()) {
+                Utility.deleteTree(f);
+            }
+        } catch (Exception e) {
+            //ignore
+        }
+    }
 }

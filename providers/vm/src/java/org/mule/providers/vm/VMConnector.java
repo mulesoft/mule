@@ -137,7 +137,7 @@ public class VMConnector extends AbstractServiceEnabledConnector
     /* (non-Javadoc)
      * @see org.mule.providers.AbstractConnector#disposeConnector()
      */
-    protected void disposeConnector() throws UMOException
+    protected void disposeConnector()
     {
         if(queues!=null) {
             BoundedPersistentQueue queue;

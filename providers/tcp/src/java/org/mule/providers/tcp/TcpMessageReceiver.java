@@ -45,7 +45,11 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -67,42 +71,23 @@ import java.net.URI;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class TcpMessageReceiver extends AbstractMessageReceiver implements Runnable
+public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     private ServerSocket serverSocket = null;
-
-    private PooledExecutor threadPool;
-
-    private Thread worker;
 
     public TcpMessageReceiver(AbstractConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint) throws InitialisationException
     {
         create(connector, component, endpoint);
-        connector.getReceiverThreadingProfile().setThreadFactory(getThreadFactory());
-        threadPool = connector.getReceiverThreadingProfile().createPool(connector.getName());
         URI uri = endpoint.getEndpointURI().getUri();
 
         connect(uri);
-        worker = new Thread(this, connector.getName() + ".receiver");
-        worker.start();
-    }
-
-    protected ThreadFactory getThreadFactory() {
-            return new ThreadFactory() {
-            public Thread newThread(Runnable runnable)
-            {
-                Thread thread = new Thread(runnable, toString());
-                if (isServerSide()) {
-                    thread.setDaemon(true);
-                }
-                else {
-                    thread.setPriority(Thread.NORM_PRIORITY + 2);
-                }
-                return thread;
-            }
-        };
+        try {
+            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
+        } catch (WorkException e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
+        }
     }
 
     protected void connect(URI uri) throws InitialisationException
@@ -188,47 +173,43 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
                 }
                 if (socket != null)
                 {
-                    Runnable worker = createWorker(socket);
+                    Work work = createWork(socket);
                     try
                     {
-                        threadPool.execute(worker);
-                    } catch (InterruptedException e)
+                        getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, null);
+                    } catch (WorkException e)
                     {
-                        logger.error("Tcp Server receiver interrupted: " + e.getMessage(), e);
+                        logger.error("Tcp Server receiver Work was not processed: " + e.getMessage(), e);
                     }
                 }
             }
         }
     }
 
-    public void doDispose() throws UMOException
+    public void release() {
+    }
+
+    public void doDispose()
     {
-        if (worker != null)
-        {
-            worker.interrupt();
-            worker = null;
-        }
         try
         {
-            threadPool.shutdownNow();
-
             if (serverSocket != null && !serverSocket.isClosed()) serverSocket.close();
             serverSocket = null;
 
         } catch (Exception e)
         {
-            throw new DisposeException(new Message("tcp", 2), e);
+            logger.error(new DisposeException(new Message("tcp", 2), e));
         }
         logger.info("Closed Tcp port");
     }
 
-    protected Runnable createWorker(Socket socket)
+    protected Work createWork(Socket socket)
     {
         return new TcpWorker(socket);
     }
 
 
-    protected class TcpWorker implements Runnable, Disposable
+    protected class TcpWorker implements Work, Disposable
     {
         protected Socket socket = null;
         protected DataInputStream dataIn;
@@ -238,6 +219,10 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
         public TcpWorker(Socket socket)
         {
             this.socket = socket;
+        }
+
+        public void release() {
+            dispose();
         }
 
         public void dispose()

@@ -47,7 +47,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher {
 	/* (non-Javadoc)
 	 * @see org.mule.providers.AbstractMessageDispatcher#doDispose()
 	 */
-	public void doDispose() throws UMOException {
+	public void doDispose() {
 	}
 
 	/* (non-Javadoc)

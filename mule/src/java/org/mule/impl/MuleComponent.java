@@ -47,7 +47,7 @@ import java.beans.ExceptionListener;
  * @version $Revision$
  */
 
-public final class MuleComponent implements UMOComponent
+public final class MuleComponent implements UMOComponent, Runnable
 {
     /**
      * logger used by this class
@@ -286,9 +286,13 @@ public final class MuleComponent implements UMOComponent
         model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_RESUMED));
     }
 
-    public void dispose() throws UMOException
+    public void dispose()
     {
-        if (!stopped.get()) stop();
+        try {
+            if (!stopped.get()) stop();
+        } catch (UMOException e) {
+            logger.error("Failed to stop component: " + descriptor.getName(), e);
+        }
         try
         {
             if (queue != null) queue.dispose();
@@ -312,6 +316,7 @@ public final class MuleComponent implements UMOComponent
             logger.error("Proxy Pool did not close properly: " + e);
         }
         model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_DISPOSED));
+        ((MuleManager) MuleManager.getInstance()).getStatistics().remove(stats);
     }
 
     public ComponentStatistics getStatistics()

@@ -119,16 +119,15 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
      * Template method to dispose any resources associated with this receiver.  There
      * is not need to dispose the connector as this is already done by the framework
      *
-     * @throws org.mule.umo.UMOException
      */
-    protected void doDispose() throws UMOException
+    protected void doDispose()
     {
         try
         {
             Registry.unpublish(component.getDescriptor().getName());
         } catch (RegistryException e)
         {
-            throw new DisposeException(new Message(Messages.FAILED_TO_UNREGISTER_X_ON_ENDPOINT_X, component.getDescriptor().getName(), endpoint.getEndpointURI()), e);
+            logger.error(new Message(Messages.FAILED_TO_UNREGISTER_X_ON_ENDPOINT_X, component.getDescriptor().getName(), endpoint.getEndpointURI()), e);
         }
     }
 

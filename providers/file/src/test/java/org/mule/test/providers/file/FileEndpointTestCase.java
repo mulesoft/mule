@@ -52,14 +52,14 @@ public class FileEndpointTestCase extends NamedTestCase
 
     public void testrelativeFileUriAsParameter() throws Exception
     {
-        UMOEndpointURI url = new MuleEndpointURI("file://?endpointUri=./temp&endpointName=fileEndpoint");
+        UMOEndpointURI url = new MuleEndpointURI("file://?address=./temp&endpointName=fileEndpoint");
         assertEquals("file", url.getScheme());
         assertEquals("./temp", url.getAddress());
         assertNotNull(url.getEndpointName());
         assertEquals("fileEndpoint", url.getEndpointName());
         assertEquals(-1, url.getPort());
-        assertEquals("file://?endpointUri=./temp&endpointName=fileEndpoint", url.toString());
-        assertEquals("endpointUri=./temp&endpointName=fileEndpoint", url.getQuery());
+        assertEquals("file://?address=./temp&endpointName=fileEndpoint", url.toString());
+        assertEquals("address=./temp&endpointName=fileEndpoint", url.getQuery());
         assertEquals(2, url.getParams().size());
     }
 
