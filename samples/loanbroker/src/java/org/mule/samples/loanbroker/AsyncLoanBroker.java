@@ -39,31 +39,33 @@ public class AsyncLoanBroker implements LoanBroker
         logger.info("\nClient " + request.getCustomer().getName() + " with ssn= " + request.getCustomer().getSsn() + " requests a loan of amount= " + request.getLoanAmount() + " for " + request.getLoanDuration() + " months");
         BankQuoteRequest bqr = new BankQuoteRequest();
         bqr.setLoanRequest(request);
-        System.out.println("ORequest: " + incRequests());
+        //System.out.println("ORequest: " + incRequests());
 
         return bqr ;
   }
 
     public Object receiveQuote(LoanQuote quote) {
         logger.info("\nLoan Broker Quote recieved: " + quote);
-        System.out.println("OQuote: " + incQuotes());
+        System.out.println("Quote " + incQuotes() + " recieved: " + quote);
+
+        //System.out.println("OQuote: " + incQuotes());
         return null;
     }
 
     public synchronized int incQuotes()
     {
-        if(quotes % 100 == 0) {
-            System.out.println("%% Received " + quotes + " quotes in: " + (System.currentTimeMillis() - start));
-        }
+//        if(quotes % 100 == 0) {
+//            System.out.println("%% Received " + quotes + " quotes in: " + (System.currentTimeMillis() - start));
+//        }
         return ++quotes;
     }
 
     public synchronized int incRequests()
     {
         if(requests==0) start = System.currentTimeMillis();
-        if(requests % 100 == 0) {
-            System.out.println("## Sent " + requests + " messages in: " + (System.currentTimeMillis() - start));
-        }
+//        if(requests % 100 == 0) {
+//            System.out.println("## Sent " + requests + " messages in: " + (System.currentTimeMillis() - start));
+//        }
         return ++requests;
     }
 }

@@ -16,7 +16,6 @@ package org.mule.samples.loanbroker;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.umo.FutureMessageResult;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.util.StringMessageHelper;
@@ -96,18 +95,17 @@ public class LoanConsumer
         return new Double(Math.random() * 60).intValue();
     }
 
-    public LoanQuote request(LoanRequest request) throws Exception
+    public void request(LoanRequest request, boolean sync) throws Exception
     {
-        FutureMessageResult result = client.sendAsync("vm://LoanBrokerRequests", request, null);
-
-        while (!result.isReady())
-        {
-            System.out.println("Waiting for request to complete");
-            Thread.sleep(500);
+        if(!sync) {
+            client.dispatch("vm://LoanBrokerRequests", request, null);
+            System.out.println("Sent Async request");
+            //let the request catch up
+            Thread.sleep(1500);
+        } else {
+            UMOMessage result = client.send("vm://LoanBrokerRequests", request, null);
+            System.out.println("Loan Consumer received a Quote: " + result.getPayload());
         }
-        LoanQuote quote = (LoanQuote) result.getMessage().getPayload();
-        System.out.println("Loan Consumer received a Quote: " + quote);
-        return quote;
     }
 
     public void requestDispatch(int number, String endpoint) throws Exception
@@ -132,17 +130,19 @@ public class LoanConsumer
         return results;
     }
 
-    public void requestRandom(int number) throws Exception
+    public void requestRandom(int number, boolean sync) throws Exception
     {
+
         for (int i = 0; i < number; i++)
         {
-            request(createRequest());
+            request(createRequest(), sync);
         }
     }
 
     public static void main(String[] args)
     {
         LoanConsumer loanConsumer = null;
+        boolean synchronous = false;
         try
         {
             if (args.length > 0)
@@ -182,10 +182,12 @@ public class LoanConsumer
                 if (response == 's')
                 {
                     System.out.println("Loading Synchronous Loan Broker");
+                    synchronous = true;
                     loanConsumer = new LoanConsumer("loan-broker-sync-config.xml");
                 } else
                 {
                     System.out.println("Loading Asynchronous Loan Broker");
+                    synchronous = false;
                     loanConsumer = new LoanConsumer("loan-broker-async-config.xml");
                 }
 
@@ -199,11 +201,20 @@ public class LoanConsumer
                     response = getSelection();
                     if (response == '2')
                     {
-                        loanConsumer.requestRandom(100);
+                        if(synchronous) {
+                            List list = loanConsumer.requestSend(100, "vm://LoanBrokerRequests");
+                            int i=1;
+                            for (Iterator iterator = list.iterator(); iterator.hasNext();i++)
+                            {
+                                System.out.println("Request " + i + ": " + iterator.next().toString());
+                            }
+                        } else {
+                            loanConsumer.requestDispatch(100, "vm://LoanBrokerRequests");
+                        }
                     } else if (response == '1')
                     {
                         LoanRequest request = getRequestFromUser();
-                        loanConsumer.request(request);
+                        loanConsumer.request(request, synchronous);
                     } else if (response == 'q')
                     {
                         System.out.println("Exiting now");
