@@ -173,7 +173,7 @@ public abstract class AbstractTransformer implements UMOTransformer
         
         if (!isSourceTypeSupported(src.getClass()))
         {
-            throw new TransformerException("This transformer: " + getName() + " does not support this source type: " + src.getClass().getName());
+            throw new TransformerException("This transformer: " + getName() + " does not support this source type: " + src.getClass().getName() + ". Endpoint is: " + endpoint.getEndpointURI());
         } else {
             result = doTransform(src);
             result = checkReturnClass(result);
