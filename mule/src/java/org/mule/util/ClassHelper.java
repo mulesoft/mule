@@ -320,7 +320,7 @@ public class ClassHelper
      */
     public static Class[] getClassTypes(Object object) {
         Class[] types;
-        if(object.getClass().isArray()) {
+        if(object instanceof Object[]) {
             Object[] objects = (Object[])object;
             types = new Class[objects.length];
             for (int i = 0; i < objects.length; i++)

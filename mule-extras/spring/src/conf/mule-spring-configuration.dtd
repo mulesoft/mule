@@ -837,6 +837,23 @@ Is a fully qualified class name of the catch all strategy class
 <!ATTLIST router className                   NMTOKEN           #REQUIRED>
 
 <!--
+    enableCorrelation
+    This is used by outbound routers to determine if a correlationId should be set
+    on the message being routed.  By default the correlationId is set as the current
+    message id
+-->
+
+<!ATTLIST router enableCorrelation           (ALWAYS | NEVER | IF_NOT_SET)           "IF_NOT_SET">
+
+<!--
+    propertyExtractor
+    Is a fully qualified classname of a class that implements org.mule.config.PropertyExtractor
+    This object will be used to extract properties such as CorrelationId from the incoming message
+-->
+
+<!ATTLIST router propertyExtractor           (ALWAYS | NEVER | IF_NOT_SET)           "IF_NOT_SET">
+
+<!--
     filters are used to determine whether the router should accept the current
     message.
     Note that any properties on the filter can be set by setting attributes

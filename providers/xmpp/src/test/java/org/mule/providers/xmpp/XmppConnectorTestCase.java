@@ -14,7 +14,6 @@
 package org.mule.providers.xmpp;
 
 import org.jivesoftware.smack.packet.Message;
-import org.mule.providers.xmpp.XmppConnector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
@@ -28,6 +27,9 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
     {
         XmppConnector cnn = new XmppConnector();
         cnn.setName("xmppConnector");
+        cnn.setUsername("mule");
+        cnn.setPassword("");
+        cnn.setServerName("jabber.org.au");
         cnn.initialise();
         return cnn;
     }
@@ -42,8 +44,8 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
         return "xmpp://mule:mule@jabber.org.au";
     }
 
-    public void testConnectorListenerSupport() throws Exception
-    {
-        //todo fix this. for some reason I can't connect to jabber.org.au
-    }
+//    public void testConnectorListenerSupport() throws Exception
+//    {
+//        //todo fix this. for some reason I can't connect to jabber.org.au
+//    }
 }

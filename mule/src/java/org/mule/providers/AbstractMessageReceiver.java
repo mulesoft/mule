@@ -177,6 +177,15 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             }
             logger.debug("Message properties:\n" + buf.toString());
         }
+        if(logger.isTraceEnabled()) {
+            try
+            {
+                logger.trace("Message Payload: \n" + message.getPayloadAsString());
+            } catch (Exception e)
+            {
+                //ignore
+            }
+        }
 
         ResponseOutputStream ros=null;
         if(outputStream!=null) {

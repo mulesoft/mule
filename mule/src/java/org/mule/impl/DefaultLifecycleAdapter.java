@@ -175,22 +175,43 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             //Invoke method
             result = entryPoint.invoke(component, RequestContext.getEventContext(), method);
 
+            UMOMessage resultMessage = null;
             if(result==null && entryPoint.isVoid()) {
-                   return new MuleMessage(event.getTransformedMessage(), event.getProperties());
-            } else if(descriptor.getResponseRouter()!=null) {
-            	logger.debug("Waiting for response router message");
-                if(result==null) {
-                    result = descriptor.getResponseRouter().getResponse(event.getMessage());
+                   resultMessage = new MuleMessage(event.getTransformedMessage(), event.getProperties());
+            } else if(result!=null) {
+                if(result instanceof UMOMessage) {
+                    resultMessage = (UMOMessage)result;
                 } else {
-                    result = descriptor.getResponseRouter().getResponse(new MuleMessage(result, event.getProperties()));
+                    resultMessage = new MuleMessage(result, event.getProperties());
                 }
-                if (descriptor.getResponseRouter().isStopProcessing()) {
+            }
+            boolean stopProcessing = false;
+            if(descriptor.getResponseRouter()!=null) {
+                stopProcessing = descriptor.getResponseRouter().isStopProcessing();
+            } else {
+                stopProcessing = event.isStopFurtherProcessing();
+            }
+
+            //Need to find a cleaner solution for handling response messages
+            //Right now routing is split between here a nd the proxy
+            if(descriptor.getResponseRouter()!=null) {
+                if(event.isSynchronous() && !stopProcessing) {
+                    //we need to do the outbound first but we dispatch aynshonously as
+                    //we are waiting for a response on another resource
+                    stopProcessing = true;
+                    descriptor.getOutboundRouter().route(resultMessage, event.getSession(), false);
+                }
+                logger.debug("Waiting for response router message");
+                result = descriptor.getResponseRouter().getResponse(resultMessage);
+
+                if (stopProcessing) {
+                    logger.debug("Setting stop oubound processing according to response router");
                 	RequestContext.getEvent().setStopFurtherProcessing(true);
                 }
                 return result;
             } else {
-                return result;
-            }
+                return resultMessage;
+           }
         }
         catch (Exception e)
         {

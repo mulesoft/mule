@@ -13,7 +13,7 @@
  */
 package org.mule.umo.provider;
 
-import org.mule.umo.MessageException;
+import org.mule.MuleRuntimeException;
 
 /**
  * <code>UniqueIdNotSupportedException</code> is thrown by UMOMessageAdapter.getUniqueId()
@@ -23,7 +23,7 @@ import org.mule.umo.MessageException;
  * @version $Revision$
  */
 
-public class UniqueIdNotSupportedException extends MessageException
+public class UniqueIdNotSupportedException extends MuleRuntimeException
 {
     public UniqueIdNotSupportedException(UMOMessageAdapter adapter)
     {

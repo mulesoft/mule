@@ -30,18 +30,18 @@ import java.util.Map;
  */
 public class HttpMessageAdapter extends AbstractMessageAdapter
 {
-    private Object message = null;
+    private byte[] message = null;
 
     public HttpMessageAdapter(Object message) throws MessageException
     {
         if (message instanceof Object[])
         {
-            this.message = ((Object[])message)[0];
+            this.message = (byte[])((Object[])message)[0];
             if(((Object[])message).length > 1) {
                 properties = (Map)((Object[])message)[1];
             }
         } else if(message instanceof byte[]){
-            this.message = message;
+            this.message = (byte[])message;
         }  else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
@@ -65,13 +65,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        if (isBinary())
-        {
-            return (byte[]) message;
-        } else
-        {
-            return ((String) message).getBytes();
-        }
+        return message;
     }
 
     /* (non-Javadoc)
@@ -79,12 +73,6 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      */
     public String getPayloadAsString() throws Exception
     {
-        if (isBinary())
-        {
-            return new String((byte[]) message);
-        } else
-        {
-            return (String) message;
-        }
+        return new String(message);
     }
 }

@@ -20,7 +20,7 @@
 	
 	<model name="model">
 		<mule-descriptor name="TcpReceiver" 
-			implementation="org.mule.test.usecases.sync.TcpRequestComponent"
+			implementation="org.mule.components.simple.EchoComponent"
 			inboundEndpoint="tcp://localhost:4444/?synchronous=true">
 			<outbound-router>
 				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
@@ -30,14 +30,14 @@
                     </properties> 				
 				</router>
 			</outbound-router>
-			<response-router>
+			<response-router stopProcessing="false" >
 				<endpoint address="jms://queue_out"/>
-				<router className="org.mule.test.usecases.sync.JmsResponseAggregator"/>
+				<router className="org.mule.test.usecases.service.DummyResponseAggregator"/>
 			</response-router>
 		</mule-descriptor>
 
 		<mule-descriptor name="JMSReplyProvider" 
-			implementation="org.mule.test.usecases.sync.TcpReplyComponent"
+			implementation="org.mule.test.usecases.service.TestReceiver"
 			inboundEndpoint="jms://queue_in" />
 	</model>
 	

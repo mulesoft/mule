@@ -37,6 +37,6 @@ public class TcpJmsResponseTestCase extends NamedTestCase {
         MuleClient client = new MuleClient();
         UMOMessage message = client.send("tcp://localhost:4444", "request", null);
         assertNotNull(message);
-        assertEquals("request response", message.getPayloadAsString());
+        assertEquals("Received: request", message.getPayloadAsString());
     }
 }

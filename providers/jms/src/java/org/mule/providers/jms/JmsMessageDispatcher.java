@@ -71,7 +71,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
     private UMOMessage dispatchMessage(UMOEvent event) throws Exception
     {
-    	// If a jms session can be bound to the current transaction,
+        if(logger.isDebugEnabled()) {
+            logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI() + ". Event id is: " + event.getId());
+        }
+            // If a jms session can be bound to the current transaction,
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         boolean transacted = false;
         if(tx==null) {

@@ -13,11 +13,11 @@
  */
 package org.mule.routing.outbound;
 
+import org.mule.config.MuleProperties;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
@@ -42,14 +42,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
-        String correlationId = null;
-        try
-        {
-            correlationId = message.getUniqueId();
-        } catch (UniqueIdNotSupportedException e)
-        {
-            throw new RoutingException("Cannot use multicasting router with transports that do not support a unique id", e, message);
-        }
+        String correlationId = (String)propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
         initialise(message);
 
         UMOEndpoint endpoint;
@@ -72,9 +65,21 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             {
                 try
                 {
-                    message.setCorrelationId(correlationId);
-                    message.setCorrelationSequence(i++);
-                    message.setCorrelationGroupSize(list.size());
+                    if(enableCorrelation != ENABLE_CORREATION_NEVER) {
+                        boolean correlationSet = message.getCorrelationId()!=null;
+                        if(correlationSet && (enableCorrelation == ENABLE_CORREATION_IF_NOT_SET)) {
+                            logger.debug("CorrelationId is already set, not setting Correlation group size");
+                        } else {
+                            //the correlationId will be set by the AbstractOutboundRouter
+                            //todo maybe this doesn't have to be set here
+                            message.setCorrelationId(correlationId);
+                            message.setCorrelationGroupSize(list.size());
+                            message.setCorrelationSequence(i++);
+                        }
+                    }
+//                    message.setCorrelationId(correlationId);
+//                    message.setCorrelationSequence(i++);
+//                    message.setCorrelationGroupSize(list.size());
                     if (synchronous)
                     {
                         result = send(session, message, endpoint);

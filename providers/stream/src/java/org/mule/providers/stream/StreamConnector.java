@@ -29,8 +29,6 @@
 package org.mule.providers.stream;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
@@ -52,13 +50,9 @@ import java.io.OutputStream;
 public abstract class StreamConnector extends AbstractServiceEnabledConnector
 {
 
-    /**
-     * The logger for this class
-     */
-    private static final transient Log logger = LogFactory.getLog(StreamConnector.class);
-
-    private String id;
-
+    protected StreamConnector()
+    {
+    }
 
     /* (non-Javadoc)
      * @see org.mule.umo.provider.UMOConnector#registerListener(org.mule.umo.UMOSession, org.mule.umo.endpoint.UMOEndpoint)
@@ -112,17 +106,6 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
      * Sub classes might want to reinitialise between stream reads here
      */
     public abstract void reinitialise();
-
-
-    public String getId()
-    {
-        return id;
-    }
-
-    void setId(String id)
-    {
-        this.id = id;
-    }
 
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()

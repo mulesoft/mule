@@ -58,6 +58,11 @@ public class SystemStreamConnector extends StreamConnector
 
     private long messageDelayTime = 0;
 
+    public SystemStreamConnector()
+    {
+        super();
+    }
+
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();

@@ -17,7 +17,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
@@ -39,13 +38,14 @@ public class MulticastingRouter extends FilteringOutboundRouter
         {
             throw new RoutingException("No endpoints are set on this router, cannot route message");
         }
-        try
-        {
-            message.setCorrelationId(message.getUniqueId());
-            message.setCorrelationGroupSize(endpoints.size());
-        } catch (UniqueIdNotSupportedException e)
-        {
-            throw new RoutingException("Cannot use multicasting router with transports that do not support a unique id", e, message);
+        if(enableCorrelation != ENABLE_CORREATION_NEVER) {
+            boolean correlationSet = message.getCorrelationId()!=null;
+            if(correlationSet && (enableCorrelation == ENABLE_CORREATION_IF_NOT_SET)) {
+                logger.debug("CorrelationId is already set, not setting Correlation group size");
+            } else {
+                //the correlationId will be set by the AbstractOutboundRouter
+                message.setCorrelationGroupSize(endpoints.size());
+            }
         }
 
         try
@@ -58,7 +58,17 @@ public class MulticastingRouter extends FilteringOutboundRouter
                     endpoint = (UMOEndpoint) endpoints.get(i);
                     if (synchronous)
                     {
-                        result = send(session, message, (UMOEndpoint) endpoint);
+                        //Were we have multiple outbound endpoints
+                        if(result==null) {
+                            result = send(session, message, (UMOEndpoint) endpoint);
+                        } else {
+                            String def = (String)endpoint.getProperties().get("default");
+                            if(def!=null) {
+                                result = send(session, message, (UMOEndpoint) endpoint);
+                            } else {
+                                send(session, message, (UMOEndpoint) endpoint);
+                            }
+                        }
                     } else
                     {
                         dispatch(session, message, (UMOEndpoint) endpoint);

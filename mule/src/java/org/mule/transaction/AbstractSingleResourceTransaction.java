@@ -14,9 +14,8 @@
  */
 package org.mule.transaction;
 
-import org.mule.umo.UMOTransactionException;
-
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import org.mule.umo.UMOTransactionException;
 
 /**
  * This abstract class can be used as a base class for transactions
@@ -107,7 +106,11 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
 	public void setRollbackOnly() {
         rollbackOnly.set(true);
 	}
-	
+
+    public Object getId() {
+        return key;
+    }
+
 	/**
 	 * Really begin the transaction.
 	 * Note that resources are enlisted yet. 
