@@ -229,6 +229,8 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
         //check first Router
         UMOOutboundRouter route1 = (UMOOutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof FilteringOutboundRouter);
+        assertNotNull(((FilteringOutboundRouter)route1).getTransformer());
+        
         UMOFilter filter = ((FilteringOutboundRouter) route1).getFilter();
         assertNotNull(filter);
         assertTrue(filter instanceof PayloadTypeFilter);
