@@ -260,10 +260,10 @@ public class WorkerContext implements Work {
                 try {
                     worker.run();
                 } finally {
-                    ExecutionContext returningContext = new ExecutionContext();
-                    if (context != returningContext) {
-                        throw new WorkCompletedException("Wrong TransactionContext on return from work done");
-                    }
+//                    ExecutionContext returningContext = new ExecutionContext();
+//                    if (context != returningContext) {
+//                        throw new WorkCompletedException("Wrong TransactionContext on return from work done");
+//                    }
                 }
                 //TODO should we commit the txContext to flush any leftover state???
             } else {

@@ -42,6 +42,16 @@
             </properties>
         </dependency>
         <dependency>
+            <artifactId>mule-stream-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
             <artifactId>mule-tcp-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
