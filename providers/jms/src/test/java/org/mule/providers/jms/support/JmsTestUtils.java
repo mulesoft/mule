@@ -13,6 +13,7 @@
 package org.mule.providers.jms.support;
 
 import org.mule.util.ClassHelper;
+import org.mule.util.Utility;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -97,21 +98,11 @@ public class JmsTestUtils
 
     public static void fixProviderUrl(Properties props) throws IOException
     {
-        //this just allows us to define relative urls in the test conf.jndi properties
-        String url = props.getProperty(Context.PROVIDER_URL);
-        if(url.indexOf(":") == -1)
-        {
-            File f = new File(".");
-            url = f.getCanonicalPath() + (url.startsWith("/") ? url : "/" + url);
-            if(url.indexOf(":") == 1)
-            {
-                url = "file:" + url.substring(2);
-                props.put(Context.PROVIDER_URL, url);
-            }
-        } else  if (url.indexOf(":") == 1)
-        {
-            url = "file:" + File.separator + url.substring(2);
-            props.put(Context.PROVIDER_URL, url);
+        String providerUrl = props.getProperty(Context.PROVIDER_URL);
+        if(providerUrl!=null && !providerUrl.startsWith("file:")) {
+            providerUrl = "file:" + File.separator + Utility.getResourcePath(providerUrl, JmsTestUtils.class);
+            System.out.println("Setting provider url to: " + providerUrl);
+            props.setProperty(Context.PROVIDER_URL, providerUrl);
         }
     }
 

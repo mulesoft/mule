@@ -17,13 +17,13 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.FileInputStream;
 import java.net.URL;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -298,25 +298,28 @@ public class Utility
     }
 
     public static String getResourcePath(String resourceName, Class callingClass) throws IOException
-        {
-            URL url = getResource(resourceName, callingClass);
-            String resource = null;
-            if (url == null)
-            {
-                File f = new File(resourceName);
-                if(f.exists()){
-                    resource = f.getAbsolutePath();
-                }
-            }
-            else
-            {
-                resource = url.toExternalForm();
-            }
-            if(resource.startsWith("file:/")) {
-                resource = resource.substring(6);
-            }
-            return resource;
+    {
+        if(resourceName==null) {
+            return null;
         }
+        URL url = getResource(resourceName, callingClass);
+        String resource = null;
+        if (url == null)
+        {
+            File f = new File(resourceName);
+            if(f.exists()){
+                resource = f.getAbsolutePath();
+            }
+        }
+        else
+        {
+            resource = url.toExternalForm();
+        }
+        if(resource!=null && resource.startsWith("file:/")) {
+            resource = resource.substring(6);
+        }
+        return resource;
+    }
 
     public static String inputStreamToString(InputStream is, int bufferSize) throws IOException
     {
