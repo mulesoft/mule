@@ -33,6 +33,11 @@ public class GroovyComponentTestCase extends NamedTestCase
         builder.configure("groovy-mule-config.xml");
     }
 
+    protected void tearDown() throws Exception
+    {
+        MuleManager.getInstance().dispose();
+    }
+
     public void testFunctionBehaviour() throws Exception
     {
         MuleClient client = new MuleClient(true);
