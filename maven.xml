@@ -65,8 +65,11 @@
             <unjar src="${jarfile}" dest="${mule.release.dist.dir}/temp"/>
         </j:forEach>
 
-        <copy file="${basedir}/mule/target/classes/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
-        <copy overwrite="true" file="${basedir}/mule/target/classes/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF"/>
+         <!-- unjar the core jar again to overlay the correct manifest -->
+        <unjar src="${mule.release.dist.dir}/mule-core-${pom.currentVersion}.jar" dest="${mule.release.dist.dir}/temp"/>
+
+        <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
+<!--        <copy overwrite="true" file="${basedir}/mule/target/classes/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF"/>-->
 
         <echo>creating jar: ${mule.release.dist.dir}/mule-${pom.currentVersion}</echo>
         <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
@@ -359,6 +362,16 @@
             includes="project.xml"
             goals="dist-samples"
             banner="Dist Samples"
+            ignoreFailures="false"/>
+    </goal>
+
+    <goal name="mini-mule" prereqs="setvars">
+        <maven:reactor
+            basedir="${basedir}/etc/mini"
+            postProcessing="false"
+            includes="project.xml"
+            goals="mule:mini"
+            banner="Dist Mini"
             ignoreFailures="false"/>
     </goal>
 </project>

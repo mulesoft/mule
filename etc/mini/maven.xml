@@ -41,13 +41,15 @@
             <echo>jar is ${jarfile}</echo>
             <copy file="${jarfile}" todir="${mule.release.dist.dir}"/>
             <unjar src="${jarfile}" dest="${mule.release.dist.dir}/temp"/>
-            <delete file="${jarfile}"/>
         </j:forEach>
 
         <!-- unjar the core jar again to overlay the correct manifest -->
-        <unjar src="${mule.release.lib.dir}/mule-core-${pom.currentVersion}.jar" dest="${mule.release.dist.dir}/temp"/>
+        <unjar src="${mule.release.dist.dir}/mule-core-${pom.currentVersion}.jar" dest="${mule.release.dist.dir}/temp"/>
         <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
 
+        <delete>
+            <fileset dir="${mule.release.dist.dir}" includes="*.jar"/>
+        </delete>
         <echo>creating jar: ${mule.release.dist.dir}/mule-${pom.currentVersion}</echo>
         <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
         <delete dir="${mule.release.dist.dir}/temp"/>
