@@ -177,7 +177,8 @@
         <bean name="{$name}" class="org.mule.impl.endpoint.MuleEndpoint">
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
-            <xsl:apply-templates select="@*[local-name() != 'address' and local-name() != 'transformers']" mode="addProperties"/>
+            <xsl:apply-templates select="@createConnector"/>
+            <xsl:apply-templates select="@*[local-name() != 'address' and local-name() != 'transformers' and local-name() != 'createConnector']" mode="addProperties"/>
             <xsl:apply-templates select="properties" mode="asMap"/>
             <xsl:apply-templates select="transaction"/>
             <xsl:apply-templates select="filter"/>
