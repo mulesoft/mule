@@ -15,6 +15,7 @@ package org.mule.umo.routing;
 
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * <code>UMOOutboundMessageRouter</code> TODO
@@ -34,4 +35,13 @@ public interface UMOOutboundMessageRouter extends UMORouterCollection
      */
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException;
+
+    /**
+     * A helper method for finding out which endpoints a message would be routed to
+     * without actually routing the the message
+     * @param message the message to retrieve endpoints for
+     * @return an array of UMOEndpoint objects or an empty array
+     * @throws RoutingException if there is a filter exception
+     */
+    public UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws RoutingException;
 }

@@ -19,11 +19,14 @@ import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>OutboundMessageRouter</code> is a container of routers. An
@@ -79,6 +82,30 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
                             + " and there is no catch all strategy configured on this router.  Disposing message.");
         }
         return message;
+    }
+
+    /**
+     * A helper method for finding out which endpoints a message would be routed to
+     * without actually routing the the message
+     * @param message the message to retrieve endpoints for
+     * @return an array of UMOEndpoint objects or an empty array
+     * @throws RoutingException
+     */
+    public UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws RoutingException
+    {
+        List endpoints = new ArrayList();
+        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
+
+            UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter) iterator.next();
+            if (umoOutboundRouter.isMatch(message)) {
+                endpoints.addAll(umoOutboundRouter.getEndpoints());
+                if (!isMatchAll()) {
+                    break;
+                }
+            }
+        }
+        UMOEndpoint[] result = new UMOEndpoint[endpoints.size()];
+        return (UMOEndpoint[])endpoints.toArray(result);
     }
 
     protected UMOMessage catchAll(UMOMessage message, UMOSession session, boolean synchronous)
