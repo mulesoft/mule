@@ -19,9 +19,9 @@
     <!--            ignoreFailures="false"/>-->
     <!--    </goal>-->
 
-    <goal name="clean-build" prereqs="multiproject:clean,multiproject:install"/>
+    <goal name="clean-build" prereqs="clean,multiproject:clean,multiproject:install"/>
 
-    <goal name="clean-build-snapshot" prereqs="multiproject:clean,multiproject:install-snapshot"/>
+    <goal name="clean-build-snapshot" prereqs="clean,multiproject:clean,multiproject:install-snapshot"/>
 
     <postGoal name="multiproject:install">
         <attainGoal name="all-jars"/>
@@ -77,6 +77,12 @@
                 <fileset file="${mule.release.dist.dir}/*.*"/>
             </copy>
         </j:if>
+    </goal>
+
+    <goal name="run-jms">
+    <java classname="org.codehaus.activemq.broker.impl.Main" fork="yes" maxmemory="128M">
+          <classpath refid="maven.dependency.classpath"/>
+        </java>
     </goal>
 
     <goal name="mule:javadoc" prereqs="setvars,build-classpath">
