@@ -61,12 +61,13 @@ import org.mule.util.Utility;
 import org.mule.util.queue.PersistenceStrategy;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
+import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.ParserConfigurationException;
+import java.beans.ExceptionListener;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import java.beans.ExceptionListener;
 
 /**
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that builds a
@@ -997,6 +998,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         addPropertyFactoryRule(digester, path + "/factory-property");
         addSystemPropertyRule(digester, path + "/system-property");
+        addFilePropertiesRule(digester, path + "/file-properties");
         addContainerPropertyRule(digester, path + "/container-property", setAsBeanProperties);
 
         digester.addObjectCreate(path + "/map", HashMap.class);
@@ -1006,6 +1008,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         addPropertyFactoryRule(digester, path + "/map/factory-property");
         addSystemPropertyRule(digester, path + "/map/system-property");
+        addFilePropertiesRule(digester, path + "/map/file-properties");
         addContainerPropertyRule(digester, path + "/map/container-property", false);
 
         //A small hack to call a method on top -1
@@ -1097,6 +1100,35 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         });
     }
 
+    protected void addFilePropertiesRule(Digester digester, String path) {
+        digester.addRule(path, new Rule() {
+            public void begin(String s, String s1, Attributes attributes) throws Exception
+            {
+                String location = attributes.getValue("location");
+                String temp = attributes.getValue("override");
+                boolean override = "true".equalsIgnoreCase(temp);
+                InputStream is = Utility.loadResource(location, getClass());
+                if(is==null) {
+                    throw new FileNotFoundException(location);
+                }
+                Properties p = new Properties();
+                p.load(is);
+                Map props = (Map)digester.peek();
+                if(override) {
+                    props.putAll(p);
+                } else {
+                    String key;
+                    for (Iterator iterator = p.keySet().iterator(); iterator.hasNext();) {
+                        key = (String) iterator.next();
+                        if(!props.containsKey(key)) {
+                            props.put(key, p.getProperty(key));
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     protected void addContainerPropertyRule(Digester digester, String path, final boolean setAsBeanProperties) {
         digester.addRule(path, new Rule() {
             public void begin(String s, String s1, Attributes attributes) throws Exception
@@ -1131,6 +1163,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         endpointReferences.add(new EndpointReference(propName, endpointName, null, null, object));
     }
 
+    /**
+     * this rule serves 2 functions -
+     * 1. Allows for late binding of certain types of object, namely Transformers and endpoints
+     * that need to be set on objects once the Manager configuration has been processed
+     * 2. Allows for template parameters to be parse on the configuration file in the form of
+     * ${param-name}.  These will get resolved against properties set in the mule-properites element
+     */
     private class MuleSetPropertiesRule extends SetPropertiesRule
     {
 
@@ -1150,6 +1189,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         public void begin(String s1, String s2, Attributes attributes) throws Exception
         {
+            attributes = processAttributes(attributes);
             //Add transformer references that will be bound to their objects once
             //all configuration has bean read
             String transformerNames = attributes.getValue("transformer");
@@ -1188,6 +1228,27 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             }
 
             super.begin(attributes);
+        }
+
+        private Attributes processAttributes(Attributes attributes)
+        {
+            AttributesImpl att = (AttributesImpl)attributes;
+            String value = null;
+            String realValue = null;
+            String key = null;
+            UMOManager manager = MuleManager.getInstance();
+            for(int i = 0; i < att.getLength(); i++) {
+                value = att.getValue(i);
+                if(value.startsWith("${")) {
+                    key = value.substring(2, value.length()-1);
+                    realValue = (String)manager.getProperty(key);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("Param is '" + value + "', Property key is '" + key + "', Property value is '" + realValue + "'");
+                    }
+                    att.setValue(i, realValue);
+                }
+            }
+            return att;
         }
     }
 }
