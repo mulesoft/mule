@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-tcp-provider</artifactId>
+    <name>Mule Tcp Provider</name>
+    <description>A Mule provider for Tcp Connectivity. This provider supplies a tcp Server and client implementation.
+        for more information see the
+        <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
+    </description>
+    <shortDescription>tcp</shortDescription>
+    <url>http://www.muleumo.org/doc/providers/tcp/</url>
+    <dependencies>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule</artifactId>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+        </dependency>
+    </dependencies>
+</project>

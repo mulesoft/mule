@@ -1,0 +1,1 @@
+call run-with-classpath.bat -config ../conf/mule-config.xml

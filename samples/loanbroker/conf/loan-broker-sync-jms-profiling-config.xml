@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Loan_broker_Sync" version="1.0">
+
+    <mule-environment-properties synchronous="true" serverUrl="" synchronousReceive="true" />
+
+     <!-- Testing with ActiveMq -->
+<!--    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
+<!--        <properties>-->
+<!--            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>-->
+<!--            <property name="jndiInitialFactory" value="org.codehaus.activemq.jndi.ActiveMQInitialContextFactory"/>-->
+<!--            <property name="specification" value="1.1"/>-->
+<!--        </properties>-->
+<!--    </connector>-->
+
+    <!-- testing with OpenJms -->
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="connectionFactoryJndiName" value="JmsQueueConnectionFactory"/>
+            <property name="jndiInitialFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>
+            <property name="jndiProviderUrl" value="tcp://localhost:3035"/>
+        </properties>
+    </connector>
+
+    <endpoint-identifiers>
+        <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerRequests"/>
+        <endpoint-identifier name="CreditAgency" value="jms://CreditAgencyService"/>
+        <endpoint-identifier name="LenderService" value="jms://LenderService"/>
+        <endpoint-identifier name="Bank1" value="jms://Bank1"/>
+        <endpoint-identifier name="Bank2" value="jms://Bank2"/>
+        <endpoint-identifier name="Bank3" value="jms://Bank3"/>
+        <endpoint-identifier name="Bank4" value="jms://Bank4"/>
+        <endpoint-identifier name="Bank5" value="jms://Bank5"/>
+    </endpoint-identifiers>
+
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+    </agents>
+
+    <model name="loan-broker">
+        <mule-descriptor name="LoanBroker" 
+            inboundEndpoint="LoanBroker"
+            implementation="org.mule.samples.loanbroker.SyncLoanBroker">
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="CreditAgency"/>
+                    <filter expectedType="org.mule.samples.loanbroker.Customer" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
+                </router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="LenderService"/>
+                    <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+            </outbound-router>
+            <pooling-profile initialisationPolicy="INITIALISE_ALL"/>
+        </mule-descriptor>
+
+        <mule-descriptor name="CreditAgencyService"
+            inboundEndpoint="CreditAgency"
+            implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
+
+<!--            <interceptor className="org.mule.interceptors.JXPathNormalizerInterceptor">-->
+<!--                <properties>-->
+<!--                    <property name="beforeExpressions" value="loanRequest/customer"/>-->
+<!--                    <property name="afterExpression" value="loanRequest/creditProfile"/>-->
+<!--                </properties>-->
+<!--            </interceptor>-->
+        </mule-descriptor>
+
+        <mule-descriptor name="LenderService"
+            inboundEndpoint="LenderService"
+            implementation="org.mule.samples.loanbroker.DefaultLenderService">
+<!--            <interceptor className="org.mule.interceptors.JXPathNormalizerInterceptor">-->
+<!--                <properties>-->
+<!--                    <property name="beforeExpressions" value="loanRequest/creditProfile,loanRequest/loanAmount"/>-->
+<!--                    <property name="afterExpression" value="lenders"/>-->
+<!--                </properties>-->
+<!--            </interceptor>-->
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank1"
+            inboundEndpoint="Bank1"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank2"
+            inboundEndpoint="Bank2"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank3"
+            inboundEndpoint="Bank3"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank4"
+            inboundEndpoint="Bank4"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank5"
+            inboundEndpoint="Bank5"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="TcpReceiver" implementation="org.mule.components.simple.NullComponent">
+            <inbound-router>
+                <router className="org.mule.routing.inbound.ForwardingConsumer"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <filter expression="authenticate=true" className="org.mule.routing.filters.UMOEventFilter"/>
+                    <endpoint address="vm://LdapAuthenticator"/>
+                </router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://JMSMessagingManager"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

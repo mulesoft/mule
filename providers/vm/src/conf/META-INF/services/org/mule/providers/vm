@@ -1,0 +1,5 @@
+connector=org.mule.providers.vm.VMConnector
+dispatcher.factory=org.mule.providers.vm.VMMessageDispatcherFactory
+message.receiver=org.mule.providers.vm.VMMessageReceiver
+message.adapter=org.mule.providers.vm.VMMessageAdapter
+endpoint.builder=org.mule.impl.endpoint.ResourceNameEndpointBuilder

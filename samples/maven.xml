@@ -1,0 +1,17 @@
+<project default="jar"
+    xmlns:j="jelly:core"
+    xmlns:u="jelly:util"
+    xmlns:ant="jelly:ant"
+    xmlns:maven="jelly:maven"
+    xmlns:deploy="deploy">
+
+    <goal name="dist-lib">
+        <j:forEach var="lib" items="${pom.dependencies}">
+            <j:if test="${lib.getProperty('mule.core.jar')!='true'}">
+                <echo>copying ${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()} to lib</echo>
+                <copy todir="../../target/release/lib"
+                    file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
+            </j:if>
+        </j:forEach>
+    </goal>
+</project>

@@ -1,0 +1,39 @@
+<project default="mule:war"
+    xmlns:j="jelly:core"
+    xmlns:u="jelly:util"
+    xmlns:ant="jelly:ant"
+    xmlns:maven="jelly:maven">
+
+    <!-- this goal should be run from the distribution and assumes the distribution
+    directory structure is present -->
+    <goal name="mule:war">
+        <echo>Building Mule Samples war</echo>
+        <!-- copy libs -->
+        <copy todir="webapp/WEB-INF/lib">
+            <fileset dir="../../lib">
+               <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="webapp/WEB-INF/lib">
+            <fileset dir="../../lib/mule-extras-spring">
+               <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="webapp/WEB-INF/lib" file="../../dist/mule-@VERSION@.jar"/>
+
+        <copy todir="webapp/WEB-INF/classes">
+        	<fileset dir="../hello/classes"/>
+        </copy>
+   	<copy todir="webapp/WEB-INF/classes">
+   		<fileset dir="../loanbroker/classes"/>
+        </copy>
+   	<copy todir="webapp/WEB-INF/classes">
+   		<fileset dir="../errorhandler/classes"/>
+        </copy>
+
+        <!-- create the war -->
+        <zip zipfile="mule.war">
+            <zipfileset dir="webapp"/>
+        </zip>
+    </goal>
+</project>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <id>mule-extras-groovy</id>
+    <artifactId>mule-extras-groovy</artifactId>
+    <name>Groovy Support</name>
+    <shortDescription>groovy</shortDescription>
+    <description>Groovy support currently provides transformers to enable Mule users to transform their objects using groovy scripts. for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
+    <dependencies>
+    	<dependency>
+            <id>groovy</id>
+            <version>1.0-beta-8</version>
+            <url>http://groovy.codehaus.org</url>
+        </dependency>
+        <dependency>
+            <id>asm</id>
+            <version>1.5.2</version>
+            <url></url>
+        </dependency>
+        <dependency>
+            <id>asm:asm-util</id>
+            <version>1.5.2</version>
+            <url></url>
+        </dependency>
+         <dependency>
+            <id>mule:mule-extras-client</id>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.3</version>
+            <url>http://jakarta.apache.org/commons/logging/index.html</url>
+        </dependency>
+    </dependencies>
+</project>

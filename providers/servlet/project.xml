@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-servlet-provider</artifactId>
+    <name>Mule Servlet Provider</name>
+    <description>A Mule provider for connecting via a web app enabling implementations such as REST style services for Mule. for more information see the <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.</description>
+    <shortDescription>servlet</shortDescription>
+    <url>http://www.muleumo.org/doc/providers/servlet/</url>
+    <dependencies>
+        <dependency>
+                <artifactId>mule</artifactId>
+                <groupId>mule</groupId>
+                <version>SNAPSHOT</version>
+                <url>http://www.muleumo.org</url>
+        </dependency>
+        <dependency>
+                <artifactId>mule-http-provider</artifactId>
+                <groupId>mule</groupId>
+                <version>SNAPSHOT</version>
+                <url>http://www.muleumo.org</url>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <groupId>mule</groupId>
+    <id>mule-extras-tyrex</id>
+    <artifactId>mule-extras-tyrex</artifactId>
+    <name>Tyrex Support</name>
+    <shortDescription>tyrex</shortDescription>
+    <description>Provides access to the Tyrex transaction manager for User and Xa transactions.  for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
+    <dependencies>
+        <dependency>
+            <id>tyrex</id>
+            <version>1.0</version>
+            <url>http://www.exolab.org</url>
+        </dependency>
+        <dependency>
+            <id>ots-jts</id>
+            <jar>ots-jts_1.0.jar</jar>
+            <url>http://www.exolab.org/</url>
+        </dependency>
+        <dependency>
+            <id>castor</id>
+            <version>0.9.4.3</version>
+            <url>http://www.exolab.org/</url>
+        </dependency>
+        <dependency>
+            <id>xerces:xmlParserAPIs</id>
+            <version>2.2.1</version>
+            <url>http://xml.apache.org/xerces2-j/index.html</url>
+        </dependency>
+        <dependency>
+            <id>xerces</id>
+            <version>2.2.1</version>
+            <url>http://xml.apache.org/xerces2-j/index.html</url>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.3</version>
+            <url>http://jakarta.apache.org/commons/logging/index.html</url>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee</artifactId>
+            <version>1.4-rc2</version>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,71 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.providers.soap.glue;
+
+import electric.glue.context.ServiceContext;
+import electric.registry.Registry;
+import electric.registry.RegistryException;
+import electric.service.IService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.InitialisationException;
+import org.mule.impl.InitialisationCallback;
+
+/**
+ * <code>GlueInitialisationCallback</code> is invoked when an Glue service component is
+ * created from its descriptor.
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+public class GlueInitialisationCallback implements InitialisationCallback
+{
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(GlueInitialisationCallback.class);
+
+
+    private IService service;
+    private ServiceContext context;
+    private String servicePath;
+    private boolean invoked = false;
+
+    public GlueInitialisationCallback(IService service, String path, ServiceContext context)
+    {
+        this.service = service;
+        this.servicePath = path;
+        this.context = context;
+        if(context==null) this.context = new ServiceContext();
+    }
+
+    public void initialise(Object component) throws InitialisationException
+    {
+        //only call this once
+        if(invoked) return;
+        if(component instanceof GlueInitialisable) {
+            logger.debug("Calling axis initialisation for component: " + component.getClass().getName());
+            ((GlueInitialisable)component).initialise(service, context);
+        }
+        invoked = true;
+        try
+        {
+            Registry.publish(servicePath, service, context);
+        } catch (RegistryException e)
+        {
+            throw new InitialisationException("Failed to register component as a service: " + e.getMessage(), e);
+        }
+    }
+}
+

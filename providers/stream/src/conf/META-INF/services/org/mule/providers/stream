@@ -1,0 +1,5 @@
+connector=org.mule.providers.stream.SystemStreamConnector
+dispatcher.factory=org.mule.providers.stream.StreamMessageDispatcherFactory
+message.receiver=org.mule.providers.stream.StreamMessageReceiver
+message.adapter=org.mule.providers.stream.StreamMessageAdapter
+endpoint.builder=org.mule.impl.endpoint.ResourceNameEndpointBuilder

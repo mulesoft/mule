@@ -1,0 +1,110 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.providers;
+
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.config.MuleProperties;
+import org.mule.impl.MuleComponent;
+import org.mule.impl.MuleEvent;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.Map;
+
+/**
+ * <code>DefaultReplyToHandler</code> is responsible for processing a message replyTo
+ * header.
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+
+public class DefaultReplyToHandler implements ReplyToHandler
+{
+    private UMOTransformer transformer;
+
+    private Map endpointCache = new ConcurrentHashMap();
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(DefaultReplyToHandler.class);
+
+    public DefaultReplyToHandler(UMOTransformer transformer)
+    {
+        this.transformer = transformer;
+    }
+
+    public void processReplyTo(UMOEvent event, UMOMessage returnMessage, Object replyTo) throws UMOException
+    {
+        logger.info("sending reply to: " + returnMessage.getReplyTo());
+        String replytToEndpoint = replyTo.toString();
+
+        //get the endpoint for this url
+        UMOEndpoint endpoint = getEndpoint(event, replytToEndpoint);
+        if (transformer != null)
+        {
+            endpoint.setTransformer(transformer);
+        }
+
+        //Create the replyTo event asynchronous
+        UMOEvent replyToEvent = new MuleEvent(returnMessage, endpoint, event.getSession(), false);
+
+        //make sure remove the replyTo property as not cause a a forever replyto loop
+        replyToEvent.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+
+        //dispatch the event
+        try
+        {
+            endpoint.getConnector().getDispatcher(replyTo.toString()).dispatch(replyToEvent);
+            logger.info("reply to sent: " + endpoint);
+            ((MuleComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
+        } catch (Exception e)
+        {
+            throw new DispatchException("Failed to dispatch on replyTo: " + endpoint + ". " + e.getMessage(), e);
+        }
+
+
+    }
+
+    protected UMOEndpoint getEndpoint(UMOEvent event, String endpointUri) throws UMOException
+    {
+        UMOEndpoint endpoint = (UMOEndpoint) endpointCache.get(endpointUri);
+        if (endpoint == null)
+        {
+            UMOEndpointURI ep = new MuleEndpointURI(endpointUri);
+            endpoint = MuleEndpoint.getOrCreateEndpointForUri(ep, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            endpointCache.put(endpointUri, endpoint);
+        }
+        return endpoint;
+    }
+
+    public UMOTransformer getTransformer()
+    {
+        return transformer;
+    }
+
+    public void setTransformer(UMOTransformer transformer)
+    {
+        this.transformer = transformer;
+    }
+}

@@ -1,0 +1,147 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.management.agents;
+
+import mx4j.log.CommonsLogger;
+import mx4j.log.Log;
+import mx4j.tools.adaptor.http.HttpAdaptor;
+import mx4j.tools.adaptor.http.XSLTProcessor;
+import org.mule.InitialisationException;
+import org.mule.umo.UMOAgent;
+import org.mule.umo.UMOException;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+import java.net.URI;
+
+/**
+ * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for
+ * Jmx management, statistics and configuration viewing of a Mule instance..
+ *
+ * @author Guillaume Nodet
+ * @version $Revision$
+ */
+public class Mx4jAgent implements UMOAgent {
+
+	private String name;
+	private String jmxAdaptorUrl = "http://localhost:9999";
+	private Object adaptor;
+	private MBeanServer mBeanServer;
+	private ObjectName adaptorName;
+
+	protected Object createAdaptor() throws Exception {
+		Object adaptor = null;
+		Log.redirectTo(new CommonsLogger());
+		URI uri = new URI(jmxAdaptorUrl);
+		adaptor = new HttpAdaptor(uri.getPort(), uri.getHost());
+		((HttpAdaptor) adaptor).setProcessor(new XSLTProcessor());
+		return adaptor;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mule.umo.UMOAgent#getName()
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mule.umo.UMOAgent#setName(java.lang.String)
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mule.umo.UMOAgent#getDescription()
+	 */
+	public String getDescription() {
+		return "MX4J Http adaptor: " + jmxAdaptorUrl;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mule.umo.lifecycle.Startable#start()
+	 */
+	public void start() throws UMOException {
+		try {
+			mBeanServer.invoke(adaptorName, "start", null, null);
+		} catch (InstanceNotFoundException e) {
+			throw new JmxManagementException("failed to start agent", e, adaptorName);
+		} catch (MBeanException e) {
+			throw new JmxManagementException("failed to start agent", e, adaptorName);
+		} catch (ReflectionException e) {
+			//ignore
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mule.umo.lifecycle.Stoppable#stop()
+	 */
+	public void stop() throws UMOException {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mule.umo.lifecycle.Disposable#dispose()
+	 */
+	public void dispose() throws UMOException {
+	}
+
+/* (non-Javadoc)
+	 * @see org.mule.umo.UMOAgent#registered()
+	 */
+    public void registered()
+    {
+    }
+
+    /* (non-Javadoc)
+	 * @see org.mule.umo.UMOAgent#unregistered()
+	 */
+    public void unregistered()
+    {
+    }
+    
+
+	/* (non-Javadoc)
+	 * @see org.mule.umo.lifecycle.Initialisable#initialise()
+	 */
+	public void initialise() throws InitialisationException {
+		try {
+			mBeanServer = (MBeanServer) MBeanServerFactory
+					.findMBeanServer(null).get(0);
+			adaptor = createAdaptor();
+			adaptorName = new ObjectName("Adaptor:class="
+					+ adaptor.getClass().getName());
+			mBeanServer.registerMBean(adaptor, adaptorName);
+		} catch (Exception e) {
+			throw new InitialisationException("Could not start mx4j agent", e);
+		}
+	}
+
+	/**
+	 * @return Returns the jmxAdaptorUrl.
+	 */
+	public String getJmxAdaptorUrl() {
+		return jmxAdaptorUrl;
+	}
+	/**
+	 * @param jmxAdaptorUrl The jmxAdaptorUrl to set.
+	 */
+	public void setJmxAdaptorUrl(String jmxAdaptorUrl) {
+		this.jmxAdaptorUrl = jmxAdaptorUrl;
+	}
+}

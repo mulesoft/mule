@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <extend>../../../project.xml</extend>
+    <id>mule-webapp</id>
+    <groupId>mule</groupId>
+    <pomVersion>3</pomVersion>
+    <name>Mule Samples Webapps</name>
+    <shortDescription>Mule Samples Webapps</shortDescription>
+    <url>http://samples.muleumo.org</url>
+    <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
+    <siteAddress>www.muleumo.org</siteAddress>
+    <siteDirectory>/var/www/html/muleumo.org/samples</siteDirectory>
+    <distributionDirectory>/var/www/html/muleumo.org/samples/</distributionDirectory>
+    <dependencies>
+        <dependency>
+            <id>mule</id>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>spring</id>
+            <version>1.1-rc1</version>
+            <url>http://www.springframework.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <includes>
+                <include>${basedir}/../LICENSE.txt</include>
+            </includes>
+        </resources>
+        <resources>
+            <resource>
+                <directory>../hello</directory>
+                <includes>
+                    <include>**/*.class</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+</project>

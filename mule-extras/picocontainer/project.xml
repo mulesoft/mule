@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <groupId>mule</groupId>
+    <id>mule-extras-picocontainer</id>
+    <artifactId>mule-extras-picocontainer</artifactId>
+    <name>Pico Extensions</name>
+    <shortDescription>pico</shortDescription>
+    <description>Provides extensions to use PicoContainer with Mule, such as using the container as a factory for Mule managed objects. for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
+    <dependencies>
+        <dependency>
+            <groupId>picocontainer</groupId>
+            <artifactId>picocontainer</artifactId>
+            <version>1.1</version>
+            <url>http://www.picocontainer.org</url>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.6.1</version>
+            <url>http://jakarta.apache.org/commons/beanutils</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+         <dependency>
+            <artifactId>commons-collections</artifactId>
+            <groupId>commons-collections</groupId>
+            <version>2.1</version>
+            <url>http://jakarta.apache.org/commons/collections/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <artifactId>nanocontainer</artifactId>
+            <groupId>nanocontainer</groupId>
+            <version>1.0-beta-3</version>
+            <url>http://www.picocontainer.org</url>
+        </dependency>
+        <dependency>
+            <groupId>nanocontainer</groupId>
+            <artifactId>nanocontainer-nanowar</artifactId>
+            <version>1.0-beta-4</version>
+            <url>http://www.picocontainer.org</url>
+        </dependency>
+    </dependencies>
+</project>

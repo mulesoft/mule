@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Test_Mule_Properties" version="1.0">
+
+    <connector name="fileConnector1" className="org.mule.providers.file.FileConnector"/>
+
+    <connector name="fileConnector2" className="org.mule.providers.file.FileConnector">
+        <properties>
+            <map name="serviceOverrides">
+                <property name="outbound.transformer" value="org.mule.transformers.simple.SerialisableToByteArray"/>
+                <property name="inbound.transformer" value="org.mule.transformers.simple.ByteArrayToSerialisable"/>
+            </map>
+        </properties>
+ </connector>
+
+ <connector name="fileConnector3" className="org.mule.providers.file.FileConnector"/>
+</mule-configuration>

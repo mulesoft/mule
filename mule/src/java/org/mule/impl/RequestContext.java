@@ -1,0 +1,86 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.impl;
+
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * <code>RequestContext</code> is a thread context where components can get
+ * the current event or set response properties that will be sent on the
+ * outgoing message.
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+public class RequestContext
+{
+    private static ThreadLocal events = new ThreadLocal();
+
+    private static ThreadLocal props = new ThreadLocal();
+
+    public static UMOEventContext getEventContext() {
+        UMOEvent event = getEvent();
+        if(event!=null) {
+            return new MuleEventContext(event);
+        } else {
+            return null;
+        }
+    }
+
+    public static UMOEvent getEvent() {
+        return (UMOEvent) events.get();
+    }
+
+    public static synchronized void setEvent(UMOEvent event) {
+        events.set(event);
+    }
+
+    public static void setProperty(String key, Object value) {
+        Map properties = (Map)props.get();
+        if(properties==null) {
+            properties = new HashMap();
+            props.set(properties);
+        }
+        properties.put(key, value);
+    }
+
+    public static Map getProperties() {
+        return (Map)props.get();
+    }
+
+    public static Object getProperty(String key) {
+        Map properties = (Map)props.get();
+        if(properties==null) return null;
+        return properties.get(key);
+    }
+
+    public static void rewriteEvent(UMOMessage message) {
+        UMOEvent event = getEvent();
+        if(event!=null) {
+            event = new MuleEvent(message, event);
+            setEvent(event);
+        }
+    }
+
+    public static Map clearProperties() {
+        Map p = (Map)props.get();
+        props.set(null);
+        return p;
+    }
+}

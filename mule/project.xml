@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <name>Mule</name>
+    <groupId>mule</groupId>
+    <artifactId>mule</artifactId>
+    <package>org.mule</package>
+    <dependencies>
+        <!-- required: used by the core server -->
+        <dependency>
+            <groupId>concurrent</groupId>
+            <artifactId>concurrent</artifactId>
+            <version>1.3.4</version>
+            <url>http://g.oswego.edu</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <!-- required used by the core server -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.6.1</version>
+            <url>http://jakarta.apache.org/commons/beanutils/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>2.1</version>
+            <url>http://jakarta.apache.org/commons/collections/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.2-dev</version>
+            <url>http://jakarta.apache.org/commons/discovery/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.3</version>
+            <url>http://jakarta.apache.org/commons/logging/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- Optional: used by mules default component pooling mechanism -->
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.1</version>
+            <url>http://jakarta.apache.org/commons/pool/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- Required J2ee transaction api -->
+        <dependency>
+            <groupId>jta</groupId>
+            <artifactId>jta</artifactId>
+            <jar>jta-1.0.1b.jar</jar>
+            <url>http://java.sun.com/jta</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- Optional for MuleXmlConfigurationBuilder -->
+        <dependency>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+            <version>1.5</version>
+            <url>http://jakarta.apache.org/commons/digester/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- Optional: JXPath filtering of events -->
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+            <version>1.1</version>
+            <url>http://jakarta.apache.org/commons/jxpath/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- Optional used by Xml based filters and transformers -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.4</version>
+            <url>http://www.dom4j.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- Optional used for test cases -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <url>http://junit.sourceforge.net/index.html</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects</artifactId>
+            <version>core-0.09</version>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+
+        <!-- optional for servlet container integration -->
+        <dependency>
+            <groupId>servletapi</groupId>
+            <artifactId>servletapi</artifactId>
+            <version>2.3</version>
+            <url>http://jakarta.apache.org/tomcat/tomcat-5.0-doc/servletapi/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <ignore>false</ignore>
+            </properties>
+        </dependency>
+
+        <!-- Required UUID generator -->
+        <dependency>
+            <groupId>jug</groupId>
+            <artifactId>jug</artifactId>
+            <version>1.0.3</version>
+            <url>http://www.doomdark.org/doomdark/proj/jug/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- Optional logging -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.8</version>
+            <url>http://jakarta.apache.org/log4j/docs/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- Optional file context jndi jars -->
+        <dependency>
+            <groupId>fscontext</groupId>
+            <artifactId>fscontext</artifactId>
+            <jar>fscontext.jar</jar>
+            <url></url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>providerutil</groupId>
+            <artifactId>providerutil</artifactId>
+            <version></version>
+            <jar>providerutil.jar</jar>
+            <url></url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- XStream for de/serialising objects -->
+        <dependency>
+            <groupId>xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.0.2</version>
+            <url>http://xstream.codehaus.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>xpp3</groupId>
+            <artifactId>xpp3</artifactId>
+            <version>1.1.3.4d_b4_min</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- used by Jms provider and jms related tests -->
+        <dependency>
+            <groupId>jms</groupId>
+            <artifactId>jms</artifactId>
+            <version>1.1</version>
+            <url></url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+
+        <!-- Jms tests using ActiveMq -->
+<!--<dependency>
+          <groupId>geronimo-spec</groupId>
+          <artifactId>geronimo-spec-j2ee</artifactId>
+          <version>1.4-rc2</version>
+          <properties>
+            <ignore>true</ignore>
+          </properties>
+        </dependency>
+        <dependency>
+          <artifactId>activemq</artifactId>
+          <version>1.1</version>
+          <properties>
+            <ignore>true</ignore>
+          </properties>
+        </dependency>-->
+        <!-- testing with Open jms -->
+        <dependency>
+            <groupId>exolabcore</groupId>
+            <artifactId>exolabcore</artifactId>
+            <version>0.3.7</version>
+            <properties>
+                <ignore>true</ignore>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>openjms</groupId>
+            <artifactId>openjms</artifactId>
+            <version>0.7.6.1</version>
+            <properties>
+                <ignore>true</ignore>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+
+        <!-- optional management deps -->
+        <dependency>
+            <groupId>jmxri</groupId>
+            <artifactId>jmxri</artifactId>
+            <version>1.2</version>
+            <properties>
+                <ignore>true</ignore>
+                <mule.core.jar>false</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>jmxri</groupId>
+            <artifactId>jmxtools</artifactId>
+            <version>1.2</version>
+            <properties>
+                <ignore>true</ignore>
+                <mule.core.jar>false</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>jmxri</groupId>
+            <artifactId>jmxremoting</artifactId>
+            <version>1.2</version>
+            <properties>
+                <ignore>true</ignore>
+                <mule.core.jar>false</mule.core.jar>
+            </properties>
+        </dependency>
+        <!-- Optional mx4j Agent support  -->
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-jmx</artifactId>
+            <version>2.1.1</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-tools</artifactId>
+            <version>2.1.1</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-remote</artifactId>
+            <version>2.1.1</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <nagEmailAddress>mule-developer@lists.sourceforge.net</nagEmailAddress>
+        <sourceDirectory>${basedir}/src/java</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
+        <unitTest>
+            <includes>
+                <include>**/*TestCase.*</include>
+            </includes>
+            <excludes>
+                <exclude>**/Abstract*.*</exclude>
+                <!-- need to have a Jms server running to include these -->
+                <exclude>**/*Jms*.*</exclude>
+                <exclude>**/*JMS*.*</exclude>
+                <exclude>**/ActiveMQ*.*</exclude>
+                <exclude>**/OpenJms*.*</exclude>
+                <exclude>**/Joram*.*</exclude>
+                <exclude>**/SpiritWave*.*</exclude>
+
+                <!-- Fails as mail folder cannot be null, but can't mock a mail folder... -->
+                <exclude>**/MailMessageReceiverTestCase.*</exclude>
+
+                <!-- tests fails on Linux jdk -->
+                <exclude>**/CompressionTransformerTestCase.*</exclude>
+
+                <!-- Disable Multicast tests unless configured -->
+                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
+
+                <!-- sometimes fails failing to bind -->
+                <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
+
+            </excludes>
+<!--
+            If you have included the Jms Tests above you can also include tests
+            for you particular Jms server
+            -->
+
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/test/conf</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+                <resource>
+                    <directory>${basedir}/src/conf</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/conf</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <excludes>
+                    <exclude>**/*.xml</exclude>
+                    <exclude>**/*.groovy</exclude>
+                    <exclude>**/log4j.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
+    <reports>
+<!--report>maven-pmd-plugin</report>
+        <report>maven-simian-plugin</report-->
+        <report>maven-jdepend-plugin</report>
+        <report>maven-jxr-plugin</report>
+        <!--report>maven-javadoc-plugin</report-->
+<!-- The Clover report MUST be before the JUnit report as the test:test
+            target is run only ONCE (due to the test:test postGoal) and clover needs to
+            "watch" the tests run, while JUnit report simply analyses the output from
+            the tests -->
+        <!--        <report>maven-clover-plugin</report>-->
+        <!--report>maven-junit-report-plugin</report-->
+    </reports>
+</project>

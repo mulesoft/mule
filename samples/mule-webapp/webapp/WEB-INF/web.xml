@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+    <display-name>Mule</display-name>
+    <description>Mule Web App Samples</description>
+
+    <context-param>
+        <!-- If using the SpringContextLoaderListener, use this param name -->
+        <!--<param-name>contextConfigLocation</param-name>-->
+        <param-name>org.mule.config</param-name>
+        <param-value>/WEB-INF/mule-config.xml,
+                     /WEB-INF/mule-loanbroker-config.xml,
+                     /WEB-INF/mule-hello-config.xml,
+                     /WEB-INF/mule-echo-config.xml,
+                     /WEB-INF/mule-rest-config.xml
+        </param-value>
+    </context-param>
+
+<!--    <listener>-->
+<!--        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
+<!--    </listener>-->
+
+    <!--
+    To use a MuleXml configuration file use this context listener
+    -->
+    <listener>
+        <listener-class>org.mule.config.builders.MuleXmlBuilderContextListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>muleRESTServlet</servlet-name>
+        <servlet-class>org.mule.providers.servlet.MuleRESTReceiverServlet</servlet-class>
+        <init-param>
+            <param-name>org.mule.servlet.timeout</param-name>
+            <param-value>4000</param-value>
+            <description>request timeout</description>
+        </init-param>
+        <!-- If a servlet is read-only it will not receive doPut or doDelete events -->
+        <init-param>
+            <param-name>readonly</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <load-on-startup/>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>muleRESTServlet</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+</web-app>

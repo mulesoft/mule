@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="client_test" version="1.0">
+
+    <mule-environment-properties
+        synchronous="true"
+        serverUrl="jms://jmsSysProvider/mule.sys.queue?createConnector=NEVER"
+        />
+
+     <!-- testing with OpenJms -->
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="connectionFactoryJndiName" value="JmsQueueConnectionFactory"/>
+            <property name="jndiInitialFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>
+            <property name="jndiProviderUrl" value="tcp://localhost:3035"/>
+        </properties>
+    </connector>
+
+    <!-- this connector simulates an existing endpoint on a remote server -->
+    <connector name="vmRemoteConnector" className="org.mule.providers.vm.VMConnector">
+        <properties>
+            <property name="queueEvents" value="true"/>
+        </properties>
+    </connector>
+
+    <global-endpoints>
+        <endpoint name="vmRemoteEndpoint" connector="vmRemoteConnector" address="vm://remote.queue"/>
+        <endpoint name="jmsSysEndpoint" connector="jmsConnector" address="jms://mule.sys.queue"/>
+    </global-endpoints>
+
+    <model name="model">
+        <mule-descriptor name="TestReceiverUMO"
+            inboundEndpoint="vm://localhost/test.queue"
+            outboundEndpoint="stream://localhost/system"
+            implementation="org.mule.extras.client.TestReceiver">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

@@ -1,0 +1,1 @@
+exec ./run-with-classpath.sh -config ../conf/hello-http-mule-config.xml

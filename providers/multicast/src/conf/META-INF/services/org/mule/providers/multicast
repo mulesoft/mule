@@ -1,0 +1,5 @@
+connector=org.mule.providers.multicast.MulticastConnector
+dispatcher.factory=org.mule.providers.multicast.MulticastMessageDispatcherFactory
+message.receiver=org.mule.providers.multicast.MulticastMessageReceiver
+message.adapter=org.mule.providers.multicast.MulticastMessageAdapter
+endpoint.builder=org.mule.impl.endpoint.SocketEndpointBuilder

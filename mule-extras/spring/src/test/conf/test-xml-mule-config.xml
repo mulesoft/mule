@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-spring-configuration.dtd">
+
+
+<mule-configuration id="Test_Mule_Properties" version="1.0">
+
+    <mule-environment-properties
+        synchronous="false"
+        model="test-model">
+        <threading-profile id="default" maxBufferSize="0" maxThreadsActive="8"
+            maxThreadsIdle="4" poolExhaustedAction="WAIT" threadTTL="60001"/>
+        <pooling-profile  exhaustedAction="WAIT" maxActive="8" maxIdle="4" maxWait="4000" initialisationPolicy="INITIALISE_FIRST"/>
+        <queue-profile maxOutstandingMessages="100">
+            <persistence-strategy className="org.mule.util.queue.SerialisationPersistence"/>
+        </queue-profile>
+    </mule-environment-properties>
+
+    <environment-properties>
+        <!-- Whether mule transfromers should use compression when sending and recieving messages -->
+        <property name="doCompression" value="true"/>
+        <property name="beanProperty1" value="this was set from the manager properties!"/>
+        <system-property name="OS Version" key="os.version"/>
+        <system-property name="system-prop2" key="system-prop2" defaultValue="default"/>
+    </environment-properties>
+
+    <transaction-manager factory="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
+
+    <agents>
+        <agent name="jmxAgent" className="org.mule.management.agents.JmxAgent"/>
+    </agents>
+
+    <connector name="dummyConnector" className="org.mule.tck.testmodels.mule.TestConnector">
+        <threading-profile id="dispatcher" maxBufferSize="2"/>
+        <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
+    </connector>
+
+    <endpoint-identifiers>
+        <endpoint-identifier name="AppleQueue" value="test://apple.queue"/>
+        <endpoint-identifier name="Banana_Queue" value="test://banana.queue"/>
+        <endpoint-identifier name="Test Queue" value="test://test.queue"/>
+    </endpoint-identifiers>
+
+    <transformers>
+        <transformer name="TestCompressionTransformer" className="org.mule.tck.testmodels.mule.TestCompressionTransformer"
+            returnClass="java.lang.String">
+            <properties>
+                <property name="org.mule.useManagerProperties" value="true"/>
+                <property name="beanProperty2" value="12"/>
+                <container-property name="containerProperty" reference="java.lang.String"/>
+            </properties>
+        </transformer>
+    </transformers>
+
+    <global-endpoints>
+        <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ"/>
+        <endpoint name="waterMelonEndpoint" address="Test Queue"/>
+        <endpoint name="appleInEndpoint" type="receiver" address="test://AppleQueue"/>
+        <endpoint name="appleResponseEndpoint" type="receiver" address="test://AppleResponseQueue"/>
+        <endpoint name="orangeEndpoint" address="test://orangeQ">
+            <properties>
+                <property name="testGlobal" value="value1"/>
+            </properties>
+        </endpoint>
+    </global-endpoints>
+
+    <interceptor-stack name="default">
+        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
+        <interceptor className="org.mule.interceptors.TimerInterceptor"/>
+    </interceptor-stack>
+
+    <model name="test-model">
+        <entry-point-resolver className="org.mule.tck.testmodels.mule.TestEntryPointResolver"/>
+
+        <component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/>
+
+        <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy">
+           <endpoint address="test://component.exceptions"/>
+        </exception-strategy>
+
+        <mule-descriptor name="orangeComponent"
+            implementation="local:orange">
+
+            <inbound-router>
+                <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
+                    <endpoint address="test://catch.all"/>
+                </catch-all-strategy>
+                <global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">
+                    <properties>
+                        <property name="testLocal" value="value1"/>
+                    </properties>
+                    <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="java.lang.String"/>
+                </global-endpoint>
+                <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer"/>
+            </inbound-router>
+
+            <response-router transformers="TestCompressionTransformer">
+                <endpoint address="test://response1"/>
+                <global-endpoint name="appleResponseEndpoint"/>
+                <router className="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
+            </response-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <global-endpoint name="appleInEndpoint" transformers="TestCompressionTransformer"/>
+                </router>
+            </outbound-router>
+
+            <interceptor className="default"/>
+            <interceptor className="org.mule.interceptors.TimerInterceptor"/>
+
+            <properties>
+                <factory-property name="orange" factory="org.mule.tck.testmodels.fruit.Orange"/>
+                <property name="brand" value="Juicy Baby!"/>
+                <property name="segments" value="9"/>
+                <property name="radius" value="4.21"/>
+                <map name="mapProperties">
+                    <property name="prop1" value="prop1"/>
+                    <property name="prop2" value="prop2"/>
+                </map>
+                <list name="listProperties">
+                    <entry value="prop1"/>
+                    <entry value="prop2"/>
+                    <entry value="prop3"/>
+                </list>
+                <list name="arrayProperties">
+                    <entry value="prop4"/>
+                    <entry value="prop5"/>
+                    <entry value="prop6"/>
+                </list>
+            </properties>
+             <exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
+                   <endpoint address="test://orange.exceptions"/>
+                </exception-strategy>
+
+        </mule-descriptor>
+
+        <mule-descriptor name="appleComponent"
+            implementation="org.mule.tck.testmodels.fruit.Apple">
+            <inbound-router>
+                <global-endpoint name="appleInEndpoint"/>
+                <catch-all-strategy className="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
+                <router className="org.mule.routing.inbound.SelectiveConsumer">
+                    <filter expectedType="java.lang.String" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+                <router className="org.mule.routing.inbound.IdempotentReceiver"/>
+            </inbound-router>
+
+            <outbound-router>
+                <catch-all-strategy className="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint name="TestApple-Out" type="sender" address="test://appleQ2"/>
+                    <filter expectedType="java.lang.String" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                </router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <global-endpoint name="waterMelonEndpoint"/>
+                    <filter className="org.mule.routing.filters.logic.AndFilter">
+                        <left-filter pattern="the quick brown (.*)" className="org.mule.routing.filters.RegExFilter"/>
+                        <right-filter pattern="(.*) brown (.*)" className="org.mule.routing.filters.RegExFilter"/>
+                    </filter>
+                </router>
+            </outbound-router>
+
+            <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
+
+            <exception-strategy className="org.mule.impl.DefaultExceptionStrategy"/>
+        </mule-descriptor>
+    </model>
+</mule-configuration>

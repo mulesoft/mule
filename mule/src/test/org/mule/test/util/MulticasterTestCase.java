@@ -1,0 +1,52 @@
+/*
+ * $Header$ 
+ * $Revision$ 
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ * 
+ * Copyright (c) Cubis Limited. All rights reserved. http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD style
+ * license a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ *  
+ */
+
+package org.mule.test.util;
+
+import junit.framework.TestCase;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.tck.testmodels.fruit.WaterMelon;
+import org.mule.util.Multicaster;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * <code>MulticasterTestCase</code> TODO (document class)
+ * 
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+public class MulticasterTestCase extends TestCase
+{
+    public void testMulticating() throws Exception
+    {
+        List fruit = new ArrayList();
+        Apple apple = new Apple();
+        Banana banana  = new Banana();
+        WaterMelon melon = new WaterMelon();
+        fruit.add(apple);
+        fruit.add(banana);
+        fruit.add(melon);
+
+        Fruit caster = (Fruit)Multicaster.create(Fruit.class, fruit);
+        caster.bite();
+
+        assertTrue(apple.isBitten());
+        assertTrue(banana.isBitten());
+        assertTrue(melon.isBitten());
+    }
+}

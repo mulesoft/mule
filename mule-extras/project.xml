@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <!--
+    This assumes you have the mule module and mule-extras module checked out
+    at the same directory level.  If this is not the case you will need to set the
+    extend tag accordingly.
+    -->
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <name>Mule Extras</name>
+    <groupId>mule</groupId>
+    <id>mule-extras</id>
+    <inceptionYear>2004</inceptionYear>
+    <package>org.mule.extras</package>
+    <logo>http://www.muleumo.org/images/mule-logo.gif</logo>
+    <shortDescription>muleextras</shortDescription>
+    <description>
+    Mule extras is a sub-project of Mule where all extensions to Mule exist. Mule
+    is a highly extensible framework where every component can be customised and
+    swapped in. These extensions will can be anything from transformers, routers,
+    interceptors to extensions to other frameworks such as Spring or Pico to providers
+    that allow you to connect to other systems.
+    </description>
+    <url>http://wiki.muleumo.org/display/MULE/Mule+Extras</url>
+    <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
+    <siteAddress>www.muleumo.org</siteAddress>
+    <siteDirectory>/var/www/html/muleumo.org</siteDirectory>
+    <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
+    <dependencies>
+        <dependency>
+            <id>mule</id>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>mule:mule-tcp-provider</id>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>mule:mule-http-provider</id>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>mule:mule-vm-provider</id>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>mule:mule-jms-provider</id>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>mule:mule-stream-provider</id>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+    </dependencies>
+    <build>
+        <sourceDirectory>${basedir}/src/java</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test</unitTestSourceDirectory>
+        <unitTest>
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/test/conf</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+                <resource>
+                    <directory>${basedir}/src/conf</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+        <resources>
+            <includes>
+                <include>${basedir}/../LICENSE.txt</include>
+                <include>${basedir}/licenses/*.*</include>
+            </includes>
+        </resources>
+    </build>
+</project>

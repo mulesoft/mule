@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Samples" version="1.0">
+
+    <mule-environment-properties synchronous="true"/>
+
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+    </agents>
+
+    <model name="samples">
+
+    </model>
+</mule-configuration>

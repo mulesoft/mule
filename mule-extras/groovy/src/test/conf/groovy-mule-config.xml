@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="groovy_test" version="1.0">
+
+    <model name="model">
+        <mule-descriptor name="GroovyUMO1"
+            inboundEndpoint="vm://localhost/groovy.1"
+            outboundEndpoint="vm://localhost/groovy.2"
+            implementation="org.mule.extras.groovy.GroovyComponent">
+            <properties>
+                <property name="script" value="test1.groovy"/>
+                <property name="methodName" value="receive"/>
+            </properties>
+        </mule-descriptor>
+        <mule-descriptor name="GroovyUMO2"
+            inboundEndpoint="vm://localhost/groovy.2"
+            outboundEndpoint="stream://localhost/system"
+            implementation="org.mule.extras.groovy.GroovyComponent">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="helloSampleProperties" version="1.0">
+    <connector name="SystemStreamConnector" className="org.mule.providers.stream.SystemStreamConnector">
+        <properties>
+            <property name="promptMessage" value="Please enter something: "/>
+            <property name="messageDelayTime" value="1000"/>
+        </properties>
+    </connector>
+
+    <connector name="TestConnector"
+        className="org.mule.extras.spring.events.TestConnectorWithContainerDependents">
+        <properties>
+            <container-property name="containerProp"
+                reference="apple"/>
+        </properties>
+    </connector>
+
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="mule-events-app-context-with-ref-props.xml"/>
+        </properties>
+    </container-context>
+
+    <model name="echoSample">
+        <mule-descriptor name="EchoUMO"
+            inboundEndpoint="stream://localhost"
+            outboundEndpoint="stream://localhost"
+            implementation="org.mule.components.simple.EchoComponent"
+            containerManaged="false">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

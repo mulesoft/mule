@@ -1,0 +1,641 @@
+<project default="jar"
+    xmlns:j="jelly:core"
+    xmlns:u="jelly:util"
+    xmlns:ant="jelly:ant"
+    xmlns:maven="jelly:maven"
+    xmlns:deploy="deploy">
+
+    <!--=================================================-->
+    <!--              USER BUILD TARGETS                 -->
+    <!--=================================================-->
+
+    <goal name="mule:site"
+        prereqs="mule:dtd, site" description="builds the mule site, does not include extras"/>
+
+    <!-- Cruisecontrol target -->
+    <goal name="mule:cc"
+        prereqs="clean, scm:update-project, jar:install, setvars, mule:dist-prepare, mule:providers-copy, mule:providers-test-reports-copy, update-mule-extras, jar-extras, shuffle-jars" description="Will build all jars incluing mule extras for CI build"/>
+
+    <goal name="mule:dist-nightly"
+        prereqs="clean, scm:update-project, jar:install, setvars, mule:dist-prepare, mule:providers-copy, update-mule-extras, jar-extras, shuffle-jars" description="Will build all jars incluing mule extras for Nightly build"/>
+
+    <goal name="mule:jars"
+        prereqs="clean, jar:install, setvars, mule:dist-prepare, mule:providers-copy, dist-extras, shuffle-jars" description="Will build all jars incluing mule extras"/>
+
+    <goal name="mule:core-jars"
+        prereqs="clean, jar:install, setvars, mule:dist-prepare, mule:providers-copy, shuffle-jars" description="Builds the mule core jar, tck and provider jars"/>
+
+    <goal name="mule:release"
+        prereqs="clean, jar:install, setvars, mule:dist-prepare, mule:release-lib, mule:providers-all, dist-extras, samples-dist-lib, shuffle-jars, dist-samples, mule:site" description="Zips build for distribution">
+
+        <!-- src copy -->
+        <echo>Copying src</echo>
+        <copy todir="${mule.release.dir}/src/java">
+            <fileset dir="${maven.src.dir}/java"/>
+        </copy>
+        <copy todir="${mule.release.dir}/src/test">
+            <fileset dir="${maven.src.dir}/test"/>
+        </copy>
+        <copy todir="${mule.release.dir}/lib/legal">
+            <fileset dir="${basedir}/legal"/>
+        </copy>
+
+        <copy todir="${mule.release.dir}" file="${basedir}/LICENSE.txt"/>
+        <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
+
+        <attainGoal name="mule:javadoc-release-src"/>
+
+        <!-- copy the full javadocs to the site docs -->
+        <copy todir="${maven.build.dir}/docs">
+            <fileset dir="${mule.release.dir}/docs"/>
+        </copy>
+
+        <attainGoal name="mule:site"/>
+
+        <attainGoal name="mule:zip-release"/>
+    </goal>
+
+    <!--=================================================-->
+    <!--        TARGETS FOR RUNNING SAMPLES              -->
+    <!--=================================================-->
+    <goal name="mule:loanbroker" prereqs="setvars,compile-samples" description="run the loanbroker example">
+
+        <java classname="org.mule.samples.loanbroker.LoanConsumer" fork="false">
+             <classpath>
+               <path refid="maven.dependency.classpath"/>
+               <pathelement location="src/samples/target/classes"/>
+             </classpath>
+          </java>
+    </goal>
+    <!--=================================================-->
+    <!--                  MAIN TARGETS                   -->
+    <!--=================================================-->
+
+    <goal name="setvars">
+        <j:set var="maven.build.dir" value="${basedir}\target"/>
+        <j:set var="mule.release.dir" value="${maven.build.dir}\release"/>
+        <j:set var="mule.release.lib.dir" value="${mule.release.dir}\lib"/>
+        <j:set var="mule.release.dist.dir" value="${mule.release.dir}\dist"/>
+        <j:set var="mule.release.src.dir" value="${mule.release.dir}\src"/>
+        <echo>Release dir is ${mule.release.dir}</echo>
+        <j:set var="mule.base.context.path" value="../../.."/>
+        <j:set var="mule.samples.dist" value="${mule.release.dir}\samples"/>
+    </goal>
+
+    <goal name="build-classpath" prereqs="setvars">
+        <echo>Building classpath from ${mule.release.lib.dir}</echo>
+        <ant:path id="cp">
+            <ant:fileset dir="${mule.release.lib.dir}">
+                <ant:include name="*.jar"/>
+            </ant:fileset>
+            <!-- include spring jars -->
+            <ant:fileset dir="${mule.release.lib.dir}/mule-extras-spring">
+                <ant:include name="*.jar"/>
+            </ant:fileset>
+        </ant:path>
+        <property name="classpath" refid="cp"/>
+    </goal>
+
+    <goal name="mule:javadoc-release-src" prereqs="setvars">
+
+        <!-- Get the year to display in the Javadocs -->
+        <ant:tstamp>
+            <ant:format property="year" pattern="${pom.inceptionYear}-yyyy"/>
+        </ant:tstamp>
+        <ant:javadoc
+            destdir="${mule.release.dir}/docs/apidocs"
+            author="true"
+            version="true"
+            use="true"
+            windowtitle="Mule ${pom.currentVersion} API"
+            doctitle="Mule ${pom.currentVersion} API"
+            bottom="Copyright &amp;copy; ${year} ${pom.organization.name}. All Rights Reserved."
+            stylesheetfile="./xdocs/stylesheets/maven.css"
+            >
+
+            <packageset dir="${mule.release.dir}/src/java" defaultexcludes="yes">
+                <exclude name="org/mule/tck/testmodels/**"/>
+            </packageset>
+        </ant:javadoc>
+    </goal>
+
+    <goal name="mule:dist-prepare" prereqs="clean,setvars">
+
+        <j:set var="goal" value="clean"/>
+        <attainGoal name="multiproject:goal"/>
+
+        <echo>About to create lib and bin directories in ${mule.release.dir}</echo>
+        <mkdir dir="${mule.release.dir}"/>
+        <mkdir dir="${mule.release.dist.dir}"/>
+        <mkdir dir="${mule.release.lib.dir}"/>
+        <mkdir dir="${mule.release.lib.dir}/legal"/>
+        <mkdir dir="${mule.release.src.dir}"/>
+
+    </goal>
+
+    <goal name="shuffle-jars" prereqs="setvars">
+
+        <echo>About to copy Mule jars to ${mule.release.dir}/dist</echo>
+        <mkdir dir="${mule.release.dir}/dist"/>
+        <copy todir="${mule.release.dir}/dist">
+            <ant:fileset dir="${mule.release.lib.dir}" includes="mule-*.jar"/>
+        </copy>
+        <copy todir="${mule.release.dir}/dist">
+            <ant:fileset dir="${maven.build.dir}" includes="mule-*.jar"/>
+        </copy>
+        <delete>
+            <ant:fileset dir="${mule.release.lib.dir}" includes="mule-*.jar"/>
+        </delete>
+        <echo>scanning ${mule.release.dir}/dist for mule jars</echo>
+        <fileScanner var="mulejars">
+            <fileset dir="${mule.release.dir}/dist">
+                <include name="mule-*.jar"/>
+            </fileset>
+        </fileScanner>
+
+        <mkdir dir="${mule.release.dir}/dist/mule-all"/>
+        <j:forEach var="jarfile" items="${mulejars.iterator()}">
+            <echo>jar is ${jarfile}</echo>
+            <unjar src="${jarfile}" dest="${mule.release.dir}/dist/mule-all"/>
+        </j:forEach>
+        <!-- do the main jar over the top to get the manifest file -->
+        <unjar src="${mule.release.dir}/dist/mule-${pom.currentVersion}.jar" dest="${mule.release.dir}/dist/mule-all"/>
+        <copy file="${mule.release.dir}/dist/mule-all/META-INF/MANIFEST.MF" tofile="${mule.release.dir}/dist/mule-all/META-INF/Mule.mf"/>
+
+        <echo>creating jar: ${mule.release.dir}/dist/mule-${pom.currentVersion}</echo>
+        <move file="${mule.release.dir}/dist/mule-${pom.currentVersion}.jar" tofile="${mule.release.dir}/dist/mule-core-${pom.currentVersion}.jar"/>
+        <jar manifest="${mule.release.dir}/dist/mule-all/META-INF/MANIFEST.MF" basedir="${mule.release.dir}/dist/mule-all" destfile="${mule.release.dir}/dist/mule-${pom.currentVersion}.jar"/>
+        <delete dir="${mule.release.dir}/dist/mule-all"/>
+
+        <copy todir="${mule.release.dir}/dist">
+            <fileset file="${basedir}/src/conf/mule-configuration.dtd"/>
+        </copy>
+
+        <u:available file="/var/www/html/cubis.co.uk/dtds">
+            <copy todir="/var/www/html/cubis.co.uk/dtds" file="${basedir}/src/conf/mule-configuration.dtd"/>
+        </u:available>
+
+        <!--local deploy -->
+        <copy todir="${maven.repo.local}/mule/jars">
+            <fileset file="${mule.release.dir}/dist/mule-core-${pom.currentVersion}.jar"/>
+            <fileset file="${mule.release.dir}/dist/mule-${pom.currentVersion}.jar"/>
+        </copy>
+        <!-- do custom deploy -->
+        <j:if test="${context.getVariable('mule.release.dist.deploy.dir')!= null}">
+            <copy todir="${mule.release.dist.deploy.dir}">
+                <fileset file="${mule.release.dir}/dist/*.*"/>
+            </copy>
+        </j:if>
+    </goal>
+
+    <goal name="mule:dtd">
+        <echo>Generating dtd docs</echo>
+        <ant:java classname="DTDDoc.DTDDoc" classpath="${mule.base.dir}/dtd/DTDDoc.jar;${mule.base.dir}/dtd/dtdparser120.jar;${mule.base.dir}/dtd/jakarta-regexp-1.2.jar">
+            <ant:arg line="${mule.base.dir}/dtd/mule.properties"/>
+        </ant:java>
+
+        <ant:copy todir="${basedir}/xdocs">
+            <ant:fileset dir="${basedir}/mule_dtd_doc" includes="*.dtd.*"/>
+        </ant:copy>
+
+        <attainGoal name="html2xdoc"/>
+
+        <ant:delete>
+            <ant:fileset dir="${basedir}/xdocs" includes="*mule-configuration.dtd*.html"/>
+        </ant:delete>
+        <ant:delete dir="${basedir}/mule_dtd_doc"/>
+
+    </goal>
+
+    <goal name="copy-pom-jars">
+        <j:forEach var="lib" items="${pom.dependencies}">
+            <j:if test="${lib.getProperty('ignore')!='true'}">
+                <j:if test="${lib.getProperty('mule.core.jar')=='true'}">
+                    <copy todir="${mule.release.lib.dir}"
+                        file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
+                </j:if>
+            </j:if>
+        </j:forEach>
+    </goal>
+
+    <goal name="mule:release-lib" prereqs="setvars, jar:install" description="Copies dependent jars for a release distribution">
+
+        <mkdir dir="${mule.release.dir}"/>
+        <attainGoal name="copy-pom-jars"/>
+
+        <!-- our build jar too ->
+        <copy todir="${mule.release.lib.dir}" file="${maven.build.dir}/${maven.final.name}.jar"/-->
+        <!--Copy any resources that must be present in the deployed JAR file-->
+        <!--<j:if test="${!pom.build.resources.isEmpty()}">
+            <maven:copyResources resources="${pom.build.resources}" todir="${mule.release.dir}/conf"/>
+        </j:if>-->
+    </goal>
+
+    <goal name="mule:zip-release" prereqs="setvars">
+        <mkdir dir="${maven.build.dir}/distributions"/>
+        <!--<zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dist.zip">
+            <zipfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
+        </zip>-->
+
+        <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-dist.tar.gz" longfile="gnu">
+            <tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
+        </tar>
+        <!-- zip up dependencies -->
+<!--        <zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dependencies.zip">-->
+<!--            <zipfileset dir="${mule.release.lib.dir}" prefix="${maven.final.name}/lib"/>-->
+<!--        </zip>-->
+        <!-- zip up site -->
+        <zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-site.zip">
+            <zipfileset dir="${maven.build.dir}/docs" prefix="docs"/>
+        </zip>
+    </goal>
+
+    <!--=================================================-->
+    <!--               PROVIDERS TARGETS                 -->
+    <!--=================================================-->
+
+    <goal name="mule:providers-all">
+        <j:set var="goal" value="jar:install"/>
+        <attainGoal name="multiproject:goal"/>
+        <!-- copies artifact and deps -->
+        <j:set var="goal" value="mule:providers-jars-copy"/>
+        <attainGoal name="multiproject:goal"/>
+        <j:set var="goal" value="mule:providers-src-copy"/>
+        <attainGoal name="multiproject:goal"/>
+        <j:set var="goal" value="site"/>
+        <attainGoal name="multiproject:goal"/>
+        <j:set var="goal" value="mule:providers-xref-copy"/>
+        <attainGoal name="multiproject:goal"/>
+    </goal>
+
+    <goal name="mule:providers-copy">
+        <j:set var="goal" value="jar:install"/>
+        <attainGoal name="multiproject:goal"/>
+        <j:set var="goal" value="mule:providers-artifact-copy"/>
+        <attainGoal name="multiproject:goal"/>
+        <j:set var="goal" value="mule:providers-src-copy"/>
+        <attainGoal name="multiproject:goal"/>
+    </goal>
+
+    <goal name="mule:providers-jars-copy" prereqs="setvars,mule:providers-artifact-copy">
+
+        <echo>Copying provider dependencies</echo>
+        <j:forEach var="lib" items="${pom.dependencies}">
+            <j:if test="${lib.getProperty('mule.core.jar')!='true'}">
+                <j:if test="${lib.getProperty('ignore')!='true'}">
+                    <copy todir="../../../target/release/lib"
+                        file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
+               </j:if>
+            </j:if>
+        </j:forEach>
+        <copy todir="../../../target/release/dist/">
+            <fileset dir="${maven.build.dir}">
+                <include name="mule-*.jar"/>
+            </fileset>
+        </copy>
+    </goal>
+
+    <goal name="mule:providers-artifact-copy" prereqs="setvars">
+
+        <echo>Copying provider artifact</echo>
+
+        <copy todir="../../../target/release/dist/">
+            <fileset dir="${maven.build.dir}">
+                <include name="mule-*.jar"/>
+            </fileset>
+        </copy>
+    </goal>
+
+    <goal name="mule:providers-test-reports-copy" prereqs="setvars">
+
+        <j:if test="${context.getVariable('provider.test.report.dir')!= null}">
+            <echo>Copying provider Test reports</echo>
+
+            <mkdir dir="${provider.test.report.dir}/${pom.shortDescription}"/>
+            <copy todir="${provider.test.report.dir}/${pom.shortDescription}">
+                <fileset dir="${maven.build.dir}/test-reports"/>
+            </copy>
+        </j:if>
+    </goal>
+
+    <goal name="mule:providers-xref-copy" prereqs="setvars">
+
+        <echo>Copying provider Docs</echo>
+
+        <mkdir dir="../../../target/docs/providers/${pom.shortDescription}"/>
+        <copy todir="../../../target/docs/providers/${pom.shortDescription}">
+            <fileset dir="${maven.build.dir}/docs"/>
+        </copy>
+    </goal>
+
+    <goal name="mule:providers-src-copy" prereqs="setvars">
+        <echo>Copying provider src</echo>
+        <copy todir="../../../target/release/src/">
+            <fileset dir="${maven.src.dir}"/>
+        </copy>
+    </goal>
+    <!--=================================================-->
+    <!--                EXTRAS TARGETS                   -->
+    <!--=================================================-->
+
+    <goal name="update-mule-extras">
+        <!-- update extras -->
+        <maven:reactor
+            basedir="${mule.extras.base.dir}"
+            postProcessing="true"
+            includes="project.xml"
+            goals="scm:update-project"
+            banner="Updating CVS image"
+            ignoreFailures="false"/>
+    </goal>
+
+    <goal name="mule:extras-site" prereqs="setvars">
+
+        <attainGoal name="site"/>
+        <echo>Copying Extras docs</echo>
+
+        <mkdir dir="../../mule/target/docs/extras/${pom.shortDescription}"/>
+        <copy todir="../../mule/target/docs/extras/${pom.shortDescription}">
+            <fileset dir="${maven.build.dir}/docs"/>
+        </copy>
+
+    </goal>
+
+    <goal name="dist-extras" prereqs="jar-extras" description="Compiles and tests sample apps">
+        <echo>Base extras dir is ${mule.extras.base.dir}</echo>
+        <u:available file="${mule.extras.base.dir}">
+            <j:set var="has.extras" value="true"/>
+
+            <maven:reactor
+                basedir="${mule.extras.base.dir}"
+                postProcessing="true"
+                includes="**/project.xml"
+                excludes="project.xml"
+                goals="mule:extras-src-copy,mule:extras-site"
+                banner="Building"
+                ignoreFailures="false"/>
+        </u:available>
+    </goal>
+
+    <goal name="jar-extras" prereqs="setvars" description="Compiles and tests sample apps">
+        <echo>Base extras dir is ${mule.extras.base.dir}</echo>
+        <u:available file="${mule.extras.base.dir}">
+            <j:set var="has.extras" value="true"/>
+
+            <maven:reactor
+                basedir="${mule.extras.base.dir}"
+                postProcessing="true"
+                includes="**/project.xml"
+                excludes="project.xml"
+                goals="clean,jar:install"
+                banner="Building"
+                ignoreFailures="false"
+                />
+            <j:forEach var="reactorProject" items="${reactorProjects}">
+
+                <u:tokenize var="tokens" delim=":">${reactorProject.id}</u:tokenize>
+                <j:set var="project.name" value="${tokens[1]}"/>
+                <j:set var="final.name" value="${project.name}-${reactorProject.currentVersion}"/>
+                <echo>copying ${maven.repo.local}/${reactorProject.groupId}/jars/${final.name}.jar to ${mule.release.lib.dir}</echo>
+                <copy file="${maven.repo.local}/${reactorProject.groupId}/jars/${final.name}.jar"
+                    todir="${mule.release.lib.dir}"/>
+                <!-- copy libs also -->
+                <j:forEach var="lib" items="${reactorProject.dependencies}">
+                    <j:if test="${lib.getProperty('mule.core.jar')!='true'}">
+                        <j:if test="${lib.getProperty('ignore')!='true'}">
+                            <echo>copying ${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()} to lib</echo>
+                            <mkdir dir="${mule.release.lib.dir}/${project.name}"/>
+                            <copy todir="${mule.release.lib.dir}/${project.name}"
+                                file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
+                        </j:if>
+                    </j:if>
+                </j:forEach>
+            </j:forEach>
+        </u:available>
+    </goal>
+
+
+
+    <goal name="mule:extras-src-copy" prereqs="setvars">
+        <echo>Copying Extras src</echo>
+        <copy todir="../../mule/target/release/src/">
+            <fileset dir="${maven.src.dir}"/>
+        </copy>
+    </goal>
+
+    <!--=================================================-->
+    <!--                SAMPLES TARGETS                  -->
+    <!--=================================================-->
+    <goal name="compile-samples" prereqs="setvars" description="Compiles and tests sample apps">
+
+        <echo>Base samples dir is ${maven.src.dir}/samples</echo>
+        <maven:reactor
+            basedir="${maven.src.dir}/samples"
+            includes="project.xml"
+            goals="test"
+            banner="Building"
+            ignoreFailures="false"
+            />
+    </goal>
+
+    <goal name="samples-dist-lib" description="Copies the jars needed by the samples">
+
+        <echo>Base samples dir is ${maven.src.dir}/samples</echo>
+        <maven:reactor
+            basedir="${maven.src.dir}/samples"
+            includes="project.xml"
+            goals="dist-lib"
+            banner="Distributing lib"
+            ignoreFailures="false"
+            />
+    </goal>
+
+    <goal name="dist-webapp-sample" prereqs="setvars">
+        <j:set var="mule.samples.dist.dir" value="${mule.samples.dist}/mule-webapp"/>
+        <mkdir dir="${mule.samples.dist.dir}"/>
+        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/lib"/>
+        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello"/>
+        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest"/>
+        <!--        <mkdir dir="${mule.samples.dist.dir}/src"/>-->
+        <!--        <copy todir="${mule.samples.dist.dir}/src">-->
+        <!--            <fileset dir="src/samples/mule-webapp/src/java"/>-->
+        <!--        </copy>-->
+
+        <copy todir="${mule.samples.dist.dir}" file="src/samples/mule-webapp/maven.xml"/>
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes" file="src/conf/log4j.properties"/>
+
+        <replace token="@VERSION@" value="${pom.currentVersion}" file="${mule.samples.dist.dir}/maven.xml"/>
+        
+        <copy todir="${mule.samples.dist.dir}/webapp">
+            <fileset dir="src/samples/mule-webapp/webapp">
+                <include name="**/*.xml"/>
+                <include name="**/*.jsp"/>
+                <include name="**/*.html"/>
+                <include name="**/*.gif"/>
+            </fileset>
+        </copy>
+
+        <!--        <copy todir="${mule.samples.dist.dir}/src">-->
+        <!--            <fileset dir="src/samples/mule-webapp/src/java"/>-->
+        <!--        </copy>-->
+
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello">
+            <fileset dir="${maven.src.dir}/samples/target/classes/org/mule/samples/hello">
+                <include name="**/*.class"/>
+            </fileset>
+        </copy>
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest">
+            <fileset dir="${maven.src.dir}/samples/target/classes/org/mule/samples/rest">
+                <include name="**/*.class"/>
+            </fileset>
+        </copy>
+    </goal>
+
+    <goal name="dist-samples" prereqs="setvars, compile-samples">
+
+        <!-- dist Echo sample -->
+        <mkdir dir="${mule.samples.dist}"/>
+        <j:set var="mule.sample.name" value="echo"/>
+        <j:set var="mule.sample.testdata" value="false"/>
+        <j:set var="mule.sample.main" value="org.mule.MuleServer"/>
+        <attainGoal name="dist-sample"/>
+
+        <!-- dist Hello sample -->
+        <mkdir dir="${mule.samples.dist}"/>
+        <j:set var="mule.sample.name" value="hello"/>
+        <j:set var="mule.sample.testdata" value="false"/>
+        <j:set var="mule.sample.main" value="org.mule.MuleServer"/>
+        <attainGoal name="dist-sample"/>
+        <!-- Dist Error Handler sample -->
+        <j:set var="mule.sample.name" value="errorhandler"/>
+        <j:set var="mule.sample.testdata" value="true"/>
+        <j:set var="mule.sample.main" value="org.mule.MuleServer"/>
+        <attainGoal name="dist-sample"/>
+
+        <!-- dist loan broker sample -->
+        <mkdir dir="${mule.samples.dist}"/>
+        <j:set var="mule.sample.name" value="loanbroker"/>
+        <j:set var="mule.sample.main" value="org.mule.samples.loanbroker.LoanConsumer"/>
+        <j:set var="mule.sample.testdata" value="false"/>
+        <attainGoal name="dist-sample"/>
+
+        <attainGoal name="dist-webapp-sample"/>
+    </goal>
+
+    <goal name="dist-sample">
+        <j:set var="mule.samples.dist.dir" value="${mule.samples.dist}/${mule.sample.name}"/>
+        <mkdir dir="${mule.samples.dist.dir}"/>
+        <mkdir dir="${mule.samples.dist.dir}/src"/>
+        <mkdir dir="${mule.samples.dist.dir}/conf"/>
+
+        <copy todir="${mule.samples.dist.dir}/conf" file="src/conf/log4j.properties"/>        
+
+        <u:available file="src/samples/${mule.sample.name}/src/java">
+            <copy todir="${mule.samples.dist.dir}/src">
+                <fileset dir="src/samples/${mule.sample.name}/src/java"/>
+            </copy>
+        </u:available>
+
+        <mkdir dir="${mule.samples.dist.dir}/bin"/>
+        <chmod file="${mule.samples.dist.dir}/bin" perm="ugo+rx"/>
+        <copy todir="${mule.samples.dist.dir}/bin">
+            <fileset dir="src/samples/${mule.sample.name}/bin"/>
+        </copy>
+
+	<u:available file="${maven.src.dir}/samples/target/classes/org/mule/samples/${mule.sample.name}">
+        <mkdir dir="${mule.samples.dist.dir}/classes"/>
+        <copy todir="${mule.samples.dist.dir}/classes/org/mule/samples/${mule.sample.name}">
+            <fileset dir="${maven.src.dir}/samples/target/classes/org/mule/samples/${mule.sample.name}">
+                <include name="**/*.class"/>
+            </fileset>
+        </copy>
+        </u:available>
+        <copy todir="${mule.samples.dist.dir}/conf">
+            <fileset dir="src/samples/${mule.sample.name}/conf">
+                <exclude name="test-*.*"/>
+            </fileset>
+        </copy>
+        <j:if test="${mule.sample.testdata}">
+            <copy todir="${mule.samples.dist.dir}/test-data">
+                <fileset dir="src/samples/${mule.sample.name}/test-data"/>
+            </copy>
+        </j:if>
+
+        <attainGoal name="build-classpath"/>
+
+        <j:file name="${mule.samples.dist.dir}/bin/run-with-classpath.bat"
+            escapeText="false" omitXmlDeclaration="true">
+@REM Make sure prerequisite environment variables are set
+if not "%JAVA_HOME%" == "" goto gotJavaHome
+echo The JAVA_HOME environment variable is not defined
+echo This environment variable is needed to run this program
+goto end
+:gotJavaHome
+@REM Setup Environment variables for Mule
+@REM Set any jars you want to appear at the begining of the classpath here
+@REM remember to terminate with a ;
+
+@SET PRE_MULE_CLASSPATH=
+
+@REM Set any jars you want to appear at the end of the classpath here
+@REM remember to terminate with a ;
+
+@SET POST_MULE_CLASSPATH=
+
+@SET MULE_BASE=${mule.base.context.path}
+@SET MULE_PATH=.;../classes;../conf;%MULE_BASE%/dist/mule-${pom.currentVersion}.jar;%MULE_BASE%/dist/mule-extras-spring-${pom.currentVersion}.jar;%PRE_MULE_CLASSPATH%${classpath};%POST_MULE_CLASSPATH%
+@%JAVA_HOME%\bin\java -classpath "%MULE_PATH%" ${mule.sample.main} %1 %2 %3 %4 %5 %6 %7 %8 %9
+
+:end
+        </j:file>
+        <echo>replacing token=${mule.release.lib.dir} with value=%MULE_BASE%/lib in file=${mule.samples.dist.dir}/bin/run-with-classpath.bat</echo>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.bat" token="${mule.release.lib.dir}" value="%MULE_BASE%/lib"/>
+
+        <j:file name="${mule.samples.dist.dir}/bin/run-with-classpath.sh"
+            escapeText="false" omitXmlDeclaration="true">
+#!/bin/sh
+#Make sure prerequisite environment variables are set
+if [ "$JAVA_HOME" = "" ]
+then
+    echo "The JAVA_HOME environment variable is not defined"
+    echo "This environment variable is needed to run this program"
+fi
+
+#Setup Environment variables for Mule
+# Set any jars you want to appear at the begining of the classpath here
+# remember to terminate with a :
+
+PRE_MULE_CLASSPATH=
+
+#Set any jars you want to appear at the end of the classpath here
+#remember to terminate with a :
+
+POST_MULE_CLASSPATH=
+
+MULE_BASE=${mule.base.context.path}
+MULE_PATH=.:../classes:../conf:$$MULE_BASE/dist/mule-${pom.currentVersion}.jar:$$MULE_BASE/dist/mule-extras-spring-${pom.currentVersion}.jar:$$PRE_MULE_CLASSPATH${classpath}:$$POST_MULE_CLASSPATH
+
+#if using cygwin under windows we need to make the paths windows friendly
+case "`uname`" in
+CYGWIN*)
+  if [ -n "$PRE_MULE_CLASSPATH" ] ; then
+    PRE_MULE_CLASSPATH=`cygpath -pw $PRE_MULE_CLASSPATH`;
+  fi
+  if [ -n "$POST_MULE_CLASSPATH" ] ; then
+    POST_MULE_CLASSPATH=`cygpath -pw $POST_MULE_CLASSPATH`;
+  fi
+  if [ -n "$MULE_PATH" ] ; then
+    MULE_PATH=`cygpath -pw $MULE_PATH`;
+  fi
+esac
+
+$$JAVA_HOME/bin/java -classpath $$MULE_PATH ${mule.sample.main} $$@
+
+        </j:file>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token=";" value=":"/>
+        <echo>replacing token=${mule.release.lib.dir} with value=$MULE_BASE/lib in file=${mule.samples.dist.dir}/bin/run-with-classpath.sh</echo>
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="${mule.release.lib.dir}" value="$MULE_BASE/lib"/>
+
+        <replace file="${mule.samples.dist.dir}/bin/run-with-classpath.sh" token="\" value="/"/>
+    </goal>
+</project>

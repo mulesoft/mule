@@ -1,0 +1,8 @@
+connector=org.mule.providers.soap.glue.GlueConnector
+dispatcher.factory=org.mule.providers.soap.glue.GlueMessageDispatcherFactory
+message.receiver=org.mule.providers.soap.glue.GlueMessageReceiver
+message.adapter=org.mule.providers.DefaultMessageAdapter
+inbound.transformer=
+outbound.transformer=
+endpoint.builder=org.mule.providers.soap.SoapEndpointBuilder
+service.finder=org.mule.providers.soap.SoapServiceFinder

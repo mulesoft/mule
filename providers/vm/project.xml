@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-vm-provider</artifactId>
+    <name>Mule VM Provider</name>
+    <description>A Mule provider that enables event sending and receiving over VM or embedded memory queues. These
+        queues can be persistent or transient. for more information see the
+        <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
+    </description>
+    <shortDescription>vm</shortDescription>
+    <url>http://www.muleumo.org/doc/providers/vm/</url>
+    <dependencies>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule</artifactId>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-tcp-provider</artifactId>
+            <version>SNAPSHOT</version>
+            <url>http://www.muleumo.org</url>
+        </dependency>
+    </dependencies>
+</project>

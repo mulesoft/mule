@@ -1,0 +1,174 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.providers.jms;
+
+import javax.jms.*;
+import javax.naming.Context;
+
+/**
+ * <code>Jms102bSupport</code> is a template class to provide an absstraction to to the Jms 1.0.2b
+ * api specification.
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+
+public class Jms102bSupport extends Jms11Support
+{
+    public Jms102bSupport(Context context, boolean jndiDestinations, boolean forceJndiDestinations)
+    {
+        super(context, jndiDestinations, forceJndiDestinations);
+    }
+
+    public Connection createConnection(ConnectionFactory connectionFactory, String username, String password) throws JMSException
+    {
+        if (connectionFactory == null)
+        {
+            throw new IllegalArgumentException("connectionFactory cannot be null");
+        }
+        if (connectionFactory instanceof QueueConnectionFactory)
+        {
+            return ((QueueConnectionFactory) connectionFactory).createQueueConnection(username, password);
+        } else if (connectionFactory instanceof TopicConnectionFactory)
+        {
+            return ((TopicConnectionFactory) connectionFactory).createTopicConnection(username, password);
+        } else
+        {
+            throw new IllegalArgumentException("Unsupported ConnectionFactory type: " + connectionFactory.getClass().getName());
+        }
+    }
+
+    public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException
+    {
+        if (connectionFactory == null)
+        {
+            throw new IllegalArgumentException("connectionFactory cannot be null");
+        }
+        if (connectionFactory instanceof QueueConnectionFactory)
+        {
+            return ((QueueConnectionFactory) connectionFactory).createQueueConnection();
+        } else if (connectionFactory instanceof TopicConnectionFactory)
+        {
+            return ((TopicConnectionFactory) connectionFactory).createTopicConnection();
+        } else
+        {
+            throw new IllegalArgumentException("Unsupported ConnectionFactory type: " + connectionFactory.getClass().getName());
+        }
+    }
+
+    public Session createSession(Connection connection, boolean transacted, int ackMode, boolean noLocal) throws JMSException
+    {
+        if (connection instanceof XAQueueConnection)
+        {
+            return ((XAQueueConnection) connection).createXAQueueSession();
+        } else if (connection instanceof QueueConnection)
+        {
+            return ((QueueConnection) connection).createQueueSession(transacted, ackMode);
+        } else if (connection instanceof XATopicConnection)
+        {
+            return ((XATopicConnection) connection).createXATopicSession();
+        } else if (connection instanceof TopicConnection)
+        {
+            return ((TopicConnection) connection).createTopicSession(noLocal, ackMode);
+        } else
+        {
+            throw new IllegalArgumentException("Unknown Jms connection: " + connection.getClass().getName());
+        }
+
+    }
+
+    public MessageConsumer createConsumer(Session session, Destination destination, String messageSelector, boolean noLocal, String durableName) throws JMSException
+    {
+        if (destination instanceof Queue)
+        {
+            if (session instanceof XAQueueSession || session instanceof QueueSession)
+            {
+                if (messageSelector != null)
+                {
+                    return ((QueueSession) session).createReceiver((Queue) destination, messageSelector);
+                } else
+                {
+                    return ((QueueSession) session).createReceiver((Queue) destination);
+                }
+            }
+        } else
+        {
+            if (session instanceof XATopicSession || session instanceof TopicSession)
+            {
+                if (durableName == null)
+                {
+                    return ((TopicSession) session).createSubscriber((Topic) destination, messageSelector, noLocal);
+                } else
+                {
+                    return ((TopicSession) session).createDurableSubscriber((Topic) destination, messageSelector, durableName, noLocal);
+                }
+            }
+        }
+        throw new IllegalArgumentException("Session and domain type do not match");
+    }
+
+    public MessageProducer createProducer(Session session, Destination dest) throws JMSException
+    {
+        if (dest instanceof Queue)
+        {
+            if (session instanceof XAQueueSession || session instanceof QueueSession)
+            {
+                return ((QueueSession) session).createSender((Queue) dest);
+            }
+        } else
+        {
+            if (session instanceof XATopicSession || session instanceof TopicSession)
+            {
+                return ((TopicSession) session).createPublisher((Topic) dest);
+            }
+        }
+        throw new IllegalArgumentException("Session and domain type do not match");
+    }
+
+    public void send(MessageProducer producer, Message message) throws JMSException
+    {
+        if(producer instanceof QueueSender) {
+            ((QueueSender)producer).send(message);
+        } else {
+            ((TopicPublisher)producer).publish(message);
+        }
+    }
+
+    public void send(MessageProducer producer, Message message, Destination dest) throws JMSException
+    {
+        if(producer instanceof QueueSender) {
+            ((QueueSender)producer).send((Queue)dest, message);
+        } else {
+            ((TopicPublisher)producer).publish((Topic)dest, message);
+        }
+    }
+
+    public void send(MessageProducer producer, Message message, int ackMode, int priority, long ttl) throws JMSException
+    {
+        if(producer instanceof QueueSender) {
+            ((QueueSender)producer).send(message, ackMode, priority, ttl);
+        } else {
+            ((TopicPublisher)producer).publish(message, ackMode, priority, ttl);
+        }
+    }
+
+    public void send(MessageProducer producer, Message message, Destination dest, int ackMode, int priority, long ttl) throws JMSException
+    {
+        if(producer instanceof QueueSender) {
+            ((QueueSender)producer).send((Queue)dest, message, ackMode, priority, ttl);
+        } else {
+            ((TopicPublisher)producer).publish((Topic)dest, message, ackMode, priority, ttl);
+        }
+    }
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+</style>
+<link rel="stylesheet" href="http://www.muleumo.org/style/maven.css" type="text/css" media="all"></link>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"></meta>
+<meta name="author" content="Ross Mason"></meta>
+<title>Mule Hello World</title>
+</head>
+<body>
+<h2>Http POST</h2>
+Http POST will send an event to the Mule server and return a result once the request has been <br/>
+processed.  This example uses the <a target="_blank" href="http://wiki.muleumo.org/display/MULE/Servlet+Provider">Servlet provider</a>.
+<p/>
+
+Please enter your name:
+<form method="POST" name="submitName" action="/mule/rest/greeter">
+    <table>
+        <tr><td>
+            <input type="text" name="payload"/></td><td><input type="submit" value="POST" />
+        </td></tr>
+    </table>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <pomVersion>3</pomVersion>
+    <name>Mule</name>
+    <id>mule</id>
+    <groupId>mule</groupId>
+    <currentVersion>1.0</currentVersion>
+    <organization>
+        <name>Cubis Limited</name>
+<!--url>http://www.cubis.co.uk/</url>
+        <logo>/images/cubis-logo.gif</logo-->
+    </organization>
+
+    <inceptionYear>2003</inceptionYear>
+    <package>org.mule</package>
+    <logo>http://www.muleumo.org/images/mule-logo.gif</logo>
+    <shortDescription>Mule - Universal Message Objects</shortDescription>
+    <description>Mule is a simple yet robust and highly scalable ESB services framework. It is designed as a
+        light-weight, event-driven component technology that handles communication with disparate systems transparently
+        providing a simple component interface.</description>
+    <url>http://www.muleumo.org</url>
+    <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
+    <siteAddress>www.muleumo.org</siteAddress>
+    <siteDirectory>/var/www/html/muleumo.org/</siteDirectory>
+    <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
+    <!-- repository CVS -->
+    <repository>
+        <!--        <connection>scm:cvs:pserver:anonymous@cvs.sourceforge.net:/cvsroot/mule:mule</connection>-->
+        <developerConnection>scm:cvs:ext:${maven.username}@cvs.sourceforge.net:/cvsroot/mule:mule</developerConnection>
+        <url>http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/mule</url>
+    </repository>
+    <mailingLists>
+        <mailingList>
+            <name>Mule Developer List</name>
+            <subscribe>http://lists.sourceforge.net/lists/listinfo/mule-developer</subscribe>
+            <unsubscribe>http://lists.sourceforge.net/lists/listinfo/mule-developer</unsubscribe>
+            <archive>http://sourceforge.net/mailarchive/forum.php?forum=mule-developer</archive>
+        </mailingList>
+    </mailingLists>
+    <developers>
+        <developer>
+            <name>Ross Mason</name>
+            <id>rossmason</id>
+            <email>ross.mason@cubis.co.uk</email>
+            <organization>Cubis Limited</organization>
+        </developer>
+        <developer>
+            <name>Ian De Beer</name>
+            <id>iandbeer</id>
+            <email></email>
+        </developer>
+        <developer>
+            <name>Magnus Stattin</name>
+            <id>mgnus_sattin</id>
+            <email></email>
+        </developer>
+        <developer>
+            <!-- Stephane Vanmeerhaeghe -->
+            <name>St&#233;phane Vanmeerhaeghe</name>
+            <id></id>
+            <email></email>
+        </developer>
+    </developers>
+    <contributors>
+        <contributor>
+            <name>Ben Alex</name>
+            <id></id>
+            <email></email>
+        </contributor>
+        <contributor>
+            <name>Guillaume Nodet</name>
+            <id></id>
+            <email></email>
+        </contributor>
+        <contributor>
+            <name>Andy Depue</name>
+            <id></id>
+            <email></email>
+        </contributor>
+        <contributor>
+            <!-- Jerome Bernard -->
+            <name>J&#233;r&#244;me Bernard</name>
+            <id></id>
+            <email></email>
+        </contributor>
+        <contributor>
+            <name>Stefan Ledent</name>
+            <id></id>
+            <email></email>
+        </contributor>
+        <contributor>
+            <name>Brian Kalbfus</name>
+            <email></email>
+        </contributor>
+        <contributor>
+            <name>Michael Watson</name>
+            <id>mwatson</id>
+            <organization>Estafet Limited</organization>
+        </contributor>
+        <contributor>
+            <name>Robert Leftwich</name>
+            <id></id>
+            <email></email>
+        </contributor>
+    </contributors>
+    <dependencies>
+        <!-- required: used by the core server -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>concurrent</groupId>-->
+        <!--            <artifactId>concurrent</artifactId>-->
+        <!--            <version>1.3.4</version>-->
+        <!--            <url>http://g.oswego.edu</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!-- required used by the core server -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>commons-beanutils</groupId>-->
+        <!--            <artifactId>commons-beanutils</artifactId>-->
+        <!--            <version>1.6.1</version>-->
+        <!--            <url>http://jakarta.apache.org/commons/beanutils/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--        <dependency>-->
+        <!--            <groupId>commons-collections</groupId>-->
+        <!--            <artifactId>commons-collections</artifactId>-->
+        <!--            <version>2.1</version>-->
+        <!--            <url>http://jakarta.apache.org/commons/collections/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>commons-discovery</groupId>-->
+        <!--            <artifactId>commons-discovery</artifactId>-->
+        <!--            <version>0.2-dev</version>-->
+        <!--            <url>http://jakarta.apache.org/commons/discovery/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--        <dependency>-->
+        <!--            <groupId>commons-logging</groupId>-->
+        <!--            <artifactId>commons-logging</artifactId>-->
+        <!--            <version>1.0.3</version>-->
+        <!--            <url>http://jakarta.apache.org/commons/logging/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!-- Optional: used by mules default component pooling mechanism -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>commons-pool</groupId>-->
+        <!--            <artifactId>commons-pool</artifactId>-->
+        <!--            <version>1.1</version>-->
+        <!--            <url>http://jakarta.apache.org/commons/pool/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--  Required J2ee transaction api -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>jta</groupId>-->
+        <!--            <artifactId>jta</artifactId>-->
+        <!--            <jar>jta-1.0.1b.jar</jar>-->
+        <!--            <url>http://java.sun.com/jta</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--  Optional for MuleXmlConfigurationBuilder -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>commons-digester</groupId>-->
+        <!--            <artifactId>commons-digester</artifactId>-->
+        <!--            <version>1.5</version>-->
+        <!--            <url>http://jakarta.apache.org/commons/digester/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--  Optional: JXPath filtering of events -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>commons-jxpath</groupId>-->
+        <!--            <artifactId>commons-jxpath</artifactId>-->
+        <!--            <version>1.1</version>-->
+        <!--            <url>http://jakarta.apache.org/commons/jxpath/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--  Optional used by Xml based filters and transformers -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>dom4j</groupId>-->
+        <!--            <artifactId>dom4j</artifactId>-->
+        <!--            <version>1.4</version>-->
+        <!--            <url>http://www.dom4j.org</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--  Optional used for test cases -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>junit</groupId>-->
+        <!--            <artifactId>junit</artifactId>-->
+        <!--            <version>3.8.1</version>-->
+        <!--            <url>http://junit.sourceforge.net/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <ignore>true</ignore>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--        <dependency>-->
+        <!--            <groupId>mockobjects</groupId>-->
+        <!--            <artifactId>mockobjects</artifactId>-->
+        <!--            <version>core-0.09</version>-->
+        <!--            <properties>-->
+        <!--                <ignore>true</ignore>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--  optional for servlet container integration -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>servletapi</groupId>-->
+        <!--            <artifactId>servletapi</artifactId>-->
+        <!--            <version>2.3</version>-->
+        <!--            <url>http://jakarta.apache.org/tomcat/tomcat-5.0-doc/servletapi/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <ignore>false</ignore>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+
+        <!--  Required UUID generator -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>jug</groupId>-->
+        <!--            <artifactId>jug</artifactId>-->
+        <!--            <version>1.0.3</version>-->
+        <!--            <url>http://www.doomdark.org/doomdark/proj/jug/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+
+        <!--  Optional logging -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>log4j</groupId>-->
+        <!--            <artifactId>log4j</artifactId>-->
+        <!--            <version>1.2.8</version>-->
+        <!--            <url>http://jakarta.apache.org/log4j/docs/index.html</url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+
+        <!--  Optional file context jndi jars -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>fscontext</groupId>-->
+        <!--            <artifactId>fscontext</artifactId>-->
+        <!--            <jar>fscontext.jar</jar>-->
+        <!--            <url></url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+
+        <!--        <dependency>-->
+        <!--            <groupId>providerutil</groupId>-->
+        <!--            <artifactId>providerutil</artifactId>-->
+        <!--            <version></version>-->
+        <!--            <jar>providerutil.jar</jar>-->
+        <!--            <url></url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--  XStream for de/serialising objects -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>xstream</groupId>-->
+        <!--          <artifactId>xstream</artifactId>-->
+        <!--          <version>1.0.2</version>-->
+        <!--          <url>http://xstream.codehaus.org</url>-->
+        <!--          <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>xpp3</groupId>-->
+        <!--          <artifactId>xpp3</artifactId>-->
+        <!--          <version>1.1.3.4d_b4_min</version>-->
+        <!--          <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+
+        <!--  used by Jms provider and jms related tests -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>jms</groupId>-->
+        <!--            <artifactId>jms</artifactId>-->
+        <!--            <version>1.1</version>-->
+        <!--            <url></url>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--                <war.bundle>true</war.bundle>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        -->
+        <!--  Jms tests using ActiveMq -->-->
+        <!-- <dependency>-->
+        <!--          <groupId>geronimo-spec</groupId>-->
+        <!--          <artifactId>geronimo-spec-j2ee</artifactId>-->
+        <!--          <version>1.4-rc2</version>-->
+        <!--          <properties>-->
+        <!--            <ignore>true</ignore>-->
+        <!--          </properties>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--          <artifactId>activemq</artifactId>-->
+        <!--          <version>1.1</version>-->
+        <!--          <properties>-->
+        <!--            <ignore>true</ignore>-->
+        <!--          </properties>-->
+        <!--        </dependency>-->-->
+        <!--  testing with Open jms -->-->
+        <!--       <dependency>-->
+        <!--            <groupId>exolabcore</groupId>-->
+        <!--            <artifactId>exolabcore</artifactId>-->
+        <!--            <version>0.3.7</version>-->
+        <!--            <properties>-->
+        <!--                <ignore>true</ignore>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>openjms</groupId>-->
+        <!--            <artifactId>openjms</artifactId>-->
+        <!--            <version>0.7.6.1</version>-->
+        <!--            <properties>-->
+        <!--                <ignore>true</ignore>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+
+        <!--  optional management deps -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>jmxri</groupId>-->
+        <!--            <artifactId>jmxri</artifactId>-->
+        <!--            <version>1.2</version>-->
+        <!--            <properties>-->
+        <!--                <ignore>true</ignore>-->
+        <!--                <mule.core.jar>false</mule.core.jar>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>jmxri</groupId>-->
+        <!--            <artifactId>jmxtools</artifactId>-->
+        <!--            <version>1.2</version>-->
+        <!--            <properties>-->
+        <!--                <ignore>true</ignore>-->
+        <!--                <mule.core.jar>false</mule.core.jar>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>jmxri</groupId>-->
+        <!--            <artifactId>jmxremoting</artifactId>-->
+        <!--            <version>1.2</version>-->
+        <!--            <properties>-->
+        <!--                <ignore>true</ignore>-->
+        <!--                <mule.core.jar>false</mule.core.jar>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--  Optional mx4j Agent support  -->-->
+        <!--        <dependency>-->
+        <!--            <groupId>mx4j</groupId>-->
+        <!--            <artifactId>mx4j-jmx</artifactId>-->
+        <!--            <version>2.1.1</version>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>mx4j</groupId>-->
+        <!--            <artifactId>mx4j-tools</artifactId>-->
+        <!--            <version>2.1.1</version>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>mx4j</groupId>-->
+        <!--            <artifactId>mx4j-remote</artifactId>-->
+        <!--            <version>2.1.1</version>-->
+        <!--            <properties>-->
+        <!--                <mule.core.jar>true</mule.core.jar>-->
+        <!--            </properties>-->
+        <!--        </dependency>-->
+    </dependencies>
+
+    <reports>
+<!--report>maven-pmd-plugin</report>
+        <report>maven-simian-plugin</report-->
+        <report>maven-jdepend-plugin</report>
+        <report>maven-jxr-plugin</report>
+        <!--report>maven-javadoc-plugin</report-->
+<!-- The Clover report MUST be before the JUnit report as the test:test
+            target is run only ONCE (due to the test:test postGoal) and clover needs to
+            "watch" the tests run, while JUnit report simply analyses the output from
+            the tests -->
+        <!--        <report>maven-clover-plugin</report>-->
+        <!--report>maven-junit-report-plugin</report-->
+    </reports>
+</project>

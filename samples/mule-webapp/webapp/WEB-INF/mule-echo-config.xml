@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Samples" version="1.0">
+
+    <mule-descriptor name="echoUMO"
+        inboundEndpoint="vm://echo"
+        implementation="org.mule.components.simple.EchoComponent">
+    </mule-descriptor>
+
+</mule-configuration>
