@@ -17,6 +17,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractRouterCollection;
+import org.mule.transaction.TransactionCallback;
+import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -33,13 +35,14 @@ import java.util.List;
  * OutboundMessageRouter must have atleast one router. By default the first matching
  * router is used to route an event though it is possible to match on all routers meaning
  * that the message will get sent over all matching routers.
- * 
+ *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason </a>
  * @version $Revision$
  */
 
 public class OutboundMessageRouter extends AbstractRouterCollection implements
-        UMOOutboundMessageRouter {
+        UMOOutboundMessageRouter
+{
 
     /**
      * logger used by this class
@@ -47,39 +50,61 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
     protected static transient Log logger = LogFactory
             .getLog(OutboundMessageRouter.class);
 
-    public OutboundMessageRouter() {
+    public OutboundMessageRouter()
+    {
         super(RouterStatistics.TYPE_OUTBOUND);
     }
-    
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
-            throws RoutingException {
+
+    public UMOMessage route(final UMOMessage message, final UMOSession session, final boolean synchronous)
+            throws RoutingException
+    {
 
         UMOMessage result = null;
         boolean matchfound = false;
-        //synchronized(lock) {
-            for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
 
-                UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter) iterator.next();
-                if (umoOutboundRouter.isMatch(message)) {
-                    matchfound = true;
-                    result = umoOutboundRouter.route(message, session, synchronous);
+        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
+        {
+            UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter) iterator.next();
+            if (umoOutboundRouter.isMatch(message))
+            {
+                matchfound = true;
+                //Manage outbound only transactions here
+                final UMOOutboundRouter router = umoOutboundRouter;
+                TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig());
 
-                    if (!isMatchAll()) {
-                        return result;
+                TransactionCallback cb = new TransactionCallback()
+                {
+                    public Object doInTransaction() throws Exception
+                    {
+                        return router.route(message, session, synchronous);
                     }
+                };
+                try
+                {
+                    result = (UMOMessage) tt.execute(cb);
+                } catch (Exception e)
+                {
+                    throw new RoutingException(e.getMessage(), e);
+                }
+
+                if (!isMatchAll())
+                {
+                    return result;
                 }
             }
-        //}
+        }
 
-        if (!matchfound && getCatchAllStrategy() != null) {
+        if (!matchfound && getCatchAllStrategy() != null)
+        {
             logger.debug("Message did not match any routers on: "
                     + session.getComponent().getDescriptor().getName()
                     + " invoking catch all strategy");
             return catchAll(message, session, synchronous);
-        } else if(!matchfound) {
+        } else if (!matchfound)
+        {
             logger.warn("Message did not match any routers on: "
-                            + session.getComponent().getDescriptor().getName()
-                            + " and there is no catch all strategy configured on this router.  Disposing message.");
+                    + session.getComponent().getDescriptor().getName()
+                    + " and there is no catch all strategy configured on this router.  Disposing message.");
         }
         return message;
     }
@@ -87,6 +112,7 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
     /**
      * A helper method for finding out which endpoints a message would be routed to
      * without actually routing the the message
+     *
      * @param message the message to retrieve endpoints for
      * @return an array of UMOEndpoint objects or an empty array
      * @throws RoutingException
@@ -94,25 +120,29 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
     public UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws RoutingException
     {
         List endpoints = new ArrayList();
-        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
+        {
 
             UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter) iterator.next();
-            if (umoOutboundRouter.isMatch(message)) {
+            if (umoOutboundRouter.isMatch(message))
+            {
                 endpoints.addAll(umoOutboundRouter.getEndpoints());
-                if (!isMatchAll()) {
+                if (!isMatchAll())
+                {
                     break;
                 }
             }
         }
         UMOEndpoint[] result = new UMOEndpoint[endpoints.size()];
-        return (UMOEndpoint[])endpoints.toArray(result);
+        return (UMOEndpoint[]) endpoints.toArray(result);
     }
 
     protected UMOMessage catchAll(UMOMessage message, UMOSession session, boolean synchronous)
-            throws RoutingException {
+            throws RoutingException
+    {
 
-        if (getStatistics().isEnabled()) {
-            //getStatistics().incrementNoRoutedMessage();
+        if (getStatistics().isEnabled())
+        {
             getStatistics().incrementCaughtMessage();
         }
 

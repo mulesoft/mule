@@ -26,7 +26,6 @@ public interface UMOTransactionFactory
 {
     /**
      * Create and begins a new transaction
-     * @param session can be any object used to manage the transaction
      * @return a new Transaction
      * @throws UMOTransactionException if the transaction cannot be created or begun
      */

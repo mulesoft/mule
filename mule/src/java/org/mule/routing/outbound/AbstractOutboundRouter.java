@@ -23,6 +23,7 @@ import org.mule.management.stats.RouterStatistics;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.UMOOutboundRouter;
@@ -54,6 +55,8 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     protected PropertyExtractor correlationGroupExtractor = null;
 
     protected RouterStatistics routerStatistics;
+
+    protected UMOTransactionConfig transactionConfig;
 
 
     public void dispatch(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
@@ -228,5 +231,15 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     public void setCorrelationGroupExtractor(PropertyExtractor correlationGroupExtractor)
     {
         this.correlationGroupExtractor = correlationGroupExtractor;
+    }
+
+    public UMOTransactionConfig getTransactionConfig()
+    {
+        return transactionConfig;
+    }
+
+    public void setTransactionConfig(UMOTransactionConfig transactionConfig)
+    {
+        this.transactionConfig = transactionConfig;
     }
 }
