@@ -38,7 +38,7 @@ public class JdbcEndpointTestCase extends NamedTestCase {
     {
         UMOEndpointURI url = new MuleEndpointURI("jdbc://?sql=SELECT * FROM TABLE");
         assertEquals("jdbc", url.getScheme());
-        assertEquals("", url.getAddress());
+        assertEquals(null, url.getAddress());
         assertNull(url.getEndpointName());
         assertNotNull(url.getParams());
         assertEquals("SELECT * FROM TABLE", url.getParams().get("sql"));
