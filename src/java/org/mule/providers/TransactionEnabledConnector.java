@@ -6,8 +6,18 @@
  */
 package org.mule.providers;
 
-import org.mule.transaction.*;
-import org.mule.umo.*;
+import org.mule.transaction.IllegalTransactionStateException;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.TransactionNotInProgressException;
+import org.mule.transaction.TransactionProxy;
+import org.mule.transaction.TransactionRollbackException;
+import org.mule.transaction.TransactionStatusException;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOSession;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.UMOTransactionException;
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 public abstract class TransactionEnabledConnector extends AbstractServiceEnabledConnector
@@ -49,6 +59,7 @@ public abstract class TransactionEnabledConnector extends AbstractServiceEnabled
         {
             try
             {
+                logger.info("Beginning transaction on endpoint: " + endpoint.getEndpointURI());
                 UMOTransaction tx = factory.beginTransaction(session);
                 return TransactionCoordination.getInstance().bindTransaction(tx, endpoint.getTransactionConfig().getConstraint());
             }
@@ -72,6 +83,7 @@ public abstract class TransactionEnabledConnector extends AbstractServiceEnabled
             rollbackTransaction(event);
             return;
         }
+        logger.info("Committing transaction on endpoint: " + event.getEndpoint().getEndpointURI());
 
         UMOEndpoint endpoint = event.getEndpoint();
         byte action = endpoint.getTransactionConfig().getCommitAction();
@@ -105,6 +117,7 @@ public abstract class TransactionEnabledConnector extends AbstractServiceEnabled
 
     public void rollbackTransaction(UMOEvent event) throws TransactionRollbackException, TransactionStatusException
     {
+        logger.info("Rolling back transaction on endpoint: " + event.getEndpoint().getEndpointURI());
         UMOSession session = event.getSession();
         UMOTransaction trans = TransactionCoordination.getInstance().unbindTransaction();
 
