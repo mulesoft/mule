@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.ResponseOutputStream;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -120,8 +121,11 @@ public class TcpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
                         callbackCount++;
                         String result = "Received Async event: " + context.getMessageAsString();
                         assertNotNull(context.getOutputStream());
-                        context.getOutputStream().write(result.getBytes());
-                        context.getOutputStream().flush();
+
+                        if(!((ResponseOutputStream)context.getOutputStream()).getSocket().isClosed()) {
+                            context.getOutputStream().write(result.getBytes());
+                            context.getOutputStream().flush();
+                        };
                         callbackCalled = true;
                     }
                 });
