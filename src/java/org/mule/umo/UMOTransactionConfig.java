@@ -36,9 +36,9 @@ public interface UMOTransactionConfig
 
     public void setFactory(UMOTransactionFactory factory);
 
-    public byte getBeginAction();
+    public byte getAction();
 
-    public void setBeginAction(byte action);
+    public void setAction(byte action);
 
     public boolean isTransacted();
 

@@ -37,7 +37,7 @@ public class TransactionTemplate {
 		if (config == null) {
 			return callback.doInTransaction();
 		} else {
-	        byte action = config.getBeginAction();
+	        byte action = config.getAction();
 			UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
 			
 			if (action == UMOTransactionConfig.ACTION_NONE && tx != null) {

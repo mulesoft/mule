@@ -14,9 +14,9 @@ package org.mule.providers;
 
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import org.apache.commons.collections.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.DisposeException;
 import org.mule.InitialisationException;
 import org.mule.MuleException;
 import org.mule.MuleManager;
@@ -97,7 +97,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * A pool of dispatchers for this connector, the pool is keyed on endpointUri
      */
-    protected LRUMap dispatchers;
+    protected Map dispatchers;
 
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
@@ -153,7 +153,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         //make sure we always have an exception strategy
         exceptionStrategy = new DefaultExceptionStrategy();
-        dispatchers = new LRUMap(16);
+        dispatchers = new ConcurrentHashMap();
         receivers = new ConcurrentHashMap();
     }
 
@@ -313,13 +313,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             //Map.Entry entry;
             logger.debug("Disposing Dispatchers");
             Object entry = null;
-            while(dispatchers.size() != 0) {
-                entry = dispatchers.remove(dispatchers.getFirstKey());
-                //Not sure why this entry cna be null, but ometimes it is??
-                if(entry!=null) {
-                    ((UMOMessageDispatcher) entry).dispose();
-                }
+            for (Iterator iterator = dispatchers.values().iterator(); iterator.hasNext();)
+            {
+                UMOMessageDispatcher umoMessageDispatcher = (UMOMessageDispatcher) iterator.next();
+                umoMessageDispatcher.dispose();
             }
+            dispatchers.clear();
             logger.debug("Dispatchers Disposed");
         }
         disposeConnector();
@@ -404,14 +403,15 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     public synchronized UMOMessageDispatcher getDispatcher(String endpoint) throws UMOException
     {
+        checkDisposed();
         UMOMessageDispatcher dispatcher = null;
         if(endpoint==null || "".equals(endpoint)) endpoint= "ANY";
         if ("ANY".equals(endpoint))
         {
-            dispatcher = (UMOMessageDispatcher) dispatchers.getFirstValue();
+            dispatcher = (UMOMessageDispatcher) dispatchers.values().iterator().next();
             while(dispatcher!=null && dispatcher.isDisposed()) {
                 dispatchers.values().remove(dispatcher);
-                dispatcher = (UMOMessageDispatcher) dispatchers.getFirstValue();
+                dispatcher = (UMOMessageDispatcher) dispatchers.values().iterator().next();
             }
         } else
         {
@@ -431,6 +431,11 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             dispatchers.put(endpoint, dispatcher);
         }
         return dispatcher;
+    }
+
+    protected void checkDisposed() throws DisposeException
+    {
+        if(isDisposed()) throw new DisposeException("Cannot perform action, connector is disposed");
     }
 
     protected UMOMessageDispatcher createDispatcher() throws UMOException
