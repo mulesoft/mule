@@ -85,6 +85,14 @@
 <!ATTLIST mule-environment-properties recoverableMode   		(true | false)          "false">
 
 <!--
+     Determines whether Mule amule instance is runnig in client mode.  client mode means that
+     certain Mule Manager services are not started suhc as the the Admin component and the Server
+     event manager.  The only time a user would need to set variable explicitly is if they
+     where configuring a Mule instance via Xml config for client-only usage.
+-->
+<!ATTLIST mule-environment-properties clientMode   		(true | false)          "false">
+
+<!--
 A pooling profile is used to configure the pooling behaviour of UMO components.
 each descriptor can set it's own pooling profile or a default one can be set
 on the mule-configuration.
