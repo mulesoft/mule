@@ -11,7 +11,7 @@
 
 -->
 
-<!ELEMENT mule-configuration ((mule-environment-properties)?,(environment-properties)?, (transaction-manager)?,
+<!ELEMENT mule-configuration ((mule-environment-properties)?,(environment-properties)?, (security-manager)?, (transaction-manager)?,
             (agents)?,(connector)*,(endpoint-identifiers)?,(transformers)?,(global-endpoints)?,
 		    (interceptor-stack)*,(container-context)?,(model)+,(mule-descriptor)*)>
 
@@ -58,6 +58,11 @@
      This property determines how long to wait for a receive
 -->
 <!ATTLIST mule-environment-properties synchronousEventTimeout  		NMTOKEN                 #IMPLIED>
+
+<!--
+     Default transaction timeout
+-->
+<!ATTLIST mule-environment-properties transactionTimeout  		NMTOKEN                 #IMPLIED>
 
 <!--
      Determines whether when running synchronously, return events are received before
@@ -245,15 +250,45 @@ threading in every connector
 <!ELEMENT transaction-manager (properties?)>
 
 <!--
-	The <i>factory</i> specifies the transaction manager factory to use to 
+	The <i>factory</i> specifies the transaction manager factory to use to
 	create a transaction manager for the Mule server
-	
+
 	The <i>property</i> element allows to add custom attributes.  Each of the
 	key value pair attributes will be passed to the connection as a HashMap
 	The connection implementation will then handle how these properties are set.
 -->
 
 <!ATTLIST transaction-manager factory        		NMTOKEN         		#REQUIRED>
+
+<!--
+	This element specifies the security manager to use (if any) for this Mule Server instance
+	The security manager is responsible for managing one or more security providers that can
+    validate user credentials
+
+  -->
+<!ELEMENT security-manager (security-provider+)>
+
+<!--
+	The <i>className</i> is optional and specifies the security manager to use.
+-->
+
+<!ATTLIST security-manager className        		NMTOKEN         		#IMPLIED>
+
+<!--
+   A security provider allows credentials to be authenticated against various credential
+   providers.
+-->
+<!ELEMENT security-provider (properties?)>
+
+<!--
+ A fully qualified class name of the security provider to use
+ -->
+<!ATTLIST security-provider className        		NMTOKEN         		#REQUIRED>
+
+<!--
+ A unique name that identifies the security provider
+ -->
+<!ATTLIST security-provider name        		ID         		#REQUIRED>
 
 <!--
 The <i>connection-descriptor</i> element specifies one or more message
@@ -377,7 +412,7 @@ The <i>connection-descriptor</i> element specifies one or more message
 
 -->
 
-<!ELEMENT endpoint ((transaction)?, (filter)?, (properties)?)>
+<!ELEMENT endpoint ((transaction)?, (filter)?, (security-filter)?, (properties)?)>
 
 <!--
 	The name attribute is used to bind a <i>endpoint</i> to a logical name in the system
@@ -432,7 +467,7 @@ The <i>connection-descriptor</i> element specifies one or more message
 <!--
     A global endpoint reference
 -->
-<!ELEMENT global-endpoint (transaction?, filter?, properties*)>
+<!ELEMENT global-endpoint (transaction?, filter?, security-filter?, properties*)>
 
 <!--
     name
@@ -451,6 +486,25 @@ The <i>connection-descriptor</i> element specifies one or more message
     Used to override the transformers on the global endpoint
 -->
 <!ATTLIST global-endpoint transformers	IDREFS			#IMPLIED>
+
+<!--
+A security filter ensures that all requestsmade via an endpoint will be authenticated
+-->
+<!ELEMENT security-filter (properties?)>
+
+<!--
+By default, all providers registered with the security manager will be
+authenticated against.  However a space separated list of provider names can
+be specified to change the order or the restrict the list of security
+providers used.
+-->
+<!ATTLIST security-filter useProviders	IDREFS			#IMPLIED>
+
+<!--
+A fully qualified classname of the security filter to use on this endpoint
+-->
+<!ATTLIST security-filter className	NMTOKEN			#REQUIRED>
+
 <!--
 	Defines transacitonal behaviour for this endpoint
 -->
@@ -491,6 +545,13 @@ The <i>connection-descriptor</i> element specifies one or more message
 -->
 
 <!ATTLIST transaction commitAction 		(NONE | ALWAYS_COMMIT | COMMIT_IF_POSSIBLE )    		#IMPLIED>
+
+<!--
+	Transaction timeout for transactions initiated from the endpoint associated with
+    this transaction config.
+-->
+
+<!ATTLIST transaction timeout 		NMTOKEN    		#IMPLIED>
 
 <!--
     Constraints can be defined on a send provider to control how and when a transaction
@@ -899,7 +960,7 @@ or relax dtd validation on their parser
 <!--
 	The key identifier for the object to use in the container
 -->
-<!ATTLIST container-property reference 			CDATA		#IMPLIED>
+<!ATTLIST container-property reference 			CDATA		#REQUIRED>
 
 <!--
 	Whether an exception should be thrown if the component is not in the container.
