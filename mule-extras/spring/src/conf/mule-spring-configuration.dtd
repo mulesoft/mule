@@ -369,7 +369,7 @@ The <i>connection-descriptor</i> element specifies one or more message
     	The <i>org.mule.doCompression</i> property determines whether a transformer should 
     	compress/uncompress its data.  This attribute is ignored unless the 
     	transformer named in the className attribute extends 
-    	<i>org.mule.transformers.CompressionTransformer</i>
+    	<i>org.mule.transformers.compression.AbstractCompressionTransformer</i>
     	This is a fairlycommon property but must be specified on the transformer
     	declaration as a property i.e.
     	

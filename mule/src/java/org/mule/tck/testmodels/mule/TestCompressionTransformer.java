@@ -13,15 +13,18 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.transformers.CompressionTransformer;
+import org.mule.transformers.compression.AbstractCompressionTransformer;
+import org.mule.transformers.compression.AbstractCompressionTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.compression.CompressionStrategy;
+import org.mule.util.compression.GZipCompression;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
 
-public class TestCompressionTransformer extends CompressionTransformer
+public class TestCompressionTransformer extends AbstractCompressionTransformer
 {
     private String beanProperty1;
     private String containerProperty;
@@ -74,5 +77,10 @@ public class TestCompressionTransformer extends CompressionTransformer
             throw new IllegalStateException("Transformer cannot be cloned until all properties have been set on it");
         }
         return super.clone();
+    }
+
+    protected CompressionStrategy getStrategy()
+    {
+        return new GZipCompression();
     }
 }

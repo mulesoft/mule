@@ -17,7 +17,6 @@ package org.mule.test.transformers.codec;
 
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.test.transformers.ReverseCompressionTransformer;
 import org.mule.transformers.codec.Base64Encoder;
 import org.mule.transformers.codec.Base64Decoder;
 import org.mule.transformers.codec.UUEncoder;

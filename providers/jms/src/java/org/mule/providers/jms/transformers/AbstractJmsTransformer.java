@@ -32,7 +32,8 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.impl.RequestContext;
 import org.mule.providers.jms.JmsMessageUtils;
-import org.mule.transformers.CompressionTransformer;
+import org.mule.transformers.compression.AbstractCompressionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
@@ -53,10 +54,8 @@ import java.util.Map;
  * @version 1.2
  */
 
-public abstract class AbstractJmsTransformer extends CompressionTransformer
+public abstract class AbstractJmsTransformer extends AbstractTransformer
 {
-    public static final String JMS_PROPERTY_COMPRESSED = "isCompressed";
-
     /**
      * logger used by this class
      */
@@ -116,27 +115,27 @@ public abstract class AbstractJmsTransformer extends CompressionTransformer
                 //throw new TransformerException("You must set the JMS AbstractMessageDispatcher on a AbstractJmsTransformer before using it");
             }
             
-            if (getDoCompression())
-            {
-                byte[] buffer = compressMessage(src);
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Compressing message in transformation");
-                }
-                BytesMessage bMsg = session.createBytesMessage();
-                bMsg.clearBody();
-                bMsg.setBooleanProperty(JMS_PROPERTY_COMPRESSED, true);
-
-                //was getting strange results with the unit tests if I used
-                //bMsg.writeObject(buffer) or bMsg.writeBytes(buffer)  to do with an
-                //optimisation in the server I am testing with.
-                //Doing it byte by byte for now
-                for (int i = 0; i < buffer.length; i++)
-                {
-                    bMsg.writeByte(buffer[i]);
-                }
-                return bMsg;
-            } else {
+//            if (getDoCompression())
+//            {
+//                byte[] buffer = compressMessage(src);
+//                if (logger.isDebugEnabled())
+//                {
+//                    logger.debug("Compressing message in transformation");
+//                }
+//                BytesMessage bMsg = session.createBytesMessage();
+//                bMsg.clearBody();
+//                bMsg.setBooleanProperty(JMS_PROPERTY_COMPRESSED, true);
+//
+//                //was getting strange results with the unit tests if I used
+//                //bMsg.writeObject(buffer) or bMsg.writeBytes(buffer)  to do with an
+//                //optimisation in the server I am testing with.
+//                //Doing it byte by byte for now
+//                for (int i = 0; i < buffer.length; i++)
+//                {
+//                    bMsg.writeByte(buffer[i]);
+//                }
+//                return bMsg;
+//            } else {
                 Message msg = null;
                 if (src instanceof Message) {
                     msg = (Message)src;
@@ -166,7 +165,7 @@ public abstract class AbstractJmsTransformer extends CompressionTransformer
                 }
 
                 return msg;
-            }
+         //   }
         } catch (Exception e)
         {
             throw new TransformerException("Failed to transform message: " + e, e);

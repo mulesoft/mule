@@ -102,7 +102,6 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         UMOTransformer t = MuleManager.getInstance().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
-        assertTrue(((TestCompressionTransformer) t).getDoCompression());
         //This will only work with the MuleXml Builder other implementations
         //will have to set this proerty manually or mimic Mules behaviour
         Assert.assertEquals("this was set from the manager properties!", ((TestCompressionTransformer) t).getBeanProperty1());

@@ -146,46 +146,46 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
         assertTrue("source and result messages should be the same", text.equals(res));
     }
 
-    public void testTransCompressMessage() throws Exception
-    {
-        RequestContext.setEvent(getTestEvent("test"));
-        logger.debug("testTransCompressMessage()");
-        String text = "This is a tests Compressed Byte Message";
-        AbstractJmsTransformer trans = new ObjectToJMSMessage();
-        trans.setReturnClass(Message.class);
-        trans.setDoCompression(true);
-        Object result2 = trans.transform(text, session);
-        logger.debug("transformed object is of type " + result2.getClass().getName());
-        assertTrue("Transformed object should be an Bytes message", result2 instanceof BytesMessage);
-        BytesMessage bMsg = (BytesMessage) result2;
-        logger.debug("created Bytes Message: " + bMsg);
-        AbstractJmsTransformer trans2 = new JMSMessageToObject();
-        trans2.setReturnClass(byte[].class);
-        trans2.setDoCompression(true);
-        Object result = trans2.transform(bMsg, session);
-        logger.debug("transformed object is of type " + result.getClass().getName());
-        //If message is type byte[] on this test it seems the JMS server implementation
-        //uncompresses messages automatically.  There are separent test cases for
-        //Compression methods anyway.
-        //assertTrue("Transformed object should be a String", result instanceof String);
-
-        String temp = null;
-        if (result instanceof byte[])
-        {
-            temp = new String((byte[]) result);
-        }
-        else if (result instanceof String)
-        {
-            temp = (String) result;
-        }
-        else
-        {
-            assertTrue("Expected return type of message should be String or byte[] instead was: "
-                    + result.getClass().getName(), false);
-        }
-        logger.debug("result message is " + temp);
-        assertTrue("source and result messages should be the same", text.equals(temp));
-    }
+//    public void testTransCompressMessage() throws Exception
+//    {
+//        RequestContext.setEvent(getTestEvent("test"));
+//        logger.debug("testTransCompressMessage()");
+//        String text = "This is a tests Compressed Byte Message";
+//        AbstractJmsTransformer trans = new ObjectToJMSMessage();
+//        trans.setReturnClass(Message.class);
+//        trans.setDoCompression(true);
+//        Object result2 = trans.transform(text, session);
+//        logger.debug("transformed object is of type " + result2.getClass().getName());
+//        assertTrue("Transformed object should be an Bytes message", result2 instanceof BytesMessage);
+//        BytesMessage bMsg = (BytesMessage) result2;
+//        logger.debug("created Bytes Message: " + bMsg);
+//        AbstractJmsTransformer trans2 = new JMSMessageToObject();
+//        trans2.setReturnClass(byte[].class);
+//        trans2.setDoCompression(true);
+//        Object result = trans2.transform(bMsg, session);
+//        logger.debug("transformed object is of type " + result.getClass().getName());
+//        //If message is type byte[] on this test it seems the JMS server implementation
+//        //uncompresses messages automatically.  There are separent test cases for
+//        //Compression methods anyway.
+//        //assertTrue("Transformed object should be a String", result instanceof String);
+//
+//        String temp = null;
+//        if (result instanceof byte[])
+//        {
+//            temp = new String((byte[]) result);
+//        }
+//        else if (result instanceof String)
+//        {
+//            temp = (String) result;
+//        }
+//        else
+//        {
+//            assertTrue("Expected return type of message should be String or byte[] instead was: "
+//                    + result.getClass().getName(), false);
+//        }
+//        logger.debug("result message is " + temp);
+//        assertTrue("source and result messages should be the same", text.equals(temp));
+//    }
 
     protected void setUp() throws Exception
     {

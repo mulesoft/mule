@@ -28,7 +28,7 @@ public class DomXmlTransformersTestCase extends AbstractTransformerTestCase
 
     protected void setUp() throws Exception
     {
-        srcData = Utility.fileToString("src/test/conf/cdcatalog.xml");
+        srcData = Utility.loadResourceAsString("cdcatalog.xml", getClass());
         org.dom4j.Document dom4jDoc = DocumentHelper.parseText(srcData);
         resultData = new DOMWriter().write(dom4jDoc);
     }

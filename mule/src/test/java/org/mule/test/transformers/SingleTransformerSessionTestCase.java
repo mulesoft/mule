@@ -14,12 +14,11 @@ package org.mule.test.transformers;
 
 import junit.framework.TestCase;
 import org.mule.transformers.SingleTransformerSession;
+import org.mule.transformers.codec.Base64Encoder;
+import org.mule.transformers.codec.Base64Decoder;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <p/>
- * <code>MultiTransformerTestCase</code> TODO (document class)
- *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
@@ -27,7 +26,8 @@ public class SingleTransformerSessionTestCase extends TestCase
 {
     private static final String TEST_DATA = "the quick brown fox jumped over the lazy dog";
 
-    private ReverseCompressionTransformer trans;
+    private Base64Encoder trans;
+    private Base64Decoder roundtripTrans;
 
     public void testBeginCommitBehaviour() throws Exception
     {
@@ -38,7 +38,7 @@ public class SingleTransformerSessionTestCase extends TestCase
         assertTrue(sts.isInSession());
         Object result = sts.transform(TEST_DATA);
         assertTrue(sts.isInSession());
-        assertEquals(TEST_DATA, new StringBuffer(result.toString()).reverse().toString());
+        assertEquals(TEST_DATA, new String(roundtripTrans.transform(result).toString()));
 
         sts.rollback();
         assertEquals(TEST_DATA, sts.getData());
@@ -46,7 +46,7 @@ public class SingleTransformerSessionTestCase extends TestCase
 
         result = sts.transform(TEST_DATA);
         assertTrue(sts.isInSession());
-        assertEquals(TEST_DATA, new StringBuffer(result.toString()).reverse().toString());
+        assertEquals(TEST_DATA, new String(roundtripTrans.transform(result).toString()));
 
         sts.commit();
         assertEquals(result, sts.getData());
@@ -98,7 +98,8 @@ public class SingleTransformerSessionTestCase extends TestCase
 	 */
     protected void setUp() throws Exception
     {
-        trans = new ReverseCompressionTransformer();
+        trans = new Base64Encoder();
+        roundtripTrans = new Base64Decoder();
     }
 
 }
