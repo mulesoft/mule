@@ -15,8 +15,10 @@
 package org.mule.transaction;
 
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransactionFactory;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>XaTransactionFactory</code> Is used to create/retreive a Transaction
@@ -32,14 +34,14 @@ public class XaTransactionFactory implements UMOTransactionFactory
     {
     }
 
-    public UMOTransaction beginTransaction() throws UMOTransactionException
+    public UMOTransaction beginTransaction() throws TransactionException
     {
     	try {
         	XaTransaction xat = new XaTransaction();
         	xat.begin();
         	return xat;
     	} catch (Exception e) {
-    		throw new UMOTransactionException("Can not start xa transaction", e);
+    		throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "XA"), e);
     	}
     }
 

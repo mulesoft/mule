@@ -1,0 +1,122 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.config.i18n;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
+import java.util.Map;
+import java.util.HashMap;
+
+/**
+ * <code>Messages</code> TODO
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
+public class Messages implements CoreMessageConstants
+{
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(Messages.class);
+
+    public static final String DEFAULT_BUNDLE = "core";
+
+    private static Map bundles = new HashMap();
+
+    private static Object[] emptyArgs = new Object[]{};
+
+     public static String get(int code) {
+        return getString(DEFAULT_BUNDLE, code, emptyArgs);
+    }
+
+    public static String get(int code, Object[] args) {
+        if(args==null) {
+            args = Messages.emptyArgs;
+        }
+        return getString(DEFAULT_BUNDLE, code, args);
+    }
+
+    public static String get(int code, Object arg1) {
+        if(arg1==null)  arg1 = "null";
+        return getString(DEFAULT_BUNDLE, code, new Object[]{arg1});
+    }
+
+    public static String get(int code, Object arg1, Object arg2) {
+        if(arg1==null)  arg1 = "null";
+        if(arg2==null)  arg2 = "null";
+        return getString(DEFAULT_BUNDLE, code, new Object[]{arg1, arg2});
+    }
+
+    public static String get(int code, Object arg1, Object arg2, Object arg3) {
+        if(arg1==null)  arg1 = "null";
+        if(arg2==null)  arg2 = "null";
+        if(arg3==null)  arg3 = "null";
+        return getString(DEFAULT_BUNDLE, code, new Object[]{arg1, arg2, arg3});
+    }
+
+    public static String get(String bundle, int code) {
+        return getString(bundle, code, emptyArgs);
+    }
+
+    public static String get(String bundle, int code, Object[] args) {
+        if(args==null) {
+            args = Messages.emptyArgs;
+        }
+        return getString(bundle, code, args);
+    }
+
+    public static String get(String bundle, int code, Object arg1) {
+        if(arg1==null)  arg1 = "null";
+        return getString(bundle, code, new Object[]{arg1});
+    }
+
+    public static String get(String bundle, int code, Object arg1, Object arg2) {
+        if(arg1==null)  arg1 = "null";
+        if(arg2==null)  arg2 = "null";
+        return getString(bundle, code, new Object[]{arg1, arg2});
+    }
+
+    public static String get(String bundle, int code, Object arg1, Object arg2, Object arg3) {
+        if(arg1==null)  arg1 = "null";
+        if(arg2==null)  arg2 = "null";
+        if(arg3==null)  arg3 = "null";
+        return getString(bundle, code, new Object[]{arg1, arg2, arg3});
+    }
+
+    public static String getString(String bundle, int code, Object[] args)
+    {
+        String m = getBundle(bundle).getString(String.valueOf(code));
+        if(m==null) {
+            logger.error("Failed to find message for id " + code + " in resource bundle " + bundle);
+            return "";
+        }
+        return MessageFormat.format(m, args);
+    }
+
+    protected static ResourceBundle getBundle(String name)
+    {
+        ResourceBundle bundle = (ResourceBundle)bundles.get(name);
+        if(bundle ==null) {
+            String path = "META-INF.services.org.mule.i18n." + name + "-messages";
+            logger.debug("Loading resource bundle: " + path);
+            bundle = ResourceBundle.getBundle(path);
+            bundles.put(name, bundle);
+        }
+        return bundle;
+    }
+}

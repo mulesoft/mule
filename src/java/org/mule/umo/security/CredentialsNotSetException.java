@@ -14,6 +14,8 @@
 package org.mule.umo.security;
 
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.UMOMessage;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>CredentialsNotSetException</code> is thrown when user credentials
@@ -24,25 +26,18 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  */
 public class CredentialsNotSetException extends UnauthorisedException
 {
-    /**
-     * @param message the exception message
-     */
-    public CredentialsNotSetException(String message)
+    public CredentialsNotSetException(Message message, UMOMessage umoMessage)
     {
-        super(message);
+        super(message, umoMessage);
     }
 
-    /**
-     * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
-     */
-    public CredentialsNotSetException(String message, Throwable cause)
+    public CredentialsNotSetException(Message message, UMOMessage umoMessage, Throwable cause)
     {
-        super(message, cause);
+        super(message, umoMessage, cause);
     }
 
-    public CredentialsNotSetException(UMOSecurityContext context, UMOImmutableEndpoint endpoint, UMOEndpointSecurityFilter filter)
+    public CredentialsNotSetException(UMOMessage umoMessage, UMOSecurityContext context, UMOImmutableEndpoint endpoint, UMOEndpointSecurityFilter filter)
     {
-        super(context, endpoint, filter);
+        super(umoMessage, context, endpoint, filter);
     }
 }

@@ -15,6 +15,8 @@ package org.mule.transformers.simple;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,7 +51,7 @@ public class ByteArrayToSerialisable extends AbstractTransformer
             return result;
         } catch (Exception e)
         {
-            throw new TransformerException("Faield to convert byte[] to Object: " + e.getMessage(), e);
+            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "byte[]", "Object"), this, e);
         } finally {
             try
             {

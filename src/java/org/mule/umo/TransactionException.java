@@ -13,33 +13,38 @@
  *
  */
 
-package org.mule.impl;
+package org.mule.umo;
 
-import org.mule.MuleException;
+import org.mule.config.i18n.Message;
 
 /**
- * <code>SessionException</code> is thrown when errors occur in the MuleSession
- * or Seession Manager
+ * <p><code>TransactionException</code> is thrown when an exception occurs
+ * while trying to create, start commit or rollback an exception
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class SessionException extends MuleException
+public class TransactionException extends UMOException
 {
     /**
-     * @param message the exception payload
+     * @param message the exception message
      */
-    public SessionException(String message)
+    public TransactionException(Message message)
     {
         super(message);
     }
 
     /**
-     * @param message the exception payload
-     * @param cause   the exception that triggered this exception
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
      */
-    public SessionException(String message, Throwable cause)
+    public TransactionException(Message message, Throwable cause)
     {
         super(message, cause);
+    }
+
+    public TransactionException(Throwable cause)
+    {
+        super(cause);
     }
 }

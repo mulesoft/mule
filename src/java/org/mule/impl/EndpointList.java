@@ -16,6 +16,8 @@ package org.mule.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.WildcardFilter;
@@ -34,6 +36,7 @@ import java.util.Map;
  * send endpoints and receive endpoints. It also provides helper methods to
  * query manipulate and maintain state of the lists.
  *
+ * @deprecated
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
@@ -204,7 +207,7 @@ public class EndpointList
     {
         if (endpoint == null)
         {
-            throw new MuleException("The endpoint argument is null");
+            throw new MuleException(new Message(Messages.X_IS_NULL, "Endpoint"));
         }
 
         //provider = validateType(provider, true);
@@ -253,7 +256,7 @@ public class EndpointList
     {
         if (endpoint == null)
         {
-            throw new MuleException("The endpoint argument is null");
+            throw new MuleException(new Message(Messages.X_IS_NULL, "Endpoint"));            
         }
         //provider = validateType(provider, false);
         //FIX

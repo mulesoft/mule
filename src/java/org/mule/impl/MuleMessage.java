@@ -15,6 +15,7 @@ package org.mule.impl;
 
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
@@ -34,6 +35,9 @@ import java.util.Map;
 public class MuleMessage implements UMOMessage
 {
     private UMOMessageAdapter adapter;
+
+    protected UMOExceptionPayload exceptionPayload;
+
 
     public MuleMessage(UMOMessageAdapter message)
     {
@@ -319,26 +323,11 @@ public class MuleMessage implements UMOMessage
         adapter.setCorrelationGroupSize(size);
     }
 
-    /**
-     * If an error occurred during the processing of this message this
-     * will return a value greater than zero
-     *
-     * @return
-     */
-    public int getErrorCode()
-    {
-        return adapter.getErrorCode();
+    public UMOExceptionPayload getExceptionPayload() {
+        return exceptionPayload;
     }
 
-    /**
-     * If an error occurs while processing this message, this error code
-     * should be set to a value greater than zero and the palyoad of the this
-     * message should contain the error details
-     *
-     * @param code
-     */
-    public void setErrorCode(int code)
-    {
-        adapter.setErrorCode(code);
+    public void setExceptionPayload(UMOExceptionPayload exceptionPayload) {
+        this.exceptionPayload = exceptionPayload;
     }
 }

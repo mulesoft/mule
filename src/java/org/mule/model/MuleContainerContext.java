@@ -15,8 +15,10 @@
 
 package org.mule.model;
 
-import org.mule.umo.model.ComponentNotFoundException;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassHelper;
 
 import java.io.Reader;
@@ -36,11 +38,11 @@ public class MuleContainerContext implements UMOContainerContext
     /* (non-Javadoc)
      * @see org.mule.model.UMOContainerContext#getComponent(java.lang.Object)
      */
-    public Object getComponent(Object key) throws ComponentNotFoundException
+    public Object getComponent(Object key) throws ObjectNotFoundException
     {
         if (key == null)
         {
-            throw new ComponentNotFoundException("Component not found for null key");
+            throw new ObjectNotFoundException("Component not found for null key");
         }
         try
         {
@@ -57,7 +59,7 @@ public class MuleContainerContext implements UMOContainerContext
         }
         catch (Exception e)
         {
-            throw new ComponentNotFoundException("Failed to instanciate: " + key.toString() + ". Exception is: " + e.getMessage(), e);
+            throw new ObjectNotFoundException("Failed to instanciate: " + key.toString() + ". Exception is: " + e.getMessage(), e);
         }
     }
 

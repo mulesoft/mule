@@ -46,5 +46,5 @@ public interface UMOEndpointSecurityFilter extends Initialisable
 
     public UMOCredentialsAccessor getCredentialsAccessor();
 
-    public void authenticate(UMOEvent event) throws UMOSecurityException;
+    public void authenticate(UMOEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException, SecurityProviderNotFoundException;
 }

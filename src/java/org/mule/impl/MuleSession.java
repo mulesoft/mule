@@ -19,6 +19,8 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOComponent;
@@ -30,6 +32,8 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.security.UMOSecurityContext;
 import org.mule.util.UUID;
@@ -81,7 +85,7 @@ public final class MuleSession implements UMOSession
     {
         UMOOutboundMessageRouter router = component.getDescriptor().getOutboundRouter();
         if(router==null) {
-            throw new EndpointNotFoundException("There is no outbound router configured on componennt: " + component.getDescriptor().getName());
+            throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X, component.getDescriptor().getName()));            
         }
         router.route(message, this, false);
     }
@@ -94,9 +98,9 @@ public final class MuleSession implements UMOSession
     public void dispatchEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
         logger.debug("Session has received asynchronous event on: " + endpoint);
-        if (endpoint == null && component == null)
+        if (component == null)
         {
-            throw new EndpointNotFoundException("Cannot build null endpoint for session. Session component is also null");
+            throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
         } else if (endpoint==null) {
             endpoint = component.getDescriptor().getOutboundEndpoint();
         }
@@ -113,7 +117,7 @@ public final class MuleSession implements UMOSession
     {
         UMOOutboundMessageRouter router = component.getDescriptor().getOutboundRouter();
         if(router==null) {
-            throw new EndpointNotFoundException("There is no outbound router configured on componennt: " + component.getDescriptor().getName());
+            throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X, component.getDescriptor().getName()));
         }
         return router.route(message, this, true);
     }
@@ -121,9 +125,9 @@ public final class MuleSession implements UMOSession
     public UMOMessage sendEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
         logger.debug("Session has received synchronous event on: " + endpoint);
-        if (endpoint == null && component == null)
+        if (component == null)
         {
-            throw new EndpointNotFoundException("Cannot build null endpoint for session. Session component is also null");
+            throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
         } else if (endpoint == null) {
             endpoint = component.getDescriptor().getOutboundEndpoint();
         }
@@ -147,7 +151,7 @@ public final class MuleSession implements UMOSession
 
             } catch (Exception e)
             {
-                throw new MuleException("Failed to send event through Connector dispatcher: " + e.getMessage(), e);
+                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
 
         } else if(component!=null){
@@ -155,7 +159,7 @@ public final class MuleSession implements UMOSession
             component.dispatchEvent(event);
 
         } else {
-            throw new MuleException("Cannot dispatch event, endpoint is a receiver and there is no current compoenent");
+            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT), event.getMessage(),  event.getEndpoint());
         }
     }
 
@@ -186,7 +190,7 @@ public final class MuleSession implements UMOSession
             }
             catch (Exception e)
             {
-                throw new MuleException("Failed to send event through Connector dispatcher: " + e.getMessage(), e);
+                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
 
         } else if(component!=null){
@@ -194,7 +198,7 @@ public final class MuleSession implements UMOSession
             return component.sendEvent(event);
 
         } else {
-            throw new MuleException("Cannot send event, endpoint is a receiver and there is no current compoenent");
+            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT), event.getMessage(),  event.getEndpoint());
         }
     }
 
@@ -234,7 +238,7 @@ public final class MuleSession implements UMOSession
             return dispatcher.receive(endpoint.getEndpointURI(), timeout);
         } catch (Exception e)
         {
-            throw new MuleException("Failed to receive event: " + e.getMessage(), e);
+            throw new ReceiveException(endpoint.getEndpointURI(), timeout, e);
         }
     }
 
@@ -244,11 +248,7 @@ public final class MuleSession implements UMOSession
 
         if (endpoint == null)
         {
-            throw new MuleException("When creating an event the proivder cannot be null");
-        }
-        if (message == null)
-        {
-            throw new MuleException("When creating an event the data and/or the properties must be set");
+            throw new DispatchException(new Message(Messages.X_IS_NULL, "Outbound Endpoint"), message, endpoint);
         }
         //Use default transformer if none is set
         if(endpoint.getTransformer() == null)
@@ -270,8 +270,7 @@ public final class MuleSession implements UMOSession
         }
         catch (Exception e)
         {
-            throw new MuleException("Failed to create event using endpoint: " + endpoint.getConnector().getClass().getName(),
-                    e);
+            throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Event"), message, endpoint, e);
         }
     }
 

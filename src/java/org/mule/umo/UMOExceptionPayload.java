@@ -11,24 +11,24 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.umo.routing;
+package org.mule.umo;
+
+import java.util.Map;
 
 /**
- * <code>RoutingFailureException</code> TODO
+ * <code>UMOExceptionPayload</code> is a message payload that contains exception information
+ * that occurred during message processing
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
+public interface UMOExceptionPayload {
 
-public class RoutingFailureException extends RoutingException
-{
-    public RoutingFailureException(String message)
-    {
-        super(message);
-    }
+    public int getCode();
 
-    public RoutingFailureException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+    public String getMessage();
+
+    public Map getInfo();
+
+    public Throwable getException();
 }

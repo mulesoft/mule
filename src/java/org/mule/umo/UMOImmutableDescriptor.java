@@ -22,6 +22,7 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.HashMap;
 import java.util.List;
+import java.beans.ExceptionListener;
 
 /**
  * <code>UMODescriptor</code> describes all the properties for a Mule UMO.  New Mule UMOs
@@ -38,7 +39,7 @@ public interface UMOImmutableDescriptor
      * @return the exception strategy to use. If none has been set a default
      *         will be used.
      */
-    UMOExceptionStrategy getExceptionStrategy();
+    ExceptionListener getExceptionListener();
 
     /**
      * The inbound Provider to use when receiveing an event. This

@@ -15,6 +15,8 @@
 
 package org.mule.transaction;
 
+import org.mule.config.i18n.Message;
+
 
 /**
  * <p><code>TransactionNotInProgressException</code> TODO (document class)
@@ -24,20 +26,19 @@ package org.mule.transaction;
  */
 public class TransactionNotInProgressException extends TransactionStatusException
 {
-
     /**
-     * @param message
+     * @param message the exception message
      */
-    public TransactionNotInProgressException(String message)
+    public TransactionNotInProgressException(Message message)
     {
         super(message);
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
      */
-    public TransactionNotInProgressException(String message, Throwable cause)
+    public TransactionNotInProgressException(Message message, Throwable cause)
     {
         super(message, cause);
     }

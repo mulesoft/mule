@@ -13,6 +13,8 @@
  */
 package org.mule.umo.endpoint;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 
 /**
@@ -26,19 +28,19 @@ package org.mule.umo.endpoint;
 public class MalformedEndpointException extends EndpointException
 {
     /**
-     * @param message the exception message
+     * @param endpoint the endpoint that could not be parsed
      */
-    public MalformedEndpointException(String message)
+    public MalformedEndpointException(String endpoint)
     {
-        super(message);
+        super(new Message(Messages.ENPOINT_X_IS_MALFORMED, endpoint));
     }
 
     /**
-     * @param message the exception message
+     * @param endpoint the endpoint that could not be parsed
      * @param cause   the exception that cause this exception to be thrown
      */
-    public MalformedEndpointException(String message, Throwable cause)
+    public MalformedEndpointException(String endpoint, Throwable cause)
     {
-        super(message, cause);
+        super(new Message(Messages.ENPOINT_X_IS_MALFORMED, endpoint), cause);
     }
 }

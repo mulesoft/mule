@@ -12,7 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
-package org.mule.umo.model;
+package org.mule.umo.manager;
 
 import java.io.Reader;
 import java.util.Map;
@@ -25,6 +25,6 @@ import java.util.Map;
  */
 public interface UMOContainerContext
 {
-    public Object getComponent(Object key) throws ComponentNotFoundException;
-    public void configure(Reader configuration, Map configurationProperties) throws ComponentResolverException;
+    public Object getComponent(Object key) throws ObjectNotFoundException;
+    public void configure(Reader configuration, Map configurationProperties) throws ContainerException;
 }

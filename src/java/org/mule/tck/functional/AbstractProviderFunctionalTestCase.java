@@ -106,7 +106,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     public static MuleDescriptor getTestDescriptor(String name, String implementation)
     {
         MuleDescriptor descriptor = new MuleDescriptor();
-        descriptor.setExceptionStrategy(new DefaultExceptionStrategy());
+        descriptor.setExceptionListener(new DefaultExceptionStrategy());
         descriptor.setName(name);
         descriptor.setImplementation(implementation);
         return descriptor;

@@ -20,6 +20,8 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassHelper;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.util.Iterator;
 import java.util.List;
@@ -80,7 +82,7 @@ public abstract class AbstractXStreamTransformer extends AbstractTransformer
                 clazz = ClassHelper.loadClass(classname, getClass());
             } catch (ClassNotFoundException e)
             {
-                throw new TransformerException("Failed to load class: " + classname, e);
+                throw new TransformerException(new Message(Messages.CLASS_X_NOT_FOUND, classname), this, e);
             }
             xstream.alias(entry.getKey().toString(), clazz);
         }
@@ -101,7 +103,7 @@ public abstract class AbstractXStreamTransformer extends AbstractTransformer
                 xstream.registerConverter((Converter)clazz.newInstance());
             } catch (Exception e)
             {
-                throw new TransformerException("Failed to load converter: " + classname, e);
+                throw new TransformerException(this, e);
             }
         }
     }

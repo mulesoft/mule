@@ -15,7 +15,7 @@
 
 package org.mule.umo.provider;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -62,7 +62,7 @@ public interface UMOMessageReceiver extends Disposable
      * @param message
      * @param exception
      */
-    public abstract void handleException(Object message, Throwable exception);
+    //public abstract void handleException(Object message, Throwable exception);
 
     /**
      * @return the component associated with the receiver

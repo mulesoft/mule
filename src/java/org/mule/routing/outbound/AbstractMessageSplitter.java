@@ -71,7 +71,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                             logger.debug("CorrelationId is already set, not setting Correlation group size");
                         } else {
                             //the correlationId will be set by the AbstractOutboundRouter
-                            //todo maybe this doesn't have to be set here
+                            //todo maybe the correlationId doesn't have to be set here
                             message.setCorrelationId(correlationId);
                             message.setCorrelationGroupSize(list.size());
                             message.setCorrelationSequence(i++);
@@ -89,7 +89,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                     }
                 } catch (UMOException e)
                 {
-                    throw new CouldNotRouteOutboundMessageException(e.getMessage(), e, message);
+                    throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
                 }
                 if(!multimatch) break;
                 message = getMessagePart(message, endpoint);

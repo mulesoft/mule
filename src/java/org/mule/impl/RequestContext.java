@@ -13,9 +13,7 @@
  */
 package org.mule.impl;
 
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,5 +85,13 @@ public class RequestContext
     public static void clear() {
         setEvent(null);
         clearProperties();
+    }
+
+    public static void setExceptionPayload(UMOExceptionPayload exceptionPayload) {
+        getEvent().getMessage().setExceptionPayload(exceptionPayload);
+    }
+
+    public static UMOExceptionPayload getExceptionPayload() {
+        return getEvent().getMessage().getExceptionPayload();
     }
 }

@@ -13,33 +13,35 @@
  *
  */
 
-package org.mule.umo;
+package org.mule.umo.model;
+
+import org.mule.MuleException;
+import org.mule.umo.model.ModelException;
+import org.mule.config.i18n.Message;
 
 /**
- * <p><code>UMOTransactionException</code> TODO (document class)
+ * <code>SessionException</code> is thrown when errors occur in the MuleSession
+ * or Seession Manager
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class UMOTransactionException extends UMOException
+public class SessionException extends ModelException
 {
     /**
-     * @param message
+     * @param message the exception message
      */
-    public UMOTransactionException(String message)
+    public SessionException(Message message)
     {
         super(message);
-        // TODO Auto-generated constructor stub
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
      */
-    public UMOTransactionException(String message, Throwable cause)
+    public SessionException(Message message, Throwable cause)
     {
         super(message, cause);
-        // TODO Auto-generated constructor stub
     }
-
 }

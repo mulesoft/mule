@@ -13,8 +13,11 @@
  */
 package org.mule.umo.security;
 
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.impl.RequestContext;
 
 /**
  * <code>UnauthorisedException</code> is thrown if authentication fails
@@ -23,43 +26,42 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
  * @version $Revision$
  */
 
-public class UnauthorisedException extends UMOSecurityException
+public class UnauthorisedException extends SecurityException
 {
-    /**
-     * @param message the exception message
-     */
-    public UnauthorisedException(String message)
+    public UnauthorisedException(Message message)
     {
-        super(message);
+        super(message, RequestContext.getEventContext().getMessage());
     }
 
-    /**
-     * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
-     */
-    public UnauthorisedException(String message, Throwable cause)
+    public UnauthorisedException(Message message, Throwable cause)
     {
-        super(message, cause);
+        super(message, RequestContext.getEventContext().getMessage(), cause);
     }
 
-    public UnauthorisedException(UMOSecurityContext context, UMOImmutableEndpoint endpoint, UMOEndpointSecurityFilter filter)
+    public UnauthorisedException(Message message, UMOMessage umoMessage)
     {
-        super(constructMessage(context, endpoint, filter));
+        super(message, umoMessage);
     }
 
-    private static String constructMessage(UMOSecurityContext context, UMOImmutableEndpoint endpoint, UMOEndpointSecurityFilter filter) {
+    public UnauthorisedException(Message message, UMOMessage umoMessage, Throwable cause)
+    {
+        super(message, umoMessage, cause);
+    }
 
-        StringBuffer buf = new StringBuffer();
+    public UnauthorisedException(UMOMessage umoMessage, UMOSecurityContext context, UMOImmutableEndpoint endpoint, UMOEndpointSecurityFilter filter)
+    {
+        super(constructMessage(context, endpoint, filter), umoMessage);
+    }
+
+    private static Message constructMessage(UMOSecurityContext context, UMOImmutableEndpoint endpoint, UMOEndpointSecurityFilter filter) {
+
+        Message m = null;
         if(context==null) {
-            buf.append("Registered authentication is set to ").append(filter.getClass().getName());
-            buf.append(" but there was no security context on the session.");
+            m = new Message(Messages.AUTH_SET_TO_X_BUT_NO_CONTEXT, filter.getClass().getName());
         } else {
-            buf.append("User authentication failed for: " + context.getAuthentication().getPrincipal());
+             m = new Message(Messages.AUTH_FAILED_FOR_USER_X, context.getAuthentication().getPrincipal());
         }
-        buf.append("Failed to ");
-        buf.append((endpoint.getType().equals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER) ? "receive" : "dispatch"));
-        buf.append(" via endpoint ").append(endpoint.getEndpointURI());
-
-        return buf.toString();
+        m.setNextMessage(new Message(Messages.AUTH_DENIED_ON_ENDPOINT_X, endpoint.getEndpointURI()));
+        return m;
     }
 }

@@ -17,21 +17,18 @@ import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.events.ComponentEvent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.ComponentException;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOExceptionStrategy;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.*;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
@@ -40,6 +37,7 @@ import org.mule.util.queue.BoundedPersistentQueue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.beans.ExceptionListener;
 
 /**
  * <code>MuleComponent</code> manages the interaction and distribution of
@@ -109,7 +107,7 @@ public final class MuleComponent implements UMOComponent
      * The exception strategy used by the component, this is provided
      * by the UMODescriptor
      */
-    private UMOExceptionStrategy exceptionStrategy = null;
+    private ExceptionListener exceptionListener = null;
 
     /**
      * Determines if the component has been initilised
@@ -143,11 +141,11 @@ public final class MuleComponent implements UMOComponent
     {
         if (initialised.get())
         {
-            throw new InitialisationException("Component: " + descriptor.getName() + " has already bean initialised");
+            throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALSIED, "Component '" + descriptor.getName() + "'"), this);
         }
         descriptor.initialise();
 
-        this.exceptionStrategy = descriptor.getExceptionStrategy();
+        this.exceptionListener = descriptor.getExceptionListener();
 
         //initialise statistics
         stats = new ComponentStatistics(getName(),
@@ -176,7 +174,7 @@ public final class MuleComponent implements UMOComponent
             throw e;
         } catch (Throwable e)
         {
-            throw new InitialisationException("Failed to component queue: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.X_FAILED_TO_INITIALISE, "Compoennt Queue"), e, this);
         }
         initialised.set(true);
         model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_INITIALISED));
@@ -209,7 +207,7 @@ public final class MuleComponent implements UMOComponent
             poolInitialised.set(true);
         } catch (Exception e)
         {
-            throw new InitialisationException("Mule proxy pool failed to initialise: " + e, e);
+            throw new InitialisationException(new Message(Messages.X_FAILED_TO_INITIALISE, "Proxy Pool"), e, this);
         }
     }
 
@@ -230,7 +228,7 @@ public final class MuleComponent implements UMOComponent
                 proxyPool.stop();
             } catch (Exception e)
             {
-                throw new ComponentException("Failed to start component", this, e);
+                throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Component: " + descriptor.getName()), e, this);
             }
             if (worker != null)
             {
@@ -269,7 +267,7 @@ public final class MuleComponent implements UMOComponent
                 worker.start();
             } catch (Exception e)
             {
-                throw new ComponentException("Failed to start proxy pool", this, e);
+                throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Component: " + descriptor.getName()), e, this);
             }
         }
         model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_STARTED));
@@ -339,7 +337,7 @@ public final class MuleComponent implements UMOComponent
                 dispatcher.dispatch(event);
             } catch (Exception e)
             {
-                throw new DispatchException(e.getMessage(), e);
+                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
             return;
         }
@@ -377,8 +375,8 @@ public final class MuleComponent implements UMOComponent
 
         } catch (InterruptedException e)
         {
-            FailedToQueueEventException e1 = new FailedToQueueEventException("Interrupted while queue event for: " + getName(), e);
-            handleException(event, e1);
+            FailedToQueueEventException e1 = new FailedToQueueEventException(new Message(Messages.INTERRUPTED_QUEUING_EVENT_FOR_X, getName()), event.getMessage(), this, e);
+            handleException(e1);
         }
         logger.trace("Event added to queue for: " + descriptor.getName());
     }
@@ -425,12 +423,12 @@ public final class MuleComponent implements UMOComponent
             } catch (Exception ignore)
             {
             }
-            if (e instanceof MuleException)
+            if (e instanceof UMOException)
             {
                 throw (MuleException) e;
             } else
             {
-                throw new MuleException("Failed to send event through session: " + e, e);
+                throw new ComponentException(event.getMessage(), this, e);
             }
         }
         return result;
@@ -513,15 +511,18 @@ public final class MuleComponent implements UMOComponent
                         proxy.setStatistics(getStatistics());
                     } catch (NoSuchElementException e)
                     {
-                        handleException(event, new ComponentException("Proxy pool timed out. " + e, this, e));
+                        handleException(new ComponentException(new Message(Messages.PROXY_POOL_TIMED_OUT), event.getMessage(), this, e));
+                    } catch (UMOException e)
+                    {
+                        handleException(e);
                     } catch (Exception e)
                     {
-                        handleException(event, new ComponentException("Failed to borrow object from pool: " + e.getMessage(), this, e));
+                        handleException(new ComponentException(new Message(Messages.FAILED_TO_GET_POOLED_OBJECT), event.getMessage(), this, e));
                     }
 
                     if (proxy == null)
                     {
-                        handleException(event, new ComponentException("No proxy was found", this));
+                        handleException(new ComponentException(new Message(Messages.FAILED_TO_GET_POOLED_OBJECT), event.getMessage(), this));
                     }
 
                     if (!proxy.isStarted())
@@ -531,7 +532,7 @@ public final class MuleComponent implements UMOComponent
                             proxy.start();
                         } catch (UMOException e)
                         {
-                            handleException(event, e);
+                            handleException(e);
                         }
                     }
                     proxy.onEvent(event);
@@ -540,22 +541,22 @@ public final class MuleComponent implements UMOComponent
                         threadPool.execute(proxy);
                     } catch (InterruptedException e)
                     {
-                        handleException(event, e);
+                        handleException(new ComponentException(new Message(Messages.EVENT_PROCIESSING_FAILED_FOR_X, descriptor.getName()), event.getMessage(), this, e));
                     }
                 }
             }
         }
     }
 
-    protected void handleException(Object msg, Throwable t)
+    protected void handleException(Exception e)
     {
-        if (exceptionStrategy instanceof DefaultComponentExceptionStrategy)
+        if (exceptionListener instanceof DefaultComponentExceptionStrategy)
         {
-            if (((DefaultComponentExceptionStrategy) exceptionStrategy).getComponent() == null)
+            if (((DefaultComponentExceptionStrategy) exceptionListener).getComponent() == null)
             {
-                ((DefaultComponentExceptionStrategy) exceptionStrategy).setComponent(this);
+                ((DefaultComponentExceptionStrategy) exceptionListener).setComponent(this);
             }
         }
-        exceptionStrategy.handleException(msg, t);
+        exceptionListener.exceptionThrown(e);
     }
 }

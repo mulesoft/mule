@@ -13,7 +13,10 @@
  */
 package org.mule.impl;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>AlreadyInitialisedException</code> is thrown when a component or connector has
@@ -26,19 +29,10 @@ import org.mule.InitialisationException;
 public class AlreadyInitialisedException extends InitialisationException
 {
     /**
-     * @param message
+     * @param object the object that has been initialised can cannot be initialised again
      */
-    public AlreadyInitialisedException(String message)
+    public AlreadyInitialisedException(String name, Object object)
     {
-        super(message);
-    }
-
-    /**
-     * @param message
-     * @param cause
-     */
-    public AlreadyInitialisedException(String message, Throwable cause)
-    {
-        super(message, cause);
+        super(new Message(Messages.OBJECT_X_ALREADY_INITIALSIED, name), object);
     }
 }

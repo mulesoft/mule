@@ -16,6 +16,8 @@ package org.mule.config.builders;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOManager;
 
 import java.net.URL;
@@ -39,6 +41,10 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
 
     public static final String MULE_CONFIGURATION_RESOURCE = "mule-config.xml";
 
+    public MuleClasspathConfigurationBuilder() throws ConfigurationException {
+        super();
+    }
+
     /**
      * Will configure a UMOManager based on the configuration file(s) provided.
      *
@@ -53,17 +59,16 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
     {
         if(configResources!=null && !"".equals(configResources)) {
             if(configResources.indexOf(",") > -1) {
-                throw new ConfigurationException("For this builder the config resources " +
-                        "should be null or a single name of the resuorces to look up");
+                throw new ConfigurationException(new Message(Messages.ONLY_SINGLE_RESOURCE_CAN_BE_SPECIFIED));
             }
         } else {
             configResources = MULE_CONFIGURATION_RESOURCE;
         }
 
+        URL url = null;
         try
         {
             Enumeration e = Thread.currentThread().getContextClassLoader().getResources(configResources);
-            URL url;
             while(e.hasMoreElements()) {
                 url = (URL)e.nextElement();
                 logger.info("Loading resource: " + url.toExternalForm());
@@ -71,7 +76,7 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
             }
         } catch (Exception e)
         {
-            throw new ConfigurationException("Failed ro loand configuration from the claspath: " + e.getMessage(), e);
+            throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X, "Config: " + url.toString()), e);
         }
 
         return manager;

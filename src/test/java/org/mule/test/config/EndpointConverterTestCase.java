@@ -35,7 +35,7 @@ public class EndpointConverterTestCase extends AbstractConverterTestCase
         try
         {
             return getTestEndpoint("test://Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        } catch (UMOException e)
+        } catch (Exception e)
         {
             e.printStackTrace();
             fail(e.getMessage());

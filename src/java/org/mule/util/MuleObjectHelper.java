@@ -18,6 +18,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.service.ConnectorFactoryException;
@@ -65,7 +67,7 @@ public class MuleObjectHelper
             tempTrans = manager.lookupTransformer(key);
             if (tempTrans == null)
             {
-                throw new MuleException("Transformer: " + key.toString() + " has not been registered with Mule");
+                throw new MuleException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Transformer: " + key));
             }
             if (currentTrans == null)
             {
@@ -197,7 +199,7 @@ public class MuleObjectHelper
 
             } catch (Exception e)
             {
-                throw new ConnectorFactoryException("Failed to set bean properties on the connector: " + e.getMessage(), e);
+                throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"), e);
             }
         }
         return connector;

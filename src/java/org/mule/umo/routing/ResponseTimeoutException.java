@@ -11,9 +11,12 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.routing.response;
+package org.mule.umo.routing;
 
 import org.mule.umo.routing.RoutingException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.UMOMessage;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>ResponseTimeoutException</code> is thrown when a response is not received
@@ -25,18 +28,13 @@ import org.mule.umo.routing.RoutingException;
  */
 public class ResponseTimeoutException extends RoutingException
 {
-    public ResponseTimeoutException(String message)
+    public ResponseTimeoutException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
     {
-        super(message);
+        super(message, umoMessage, endpoint);
     }
 
-    public ResponseTimeoutException(String message, Throwable cause)
+    public ResponseTimeoutException(Message message, UMOMessage umoMessage,UMOEndpoint endpoint, Throwable cause)
     {
-        super(message, cause);
-    }
-
-    public ResponseTimeoutException(String message, Throwable cause, Object event)
-    {
-        super(message, cause, event);
+        super(message, umoMessage, endpoint, cause);
     }
 }

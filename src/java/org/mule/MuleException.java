@@ -15,6 +15,7 @@
 package org.mule;
 
 import org.mule.umo.UMOException;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>MuleException</code> Is the base exception type for the Mule application
@@ -29,17 +30,21 @@ public class MuleException extends UMOException
     /**
      * @param message the exception message
      */
-    public MuleException(String message)
+    public MuleException(Message message)
     {
         super(message);
     }
 
     /**
      * @param message the exception message
-     * @param cause   the exception that triggered this exception
+     * @param cause   the exception that cause this exception to be thrown
      */
-    public MuleException(String message, Throwable cause)
+    public MuleException(Message message, Throwable cause)
     {
         super(message, cause);
+    }
+
+    public MuleException(Throwable cause) {
+        super(cause);
     }
 }

@@ -13,6 +13,10 @@
  */
 package org.mule.umo;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.provider.UMOConnector;
+
 /**
  * <code>ComponentException</code> should be thrown when some action on a component
  * fails such as starting or stopping
@@ -20,22 +24,46 @@ package org.mule.umo;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class ComponentException extends UMOException
+public class ComponentException extends MessagingException
 {
+    private transient UMOComponent component;
     /**
      * @param message the exception message
      */
-    public ComponentException(String message, UMOComponent component)
+    public ComponentException(Message message, UMOMessage umoMessage, UMOComponent component)
     {
-        super(message + ". Component is: " + component.getDescriptor().getName());
+        super(generateMessage(message, component), umoMessage);
+        this.component = component;
     }
 
     /**
      * @param message the exception message
      * @param cause   the exception that cause this exception to be thrown
      */
-    public ComponentException(String message, UMOComponent component, Throwable cause)
+    public ComponentException(Message message, UMOMessage umoMessage, UMOComponent component, Throwable cause)
     {
-        super(message + ". Component is: " + component.getDescriptor().getName() + ". Error is: " + cause.getMessage(), cause);
+        super(generateMessage(message, component), umoMessage, cause);
+        this.component = component;
+    }
+
+    public ComponentException(UMOMessage umoMessage, UMOComponent component, Throwable cause)
+    {
+        super(generateMessage(null, component), umoMessage, cause);
+        this.component = component;
+    }
+
+    public UMOComponent getComponent() {
+        return component;
+    }
+
+    private static Message generateMessage(Message message, UMOComponent component) {
+         Message m = new Message(Messages.COMPONENT_CAUSED_ERROR_IS_X, component);
+         if(message!=null) {
+             message.setNextMessage(m);
+             return message;
+         } else {
+             message = new Message(-1);
+             return m;
+         }
     }
 }

@@ -1,12 +1,28 @@
-//COPYRIGHT
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
 package org.mule.config.builders;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.model.ComponentNotFoundException;
-import org.mule.umo.model.ComponentResolverException;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.util.List;
 import java.util.Map;
@@ -39,13 +55,13 @@ public class ContainerReference
         this.required = required;
     }
 
-    public void resolveReference(UMOContainerContext ctx) throws ComponentResolverException
+    public void resolveReference(UMOContainerContext ctx) throws ContainerException
     {
         Object comp = null;
         try
         {
             comp = ctx.getComponent(containerRef);
-        } catch (ComponentNotFoundException e)
+        } catch (ObjectNotFoundException e)
         {
             if (required)
             {
@@ -70,8 +86,8 @@ public class ContainerReference
             }
         } catch (Exception e)
         {
-            throw new ComponentResolverException("Failed to set property: " + propertyName + " on object: " +
-                    object.getClass().getName() + " with parameter type: " + comp.getClass().getName());
+            throw new ContainerException(new Message(Messages.CANT_SET_PROP_X_ON_X_OF_TYPE_X,
+                            propertyName, object.getClass().getName(), comp.getClass().getName()));
         }
     }
 }

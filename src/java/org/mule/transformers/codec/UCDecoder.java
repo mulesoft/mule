@@ -15,6 +15,8 @@ package org.mule.transformers.codec;
 
 import org.mule.transformers.DefaultTransformer;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import sun.misc.BASE64Encoder;
 import sun.misc.BASE64Decoder;
 
@@ -59,7 +61,7 @@ public class UCDecoder extends DefaultTransformer
             return result;
         } catch (IOException e)
         {
-            throw new TransformerException("Failed to decode data from UU Encoding: " + e.getMessage(), e);
+            throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X, "UU Encoding"), this, e);
         }
     }
 }

@@ -12,33 +12,33 @@
  * the LICENSE.txt file. 
  *
  */
-package org.mule.model;
+package org.mule.umo.manager;
 
-import org.mule.MuleException;
+import org.mule.config.i18n.Message;
 
 /**
- * <code>MulePoolException</code> is thrown Proxy pool implementations when components cannot be
- * instanciated, taken or returned to the pool.
+ * <code>ContainerException</code> is an Exception thrown by the
+ * component resolver when it fials to find a component
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class MulePoolException extends MuleException
+public class ContainerException extends ManagerException
 {
 
     /**
-     * @param message
+     * @param message the exception message
      */
-    public MulePoolException(String message)
+    public ContainerException(Message message)
     {
         super(message);
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
      */
-    public MulePoolException(String message, Throwable cause)
+    public ContainerException(Message message, Throwable cause)
     {
         super(message, cause);
     }

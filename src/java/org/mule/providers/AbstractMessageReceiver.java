@@ -18,28 +18,22 @@ package org.mule.providers;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.ExceptionHelper;
 import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.UMOTransaction;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
-import org.mule.umo.security.UMOSecurityException;
+import org.mule.umo.security.SecurityException;
 
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -110,11 +104,20 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
     }
 
     /* (non-Javadoc)
-     * @see org.mule.umo.provider.UMOMessageReceiver#getExceptionStrategy()
+     * @see org.mule.umo.provider.UMOMessageReceiver#getExceptionListener()
      */
-    public void handleException(Object message, Throwable exception)
+    public void handleException(Exception exception)
     {
-        connector.getExceptionStrategy().handleException(message, exception);
+        connector.getExceptionListener().exceptionThrown(exception);
+        String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol());
+        //If we dont find a error code property we can assume there are not
+        //error code mappings for this connector
+        UMOMessage message = RequestContext.getEvent().getMessage();
+        if(propName!=null && message!=null) {
+            String code = ExceptionHelper.getErrorMapping(connector.getProtocol(), exception.getClass());
+            if(logger.isDebugEnabled()) logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
+            message.setProperty(propName, code);
+        }
     }
 
     public UMOConnector getConnector()
@@ -212,10 +215,11 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             try
             {
                 endpoint.getSecurityFilter().authenticate(muleEvent);
-            } catch (UMOSecurityException e)
+            } catch (SecurityException e)
             {
                 logger.warn("Request was made but was not authenticated: " + e.getMessage(), e);
-                return handleSecurtyException(e, muleEvent);
+                handleException(e);
+                return message;
             }
         }
 
@@ -228,13 +232,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             resultMessage = component.getDescriptor().getInboundRouter().route(muleEvent);
         }
         return resultMessage;
-    }
-
-    protected UMOMessage handleSecurtyException(UMOSecurityException e, UMOEvent event) {
-        UMOMessage m  = new MuleMessage(e.getMessage(), event.getProperties());
-        //todo
-        m.setErrorCode(100);
-        return m;
     }
 
     protected UMOMessage handleUnacceptedFilter(UMOMessage message) {

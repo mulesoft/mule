@@ -14,15 +14,16 @@
  */
 package org.mule.umo.provider;
 
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
+
+import java.beans.ExceptionListener;
 
 /**
  * <code>UMOConnector</code> is the mechanism used to connect to external
@@ -66,10 +67,10 @@ public interface UMOConnector extends Startable, Stoppable, Disposable, Initiali
      *
      * @param message the data with which to initialise the <code>UMOMessageAdapter</code>
      * @return the <code>UMOMessageAdapter</code> for the endpoint
-     * @throws MessageException if the message parameter is not supported
+     * @throws MessagingException if the message parameter is not supported
      * @see UMOMessageAdapter
      */
-    public UMOMessageAdapter getMessageAdapter(Object message) throws MessageException;
+    public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException;
 
     /**
      * @return the name associated with the endpoint
@@ -97,22 +98,21 @@ public interface UMOConnector extends Startable, Stoppable, Disposable, Initiali
     public UMOMessageDispatcher getDispatcher(String endpoint) throws UMOException;
 
     /**
-     * @param strategy the exception strategy to use with this endpoint
+     * @param listener the exception strategy to use with this endpoint
      * @see UMOExceptionStrategy
      */
-    public void setExceptionStrategy(UMOExceptionStrategy strategy);
+    public void setExceptionListener(ExceptionListener listener);
 
     /**
      * @return the Exception stategy used by the endpoint
      * @see UMOExceptionStrategy
      */
-    public UMOExceptionStrategy getExceptionStrategy();
+    public ExceptionListener getExceptionListener();
 
     /**
-     * @param message   the object that was being processed when the exception occurred
      * @param exception the exception that was caught
      */
-    public void handleException(Object message, Throwable exception);
+    public void handleException(Exception exception);
 
     /**
      * The dispatcher factory is used to create a message dispatcher of the current

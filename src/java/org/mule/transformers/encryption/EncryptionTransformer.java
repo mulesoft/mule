@@ -27,6 +27,6 @@ public class EncryptionTransformer extends AbstractEncryptionTransformer
 {
     protected byte[] getTransformedBytes(byte[] buffer) throws CryptoFailureException
     {
-        return getStrategy().encrypt(buffer);
+        return getStrategy().encrypt(buffer, null);
     }
 }

@@ -19,6 +19,7 @@ import org.mule.config.MuleConfiguration;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 
@@ -59,7 +60,7 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
 
         try
         {
-            descriptor.setExceptionStrategy(null);
+            descriptor.setExceptionListener(null);
             fail("setting exeption strategy to null should fail");
         }
         catch (RuntimeException e)
@@ -109,15 +110,15 @@ public class MuleDescriptorTestCase extends AbstractMuleTestCase
     {
         UMODescriptor descriptor = getTestDescriptor("Terry", Orange.class.getName());
         TestExceptionStrategy es = new TestExceptionStrategy();
-        descriptor.setExceptionStrategy(es);
+        descriptor.setExceptionListener(es);
         assertNotNull(descriptor.getOutboundEndpoint());
-        assertNotNull(descriptor.getOutboundEndpoint().getConnector().getExceptionStrategy());
+        assertNotNull(descriptor.getOutboundEndpoint().getConnector().getExceptionListener());
         
         //create receive endpoint
         UMOEndpoint endpoint = getTestEndpoint("test2", UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
         descriptor.setInboundEndpoint(endpoint);
         //Add receive endpoint, this shoulbe set as default
-        assertNotNull(descriptor.getInboundEndpoint().getConnector().getExceptionStrategy());
+        assertNotNull(descriptor.getInboundEndpoint().getConnector().getExceptionListener());
 //        assertNotNull(descriptor.getReceiveEndpoint());
 //        assertEquals(descriptor.getReceiveEndpoint(), endpoint.getEndpointURI());
     }

@@ -19,6 +19,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.routing.RoutingException;
+import org.mule.umo.routing.ComponentRoutingException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router for any events
@@ -36,7 +39,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
     public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
         if(getEndpoint()==null) {
-            throw new RoutingException("Cannot route event in Catch all as no endpoint has been set");
+            throw new ComponentRoutingException(new Message(Messages.NO_CATCH_ALL_ENDPOINT_SET), message, getEndpoint(), session.getComponent());
         }
         try
         {
@@ -54,7 +57,8 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
             }
         } catch (Exception e)
         {
-            throw new RoutingException("Failed to sispatch event: " + e, e);
+            throw new RoutingException(message, getEndpoint(), e);
+
         }
     }
 

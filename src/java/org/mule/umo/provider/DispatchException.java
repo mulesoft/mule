@@ -13,7 +13,10 @@
  */
 package org.mule.umo.provider;
 
-import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.routing.RoutingException;
+import org.mule.config.i18n.Message;
 
 /**
  * <code>DispatchException</code> is thrown when an endpoint dispatcher fails to
@@ -23,15 +26,25 @@ import org.mule.umo.endpoint.EndpointException;
  * @version $Revision$
  */
 
-public class DispatchException extends EndpointException
+public class DispatchException extends RoutingException
 {
-    public DispatchException(String message)
+    public DispatchException(UMOMessage message, UMOEndpoint endpoint)
     {
-        super(message);
+        super(message, endpoint);
     }
 
-    public DispatchException(String message, Throwable cause)
+    public DispatchException(UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
     {
-        super(message, cause);
+        super(umoMessage, endpoint, cause);
+    }
+
+    public DispatchException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint)
+    {
+        super(message, umoMessage, endpoint);
+    }
+
+    public DispatchException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    {
+        super(message, umoMessage, endpoint, cause);
     }
 }

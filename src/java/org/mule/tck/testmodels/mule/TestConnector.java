@@ -15,11 +15,11 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.AbstractMessageReceiver;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
@@ -88,7 +88,7 @@ public class TestConnector extends AbstractConnector
     /* (non-Javadoc)
      * @see org.mule.umo.provider.UMOConnector#getMessageAdapter(java.lang.Object)
      */
-    public UMOMessageAdapter getMessageAdapter(Object message) throws MessageException
+    public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
     {
         return new DummyMessageAdapter(message);
     }

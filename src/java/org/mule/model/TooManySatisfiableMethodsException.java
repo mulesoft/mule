@@ -17,6 +17,8 @@ package org.mule.model;
 
 import org.mule.umo.model.ModelException;
 import org.mule.util.StringMessageHelper;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>TooManySatisfiableMethodsException</code> is thrown by EntryPointResolvers when
@@ -25,22 +27,20 @@ import org.mule.util.StringMessageHelper;
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
- * @see UMOEntryPointResolver
+ * @see org.mule.umo.model.UMOEntryPointResolver
  */
 public class TooManySatisfiableMethodsException extends ModelException
 {
-    private static final String msg = "Found too many possible entry points on: ";
-
     /**
      * @param component 
      */
     public TooManySatisfiableMethodsException(Object component)
     {
-        this(component, null);
+        super(new Message(Messages.TOO_MANY_ENTRY_POINTS_ON_X, StringMessageHelper.getObjectValue(component)));
     }
 
     public TooManySatisfiableMethodsException(Object component, Exception cause)
     {
-        super(msg + StringMessageHelper.getObjectValue(component), cause);
+        super(new Message(Messages.TOO_MANY_ENTRY_POINTS_ON_X, StringMessageHelper.getObjectValue(component)), cause);
     }
 }

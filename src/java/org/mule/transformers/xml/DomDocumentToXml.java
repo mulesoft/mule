@@ -41,8 +41,7 @@ public class DomDocumentToXml extends AbstractTransformer
             return dom4jDoc.asXML();
         } catch (Exception e)
         {
-            throw new TransformerException("Failed to create XML String: "
-                    + e, e);
+            throw new TransformerException(this, e);
         }
     }
 

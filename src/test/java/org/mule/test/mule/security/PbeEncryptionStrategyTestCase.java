@@ -28,9 +28,9 @@ public class PbeEncryptionStrategyTestCase extends NamedTestCase
         pbe.setPassword("test");
         pbe.initialise();
 
-        byte[] b = pbe.encrypt("hello".getBytes());
+        byte[] b = pbe.encrypt("hello".getBytes(), null);
 
-        String s= new String(pbe.decrypt(b), "UTF-8");
+        String s= new String(pbe.decrypt(b, null), "UTF-8");
         assertEquals("hello", s);
     }
 

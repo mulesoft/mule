@@ -17,19 +17,17 @@ package org.mule.impl;
 import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.interceptors.LifecycleInterceptor;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.ReplyToHandler;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOImmutableDescriptor;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Lifecycle;
@@ -38,6 +36,7 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.DispatchException;
 import org.mule.util.ObjectPool;
 
 import java.util.Iterator;
@@ -124,7 +123,7 @@ public class MuleProxy implements Runnable, Lifecycle
                     ((LifecycleInterceptor) temp).initialise();
                 } catch (Exception e)
                 {
-                    throw new ModelException("Failed to initialise interceptor on component: " + e.getMessage(), e);
+                    throw new ModelException(new Message(Messages.FAILED_TO_INITIALISE_INTERCEPTORS_ON_X, descriptor.getName()), e);
                 }
             }
         }
@@ -135,7 +134,7 @@ public class MuleProxy implements Runnable, Lifecycle
             umo.initialise();
         } catch (Exception e)
         {
-            throw new ModelException("Failed to initialise component: " + e.getMessage(), e);
+            throw new ModelException(new Message(Messages.X_FAILED_TO_INITIALISE, "Component '" + descriptor.getName() + "'"), e);
         }
     }
 
@@ -149,7 +148,7 @@ public class MuleProxy implements Runnable, Lifecycle
                 umo.start();
             } catch (Exception e)
             {
-                throw new ModelException("Failed to start component: " + e.getMessage(), e);
+                throw new ModelException(new Message(Messages.FAILED_TO_START_X, "Component '" + descriptor.getName() + "'"), e);
             }
         }
 
@@ -170,7 +169,7 @@ public class MuleProxy implements Runnable, Lifecycle
                 umo.stop();
             } catch (Exception e)
             {
-                throw new ModelException("Failed to stop component: " + e.getMessage(), e);
+                throw new ModelException(new Message(Messages.FAILED_TO_STOP_X, "Component '" + descriptor.getName() + "'"), e);
             }
         }
     }
@@ -190,7 +189,7 @@ public class MuleProxy implements Runnable, Lifecycle
                     ((LifecycleInterceptor) temp).dispose();
                 } catch (Exception e)
                 {
-                    throw new MuleException("Failed to dispose Mule proxy: " + descriptor.getName(), e);
+                    throw new ModelException(new Message(Messages.FAILED_TO_DISPOSE_X, "Interceptor '" + temp.getClass().getName() + "'"), e);                    
                 }
             }
         }
@@ -199,7 +198,7 @@ public class MuleProxy implements Runnable, Lifecycle
             umo.dispose();
         } catch (Exception e)
         {
-            throw new ModelException("Failed to dispose component: " + e.getMessage(), e);
+            throw new ModelException(new Message(Messages.FAILED_TO_DISPOSE_X, "Component '" + descriptor.getName() + "'"), e);
         }
     }
 
@@ -311,7 +310,11 @@ public class MuleProxy implements Runnable, Lifecycle
         } catch (Exception e)
         {
             event.getSession().setValid(false);
-            handleException(event, e);
+            if(e instanceof UMOException) {
+                handleException(e);
+            } else {
+                handleException(new MessagingException(new Message(Messages.EVENT_PROCIESSING_FAILED_FOR_X, descriptor.getName()), event.getMessage(), e));
+            }
         } finally
         {
             //Finalise the event for this component
@@ -393,12 +396,11 @@ public class MuleProxy implements Runnable, Lifecycle
      * When an exception occurs this method can be called to invoke the
      * configured UMOExceptionStrategy on the UMO
      *
-     * @param source    Usually is the current payload but can be anything
      * @param exception If the UMOExceptionStrategy implementation fails
      */
-    public void handleException(Object source, Throwable exception)
+    public void handleException(Exception exception)
     {
-        descriptor.getExceptionStrategy().handleException(source, exception);
+        descriptor.getExceptionListener().exceptionThrown(exception);
     }
 
     /* (non-Javadoc)
@@ -525,7 +527,11 @@ public class MuleProxy implements Runnable, Lifecycle
             //Finalise the event for this component
             ((MuleComponent) event.getComponent()).finaliseEvent(event);
             event.getSession().setValid(false);
-            handleException(event, e);
+            if(e instanceof UMOException) {
+                handleException(e);
+            } else {
+                handleException(new MessagingException(new Message(Messages.EVENT_PROCIESSING_FAILED_FOR_X, descriptor.getName()), event.getMessage(), e));
+            }
         } finally
         {
             try

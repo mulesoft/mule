@@ -12,11 +12,12 @@
 
 package org.mule.tck.model;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOPoolFactory;
 import org.mule.util.ObjectPool;
 

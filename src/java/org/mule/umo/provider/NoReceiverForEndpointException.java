@@ -14,6 +14,9 @@
 package org.mule.umo.provider;
 
 import org.mule.umo.endpoint.EndpointException;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>NoReceiverForEndpointException</code> is thrown when an enpoint is specified for a
@@ -25,14 +28,34 @@ import org.mule.umo.endpoint.EndpointException;
 
 public class NoReceiverForEndpointException extends EndpointException
 {
-    public NoReceiverForEndpointException(String message)
+    /**
+     * @param endpoint the endpoint that could not be located
+     */
+    public NoReceiverForEndpointException(String endpoint)
+    {
+        super(new Message(Messages.ENDPOINT_X_NOT_FOUND, endpoint));
+    }
+
+    /**
+     * @param message the exception message
+     */
+    public NoReceiverForEndpointException(Message message)
     {
         super(message);
     }
 
-    public NoReceiverForEndpointException(String message, Throwable cause)
+    /**
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
+     */
+    public NoReceiverForEndpointException(Message message, Throwable cause)
     {
         super(message, cause);
+    }
+
+    public NoReceiverForEndpointException(Throwable cause)
+    {
+        super(cause);
     }
 
 }

@@ -6,17 +6,32 @@
  */
 package org.mule.transaction;
 
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
-public class TransactionRollbackException extends UMOTransactionException
+public class TransactionRollbackException extends TransactionException
 {
-    public TransactionRollbackException(String message)
+    /**
+     * @param message the exception message
+     */
+    public TransactionRollbackException(Message message)
     {
         super(message);
     }
 
-    public TransactionRollbackException(String message, Throwable cause)
+    /**
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
+     */
+    public TransactionRollbackException(Message message, Throwable cause)
     {
         super(message, cause);
     }
+
+    public TransactionRollbackException(Throwable cause)
+    {
+        super(new Message(Messages.TX_ROLLBACK_FAILED), cause);
+    }
+
 }

@@ -21,7 +21,11 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
+import org.mule.umo.routing.RoutePathNotFoundException;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>FilteringRouter</code> is a router that accepts events based on a filter set.
@@ -41,7 +45,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         UMOMessage result = null;
         if (endpoints == null || endpoints.size() == 0)
         {
-            throw new RoutingException("No endpoints are set on this router, cannot route message");
+            throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
         }
         try
         {
@@ -55,7 +59,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
             }
         } catch (UMOException e)
         {
-            throw new CouldNotRouteOutboundMessageException(e.getMessage(), e, message);
+            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint)endpoints.get(0), e);
         }
         return result;
     }
@@ -76,20 +80,18 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         if(getFilter() instanceof MessageFilter) {
             return getFilter().accept(message);
         }
+        Object payload = message.getPayload();
         try
         {
-            Object payload = message.getPayload();
-
             if (transformer != null)
             {
                 payload = transformer.transform(message);
             }
-            return getFilter().accept(payload);
-
-        } catch (Exception e)
+        } catch (TransformerException e)
         {
-            throw new RoutingException("Failed to transform event payload: " + e, e);
+            throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), message, (UMOEndpoint)endpoints.get(0), e);
         }
+        return getFilter().accept(payload);
     }
 
     public UMOTransformer getTransformer()

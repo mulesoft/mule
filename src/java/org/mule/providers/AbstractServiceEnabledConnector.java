@@ -13,14 +13,16 @@
  */
 package org.mule.providers;
 
-import org.mule.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.service.ConnectorServiceDescriptor;
 import org.mule.providers.service.ConnectorServiceException;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.BeanUtils;
@@ -56,7 +58,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
     public void initialiseFromUrl(UMOEndpointURI endpointUri) throws InitialisationException
     {
         if(!getProtocol().equalsIgnoreCase(endpointUri.getScheme()) && !getProtocol().equalsIgnoreCase(endpointUri.getSchemeMetaInfo())) {
-            throw new InitialisationException("The endpointUri scheme is not compatible with this connector: " + getProtocol() + ", " + endpointUri);
+            throw new InitialisationException(new Message(Messages.SCHEME_X_NOT_COMPATIBLE_WITH_CONNECTOR_X, getProtocol(), getClass().getName()), this);
         }
         Properties props = new Properties();
         props.putAll(endpointUri.getParams());
@@ -80,7 +82,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
             BeanUtils.populateWithoutFail(this, props, true);
         } catch (InvocationTargetException e)
         {
-            throw new InitialisationException(e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"), e, this);
         }
     }
 
@@ -101,7 +103,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
             defaultResponseTransformer = serviceDescriptor.createResponseTransformer();
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to initialise connector from endpoint service descriptor: " + e.getMessage(), e);
+            throw new InitialisationException(e, this);
         }
     }
 
@@ -122,17 +124,17 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
      *
      * @param message the data with which to initialise the <code>UMOMessageAdapter</code>
      * @return the <code>UMOMessageAdapter</code> for the endpoint
-     * @throws org.mule.umo.MessageException if the message parameter is not supported
+     * @throws org.mule.umo.MessagingException if the message parameter is not supported
      * @see org.mule.umo.provider.UMOMessageAdapter
      */
-    public UMOMessageAdapter getMessageAdapter(Object message) throws MessageException
+    public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
     {
         try
         {
             return serviceDescriptor.createMessageAdapter(message);
         } catch (ConnectorServiceException e)
         {
-            throw new MessageException("Failed to create message adapter from service: " + e.getMessage(), e);
+            throw new MessagingException(new Message(Messages.FAILED_TO_CREATE_X, "Message Adapter"), message, e);
         }
     }
 

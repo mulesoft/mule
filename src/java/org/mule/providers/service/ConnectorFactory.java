@@ -15,6 +15,8 @@ package org.mule.providers.service;
 
 import org.mule.MuleException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.endpoint.EndpointException;
@@ -71,7 +73,7 @@ public class ConnectorFactory
                 connector = MuleManager.getInstance().lookupConnector(uri.getConnectorName());
                 if (connector == null)
                 {
-                    throw new ConnectorFactoryException("No connector found called: " + uri.getConnectorName());
+                    throw new ConnectorFactoryException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Connector: " + uri.getConnectorName()));
                 }
             } else
             {
@@ -84,12 +86,12 @@ public class ConnectorFactory
             }
         } catch (Exception e)
         {
-            throw new ConnectorFactoryException("Failed to get connector: " + e.getMessage(), e);
+            throw new ConnectorFactoryException(e);
         }
 
         if (connector == null)
         {
-            throw new ConnectorFactoryException("Failed to find/create connector for protocol: " + scheme);
+            throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Connector", "Protocol: " + scheme));
         }
 
         UMOEndpoint endpoint = new MuleEndpoint();
@@ -107,14 +109,6 @@ public class ConnectorFactory
             UMOTransformer trans = getTransformer(uri, connector, UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type));
             endpoint.setTransformer(trans);
         }
-        //RM* todo
-//        try
-//        {
-//            endpoint.initialise();
-//        } catch (InitialisationException e)
-//        {
-//            throw new ConnectorFactoryException(e.getMessage(), e);
-//        }
         return endpoint;
     }
 
@@ -128,7 +122,7 @@ public class ConnectorFactory
                 trans = MuleObjectHelper.getTransformer(url.getTransformers(), ",");
             } catch (MuleException e)
             {
-                throw new ConnectorFactoryException("Failed to load transformers for endpoint: " + e.getMessage(), e);
+                throw new ConnectorFactoryException(e);
             }
         } else
         {
@@ -177,7 +171,7 @@ public class ConnectorFactory
         //Make sure we can create the endpoint/connector using this service method
         if (psd.getServiceError() != null)
         {
-            throw new ConnectorServiceException(psd.getServiceError());
+            throw new ConnectorServiceException(Message.createStaticMessage(psd.getServiceError()));
         }
         //if there is a factory, use it
         try
@@ -197,7 +191,7 @@ public class ConnectorFactory
                     }
                 } else
                 {
-                    throw new ConnectorFactoryException("connector property not set for endpoint service factory: " + scheme);
+                    throw new ConnectorFactoryException(new Message(Messages.X_NOT_SET_IN_SERVICE_X, "Connector", scheme));
                 }
             }
         } catch (ConnectorFactoryException e)
@@ -205,7 +199,7 @@ public class ConnectorFactory
             throw e;
         } catch (Exception e)
         {
-            throw new ConnectorFactoryException("failed to create endpoint with url: " + url + ". Error was: " + e.getMessage(), e);
+            throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Endpoint", url), e);
         }
 
         if (connector.getName() == null)
@@ -244,11 +238,11 @@ public class ConnectorFactory
                     csdCache.put(new CSDKey(csd.getProtocol(), overrides), csd);
                 } else
                 {
-                    throw new ConnectorServiceNotFoundException("Failed to create endpoint from service location: " + location + "/" + protocol);
+                    throw new ConnectorServiceNotFoundException(location + "/" + protocol);
                 }
             } catch (IOException e)
             {
-                throw new ConnectorFactoryException("Failed to create endpoint from service location: " + location + "/" + protocol + ". error is: " + e.getMessage(), e);
+                throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_ENDPOINT_FROM_LOCATION_X, location + "/" + protocol), e);
             }
         }
         return csd;

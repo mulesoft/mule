@@ -18,6 +18,7 @@ import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.impl.MuleEvent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.MessagingException;
 import org.mule.umo.routing.RoutingException;
 
 import java.util.Map;
@@ -36,7 +37,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     protected Map eventGroups = new ConcurrentHashMap();
     private Object lock = new Object();
 
-    public UMOEvent[] process(UMOEvent event) throws RoutingException
+    public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         SynchronizedBoolean doAggregate = new SynchronizedBoolean(false);
         EventGroup eg = null;

@@ -13,20 +13,26 @@
  */
 package org.mule.impl.security.filters;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.security.AbstractEndpointSecurityFilter;
 import org.mule.impl.security.MuleAuthentication;
 import org.mule.impl.security.MuleHeaderCredentialsAccessor;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.security.UMOSecurityContext;
-import org.mule.umo.security.UMOSecurityException;
+import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.security.CredentialsNotSetException;
+import org.mule.umo.security.CryptoFailureException;
+import org.mule.umo.security.SecurityProviderNotFoundException;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
  * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based encription
@@ -44,18 +50,18 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         setCredentialsAccessor(new MuleHeaderCredentialsAccessor());
     }
 
-    protected final void authenticateInbound(UMOEvent event) throws UMOSecurityException
+    protected final void authenticateInbound(UMOEvent event) throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
     {
         String userHeader = (String)getCredentialsAccessor().getCredentials(event);
         if (userHeader == null)
         {
-            throw new CredentialsNotSetException(event.getSession().getSecurityContext(), event.getEndpoint(), this);
+            throw new CredentialsNotSetException(event.getMessage(), event.getSession().getSecurityContext(), event.getEndpoint(), this);
         }
         byte[] creds = null;
         if(userHeader.startsWith("Plain ")) {
             creds = userHeader.substring(6).getBytes();
         } else {
-            creds = strategy.decrypt(userHeader.getBytes());
+            creds = strategy.decrypt(userHeader.getBytes(), null);
         }
         UMOCredentials user = new MuleCredentials(new String(creds));
 
@@ -64,7 +70,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         try
         {
             authResult = getSecurityManager().authenticate(umoAuthentication);
-        } catch (UMOSecurityException e)
+        } catch (Exception e)
         {
             // Authentication failed
             if (logger.isDebugEnabled())
@@ -72,7 +78,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
                 logger.debug("Authentication request for user: " + user.getUsername()
                         + " failed: " + e.toString());
             }
-            throw new UnauthorisedException("Authentication failed for " + user.getUsername() + ": " + e.getMessage(), e);
+            throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, user.getUsername()), event.getMessage(), e);
         }
 
         // Authentication success
@@ -85,13 +91,13 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         event.getSession().setSecurityContext(context);
     }
 
-    protected void authenticateOutbound(UMOEvent event) throws UMOSecurityException
+    protected void authenticateOutbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
         if (event.getSession().getSecurityContext() == null)
         {
             if (isAuthenticate())
             {
-                throw new UnauthorisedException(event.getSession().getSecurityContext(), event.getEndpoint(), this);
+                throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(), event.getEndpoint(), this);
             } else
             {
                 return;
@@ -108,7 +114,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         }
 
         String token = auth.getCredentials().toString();
-        String header = new String(strategy.encrypt(token.getBytes()));
+        String header = new String(strategy.encrypt(token.getBytes(), null));
         getCredentialsAccessor().setCredentials(event, header);
 
     }
@@ -121,7 +127,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
 
         if (strategy == null)
         {
-            throw new InitialisationException("No encryption strategy has been set on this filter");
+            throw new InitialisationException(new Message(Messages.ENCRYPT_STRATEGY_NOT_SET), this);
         }
     }
 

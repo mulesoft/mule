@@ -13,6 +13,9 @@
  */
 package org.mule.umo.security;
 
+import org.mule.MuleException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEncryptionStrategy;
 
 /**
@@ -26,22 +29,37 @@ import org.mule.umo.UMOEncryptionStrategy;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class CryptoFailureException extends UMOSecurityException
+public class CryptoFailureException extends MuleException
 {
-    /**
-     * @param message the exception message
-     */
-    public CryptoFailureException(String message, UMOEncryptionStrategy strategy)
+    private transient UMOEncryptionStrategy encryptionStrategy;
+
+    public CryptoFailureException(Message message, UMOEncryptionStrategy strategy)
     {
-        super(message + (strategy==null ? "" : " : Crypto strategy is: " + strategy.toString()));
+        super(message);
+        String s = (strategy==null ? "null" : strategy.toString());
+        addInfo("Encryption", s);
+        this.encryptionStrategy = strategy;
     }
 
-    /**
-     * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
-     */
-    public CryptoFailureException(String message, Throwable cause, UMOEncryptionStrategy strategy)
+    public CryptoFailureException(Message message, UMOEncryptionStrategy strategy, Throwable cause)
     {
-        super(message  + (strategy==null ? "" : " : Crypto strategy is: " + strategy.toString()), cause);
+        super(message, cause);
+        String s = (strategy==null ? "null" : strategy.toString());
+        addInfo("Encryption", s);
+        this.encryptionStrategy = strategy;
+    }
+
+    public CryptoFailureException(UMOEncryptionStrategy strategy, Throwable cause)
+    {
+        super(new Message(Messages.CRYPTO_FAILURE), cause);
+        String s = (strategy==null ? "null" : strategy.toString());
+        addInfo("Encryption", s);
+        this.encryptionStrategy = strategy;
+
+    }
+
+    public UMOEncryptionStrategy getEncryptionStrategy()
+    {
+        return encryptionStrategy;
     }
 }

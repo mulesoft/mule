@@ -15,6 +15,7 @@ package org.mule.umo.routing;
 
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.MessagingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.List;
 
 public interface UMOInboundMessageRouter  extends UMORouterCollection
 {
-    public UMOMessage route(UMOEvent event) throws RoutingException;
+    public UMOMessage route(UMOEvent event) throws MessagingException;
 
     public void addRouter(UMOInboundRouter router);
 

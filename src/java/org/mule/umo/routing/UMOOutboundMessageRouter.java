@@ -15,6 +15,7 @@ package org.mule.umo.routing;
 
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.MessagingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
@@ -34,7 +35,7 @@ public interface UMOOutboundMessageRouter extends UMORouterCollection
      * @throws RoutingException If any of the events cannot be created.
      */
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException;
+    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws MessagingException;
 
     /**
      * A helper method for finding out which endpoints a message would be routed to
@@ -43,5 +44,5 @@ public interface UMOOutboundMessageRouter extends UMORouterCollection
      * @return an array of UMOEndpoint objects or an empty array
      * @throws RoutingException if there is a filter exception
      */
-    public UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws RoutingException;
+    public UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws MessagingException;
 }

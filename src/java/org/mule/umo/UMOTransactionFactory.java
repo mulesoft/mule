@@ -27,9 +27,9 @@ public interface UMOTransactionFactory
     /**
      * Create and begins a new transaction
      * @return a new Transaction
-     * @throws UMOTransactionException if the transaction cannot be created or begun
+     * @throws TransactionException if the transaction cannot be created or begun
      */
-    public UMOTransaction beginTransaction() throws UMOTransactionException;
+    public UMOTransaction beginTransaction() throws TransactionException;
 
     /**
      * Determines whether this transaction factory creates transactions that are really

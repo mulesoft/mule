@@ -13,7 +13,8 @@
  */
 package org.mule.umo.endpoint;
 
-
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 
 /**
@@ -26,14 +27,29 @@ package org.mule.umo.endpoint;
 
 public class EndpointNotFoundException extends EndpointException
 {
-    public EndpointNotFoundException(String message)
+    public EndpointNotFoundException(String endpoint)
+    {
+        super(new Message(Messages.ENDPOINT_X_NOT_FOUND, endpoint));
+    }
+
+    /**
+     * @param message the exception message
+     */
+    public EndpointNotFoundException(Message message)
     {
         super(message);
     }
-
-    public EndpointNotFoundException(String message, Throwable cause)
+    /**
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
+     */
+    public EndpointNotFoundException(Message message, Throwable cause)
     {
         super(message, cause);
     }
 
+    public EndpointNotFoundException(Throwable cause)
+    {
+        super(cause);
+    }
 }

@@ -42,7 +42,7 @@ public interface Callable
      *         <li>the <code>setStopFurtherProcessing(true)</code> wasn't called on the event context event.</li>
      *         </ol>
      * @throws Exception if the event fails to process properly. If exceptions aren't handled by the implementation
-     *                   they will be handled by the exceptionStrategy associated with the component
+     *                   they will be handled by the exceptionListener associated with the component
      */
     Object onCall(UMOEventContext eventContext) throws Exception;
 

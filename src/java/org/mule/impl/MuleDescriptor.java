@@ -17,7 +17,8 @@ package org.mule.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
@@ -30,7 +31,6 @@ import org.mule.routing.inbound.InboundPassThroughRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundMessageRouter;
@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.beans.ExceptionListener;
 
 /**
  * <code>MuleDescriptor</code>  describes all the properties for a Mule UMO.  New Mule UMOs
@@ -90,13 +91,13 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
 
     /* (non-Javadoc)
-     * @see org.mule.umo.UMODescriptor#setExceptionStrategy(org.mule.umo.UMOExceptionStrategy)
+     * @see org.mule.umo.UMODescriptor#setExceptionListener(org.mule.umo.UMOExceptionStrategy)
      */
-    public void setExceptionStrategy(UMOExceptionStrategy exceptionStrategy)
+    public void setExceptionListener(ExceptionListener listener)
     {
-        if (exceptionStrategy == null) throw new IllegalArgumentException("Exception Strategy cannot be null");
-        this.exceptionStrategy = exceptionStrategy;
-        logger.debug("Using exception strategy: " + exceptionStrategy.getClass().getName());
+        if (listener == null) throw new IllegalArgumentException("Exception Strategy cannot be null");
+        this.exceptionListener = listener;
+        logger.debug("Using exception strategy: " + listener.getClass().getName());
     }
 
     /* (non-Javadoc)
@@ -252,8 +253,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
         if(poolingProfile==null) poolingProfile = config.getPoolingProfile();
         if(queueProfile==null) queueProfile = config.getQueueProfile();
 
-        if(exceptionStrategy==null) {
-            exceptionStrategy = MuleManager.getInstance().getModel().getExceptionStrategy();
+        if(exceptionListener==null) {
+            exceptionListener = MuleManager.getInstance().getModel().getExceptionListener();
         }
 
         if(inboundEndpoint!=null) {
@@ -280,8 +281,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
             }
         }
 
-        if(exceptionStrategy.getEndpoint()!=null) {
-            ((MuleEndpoint)exceptionStrategy.getEndpoint()).initialise();
+        if(exceptionListener instanceof Initialisable) {
+            ((Initialisable)exceptionListener).initialise();
         }
 
         MuleEndpoint endpoint;

@@ -15,6 +15,9 @@ package org.mule.config.builders;
 
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.config.ConfigurationException;
+import org.mule.config.i18n.Messages;
+import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManager;
 
@@ -47,7 +50,11 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         if(config == null) {
             config = getDefaultConfigResource();
         }
-        createManager(config, event.getServletContext());
+        try {
+            createManager(config, event.getServletContext());
+        } catch (ConfigurationException e) {
+            event.getServletContext().log(e.getMessage(), e);
+        }
     }
 
     /**
@@ -56,8 +63,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
      * local file system or on the classpath.
      * @return  A configured UMOManager instance
      */
-    protected UMOManager createManager(String configResource, ServletContext context)
-    {
+    protected UMOManager createManager(String configResource, ServletContext context) throws ConfigurationException {
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context);
         return builder.configure(configResource);
     }
@@ -79,7 +85,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
             MuleManager.getInstance().dispose();
         } catch (UMOException e)
         {
-            throw new MuleRuntimeException("Exceptions occurred while disposing the Mule Manager: " + e.getMessage(), e);
+            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_DISPOSE_X, "Mule Manager"), e);
         }
     }
 }

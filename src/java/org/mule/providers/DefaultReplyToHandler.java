@@ -17,6 +17,8 @@ import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleComponent;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -80,7 +82,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
             ((MuleComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
         } catch (Exception e)
         {
-            throw new DispatchException("Failed to dispatch on replyTo: " + endpoint + ". " + e.getMessage(), e);
+            throw new DispatchException(new Message(Messages.FAILED_TO_DISPATCH_TO_REPLYTO_X, endpoint), replyToEvent.getMessage(), replyToEvent.getEndpoint(), e);
         }
 
 

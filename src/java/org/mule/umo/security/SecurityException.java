@@ -13,30 +13,25 @@
  */
 package org.mule.umo.security;
 
-import org.mule.umo.UMOException;
+import org.mule.config.i18n.Message;
+import org.mule.umo.MessagingException;
+import org.mule.umo.UMOMessage;
 
 /**
- * <code>UMOSecurityException</code> is a generic security exception
+ * <code>SecurityException</code> is a generic security exception
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class UMOSecurityException extends UMOException
+public abstract class SecurityException extends MessagingException
 {
-    /**
-     * @param message the exception message
-     */
-    public UMOSecurityException(String message)
+    protected SecurityException(Message message, UMOMessage umoMessage)
     {
-        super(message);
+        super(message, umoMessage);
     }
 
-    /**
-     * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
-     */
-    public UMOSecurityException(String message, Throwable cause)
+    protected SecurityException(Message message, UMOMessage umoMessage, Throwable cause)
     {
-        super(message, cause);
+        super(message, umoMessage, cause);
     }
 }

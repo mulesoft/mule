@@ -16,7 +16,6 @@ package org.mule.umo.model;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
@@ -24,6 +23,7 @@ import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 
 import java.util.Iterator;
 import java.util.List;
+import java.beans.ExceptionListener;
 
 /**
  * The <code>UMOModel</code> encapsulates and manages the runtime behaviour
@@ -142,17 +142,17 @@ public interface UMOModel extends Lifecycle, Initialisable
      * @return the default exception strategy for this model.
      * @see UMOExceptionStrategy
      */
-    public UMOExceptionStrategy getExceptionStrategy();
+    public ExceptionListener getExceptionListener();
 
     /**
      * The exception strategy to use by components managed by the model. The exception
      * strategy is used when an exception occurs while processing the current event for a
      * component.  A component can define it's own exception strategy, but if it doesn't this
      * implmentation will be used.
-     * @param exceptionStrategy the default exception strategy for this model.
+     * @param listener the default exception strategy for this model.
      * @see UMOExceptionStrategy
      */
-    public void setExceptionStrategy(UMOExceptionStrategy exceptionStrategy);
+    public void setExceptionListener(ExceptionListener listener);
 
     /**
      * Returns a descriptor for the given component name

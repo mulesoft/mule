@@ -13,7 +13,9 @@
  */
 package org.mule.umo.provider;
 
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>MessageTypeNotSupportedException</code> is thrown when a message payload is set
@@ -24,11 +26,11 @@ import org.mule.umo.MessageException;
  * @version $Revision$
  */
 
-public class MessageTypeNotSupportedException extends MessageException
+public class MessageTypeNotSupportedException extends MessagingException
 {
     public MessageTypeNotSupportedException(Object message, Class adapterClass)
     {
-        super("Message type: " + message.getClass().getName() + " is not supported by adapter: " + adapterClass.getName());
+        super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X, message.getClass().getName(), adapterClass.getName()), message);
     }
 
 }

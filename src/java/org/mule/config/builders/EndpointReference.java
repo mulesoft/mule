@@ -15,12 +15,14 @@ package org.mule.config.builders;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
@@ -114,7 +116,7 @@ public class EndpointReference
         {
             UMOEndpoint ep = MuleManager.getInstance().lookupEndpoint(endpointName);
             if(ep == null) {
-                throw new InitialisationException("Failed to find Endpoint with name: " + endpointName);
+                throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Endpoint '" + endpointName + "'"), this);
             }
             if(address!=null) {
                 if(logger.isDebugEnabled()) {
@@ -136,7 +138,7 @@ public class EndpointReference
             ep.initialise();
             Method m = object.getClass().getMethod(propertyName, new Class[]{UMOEndpoint.class});
             if(m==null) {
-                throw new InitialisationException("Method not found: " + propertyName + " on " + object.getClass().getName());
+                throw new InitialisationException(new Message(Messages.METHOD_X_NOT_FOUND_ON_X, propertyName, object.getClass().getName()), this);
             }
             m.invoke(object, new Object[]{ep});
         } catch (InitialisationException e)
@@ -144,8 +146,22 @@ public class EndpointReference
            throw e;
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to set transformer on bean: " +
-                    object.getClass().getName() + "." + propertyName + "(...).  Error is: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.CANT_SET_PROP_X_ON_X_OF_TYPE_X, propertyName, object.getClass().getName(), UMOEndpoint.class.getName()), e, this);
         }
+    }
+
+
+    public String toString()
+    {
+        return "EndpointReference{" +
+                "propertyName='" + propertyName + "'" +
+                ", endpointName='" + endpointName + "'" +
+                ", address='" + address + "'" +
+                ", transformer='" + transformer + "'" +
+                ", object=" + object +
+                ", properties=" + properties +
+                ", filter=" + filter +
+                ", transactionConfig=" + transactionConfig +
+                "}";
     }
 }

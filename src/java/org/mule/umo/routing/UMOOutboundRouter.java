@@ -17,12 +17,17 @@ package org.mule.umo.routing;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.MessagingException;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.util.List;
 
 /**
- * <code>UMOOutboundRouter</code> TODO
+ * <code>UMOOutboundRouter</code> is used to control outbound routing behaviour
+ * for an event.  One or more Outbound routers can be associated with an
+ * <code>UMOOutboundMessageRouter</code> and will be selected based on the filters
+ * set on the individual Outbound Router.
+ * @see UMOOutboundMessageRouter 
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
@@ -38,9 +43,9 @@ public interface UMOOutboundRouter extends UMORouter
 
     public boolean removeEndpoint(UMOEndpoint endpoint);
 
-    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException;
+    public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws MessagingException;
 
-    public boolean isMatch(UMOMessage message) throws RoutingException;
+    public boolean isMatch(UMOMessage message) throws MessagingException;
 
     public UMOTransactionConfig getTransactionConfig();
 

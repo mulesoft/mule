@@ -36,37 +36,37 @@ public interface UMOTransaction
 
     /**
      * Begin the transaction.
-     * @throws UMOTransactionException
+     * @throws TransactionException
      */
-    public void begin() throws UMOTransactionException;
+    public void begin() throws TransactionException;
 
     /**
      * Commit the transaction
-     * @throws UMOTransactionException
+     * @throws TransactionException
      */
-    public void commit() throws UMOTransactionException;
+    public void commit() throws TransactionException;
 
     /**
      * Rollback the transaction
-     * @throws UMOTransactionException
+     * @throws TransactionException
      */
-    public void rollback() throws UMOTransactionException;
+    public void rollback() throws TransactionException;
 
-    public int getStatus() throws UMOTransactionException;
+    public int getStatus() throws TransactionException;
 
-    public abstract boolean isBegun() throws UMOTransactionException;
+    public abstract boolean isBegun() throws TransactionException;
 
-    public abstract boolean isRolledBack() throws UMOTransactionException;
+    public abstract boolean isRolledBack() throws TransactionException;
 
-    public abstract boolean isCommitted() throws UMOTransactionException;
+    public abstract boolean isCommitted() throws TransactionException;
 
     public Object getResource(Object key);
     
     public boolean hasResource(Object key);
     
-    public void bindResource(Object key, Object resource) throws UMOTransactionException;
+    public void bindResource(Object key, Object resource) throws TransactionException;
 
-    public void setRollbackOnly() throws UMOTransactionException;
+    public void setRollbackOnly() throws TransactionException;
 
-    public boolean isRollbackOnly() throws UMOTransactionException;
+    public boolean isRollbackOnly() throws TransactionException;
 }

@@ -28,7 +28,7 @@ import java.util.List;
 
 public interface UMOSecurityManager extends Initialisable
 {
-    public UMOAuthentication authenticate(UMOAuthentication authentication) throws UMOSecurityException;
+    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException, SecurityProviderNotFoundException;
 
     public void addProvider(UMOSecurityProvider provider);
 

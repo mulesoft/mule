@@ -13,10 +13,12 @@
  */
 package org.mule.transformers.encryption;
 
-import org.mule.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.transformer.TransformerException;
 
@@ -58,7 +60,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
             }
         } catch (CryptoFailureException e)
         {
-            throw new TransformerException(e.getMessage(), e);
+            throw new TransformerException(this, e);
         }
     }
 
@@ -68,7 +70,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
      * Template method were deriving classes can do any initialisation
      * after the properties have been set on this transformer
      *
-     * @throws org.mule.InitialisationException
+     * @throws org.mule.umo.lifecycle.InitialisationException
      *
      */
     public void initialise() throws InitialisationException
@@ -77,7 +79,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
             if(MuleManager.getInstance().getSecurityManager()==null)
             { 
                 if(strategy==null) {
-                    throw new InitialisationException("Cannot look up encryption strategy as a security manager has not been configured");
+                    throw new InitialisationException(new Message(Messages.AUTH_SECURITY_MANAGER_NOT_SET), this);
               
                 } 
             }else {
@@ -85,7 +87,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
             }
         }
         if(strategy==null) {
-            throw new InitialisationException("No encryption strategy has been set on this transformer");
+            throw new InitialisationException(new Message(Messages.ENCRYPT_STRATEGY_NOT_SET), this);
         }
     }
 

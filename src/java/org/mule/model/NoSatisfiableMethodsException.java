@@ -17,6 +17,8 @@ package org.mule.model;
 
 import org.mule.umo.model.ModelException;
 import org.mule.util.StringMessageHelper;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>NoSatisfiableMethodsException</code> is thrown by EntryPointResolvers when
@@ -25,7 +27,7 @@ import org.mule.util.StringMessageHelper;
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
- * @see UMOEntryPointResolver
+ * @see org.mule.umo.model.UMOEntryPointResolver
  */
 public class NoSatisfiableMethodsException extends ModelException
 {
@@ -41,6 +43,6 @@ public class NoSatisfiableMethodsException extends ModelException
 
     public NoSatisfiableMethodsException(Object component, Exception cause)
     {
-        super(msg + StringMessageHelper.getObjectValue(component), cause);
+        super(new Message(Messages.NO_ENTRY_POINT_FOUND_ON_X, StringMessageHelper.getObjectValue(component)), cause);
     }
 }

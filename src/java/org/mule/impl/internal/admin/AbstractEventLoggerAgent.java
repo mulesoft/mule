@@ -15,7 +15,7 @@ package org.mule.impl.internal.admin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.impl.internal.events.AdminEventListener;
 import org.mule.impl.internal.events.ComponentEventListener;
@@ -29,6 +29,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOManager;
 import org.mule.umo.UMOServerEvent;
 import org.mule.umo.UMOServerEventListener;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import java.util.HashSet;
 import java.util.Iterator;

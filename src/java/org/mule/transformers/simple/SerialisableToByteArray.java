@@ -56,7 +56,7 @@ public class SerialisableToByteArray extends AbstractTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerException("Faield to convert Object to byte[]: " + e.getMessage(), e);
+            throw new TransformerException(this, e);
         } finally {
             try
             {

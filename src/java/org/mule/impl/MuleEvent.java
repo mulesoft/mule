@@ -18,6 +18,8 @@ import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -228,9 +230,8 @@ public class MuleEvent extends EventObject implements UMOEvent
         }
         catch (Exception e)
         {
-            throw new MuleException("Failed while retrieving the current payload. Message is of type "
-                    + message.getPayload().getClass().getName(),
-                    e);
+            throw new MuleException(new Message(Messages.CANT_READ_PAYLOAD_AS_BYTES_TYPE_IS_X,
+                     message.getPayload().getClass().getName()), e);
         }
     }
 
@@ -263,7 +264,8 @@ public class MuleEvent extends EventObject implements UMOEvent
         }
         catch (IOException e)
         {
-            throw new TransformerException("Failed to convert transformed payload to byte[]: " + e, e);
+            throw new TransformerException(new Message(Messages.CANT_READ_PAYLOAD_AS_BYTES_TYPE_IS_X,
+                     getTransformedMessage().getClass().getName()), endpoint.getTransformer(), e);
         }
     }
 
@@ -295,9 +297,8 @@ public class MuleEvent extends EventObject implements UMOEvent
         }
         catch (Exception e)
         {
-            throw new MuleException("Failed while retrieving the current payload. Message is of type "
-                    + message.getPayload().getClass().getName(),
-                    e);
+            throw new MuleException(new Message(Messages.CANT_READ_PAYLOAD_AS_STRING_TYPE_IS_X,
+                     message.getClass().getName()), e);
         }
     }
 

@@ -15,30 +15,32 @@
 
 package org.mule.transaction;
 
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.config.i18n.Message;
 
 /**
- * <p><code>TransactionInProgressException</code> TODO (document class)
+ * <p><code>TransactionInProgressException</code> is thrown if a new transaction is started
+ * when there is one already in progress
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class TransactionInProgressException extends UMOTransactionException
+public class TransactionInProgressException extends TransactionStatusException
 {
 
     /**
-     * @param message
+     * @param message the exception message
      */
-    public TransactionInProgressException(String message)
+    public TransactionInProgressException(Message message)
     {
         super(message);
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
      */
-    public TransactionInProgressException(String message, Throwable cause)
+    public TransactionInProgressException(Message message, Throwable cause)
     {
         super(message, cause);
     }

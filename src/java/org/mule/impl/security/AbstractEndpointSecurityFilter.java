@@ -13,16 +13,22 @@
  */
 package org.mule.impl.security;
 
-import org.mule.InitialisationException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
-import org.mule.umo.security.UMOSecurityException;
+import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UMOCredentialsAccessor;
+import org.mule.umo.security.CryptoFailureException;
+import org.mule.umo.security.SecurityProviderNotFoundException;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.util.Utility;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -57,11 +63,11 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         }
         if (securityManager == null)
         {
-            throw new InitialisationException("No security Manager has been set");
+            throw new InitialisationException(new Message(Messages.AUTH_SECURITY_MANAGER_NOT_SET), this);
         }
         if (endpoint == null)
         {
-            throw new InitialisationException("The endpont is null for this Security filter");
+            throw new InitialisationException(new Message(Messages.X_IS_NULL, "Endpoint"), this);
         }
         //This filter may only allow authentication on a subset of registered security providers
         if (securityProviders != null)
@@ -76,7 +82,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
                     localManager.addProvider(provider);
                 } else
                 {
-                    throw new InitialisationException("There is not security provider registered called: " + sp[i]);
+                    throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Security Provider '" + sp[i] + "'"), this);
                 }
             }
             securityManager = localManager;
@@ -89,9 +95,8 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
             inbound = false;
         } else
         {
-            throw new InitialisationException("The Endpoint that this security filter is associated with must have a type of "
-                    + UMOEndpoint.ENDPOINT_TYPE_SENDER + " or " + UMOEndpoint.ENDPOINT_TYPE_RECEIVER
-                    + ". Endpoint type is set to " + endpoint.getType());
+            throw new InitialisationException(new Message(Messages.AUTH_ENDPOINT_TYPE_FOR_FILTER_MUST_BE_X_BUT_IS_X,
+                    UMOEndpoint.ENDPOINT_TYPE_SENDER + " or " + UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType()), this);
         }
         doInitialise();
     }
@@ -139,7 +144,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         this.endpoint = endpoint;
     }
 
-    public void authenticate(UMOEvent event) throws UMOSecurityException
+    public void authenticate(UMOEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException, SecurityProviderNotFoundException
     {
         if (inbound)
         {
@@ -160,9 +165,9 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
         this.credentialsAccessor = credentialsAccessor;
     }
 
-    protected abstract void authenticateInbound(UMOEvent event) throws UMOSecurityException;
+    protected abstract void authenticateInbound(UMOEvent event) throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException;
 
-    protected abstract void authenticateOutbound(UMOEvent event) throws UMOSecurityException;
+    protected abstract void authenticateOutbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException;
 
     protected abstract void doInitialise() throws InitialisationException;
 

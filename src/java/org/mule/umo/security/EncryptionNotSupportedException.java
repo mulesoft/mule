@@ -13,6 +13,9 @@
  */
 package org.mule.umo.security;
 
+import org.mule.config.i18n.Message;
+import org.mule.umo.UMOMessage;
+
 /**
  * <code>EncryptionNotSupportedException</code> is thrown if an algorithm is
  * set in the MULE_USER header but it doesn't match the algorithm set on
@@ -22,22 +25,15 @@ package org.mule.umo.security;
  * @version $Revision$
  */
 
-public class EncryptionNotSupportedException extends UMOSecurityException
+public class EncryptionNotSupportedException extends SecurityException
 {
-    /**
-     * @param message the exception message
-     */
-    public EncryptionNotSupportedException(String message)
+    public EncryptionNotSupportedException(Message message, UMOMessage umoMessage)
     {
-        super(message);
+        super(message, umoMessage);
     }
 
-    /**
-     * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
-     */
-    public EncryptionNotSupportedException(String message, Throwable cause)
+    public EncryptionNotSupportedException(Message message, UMOMessage umoMessage, Throwable cause)
     {
-        super(message, cause);
+        super(message, umoMessage, cause);
     }
 }

@@ -13,6 +13,8 @@
  */
 package org.mule.providers.service;
 
+import org.mule.config.i18n.Message;
+
 /**
  * <code>ConnectorServiceException</code> is thrown if a ProviderServicedescriptor has
  * a service error set. This is usually because the endpoint/connector cannot be created from
@@ -24,12 +26,19 @@ package org.mule.providers.service;
 
 public class ConnectorServiceException extends ConnectorFactoryException
 {
-    public ConnectorServiceException(String message)
+    /**
+     * @param message the exception message
+     */
+    public ConnectorServiceException(Message message)
     {
         super(message);
     }
 
-    public ConnectorServiceException(String message, Throwable cause)
+    /**
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
+     */
+    public ConnectorServiceException(Message message, Throwable cause)
     {
         super(message, cause);
     }

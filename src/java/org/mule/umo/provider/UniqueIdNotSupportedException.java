@@ -14,6 +14,8 @@
 package org.mule.umo.provider;
 
 import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * <code>UniqueIdNotSupportedException</code> is thrown by UMOMessageAdapter.getUniqueId()
@@ -27,17 +29,21 @@ public class UniqueIdNotSupportedException extends MuleRuntimeException
 {
     public UniqueIdNotSupportedException(UMOMessageAdapter adapter)
     {
-        super("Apater: " + adapter.getClass().getName() + " does not support unique identifiers");
+        super(new Message(Messages.UNIQUE_ID_NOT_SUPPORTED_BY_ADAPTER_X, adapter.getClass().getName()));
     }
 
-    public UniqueIdNotSupportedException(UMOMessageAdapter adapter, String message)
+    public UniqueIdNotSupportedException(UMOMessageAdapter adapter, Message message)
     {
-        super("Apater: " + adapter.getClass().getName() + " does not support unique identifiers: " + message);
+        super(chainMessage(new Message(Messages.UNIQUE_ID_NOT_SUPPORTED_BY_ADAPTER_X, adapter.getClass().getName()), message));        
     }
 
     public UniqueIdNotSupportedException(UMOMessageAdapter adapter, Throwable cause)
     {
-        super("Apater: " + adapter.getClass().getName() + " does not support unique identifiers: " + cause.getMessage(), cause);
+        super(new Message(Messages.UNIQUE_ID_NOT_SUPPORTED_BY_ADAPTER_X, adapter.getClass().getName()), cause);
     }
 
+    protected static Message chainMessage(Message m1, Message m2) {
+        m1.setNextMessage(m2);
+        return m1;
+    }
 }

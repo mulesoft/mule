@@ -23,7 +23,6 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
@@ -92,7 +91,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                 }
             } catch (UMOException e)
             {
-                throw new CouldNotRouteOutboundMessageException(e.getMessage(), e, message);
+                throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
             }
         }
         
@@ -115,11 +114,8 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         {
             endpointUri = new MuleEndpointURI(recipient);
             endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        } catch (MalformedEndpointException e)
-        {
-            throw new RoutingException("Could not route message as recipient endpointUri was malformed: " + recipient, e, message);
         } catch (UMOException e) {
-            throw new RoutingException("Could not route message as could not get endpoint for endpointUri: " + recipient, e, message);
+            throw new RoutingException(message, endpoint, e);
         }
         recipientCache.put(recipient, endpoint);
         return endpoint;

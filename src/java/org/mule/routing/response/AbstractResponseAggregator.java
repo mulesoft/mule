@@ -20,11 +20,13 @@ import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.RoutingException;
+import org.mule.umo.routing.ResponseTimeoutException;
 
 import java.util.Map;
 
@@ -91,10 +93,10 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     {
         String cId = (String)correlationExtractor.getPropertry(MuleProperties.MULE_CORRELATION_ID_PROPERTY, event.getMessage());
         if (cId == null) {
-            throw new RoutingException("There is no Correlation Id set on the current event: " + event);
+            throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event.getEndpoint());
         }
         EventGroup eg = (EventGroup) eventGroups.get(cId);
-        logger.debug("\n\nAdding event to response aggregator group: " + cId);
+        if(logger.isDebugEnabled()) logger.debug("Adding event to response aggregator group: " + cId);
         if (eg == null)
         {
             eg = new EventGroup(cId);
@@ -115,16 +117,11 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     public UMOMessage getResponse(UMOMessage message) throws RoutingException
     {
         String messageId = null;
-        try
-        {
-            messageId = message.getUniqueId();
-	    	if (logger.isDebugEnabled()) {
-	    		logger.debug("Waiting for response for message id: " + messageId + " in " + this);
-	    	}
-        } catch (UniqueIdNotSupportedException e)
-        {
-            throw new RoutingException("Failed to receive response for message id: " + e.getMessage(), e);
+        messageId = message.getUniqueId();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Waiting for response for message id: " + messageId + " in " + this);
         }
+
         Sync s = (Sync)locks.get(messageId);
         if(s==null) {
     		logger.debug("Got response but no one is waiting for it yet. Creating latch for " + messageId + " in " + this);
@@ -149,7 +146,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             logger.error(e.getMessage(), e);
         }
         if(!b) {
-           throw new ResponseTimeoutException("Response timed out waiting for message response id: " + messageId);
+           throw new ResponseTimeoutException(new Message(Messages.RESPONSE_TIMED_OUT_X_WAITING_FOR_ID_X, String.valueOf(timeout), messageId), message, null);
         }
 
         UMOMessage result = (UMOMessage)responseEvents.get(messageId);

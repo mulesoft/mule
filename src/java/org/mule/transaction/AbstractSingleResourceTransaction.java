@@ -15,7 +15,9 @@
 package org.mule.transaction;
 
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * This abstract class can be used as a base class for transactions
@@ -37,7 +39,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#begin()
 	 */
-	public void begin() throws UMOTransactionException {
+	public void begin() throws TransactionException {
 		super.begin();
         started.commit(false, true);
 	}
@@ -45,7 +47,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#commit()
 	 */
-	public void commit() throws UMOTransactionException {
+	public void commit() throws TransactionException {
 		super.commit();
 	    committed.commit(false, true);
 	}
@@ -53,7 +55,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#rollback()
 	 */
-	public void rollback() throws UMOTransactionException {
+	public void rollback() throws TransactionException {
 		super.rollback();
         rolledBack.commit(false, true);
 	}
@@ -86,15 +88,15 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
 	/* (non-Javadoc)
 	 * @see org.mule.umo.UMOTransaction#bindResource(java.lang.Object, java.lang.Object)
 	 */
-	public void bindResource(Object key, Object resource) throws UMOTransactionException {
+	public void bindResource(Object key, Object resource) throws TransactionException {
 		if (key == null) {
-			throw new IllegalTransactionStateException("Can not bind resource to a null key");
+			throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_TO_NULL_KEY));
 		}
 		if (resource == null) {
-			throw new IllegalTransactionStateException("Can not bind a null resource");
+			throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_BIND_NULL_RESOURCE));
 		}
 		if (this.key != null) {
-			throw new IllegalTransactionStateException("Only one resource can be bound to this transaction");
+			throw new IllegalTransactionStateException(new Message(Messages.TX_SINGLE_RESOURCE_ONLY));
 		}
 		this.key = key;
 		this.resource = resource;
@@ -114,20 +116,20 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
 	/**
 	 * Really begin the transaction.
 	 * Note that resources are enlisted yet. 
-	 * @throws UMOTransactionException
+	 * @throws TransactionException
 	 */
-	protected abstract void doBegin() throws UMOTransactionException;
+	protected abstract void doBegin() throws TransactionException;
 
 	/**
 	 * Commit the transaction on the underlying resource 
-	 * @throws UMOTransactionException
+	 * @throws TransactionException
 	 */
-	protected abstract void doCommit() throws UMOTransactionException;
+	protected abstract void doCommit() throws TransactionException;
 
 	/**
 	 * Rollback the transaction on the underlying resource 
-	 * @throws UMOTransactionException
+	 * @throws TransactionException
 	 */
-	protected abstract void doRollback() throws UMOTransactionException;
+	protected abstract void doRollback() throws TransactionException;
 	
 }

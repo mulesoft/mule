@@ -16,29 +16,14 @@ package org.mule.config.builders;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.digester.CallMethodRule;
-import org.apache.commons.digester.Digester;
-import org.apache.commons.digester.NodeCreateRule;
-import org.apache.commons.digester.ObjectCreateRule;
-import org.apache.commons.digester.Rule;
-import org.apache.commons.digester.SetPropertiesRule;
+import org.apache.commons.digester.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
 import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.ConfigurationException;
-import org.mule.config.MuleConfiguration;
-import org.mule.config.MuleDtdResolver;
-import org.mule.config.PoolingProfile;
-import org.mule.config.PropertyFactory;
-import org.mule.config.QueueProfile;
-import org.mule.config.ThreadingProfile;
-import org.mule.config.converters.ConnectorConverter;
-import org.mule.config.converters.EndpointConverter;
-import org.mule.config.converters.EndpointURIConverter;
-import org.mule.config.converters.TransactionFactoryConverter;
-import org.mule.config.converters.TransformerConverter;
+import org.mule.config.*;
+import org.mule.config.converters.*;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.impl.DefaultLifecycleAdapter;
 import org.mule.impl.MuleDescriptor;
@@ -54,19 +39,12 @@ import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.response.ResponseMessageRouter;
 import org.mule.transaction.constraints.BatchConstraint;
-import org.mule.umo.UMOAgent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.UMOExceptionStrategy;
-import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOInterceptor;
-import org.mule.umo.UMOManager;
-import org.mule.umo.UMOTransactionFactory;
-import org.mule.umo.UMOTransactionManagerFactory;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.model.ComponentResolverException;
-import org.mule.umo.model.UMOContainerContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.UMOInboundMessageRouter;
@@ -85,19 +63,10 @@ import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.beans.ExceptionListener;
 
 /**
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that builds a
@@ -147,7 +116,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public static final String INTERCEPTOR_INTERFACE = UMOInterceptor.class.getName();
     public static final String ROUTER_INTERFACE = UMOOutboundRouter.class.getName();
     public static final String FILTER_INTERFACE = UMOFilter.class.getName();
-    public static final String EXCEPTION_STRATEGY_INTERFACE = UMOExceptionStrategy.class.getName();
+    public static final String EXCEPTION_STRATEGY_INTERFACE = ExceptionListener.class.getName();
 
     protected UMOManager manager;
     protected Digester digester;
@@ -155,8 +124,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     private List transformerReferences = new ArrayList();
     private List endpointReferences = new ArrayList();
 
-    public MuleXmlConfigurationBuilder()
-    {
+    public MuleXmlConfigurationBuilder() throws ConfigurationException {
         ConvertUtils.register(new EndpointConverter(), UMOEndpoint.class);
         ConvertUtils.register(new TransformerConverter(), UMOTransformer.class);
         ConvertUtils.register(new ConnectorConverter(), UMOConnector.class);
@@ -226,7 +194,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 }
                 catch (FileNotFoundException e)
                 {
-                    throw new ConfigurationException("Failed to find resource on the local file system: " + configResource, e);
+                    throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configResource), e);
 
                 }
             } else {
@@ -236,7 +204,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                     is = url.openStream();
                 } catch (Exception e)
                 {
-                    throw new ConfigurationException("Failed to find resource on the classpath, as a Url or on the local file system: " + configResource);
+                    throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configResource));
                 }
             }
         }
@@ -255,7 +223,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 readers[i] = new InputStreamReader(loadConfig(resources[i].trim()), "UTF-8");
             } catch (UnsupportedEncodingException e)
             {
-                throw new ConfigurationException(e.getMessage(), e);
+                throw new ConfigurationException(e);
             }
         }
         return configure(readers);
@@ -264,14 +232,20 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public UMOManager configure(Reader[] configResources) throws ConfigurationException
     {
         manager = MuleManager.getInstance();
-        try
+
+        Reader configResource = null;
+        for (int i = 0; i < configResources.length; i++)
         {
-            for (int i = 0; i < configResources.length; i++)
-            {
-                Reader configResource = configResources[i];
+            try {
+                configResource = configResources[i];
                 digester.push(manager);
                 manager = (UMOManager)digester.parse(configResource);
+            } catch (Exception e) {
+                throw new ConfigurationException(new Message(Messages.FAILED_TO_PARSE_CONFIG_RESOURCE_X, configResource), e);
             }
+        }
+        try
+        {
             setContainerProperties();
             setTransformers();
             setGlobalEndpoints();
@@ -279,7 +253,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         }
         catch (Exception e)
         {
-            throw new ConfigurationException("Failed to parse configuration resource(s): " + e.getMessage(), e);
+            throw new ConfigurationException(new Message(Messages.X_FAILED_TO_INITIALISE, "MuleManager"), e);
         }
         return manager;
     }
@@ -292,7 +266,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         return manager != null;
     }
 
-    protected void setContainerProperties() throws ComponentResolverException
+    protected void setContainerProperties() throws ContainerException
     {
         UMOContainerContext ctx = manager.getContainerContext();
         try
@@ -460,7 +434,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         try {
             nodeCreateRule = new NodeCreateRule(Node.DOCUMENT_FRAGMENT_NODE);
         } catch (ParserConfigurationException e) {
-            throw new ConfigurationException("could not create NodeCreateRule", e);
+            throw new ConfigurationException(e);
         }
         digester.addRule(path + "/configuration", nodeCreateRule);
         digester.addSetRoot(path + "/configuration", "setContainerContextConfiguration");
@@ -910,16 +884,14 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester.addSetNext(path, "setFilter");
     }
 
-    protected void addEndpointRules(Digester digester, String path, String method)
-    {
+    protected void addEndpointRules(Digester digester, String path, String method) throws ConfigurationException {
         //Set message endpoint
         path += "/endpoint";
         digester.addObjectCreate(path, DEFAULT_ENDPOINT);
         addCommonEndpointRules(digester, path, method);
     }
 
-    protected void addGlobalReferenceEndpointRules(Digester digester, String path, final String method)
-    {
+    protected void addGlobalReferenceEndpointRules(Digester digester, String path, final String method) throws ConfigurationException {
         //Set message endpoint
         path += "/global-endpoint";
         digester.addRule(path, new Rule() {
@@ -941,8 +913,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         addCommonEndpointRules(digester, path, null);
     }
 
-    protected void addCommonEndpointRules(Digester digester, String path, String method)
-    {
+    protected void addCommonEndpointRules(Digester digester, String path, String method) throws ConfigurationException {
         addSetPropertiesRule(path, digester, new String[]{"address", "transformers"}, new String[]{"endpointURI", "transformer"} );
         addMulePropertiesRule(path, digester, false);
         addTransactionConfigRules(path, digester);
@@ -971,16 +942,15 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester.addSetNext(path + "/transaction", "setTransactionConfig");
     }
 
-    protected void addExceptionStrategyRules(Digester digester, String path)
-    {
+    protected void addExceptionStrategyRules(Digester digester, String path) throws ConfigurationException {
         path += "/exception-strategy";
         digester.addObjectCreate(path , EXCEPTION_STRATEGY_INTERFACE, "className");
         addMulePropertiesRule(path, digester, true);
 
         //Add endpoint rules
-        addEndpointRules(digester, path, "setEndpoint");
-        addGlobalReferenceEndpointRules(digester, path, "setEndpoint");
-        digester.addSetNext(path, "setExceptionStrategy");
+        addEndpointRules(digester, path, "addEndpoint");
+        addGlobalReferenceEndpointRules(digester, path, "addEndpoint");
+        digester.addSetNext(path, "setExceptionListener");
     }
 
     protected void addSetPropertiesRule(String path, Digester digester) {

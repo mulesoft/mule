@@ -16,6 +16,7 @@ package org.mule.routing.inbound;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.MessagingException;
 import org.mule.umo.routing.RoutingException;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
     private Comparator comparator;
     private Map eventGroups = new HashMap();
 
-    public UMOEvent[] process(UMOEvent event) throws RoutingException
+    public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
         if(isMatch(event)) {
             EventGroup eg = addEvent(event);

@@ -15,7 +15,8 @@
 
 package org.mule.transaction;
 
-import org.mule.umo.UMOTransactionException;
+import org.mule.umo.TransactionException;
+import org.mule.config.i18n.Message;
 
 /**
  * <p><code>IllegalTransactionStateException</code> TODO (document class)
@@ -23,23 +24,22 @@ import org.mule.umo.UMOTransactionException;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class IllegalTransactionStateException extends UMOTransactionException
+public class IllegalTransactionStateException extends TransactionStatusException
 {
     /**
-     * @param message
+     * @param message the exception message
      */
-    public IllegalTransactionStateException(String message)
+    public IllegalTransactionStateException(Message message)
     {
         super(message);
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param message the exception message
+     * @param cause   the exception that cause this exception to be thrown
      */
-    public IllegalTransactionStateException(String message, Throwable cause)
+    public IllegalTransactionStateException(Message message, Throwable cause)
     {
         super(message, cause);
     }
-
 }
