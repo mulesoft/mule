@@ -169,23 +169,23 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester = new Digester();
         digester.setEntityResolver(new MuleDtdResolver());
 
-        digester.setErrorHandler(new ErrorHandler() {
-
-            public void error(SAXParseException exception) throws SAXException
-            {
-                logger.error(exception.getMessage(), exception);
-            }
-
-            public void fatalError(SAXParseException exception) throws SAXException
-            {
-                logger.fatal(exception.getMessage(), exception);
-            }
-
-            public void warning(SAXParseException exception) throws SAXException
-            {
-                logger.warn(exception.getMessage());
-            }
-        });
+//        digester.setErrorHandler(new ErrorHandler() {
+//
+//            public void error(SAXParseException exception) throws SAXException
+//            {
+//                logger.error(exception.getMessage(), exception);
+//            }
+//
+//            public void fatalError(SAXParseException exception) throws SAXException
+//            {
+//                logger.fatal(exception.getMessage(), exception);
+//            }
+//
+//            public void warning(SAXParseException exception) throws SAXException
+//            {
+//                logger.warn(exception.getMessage());
+//            }
+//        });
 
         String path = "mule-configuration";
         addMuleConfigurationRules(digester, path);
@@ -1007,11 +1007,15 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                     props.remove(MuleConfiguration.USE_MANAGER_PROPERTIES);
                 }
                 super.end(string, string1);
+                String trans = (String)props.remove("transformer");
                 if(setAsBeanProperties)
                 {
                     org.mule.util.BeanUtils.populateWithoutFail(digester.peek(), props, true);
                 } else {
                     BeanUtils.setProperty(digester.peek(), string1, props);
+                }
+                if(trans!=null) {
+                    addTransformerReference("transformer", trans, digester.peek());
                 }
             }
         });
