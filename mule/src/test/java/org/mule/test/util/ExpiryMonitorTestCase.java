@@ -14,8 +14,8 @@
 package org.mule.test.util;
 
 import org.mule.tck.NamedTestCase;
-import org.mule.util.monitor.ExpiryMonitor;
 import org.mule.util.monitor.Expirable;
+import org.mule.util.monitor.ExpiryMonitor;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -40,7 +40,7 @@ public class ExpiryMonitorTestCase extends NamedTestCase
             }
         };
         monitor.addExpirable(300, e);
-        Thread.sleep(500);
+        Thread.sleep(800);
         assertTrue(expired);
         assertTrue(!monitor.isRegistered(e));
     }
@@ -55,9 +55,9 @@ public class ExpiryMonitorTestCase extends NamedTestCase
             }
         };
         monitor.addExpirable(800, e);
-        Thread.sleep(500);
+        Thread.sleep(300);
         assertTrue(!expired);
-        Thread.sleep(500);
+        Thread.sleep(800);
         assertTrue(expired);
         assertTrue(!monitor.isRegistered(e));
     }
@@ -71,13 +71,13 @@ public class ExpiryMonitorTestCase extends NamedTestCase
                 expired=true;
             }
         };
-        monitor.addExpirable(300, e);
+        monitor.addExpirable(600, e);
         Thread.sleep(200);
         assertTrue(!expired);
         monitor.resetExpirable(e);
         Thread.sleep(200);
         assertTrue(!expired);
-        Thread.sleep(200);
+        Thread.sleep(600);
         assertTrue(expired);
 
         assertTrue(!monitor.isRegistered(e));
@@ -92,12 +92,12 @@ public class ExpiryMonitorTestCase extends NamedTestCase
                 expired=true;
             }
         };
-        monitor.addExpirable(800, e);
-        Thread.sleep(500);
+        monitor.addExpirable(1000, e);
+        Thread.sleep(200);
         assertTrue(!expired);
         Thread.sleep(200);
         monitor.removeExpirable(e);
-        Thread.sleep(300);
+        Thread.sleep(800);
         assertTrue(!expired);
         assertTrue(!monitor.isRegistered(e));
     }
