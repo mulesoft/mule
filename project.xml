@@ -165,7 +165,7 @@
             <url>http://xstream.codehaus.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-                <mule.mini>false</mule.mini>
+                <mule.mini>true</mule.mini>
             </properties>
         </dependency>
         <dependency>
@@ -174,7 +174,7 @@
             <version>${xpp3_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-                <mule.mini>false</mule.mini>
+                <mule.mini>true</mule.mini>
             </properties>
         </dependency>
 
