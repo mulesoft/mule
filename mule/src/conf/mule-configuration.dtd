@@ -504,7 +504,7 @@ The <i>connection-descriptor</i> element specifies one or more message
     connector will be created. Users can specify ALWAYS to aleways create a new connector
     or NEVER which will require a connector to be pre-configured.
 -->
-<!ATTLIST endpoint createConnector	(GET_OR_CREATE | ALWAYS_CREATE | NEVER_CREATE)   		"GET_OR_CREATE">
+<!ATTLIST endpoint createConnector	(GET_OR_CREATE | ALWAYS_CREATE | NEVER_CREATE)   	#IMPLIED>
 
 <!--
     A global endpoint reference
