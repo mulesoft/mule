@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <groupId>mule</groupId>
+    <id>mule-extras-plexus</id>
+    <artifactId>mule-extras-plexus</artifactId>
+    <name>Plexus Extensions</name>
+    <description>Provides extensions to use Plexus with Mule, such as using the container as a factory for Mule managed objects. It's good for you!</description>
+    <dependencies>
+        <dependency>
+            <groupId>plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+            <version>1.0-alpha-2-SNAPSHOT</version>
+            <url>http://plexus.codehaus.org</url>
+        </dependency>
+        <dependency>
+            <groupId>plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>1.0-alpha-2-SNAPSHOT</version>
+            <url>http://plexus.codehaus.org</url>
+        </dependency>
+        <dependency>
+            <groupId>classworlds</groupId>
+            <artifactId>classworlds</artifactId>
+            <version>1.1-alpha-1</version>
+            <url>http://classworlds.codehaus.org</url>
+        </dependency>
+    </dependencies>
+</project>
