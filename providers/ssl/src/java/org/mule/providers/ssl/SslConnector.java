@@ -35,7 +35,6 @@ public class SslConnector extends TcpConnector
 {
     public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
-    public static final String DEFAULT_SSL_TYPE = "SSLv3";
     public static final String DEFAULT_MANAGER_ALGORITHM = "SunX509";
     public static final String DEFAULT_PROTOCOL_HANDLER = "com.sun.net.ssl.internal.www.protocol";
 
