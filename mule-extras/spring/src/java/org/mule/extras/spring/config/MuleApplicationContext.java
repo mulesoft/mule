@@ -19,6 +19,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.File;
 import java.io.IOException;

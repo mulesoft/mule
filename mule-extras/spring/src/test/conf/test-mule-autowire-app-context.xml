@@ -449,6 +449,9 @@
                             <property name="expectedType"><value>java.lang.String</value></property>
                         </bean>
                     </property>
+                    <property name="transformer">
+                        <ref local="TestCompressionTransformer"/>
+                    </property>
                 </bean>
                 <bean id="router2" class="org.mule.routing.outbound.FilteringOutboundRouter">
                     <property name="endpoints"><list><ref local="transactedOutboundEndpoint"/></list></property>

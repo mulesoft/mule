@@ -152,6 +152,9 @@
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint name="TestApple-Out" type="sender" address="test://appleQ2"/>
                     <filter expectedType="java.lang.String" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                    <properties>
+                        <property name="transformer" value="TestCompressionTransformer"/>
+                    </properties>
                 </router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <global-endpoint name="waterMelonEndpoint"/>

@@ -14,9 +14,11 @@
 package org.mule.extras.spring.config;
 
 import org.mule.config.MuleDtdResolver;
+import org.mule.umo.transformer.UMOTransformer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.BeansDtdResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
@@ -53,6 +55,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         super(beanDefinitionRegistry);
         setEntityResolver(createEntityResolver());
         this.configCount = configCount;
+        ((DefaultListableBeanFactory)beanDefinitionRegistry).registerCustomEditor(UMOTransformer.class, new TransformerEditor());
     }
 
     public int registerBeanDefinitions(Document document, Resource resource) throws BeansException
