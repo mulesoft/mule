@@ -65,10 +65,11 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
     public void testAuthenticationFailureNoContext() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage m = client.send("http://localhost:4567/index.html", "", null);
+        UMOMessage m = client.send("vm://my.queue", "foo", null);
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
+        System.out.println(m.getPayload());
+        assertEquals(100, m.getErrorCode());
 
     }
 
@@ -81,11 +82,11 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         user = new String(strategy.encrypt(user.getBytes()));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
-        UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
+        UMOMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
         System.out.println(m.getPayload());
+        assertEquals(100, m.getErrorCode());
     }
 
     public void testAuthenticationAuthorised() throws Exception
@@ -98,10 +99,9 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         user = new String(strategy.encrypt(user.getBytes()));
         props.put(MuleProperties.MULE_USER_PROPERTY, user);
 
-        UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
+        UMOMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
-        int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        assertEquals(HttpConstants.SC_OK, status);
+        assertEquals(0, m.getErrorCode());
         System.out.println(m.getPayload());
     }
 }

@@ -32,7 +32,7 @@
             implementation="org.mule.components.simple.EchoComponent"
             containerManaged="false">
             <inbound-router>
-                <endpoint address="http://localhost:4567">
+                <endpoint address="vm://my.queue">
                     <security-filter className="org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter">
                         <properties>
                             <property name="strategyName" value="PBE"/>
