@@ -14,14 +14,10 @@
     </connector>
     
     <model name="model">
-        <mule-descriptor name="LdapUMO"
+        <mule-descriptor name="DummyLdapUMO"
             implementation="org.mule.test.usecases.sync.TestAuthenticationUMO">
             <inbound-router>
-                <endpoint synchronous="true" address="tcp://localhost:4444">
-<!--                    <properties>-->
-<!--                        <property name="SYNC_RECEIVE" value="true"/>-->
-<!--                    </properties>-->
-                </endpoint>
+                <endpoint synchronous="true" address="tcp://localhost:4444"/>
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
