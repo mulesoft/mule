@@ -286,6 +286,8 @@
                 </includes>
                 <excludes>
                     <exclude>**/*.xml</exclude>
+                    <exclude>**/*.cer</exclude>
+                    <exclude>**/*Keystore</exclude>
                     <exclude>**/*.groovy</exclude>
                     <exclude>**/log4j.properties</exclude>
                 </excludes>

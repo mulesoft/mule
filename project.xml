@@ -25,10 +25,9 @@
     <siteAddress>www.muleumo.org</siteAddress>
     <siteDirectory>/var/www/html/muleumo.org/</siteDirectory>
     <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
-    <!-- repository CVS -->
     <repository>
-        <!--        <connection>scm:cvs:pserver:anonymous@cvs.sourceforge.net:/cvsroot/mule:mule</connection>-->
-        <developerConnection>scm:cvs:ext:${maven.username}@cvs.sourceforge.net:/cvsroot/mule:mule</developerConnection>
+        <connection>scm:cvs:pserver:anonymous@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</connection>
+        <developerConnection>scm:cvs:ext:${maven.username}@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</developerConnection>
         <url>http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/mule</url>
     </repository>
     <mailingLists>
@@ -47,14 +46,14 @@
             <organization>Cubis Limited</organization>
         </developer>
         <developer>
-            <name>Ian De Beer</name>
-            <id>iandbeer</id>
-            <email></email>
+            <name>Guillaume Nodet</name>
+            <id>gnt</id>
+            <email>gnt@codehaus.org</email>
         </developer>
         <developer>
-            <name>Magnus Stattin</name>
-            <id>mgnus_sattin</id>
-            <email></email>
+            <name>Brian Topping</name>
+            <id>topping</id>
+            <email>topping@codehaus.org</email>
         </developer>
         <developer>
             <!-- Stephane Vanmeerhaeghe -->
@@ -70,8 +69,13 @@
             <email></email>
         </contributor>
         <contributor>
-            <name>Guillaume Nodet</name>
-            <id></id>
+            <name>Ian De Beer</name>
+            <id>iandbear</id>
+            <email></email>
+        </contributor>
+        <contributor>
+            <name>Magnus Stattin</name>
+            <id>mgnus_sattin</id>
             <email></email>
         </contributor>
         <contributor>
