@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<project>
+    <extend>${basedir}/../project.xml</extend>
+		<id>mule-extras-pgp</id>
+    <artifactId>mule-extras-pgp</artifactId>
+    <name>Mule PGP Security</name>
+    <description>A Mule implementation of PGP security using cryptix libraries. See <a href="http://www.cryptix.org/">Cryptix</a>.
+    </description>
+    <shortDescription>pgp</shortDescription>
+    <dependencies>
+        <dependency>
+            <groupId>javamail</groupId>
+            <artifactId>javamail</artifactId>
+            <version>${javamail_version}</version>
+            <url>http://java.sun.com/products/javamail/</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-jce</groupId>
+            <artifactId>cryptix-jce-api</artifactId>
+            <version>20040825</version>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-jce</groupId>
+            <artifactId>cryptix-jce-provider</artifactId>
+            <version>20040825</version>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-openpgp</groupId>
+            <artifactId>certpath-api-compat</artifactId>
+            <version>20050317</version>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-openpgp</groupId>
+            <artifactId>cryptix-message-api</artifactId>
+            <version>20050317</version>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-openpgp</groupId>
+            <artifactId>cryptix-openpgp-provider</artifactId>
+            <version>20050317</version>
+        </dependency>
+        <dependency>
+            <groupId>cryptix-openpgp</groupId>
+            <artifactId>cryptix-pki-api</artifactId>
+            <version>20050317</version>
+        </dependency>
+    </dependencies>
+</project>
