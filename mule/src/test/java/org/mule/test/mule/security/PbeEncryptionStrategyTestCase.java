@@ -30,7 +30,7 @@ public class PbeEncryptionStrategyTestCase extends NamedTestCase
 
         byte[] b = pbe.encrypt("hello".getBytes());
 
-        String s= new String(pbe.decrypt(b));
+        String s= new String(pbe.decrypt(b), "UTF-8");
         assertEquals("hello", s);
     }
 

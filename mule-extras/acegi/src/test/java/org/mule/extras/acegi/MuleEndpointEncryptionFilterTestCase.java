@@ -104,4 +104,37 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         assertEquals(0, m.getErrorCode());
         System.out.println(m.getPayload());
     }
+
+    public void testAuthenticationFailureBadCredentialsHttp() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
+        String user = new MuleUserAuthenticationToken("anonX", "anonX".toCharArray()).getToken();
+        user = new String(strategy.encrypt(user.getBytes()));
+        props.put(MuleProperties.MULE_USER_PROPERTY, user);
+
+        UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
+        assertNotNull(m);
+        int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
+        System.out.println(m.getPayload());
+        assertEquals(401, status);
+    }
+
+    public void testAuthenticationAuthorisedHttp() throws Exception
+    {
+        MuleClient client = new MuleClient();
+
+        Map props = new HashMap();
+        UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
+        String user = new MuleUserAuthenticationToken("anon", "anon".toCharArray()).getToken();
+        user = new String(strategy.encrypt(user.getBytes()));
+        props.put(MuleProperties.MULE_USER_PROPERTY, user);
+
+        UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
+        assertNotNull(m);
+        int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
+        System.out.println(m.getPayload());
+        assertEquals(200, status);
+    }
 }

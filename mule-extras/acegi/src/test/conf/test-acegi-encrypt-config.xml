@@ -39,6 +39,13 @@
                         </properties>
                     </security-filter>
                 </endpoint>
+                <endpoint address="http://localhost:4567">
+                    <security-filter className="org.mule.impl.security.filters.MuleEncryptionEndpointSecurityFilter">
+                        <properties>
+                            <property name="strategyName" value="PBE"/>
+                        </properties>
+                    </security-filter>
+                </endpoint>
             </inbound-router>
         </mule-descriptor> 
     </model>
