@@ -81,7 +81,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
             String correlationId = message.getJMSCorrelationID();
             //If the reply to is set we need to send a response
             //so make this a synchronous call
-            boolean synchronous =  connector.isSynchronous();
+            boolean synchronous =  endpoint.isSynchronous();
             if(message.getJMSReplyTo()!=null) {
                 synchronous = true;
             }

@@ -483,6 +483,13 @@ The <i>connection-descriptor</i> element specifies one or more message
 <!ATTLIST endpoint transformers	IDREFS			#IMPLIED>
 
 <!--
+    synchronous
+    determines if requests received on this endpoint execute within a single thread
+    if not set the MuleManager synchronous property will be used
+-->
+<!ATTLIST endpoint synchronous	(true|false)			#IMPLIED>
+
+<!--
     A global endpoint reference
 -->
 <!ELEMENT global-endpoint (transaction?, filter?, security-filter?, properties*)>
@@ -504,6 +511,13 @@ The <i>connection-descriptor</i> element specifies one or more message
     Used to override the transformers on the global endpoint
 -->
 <!ATTLIST global-endpoint transformers	IDREFS			#IMPLIED>
+
+<!--
+    synchronous
+    determines if requests received on this endpoint execute within a single thread
+    if not set the MuleManager synchronous property will be used
+-->
+<!ATTLIST global-endpoint synchronous	(true|false)			#IMPLIED>
 
 <!--
 A security filter ensures that all requestsmade via an endpoint will be authenticated

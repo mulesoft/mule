@@ -96,9 +96,6 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public AxisConnector()
     {
         super();
-        //by default the Axis connector should be synchronous
-        //unless overridden
-        synchronous = new SynchronizedBoolean(true);
     }
 
     public void doInitialise() throws InitialisationException
@@ -163,6 +160,12 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
+        //todo May need to change this
+        if(!endpoint.isSynchronous()) {
+            logger.debug("overriding endpoint synchronicity and setting it to true for this Axis endpoint");
+            endpoint.setSynchronous(true);
+        }
+
         UMOMessageReceiver receiver = super.createReceiver(component, endpoint);
         registerAxisComponent(receiver);
         return receiver;
@@ -329,7 +332,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             startsWith = true;
             //if we are using a socket based endpointUri make sure it is running
             //synchronously by default
-            String sync = "synchronous=" + synchronous.get();
+            String sync = "synchronous=" + receiver.getEndpoint().isSynchronous();
             if(endpoint.indexOf("?") > -1) {
                 endpoint += "&" + sync;
             } else {
@@ -408,15 +411,6 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public void setServerConfig(String serverConfig)
     {
         this.serverConfig = serverConfig;
-    }
-
-    public boolean isSynchronous()
-    {
-        if(synchronous==null) {
-            return true;
-        } else {
-            return synchronous.get();
-        }
     }
 
     public List getBeanTypes()

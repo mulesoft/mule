@@ -112,7 +112,7 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
 
                     // Mark as deleted
                     messages[i].setFlag(Flags.Flag.DELETED, true);
-                    routeMessage(message, connector.isSynchronous());
+                    routeMessage(message, endpoint.isSynchronous());
                 }
             }
             catch (Exception e)

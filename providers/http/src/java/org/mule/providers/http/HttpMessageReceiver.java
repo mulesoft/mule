@@ -209,7 +209,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             logger.debug((String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
                         }
                         OutputStream os = new ResponseOutputStream(dataOut, socket);
-                        UMOMessage returnMessage = routeMessage(message, connector.isSynchronous(), os);
+                        UMOMessage returnMessage = routeMessage(message, endpoint.isSynchronous(), os);
                         if (returnMessage == null)
                         {
                             returnMessage = new MuleMessage("", null);

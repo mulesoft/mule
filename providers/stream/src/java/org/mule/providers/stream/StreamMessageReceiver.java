@@ -67,7 +67,7 @@ public class StreamMessageReceiver extends PollingMessageReceiver
             message.append(new String(buf, 0, len));
 
             UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(message.toString()));
-            routeMessage(umoMessage,  connector.isSynchronous());
+            routeMessage(umoMessage,  endpoint.isSynchronous());
 
             ((StreamConnector) endpoint.getConnector()).reinitialise();
         }

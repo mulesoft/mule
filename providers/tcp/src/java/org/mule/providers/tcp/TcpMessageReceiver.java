@@ -293,7 +293,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
         {
             UMOMessageAdapter adapter = connector.getMessageAdapter(data);
             OutputStream os = new ResponseOutputStream(socket.getOutputStream(), socket);
-            UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), connector.isSynchronous(), os);
+            UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous(), os);
             if (returnMessage != null)
             {
                 return returnMessage.getPayloadAsBytes();

@@ -215,7 +215,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Runna
             try
             {
                 UMOMessageAdapter adapter = connector.getMessageAdapter(packet);
-                UMOMessage returnMessage = routeMessage(new MuleMessage(adapter),  connector.isSynchronous());
+                UMOMessage returnMessage = routeMessage(new MuleMessage(adapter),  endpoint.isSynchronous());
 
                 if (returnMessage != null)
                 {

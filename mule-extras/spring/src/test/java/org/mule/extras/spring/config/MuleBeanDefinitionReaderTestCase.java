@@ -14,6 +14,7 @@
 package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
+import org.mule.providers.vm.VMConnector;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.tck.AbstractConfigBuilderTestCase;
@@ -46,9 +47,9 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
     // Test spring bean configs
 
     public void testConnectorBean(){
-        UMOConnector c = MuleManager.getInstance().lookupConnector("beanConnector");
+        VMConnector c = (VMConnector)MuleManager.getInstance().lookupConnector("beanConnector");
         assertNotNull(c);
-        assertTrue(c.isSynchronous());
+        assertTrue(c.isQueueEvents());
     }
 
     public void testEndpointPropertyBean()

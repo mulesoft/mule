@@ -136,4 +136,13 @@ public interface UMOEndpoint extends UMOImmutableEndpoint
      * @see org.mule.umo.security.UMOEndpointSecurityFilter
      */
     public void setSecurityFilter(UMOEndpointSecurityFilter filter);
+
+    /**
+     * Determines if requests originating from this endpoint should be synchronous
+     * i.e. execute in a single thread and possibly return an result.  This property
+     * is only used when the endpoint is of type 'receiver'.
+     * @param synchronous whether requests on this endpoint should execute in a single
+     * thread. This property is only used when the endpoint is of type 'receiver'
+     */
+    public void setSynchronous(boolean synchronous);
 }

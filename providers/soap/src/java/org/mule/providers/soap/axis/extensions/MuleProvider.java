@@ -48,7 +48,7 @@ public class MuleProvider extends RPCProvider
             throw new AxisFault("Could not find Mule registered service: " + s);
         }
         Class[] classes = ServiceProxy.getInterfacesForComponent(receiver.getComponent());
-        return ServiceProxy.createAxisProxy(receiver, connector.isSynchronous(), classes);
+        return ServiceProxy.createAxisProxy(receiver, true, classes);
     }
 
     protected Class getServiceClass(String s, SOAPService soapService, MessageContext messageContext) throws AxisFault

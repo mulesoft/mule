@@ -59,7 +59,7 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
                 throw new InitialisationException("No service interfaces could be found for component: " + component.getDescriptor().getName());
             }
             VirtualService.enable();
-            VirtualService vService = new VirtualService(interfaces, ServiceProxy.createGlueServiceHandler(this,  connector.isSynchronous()));
+            VirtualService vService = new VirtualService(interfaces, ServiceProxy.createGlueServiceHandler(this,  endpoint.isSynchronous()));
 
             if(createServer) {
                 registerContextHeaders();

@@ -175,7 +175,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements
                 logger.info("UMOMessageAdapter is a: "
                         + adapter.getClass().getName());
                 UMOMessage returnMessage = routeMessage(
-                        new MuleMessage(adapter), connector.isSynchronous());
+                        new MuleMessage(adapter), endpoint.isSynchronous());
 
                 if (returnMessage != null)
                 {

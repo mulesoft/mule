@@ -114,11 +114,17 @@ public interface UMOConnector extends Startable, Stoppable, Disposable, Initiali
      */
     public void handleException(Object message, Throwable exception);
 
+    /**
+     * The dispatcher factory is used to create a message dispatcher of the current
+     * request
+     * @param factory the factory to use when a dispatcher request is madr
+     */
     public void setDispatcherFactory(UMOMessageDispatcherFactory factory);
 
+    /**
+     * The dispatcher factory is used to create a message dispatcher of the current
+     * request
+     * @return the factory to use when a dispatcher request is madr
+     */
     public UMOMessageDispatcherFactory getDispatcherFactory();
-
-    public void setSynchronous(boolean value);
-
-    public boolean isSynchronous();
 }

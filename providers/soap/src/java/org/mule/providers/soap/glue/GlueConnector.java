@@ -119,13 +119,4 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     {
         this.context = context;
     }
-
-    public boolean isSynchronous()
-    {
-        if(synchronous==null) {
-            return true;
-        } else {
-            return synchronous.get();
-        }
-    }
 }

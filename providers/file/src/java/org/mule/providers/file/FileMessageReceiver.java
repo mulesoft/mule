@@ -138,7 +138,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
                 }
               
                 UMOMessage message = new MuleMessage(msgAdapter);
-                routeMessage(message, connector.isSynchronous());
+                routeMessage(message, endpoint.isSynchronous());
             }
         }
         catch (Exception e)

@@ -105,7 +105,7 @@ public class JdbcMessageReceiver extends PollingMessageReceiver {
 					}
 		            UMOMessageAdapter msgAdapter = this.connector.getMessageAdapter(result);
 		            UMOMessage message = new MuleMessage(msgAdapter);
-		            routeMessage(message, tx, tx != null || this.connector.isSynchronous());
+		            routeMessage(message, tx, tx != null || endpoint.isSynchronous());
 		            if (tx == null) {
 		            	DbUtils.commitAndClose(con);
 		            }

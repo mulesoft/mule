@@ -7,7 +7,7 @@
 <mule-configuration id="Test_Mule_Properties_with_beans" version="1.0">
 
     <bean id="beanConnector" class="org.mule.providers.vm.VMConnector">
-        <spring-property name="synchronous">
+        <spring-property name="queueEvents">
             <value>true</value>
         </spring-property>
     </bean>
