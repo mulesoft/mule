@@ -103,6 +103,7 @@ public class JmsMessageReceiver extends
         if (logger.isDebugEnabled())
         {
             logger.debug("Message received it is of type: " + message.getClass().getName());
+            logger.debug("Message received on " + message.getJMSDestination() + " (" + message.getJMSDestination().getClass().getName() + ")");
         }
 
         String correlationId = message.getJMSCorrelationID();
