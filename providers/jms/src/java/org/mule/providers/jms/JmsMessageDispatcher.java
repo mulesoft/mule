@@ -58,7 +58,6 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     {
         super(connector);
         this.connector = connector;
-        //eventTimeout = MuleManager.getInstance().getConfiguration().getDefaultEventTimeout();
     }
 
     /* (non-Javadoc)
@@ -91,87 +90,89 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
         Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
         Object message = event.getTransformedMessage();
-        if (message instanceof Message)
-        {
-            Message msg = (Message) message;
-            Destination replyTo = null;
 
-            Object tempReplyTo = event.removeProperty("JMSReplyTo");
-            if(tempReplyTo!=null)
-            {
-                if(tempReplyTo instanceof Destination) {
-                    replyTo = (Destination)tempReplyTo;
-                } else {
-                    boolean replyToTopic = false;
-                    String reply = tempReplyTo.toString();
-                    int i = reply.indexOf(":");
-                    if(i > -1) {
-                        String qtype = reply.substring(0, i);
-                        replyToTopic = "topic".equalsIgnoreCase(qtype);
-                        reply = reply.substring(i+1);
-                    }
-                    replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
-                }
-                msg.setJMSReplyTo(replyTo);
-             }
-                //Are we going to wait for a return event?
-             if(syncReceive && replyTo==null) {
-                replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
-                msg.setJMSReplyTo(replyTo);
-            }
-            if(replyTo!=null) {
-                replyToConsumer = connector.getJmsSupport().createConsumer(session, replyTo);                
-            }
-
-            if(producer==null) {
-                producer = connector.getJmsSupport().createProducer(session, dest);
-            }
-
-            //QoS support
-            String ttlString = (String)event.removeProperty("TimeToLive");
-            String priorityString = (String)event.removeProperty("Priority");
-            String deliveryModeString = (String)event.removeProperty("DeliveryMode");
-
-            if(ttlString==null && priorityString==null && deliveryModeString == null) {
-                connector.getJmsSupport().send(producer, msg);
-            } else {
-                long ttl = Message.DEFAULT_TIME_TO_LIVE;
-                int priority  = Message.DEFAULT_PRIORITY;
-                int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
-
-                if(ttlString!=null) ttl = Long.parseLong(ttlString);
-                if(priorityString!=null) priority = Integer.parseInt(priorityString);
-                if(deliveryModeString!=null) deliveryMode = Integer.parseInt(deliveryModeString);
-
-                connector.getJmsSupport().send(producer, msg, deliveryMode, priority, ttl);
-            }
-
-            if(replyToConsumer!=null && event.isSynchronous()) {
-                try
-                {
-                    int timeout = event.getTimeout();
-                    logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
-                    Message result = replyToConsumer.receive(timeout);
-                    if(result==null){
-                        logger.debug("No message was returned via replyTo destination");
-                        return null;
-                    } else {
-                        Object resultObject = JmsMessageUtils.getObjectForMessage(result);
-                        return new MuleMessage(resultObject, null);
-                    }
-                } finally
-                {
-                    replyToConsumer.close();
-                }
-            }
-            return null;
-        }
-        else
+         if (!(message instanceof Message))
         {
             throw new MuleException("Message is not a JMS message, it is of type: "
                     + message.getClass().getName()
                     + ". Check the transformer for this Connector: "  + connector.getName());
         }
+
+        Message msg = (Message) message;
+        if(event.getMessage().getCorrelationId()!=null) {
+            msg.setJMSCorrelationID(event.getMessage().getCorrelationId());
+        }
+        Destination replyTo = null;
+
+        Object tempReplyTo = event.removeProperty("JMSReplyTo");
+        if(tempReplyTo!=null)
+        {
+            if(tempReplyTo instanceof Destination) {
+                replyTo = (Destination)tempReplyTo;
+            } else {
+                boolean replyToTopic = false;
+                String reply = tempReplyTo.toString();
+                int i = reply.indexOf(":");
+                if(i > -1) {
+                    String qtype = reply.substring(0, i);
+                    replyToTopic = "topic".equalsIgnoreCase(qtype);
+                    reply = reply.substring(i+1);
+                }
+                replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
+            }
+            msg.setJMSReplyTo(replyTo);
+         }
+            //Are we going to wait for a return event?
+         if(syncReceive && replyTo==null) {
+            replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
+            msg.setJMSReplyTo(replyTo);
+        }
+        if(replyTo!=null) {
+            replyToConsumer = connector.getJmsSupport().createConsumer(session, replyTo);
+        }
+
+        if(producer==null) {
+            producer = connector.getJmsSupport().createProducer(session, dest);
+        }
+
+        //QoS support
+        String ttlString = (String)event.removeProperty("TimeToLive");
+        String priorityString = (String)event.removeProperty("Priority");
+        String deliveryModeString = (String)event.removeProperty("DeliveryMode");
+
+        if(ttlString==null && priorityString==null && deliveryModeString == null) {
+            connector.getJmsSupport().send(producer, msg);
+        } else {
+            long ttl = Message.DEFAULT_TIME_TO_LIVE;
+            int priority  = Message.DEFAULT_PRIORITY;
+            int deliveryMode = Message.DEFAULT_DELIVERY_MODE;
+
+            if(ttlString!=null) ttl = Long.parseLong(ttlString);
+            if(priorityString!=null) priority = Integer.parseInt(priorityString);
+            if(deliveryModeString!=null) deliveryMode = Integer.parseInt(deliveryModeString);
+
+            connector.getJmsSupport().send(producer, msg, deliveryMode, priority, ttl);
+        }
+
+        if(replyToConsumer!=null && event.isSynchronous()) {
+            try
+            {
+                int timeout = event.getTimeout();
+                logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
+                Message result = replyToConsumer.receive(timeout);
+                if(result==null){
+                    logger.debug("No message was returned via replyTo destination");
+                    return null;
+                } else {
+                    Object resultObject = JmsMessageUtils.getObjectForMessage(result);
+                    return new MuleMessage(resultObject, null);
+                }
+            } finally
+            {
+                replyToConsumer.close();
+            }
+        }
+        return null;
     }
 
     /* (non-Javadoc)
