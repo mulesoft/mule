@@ -14,11 +14,10 @@
 
 package org.mule.providers.jms.functional;
 
+import EDU.oswego.cs.dl.util.concurrent.CountDown;
 import org.mule.MuleManager;
-import org.mule.config.PoolingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleModel;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -26,7 +25,6 @@ import org.mule.providers.jms.MessageRedeliveredException;
 import org.mule.providers.jms.support.JmsTestUtils;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
-import org.mule.tck.NamedTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transaction.TransactionCoordination;
@@ -34,7 +32,6 @@ import org.mule.transaction.constraints.BatchConstraint;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOExceptionStrategy;
 import org.mule.umo.UMOManager;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
@@ -44,9 +41,10 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.QueueConnection;
 import javax.jms.Session;
 import javax.jms.TextMessage;
@@ -63,79 +61,29 @@ import java.util.List;
  * @version $Revision$
  */
 
-public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
+public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFunctionalTestCase
 {
-    public static final String DEFAULT_IN_QUEUE = "jms://in.queue";
-    public static final String DEFAULT_OUT_QUEUE = "jms://out.queue";
-    public static final String DEFAULT_IN_TOPIC = "jms://topic:in.topic";
-    public static final String DEFAULT_OUT_TOPIC = "jms://topic:out.topic";
-    public static final String DEFAULT_MESSAGE = "Test Message";
-    public static final String CONNECTOR_NAME = "testConnector";
 
-    public static final long DEFAULT_TIMEOUT = 2000;
-    
-    private UMOConnector connector;
-    private static UMOManager manager;
-    private boolean callbackCalled = false;
-    private UMOTransaction currentTx;
-    private int eventCount = 0;
-    private Connection cnn;
-    private Object lock = new Object();
+    protected UMOTransaction currentTx;
 
     protected void setUp() throws Exception
     {
-        //By default the JmsTestUtils use the openjms config, though you can pass
-        //in other configs using the property below
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        manager = MuleManager.getInstance();
-        //Make sure we are running synchronously
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-
-        manager.setModel(new MuleModel());
-        callbackCalled = false;
+        super.setUp();
         currentTx = null;
-        resetEventCount();
-        cnn = getConnection();
-        drainDestinations();
-        connector = createConnector();
     }
 
-
-
-    protected void drainDestinations() throws Exception
-    {
-        if(cnn instanceof QueueConnection)
-        {
-            JmsTestUtils.drainQueue((QueueConnection)cnn, DEFAULT_IN_QUEUE);
-            assertNull(receive());
-            JmsTestUtils.drainQueue((QueueConnection)cnn, DEFAULT_OUT_QUEUE);
-            assertNull(receive());
-        } else {
-            JmsTestUtils.drainTopic((TopicConnection)cnn, DEFAULT_IN_TOPIC);
-            assertNull(receive());
-            JmsTestUtils.drainTopic((TopicConnection)cnn, DEFAULT_OUT_TOPIC);
-            assertNull(receive());
-        }
-    }
-
-    public abstract Connection getConnection() throws Exception;
 
     protected void tearDown() throws Exception
     {
         TransactionCoordination.getInstance().unbindTransaction();
-        try
-        {
-            cnn.close();
-        }
-        catch (Throwable e) { }
-        MuleManager.getInstance().dispose();
-        
+        super.tearDown();
     }
 
     public void testSendNotTransacted() throws Exception
     {
-        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
+
+        final CountDown countDown = new CountDown(2);
 
         EventCallback callback = new EventCallback()
         {
@@ -143,35 +91,30 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
             {
                 callbackCalled = true;
                 assertNull(context.getCurrentTransaction());
-                synchronized(lock) {
-                    lock.notify();
-                }
+                countDown.release();
             }
         };
 
         initialiseComponent(descriptor, UMOTransactionConfig.ACTION_NONE, UMOTransactionConfig.ACTION_NONE, callback);
-
-        //Start the server
+        addResultListener(getOutDest().getAddress(), countDown);
         MuleManager.getInstance().start();
-
-        send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
         afterInitialise();
-        synchronized(lock) {
-            lock.wait(5000);
-        }
-        Message msg = receive();
+        send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
+        assertTrue("Only " + countDown.currentCount() + " of " + countDown.initialCount() + " checkpoints hit",
+                countDown.attempt(LOCK_WAIT));
 
-        assertNotNull(msg);
-        assertTrue(msg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) msg).getText());
+        assertNotNull(currentMsg);
+        assertTrue(currentMsg instanceof TextMessage);
+        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
         assertTrue(callbackCalled);
         assertNull(currentTx);
     }
 
     public void testSendTransactedAlways() throws Exception
     {
+        final CountDown countDown = new CountDown(2);
         //setup the component and start Mule
-        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         EventCallback callback = new EventCallback()
         {
@@ -181,32 +124,27 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
                 currentTx = context.getCurrentTransaction();
                 assertNotNull(currentTx);
                 assertTrue(currentTx.isBegun());
-                synchronized(lock) {
-                    lock.notify();
-                }
+                countDown.release();
             }
         };
 
         initialiseComponent(descriptor, UMOTransactionConfig.ACTION_ALWAYS_BEGIN, UMOTransactionConfig.ACTION_ALWAYS_COMMIT, callback);
         //Start the server
         MuleManager.getInstance().start();
+        addResultListener(getOutDest().getAddress(), countDown);
 
         //Send a test message first so that it is there when the component is started
         send(DEFAULT_MESSAGE, false, getAcknowledgementMode());
 
-        afterInitialise();
-        synchronized(lock) {
-            lock.wait(5000);
-        }
-        //Get the result message
-        Message msg = receive();
+        assertTrue("Only " + countDown.currentCount() + " of " + countDown.initialCount() + " checkpoints hit",
+                countDown.attempt(LOCK_WAIT));
 
-        assertNotNull(msg);
-        assertTrue(msg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) msg).getText());
+        assertNotNull(currentMsg);
+        assertTrue(currentMsg instanceof TextMessage);
+        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
         assertTrue(callbackCalled);
         assertTrue(currentTx.isBegun());
-        //todo for some reason this sometimes takes a little longer to commit??
+        //todo for some reason, it takes a while for committed flag on the tx to update
         Thread.sleep(300);
         assertTrue(currentTx.isCommitted());
 
@@ -224,8 +162,9 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
 
     private void doSendTransactedIfPossible(final boolean transactionAvailable) throws Exception
     {
+        final CountDown countDown = new CountDown(2);
         //setup the component and start Mule
-        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         EventCallback callback = new EventCallback()
         {
@@ -242,9 +181,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
                 {
                     assertNull(currentTx);
                 }
-                synchronized(lock) {
-                    lock.notify();
-                }
+                countDown.release();
             }
         };
 
@@ -254,27 +191,24 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
 
         //Start the server
         MuleManager.getInstance().start();
+        addResultListener(getOutDest().getAddress(), countDown);
 
         //Send a test message firstso that it is there when the component is started
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
-        afterInitialise();
-        synchronized(lock) {
-            lock.wait(5000);
-        }
-        //Get the result message
-        Message msg = receive();
+        assertTrue("Only " + countDown.currentCount() + " of " + countDown.initialCount() + " checkpoints hit",
+                countDown.attempt(LOCK_WAIT));
 
-        assertNotNull(msg);
-        assertTrue(msg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) msg).getText());
+        assertNotNull(currentMsg);
+        assertTrue(currentMsg instanceof TextMessage);
+        assertEquals(DEFAULT_MESSAGE + " Received", ((TextMessage) currentMsg).getText());
         assertTrue(callbackCalled);
 
         if (transactionAvailable)
         {
             assertNotNull(currentTx);
             assertTrue(currentTx.isBegun());
-            //todo for some reason this sometimes takes a little longer to commit??
+            //todo for some reason, it takes a while for committed flag on the tx to update
             Thread.sleep(300);
             assertTrue(currentTx.isCommitted());
         }
@@ -286,55 +220,12 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
 
     public void testSendTransactedRollback() throws Exception
     {
+        final CountDown countDown = new CountDown(2);
         //This exception strategy will be invoked when a message is redelivered
         //after a rollback
-        UMOExceptionStrategy es = new DefaultExceptionStrategy()
-        {
-            public Throwable handleException(Object message, Throwable t)
-            {
-                if (t instanceof MessageRedeliveredException)
-                {
-                    try
-                    {
-                        //MessageRedeliveredException mre = (MessageRedeliveredException)t;
 
-                        TextMessage msg = (TextMessage) message;
-
-                        assertNotNull(msg);
-                        assertTrue(msg.getJMSRedelivered());
-                        assertTrue(msg instanceof TextMessage);
-                        assertEquals(DEFAULT_MESSAGE, msg.getText());
-                    }
-                    catch (Exception e)
-                    {
-                            fail(e.getMessage());
-                    } finally {
-                        try
-                        {
-                            //commit the message off the queue
-                            ((MessageRedeliveredException) t).getSession().commit();
-                        } catch (JMSException e)
-                        {
-                            fail("Failed to commit rolled back message");
-                        }
-                        synchronized(lock) {
-                            lock.notify();
-                        }
-                    }
-                    return null;
-                }
-                else
-                {
-                    t.printStackTrace();
-                    synchronized(lock) {
-                        lock.notify();
-                    }
-                    return null;
-                }
-            }
-        };
         //setup the component and start Mule
-        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         EventCallback callback = new EventCallback()
         {
@@ -344,40 +235,42 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
                 currentTx = context.getCurrentTransaction();
                 assertNotNull(currentTx);
                 assertTrue(currentTx.isBegun());
+                System.out.println("@@@@ Rolling back transaction @@@@");
                 currentTx.setRollbackOnly();
+                countDown.release();
             }
         };
 
         initialiseComponent(descriptor, UMOTransactionConfig.ACTION_ALWAYS_BEGIN, UMOTransactionConfig.ACTION_ALWAYS_COMMIT, callback);
         UMOManager manager = MuleManager.getInstance();
+        addResultListener(getOutDest().getAddress(), countDown);
 
         UMOConnector umoCnn = manager.lookupConnector(CONNECTOR_NAME);
         //Set the test Exception strategy
-        umoCnn.setExceptionStrategy(es);
+        umoCnn.setExceptionStrategy(new RollbackExceptionHandler(countDown));
 
         //Start the server
         manager.start();
 
         //Send a test message firstso that it is there when the component is started
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
-
         afterInitialise();
+        assertTrue("Only " + countDown.currentCount() + " of " + countDown.initialCount() + " checkpoints hit",
+                countDown.attempt(LOCK_WAIT));
 
-        synchronized(lock) {
-            lock.wait(5000);
-        }
-        //Get the result message, this should be null as the message was rolled back
-        Message msg = receive();
-
-        assertNull(msg);
+        assertNull(currentMsg);
         assertTrue(callbackCalled);
         assertTrue(currentTx.isRolledBack());
+
+        //Make sure the message isn't on the queue
+        assertNull(receive(getInDest().getAddress(), 2000));
     }
 
     public void testSendBatchTransacted() throws Exception
     {
+        final CountDown countDown = new CountDown(4);
         //setup the component and start Mule
-        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
+        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         EventCallback callback = new EventCallback()
         {
@@ -388,16 +281,12 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
                 assertNotNull(currentTx);
                 assertTrue(currentTx.isBegun());
                 eventCount++;
-                if(eventCount==2) {
-                    synchronized(lock) {
-                        lock.notify();
-                    }
-                }
+                countDown.release();
             }
         };
 
         initialiseComponent(descriptor, UMOTransactionConfig.ACTION_ALWAYS_BEGIN, UMOTransactionConfig.ACTION_ALWAYS_COMMIT, callback);
-
+        addResultListener(getOutDest().getAddress(), countDown);
         BatchConstraint c = new BatchConstraint();
         c.setBatchSize(2);
         descriptor.getInboundEndpoint().getTransactionConfig().setConstraint(c);
@@ -406,81 +295,32 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
 
         //Send a test message firstso that it is there when the component is started
         send(DEFAULT_MESSAGE + "1", false, Session.AUTO_ACKNOWLEDGE);
+
+        assertTrue(!countDown.attempt(1000));
+
         send(DEFAULT_MESSAGE + "2", false, Session.AUTO_ACKNOWLEDGE);
 
-        afterInitialise();
-        synchronized(lock) {
-            lock.wait(5000);
-        }
-        //Get the result message
-        Message msg = receive();
-
-        assertNotNull(msg);
-        assertTrue(msg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + "1 Received", ((TextMessage) msg).getText());
-
-        msg = receive();
-
-        assertNotNull(msg);
-        assertTrue(msg instanceof TextMessage);
-        assertEquals(DEFAULT_MESSAGE + "2 Received", ((TextMessage) msg).getText());
+        assertTrue("Only " + countDown.currentCount() + " of " + countDown.initialCount() + " checkpoints hit",
+                countDown.attempt(LOCK_WAIT));
+        assertNotNull(currentMsg);
+        assertTrue(currentMsg instanceof TextMessage);
+        assertEquals(DEFAULT_MESSAGE + "2 Received", ((TextMessage) currentMsg).getText());
 
         assertTrue(callbackCalled);
         assertEquals(2, eventCount);
         assertTrue(currentTx.isBegun());
-        //todo for some reason this sometimes takes a little longer to commit??
+        //todo for some reason, it takes a while for committed flag on the tx to update
         Thread.sleep(300);
         assertTrue(currentTx.isCommitted());
     }
 
     public void testSendBatchTransactedRollback() throws Exception
     {
-        //This exception strategy will be invoked when a message is redelivered
-        //after a rollback
-        UMOExceptionStrategy es = new DefaultExceptionStrategy()
-        {
-            public Throwable handleException(Object message, Throwable t)
-            {
-                if (t instanceof MessageRedeliveredException)
-                {
-                    try
-                    {
-                        TextMessage msg = (TextMessage) message;
+        final CountDown countDown = new CountDown(4);
 
-                        assertNotNull(msg);
-                        assertTrue(msg.getJMSRedelivered());
-                        assertTrue(msg instanceof TextMessage);
-                        eventCount++;
-                        assertEquals(DEFAULT_MESSAGE + eventCount, msg.getText());
-                        if(eventCount==2) {
-                            synchronized(lock) {
-                                lock.notify();
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        fail(e.getMessage());
-                    } finally {
-                        try
-                        {
-                            //commit the message off the queue
-                            ((MessageRedeliveredException) t).getSession().commit();
-                        } catch (JMSException e)
-                        {
-                            fail("Failed to commit rolled back message");
-                        }
-                    }
-                    return null;
-                }
-                else
-                {
-                    return super.handleException(message, t);
-                }
-            }
-        };
         //setup the component and start Mule
-        UMODescriptor descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
+
+        UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         EventCallback callback = new EventCallback()
         {
@@ -490,18 +330,18 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
                 currentTx = context.getCurrentTransaction();
                 assertNotNull(currentTx);
                 assertTrue(currentTx.isBegun());
-                incEventCount();
+                eventCount++;
                 if (eventCount == 2)
                 {
                     currentTx.setRollbackOnly();
                     eventCount = 0;
-
                 }
-
+                countDown.release();
             }
         };
 
         initialiseComponent(descriptor, UMOTransactionConfig.ACTION_ALWAYS_BEGIN, UMOTransactionConfig.ACTION_ALWAYS_COMMIT, callback);
+        addResultListener(getOutDest().getAddress(), null);
         List constraints = new ArrayList();
         BatchConstraint c = new BatchConstraint();
         c.setBatchSize(2);
@@ -512,32 +352,28 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
 
         UMOConnector umoCnn = manager.lookupConnector(CONNECTOR_NAME);
         //Set the test Exception strategy
-        umoCnn.setExceptionStrategy(es);
+        umoCnn.setExceptionStrategy(new RollbackExceptionHandler(countDown));
 
         //Start the server
         manager.start();
 
         //Send a test message firstso that it is there when the component is started
         send(DEFAULT_MESSAGE + "1", false, Session.AUTO_ACKNOWLEDGE);
+
+        assertTrue(!countDown.attempt(1000));
         send(DEFAULT_MESSAGE + "2", false, Session.AUTO_ACKNOWLEDGE);
 
-        afterInitialise();
+        assertTrue("Only " + countDown.currentCount() + " of " + countDown.initialCount() + " checkpoints hit",
+                countDown.attempt(LOCK_WAIT));
 
-        synchronized(lock) {
-            lock.wait(5000);
-        }
-        //Get the result message, this should be null as the message was rolled back
-        Message msg = receive();
-        assertNull(msg);
+        assertNull(currentMsg);
         assertTrue(callbackCalled);
-        assertEquals(2, eventCount);
         assertTrue(currentTx.isRolledBack());
-
     }
 
     public void testCleanup() throws Exception
     {
-        assertNull("There should be no transaction associated with this thread",TransactionCoordination.getInstance().unbindTransaction());
+        assertNull("There should be no transaction associated with this thread", TransactionCoordination.getInstance().unbindTransaction());
     }
 
     public UMOComponent initialiseComponent(UMODescriptor descriptor, byte txBeginAction, byte txCommitAction,
@@ -568,11 +404,11 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
         UMOComponent component = MuleManager.getInstance().getModel().registerComponent(descriptor);
-        MuleManager.getInstance().registerConnector(connector);
+        //MuleManager.getInstance().registerConnector(connector);
         return component;
     }
 
-    public static UMODescriptor getTestDescriptor(String name, String implementation)
+    public static UMODescriptor getDescriptor(String name, String implementation)
     {
         UMODescriptor descriptor = new MuleDescriptor();
         descriptor.setExceptionStrategy(new DefaultExceptionStrategy());
@@ -583,16 +419,18 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
 
     public void afterInitialise() throws Exception
     {
-        //Thread.sleep(1000);
+        Thread.sleep(1000);
     }
 
     protected UMOEndpointURI getInDest()
     {
         try
         {
-            if(cnn instanceof QueueConnection) {
+            if (cnn instanceof QueueConnection)
+            {
                 return new MuleEndpointURI(DEFAULT_IN_QUEUE);
-            } else {
+            } else
+            {
                 return new MuleEndpointURI(DEFAULT_IN_TOPIC);
             }
         } catch (MalformedEndpointException e)
@@ -606,9 +444,11 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
     {
         try
         {
-            if(cnn instanceof QueueConnection) {
+            if (cnn instanceof QueueConnection)
+            {
                 return new MuleEndpointURI(DEFAULT_OUT_QUEUE);
-            } else {
+            } else
+            {
                 return new MuleEndpointURI(DEFAULT_OUT_TOPIC);
             }
         } catch (MalformedEndpointException e)
@@ -620,37 +460,92 @@ public abstract class AbstractJmsTransactionFunctionalTest extends NamedTestCase
 
     protected void send(String payload, boolean transacted, int ack) throws JMSException
     {
-        if(cnn instanceof QueueConnection) {
-            JmsTestUtils.queueSend((QueueConnection)cnn, getInDest().getAddress(), payload, transacted, ack, null);
-        } else {
-            JmsTestUtils.topicPublish((TopicConnection)cnn, getInDest().getAddress(), payload, transacted, ack);
+        if (cnn instanceof QueueConnection)
+        {
+            JmsTestUtils.queueSend((QueueConnection) cnn, getInDest().getAddress(), payload, transacted, ack, null);
+        } else
+        {
+            JmsTestUtils.topicPublish((TopicConnection) cnn, getInDest().getAddress(), payload, transacted, ack);
         }
     }
 
-    protected Message receive() throws JMSException
+    protected int getAcknowledgementMode()
     {
-        Message msg = null;
-        if(cnn instanceof QueueConnection) {
-            msg = JmsTestUtils.queueReceiver((QueueConnection)cnn, getOutDest().getAddress(), DEFAULT_TIMEOUT);
-        } else {
-            msg = JmsTestUtils.topicSubscribe((TopicConnection)cnn, getOutDest().getAddress(), DEFAULT_TIMEOUT);
-        }
-        return msg;
-    }
-
-    protected int getAcknowledgementMode() {
         return Session.AUTO_ACKNOWLEDGE;
     }
 
-    protected void resetEventCount() {
-        eventCount = 0;
-    }
-
-    protected void incEventCount() {
-        eventCount++;
+    protected void addResultListener(String dest, final CountDown countDown) throws JMSException
+    {
+        MessageConsumer mc;
+        //check replyTo
+        if (useTopics())
+        {
+            mc = JmsTestUtils.getTopicSubscriber((TopicConnection) cnn, dest);
+        } else
+        {
+            mc = JmsTestUtils.getQueueReceiver((QueueConnection) cnn, dest);
+        }
+        mc.setMessageListener(new MessageListener()
+        {
+            public void onMessage(Message message)
+            {
+                currentMsg = message;
+                if (countDown != null) countDown.release();
+            }
+        });
     }
 
     public abstract UMOTransactionFactory getTransactionFactory();
 
     public abstract UMOConnector createConnector() throws Exception;
+
+    private class RollbackExceptionHandler extends DefaultExceptionStrategy
+    {
+        private CountDown countDown;
+
+        public RollbackExceptionHandler(CountDown countDown)
+        {
+            this.countDown = countDown;
+        }
+
+        public Throwable handleException(Object message, Throwable t)
+        {
+            System.out.println("@@@@ ExceptionHandler Called @@@@");
+            if (t instanceof MessageRedeliveredException)
+            {
+                countDown.release();
+                try
+                {
+                    //MessageRedeliveredException mre = (MessageRedeliveredException)t;
+
+                    TextMessage msg = (TextMessage) message;
+
+                    assertNotNull(msg);
+                    assertTrue(msg.getJMSRedelivered());
+                    assertTrue(msg instanceof TextMessage);
+                    //assertEquals(DEFAULT_MESSAGE, msg.getText());
+                } catch (Exception e)
+                {
+                    fail(e.getMessage());
+                } finally
+                {
+                    try
+                    {
+                        //commit the message off the queue
+                        System.out.println("@@@@ committing rolled back message from queue @@@@");
+                        ((MessageRedeliveredException) t).getSession().commit();
+                    } catch (JMSException e)
+                    {
+                        fail("Failed to commit rolled back message");
+                    }
+                }
+                return null;
+            } else
+            {
+                t.printStackTrace();
+                fail(t.getMessage());
+                return null;
+            }
+        }
+    }
 }

@@ -14,7 +14,9 @@
 
 package org.mule.providers.jms.functional;
 
+import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.extras.jotm.JotmTransactionManagerFactory;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.XaJmsMessageReceiver;
 import org.mule.providers.jms.support.JmsTestUtils;
@@ -37,7 +39,7 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
         super.setUp();
         //As there is no default tx manager impl shipped with the core distribution
         //this test cannot currently run!  Need to move it to the integration test suite
-        //MuleManager.getInstance().setTransactionManager(new TyrexTransactionManagerFactory().create());
+        MuleManager.getInstance().setTransactionManager(new JotmTransactionManagerFactory().create());
     }
 
     public UMOConnector createConnector() throws Exception

@@ -27,7 +27,7 @@ import java.util.Properties;
  * @version $Revision$
  */
 
-public class OpenJmsQueueFunctionalTestCase extends AbstractJmsFunctionalTestCase
+public class OpenJmsQueueFunctionalTestCase extends AbstractJmsQueueFunctionalTestCase
 {
     public Connection getConnection() throws Exception
     {

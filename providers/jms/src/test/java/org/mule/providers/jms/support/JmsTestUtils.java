@@ -255,7 +255,8 @@ public class JmsTestUtils
         Message msg = null;
         while ((msg = receiver.receive(1000)) != null)
         {
-            //msg.acknowledge();
+            System.out.println("Removing message: " + msg);
+            msg.acknowledge();
         }
         receiver.close();
         session.close();

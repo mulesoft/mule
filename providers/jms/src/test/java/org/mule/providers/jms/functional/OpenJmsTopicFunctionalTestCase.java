@@ -24,7 +24,7 @@ import java.util.Properties;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class OpenJmsTopicFunctionalTestCase extends AbstractJmsFunctionalTestCase
+public class OpenJmsTopicFunctionalTestCase extends AbstractJmsQueueFunctionalTestCase
 {
      public Connection getConnection() throws Exception
     {
@@ -44,5 +44,10 @@ public class OpenJmsTopicFunctionalTestCase extends AbstractJmsFunctionalTestCas
         connector.getDispatcherThreadingProfile().setDoThreading(false);
         //connector.initialise();
         return connector;
+    }
+
+    public boolean useTopics()
+    {
+        return true;
     }
 }
