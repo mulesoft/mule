@@ -55,6 +55,10 @@
 
     <global-endpoints>
         <endpoint name="httpEndpoint" address="http://localhost:8888" transformers="HttpRequestToString StringToNameString" >
+            <!-- filter out the favicon request -->
+            <filter className="org.mule.routing.filters.logic.NotFilter">
+                <filter pattern="/favicon.ico" className="org.mule.providers.http.filters.HttpRequestWildcardFilter"/>
+            </filter>
             <properties>
                 <property name="Content-Type" value="text/plain"/>
             </properties>
