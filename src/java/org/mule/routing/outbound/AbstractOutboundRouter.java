@@ -17,15 +17,14 @@ import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.config.PropertyExtractor;
 import org.mule.config.MuleProperties;
 import org.mule.config.PropertyExtractor;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.UMOOutboundRouter;
 
 import java.util.List;
