@@ -250,7 +250,6 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Runna
             {
                 logger.error("Socket close failed with: " + e);
             }
-            socket = null;
         }
 
         /**
