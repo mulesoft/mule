@@ -94,6 +94,9 @@ public class HttpsConnector extends HttpConnector
             try
             {
                 String clientPath = Utility.getResourcePath(clientKeyStore, getClass());
+                if(clientPath==null) {
+                    throw new InitialisationException("Failed to find client key store: " + clientKeyStore);
+                }
                 System.setProperty("javax.net.ssl.keyStore", clientPath);
                 System.setProperty("javax.net.ssl.keyStorePassword", clientKeyStorePassword);
 
