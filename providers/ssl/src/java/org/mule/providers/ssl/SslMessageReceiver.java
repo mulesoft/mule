@@ -66,7 +66,7 @@ public class SslMessageReceiver extends TcpMessageReceiver
         cnn = (SslConnector) connector;
         // An SSLContext is an environment for implementing JSSE
         // It is used to create a ServerSocketFactory
-        SSLContext sslc = SSLContext.getInstance(cnn.getSslType());
+        SSLContext sslc = SSLContext.getInstance(cnn.getProtocol().toLowerCase());
 
         // Initialize the SSLContext to work with our key managers
         sslc.init(cnn.getKeyManagerFactory().getKeyManagers(), null, null);

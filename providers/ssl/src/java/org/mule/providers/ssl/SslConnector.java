@@ -44,7 +44,6 @@ public class SslConnector extends TcpConnector
     private String storePassword = null;
     private String keystoreType = KeyStore.getDefaultType();
     private String keyManagerAlgorithm = DEFAULT_MANAGER_ALGORITHM;
-    private String sslType = DEFAULT_SSL_TYPE;
     private Provider provider = new com.sun.net.ssl.internal.ssl.Provider();
     private String protocolHandler = DEFAULT_PROTOCOL_HANDLER;
     private String clientKeyStore = null;
@@ -173,16 +172,6 @@ public class SslConnector extends TcpConnector
     public void setKeyManagerAlgorithm(String keyManagerAlgorithm)
     {
         this.keyManagerAlgorithm = keyManagerAlgorithm;
-    }
-
-    public String getSslType()
-    {
-        return sslType;
-    }
-
-    public void setSslType(String sslType)
-    {
-        this.sslType = sslType;
     }
 
     public boolean isRequireClientAuthentication()
