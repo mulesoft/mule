@@ -151,7 +151,7 @@
             <url>http://jakarta.apache.org/tomcat/tomcat-5.0-doc/servletapi/index.html</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-                <ignore>false</ignore>
+                <ignore>true</ignore>
             </properties>
         </dependency>
 
