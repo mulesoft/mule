@@ -20,10 +20,10 @@ import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.extras.spring.config.ReaderInputStream;
-import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.impl.container.AbstractContainerContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassHelper;
 import org.springframework.beans.BeansException;
@@ -35,7 +35,6 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.io.InputStreamResource;
 
 import java.io.Reader;
-import java.util.Map;
 
 /**
  * <code>SpringContainerContext</code> is a Spring Context that can expose spring-managed
@@ -44,8 +43,9 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class SpringContainerContext implements UMOContainerContext, BeanFactoryAware
+public class SpringContainerContext extends AbstractContainerContext implements BeanFactoryAware
 {
+    public static final String SPRING_DOCTYPE_REF = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\">\n";
     /**
      * logger used by this class
      */
@@ -59,6 +59,10 @@ public class SpringContainerContext implements UMOContainerContext, BeanFactoryA
     protected BeanFactory externalBeanFactory;
 
     protected String configFile;
+
+    public SpringContainerContext() {
+        super("spring");
+    }
 
     /**
      * Sets the spring application context used to build components
@@ -136,6 +140,21 @@ public class SpringContainerContext implements UMOContainerContext, BeanFactoryA
     public void setConfigFile(String configFile) throws ConfigurationException
     {
         this.configFile = configFile;
+    }
+
+    public void configure(Reader configuration) throws ContainerException
+    {
+        BeanFactory bf = new XmlBeanFactory(new InputStreamResource(new ReaderInputStream(configuration)));
+        setExternalBeanFactory(bf);
+    }
+
+    protected String getDefaultDocType() {
+        return "beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\"";
+    }
+
+    public void initialise() throws InitialisationException, RecoverableException
+    {
+        if(configFile==null) return;
         try
         {
             if(ClassHelper.getResource(configFile, getClass())==null) {
@@ -147,11 +166,10 @@ public class SpringContainerContext implements UMOContainerContext, BeanFactoryA
             }
         } catch (BeansException e)
         {
-            throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X, "Application Context: " + configFile), e);
+            throw new InitialisationException(
+                    new ConfigurationException(
+                            new Message(Messages.FAILED_LOAD_X, "Application Context: " + configFile), e), this);
         }
     }
 
-    public void configure(Reader configuration, Map configurationProperties) throws ContainerException {
-        BeanFactory bf = new XmlBeanFactory(new InputStreamResource(new ReaderInputStream(configuration)));
-    }
 }

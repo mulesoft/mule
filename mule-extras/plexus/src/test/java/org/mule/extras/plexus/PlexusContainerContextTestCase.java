@@ -14,14 +14,14 @@
 package org.mule.extras.plexus;
 
 import org.mule.config.ConfigurationException;
-import org.mule.tck.model.AbstractComponentResolverTestCase;
+import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.umo.manager.UMOContainerContext;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class PlexusContainerContextTestCase extends AbstractComponentResolverTestCase
+public class PlexusContainerContextTestCase extends AbstractContainerContextTestCase
 {
     public UMOContainerContext getContainerContext() throws ConfigurationException {
         PlexusContainerContext context = new PlexusContainerContext();

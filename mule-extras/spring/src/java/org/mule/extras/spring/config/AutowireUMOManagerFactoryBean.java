@@ -220,7 +220,7 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
     }
 
-    protected void setContainerContext(Map containers) {
+    protected void setContainerContext(Map containers) throws UMOException {
         if(containers.size() == 0) {
             //Use this as the default container
             SpringContainerContext container = new SpringContainerContext();

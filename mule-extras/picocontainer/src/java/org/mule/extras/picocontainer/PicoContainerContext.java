@@ -14,25 +14,24 @@
  */
 package org.mule.extras.picocontainer;
 
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.ContainerException;
-import org.mule.util.ClassHelper;
-import org.mule.util.Utility;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.util.ClassHelper;
+import org.mule.util.Utility;
+import org.mule.impl.container.AbstractContainerContext;
 import org.nanocontainer.integrationkit.ContainerBuilder;
 import org.nanocontainer.integrationkit.PicoCompositionException;
 import org.nanocontainer.script.ScriptedContainerBuilderFactory;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.defaults.SimpleReference;
 
-import java.io.StringReader;
 import java.io.Reader;
-import java.util.Map;
+import java.io.StringReader;
 
 /**
  * <code>PicoContainerContext</code> is a Pico Context that can expose pico-managed
@@ -42,10 +41,11 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class PicoContainerContext implements UMOContainerContext
+public class PicoContainerContext extends AbstractContainerContext
 {
     public static final String CONFIGEXTENSION = "CONFIG";
 
+    private String extension = ScriptedContainerBuilderFactory.XML;
     /**
      * The url of the config file to use
      */
@@ -55,6 +55,18 @@ public class PicoContainerContext implements UMOContainerContext
      * the pico container that manages the components
      */
     private MutablePicoContainer container;
+
+    public PicoContainerContext() {
+        super("pico");
+    }
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
 
     /* (non-Javadoc)
      * @see org.mule.model.UMOContainerContext#getComponent(java.lang.Object)
@@ -116,25 +128,11 @@ public class PicoContainerContext implements UMOContainerContext
     public void setConfigFile(String configFile) throws PicoCompositionException
     {
         this.configFile = configFile;
-        try
-        {
-            String builderClassName = getBuilderClassName(configFile);
-            String configString = Utility.loadResourceAsString(configFile, getClass());
-            StringReader configReader = new StringReader(configString);
-            doConfigure(configReader, builderClassName);
 
-        } catch (Exception e)
-        {
-            throw new PicoCompositionException(e);
-        }
     }
 
-    public void configure(Reader configuration, Map configurationProperties) throws ContainerException {
-        String extension = (String)configurationProperties.get(CONFIGEXTENSION);
-        if (extension == null) {
-            extension = ScriptedContainerBuilderFactory.XML;
-        }
-
+    public void configure(Reader configuration) throws ContainerException
+    {
         String className = ScriptedContainerBuilderFactory.getBuilderClassName(extension);
         doConfigure(configuration, className);
     }
@@ -159,5 +157,21 @@ public class PicoContainerContext implements UMOContainerContext
     {
         String extension = scriptName.substring(scriptName.lastIndexOf('.'));
         return ScriptedContainerBuilderFactory.getBuilderClassName(extension);
+    }
+
+    public void initialise() throws InitialisationException, RecoverableException
+    {
+        if(configFile==null) return;
+        try
+        {
+            String builderClassName = getBuilderClassName(configFile);
+            String configString = Utility.loadResourceAsString(configFile, getClass());
+            StringReader configReader = new StringReader(configString);
+            doConfigure(configReader, builderClassName);
+
+        } catch (Exception e)
+        {
+            throw new PicoCompositionException(e);
+        }
     }
 }

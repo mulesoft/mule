@@ -10,9 +10,9 @@
 	@root mule-configuration
 
 -->
-<!ELEMENT mule-configuration (description?,(environment-properties)?, (mule-environment-properties)?, (transaction-manager)?, (security-manager)?,
-            (agents)?,(connector)*,(endpoint-identifiers)?,(transformers)?,(global-endpoints)?,
-		    (interceptor-stack)*,(container-context)*,(model)+,(mule-descriptor)*,(bean)*)>
+<!ELEMENT mule-configuration (description?,environment-properties?,mule-environment-properties?,container-context*,security-manager?,
+ transaction-manager?,agents?,connector*,endpoint-identifiers?,transformers?,global-endpoints?,
+		    interceptor-stack*,model+,mule-descriptor*,bean*)>
 
 <!--
     The id attribute allows for a unique id for this file as it is often the case that
@@ -179,6 +179,17 @@ or 'messageSender' can be used. For all other cases it can be set to 'default'.
 	Detemines how long an inactive thread is kept in the pool before being discarded
 -->
 <!ATTLIST threading-profile threadTTL           		NMTOKEN         		#IMPLIED>
+
+<!--
+	Detemines how long an inactive thread is kept in the pool before being discarded
+-->
+<!ATTLIST threading-profile threadPriority         	(1|2|3|4|5|6|7|8|9|10)         		#IMPLIED>
+
+<!--
+	Detemines how long an inactive thread is kept in the pool before being discarded
+-->
+<!ATTLIST threading-profile workManagerFactory         	NMTOKEN         		#IMPLIED>
+
 <!--
 If the maximum pool size or queue size is bounded, then it is possible for incoming execute requests to block.
 There are five supported policies for handling this situation.
@@ -497,6 +508,15 @@ The <i>connection-descriptor</i> element specifies one or more message
 <!ATTLIST endpoint synchronous	(true|false)			#IMPLIED>
 
 <!--
+	Deterimes how mule will allocate a connector for this endpoint.  By default
+    Mule will look for a connector with a protocol matching the protocol of the address
+    of this endpoint.  If a match is found that connector will be used, otherwise a new
+    connector will be created. Users can specify ALWAYS to aleways create a new connector
+    or NEVER which will require a connector to be pre-configured.
+-->
+<!ATTLIST endpoint createConnector	(GET_OR_CREATE | ALWAYS_CREATE | NEVER_CREATE)   		"GET_OR_CREATE">
+
+<!--
     A global endpoint reference
 -->
 <!ELEMENT global-endpoint (transaction?, filter?, security-filter?, properties*)>
@@ -651,7 +671,7 @@ Agents is a collection of one or more agent configurations
     There are different implementations for different containers
 	such as PicoContainer or Spring
 -->
-<!ELEMENT container-context (properties?)>
+<!ELEMENT container-context (properties?, configuration?)>
 
 <!--
 
@@ -663,9 +683,34 @@ Agents is a collection of one or more agent configurations
 <!ATTLIST container-context className  	NMTOKEN		#REQUIRED>
 
 <!--
-    The name of this container context
+    The name of this container context.  Containers have a default name, which
+    is usually the the name of the container implementation
 -->
-<!ATTLIST container-context name  	NMTOKEN		#IMPLIED>
+<!ATTLIST container-context name  	CDATA		#IMPLIED>
+
+<!--
+A blob of configuration of configration data that can be used to embed application
+specific configuration in a Mule Xml document
+-->
+<!ELEMENT configuration (PCDATA)>
+
+<!--
+The doctype declaration to use for the configuration fragment.
+can be null if no validation is to be performed or the fragment is not Xml
+the doc type can be in the form of :
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+  "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+or
+mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+"http://www.cubis.co.uk/dtds/mule-configuration.dtd"
+-->
+<!ATTLIST configuration         doctype         CDATA       #IMPLIED>
+
+<!--
+The ecoding to use in the Xml declaration for the configuration fragment.
+Can be null if fragment is not Xml.  If not set UTF-8 will be used.
+-->
+<!ATTLIST configuration         ecoding         CDATA       #IMPLIED>
 
 <!--
 	The <i>model</i> defines the components and interations between components in the Mule
@@ -673,7 +718,7 @@ Agents is a collection of one or more agent configurations
 	should behave.
 -->
 
-<!ELEMENT model (description?,(entry-point-resolver)?, (component-lifecycle-adapter-factory)?, (component-pool-factory)?, (exception-strategy)?, (mule-descriptor)*, bean*)>
+<!ELEMENT model (description?, entry-point-resolver?, component-factory?, component-lifecycle-adapter-factory?, component-pool-factory?, exception-strategy?, mule-descriptor*, bean*)>
 
 <!--	
 	The name to associate this mule-model with
@@ -692,6 +737,20 @@ Agents is a collection of one or more agent configurations
 -->
 
 <!ATTLIST entry-point-resolver className  		NMTOKEN		#REQUIRED>
+
+<!--
+	A component factory is used to create UMOComponent instances.  These are used to
+    wrap business objects and controls how events are managed for the object
+-->
+<!ELEMENT component-factory EMPTY>
+
+<!--
+	The fully qualified class name of the component factory implementation.
+    Custom component factories must implement
+    <i>org.mule.umo.UMOcomponentFactory</i>
+-->
+
+<!ATTLIST component-factory className  		NMTOKEN		#REQUIRED>
 
 <!--
 	A Lifecycle adapter factory for creating a LifecycleAdapter for UMO componenets.
@@ -942,7 +1001,7 @@ or relax dtd validation on their parser
   <i>org.mule.exception.ExceptionStrategy</i>.
   -->
   
-<!ELEMENT exception-strategy ((endpoint?|global-endpoint?), (properties)?)>
+<!ELEMENT exception-strategy ((endpoint|global-endpoint)*, (properties)?)>
 
 <!--
 	An endpoint to dispatch ExceptionMessages (including the Message being processed)
@@ -1012,6 +1071,13 @@ or relax dtd validation on their parser
 	The key identifier for the object to use in the container
 -->
 <!ATTLIST container-property reference 			CDATA		#REQUIRED>
+
+<!--
+	The container name to look up the reference in.  If this is not
+    specified all containers are queried.  An exception will be thrown
+    if this property is set but the reference was not found in the container
+-->
+<!ATTLIST container-property container 			CDATA		#IMPLIED>
 
 <!--
 	Whether an exception should be thrown if the component is not in the container.

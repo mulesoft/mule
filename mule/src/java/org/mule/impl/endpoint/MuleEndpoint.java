@@ -25,6 +25,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.providers.service.ConnectorFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -198,5 +199,19 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setSynchronous(boolean synchronous)
     {
         this.synchronous = new Boolean(synchronous);
+    }
+
+    public void setCreateConnector(int action) {
+        createConnector = action;
+    }
+
+    public void setCreateConnectorAsString(String action) {
+        if("ALWAYS_CREATE".equals(action)) {
+            createConnector = ConnectorFactory.ALWAYS_CREATE_CONNECTOR;
+        } else if("NEVER_CREATE".equals(action)) {
+            createConnector = ConnectorFactory.NEVER_CREATE_CONNECTOR;
+        } else {
+            createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
+        }
     }
 }

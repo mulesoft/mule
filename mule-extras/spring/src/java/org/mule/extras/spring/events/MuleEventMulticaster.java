@@ -445,6 +445,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             //tell mule to load component definitions from spring
             SpringContainerContext containerContext = new SpringContainerContext();
             containerContext.setBeanFactory(applicationContext);
+            manager.setContainerContext(null);
             manager.setContainerContext(containerContext);
 
             //see if there are any UMOConnectors to register

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
+                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+
+<mule-configuration id="endpoint_test" version="1.0">
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <configuration >
+            <beans>
+                <bean name="Apple" class="org.mule.tck.testmodels.fruit.Apple">
+                </bean>
+                <bean name="Banana" class="org.mule.tck.testmodels.fruit.Banana">
+                </bean>
+            </beans>
+        </configuration>
+    </container-context>
+</mule-configuration>

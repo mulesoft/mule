@@ -148,6 +148,7 @@
 
     <bean id="transactedInboundEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint">
         <property name="connector"><ref local="dummyConnector"/></property>
+        <property name="createConnector"><value>1</value></property>
         <property name="endpointURI">
             <bean class="org.mule.impl.endpoint.MuleEndpointURI">
                 <constructor-arg><value>test://endpoint.in2</value></constructor-arg>

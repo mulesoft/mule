@@ -15,11 +15,12 @@
 
 package org.mule.test.mule.model;
 
-import org.mule.model.MuleContainerContext;
-import org.mule.tck.model.AbstractComponentResolverTestCase;
+import org.mule.impl.container.MuleContainerContext;
+import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.UMOContainerContext;
+import org.mule.impl.container.MuleContainerContext;
 
 /**
  * <p><code>MuleContainerContextTestCase</code> TODO (document class)
@@ -27,7 +28,7 @@ import org.mule.umo.manager.UMOContainerContext;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleContainerContextTestCase extends AbstractComponentResolverTestCase
+public class MuleContainerContextTestCase extends AbstractContainerContextTestCase
 {
 
     MuleContainerContext context;

@@ -15,18 +15,19 @@
 
 package org.mule.extras.spring;
 
-import org.mule.tck.model.AbstractComponentResolverTestCase;
+import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.lifecycle.InitialisationException;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class SpringContainerContextTestCase extends AbstractComponentResolverTestCase
+public class SpringContainerContextTestCase extends AbstractContainerContextTestCase
 {
     SpringContainerContext context;
 
@@ -48,10 +49,9 @@ public class SpringContainerContextTestCase extends AbstractComponentResolverTes
         context.setConfigFile("test-application-context.xml");
     }
 
-    public void testContainerContext()
-    {
+    public void testContainerContext() throws Exception {
         UMOContainerContext container = getContainerContext();
-
+        container.initialise();
         assertNotNull(container);
 
         Object result = null;

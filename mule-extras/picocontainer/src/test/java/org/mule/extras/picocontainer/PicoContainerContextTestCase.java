@@ -15,14 +15,14 @@
 
 package org.mule.extras.picocontainer;
 
-import org.mule.tck.model.AbstractComponentResolverTestCase;
+import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.umo.manager.UMOContainerContext;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class PicoContainerContextTestCase extends AbstractComponentResolverTestCase
+public class PicoContainerContextTestCase extends AbstractContainerContextTestCase
 {
 
     PicoContainerContext context;

@@ -13,16 +13,14 @@
  *
  */
 
-package org.mule.model;
+package org.mule.impl.container;
 
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.ClassHelper;
 
 import java.io.Reader;
-import java.util.Map;
 
 /**
  * <code>MuleContainerContext</code> is a default resolver that doesn't support external reference resolution.
@@ -32,8 +30,11 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleContainerContext implements UMOContainerContext
+public class MuleContainerContext extends AbstractContainerContext
 {
+    public MuleContainerContext() {
+        super("mule");
+    }
 
     /* (non-Javadoc)
      * @see org.mule.model.UMOContainerContext#getComponent(java.lang.Object)
@@ -59,11 +60,14 @@ public class MuleContainerContext implements UMOContainerContext
         }
         catch (Exception e)
         {
-            throw new ObjectNotFoundException("Failed to instanciate: " + key.toString() + ". Exception is: " + e.getMessage(), e);
+            throw new ObjectNotFoundException( key.toString());
         }
     }
 
-    public void configure(Reader configuration, Map configurationProperties) {
-        // noop
+    public void configure(Reader configuration) {
+        throw new UnsupportedOperationException("configure(Reader)");
+    }
+
+    public void initialise() throws InitialisationException, RecoverableException {
     }
 }

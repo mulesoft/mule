@@ -616,6 +616,12 @@
         </property>
     </xsl:template>
 
+    <xsl:template match="@createConnector">
+        <property name="createConnectorAsString">
+        <value><xsl:value-of select="."/></value>
+        </property>
+    </xsl:template>
+
     <xsl:template match="@address|@inboundEndpoint|@outboundEndpoint" mode="addEndpointURI">
         <xsl:variable name="name">
             <xsl:choose>

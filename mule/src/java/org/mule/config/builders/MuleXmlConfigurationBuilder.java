@@ -25,14 +25,12 @@ import org.mule.config.converters.*;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.config.pool.CommonsPoolFactory;
-import org.mule.impl.DefaultLifecycleAdapter;
-import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleModel;
-import org.mule.impl.MuleTransactionConfig;
+import org.mule.impl.*;
+import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.model.DynamicEntryPointResolver;
-import org.mule.model.MuleContainerContext;
+import org.mule.impl.container.MuleContainerContext;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.inbound.InboundMessageRouter;
@@ -46,6 +44,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
+import org.mule.umo.model.UMOComponentFactory;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
@@ -60,10 +59,17 @@ import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
 import org.mule.util.queue.PersistenceStrategy;
 import org.w3c.dom.Node;
+import org.w3c.dom.DocumentFragment;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.dom.DOMSource;
 import java.beans.ExceptionListener;
 import java.io.*;
 import java.net.URL;
@@ -73,7 +79,7 @@ import java.util.*;
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that builds a
  * MuleManager instance based on a mule xml configration file defined in the
  * mule-configuration.dtd.
- * 
+ *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
@@ -86,6 +92,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
     public static final String DEFAULT_ENTRY_POINT_RESOLVER = DynamicEntryPointResolver.class.getName();
     public static final String DEFAULT_LIFECYCLE_ADAPTER = DefaultLifecycleAdapter.class.getName();
+    public static final String DEFAULT_COMPONENT_FACTORY = MuleComponentFactory.class.getName();
     public static final String DEFAULT_CONTAINER_CONTEXT = MuleContainerContext.class.getName();
     public static final String DEFAULT_ENDPOINT = MuleEndpoint.class.getName();
     public static final String DEFAULT_TRANSACTION_CONFIG = MuleTransactionConfig.class.getName();
@@ -134,6 +141,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         digester = new Digester();
         digester.setEntityResolver(new MuleDtdResolver());
+        digester.setValidating(false);
 
 //        digester.setErrorHandler(new ErrorHandler() {
 //
@@ -429,16 +437,43 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         path += "/container-context";
         digester.addObjectCreate(path, DEFAULT_CONTAINER_CONTEXT, "className");
         addMulePropertiesRule(path, digester, true);
-        digester.addSetRoot(path, "setContainerContext");
+
 
         NodeCreateRule nodeCreateRule = null;
         try {
-            nodeCreateRule = new NodeCreateRule(Node.DOCUMENT_FRAGMENT_NODE);
+            nodeCreateRule = new NodeCreateRule(Node.DOCUMENT_FRAGMENT_NODE) {
+                private String encoding;
+                private String doctype;
+                public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
+                    encoding = attributes.getValue("encoding");
+                    doctype = attributes.getValue("doctype");
+                    super.begin(endpointName, endpointName1, attributes);
+                }
+
+                public void end(String endpointName, String endpointName1) throws Exception {
+                    super.end(endpointName, endpointName1);
+
+                    DocumentFragment config = (DocumentFragment)digester.pop();
+                    StringWriter s = new StringWriter();
+                    StreamResult streamResult = new StreamResult(s);
+                    TransformerFactory tFactory = TransformerFactory.newInstance();
+                    try {
+                        Transformer transformer = tFactory.newTransformer();
+                        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                        transformer.transform(new DOMSource(config), streamResult);
+                    } catch (TransformerException e) {
+                        throw new ContainerException(new Message(Messages.COULD_NOT_RECOVER_CONTIANER_CONFIG), e);
+                    }
+                    Reader reader = new StringReader(s.toString());
+                    UMOContainerContext ctx = (UMOContainerContext) digester.peek();
+                    ctx.configure(reader, doctype, encoding);
+                    }
+            };
         } catch (ParserConfigurationException e) {
             throw new ConfigurationException(e);
         }
         digester.addRule(path + "/configuration", nodeCreateRule);
-        digester.addSetRoot(path + "/configuration", "setContainerContextConfiguration");
+        digester.addSetRoot(path, "setContainerContext");
    }
 
     protected void addTransformerRules(Digester digester, String path) throws ConfigurationException
@@ -603,6 +638,11 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester.addObjectCreate(path + "/component-lifecycle-adapter-factory", DEFAULT_LIFECYCLE_ADAPTER, "className");
         addSetPropertiesRule(path, digester);
         digester.addSetNext(path + "/component-lifecycle-adapter-factory", "setLifecycleAdapterFactory");
+
+        //Create component factory
+        digester.addObjectCreate(path + "/component-factory", DEFAULT_COMPONENT_FACTORY, "className");
+        addSetPropertiesRule(path, digester);
+        digester.addSetNext(path + "/component-factory", "setComponentFactory");
 
         //Pool factory
         addPoolingProfileRules(digester, path);
@@ -915,7 +955,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     }
 
     protected void addCommonEndpointRules(Digester digester, String path, String method) throws ConfigurationException {
-        addSetPropertiesRule(path, digester, new String[]{"address", "transformers"}, new String[]{"endpointURI", "transformer"} );
+        addSetPropertiesRule(path, digester, new String[]{"address", "transformers", "createConnector"}, new String[]{"endpointURI", "transformer", "createConnectorAsString"} );
         addMulePropertiesRule(path, digester, false);
         addTransactionConfigRules(path, digester);
 
@@ -1136,6 +1176,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 String name = attributes.getValue("name");
                 String value = attributes.getValue("reference");
                 String required = attributes.getValue("required");
+                String container = attributes.getValue("container");
                 if(required==null) required = "true";
                 boolean req = Boolean.valueOf(required).booleanValue();
                 //if we're not setting as bean properties we need get the topmost object
@@ -1146,13 +1187,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 } else {
                     obj = digester.peek();
                 }
-                addContainerReference(name, value, obj, req);
+                addContainerReference(name, value, obj, req, container);
             }
         });
     }
 
-    private void addContainerReference(String propName, String containerRef, Object object, boolean required) {
-        containerReferences.add(new ContainerReference(propName, containerRef, object, required));
+    private void addContainerReference(String propName, String containerRef, Object object, boolean required, String container) {
+        containerReferences.add(new ContainerReference(propName, containerRef, object, required, container));
     }
 
     private void addTransformerReference(String propName, String transName, Object object) {

@@ -21,7 +21,10 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.Utility;
+import org.mule.impl.container.AbstractContainerContext;
 
 import java.io.Reader;
 import java.net.URL;
@@ -34,7 +37,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class PlexusContainerContext implements UMOContainerContext
+public class PlexusContainerContext extends AbstractContainerContext
 {
     protected Embedder container;
     protected URL configFile;
@@ -46,6 +49,7 @@ public class PlexusContainerContext implements UMOContainerContext
 
     public PlexusContainerContext(Embedder container)
     {
+        super("plexus");
         this.container = container;
     }
 
@@ -65,7 +69,7 @@ public class PlexusContainerContext implements UMOContainerContext
         }
     }
 
-    public void configure(Reader configuration, Map configurationProperties) throws ContainerException
+    public void configure(Reader configuration) throws ContainerException
     {
         try
         {
@@ -82,17 +86,9 @@ public class PlexusContainerContext implements UMOContainerContext
         return configFile;
     }
 
-    public void setConfigFile(URL configFile) throws ConfigurationException
+    public void setConfigFile(URL configFile)
     {
-        try
-        {
-            this.configFile = configFile;
-            container.setConfiguration(configFile);
-            container.start();
-        } catch (Exception e)
-        {
-            throw new ConfigurationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Plexus container", this.configFile));
-        }
+         this.configFile = configFile;
     }
 
     /**
@@ -106,5 +102,18 @@ public class PlexusContainerContext implements UMOContainerContext
             throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configFile));
         }
         setConfigFile(url);
+    }
+
+    public void initialise() throws InitialisationException, RecoverableException
+    {
+        if(configFile==null) return;
+        try
+        {
+            container.setConfiguration(configFile);
+            container.start();
+        } catch (Exception e)
+        {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Plexus container", this.configFile), this);
+        }
     }
 }
