@@ -13,7 +13,6 @@
  */
 package org.mule.providers.soap.axis;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.axis.AxisFault;
 import org.apache.axis.AxisProperties;
 import org.apache.axis.configuration.FileProvider;
@@ -33,8 +32,8 @@ import org.apache.axis.wsdl.fromJava.Namespaces;
 import org.apache.axis.wsdl.fromJava.Types;
 import org.mule.InitialisationException;
 import org.mule.MuleManager;
-import org.mule.impl.MuleDescriptor;
 import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ModelEventListener;
@@ -105,9 +104,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         MuleManager.getInstance().registerListener(this);
         
         if(serverConfig==null) serverConfig = DEFAULT_MULE_AXIS_SERVER_CONFIG;
-        //if(clientConfig==null) clientConfig = DEFAULT_MULE_AXIS_CLIENT_CONFIG;
+        if(clientConfig==null) clientConfig = DEFAULT_MULE_AXIS_CLIENT_CONFIG;
         serverProvider = createAxisProvider(serverConfig);
-        //clientProvider = createAxisProvider(clientConfig);
+        clientProvider = createAxisProvider(clientConfig);
 
         // Create the AxisServer
         axisServer = new AxisServer( serverProvider );
@@ -120,7 +119,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     protected SimpleProvider createAxisProvider(String config) throws InitialisationException
     {
         InputStream is = null;
-        File f = new File(serverConfig);
+        File f = new File(config);
         if(f.exists()) {
             try
             {
@@ -130,9 +129,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
                 //ignore
             }
         } else {
-            is = ClassHelper.getResourceAsStream(serverConfig, getClass());
+            is = ClassHelper.getResourceAsStream(config, getClass());
         }
-        FileProvider fileProvider = new FileProvider(serverConfig);
+        FileProvider fileProvider = new FileProvider(config);
         if(is!=null) {
             fileProvider.setInputStream(is);
         } else {
@@ -266,7 +265,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
          */
         ServiceDesc sd = service.getInitializedServiceDesc(null);
         sd.setName(serviceName);
-        sd.setEndpointURL(servicePath);
+        sd.setEndpointURL(uri.getAddress() + "/" + serviceName);
 
         String style = (String)receiver.getComponent().getDescriptor().getProperties().get("style");
         String use = (String)receiver.getComponent().getDescriptor().getProperties().get("use");
