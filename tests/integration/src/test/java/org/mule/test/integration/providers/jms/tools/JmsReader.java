@@ -13,7 +13,7 @@
  *
  */
 
-package org.mule.providers.jms.support;
+package org.mule.test.integration.providers.jms.tools;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

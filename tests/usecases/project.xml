@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-usecases</artifactId>
+    <name>Mule Usecases</name>
+    <description>Mule usecases usually make up from scenarios presented on the mailing lists
+    </description>
+    <shortDescription>usecases</shortDescription>
+    <url>http://www.muleumo.org/</url>
+    <dependencies/>
+</project>

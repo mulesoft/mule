@@ -19,12 +19,6 @@
             <url>http://jakarta.apache.org/commons/dbutils/index.html</url>
         </dependency>
         <dependency>
-        	<groupId>hsqldb</groupId>
-        	<artifactId>hsqldb</artifactId>
-        	<version>${hsqldb_version}</version>
-        	<url>http://hsqldb.sourceforge.net/</url>
-        </dependency>
-        <dependency>
             <groupId>xapool</groupId>
             <artifactId>xapool</artifactId>
             <version>${xapool_version}</version>
@@ -33,28 +27,13 @@
             <properties/>
         </dependency>
         <dependency>
-            <groupId>jotm</groupId>
-            <artifactId>jotm</artifactId>
-            <version>${jotm_version}</version>
-            <type>jar</type>
-            <properties/>
-            <url>http://jotm.objectweb.org</url>
-        </dependency>
-        <dependency>
-            <groupId>jotm</groupId>
-            <artifactId>jotm-carol</artifactId>
-            <version>${jotm_carol_version}</version>
-            <type>jar</type>
-            <properties/>
-            <url>http://jotm.objectweb.org</url>
-        </dependency>
-        <dependency>
-            <groupId>jotm</groupId>
-            <artifactId>jotm-jrmp-stubs</artifactId>
-            <version>${jotm_jrmp_stubs_version}</version>
-            <type>jar</type>
-            <properties/>
-            <url>http://jotm.objectweb.org</url>
+        	<groupId>hsqldb</groupId>
+        	<artifactId>hsqldb</artifactId>
+        	<version>${hsqldb_version}</version>
+        	<url>http://hsqldb.sourceforge.net/</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
         </dependency>
     </dependencies>
 </project>

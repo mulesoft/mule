@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-   
+
     <extend>${basedir}/../mule/project.xml</extend>
     <pomVersion>3</pomVersion>
     <name>Mule Tests</name>
@@ -35,6 +35,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -43,6 +44,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -52,6 +54,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -61,6 +64,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -69,14 +73,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-            </properties>
-        </dependency>
-        <dependency>
-            <id>mule:mule-jms-provider</id>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -85,6 +82,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -93,6 +91,25 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>mule:mule-jdbc-provider</id>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>mule:mule-jms-provider</id>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -101,6 +118,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -109,6 +127,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -117,48 +136,19 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
             <artifactId>spring</artifactId>
             <groupId>springframework</groupId>
-            <version>1.1.3</version>
+            <version>${spring_version}</version>
             <url>http://www.springframework.org</url>
-        </dependency>
-        <dependency>
-            <artifactId>mule-vm-provider</artifactId>
-            <groupId>mule</groupId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <artifactId>mule-jms-provider</artifactId>
-            <groupId>mule</groupId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <artifactId>mule-soap-provider</artifactId>
-            <groupId>mule</groupId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
         </dependency>
         <dependency>
             <artifactId>axis</artifactId>
             <groupId>axis</groupId>
-            <version>1.2-RC3-11022005</version>
+            <version>${axis_version}</version>
             <url>http://ws.apache.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -167,7 +157,7 @@
         <dependency>
             <artifactId>axis-jaxrpc</artifactId>
             <groupId>axis</groupId>
-            <version>1.2-RC3-11022005</version>
+            <version>${axis_jaxrpc_version}</version>
             <url>http://ws.apache.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -176,7 +166,7 @@
         <dependency>
             <artifactId>axis-saaj</artifactId>
             <groupId>axis</groupId>
-            <version>1.2-RC3-11022005</version>
+            <version>${axis_saaj_version}</version>
             <url>http://ws.apache.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
@@ -185,102 +175,147 @@
         <dependency>
             <artifactId>axis-wsdl4j</artifactId>
             <groupId>axis</groupId>
-            <version>1.2-RC3-11022005</version>
+            <version>${axis_wsdl4j_version}</version>
             <url>http://ws.apache.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             </properties>
         </dependency>
-        <!-- needed by the Axis Service component -->
-        <dependency>
-            <groupId>mule</groupId>
-            <artifactId>mule-http-provider</artifactId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
         <dependency>
             <id>commons-httpclient</id>
-            <version>2.0.2</version>
+            <version>${commons_httpclient_version}</version>
             <url>http://jakarta.apache.org/commons/httpclient/index.html</url>
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>
             </properties>
         </dependency>
         <dependency>
-            <artifactId>mule-extras-client</artifactId>
-            <groupId>mule</groupId>
-            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>activemq</groupId>
-            <artifactId>activemq</artifactId>
-            <version>2.0</version>
-            <properties>
-                <ignore>true</ignore>
-            </properties>
-        </dependency>
-
-        <dependency>
             <artifactId>acegi-security</artifactId>
             <groupId>acegisecurity</groupId>
-            <version>0.7.0</version>
+            <version>${acegisecurity_version}</version>
             <url>http://acegi.sourceforge.net</url>
         </dependency>
         <dependency>
             <artifactId>aopalliance</artifactId>
             <groupId>aopalliance</groupId>
-            <version>1.0</version>
+            <version>${aopalliance_version}</version>
         </dependency>
         <dependency>
             <artifactId>aspectjrt</artifactId>
             <groupId>aspectj</groupId>
-            <version>1.2</version>
+            <version>${aspectjrt_version}</version>
         </dependency>
         <dependency>
             <artifactId>commons-attributes-api</artifactId>
             <groupId>commons-attributes</groupId>
-            <version>2.1</version>
+            <version>${commons_attributes_version}</version>
         </dependency>
-       <dependency>
+        <dependency>
             <artifactId>commons-codec</artifactId>
             <groupId>commons-codec</groupId>
-            <version>1.3</version>
+            <version>${commons_codec_version}</version>
         </dependency>
         <dependency>
             <artifactId>ehcache</artifactId>
             <groupId>ehcache</groupId>
-            <version>1.0</version>
+            <version>${ehcache_version}</version>
         </dependency>
         <dependency>
             <artifactId>oro</artifactId>
             <groupId>oro</groupId>
-            <version>2.0.7</version>
+            <version>${oro_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fscontext</groupId>
+            <artifactId>fscontext</artifactId>
+            <jar>fscontext.jar</jar>
+            <url></url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>providerutil</groupId>
+            <artifactId>providerutil</artifactId>
+            <version></version>
+            <jar>providerutil.jar</jar>
+            <url></url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <artifactId>activemq</artifactId>
+            <groupId>activemq</groupId>
+            <version>${activemq_version}</version>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>openjms</groupId>
+            <artifactId>openjms-client</artifactId>
+            <version>${openjms_client_version}</version>
+            <type>jar</type>
+            <url>http://openjms.sourceforge.net/</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>exolabcore</groupId>
+            <artifactId>exolabcore</artifactId>
+            <version>${exolabcore_version}</version>
+            <type>jar</type>
+            <url>http://openjms.sourceforge.net/</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm</artifactId>
+            <version>${jotm_version}</version>
+            <type>jar</type>
+            <url>http://jotm.objectweb.org</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm-carol</artifactId>
+            <version>${jotm_carol_version}</version>
+            <type>jar</type>
+            <url>http://jotm.objectweb.org</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm-jrmp-stubs</artifactId>
+            <version>${jotm_jrmp_stubs_version}</version>
+            <type>jar</type>
+            <url>http://jotm.objectweb.org</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+        	<groupId>hsqldb</groupId>
+        	<artifactId>hsqldb</artifactId>
+        	<version>${hsqldb_version}</version>
+        	<url>http://hsqldb.sourceforge.net/</url>
         </dependency>
     </dependencies>
     <build>
-        <sourceDirectory>${basedir}/integration</sourceDirectory>
-        <sourceDirectory>${basedir}/usecases</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/integration</unitTestSourceDirectory>
-        <unitTestSourceDirectory>${basedir}/usecases</unitTestSourceDirectory>
+        <sourceDirectory>${basedir}/src/test/java</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
         <unitTest>
             <resources>
                 <resource>
-                    <directory>${basedir}/integration/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-                <resource>
-                    <directory>${basedir}/usecases/conf</directory>
+                    <directory>${basedir}/src/test/conf</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>
@@ -288,9 +323,14 @@
             </resources>
         </unitTest>
         <resources>
+            <resource>
+                <directory>${basedir}/src/test/conf</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
             <includes>
                 <include>${basedir}/../LICENSE.txt</include>
-                <include>${basedir}/licenses/*.*</include>
             </includes>
         </resources>
     </build>
