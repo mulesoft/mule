@@ -18,9 +18,11 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.impl.RequestContext;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
@@ -82,7 +84,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             event.setSynchronous(false);
             event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
             RequestContext.setEvent(event);
-            if (doThreading && !event.isSynchronous())
+            UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+            if (doThreading && !event.isSynchronous() && tx == null)
             {
                     threadPool.execute(new Worker(event));
             } else
