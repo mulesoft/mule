@@ -21,6 +21,15 @@
             </properties>
         </dependency>
         <dependency>
+            <artifactId>mule-extras-client</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org/providers/http</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
             <artifactId>commons-httpclient</artifactId>
             <groupId>commons-httpclient</groupId>
             <version>2.0.2</version>
