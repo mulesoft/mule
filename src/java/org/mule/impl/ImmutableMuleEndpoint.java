@@ -89,16 +89,37 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     protected UMOTransactionConfig transactionConfig = null;
 
+    /**
+     * event filter for this endpoint
+     */
     protected UMOFilter filter = null;
 
+    /**
+     * determines whether unaccepted filtered events should be
+     * removed from the source.  If they are not removed its up to
+     * the Message receiver to handle recieving the same message again
+     */
     protected boolean deleteUnacceptedMessages = false;
 
+    /**
+     * has this endpoint been initialised
+     */
     protected SynchronizedBoolean initialised = new SynchronizedBoolean(false);
 
+    /**
+     * The security filter to apply to this endpoint
+     */
     protected UMOEndpointSecurityFilter securityFilter = null;
 
+    /**
+     * whether events received by this endpoint should execute in a single
+     * thread
+     */
+    protected Boolean synchronous = null;
+    /**
+     * Default ctor
+     */
     private ImmutableMuleEndpoint() {
-
     }
 
     public ImmutableMuleEndpoint(String endpoint, String type) throws UMOException
@@ -307,11 +328,10 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     {
         UMOEndpoint endpoint = ConnectorFactory.createEndpoint(uri, type);
         if(uri.getEndpointName()!=null) endpoint.setName(uri.getEndpointName());
-        //RM* todo endpoint.initialise();
         return endpoint;
     }
 
-     public static UMOEndpoint getEndpointFromUri(String uri) throws UMOException
+     public static UMOEndpoint getEndpointFromUri(String uri)
     {
         UMOEndpoint endpoint = null;
         if(uri!=null) {
@@ -437,5 +457,21 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public UMOEndpointSecurityFilter getSecurityFilter()
     {
         return securityFilter;
+    }
+
+    /**
+     * Determines if requests originating from this endpoint should be synchronous
+     * i.e. execute in a single thread and possibly return an result.  This property
+     * is only used when the endpoint is of type 'receiver'
+     *
+     * @return whether requests on this endpoint should execute in a single
+     *         thread. This property is only used when the endpoint is of type 'receiver'
+     */
+    public boolean isSynchronous()
+    {
+        if(synchronous==null) {
+            synchronous = new Boolean(MuleManager.getConfiguration().isSynchronous());
+        }
+        return synchronous.booleanValue();
     }
 }

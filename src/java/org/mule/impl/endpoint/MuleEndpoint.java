@@ -157,21 +157,6 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
         transactionConfig = config;
     }
 
-    //todo RM*
-//    public void setEndpointUrl(String url) throws UMOException
-//    {
-//        String realUrl = MuleManager.getInstance().lookupEndpointIdentifier(url, url);
-//        UMOEndpointURI endpointUri = new MuleEndpointURI(realUrl);
-//        boolean receiver = (ENDPOINT_TYPE_RECEIVER.equals(type));
-//        UMOEndpoint endpoint = getOrCreateEndpointForUri(endpointUri, receiver);
-//        //If the value was an endpoint identifier reference then set the
-//        //reference as the name of the endpoint
-//        if(endpointUri.getEndpointName()==null && !realUrl.equals(url)) {
-//            endpoint.setName(url);
-//        }
-//        initFromDescriptor(endpoint);
-//    }
-
     public void setFilter(UMOFilter filter) {
         this.filter = filter;
     }
@@ -200,5 +185,18 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
         if(securityFilter!=null) {
             securityFilter.setEndpoint(this);
         }
+    }
+
+    /**
+     * Determines if requests originating from this endpoint should be synchronous
+     * i.e. execute in a single thread and possibly return an result.  This property
+     * is only used when the endpoint is of type 'receiver'.
+     *
+     * @param synchronous whether requests on this endpoint should execute in a single
+     *                    thread. This property is only used when the endpoint is of type 'receiver'
+     */
+    public void setSynchronous(boolean synchronous)
+    {
+        this.synchronous = new Boolean(synchronous);
     }
 }

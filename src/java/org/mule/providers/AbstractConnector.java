@@ -149,12 +149,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     protected UMOTransformer defaultResponseTransformer = null;
 
-    /**
-     * Is this connector running in synchronous mode.  If so all messages
-     * received will be processed synchronously
-     */
-    protected SynchronizedBoolean synchronous = null;
-
     public AbstractConnector()
     {
         //make sure we always have an exception strategy
@@ -421,8 +415,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             }
         } else
         {
-            //todo fix this
-            //sometimes dispatchers can be null even though the map is initialised in the ctor
             if(dispatchers==null) {
                 throw new NullPointerException("Dispatchers are null for connector: " + name);
             }
@@ -646,20 +638,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     public void setDefaultResponseTransformer(UMOTransformer defaultResponseTransformer)
     {
         this.defaultResponseTransformer = defaultResponseTransformer;
-    }
-
-    public boolean isSynchronous()
-    {
-        if(synchronous==null) {
-            return MuleManager.getConfiguration().isSynchronous();
-        } else {
-            return synchronous.get();
-        }
-    }
-
-    public void setSynchronous(boolean synchronous)
-    {
-        this.synchronous = new SynchronizedBoolean(synchronous);
     }
 
     public ReplyToHandler getReplyToHandler()
