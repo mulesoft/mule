@@ -44,6 +44,8 @@
             <delete file="${jarfile}"/>
         </j:forEach>
 
+        <!-- unjar the core jar again to overlay the correct manifest -->
+        <unjar src="${mule.release.lib.dir}/mule-core-${pom.currentVersion}.jar" dest="${mule.release.dist.dir}/temp"/>
         <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
 
         <echo>creating jar: ${mule.release.dist.dir}/mule-${pom.currentVersion}</echo>

@@ -65,7 +65,8 @@
             <unjar src="${jarfile}" dest="${mule.release.dist.dir}/temp"/>
         </j:forEach>
 
-        <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
+        <copy file="${basedir}/mule/target/classes/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
+        <copy overwrite="true" file="${basedir}/mule/target/classes/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF"/>
 
         <echo>creating jar: ${mule.release.dist.dir}/mule-${pom.currentVersion}</echo>
         <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
@@ -251,7 +252,7 @@
 
     <goal name="mule:site" prereqs="mule:dtds, multiproject:site"/>
 
-    <goal name="mule:libs">
+    <goal name="mule:libs" prereqs="setvars">
         <mkdir dir="${mule.release.lib.dir}/licenses"/>
         <!-- copies artifact and deps -->
         <j:set var="goal" value="mule:libs-copy"/>
@@ -261,31 +262,37 @@
     <goal name="mule:libs-copy">
 
         <echo>Copying project dependencies for ${pom.artifactId}, package ${pom.package}</echo>
+        <echo>looking up licenses from ${basedir}/../../licenses</echo>
         <j:forEach var="lib" items="${pom.dependencies}">
             <j:if test="${lib.getProperty('ignore')!='true'}">
                 <j:if test="${pom.package=='org.mule.extras'}">
+                    <j:set var="licenses.dir" value="${basedir}/../../licenses"/>
                     <j:if test="${lib.getProperty('mule.core.jar')!='true'}">
                         <mkdir dir="${basedir}/../../target/release/lib/${pom.artifactId}"/>
                         <copy todir="${basedir}/../../target/release/lib/${pom.artifactId}"
                             file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
-                        <u:available file="${basedir}/../../licenses/${lib.artifactId}.license">
-                            <copy todir="${mule.release.lib.dir}/licenses"
-                                file="${basedir}/../../licenses/${lib.artifactId}.license"/>
-                        </u:available>
-                        <u:available file="${basedir}/../../licenses/${lib.groupId}.license">
-                            <copy todir="${mule.release.lib.dir}/licenses"
-                                file="${basedir}/../../licenses/${lib.groupId}.license"/>
-                        </u:available>
                     </j:if>
                 </j:if>
                 <j:if test="${pom.package=='org.mule'}">
+                    <j:set var="licenses.dir" value="${basedir}/../licenses"/>
                     <copy todir="${basedir}/../target/release/lib"
                         file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
                 </j:if>
                 <j:if test="${pom.package!='org.mule.extras'}">
+                    <j:set var="licenses.dir" value="${basedir}/../../licenses"/>
                     <copy todir="${basedir}/../../target/release/lib"
                         file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
                 </j:if>
+                <u:available file="${basedir}/../../licenses/${lib.artifactId}.license">
+                    <echo>Using license ${licenses.dir}/${lib.artifactId}.license</echo>
+                    <copy todir="${basedir}/../../target/release/lib/licenses"
+                        file="${licenses.dir}/${lib.artifactId}.license"/>
+                </u:available>
+                <u:available file="${license.dir}/${lib.groupId}.license">
+                    <echo>Using license ${licenses.dir}/${lib.groupId}.license</echo>
+                    <copy todir="${basedir}/../../target/release/lib/licenses"
+                        file="${licenses.dir}/${lib.groupId}.license"/>
+                </u:available>
             </j:if>
         </j:forEach>
     </goal>
@@ -344,7 +351,7 @@
         <attainGoal name="multiproject:goal"/>
     </goal>
 
-    <goal name="dist-samples">
+    <goal name="dist-samples" prereqs="setvars">
         <j:set var="root.dir" value="${basedir}"/>
         <maven:reactor
             basedir="${basedir}/samples"
