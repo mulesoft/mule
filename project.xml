@@ -146,6 +146,9 @@
                 <!-- Disable Multicast tests unless configured -->
                 <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
 
+<!--                <exclude>**/*FunctionalTestCase.*</exclude>-->
+<!--                <exclude>**/Https*.*</exclude>-->
+
                 <!-- sometimes fails failing to bind -->
                 <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
                 <exclude>**/Plexus*.*</exclude>
