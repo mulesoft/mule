@@ -20,6 +20,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.IteratorAdapter;
 import org.mule.util.Utility;
+import org.mule.config.MuleProperties;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -249,7 +250,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
      */
     public void setCorrelationId(String id)
     {
-        setProperty(HttpConstants.MULE_CORRELATION_ID, id);
+        setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, id);
     }
 
     /**
@@ -267,7 +268,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
      */
     public String getCorrelationId()
     {
-        return (String)getProperty(HttpConstants.MULE_CORRELATION_ID);
+        return (String)getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
     }
 
     /**
@@ -283,7 +284,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
         if(replyTo!=null && replyTo.toString().startsWith("http")) {
             setProperty(HttpConstants.HEADER_LOCATION, replyTo);
         }
-        setProperty(HttpConstants.MULE_CORRELATION_ID, replyTo);
+        setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, replyTo);
 
     }
 
@@ -297,7 +298,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
      */
     public Object getReplyTo()
     {
-        String replyto = (String)getProperty(HttpConstants.MULE_REPLY_TO);
+        String replyto = (String)getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
         if(replyto==null) {
             replyto = (String)getProperty(HttpConstants.HEADER_LOCATION);
         }
@@ -312,7 +313,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
      */
     public int getCorrelationSequence()
     {
-        return getIntProperty(HttpConstants.MULE_CORRELATION_SEQUENCE, -1);
+        return getIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, -1);
     }
 
     /**
@@ -323,7 +324,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
      */
     public void setCorrelationSequence(int sequence)
     {
-        setIntProperty(HttpConstants.MULE_CORRELATION_SEQUENCE, sequence);
+        setIntProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, sequence);
     }
 
     /**
@@ -333,7 +334,7 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
      */
     public int getCorrelationGroupSize()
     {
-        return getIntProperty(HttpConstants.MULE_CORRELATION_GROUP, -1);
+        return getIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, -1);
     }
 
     /**
@@ -343,6 +344,29 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
      */
     public void setCorrelationGroupSize(int size)
     {
-        setIntProperty(HttpConstants.MULE_CORRELATION_GROUP, size);
+        setIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
+    }
+
+    /**
+     * If an error occurred during the processing of this message this
+     * will return a value greater than zero
+     *
+     * @return
+     */
+    public int getErrorCode()
+    {
+        return getIntProperty(MuleProperties.MULE_ERROR_CODE_PROPERTY, 0);
+    }
+
+    /**
+     * If an error occurs while processing this message, this error code
+     * should be set to a value greater than zero and the palyoad of the this
+     * message should contain the error details
+     *
+     * @param code
+     */
+    public void setErrorCode(int code)
+    {
+        setIntProperty(MuleProperties.MULE_ERROR_CODE_PROPERTY, code);
     }
 }
