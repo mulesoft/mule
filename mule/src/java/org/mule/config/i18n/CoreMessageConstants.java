@@ -164,5 +164,6 @@ public interface CoreMessageConstants
     public static final int EXCEPTION_ON_CONNECTOR_X_NO_EXCEPTION_LISTENER = 146;
     public static final int UNIQUE_ID_NOT_SUPPORTED_BY_ADAPTER_X = 147;
     public static final int FAILED_TO_PERSIST_EVENT_X = 148;
+    public static final int FILE_X_DOES_NTO_EXIST = 149;
 
 }

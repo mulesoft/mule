@@ -57,7 +57,7 @@ public class FileToByteArray extends AbstractTransformer
             return baos.toByteArray();
         } catch (IOException e)
         {
-            throw new TransformerException(e.getMessage(), e);
+            throw new TransformerException(this, e);
         } finally {
             try
             {

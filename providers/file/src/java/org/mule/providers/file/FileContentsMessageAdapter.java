@@ -15,9 +15,11 @@
 
 package org.mule.providers.file;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.file.transformers.FileToByteArray;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.transformer.TransformerException;
@@ -40,7 +42,7 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
     private byte[] message = null;
     private File file = null;
 
-    public FileContentsMessageAdapter(Object message) throws MessageException
+    public FileContentsMessageAdapter(Object message) throws MessagingException
     {
         if(message instanceof File) {
             setMessage((File)message);
@@ -76,7 +78,7 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
     /* (non-Javadoc)
      * @see org.mule.providers.UMOMessageAdapter#setMessage(java.lang.Object)
      */
-    private void setMessage(File message) throws MessageException
+    private void setMessage(File message) throws MessagingException
     {
         try
         {
@@ -86,7 +88,7 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
             properties.put(FileConnector.PROPERTY_DIRECTORY, this.file.getAbsolutePath());
         } catch (TransformerException e)
         {
-            throw new MessageException("Failed to read file: " + file.getAbsolutePath() + ". " + e.getMessage(), e);
+            throw new MessagingException(new Message(Messages.FILE_X_DOES_NTO_EXIST, file.getAbsolutePath()), e);
         }
     }
 

@@ -13,8 +13,8 @@
  */
 package org.mule.extras.plexus;
 
+import org.mule.config.ConfigurationException;
 import org.mule.tck.model.AbstractComponentResolverTestCase;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOContainerContext;
 
 /**
@@ -23,8 +23,7 @@ import org.mule.umo.manager.UMOContainerContext;
  */
 public class PlexusContainerContextTestCase extends AbstractComponentResolverTestCase
 {
-    public UMOContainerContext getContainerContext()
-    {
+    public UMOContainerContext getContainerContext() throws ConfigurationException {
         PlexusContainerContext context = new PlexusContainerContext();
         context.setConfigFile("test-plexus-config.xml");
         return context;

@@ -15,8 +15,9 @@
 
 package org.mule.providers.file;
 
-import org.mule.InitialisationException;
 import org.mule.MuleException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
@@ -24,6 +25,7 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 
@@ -83,7 +85,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
         }
         catch (Exception e)
         {
-            handleException("Exception occurred while polling", e);
+            handleException(e);
         }
     }
 
@@ -106,9 +108,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
             //Perform some quick checks to make sure file can be processed
             if (!(file.canRead() && file.exists() && file.isFile()))
             {
-                throw new MuleException("Error while reading file "
-                        + file.getName()
-                        + ". Either the file doesn't exist or it is not a file");
+                throw new MuleException(new Message(Messages.FILE_X_DOES_NTO_EXIST, file.getName()));
             }
             else
             {
@@ -117,7 +117,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
                     resultOfFileMoveOperation = file.renameTo(destinationFile);
                     if (!resultOfFileMoveOperation)
                     {
-                        throw new MuleException("Failed to move " + file.getAbsolutePath() + " to " + destinationFile.getAbsolutePath() + ". File may already exist.");
+                        throw new MuleException(new Message("file", 4, file.getAbsolutePath(), destinationFile.getAbsolutePath()));
                     }
                     file = destinationFile;
                 }
@@ -132,7 +132,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
                         resultOfFileMoveOperation = file.delete();
                         if (!resultOfFileMoveOperation)
                         {
-                            throw new MuleException("Failed to delete " + file.getAbsolutePath());
+                            throw new MuleException(new Message("file", 3, file.getAbsolutePath()));
                         }
                     }
                 }
@@ -148,15 +148,8 @@ public class FileMessageReceiver extends PollingMessageReceiver
             {
                 resultOfRollbackFileMove = rollbackFileMove(destinationFile, file.getAbsolutePath());
             }
-            Exception ex = new MuleException("IO Exception"
-                    + e.toString()
-                    + " while processing "
-                    + file.getName()
-                    + " File was"
-                    + (resultOfFileMoveOperation ? " " : " not ")
-                    + " moved to done. Roll back of move "
-                    + (resultOfRollbackFileMove ? "succeeded" : "failed"), e);
-           handleException("Failed to dispatch event", ex);
+            Exception ex = new MuleException(new Message("file", 2, file.getName(), (resultOfRollbackFileMove ? "successful" : "unsuccessful")), e);
+            handleException(ex);
         }
     }
 
@@ -194,7 +187,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
         }
         catch (Exception e)
         {
-            throw new MuleException("Error while listing files", e);
+            throw new MuleException(new Message("file", 1), e);
         }
         return todoFiles;
     }

@@ -52,7 +52,7 @@ public class FileToString extends AbstractTransformer
             }
         } catch (IOException e)
         {
-            throw new TransformerException(e.getMessage(), e);
+            throw new TransformerException(this, e);
         } finally {
             try
             {

@@ -17,7 +17,7 @@ package org.mule.providers.file;
 
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.file.transformers.FileToByteArray;
-import org.mule.umo.MessageException;
+import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
@@ -39,7 +39,7 @@ public class FileMessageAdapter extends AbstractMessageAdapter
     private File message = null;
     private byte[] contents = null;
 
-    public FileMessageAdapter(Object message) throws MessageException
+    public FileMessageAdapter(Object message) throws MessagingException
     {
         if(message instanceof File) {
             setMessage((File)message);

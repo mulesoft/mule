@@ -15,6 +15,7 @@
  
 package org.mule.samples.errorhandler.exceptions;
 
+import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
 /**
@@ -40,7 +41,7 @@ public class FatalException extends UMOException
      */
     public FatalException(String message, Throwable cause)
     {
-        super(message, cause);
+        super(Message.createStaticMessage(message), cause);
     }
 
 }

@@ -26,15 +26,17 @@ package org.mule.providers.file;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.InitialisationException;
 import org.mule.MuleException;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.transformers.simple.ByteArrayToSerialisable;
 import org.mule.transformers.simple.SerialisableToByteArray;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.Utility;
 
@@ -132,7 +134,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
             dir = Utility.openDirectory(readDir);
             if (!(dir.canRead()))
             {
-                throw new MuleException("endpointUri [File System directory] does not " + "exist or cannot be read: " + dir.getAbsolutePath());
+                throw new MuleException(new Message(Messages.FILE_X_DOES_NTO_EXIST, dir.getAbsolutePath()));
             }
             else
             {
@@ -167,8 +169,8 @@ public class FileConnector extends AbstractServiceEnabledConnector
 
         } catch (Exception e)
         {
-            throw new InitialisationException("Failed to create receiver using spi interface: " +
-                    serviceDescriptor.getMessageReceiver() + ". Error is: " + e.getMessage(), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Message Receiver",
+                    serviceDescriptor.getMessageReceiver()), e);
         } 
     }
 

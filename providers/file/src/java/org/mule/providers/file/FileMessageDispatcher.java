@@ -15,6 +15,7 @@
 package org.mule.providers.file;
 
 import org.mule.MuleException;
+import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -91,7 +92,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             }
         } catch (Exception e)
         {
-            getConnector().handleException(event, e);
+            getConnector().handleException(e);
         }
 
     }
@@ -173,7 +174,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             return result;
         } catch (Exception e)
         {
-            throw new MuleException("Error while listing files", e);
+            throw new MuleException(new Message("file", 1), e);
         }
     }
 
