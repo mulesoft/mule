@@ -101,6 +101,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 throw new InitialisationException("Response transformer is required for the http endpoint. Check the connector service descriptor");
             }
         }
+        if(!responseTransformer.getReturnClass().equals(String.class) &&
+                !responseTransformer.getReturnClass().equals(byte[].class)) {
+            throw new InitialisationException("Response transformer for " + connector.getName() + " must return either " +
+                    "a String or byte[]");
+        }
         return responseTransformer;
     }
 
@@ -215,8 +220,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             returnMessage = new MuleMessage("", null);
                         }
                         RequestContext.rewriteEvent(returnMessage);
-                        String responseText = (String) getResponseTransformer().transform(returnMessage.getPayload());
-                        dataOut.write(responseText.getBytes());
+                        Object response = getResponseTransformer().transform(returnMessage.getPayload());
+                        if(response instanceof String) {
+                            dataOut.write(response.toString().getBytes());
+                        } else {
+                            dataOut.write((byte[])response);
+                        }
                         dataOut.flush();
                         if (keepAliveMonitor != null)
                         {
