@@ -13,10 +13,9 @@
  */
 package org.mule.umo.provider;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOException;
 
 /**
  * <code>ConnectorException</code> TODO
@@ -56,5 +55,9 @@ public class ConnectorException extends UMOException
              message = new Message(-1);
              return m;
          }
+    }
+
+    public UMOConnector getConnector() {
+        return connector;
     }
 }
