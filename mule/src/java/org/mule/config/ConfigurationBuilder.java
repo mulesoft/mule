@@ -16,6 +16,8 @@ package org.mule.config;
 
 import org.mule.umo.UMOManager;
 
+import java.io.Reader;
+
 /**
  * <code>ConfigurationBuilder</code> is a Strategy class used to configure a UMOManager
  * instance using different configuration mechanisms, such as for Xml, a script or some
@@ -34,4 +36,14 @@ public interface ConfigurationBuilder
      * @throws ConfigurationException
      */
     public UMOManager configure(String configResources) throws ConfigurationException;
+
+    /**
+     * Will configure a UMOManager based on the configurations made available through Readers
+     * @param configResources an array of Readers
+     * @return A configured UMOManager
+     * @throws ConfigurationException
+     */
+    UMOManager configure(Reader[] configResources) throws ConfigurationException;
+
+    boolean isConfigured();
 }

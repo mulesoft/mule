@@ -90,6 +90,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -267,6 +268,37 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         {
             throw new ConfigurationException("Failed to parse configuration resource(s): " + e.getMessage(), e);
         }
+    }
+
+    public UMOManager configure(Reader[] configResources) throws ConfigurationException
+    {
+        manager = MuleManager.getInstance();
+        try
+        {
+            for (int i = 0; i < configResources.length; i++)
+            {
+                Reader configResource = configResources[i];
+                digester.push(manager);
+                manager = (UMOManager)digester.parse(configResource);
+            }
+            setContainerProperties();
+            setTransformers();
+            setGlobalEndpoints();
+            manager.start();
+        }
+        catch (Exception e)
+        {
+            throw new ConfigurationException("Failed to parse configuration resource(s): " + e.getMessage(), e);
+        }
+        return manager;
+    }
+
+    /**
+     * Indicate whether this ConfigurationBulder has been configured yet
+     * @return <code>true</code> if this ConfigurationBulder has been configured
+     */
+    public boolean isConfigured() {
+        return manager != null;
     }
 
     protected void setContainerProperties() throws ComponentResolverException
