@@ -187,6 +187,9 @@ public class MuleManager implements UMOManager
         if(config==null) config = new MuleConfiguration();
         setModel(new MuleModel());
         setContainerContext(new MuleContainerContext());
+        if(!config.isClientMode()) {
+            eventManager = new ServerEventManager();
+        }
     }
 
     /**
@@ -537,14 +540,11 @@ public class MuleManager implements UMOManager
     /**
      * {@inheritDoc}
      */
-    protected synchronized void initialise() throws UMOException
+    synchronized void initialise() throws UMOException
     {
         if (!initialised.get())
         {
             initialising.set(true);
-            if(!config.isClientMode()) {
-                eventManager = new ServerEventManager();
-            }
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_INITIALISNG));
             if(id==null) {
                 logger.warn("No unique id has be set on this manager");
@@ -994,6 +994,9 @@ public class MuleManager implements UMOManager
      * {@inheritDoc}
      */
     public void registerListener(UMOServerEventListener l) {
+        if(eventManager==null) {
+            throw new MuleRuntimeException(new Message(Messages.SERVER_EVENT_MANAGER_NOT_ENABLED));
+        }
         eventManager.registerListener(l);
     }
 
@@ -1001,7 +1004,9 @@ public class MuleManager implements UMOManager
      * {@inheritDoc}
      */
     public void unregisterListener(UMOServerEventListener l) {
-        eventManager.unregisterListener(l);
+        if(eventManager!=null) {
+            eventManager.unregisterListener(l);
+        }
     }
 
     /**
