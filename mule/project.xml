@@ -353,12 +353,6 @@
                         <include>**/*</include>
                     </includes>
                 </resource>
-                <resource>
-                    <directory>${basedir}/src/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
             </resources>
         </unitTest>
         <resources>
