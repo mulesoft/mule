@@ -178,10 +178,14 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             if(result==null && entryPoint.isVoid()) {
                    return new MuleMessage(event.getTransformedMessage(), event.getProperties());
             } else if(descriptor.getResponseRouter()!=null) {
+            	logger.debug("Waiting for response router message");
                 if(result==null) {
                     result = descriptor.getResponseRouter().getResponse(event.getMessage());
                 } else {
                     result = descriptor.getResponseRouter().getResponse(new MuleMessage(result, event.getProperties()));
+                }
+                if (descriptor.getResponseRouter().isStopProcessing()) {
+                	RequestContext.getEvent().setStopFurtherProcessing(true);
                 }
                 return result;
             } else {

@@ -49,6 +49,8 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     private List endpoints = new CopyOnWriteArrayList();
 
     private UMOTransformer transformer;
+    
+    private boolean stopProcessing = true;
 
     public ResponseMessageRouter()
     {
@@ -181,6 +183,16 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public void setTransformer(UMOTransformer transformer)
     {
         this.transformer = transformer;
+    }
+    
+    public boolean isStopProcessing() 
+    {
+    	return stopProcessing;
+    }
+    
+    public void setStopProcessing(boolean stopProcessing)
+    {
+    	this.stopProcessing = stopProcessing;
     }
 
 }

@@ -67,6 +67,9 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                 responseEvents.put(id, returnMessage);
                 Sync s = (Sync)locks.get(id);
                 if(s==null) {
+                	if (logger.isDebugEnabled()) {
+                		logger.debug("Creating latch for " + id + " in " + this);
+                	}
                     s = new Latch();
                     locks.put(id, s);
                 }
@@ -113,12 +116,16 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         try
         {
             messageId = message.getUniqueId();
+	    	if (logger.isDebugEnabled()) {
+	    		logger.debug("Waiting for response for message id: " + messageId + " in " + this);
+	    	}
         } catch (UniqueIdNotSupportedException e)
         {
             throw new RoutingException("Failed to receive response for message id: " + e.getMessage(), e);
         }
         Sync s = (Sync)locks.get(messageId);
         if(s==null) {
+    		logger.debug("Creating latch for " + messageId + " in " + this);
             s = new Latch();
             locks.put(messageId, s);
         }
