@@ -79,6 +79,8 @@ public class SyncLoanBroker
         Map props = new HashMap();
         props.put("recipients", recipients);
         UMOMessage msg = new MuleMessage(bqr, props);
+
+        //dispatch the message using the default outbound router settings
         context.dispatchEvent(msg);
         context.setStopFurtherProcessing(true);
         return msg;

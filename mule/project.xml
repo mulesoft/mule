@@ -215,7 +215,7 @@
             <artifactId>jmxri</artifactId>
             <version>1.2</version>
             <properties>
-                <ignore>true</ignore>
+                <ignore>false</ignore>
                 <mule.core.jar>false</mule.core.jar>
             </properties>
         </dependency>
@@ -224,7 +224,7 @@
             <artifactId>jmxtools</artifactId>
             <version>1.2</version>
             <properties>
-                <ignore>true</ignore>
+                <ignore>false</ignore>
                 <mule.core.jar>false</mule.core.jar>
             </properties>
         </dependency>

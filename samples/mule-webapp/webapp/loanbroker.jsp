@@ -21,6 +21,7 @@
     if(random!=null) {
         LoanConsumer consumer = new LoanConsumer();
         int requests = Integer.parseInt(random);
+        //to get all the result and print them out
 //        List results = consumer.requestSend(requests, "vm://LoanBrokerRequests");
         consumer.requestDispatch(requests, "vm://LoanBrokerRequests");
         %>
@@ -40,7 +41,7 @@
         LoanRequest loanRequest = new LoanRequest(cust, amount,  duration);
         UMOMessage message = client.send("vm://LoanBrokerRequests", loanRequest, null);
         %>
-<h3>The best quote was received from: <%=message.getPayload()%></h3>
+<h3>The best quote was received from: <br/> <%=message.getPayload()%></h3>
      <%} else {%>
 <form method="POST" name="submitRequest" action="">
     Send 10 random requests:
@@ -74,7 +75,7 @@
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
 <tr><td>For more information about Loan Broker example go <a target="_blank" href="http://wiki.muleumo.org/display/MULE/Loan+Broker+Example">here</a>.<br/>
-To view the source and configuration go <a target="_blank" href="http://cvs.sourceforge.net/viewcvs.py/mule/mule/src/samples/loanbroker/">here</a>.</td></tr>
+To view the source and configuration go <a target="_blank" href="http://cvs.codehaus.org/viewrep/mule/mule/samples/loanbroker/">here</a>.</td></tr>
 </table>
 </body>
 </html>

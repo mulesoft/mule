@@ -28,7 +28,7 @@ the different components are made from the loan broker component (a la hub and s
     </connector>
 
     <endpoint-identifiers>
-        <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>
+        <endpoint-identifier name="LoanQuotes" value="vm://LoanQuotes"/>
         <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerRequests"/>
         <endpoint-identifier name="CreditAgency" value="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="axis:http://localhost:18080/mule"/>
@@ -41,16 +41,24 @@ the different components are made from the loan broker component (a la hub and s
     </endpoint-identifiers>
 
     <mule-descriptor name="LoanBroker"
-        inboundEndpoint="LoanBroker"
         implementation="org.mule.samples.loanbroker.SyncLoanBroker">
+        <inbound-router>
+            <endpoint address="LoanBroker"/>
+        </inbound-router>
+        <response-router>
+            <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
+            <endpoint address="LoanQuotes"/>
+        </response-router>
         <outbound-router>
             <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                <endpoint address="CreditAgency">
-                </endpoint>
+                <endpoint address="CreditAgency"/>
                 <filter expectedType="org.mule.samples.loanbroker.Customer" className="org.mule.routing.filters.PayloadTypeFilter"/>
             </router>
             <router className="org.mule.routing.outbound.StaticRecipientList">
                 <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
+                <properties>
+                    <property name="replyTo" value="LoanQuotes"/>
+                </properties>
             </router>
             <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                 <endpoint address="LenderService"/>

@@ -26,7 +26,7 @@ Please enter something:
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
 <tr><td>For more information about Echo example go <a target="_blank" href="http://wiki.muleumo.org/display/MULE/Echo+Example">here</a>.<br/>
-To view the source and configuration go <a target="_blank" href="http://cvs.sourceforge.net/viewcvs.py/mule/mule/src/samples/echo/">here</a>.</td></tr>
+To view the source and configuration go <a target="_blank" href="http://cvs.codehaus.org/viewrep/mule/mule/samples/echo/">here</a>.</td></tr>
 </table>
 </body>
 </html>

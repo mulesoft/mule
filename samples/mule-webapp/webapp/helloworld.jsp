@@ -26,7 +26,7 @@ Please enter your name:
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
 <tr><td>For more information about Hello world example go <a target="_blank" href="http://wiki.muleumo.org/display/MULE/Hello+World+Example">here</a>.<br/>
-To view the source and configuration go <a target="_blank" href="http://cvs.sourceforge.net/viewcvs.py/mule/mule/src/samples/hello/">here</a>.</td></tr>
+To view the source and configuration go <a target="_blank" href="http://cvs.codehaus.org/viewrep/mule/mule/samples/hello/">here</a>.</td></tr>
 </table>
 </body>
 </html>
