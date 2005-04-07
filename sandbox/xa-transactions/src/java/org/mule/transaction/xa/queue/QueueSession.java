@@ -20,8 +20,10 @@ import org.mule.transaction.xa.ResourceManagerException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public interface TransactionalQueue extends Queue {
+public interface QueueSession {
 
+	public Queue getQueue(String name);
+	
 	public void begin() throws ResourceManagerException;
 	
 	public void commit() throws ResourceManagerException;

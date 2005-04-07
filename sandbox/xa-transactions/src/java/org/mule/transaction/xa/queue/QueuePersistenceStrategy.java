@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * <code>QueuePersistenceStrategy</code> TODO
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */

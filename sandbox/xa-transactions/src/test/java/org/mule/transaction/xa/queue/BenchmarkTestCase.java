@@ -70,7 +70,8 @@ public class BenchmarkTestCase extends TestCase {
 		try {
 			mgr.start();
 		
-			TransactionalQueue q = mgr.getQueue("queue1");
+			QueueSession s = mgr.getQueueSession();
+			Queue q = s.getQueue("queue1");
 			
 			Random rnd = new Random();
 			long t0 = System.currentTimeMillis();

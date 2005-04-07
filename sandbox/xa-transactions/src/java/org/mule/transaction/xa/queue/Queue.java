@@ -16,14 +16,28 @@ package org.mule.transaction.xa.queue;
 
 
 /**
+ * <code>Queue</code> TODO
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
 public interface Queue {
 
+	/**
+	 * Returns the number of elements in this queue.
+	 * @return
+	 */
 	int size();
 	
+	/**
+	 * Puts a new object in this queue.
+	 * @param o the object to put
+	 */
     void put(Object o);
 
+    /**
+     * Retrieves an object from this queue.
+     * @return an object or <code>null</code> if none available.
+     */
     Object take();
 }

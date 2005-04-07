@@ -43,7 +43,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
 		TransactionalQueueManager mgr = createQueueManager();
 		mgr.start();
 		
-		TransactionalQueue q = mgr.getQueue("queue1");
+		QueueSession s = mgr.getQueueSession();
+		Queue q = s.getQueue("queue1");
 
 		assertEquals(0, q.size());
 		Object o = q.take();
@@ -68,11 +69,12 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
 			try {
 				mgr.start();
 				
-				TransactionalQueue q = mgr.getQueue("queue1");
+				QueueSession s = mgr.getQueueSession();
+				Queue q = s.getQueue("queue1");
 				q.put("String1");
 				assertEquals(1, q.size());
 				
-				q = mgr.getQueue("queue1");
+				q = s.getQueue("queue1");
 				assertEquals(1, q.size());
 			} finally {		
 				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
@@ -81,7 +83,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
 			mgr = createQueueManager();
 			try {
 				mgr.start();
-				TransactionalQueue q = mgr.getQueue("queue1");
+				QueueSession s = mgr.getQueueSession();
+				Queue q = s.getQueue("queue1");
 				assertEquals(1, q.size());
 			} finally {
 				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
@@ -101,21 +104,24 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
 			try {
 				mgr.start();
 				
-				TransactionalQueue q = mgr.getQueue("queue1");
-				q.begin();
+				QueueSession s = mgr.getQueueSession();
+				Queue q = s.getQueue("queue1");
+				s.begin();
 				q.put("String1");
 				assertEquals(1, q.size());
-				q.commit();
+				s.commit();
 				assertEquals(1, q.size());
 				
-				q = mgr.getQueue("queue1");
+				s = mgr.getQueueSession();
+				q = s.getQueue("queue1");
 				assertEquals(1, q.size());
 		
 				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 		
 				mgr = createQueueManager();
 				mgr.start();
-				q = mgr.getQueue("queue1");
+				s = mgr.getQueueSession();
+				q = s.getQueue("queue1");
 				assertEquals(1, q.size());
 			} finally {
 				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
@@ -135,21 +141,24 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
 			try {
 				mgr.start();
 				
-				TransactionalQueue q = mgr.getQueue("queue1");
-				q.begin();
+				QueueSession s = mgr.getQueueSession();
+				Queue q = s.getQueue("queue1");
+				s.begin();
 				q.put("String1");
 				assertEquals(1, q.size());
-				q.rollback();
+				s.rollback();
 				assertEquals(0, q.size());
 				
-				q = mgr.getQueue("queue1");
+				s = mgr.getQueueSession();
+				q = s.getQueue("queue1");
 				assertEquals(0, q.size());
 		
 				mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 		
 				mgr = createQueueManager();
 				mgr.start();
-				q = mgr.getQueue("queue1");
+				s = mgr.getQueueSession();
+				q = s.getQueue("queue1");
 				assertEquals(0, q.size());
 				
 			} finally {
@@ -159,6 +168,75 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
 			}
 		} else {
 			logger.info("Ignoring test because queue manager is not persistent");
+		}
+	}
+	
+	public void testTransactionsOnMultipleQueues() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+
+		TransactionalQueueManager mgr = createQueueManager();
+		
+		try {
+			mgr.start();
+					
+			QueueSession s1 = mgr.getQueueSession();
+			QueueSession s2 = mgr.getQueueSession();
+			
+			Queue q1s1 = s1.getQueue("queue1");
+			Queue q1s2 = s2.getQueue("queue1");
+			Queue q2s1 = s1.getQueue("queue2");
+			Queue q2s2 = s2.getQueue("queue2");
+			
+			q1s1.put("String1");
+			assertEquals(1, q1s1.size());
+			assertEquals(1, q1s2.size());
+			
+			s1.begin();
+			
+			Object o = q1s1.take();
+			assertNotNull(o);
+			assertEquals("String1", o);
+			assertEquals(0, q1s1.size());
+			assertEquals(0, q1s2.size());
+			q2s1.put("String2");
+			assertEquals(1, q2s1.size());
+			assertEquals(0, q2s2.size());
+			
+			s1.commit();
+			
+			assertEquals(0, q1s1.size());
+			assertEquals(0, q1s2.size());
+			assertEquals(1, q2s1.size());
+			assertEquals(1, q2s2.size());
+			
+			s1.begin();
+			
+			o = q2s1.take();
+			assertNotNull(o);
+			assertEquals("String2", o);
+			assertEquals(0, q1s1.size());
+			assertEquals(0, q1s2.size());
+			assertEquals(0, q2s1.size());
+			assertEquals(0, q2s2.size());
+			
+			q1s1.put("String1");
+
+			assertEquals(1, q1s1.size());
+			assertEquals(0, q1s2.size());
+			assertEquals(0, q2s1.size());
+			assertEquals(0, q2s2.size());
+			
+			s1.rollback();
+			
+			assertEquals(0, q1s1.size());
+			assertEquals(0, q1s2.size());
+			assertEquals(1, q2s1.size());
+			assertEquals(1, q2s2.size());
+			
+		} finally {
+			mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 		}
 	}
 	
@@ -172,8 +250,8 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
 		try {
 			mgr.start();
 		
-			TransactionalQueue q = mgr.getQueue("queue1");
-	
+			QueueSession s = mgr.getQueueSession();
+			Queue q = s.getQueue("queue1");
 			
 			Random rnd = new Random();
 			long t0 = System.currentTimeMillis();
