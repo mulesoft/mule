@@ -365,7 +365,7 @@
         <echo>Executing: ${maven.ssh.executable} ${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory}/../dist/nightly &amp;&amp; tar -xvzf ../${maven.final.name}-nightly-dist.tar.gz &amp;&amp; cp *.jar ../jars &amp;&amp; rm ../${maven.final.name}-nightly-dist.tar.gz'</echo>
 
         <exec dir="." executable="${maven.ssh.executable}">
-            <arg line="${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory}/../dist/nightly &amp;&amp; tar -xvzf ../${maven.final.name}-nightly-dist.tar.gz &amp;&amp; cp *.jar ../jars &amp;&amp; rm ../${maven.final.name}-nightly-dist.tar.gz'"/>
+            <arg line="${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory}/../dist/nightly &amp;&amp; tar -xvzf ../${maven.final.name}-nightly-dist.tar.gz &amp;&amp; cp *.jar ../jars &amp;&amp; cp *.rar ../rars &amp;&amp; rm ../${maven.final.name}-nightly-dist.tar.gz'"/>
         </exec>
 
         <!-- copy the dtd s to the server too -->
