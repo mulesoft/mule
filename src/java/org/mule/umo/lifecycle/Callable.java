@@ -26,7 +26,7 @@ import org.mule.umo.UMOEventContext;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public interface Callable
+public interface Callable extends UMOEventListener
 {
     /**
      * Passes the event to the listener
