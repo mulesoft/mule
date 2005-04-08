@@ -172,5 +172,6 @@ public interface CoreMessageConstants
     public static final int X_IS_INVALID = 154;
     public static final int CONTAINER_X_ALREADY_REGISTERED = 155;
     public static final int CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED = 156;
+    public static final int X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X = 157;
 
 }

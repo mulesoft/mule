@@ -21,6 +21,8 @@ import org.mule.umo.UMOTransactionConfig;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
+import java.beans.ExceptionListener;
+
 /**
  * @author Guillaume Nodet
  * @version $Revision$
@@ -30,9 +32,12 @@ public class TransactionTemplate {
 	private static final transient Log logger = LogFactory.getLog(TransactionTemplate.class);
 	
 	private UMOTransactionConfig config;
-	
-	public TransactionTemplate(UMOTransactionConfig config) {
+
+    private ExceptionListener exceptionListener;
+
+	public TransactionTemplate(UMOTransactionConfig config, ExceptionListener listener) {
 		this.config = config;
+        exceptionListener = listener;
 	}
 	
 	public Object execute(TransactionCallback callback) throws Exception {
@@ -70,11 +75,17 @@ public class TransactionTemplate {
 				}
 				return result;
 			} catch (Exception e) {
+                logger.info("Exception Caught in Transaction template.  Handing of to exception handler: " + exceptionListener);
+                exceptionListener.exceptionThrown(e);
 				if (tx != null) {
-					logger.info("Exception caught: rollback transaction", e);
-					tx.rollback();
+                    if(!tx.isCommitted()) {
+                        logger.info("Exception caught: rollback transaction", e);
+                        tx.rollback();
+                    }
 				}
-				throw e;
+			//	throw e;
+                //we've handled this exception above.  just return null now
+                return null;
 			} catch (Error e) {
 				if (tx != null) {
 					logger.info("Error caught: rollback transaction", e);

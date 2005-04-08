@@ -43,4 +43,8 @@ public class MalformedEndpointException extends EndpointException
     {
         super(new Message(Messages.ENPOINT_X_IS_MALFORMED, endpoint), cause);
     }
+
+    public MalformedEndpointException(Throwable cause) {
+        super(cause);
+    }
 }

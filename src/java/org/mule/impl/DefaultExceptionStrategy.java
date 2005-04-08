@@ -23,11 +23,13 @@ import org.mule.transformers.xml.ObjectToXml;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.config.ExceptionHelper;
+import org.mule.transaction.TransactionCoordination;
 
 import java.util.Iterator;
 import java.util.List;
@@ -97,6 +99,14 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener implemen
                 }
                 ctx.dispatchEvent(msg, endpoint);
                 logger.debug("routed Exception message via " + endpoint);
+
+                //If we route from an inbound destination to an error destination
+                //we should commit the current tx so that the message is not rolledback
+                //and processed again. Custom implmentations can override this behaviour if they wish
+                UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+                if(tx!=null) {
+                    tx.commit();
+                }
             } catch (UMOException e) {
                 logFatal(message, e);
             }

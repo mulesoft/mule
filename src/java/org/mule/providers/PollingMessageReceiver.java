@@ -71,15 +71,7 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
 	            Thread.sleep(frequency);
 	    	}
     	} catch (Exception e) {
-    		// Only handle exception if it was not due to the connector stopping
-    		if (!disposing.get()) {
-	   			logger.error("An error occurred when polling", e);
-	            try {
-	                connector.stop();
-	            } catch (Exception e2) {
-	                logger.error("Failed to stop endpoint: " + e2.getMessage(), e2);
-	            }
-    		}
+	        connector.handleException(e);
     	}
     }
 
