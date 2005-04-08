@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <code>StringMessageHelper</code> TODO (document class)
+ * <code>StringMessageHelper</code> contains some useful methods for
+ * formatting message strings for logging or exceptions.
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
@@ -129,4 +130,13 @@ public class StringMessageHelper
         return buf.toString();
     }
 
+    public static String truncate(String message, int length, boolean includeCount)
+    {
+        if(message==null) return null;
+        if(message.length() <= length) return message;
+        String result = message.substring(0, length) + "...";
+        if(includeCount) result += "[" + length + " of " + message.length() + "]";
+        return result;
+    }
 }
+
