@@ -96,6 +96,18 @@ public class StringMessageHelperTestCase extends TestCase
         assertEquals("\n************\n* This     *\n* is a     *\n* Boiler P *\n* late Mes *\n* sage tha *\n* t should *\n*  get wra *\n* pped to  *\n* the next *\n*  line if *\n*  it is w *\n* orking p *\n* roperly  *\n************", plate);
     }
 
+    public void testTruncate() {
+        String msg = "this is a test message for truncating";
+        String result = StringMessageHelper.truncate(msg, 100, true);
+        assertEquals(msg, result);
+
+        result = StringMessageHelper.truncate(msg, 10, false);
+        assertEquals("this is a ...", result);
+
+        result = StringMessageHelper.truncate(msg, 10, true);
+        assertEquals("this is a ...[10 of 37]", result);
+    }
+
     private class TestObject
     {
         private String name;
