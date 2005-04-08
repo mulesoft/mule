@@ -39,6 +39,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
     public void testOutboundMessageRouter() throws Exception
     {
         Mock session = getMockSession();
+        session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
         assertNotNull(messageRouter.getCatchAllStrategy());
@@ -79,6 +80,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         message = new MuleMessage(new IllegalArgumentException(), null);
 
+        session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
         messageRouter.route(message, (UMOSession)session.proxy(), false);
         session.verify();
@@ -92,6 +94,9 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         //now the message should be routed twice to different endpoints
         message = new MuleMessage("testing multiple routing", null);
+        session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
+        session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
+
         session.expect("dispatchEvent", C.eq(message, endpoint1));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
         messageRouter.setMatchAll(true);
