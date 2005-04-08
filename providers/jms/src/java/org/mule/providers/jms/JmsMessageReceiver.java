@@ -39,16 +39,16 @@ import org.mule.umo.provider.UMOMessageAdapter;
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class JmsMessageReceiver extends
-		TransactedPollingMessageReceiver {
+public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 
-	private JmsConnector connector;
-	private boolean reuseConsumer;
-	private boolean reuseSession;
-	private Session session;
-	private MessageConsumer consumer;
-	private long frequency;
-	
+	protected JmsConnector connector;
+	protected boolean reuseConsumer;
+	protected boolean reuseSession;
+	protected Session session;
+	protected MessageConsumer consumer;
+	protected long frequency;
+    protected RedeliveryHandler redeliveryHandler;
+
 	public JmsMessageReceiver() {
 	}
 	
@@ -61,6 +61,12 @@ public class JmsMessageReceiver extends
     	this.reuseConsumer = true;
     	this.reuseSession = true;
         receiveMessagesInTransaction = (endpoint.getTransactionConfig() != null);
+        try {
+            redeliveryHandler = this.connector.createRedeliveryHandler();
+            redeliveryHandler.setConnector(this.connector);
+        } catch (Exception e) {
+            throw new InitialisationException(e, this);
+        }
     }
 	
     /**
@@ -115,8 +121,7 @@ public class JmsMessageReceiver extends
         if (message.getJMSRedelivered())
         {
             logger.info("Message with correlationId: " + correlationId + " is redelivered. handing off to Exception Handler");
-            handleMessageRedelivered(message, session);
-            return null;
+            redeliveryHandler.handleRedelivery(message);
         }
 
         if (tx instanceof JmsClientAcknowledgeTransaction) {
@@ -191,25 +196,4 @@ public class JmsMessageReceiver extends
         // Create consumer
         consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName);
 	}
-	
-	/**
-	 * Process a redelivered message
-	 */
-    protected void handleMessageRedelivered(Message message, Session session)
-    {
-        String corrId = null;
-        try
-        {
-            corrId = message.getJMSCorrelationID();
-        }
-        catch (JMSException e)
-        {
-            corrId = "could not read id: " + e.getMessage();
-        }
-
-        logger.warn("Message was redelivered, most likely due to a transaction rollback. " +
-                "Correlation id was: " + corrId);
-        MessageRedeliveredException exception = new MessageRedeliveredException(message, session);
-        handleException(exception);
-    }
 }

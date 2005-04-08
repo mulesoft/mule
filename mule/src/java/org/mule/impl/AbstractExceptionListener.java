@@ -100,7 +100,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener
     protected Throwable getExceptionType(Exception e, Class exceptionType) {
         Throwable current = e;
         while(current!=null) {
-            if(e.getClass().isAssignableFrom(exceptionType)) {
+            if(exceptionType.isAssignableFrom(e.getClass())) {
                 return current;
             }
             current = current.getCause();

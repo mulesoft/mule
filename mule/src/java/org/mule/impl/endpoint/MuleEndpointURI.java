@@ -100,7 +100,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         uri = uri.replaceAll(" ", "%20");
 
         if(!validateUrl(uri)) {
-            throw new MalformedEndpointException("The endpointUri: " + uri + " is not a valid Mule uri endpointUri");
+            throw new MalformedEndpointException(uri);
         }
         try
         {
@@ -111,7 +111,7 @@ public class MuleEndpointURI implements UMOEndpointURI
             this.uri = new URI(uri);
         } catch (URISyntaxException e)
         {
-            throw new MalformedEndpointException("Failed to parse Mule Url: " + uri + ". " + e.getMessage(), e);
+            throw new MalformedEndpointException(uri, e);
         }
 
         try
@@ -124,7 +124,7 @@ public class MuleEndpointURI implements UMOEndpointURI
             initialise(built);
         } catch (ConnectorFactoryException e)
         {
-            throw new MalformedEndpointException("Failed to create endpointUri from uri: " + e.getMessage(), e);
+            throw new MalformedEndpointException(e);
         }
     }
 

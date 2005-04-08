@@ -15,6 +15,8 @@
 package org.mule.providers.jms;
 
 import org.mule.umo.MessagingException;
+import org.mule.umo.UMOTransaction;
+import org.mule.transaction.TransactionCoordination;
 
 import javax.jms.Message;
 import javax.jms.Session;
@@ -25,16 +27,8 @@ import javax.jms.Session;
  */
 public class MessageRedeliveredException extends MessagingException
 {
-    private Session session;
-
-    public MessageRedeliveredException(Message jmsMessage, Session session)
+    public MessageRedeliveredException(Message jmsMessage)
     {
         super(new org.mule.config.i18n.Message("jms", 7), jmsMessage);
-        this.session = session;
-    }
-
-    public Session getSession()
-    {
-        return session;
     }
 }

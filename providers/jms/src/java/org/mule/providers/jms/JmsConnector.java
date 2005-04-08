@@ -20,6 +20,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.MuleException;
+import org.mule.util.ClassHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -44,6 +45,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Hashtable;
 import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -99,6 +101,10 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     public String username = null;
 
     public String password = null;
+
+    private int maxRedelivey = 0;
+
+    private String redeliveryHandler = DefaultRedeliveryHandler.class.getName();
 
     public JmsConnector()
     {
@@ -192,10 +198,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
             connection = jmsSupport.createConnection(connectionFactory);
         }
 
-        if(clientId==null) {
-            setClientId("mule." + getName());
-            logger.debug("Jms clientId is not set defaulting to: " + getClientId());
-        } else if (clientId.length() > 0) {
+        if (clientId!=null) {
             connection.setClientID(getClientId());
         }
         return connection;
@@ -476,6 +479,14 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         this.jndiContext = jndiContext;
     }
 
+    protected RedeliveryHandler createRedeliveryHandler() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException {
+        if(redeliveryHandler!=null) {
+            return (RedeliveryHandler)ClassHelper.instanciateClass(redeliveryHandler, ClassHelper.NO_ARGS);
+        } else {
+            return new DefaultRedeliveryHandler();
+        }
+    }
+
     public ReplyToHandler getReplyToHandler()
     {
         try
@@ -524,5 +535,21 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     public void setClientId(String clientId)
     {
         this.clientId = clientId;
+    }
+
+    public int getMaxRedelivey() {
+        return maxRedelivey;
+    }
+
+    public void setMaxRedelivey(int maxRedelivey) {
+        this.maxRedelivey = maxRedelivey;
+    }
+
+    public String getRedeliveryHandler() {
+        return redeliveryHandler;
+    }
+
+    public void setRedeliveryHandler(String redeliveryHandler) {
+        this.redeliveryHandler = redeliveryHandler;
     }
 }

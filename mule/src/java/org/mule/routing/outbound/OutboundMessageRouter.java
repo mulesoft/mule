@@ -71,7 +71,8 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
                 matchfound = true;
                 //Manage outbound only transactions here
                 final UMOOutboundRouter router = umoOutboundRouter;
-                TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig());
+                TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
+                        session.getComponent().getDescriptor().getExceptionListener());
 
                 TransactionCallback cb = new TransactionCallback()
                 {

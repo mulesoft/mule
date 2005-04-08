@@ -60,6 +60,7 @@ public abstract class UMOException extends Exception
     public UMOException(Throwable cause)
     {
         super(cause);
+        setMessage(Message.createStaticMessage(cause.getMessage() + " (" + cause.getClass().getName() + ")"));
         initialise();
     }
 
@@ -80,6 +81,9 @@ public abstract class UMOException extends Exception
     {
         initialise();
         this.message = message;
+        if(i18nMessage==null) {
+            i18nMessage = Message.createStaticMessage(message);
+        }
     }
 
     public int getExceptionCode()

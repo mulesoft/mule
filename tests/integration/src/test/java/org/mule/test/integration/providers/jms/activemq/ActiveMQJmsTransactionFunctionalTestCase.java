@@ -64,5 +64,4 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
     {
         //todo there seems to be a problem with activeMQ rollback
     }
-
 }
