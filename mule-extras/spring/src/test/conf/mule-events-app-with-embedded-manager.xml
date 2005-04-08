@@ -24,7 +24,7 @@
     <bean id="muleEnvironmentProperties" class="java.util.HashMap">
         <constructor-arg>
             <map>
-                <entry key="OS Version"><value>${os.version}</value></entry>
+                <entry key="embeddedManager"><value>true</value></entry>
             </map>
         </constructor-arg>
     </bean>

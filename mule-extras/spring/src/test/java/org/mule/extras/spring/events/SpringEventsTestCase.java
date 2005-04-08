@@ -44,6 +44,11 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         eventCount2 = 0;
     }
 
+    protected void tearDown() throws Exception {
+        MuleManager.getInstance().dispose();
+        super.tearDown();
+    }
+
     protected String getConfigResources() {
         return "mule-events-app-context.xml";
     }

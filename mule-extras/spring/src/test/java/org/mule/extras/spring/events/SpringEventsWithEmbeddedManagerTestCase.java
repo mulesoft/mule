@@ -13,7 +13,6 @@
  */
 package org.mule.extras.spring.events;
 
-import org.mule.umo.UMOManager;
 import org.mule.MuleManager;
 
 /**
@@ -27,6 +26,6 @@ public class SpringEventsWithEmbeddedManagerTestCase extends SpringEventsTestCas
     }
 
     public void testCorrectManagerLoaded() {
-        assertNotNull(MuleManager.getInstance().getProperty("OS Version"));
+        assertNotNull(MuleManager.getInstance().getProperty("embeddedManager"));
     }
 }
