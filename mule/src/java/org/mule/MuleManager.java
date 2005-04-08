@@ -23,19 +23,16 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleModel;
+import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.internal.events.CustomEvent;
 import org.mule.impl.internal.events.ManagerEvent;
 import org.mule.impl.internal.events.ServerEventManager;
 import org.mule.management.stats.AllStatistics;
-import org.mule.impl.container.MuleContainerContext;
-import org.mule.impl.container.MultiContainerContext;
-import org.mule.impl.container.MultiContainerContext;
 import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
@@ -45,17 +42,8 @@ import org.mule.util.PropertiesHelper;
 import org.mule.util.SpiHelper;
 import org.mule.util.StringMessageHelper;
 import org.mule.util.Utility;
-import org.w3c.dom.DocumentFragment;
 
 import javax.transaction.TransactionManager;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -332,6 +320,8 @@ public class MuleManager implements UMOManager
             eventManager.dispose();
 
         }
+        config = null;
+        config = new MuleConfiguration();
         instance = null;
         if(logger.isInfoEnabled()) {
             logger.info("\n" + getEndSplash());

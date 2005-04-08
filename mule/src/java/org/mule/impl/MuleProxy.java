@@ -38,6 +38,7 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
 
+import javax.resource.spi.work.Work;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,7 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class MuleProxy implements Runnable, Lifecycle
+public class MuleProxy implements Work, Lifecycle
 {
     /**
      * logger used by this class
@@ -541,6 +542,16 @@ public class MuleProxy implements Runnable, Lifecycle
                 logger.error("Failed to return proxy: " + e2.getMessage(), e2);
             }
         }
+    }
+
+    public void release()
+    {
+//        try {
+//            proxyPool.returnObject(this);
+//        } catch (Exception e)
+//        {
+//            logger.error("Failed to return proxy: " + e.getMessage(), e);
+//        }
     }
 
     /* (non-Javadoc)

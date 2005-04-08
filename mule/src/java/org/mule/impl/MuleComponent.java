@@ -13,7 +13,6 @@
  */
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,10 +33,13 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.BoundedPersistentQueue;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+import java.beans.ExceptionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.beans.ExceptionListener;
 
 /**
  * <code>MuleComponent</code> manages the interaction and distribution of
@@ -47,7 +49,7 @@ import java.beans.ExceptionListener;
  * @version $Revision$
  */
 
-public final class MuleComponent implements UMOComponent, Runnable
+public final class MuleComponent implements UMOComponent, Work
 {
     /**
      * logger used by this class
@@ -60,11 +62,6 @@ public final class MuleComponent implements UMOComponent, Runnable
     private MuleDescriptor descriptor = null;
 
     /**
-     * Thread pool of Mule Proxies used to process events
-     */
-    private PooledExecutor threadPool = null;
-
-    /**
      * A pool of available Mule Proxies
      */
     private ObjectPool proxyPool = null;
@@ -72,6 +69,8 @@ public final class MuleComponent implements UMOComponent, Runnable
     private BoundedPersistentQueue queue;
 
     private ComponentStatistics stats = null;
+
+    private UMOWorkManager workManager;
 
     /**
      * Determines if the component has been stopped
@@ -92,11 +91,6 @@ public final class MuleComponent implements UMOComponent, Runnable
      * determines if the proxy pool has been initialised
      */
     private SynchronizedBoolean poolInitialised = new SynchronizedBoolean(false);
-
-    /**
-     * The worker thread in which to intercept the component
-     */
-    private Thread worker = null;
 
     /**
      * The event queue profile
@@ -159,8 +153,12 @@ public final class MuleComponent implements UMOComponent, Runnable
 
         //Create thread pool
         ThreadingProfile tp = descriptor.getThreadingProfile();
-        threadPool = tp.createPool(descriptor.getName());
-
+        workManager = tp.createWorkManager(descriptor.getName());
+        try {
+            workManager.start();
+        } catch (UMOException e) {
+            throw new InitialisationException(e, this);
+        }
         try
         {
             //Setup event Queue (used for VM execution)
@@ -223,24 +221,24 @@ public final class MuleComponent implements UMOComponent, Runnable
         {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
-            try
-            {
-                proxyPool.stop();
-            } catch (Exception e)
-            {
-                throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Component: " + descriptor.getName()), e, this);
-            }
-            if (worker != null)
-            {
-                try
-                {
-                    worker.interrupt();
-                    worker = null;
-                } catch (Exception e)
-                {
-                    logger.error("Component worker thread did not close properly: " + e);
-                }
-            }
+//            try
+//            {
+//                proxyPool.stop();
+//            } catch (Exception e)
+//            {
+//                throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Component: " + descriptor.getName()), e, this);
+//            }
+//            if (worker != null)
+//            {
+//                try
+//                {
+//                    worker.interrupt();
+//                    worker = null;
+//                } catch (Exception e)
+//                {
+//                    logger.error("Component worker thread did not close properly: " + e);
+//                }
+//            }
             stopped.set(true);
             stopping.set(false);
             model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_STOPPED));
@@ -262,9 +260,7 @@ public final class MuleComponent implements UMOComponent, Runnable
                     initialisePool();
                 }
                 proxyPool.start();
-                worker = new Thread(this, descriptor.getName() + ".component");
-                worker.setPriority(Thread.NORM_PRIORITY);
-                worker.start();
+                workManager.scheduleWork(this, WorkManager.INDEFINITE, null, null);
             } catch (Exception e)
             {
                 throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Component: " + descriptor.getName()), e, this);
@@ -303,7 +299,7 @@ public final class MuleComponent implements UMOComponent, Runnable
         try
         {
             //threadPool.awaitTerminationAfterShutdown();
-            if (threadPool != null) threadPool.shutdownNow();
+            if (workManager != null) workManager.dispose();
         } catch (Exception e)
         {
             logger.error("Component Thread Pool did not close properly: " + e);
@@ -543,14 +539,17 @@ public final class MuleComponent implements UMOComponent, Runnable
                     proxy.onEvent(event);
                     try
                     {
-                        threadPool.execute(proxy);
-                    } catch (InterruptedException e)
+                        workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, null);
+                    } catch (WorkException e)
                     {
                         handleException(new ComponentException(new Message(Messages.EVENT_PROCIESSING_FAILED_FOR_X, descriptor.getName()), event.getMessage(), this, e));
                     }
                 }
             }
         }
+    }
+
+    public void release() {
     }
 
     protected void handleException(Exception e)
