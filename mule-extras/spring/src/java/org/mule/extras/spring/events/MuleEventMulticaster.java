@@ -433,6 +433,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             //there is not need to do anything here
             if (applicationContext.containsBean("muleManager"))
             {
+                //Register the multicaster descriptor
+                registerMulticasterDescriptor();
                 return;
             }
             UMOManager manager = MuleManager.getInstance();

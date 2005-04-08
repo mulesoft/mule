@@ -39,9 +39,13 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         super.setUp();
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         
-        context = new ClassPathXmlApplicationContext("mule-events-app-context.xml");
+        context = new ClassPathXmlApplicationContext(getConfigResources());
         eventCount = 0;
         eventCount2 = 0;
+    }
+
+    protected String getConfigResources() {
+        return "mule-events-app-context.xml";
     }
 
     public void testRemovingListeners() throws Exception
