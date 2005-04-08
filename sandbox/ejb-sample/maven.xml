@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project
+    xmlns:j="jelly:core"
+    xmlns:ant="jelly:ant"
+    xmlns:artifact="artifact"
+    xmlns:license="license"
+    xmlns:maven="jelly:maven"
+    xmlns:util="jelly:util"
+    default="default">
+
+    <goal name="default" prereqs="clean, checkVars, ejb:ejb, ejb:stage"/>
+
+    <goal name="checkVars">
+    	<j:if test="${appserver==null}">
+    	    <j:set var="appserver" value="jboss"/>
+    	</j:if>
+    </goal>
+    
+    <preGoal name="ejb:ejb">
+    	<echo>copying appserver files from ${maven.src.dir}/conf/${appserver} to ${maven.build.dir}/classes</echo>
+    	<ant:copy todir="${maven.build.dir}/classes">
+    	    <ant:fileset dir="${maven.src.dir}/conf/${appserver}" includes="*"/>
+    	</ant:copy>
+    </preGoal>
+
+    <goal name="sendq" prereqs="setclasspath">
+        <java classname="com.panacya.platform.service.bus.client.JmsSimpleClient" fork="yes">
+            <classpath refid="test.classpath"/>
+            <arg value="send"/>
+            <arg value="queue.testQueue"/>
+        </java>
+    </goal>
+
+    <goal name="sendt" prereqs="setclasspath">
+        <java classname="com.panacya.platform.service.bus.client.JmsSimpleClient" fork="yes">
+            <classpath refid="test.classpath"/>
+            <arg value="send"/>
+            <arg value="topic.testTopic"/>
+        </java>
+    </goal>
+
+    <goal name="listen" prereqs="setclasspath">
+        <java classname="com.panacya.platform.service.bus.client.JmsSimpleClient" fork="yes">
+            <classpath refid="test.classpath"/>
+            <arg value="receive"/>
+            <arg value="topic.testTopic"/>
+        </java>
+    </goal>
+
+    <goal name="receive" prereqs="setclasspath">
+        <java classname="com.panacya.platform.service.bus.client.JmsSimpleClient" fork="yes">
+            <classpath refid="test.classpath"/>
+            <arg value="receive"/>
+            <arg value="queue.outbound"/>
+        </java>
+    </goal>
+
+    <goal name="receive-non-stop" prereqs="setclasspath">
+        <java classname="com.panacya.platform.service.bus.client.JmsSimpleClient" fork="yes">
+            <classpath refid="test.classpath"/>
+            <arg value="receive-non-stop"/>
+            <arg value="test.BaselineUpdateQueue"/>
+        </java>
+    </goal>
+
+    <goal name="sendq-receive" prereqs="setclasspath">
+        <java classname="com.panacya.platform.service.bus.client.JmsSimpleClient" fork="yes">
+            <classpath refid="test.classpath"/>
+            <arg value="send-receive"/>
+            <arg value="queue.testQueue"/>
+        </java>
+    </goal>
+
+    <goal name="sendt-receive" prereqs="setclasspath">
+        <java classname="com.panacya.platform.service.bus.client.JmsSimpleClient" fork="yes">
+            <classpath refid="test.classpath"/>
+            <arg value="send-receive"/>
+            <arg value="topic.testTopic"/>
+        </java>
+    </goal>
+
+    <goal name="setclasspath">
+        <maven:get var="maven.test.dest" plugin='maven-test-plugin' property='maven.test.dest'/>
+        <path id="test.classpath">
+            <pathelement location="${maven.test.dest}"/>
+            <pathelement location="${maven.build.dest}"/>
+            <path refid="maven.dependency.classpath"/>
+        </path>
+    </goal>
+
+    <goal name="ejb:stage" prereqs="checkVars">
+        <echo>attempting to stage on AppServer: ${appserver}</echo>
+        <attainGoal name="ejb:stage:${appserver}"/>
+    </goal>
+    
+    <goal name="ejb:deploy" prereqs="checkVars">
+        <echo>attempting to deploy on AppServer: ${appserver}</echo>
+        <attainGoal name="ejb:deploy:${appserver}"/>
+    </goal>
+    
+    <goal name="ejb:undeploy" prereqs="checkVars">
+        <echo>attempting to undeploy on AppServer: ${appserver}</echo>
+        <attainGoal name="ejb:undeploy:${appserver}"/>
+    </goal>
+    
+    <goal name="ds:stage" prereqs="checkVars">
+        <echo>attempting to stage datasource on AppServer: ${appserver}</echo>
+        <attainGoal name="ds:stage:${appserver}"/>
+    </goal>
+    
+    <goal name="ds:deploy" prereqs="checkVars">
+        <echo>attempting to deploy datasource on AppServer: ${appserver}</echo>
+        <attainGoal name="ds:deploy:${appserver}"/>
+    </goal>
+    
+    <goal name="ds:undeploy" prereqs="checkVars">
+        <echo>attempting to undeploy datasource on AppServer: ${appserver}</echo>
+        <attainGoal name="ds:undeploy:${appserver}"/>
+    </goal>
+    
+    <goal name="ejb:stage:jboss">
+        <ant:copy todir="${jboss.deploy.bak}">
+            <ant:fileset file="${maven.build.dir}/${maven.final.name}.jar"/>
+        </ant:copy>
+    </goal>
+
+    <goal name="ejb:deploy:jboss">
+        <ant:move file="${jboss.deploy.bak}/${maven.final.name}.jar" todir="${jboss.deploy}" overwrite="false" preservelastmodified="true"/>
+    </goal>
+
+    <goal name="ejb:undeploy:jboss">
+        <ant:move file="${jboss.deploy}/${maven.final.name}.jar" todir="${jboss.deploy.bak}" overwrite="false" preservelastmodified="true"/>
+    </goal>
+
+    <goal name="ds:stage:jboss">
+        <ant:copy todir="${jboss.deploy.bak}">
+            <ant:fileset file="${maven.src.dir}/conf/jboss/mule-ds.xml"/>
+        </ant:copy>
+    </goal>
+
+    <goal name="ds:deploy:jboss">
+        <ant:move file="${jboss.deploy.bak}/mule-ds.xml" todir="${jboss.deploy}" overwrite="false" preservelastmodified="true"/>
+    </goal>
+
+    <goal name="ds:undeploy:jboss">
+        <ant:move file="${jboss.deploy}/mule-ds.xml" todir="${jboss.deploy.bak}" overwrite="false" preservelastmodified="true"/>
+    </goal>
+
+</project>

@@ -1,0 +1,37 @@
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <groupId>mule</groupId>
+    <id>mule-ejb-example</id>
+    <artifactId>mule-ejb-example</artifactId>
+    <name>Mule EJB Example</name>
+    <shortDescription>mule-ejb-example</shortDescription>
+    <description></description>
+    <dependencies>
+    	<dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-ejb</artifactId>
+            <version>${geronimo_spec_ejb_version}</version>
+            <properties>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>false</war.bundle>
+                <mule.core.jar>false</mule.core.jar>
+                <mule.mini>false</mule.mini>
+            </properties>
+        </dependency>
+    </dependencies>
+<!--    <build>-->
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>${basedir}/src/conf</directory>-->
+<!--                <includes>-->
+<!--                    <include>**/*</include>-->
+<!--                </includes>-->
+<!--                <excludes>-->
+<!--                    <exclude>jboss/*</exclude>-->
+<!--                    <exclude>geronimo/*</exclude>-->
+<!--                    <exclude>**/log4j.properties</exclude>-->
+<!--                </excludes>-->
+<!--            </resource>-->
+<!--        </resources>-->
+<!--    </build>-->
+</project>
