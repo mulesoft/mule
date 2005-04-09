@@ -1,4 +1,16 @@
-//COPYRIGHT
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
 package org.mule.impl.endpoint;
 
 import org.mule.umo.endpoint.MalformedEndpointException;
@@ -6,8 +18,15 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import java.net.URI;
 import java.util.Properties;
 
-//AUTHOR
-
+/**
+ * <code>UserInfoEndpointBuilder</code> builds an endpoint with the userinfo
+ * and host details.  This endpoint builder is used where endpoints as of the form :
+ *
+ * xxx://ross:secret@host:1000
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
 public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
