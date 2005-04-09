@@ -22,8 +22,13 @@ import javax.ejb.SessionContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-//AUTHOR
-
+/**
+ * <code>SenderBean</code> is a simple session bean used to send an event
+ * via a Mule connection
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
 public class SenderBean implements SessionBean
 {
     private SessionContext ctx;

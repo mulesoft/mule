@@ -1,14 +1,31 @@
-//COPYRIGHT
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
 package org.mule.test.integration.spring.events;
 
-import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.extras.spring.events.TestMuleEventBean;
-import org.mule.extras.spring.events.MuleSubscriptionEventListener;
 import org.mule.extras.spring.events.MuleApplicationEvent;
+import org.mule.extras.spring.events.MuleSubscriptionEventListener;
+import org.mule.extras.spring.events.TestMuleEventBean;
+import org.mule.umo.endpoint.MalformedEndpointException;
 import org.springframework.context.ApplicationEvent;
 
-//AUTHOR
-
+/**
+ * <code>OrderManagerBean</code> receives order beans from Mule and dispatches
+ * process relsults back through Mule via the applicationContext
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
 public class OrderManagerBean extends TestMuleEventBean implements OrderManager, MuleSubscriptionEventListener
 {
     private String[] subscriptions;

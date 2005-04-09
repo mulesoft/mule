@@ -1,8 +1,26 @@
-//COPYRIGHT
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
 package org.mule.impl.container;
 
-//AUTHOR
-
+/**
+ * <code>ContainerKeyPair</code> is a key strategy that binds a contrainer reference
+ * with a container name.  This object isn't used directly by users, but it is used when
+ * the the Mule xml configuration is processed
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
 public class ContainerKeyPair
 {
     private String contaimerName;

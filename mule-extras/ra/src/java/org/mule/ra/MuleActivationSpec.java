@@ -13,19 +13,25 @@
  */
 package org.mule.ra;
 
-import org.mule.util.Utility;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.umo.endpoint.MalformedEndpointException;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.util.Utility;
 
+import javax.resource.ResourceException;
 import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
-import javax.resource.ResourceException;
 import java.util.Properties;
 
-//AUTHOR
-
+/**
+ * <code>MuleActivationSpec</code> defines the contract between a Message Driven
+ * Bean (MDB) and the Mule Resource Adapter.  This spec holds the configuration values
+ * used to register inbound communication with the Resource Adapter
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
 public class MuleActivationSpec implements ActivationSpec
 {
     private Properties propertiesMap;

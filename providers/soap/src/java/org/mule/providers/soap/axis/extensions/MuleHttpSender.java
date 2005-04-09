@@ -1,47 +1,56 @@
-//COPYRIGHT
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
 package org.mule.providers.soap.axis.extensions;
 
-import org.apache.axis.transport.http.HTTPSender;
-import org.apache.axis.transport.http.SocketHolder;
-import org.apache.axis.transport.http.HTTPConstants;
-import org.apache.axis.transport.http.ChunkedOutputStream;
-import org.apache.axis.transport.http.ChunkedInputStream;
-import org.apache.axis.transport.http.SocketInputStream;
-import org.apache.axis.MessageContext;
 import org.apache.axis.AxisFault;
-import org.apache.axis.Message;
 import org.apache.axis.Constants;
+import org.apache.axis.Message;
+import org.apache.axis.MessageContext;
 import org.apache.axis.client.Call;
-import org.apache.axis.handlers.BasicHandler;
-import org.apache.axis.soap.SOAPConstants;
-import org.apache.axis.soap.SOAP12Constants;
-import org.apache.axis.encoding.Base64;
+import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.components.net.BooleanHolder;
 import org.apache.axis.components.net.DefaultSocketFactory;
 import org.apache.axis.components.net.SocketFactory;
 import org.apache.axis.components.net.SocketFactoryFactory;
-import org.apache.axis.components.logger.LogFactory;
+import org.apache.axis.encoding.Base64;
+import org.apache.axis.handlers.BasicHandler;
+import org.apache.axis.soap.SOAP12Constants;
+import org.apache.axis.soap.SOAPConstants;
+import org.apache.axis.transport.http.*;
 import org.apache.axis.utils.Messages;
 import org.apache.axis.utils.TeeOutputStream;
 import org.apache.commons.logging.Log;
 
-import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.MimeHeader;
+import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPException;
-import java.net.URL;
+import java.io.*;
 import java.net.Socket;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedInputStream;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Enumeration;
 
-//AUTHOR
-
+/**
+ * <code>MuleHttpSender</code> is a rewrite of the Axis HttpSender.  Unfortunately,
+ * the Axis implementation is not extensible so this class is a copy of it with modifications.
+ * The enhancements made are to allow for asynchronous Http method calls which Mule initiates
+ * when the endpoint is asynchronous.
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
 public class MuleHttpSender extends BasicHandler
 {
     protected static Log log = LogFactory.getLog(HTTPSender.class.getName());

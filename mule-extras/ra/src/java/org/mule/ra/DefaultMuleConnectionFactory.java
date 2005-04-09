@@ -17,13 +17,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.naming.Reference;
-import javax.naming.Referenceable;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
-import java.io.Serializable;
 
-//AUTHOR
-
+/**
+ * <code>DefaultMuleConnectionFactory</code> an implementation of the
+ * MuleconnectionFactory interface used by clients of this ResourceAdapter
+ * to obtain a connection to Mule resources
+ *
+ * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @version $Revision$
+ */
 public class DefaultMuleConnectionFactory implements MuleConnectionFactory {
 
     /**
