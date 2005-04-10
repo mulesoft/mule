@@ -13,15 +13,17 @@
  */
 package org.mule.providers.jms;
 
-import javax.jms.Message;
+import org.mule.umo.MessagingException;
+
 import javax.jms.JMSException;
+import javax.jms.Message;
 
 /**
  * <code>RedeliveryHandler</code> is used to control how redelivered
  * messages are processed by a connector.  Typically, a messsage will
  * be re-tried once or twice before throwing an exception.  Then the
  * Exception Strategy on the connector can be used to forward the message
- * to a DLQ or log the failure.
+ * to a jms or log the failure.
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
@@ -41,9 +43,10 @@ public interface RedeliveryHandler {
      * should throw a <code>MessageRedeliveredException</code> to indicate
      * that the message should be handled by the connector Exception Handler.
      * @param message
-     * @throws JMSException if there is a problem reading message properties
+     * @throws JMSException if properties cannot be read from the JMSMessage
      * @throws MessageRedeliveredException should be thrown if the message should
      * be handled by the connection exception handler
+     * @throws MessagingException if there is a problem reading or proessing the message
      */
-    public void handleRedelivery(Message message) throws JMSException, MessageRedeliveredException;
+    public void handleRedelivery(Message message) throws JMSException, MessageRedeliveredException, MessagingException;
 }

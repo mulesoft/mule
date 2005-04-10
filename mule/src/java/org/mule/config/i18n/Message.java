@@ -13,17 +13,19 @@
  */
 package org.mule.config.i18n;
 
+import java.io.Serializable;
+
 /**
  * <code>Message</code> constructs a
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class Message
+public class Message implements Serializable
 {
     public static final int STATIC_ERROR_CODE = -1;
 
-    private static final Object[] emptyArgs = new Object[]{};
+    private static transient final Object[] emptyArgs = new Object[]{};
 
     private int code = 0;
     private Object[] args;

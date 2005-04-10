@@ -13,14 +13,15 @@
  */
 package org.mule.providers.jms;
 
-import org.mule.umo.provider.UMOConnector;
-import org.mule.config.i18n.Messages;
 import org.apache.commons.collections.LRUMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.umo.MessagingException;
 
-import javax.jms.Message;
 import javax.jms.JMSException;
-import java.util.Map;
+import javax.jms.Message;
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * <code>DefaultRedeliveryHandler</code> TODO
@@ -30,6 +31,11 @@ import java.util.Collections;
  */
 public class DefaultRedeliveryHandler implements RedeliveryHandler
 {
+    /**
+     * logger used by this class
+     */
+    protected static transient Log logger = LogFactory.getLog(DefaultRedeliveryHandler.class);
+
     private Map messages = null;
 
     protected JmsConnector connector;
@@ -56,18 +62,24 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
      *
      * @param message
      */
-    public void handleRedelivery(Message message) throws JMSException, MessageRedeliveredException {
-        if(connector.getMaxRedelivey() <= 0) return;
+    public void handleRedelivery(Message message) throws JMSException, MessagingException {
+        if(connector.getMaxRedelivery() <= 0) return;
 
         String id = message.getJMSMessageID();
         Integer i = (Integer)messages.remove(id);
         if(i==null) {
+            if(logger.isDebugEnabled()) logger.debug("Message with id: " + id + " has been redelivered for the fist time");
             messages.put(id, new Integer(1));
             return;
-        } else if(i.intValue() == connector.getMaxRedelivey()) {
-                throw new MessageRedeliveredException(message);
+        } else if(i.intValue() == connector.getMaxRedelivery()) {
+            if(logger.isDebugEnabled()) logger.debug("Message with id: " + id + " has been redelivered " + (i.intValue() + 1) + " times, which exceeds the maxRedelivery setting on the connector");
+            JmsMessageAdapter adapter = (JmsMessageAdapter)connector.getMessageAdapter(message);
+            throw new MessageRedeliveredException(adapter);
+
         } else {
             messages.put(id, new Integer(i.intValue()+1));
+            if(logger.isDebugEnabled()) logger.debug("Message with id: " + id + " has been redelivered " + i.intValue() + " times");
+
         }
     }
 }

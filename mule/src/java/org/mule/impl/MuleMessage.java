@@ -14,10 +14,11 @@
 package org.mule.impl;
 
 import org.mule.providers.DefaultMessageAdapter;
-import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOExceptionPayload;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
+import org.mule.util.PropertiesHelper;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -329,5 +330,27 @@ public class MuleMessage implements UMOMessage
 
     public void setExceptionPayload(UMOExceptionPayload exceptionPayload) {
         this.exceptionPayload = exceptionPayload;
+    }
+
+
+    public String toString() {
+
+        String id = null;
+        try {
+            id = getUniqueId();
+        } catch (UniqueIdNotSupportedException e) {
+            id = "[uniquieId not supported]";
+        }
+        StringBuffer buf = new StringBuffer();
+        buf.append("MuleMessage{");
+        buf.append("id=").append(id);
+        buf.append(", payload=").append(getPayload().getClass().getName());
+        buf.append(", correlationId=").append(getCorrelationId());
+        buf.append(", correlation Group=").append(getCorrelationGroupSize());
+        buf.append(", correlation Seq=").append(getCorrelationSequence());
+        buf.append(", exception Payload=").append(exceptionPayload);
+        buf.append("/n").append(PropertiesHelper.propertiesToString(getProperties(), true));
+        buf.append("}");
+        return buf.toString();
     }
 }

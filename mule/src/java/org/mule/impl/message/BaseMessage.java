@@ -13,24 +13,27 @@
  */
 package org.mule.impl.message;
 
-import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.UMOMessage;
-
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>BaseMessage</code> A default message implementation
+ * <code>BaseMessage</code> A default message implementation used for messages
+ * sent over the wire.  client messages should NOT implement UMOMessage.
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class BaseMessage extends AbstractMessageAdapter implements UMOMessage
+public class BaseMessage implements Serializable
 {
     protected Object message;
+
+    protected Map context;
 
     public BaseMessage(Object message)
     {
         this.message = message;
+        context = new HashMap();
     }
 
     /**
@@ -70,7 +73,7 @@ public class BaseMessage extends AbstractMessageAdapter implements UMOMessage
      */
     public void addProperties(Map properties)
     {
-        properties.putAll(properties);
+        context.putAll(properties);
     }
 
     /**
@@ -78,7 +81,7 @@ public class BaseMessage extends AbstractMessageAdapter implements UMOMessage
      */
     public void clearProperties()
     {
-        properties.clear();
+        context.clear();
     }
 
     /**
@@ -88,6 +91,14 @@ public class BaseMessage extends AbstractMessageAdapter implements UMOMessage
      */
     public Map getProperties()
     {
-        return properties;
+        return context;
+    }
+
+    public void setProperty(Object key, Object value) {
+        context.put(key, value);
+    }
+
+    public Object getProperty(Object key) {
+        return context.get(key);
     }
 }

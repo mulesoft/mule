@@ -15,11 +15,6 @@
 package org.mule.providers.jms;
 
 import org.mule.umo.MessagingException;
-import org.mule.umo.UMOTransaction;
-import org.mule.transaction.TransactionCoordination;
-
-import javax.jms.Message;
-import javax.jms.Session;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -27,8 +22,9 @@ import javax.jms.Session;
  */
 public class MessageRedeliveredException extends MessagingException
 {
-    public MessageRedeliveredException(Message jmsMessage)
-    {
-        super(new org.mule.config.i18n.Message("jms", 7), jmsMessage);
+    public MessageRedeliveredException(JmsMessageAdapter jmsMessage) {
+        super(new org.mule.config.i18n.Message("jms", 7,
+                (jmsMessage==null ? "[null message]" : jmsMessage.getUniqueId()))
+                , jmsMessage);
     }
 }

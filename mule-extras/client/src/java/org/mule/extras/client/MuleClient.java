@@ -18,40 +18,27 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
-import org.mule.impl.security.MuleCredentials;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.umo.FutureMessageResult;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOManager;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.MessagingException;
-import org.mule.umo.routing.ComponentRoutingException;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.ReceiveException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and receive
@@ -387,7 +374,7 @@ public class MuleClient
         }
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
         if (messageProperties == null) messageProperties = new HashMap();
-        messageProperties.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "true");
+        //messageProperties.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "true");
         UMOMessage message = new MuleMessage(payload, messageProperties);
         UMOEvent event = getEvent(message, muleEndpoint, true);
         event.setTimeout(timeout);

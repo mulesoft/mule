@@ -13,12 +13,12 @@
  */
 package org.mule.umo;
 
-import java.io.OutputStream;
-import java.util.Map;
-
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
+
+import java.io.OutputStream;
+import java.util.Map;
 
 /**
  * <code>UMOEventContext</code> is the context object for the current
@@ -507,4 +507,13 @@ public interface UMOEventContext
      * @return the receive endpoint for this event context
      */
     public UMOEndpointURI getEndpointURI();
+
+    /**
+     * Returns the transaction for the current event or null if there is no
+     * transaction in progresss
+     * @return the transaction for the current event or null if there is no
+     * transaction in progresss
+     */
+    public UMOTransaction getTransaction();
+    
 }

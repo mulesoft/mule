@@ -14,10 +14,9 @@
 package org.mule.test.integration.providers.jms.joram;
 
 import org.mule.providers.jms.JmsConnector;
+import org.mule.test.integration.providers.jms.AbstractJmsFunctionalTestCase;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
-import org.mule.test.integration.providers.jms.AbstractJmsFunctionalTestCase;
 
 import javax.jms.Connection;
 import java.util.Properties;

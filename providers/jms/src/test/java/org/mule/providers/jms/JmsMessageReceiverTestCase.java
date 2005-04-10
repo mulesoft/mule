@@ -39,10 +39,8 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import javax.jms.ConnectionFactory;
 import javax.jms.Connection;
-import java.util.HashMap;
-import java.util.Properties;
+import javax.jms.ConnectionFactory;
 
 
 /**

@@ -13,9 +13,9 @@
  */
 package org.mule.umo.lifecycle;
 
-import org.mule.umo.UMOException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOException;
 
 /**
  * <code>LifecycleException</code> TODO
@@ -24,7 +24,8 @@ import org.mule.config.i18n.Messages;
  * @version $Revision$
  */
 
-public class LifecycleException extends UMOException {
+public class LifecycleException extends UMOException
+{
     private transient Object component;
 
     /**

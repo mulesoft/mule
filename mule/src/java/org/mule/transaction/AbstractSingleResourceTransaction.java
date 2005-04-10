@@ -15,9 +15,9 @@
 package org.mule.transaction;
 
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import org.mule.umo.TransactionException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.TransactionException;
 
 /**
  * This abstract class can be used as a base class for transactions

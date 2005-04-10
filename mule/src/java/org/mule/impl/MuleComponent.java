@@ -554,6 +554,7 @@ public final class MuleComponent implements UMOComponent, Work
 
     protected void handleException(Exception e)
     {
+        RequestContext.getEvent().getEndpoint().getConnector().getExceptionListener().exceptionThrown(e);
         if (exceptionListener instanceof DefaultComponentExceptionStrategy)
         {
             if (((DefaultComponentExceptionStrategy) exceptionListener).getComponent() == null)

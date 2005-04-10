@@ -13,29 +13,20 @@
  */
 package org.mule.impl;
 
-import java.io.OutputStream;
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.FutureMessageResult;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.TransactionException;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
 
-import EDU.oswego.cs.dl.util.concurrent.Callable;
+import java.io.OutputStream;
+import java.util.Map;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current
@@ -188,7 +179,7 @@ public class MuleEventContext implements UMOEventContext
     {
         //If synchronous receive has not been explicitly set, default it to true
         Object temp = message.getProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY);
-        if(temp==null) {
+        if(temp==null && getTransaction()==null) {
             message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
         }
         return session.sendEvent(message, endpoint);
@@ -732,5 +723,16 @@ public class MuleEventContext implements UMOEventContext
     public UMOEndpointURI getEndpointURI()
     {
         return event.getEndpoint().getEndpointURI();
+    }
+
+    /**
+     * Returns the transaction for the current event or null if there is no
+     * transaction in progresss
+     *
+     * @return the transaction for the current event or null if there is no
+     *         transaction in progresss
+     */
+    public UMOTransaction getTransaction() {
+        return TransactionCoordination.getInstance().getTransaction();
     }
 }

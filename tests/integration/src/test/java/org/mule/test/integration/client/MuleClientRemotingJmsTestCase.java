@@ -14,8 +14,8 @@
 package org.mule.test.integration.client;
 
 import org.mule.MuleManager;
-import org.mule.extras.client.MuleClientRemotingTestCase;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.extras.client.MuleClientRemotingTestCase;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>

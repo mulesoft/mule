@@ -13,27 +13,19 @@
  */
 package org.mule.test.integration.providers.jms;
 
-import java.util.List;
-
 import EDU.oswego.cs.dl.util.concurrent.CountDown;
-
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.providers.jms.JmsMessageReceiver;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.tck.functional.EventCallback;
+import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.QueueConnection;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
+import javax.jms.*;
+import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>

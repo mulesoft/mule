@@ -21,8 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
@@ -38,10 +36,7 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.security.SecurityException;
 
-import javax.resource.spi.work.WorkManager;
 import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all Message Receivers provided with Mule.
@@ -152,7 +147,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
     }
 
     public final UMOMessage routeMessage(UMOMessage message) throws UMOException {
-        return routeMessage(message, endpoint.isSynchronous());
+        return routeMessage(message, (endpoint.isSynchronous() || TransactionCoordination.getInstance().getTransaction()!=null));
     }
 
     public final UMOMessage routeMessage(UMOMessage message, boolean synchronous) throws UMOException {
@@ -175,15 +170,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     public final UMOMessage routeMessage(UMOMessage message, UMOTransaction trans, boolean synchronous, OutputStream outputStream) throws UMOException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Received message from: " + endpoint.getEndpointURI());
-            logger.debug("Payload is of type: " + message.getPayload().getClass().getName());
-            StringBuffer buf = new StringBuffer();
-            Map props = message.getProperties();
-            for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-                Map.Entry entry = (Map.Entry) iterator.next();
-                buf.append("  ").append(entry.getKey()).append("=").append(entry.getValue()).append("\n");
-            }
-            logger.debug("Message properties:\n" + buf.toString());
+            logger.debug("Message Received from: " + endpoint.getEndpointURI());
+            logger.debug(message);
         }
         if (logger.isTraceEnabled()) {
             try {

@@ -22,8 +22,8 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.jms.MessageRedeliveredException;
 import org.mule.providers.jms.JmsConnector;
+import org.mule.providers.jms.MessageRedeliveredException;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.functional.EventCallback;
@@ -36,14 +36,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.QueueConnection;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
+import javax.jms.*;
 import java.util.HashMap;
 
 /**
@@ -495,7 +488,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         JmsConnector umoCnn = (JmsConnector)manager.lookupConnector(CONNECTOR_NAME);
 
         //After redelivery retry the message and then fail
-        umoCnn.setMaxRedelivey(1);
+        umoCnn.setMaxRedelivery(1);
 
         //Set the test Exception strategy
         umoCnn.setExceptionListener(new RollbackExceptionListener(countDown, getDLDest()));

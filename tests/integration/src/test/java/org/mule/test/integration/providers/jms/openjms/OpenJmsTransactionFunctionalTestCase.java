@@ -16,11 +16,10 @@ package org.mule.test.integration.providers.jms.openjms;
 
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsTransactionFactory;
+import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
-import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
 
 import javax.jms.Connection;
 import java.util.Properties;

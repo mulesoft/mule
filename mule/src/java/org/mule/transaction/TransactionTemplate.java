@@ -16,10 +16,10 @@ package org.mule.transaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionConfig;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionConfig;
 
 import java.beans.ExceptionListener;
 
@@ -66,10 +66,10 @@ public class TransactionTemplate {
 				Object result = callback.doInTransaction();
 				if (tx != null) {
 					if (tx.isRollbackOnly()) {
-						logger.info("Transaction is marked for rollback");
+						logger.debug("Transaction is marked for rollback");
 						tx.rollback();
 					} else {
-						logger.info("Committing transaction");
+						logger.debug("Committing transaction");
 						tx.commit();
 					}
 				}
@@ -78,9 +78,15 @@ public class TransactionTemplate {
                 logger.info("Exception Caught in Transaction template.  Handing of to exception handler: " + exceptionListener);
                 exceptionListener.exceptionThrown(e);
 				if (tx != null) {
-                    if(!tx.isCommitted()) {
+                    //The exception strategy can choose to route exception messages
+                    //as part of the current transaction. So only rollback the tx
+                    //if it has been marked for rollback (which is the default case in the
+                    // AbstractExceptionListener)
+                    if(tx.isRollbackOnly()) {
                         logger.info("Exception caught: rollback transaction", e);
                         tx.rollback();
+                    } else {
+                        tx.commit();
                     }
 				}
 			//	throw e;

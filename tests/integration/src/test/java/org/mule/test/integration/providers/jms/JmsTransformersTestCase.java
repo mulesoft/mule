@@ -38,12 +38,7 @@ import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 
-import javax.jms.BytesMessage;
-import javax.jms.MapMessage;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.TextMessage;
+import javax.jms.*;
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;

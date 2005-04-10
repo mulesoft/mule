@@ -18,9 +18,9 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
-import org.mule.util.SpiHelper;
-import org.mule.util.PropertiesHelper;
 import org.mule.util.ClassHelper;
+import org.mule.util.PropertiesHelper;
+import org.mule.util.SpiHelper;
 import org.mule.util.Utility;
 
 import java.io.IOException;
@@ -225,7 +225,15 @@ public class ExceptionHelper
             s += ".html";
             url += s;
         }
-        logger.debug("Javadoc Url for package '" + packageName + "' is: " + url);
+        if(logger.isDebugEnabled()) {
+            if("javadoc".equalsIgnoreCase(prefix) ) {
+                logger.debug("Javadoc Url for package '" + packageName + "' is: " + url);
+            } else if("doc".equalsIgnoreCase(prefix) ) {
+                logger.debug("Online Doc Url for package '" + packageName + "' is: " + url);
+            } else {
+                logger.debug(prefix + " Url for package '" + packageName + "' is: " + url);
+            }
+        }
         return url;
     }
 

@@ -16,36 +16,30 @@ package org.mule.providers.jms;
 
 
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
-import org.mule.MuleException;
-import org.mule.util.ClassHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.ReplyToHandler;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.TransactionException;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.util.ClassHelper;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import javax.jms.XAConnectionFactory;
+import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Hashtable;
 import java.util.Map;
-import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -102,7 +96,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 
     public String password = null;
 
-    private int maxRedelivey = 0;
+    private int maxRedelivery = 0;
 
     private String redeliveryHandler = DefaultRedeliveryHandler.class.getName();
 
@@ -537,12 +531,12 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         this.clientId = clientId;
     }
 
-    public int getMaxRedelivey() {
-        return maxRedelivey;
+    public int getMaxRedelivery() {
+        return maxRedelivery;
     }
 
-    public void setMaxRedelivey(int maxRedelivey) {
-        this.maxRedelivey = maxRedelivey;
+    public void setMaxRedelivery(int maxRedelivery) {
+        this.maxRedelivery = maxRedelivery;
     }
 
     public String getRedeliveryHandler() {

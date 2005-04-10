@@ -17,8 +17,6 @@ package org.mule.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.Initialisable;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
@@ -33,19 +31,21 @@ import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.beans.ExceptionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.beans.ExceptionListener;
 
 /**
  * <code>MuleDescriptor</code>  describes all the properties for a Mule UMO.  New Mule UMOs
@@ -255,6 +255,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
 
         if(exceptionListener==null) {
             exceptionListener = MuleManager.getInstance().getModel().getExceptionListener();
+        } else if(exceptionListener instanceof Initialisable) {
+            ((Initialisable)exceptionListener).initialise();
         }
 
         if(inboundEndpoint!=null) {

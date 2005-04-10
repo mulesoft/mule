@@ -266,4 +266,19 @@ public class PropertiesHelper
         }
         return i2;
     }
+
+    public static String propertiesToString(Map props, boolean newline) {
+        StringBuffer buf = new StringBuffer();
+        buf.append("Properties{");
+        if(newline) buf.append("\n");
+        Map.Entry entry;
+        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
+            entry = (Map.Entry) iterator.next();
+            if(!newline) buf.append(", ");
+            buf.append(entry.getKey()).append("=").append(entry.getValue());
+            if(newline)  buf.append("\n");
+        }
+        buf.append("}");
+        return buf.toString();
+    }
 }

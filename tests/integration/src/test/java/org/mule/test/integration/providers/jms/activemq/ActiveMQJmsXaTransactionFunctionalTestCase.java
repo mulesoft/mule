@@ -1,5 +1,5 @@
 /*
- * $Header$ 
+ * $Header$
  * $Revision$ 
  * $Date$
  * ------------------------------------------------------------------------------------------------------
@@ -14,16 +14,15 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import javax.transaction.TransactionManager;
-
 import org.mule.MuleManager;
-import org.mule.test.integration.providers.jms.activemq.ActiveMQJmsTransactionFunctionalTestCase;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.provider.UMOConnector;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
+
+import javax.transaction.TransactionManager;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>

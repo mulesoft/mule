@@ -16,24 +16,19 @@ package org.mule.test.integration.providers.jms;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.QueueConnection;
-import javax.jms.TopicConnection;
+import javax.jms.*;
 import java.util.HashMap;
 
 /**
@@ -45,7 +40,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 {
     public static final String DEFAULT_IN_QUEUE = "jms://in.q";
     public static final String DEFAULT_OUT_QUEUE = "jms://out.q";
-    public static final String DEFAULT_DL_QUEUE = "jms://dlq";
+    public static final String DEFAULT_DL_QUEUE = "jms://jms";
     public static final String DEFAULT_IN_TOPIC = "jms://topic:in.t";
     public static final String DEFAULT_OUT_TOPIC = "jms://topic:out.t";
     public static final String DEFAULT_DL_TOPIC = "jms://topic:dlt";

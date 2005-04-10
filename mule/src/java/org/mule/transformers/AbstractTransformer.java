@@ -288,4 +288,12 @@ public abstract class AbstractTransformer implements UMOTransformer
         registerSourceType(clazz);
     }
 
+
+    public String toString() {
+        return "AbstractTransformer{" +
+                "name='" + name + "'" +
+                ", returnClass=" + returnClass +
+                ", sourceTypes=" + sourceTypes +
+                "}";
+    }
 }

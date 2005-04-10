@@ -13,8 +13,8 @@
  */
 package org.mule.providers.jms;
 
-import org.mule.umo.UMOTransaction;
 import org.mule.umo.TransactionException;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
 
 /**

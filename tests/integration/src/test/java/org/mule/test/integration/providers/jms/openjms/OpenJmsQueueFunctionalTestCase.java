@@ -14,15 +14,13 @@
 package org.mule.test.integration.providers.jms.openjms;
 
 import org.mule.providers.jms.JmsConnector;
+import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
-import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.naming.NamingException;
-
 import java.util.HashMap;
 import java.util.Properties;
 

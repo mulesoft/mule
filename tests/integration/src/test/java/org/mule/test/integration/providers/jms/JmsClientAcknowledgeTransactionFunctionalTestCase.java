@@ -18,7 +18,6 @@ import org.mule.providers.jms.JmsConnector;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 
 import javax.jms.Connection;
 import javax.jms.Session;

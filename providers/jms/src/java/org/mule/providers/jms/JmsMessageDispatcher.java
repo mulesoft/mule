@@ -28,15 +28,10 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.UMOConnector;
 
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import javax.jms.*;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching
@@ -200,7 +195,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
      */
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
-        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+        UMOTransaction tx =TransactionCoordination.getInstance().getTransaction();
     	Session receiveSession = connector.getSession(tx instanceof XaTransaction);
         
         Destination dest = null;
@@ -224,7 +219,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             if(message==null) return null;
             return new MuleMessage(connector.getMessageAdapter(message));
         } catch (Exception e) {
-            e.printStackTrace();
+            connector.getExceptionListener().exceptionThrown(e);
             return null;
         }
     }
@@ -261,7 +256,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     	JmsUtils.closeQuietly(producer);
     	JmsUtils.closeQuietly(consumer);
     	JmsUtils.closeQuietly(receiveSession);
-    	JmsUtils.closeQuietly(session);
+        //only close the session if a tx is not in progress.  Otherwise
+        //let the consumer close it
+        if(TransactionCoordination.getInstance().getTransaction()==null) {
+    	    JmsUtils.closeQuietly(session);
+        }
         producer = null;
         consumer = null;
         receiveSession = null;
