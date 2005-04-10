@@ -25,13 +25,14 @@ import org.mule.model.DynamicEntryPointResolver;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.model.ModelException;
+import org.mule.umo.model.UMOComponentFactory;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.model.UMOComponentFactory;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
@@ -484,6 +485,9 @@ public class MuleModel implements UMOModel
         if(!initialised.get()) {
             fireEvent(new ModelEvent(this, ModelEvent.MODEL_INITIALISING));
 
+            if(exceptionListener instanceof Initialisable) {
+                ((Initialisable)exceptionListener).initialise();
+            }
             UMOComponent temp = null;
             for (Iterator i = components.values().iterator(); i.hasNext();)
             {

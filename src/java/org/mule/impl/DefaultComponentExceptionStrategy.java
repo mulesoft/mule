@@ -87,6 +87,7 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
 
         if(component!=null) {
             logger.error("Caught exception in Exception Strategy for: " + component.getDescriptor().getName() + ": " + t, t);
+            markTransactionForRollback();
         } else {
             super.defaultHandler(t);
         }

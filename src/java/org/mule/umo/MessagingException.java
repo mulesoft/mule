@@ -13,8 +13,8 @@
  */
 package org.mule.umo;
 
-import org.mule.config.i18n.Messages;
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 
@@ -31,7 +31,7 @@ public class MessagingException extends UMOException
     /**
      * The UMOMessage being processed when the error occurred
      */
-    protected UMOMessage umoMessage = null;
+    protected transient UMOMessage umoMessage = null;
 
     public MessagingException(Message message, UMOMessage umoMessage)
     {

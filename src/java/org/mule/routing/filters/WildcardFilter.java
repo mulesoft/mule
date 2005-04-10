@@ -29,7 +29,7 @@ import org.mule.util.Utility;
  *
  * jms.events.*, jms.actions.*
  *
- * will match jms.events.system and jms.actions but not jms.queue 
+ * will match jms.events.system and jms.actions but not jms.queue
  *
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$

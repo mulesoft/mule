@@ -28,12 +28,9 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.DisposeException;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.ConnectorException;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
-import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.*;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.beans.ExceptionListener;
@@ -197,6 +194,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         }
         if (logger.isInfoEnabled())
             logger.info("Initialising " + getClass().getName());
+
+        if(exceptionListener instanceof Initialisable) {
+            ((Initialisable)exceptionListener).initialise();
+        }
 
         doInitialise();
         initialised.set(true);
