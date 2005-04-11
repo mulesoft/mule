@@ -13,67 +13,108 @@
  */
 package org.mule.providers.xmpp;
 
+import org.jivesoftware.smack.AccountManager;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.endpoint.UMOEndpointURI;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>XmppConnector</code> TODO
  *
  * @author Peter Braswell
+ * @author John Evans
  * @version $Revision$
  */
 public class XmppConnector extends AbstractServiceEnabledConnector
 {
-    private String hostname = null;
-    
-    private String username = null;
-    
-    private String password = null;
+    private static final String DEFAULT_RESOURCE = "mule";
 
-    public String getProtocol()
-    {
-    	return "xmpp";
-    }
+	private Map connCache = new HashMap();
+
+	public String getProtocol()
+	{
+		return "xmpp";
+	}
+
+	public XMPPConnection findOrCreateXmppConnection(UMOEndpointURI endpointURI)
+		throws XMPPException
+	{
+		logger.info("Trying to find XMPP connection for uri: " + endpointURI);
+		XMPPConnection xmppConnection = null;
+
+		String username = endpointURI.getUsername();
+		String hostname = endpointURI.getHost();
+		String password = endpointURI.getPassword();
+		String resource = endpointURI.getPath();
+
+		if (null == resource)
+		{
+			resource = DEFAULT_RESOURCE;
+		} else {
+            resource = resource.substring(1);
+        }
+
+		xmppConnection = findOrCreateConnection(endpointURI);
+
+        logger.info("*************************************");
+        logger.info("*            JABBER LOGIN           *");
+        logger.info("*************************************");
+
+		if (!xmppConnection.isAuthenticated())
+		{
+	        // Make sure we have an account.  If we don't, make one.
+	        try
+	        {
+	            AccountManager accManager = new AccountManager(xmppConnection);
+	            accManager.createAccount(username, password);
+	        }
+	        catch (XMPPException ex)
+	        {
+	            // User probably already exists, throw away...
+	            logger.info("*** account (" + username + ") already exists ***");
+	        }
+
+	        logger.info("Logging in as: "+username);
+	        logger.info("pw is        : "+password);
+	        logger.info("server       : "+hostname);
+	        logger.info("resource     : "+resource);
+	        xmppConnection.login(username, password, resource);
+		}
+		else
+		{
+			logger.info("Already authenticated on this connection, no need to log in again.");
+		}
+
+        logger.info("XMPP LOGIN COMPLETE!");
+
+		return xmppConnection;
+	}
+
+	private XMPPConnection findOrCreateConnection(UMOEndpointURI uri) throws XMPPException
+	{
+		XMPPConnection conn = (XMPPConnection)connCache.get(uri);
+		if (null == conn)
+		{
+			conn = new XMPPConnection(uri.getHost());
+			connCache.put(uri, conn);
+		}
+		return conn;
+	}
 
     /**
-     * @return Returns the hostname.
+     * Template method to perform any work when destroying the connectoe
      */
-    public String getHostname()
+    protected void disposeConnector()
     {
-        return hostname;
-    }
-    /**
-     * @param hostname The hostname to set.
-     */
-    public void setHostname(String hostname)
-    {
-        this.hostname = hostname;
-    }
-    /**
-     * @return Returns the password.
-     */
-    public String getPassword()
-    {
-        return password;
-    }
-    /**
-     * @param password The password to set.
-     */
-    public void setPassword(String password)
-    {
-        this.password = password;
-    }
-    /**
-     * @return Returns the username.
-     */
-    public String getUsername()
-    {
-        return username;
-    }
-    /**
-     * @param username The username to set.
-     */
-    public void setUsername(String username)
-    {
-        this.username = username;
+        for (Iterator iterator = connCache.keySet().iterator(); iterator.hasNext();) {
+            UMOEndpointURI uri = (UMOEndpointURI) iterator.next();
+            XMPPConnection conn = (XMPPConnection) connCache.remove(uri);
+            conn.close();
+        }
     }
 }

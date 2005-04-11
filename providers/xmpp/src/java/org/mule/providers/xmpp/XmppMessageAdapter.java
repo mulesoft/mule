@@ -17,6 +17,9 @@ import org.jivesoftware.smack.packet.Message;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
+import org.mule.umo.provider.UniqueIdNotSupportedException;
+
+import java.util.Iterator;
 
 /**
  * <code>XmppMessageAdapter</code> TODO
@@ -33,6 +36,12 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
         if (message instanceof Message)
         {
             this.message = (Message) message;
+            for (Iterator iter = this.message.getPropertyNames(); iter.hasNext();) {
+                String name =  (String)iter.next();
+                setProperty(name, this.message.getProperty(name));
+            }
+            setProperty("subject", this.message.getSubject());
+            setProperty("thread", this.message.getThread());
         } else
         {
             throw new MessageTypeNotSupportedException(message, getClass());
@@ -41,16 +50,20 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
 
     public String getPayloadAsString() throws Exception
     {
-        return message.toString();
+        return message.getBody();
     }
 
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return message.toString().getBytes();
+        return message.getBody().getBytes();
     }
 
     public Object getPayload()
     {
         return message;
+    }
+
+    public String getUniqueId() throws UniqueIdNotSupportedException {
+        return message.getPacketID();
     }
 }

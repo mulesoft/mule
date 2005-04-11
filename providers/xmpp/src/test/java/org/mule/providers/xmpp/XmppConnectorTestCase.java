@@ -27,9 +27,6 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
     {
         XmppConnector cnn = new XmppConnector();
         cnn.setName("xmppConnector");
-        cnn.setUsername("mule");
-        cnn.setPassword("mule");
-        cnn.setHostname("jabber.org.au");
         cnn.initialise();
         return cnn;
     }
@@ -42,11 +39,6 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
 
     public String getTestEndpointURI()
     {
-        return "xmpp://mule:mule@jabber.org.au";
-    }
-
-    public void testConnectorListenerSupport() throws Exception
-    {
-        //todo fix this. for some reason I can't connect to jabber.org.au
+        return "xmpp://mule1:mule@jabber.org.au";
     }
 }
