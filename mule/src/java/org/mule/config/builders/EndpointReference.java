@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
@@ -51,18 +52,20 @@ public class EndpointReference
     private String endpointName;
     private String address;
     private String transformer;
+    private String createConnector;
     private Object object;
     private Map properties;
     private UMOFilter filter;
     private UMOTransactionConfig transactionConfig;
 
-    public EndpointReference(String propertyName, String endpointName, String address, String transformer, Object object)
+    public EndpointReference(String propertyName, String endpointName, String address, String transformer, String createConnector, Object object)
     {
         this.propertyName = propertyName;
         this.endpointName = endpointName;
         this.address = address;
         this.transformer = transformer;
         this.object = object;
+        this.createConnector = createConnector;
     }
 
     public String getPropertyName()
@@ -110,11 +113,19 @@ public class EndpointReference
         this.properties = properties;
     }
 
+    public String getCreateConnector() {
+        return createConnector;
+    }
+
+    public void setCreateConnector(String createConnector) {
+        this.createConnector = createConnector;
+    }
+
     public void resolveEndpoint() throws InitialisationException
     {
         try
         {
-            UMOEndpoint ep = MuleManager.getInstance().lookupEndpoint(endpointName);
+            MuleEndpoint ep = (MuleEndpoint)MuleManager.getInstance().lookupEndpoint(endpointName);
             if(ep == null) {
                 throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Endpoint '" + endpointName + "'"), this);
             }
@@ -123,6 +134,12 @@ public class EndpointReference
                     logger.debug("Overloading endpoint uri for: " + endpointName + " from " + ep.getEndpointURI().toString() + " to " + address);
                 }
                 ep.setEndpointURI(new MuleEndpointURI(address));
+            }
+            if(createConnector!=null) {
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Overloading createConnector property for endpoint: " + endpointName + " from " + ep.getCreateConnector() + " to " + createConnector);
+                }
+                ep.setCreateConnectorAsString(createConnector);
             }
             if(transformer!=null) {
                 if(logger.isDebugEnabled()) {
@@ -140,6 +157,7 @@ public class EndpointReference
             if(m==null) {
                 throw new InitialisationException(new Message(Messages.METHOD_X_NOT_FOUND_ON_X, propertyName, object.getClass().getName()), this);
             }
+
             m.invoke(object, new Object[]{ep});
         } catch (InitialisationException e)
         {

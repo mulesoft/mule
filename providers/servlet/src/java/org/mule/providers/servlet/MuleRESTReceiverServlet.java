@@ -19,6 +19,7 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.EndpointException;
@@ -118,7 +119,7 @@ public class MuleRESTReceiverServlet extends HttpServlet
 
         UMOConnector cnn = null;
 
-        cnn = MuleObjectHelper.getConnectorByProtocol("servlet");
+        cnn = ConnectorFactory.getConnectorByProtocol("servlet");
         if(cnn==null)
         {
             throw new ServletException("No servlet connector found using protocol: servlet");

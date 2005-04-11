@@ -30,7 +30,6 @@ import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.model.DynamicEntryPointResolver;
-import org.mule.impl.container.MuleContainerContext;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.inbound.InboundMessageRouter;
@@ -44,7 +43,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.model.UMOComponentFactory;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
@@ -58,18 +56,18 @@ import org.mule.util.ClassHelper;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
 import org.mule.util.queue.PersistenceStrategy;
-import org.w3c.dom.Node;
 import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.beans.ExceptionListener;
 import java.io.*;
 import java.net.URL;
@@ -308,6 +306,19 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
     protected void setGlobalEndpoints() throws InitialisationException
     {
+        //because Mule Xml allows developers to overload global endpoints
+        //we need a way to initialise Global endpoints after the Xml has
+        //been processed but before the MuleManager is initialised.  So we do
+        //it here
+        Map endpoints = MuleManager.getInstance().getEndpoints();
+        UMOEndpoint ep;
+        for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();) {
+            ep = (UMOEndpoint) iterator.next();
+            ep.initialise();
+            MuleManager.getInstance().unregisterEndpoint(ep.getName());
+            MuleManager.getInstance().registerEndpoint(ep);
+        }
+
         try
         {
             for (Iterator iterator = endpointReferences.iterator(); iterator.hasNext();)
@@ -941,7 +952,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 String name = attributes.getValue("name");
                 String address = attributes.getValue("address");
                 String trans = attributes.getValue("transformers");
-                EndpointReference ref = new EndpointReference(method, name, address, trans, digester.peek());
+                String createConnector = attributes.getValue("createConnector");
+                EndpointReference ref = new EndpointReference(method, name, address, trans, createConnector, digester.peek());
                 digester.push(ref);
             }
 
@@ -1201,7 +1213,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     }
 
     private void addEndpointReference(String propName, String endpointName, Object object) {
-        endpointReferences.add(new EndpointReference(propName, endpointName, null, null, object));
+        endpointReferences.add(new EndpointReference(propName, endpointName, null, null, null, object));
     }
 
     /**
@@ -1230,7 +1242,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         public void begin(String s1, String s2, Attributes attributes) throws Exception
         {
-            attributes = processAttributes(attributes);
+            attributes = processAttributes(attributes, s2);
             //Add transformer references that will be bound to their objects once
             //all configuration has bean read
             String transformerNames = attributes.getValue("transformer");
@@ -1271,8 +1283,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             super.begin(attributes);
         }
 
-        private Attributes processAttributes(Attributes attributes)
-        {
+        private Attributes processAttributes(Attributes attributes, String elementName) throws ConfigurationException {
             AttributesImpl attribs = new AttributesImpl(attributes);
             String value = null;
             String realValue = null;
@@ -1280,18 +1291,26 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             UMOManager manager = MuleManager.getInstance();
             for(int i = 0; i < attribs.getLength(); i++) {
                 value = attribs.getValue(i);
-                if(value.startsWith("${")) {
-                    key = value.substring(2, value.length()-1);
+                int x = value.indexOf("${");
+                while(x > -1) {
+                    int y = value.indexOf("}", x +1);
+                    if(y==-1) {
+                        throw new ConfigurationException(new Message(Messages.PROPERTY_TEMPLATE_MALFORMED_X,
+                                "<" + elementName + attribs.getLocalName(i) + "='" + value + "' ...>"));
+                    }
+                    key = value.substring(x+2, y);
                     realValue = (String)manager.getProperty(key);
                     if(logger.isDebugEnabled()) {
                         logger.debug("Param is '" + value + "', Property key is '" + key + "', Property value is '" + realValue + "'");
                     }
                     if(realValue!=null) {
-                        attribs.setValue(i, realValue);
+                        value = value.substring(0, x) +  realValue + value.substring(y+1);
                     } else {
-                        logger.info("Property for placeholder: '" + value + "' was not found.  Leaving place holder as is");
+                        logger.info("Property for placeholder: '" + key + "' was not found.  Leaving place holder as is");
                     }
+                    x = value.indexOf("${");
                 }
+                attribs.setValue(i, value);
             }
             return attribs;
         }

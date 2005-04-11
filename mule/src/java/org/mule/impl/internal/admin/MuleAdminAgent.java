@@ -15,19 +15,18 @@ package org.mule.impl.internal.admin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.AlreadyInitialisedException;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOAgent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOManager;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.MuleObjectHelper;
 
 /**
  * <code>MuleAdminAgent</code> manages the server endpoint that receives
@@ -114,7 +113,7 @@ public class MuleAdminAgent implements UMOAgent
                 }
 
                 UMOEndpointURI endpointUri = new MuleEndpointURI(serverEndpoint);
-                UMOConnector connector = MuleObjectHelper.getOrCreateConnectorByProtocol(endpointUri);
+                UMOConnector connector = ConnectorFactory.getOrCreateConnectorByProtocol(endpointUri);
                 //If this connector has already been initialised i.e. it's a
                 //pre-existing connector not not reinit
                 if(manager.lookupConnector(connector.getName())==null) {

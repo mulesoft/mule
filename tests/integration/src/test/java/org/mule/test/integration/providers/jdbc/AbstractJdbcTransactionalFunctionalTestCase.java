@@ -20,12 +20,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.functional.EventCallback;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionConfig;
-import org.mule.umo.UMOTransactionFactory;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.util.HashMap;
@@ -101,7 +96,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends
         descriptor.setImplementation(JdbcFunctionalTestComponent.class.getName());
 		
 		UMOEndpoint endpoint = new MuleEndpoint("testIn", getInDest(),
-				connector, null, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, null);
+				connector, null, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null);
 
 		
 		UMOTransactionFactory tf = getTransactionFactory(); 
@@ -110,7 +105,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends
 		txConfig.setAction(txBeginAction);
 
 		UMOEndpoint outProvider = new MuleEndpoint("testOut", getOutDest(),
-				connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, null);
+				connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null);
 
 		endpoint.setTransactionConfig(txConfig);
 

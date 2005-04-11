@@ -15,6 +15,7 @@
 package org.mule.impl.endpoint;
 
 import org.mule.impl.ImmutableMuleEndpoint;
+import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
@@ -25,7 +26,6 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.providers.service.ConnectorFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,14 +46,14 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
      */
     public MuleEndpoint()
     {
-        super(null, null, null, null, ENDPOINT_TYPE_SENDER_AND_RECEIVER, new HashMap());
+        super(null, null, null, null, ENDPOINT_TYPE_SENDER_AND_RECEIVER, 0, new HashMap());
     }
 
     public MuleEndpoint(String name, UMOEndpointURI endpointUri, UMOConnector connector,
-                                  UMOTransformer transformer, String type,
+                                  UMOTransformer transformer, String type, int createConnector,
                                   Map properties)
     {
-        super(name, endpointUri, connector, transformer, type, properties);
+        super(name, endpointUri, connector, transformer, type, createConnector, properties);
     }
 
     public MuleEndpoint(UMOImmutableEndpoint endpoint)
@@ -144,7 +144,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
      */
     public UMOImmutableEndpoint getImmutableProvider()
     {
-        UMOImmutableEndpoint result = new ImmutableMuleEndpoint(name, endpointUri, connector, transformer, type, properties);
+        UMOImmutableEndpoint result = new ImmutableMuleEndpoint(name, endpointUri, connector, transformer, type, createConnector, properties);
 
         return result;
     }

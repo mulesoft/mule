@@ -109,7 +109,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         HttpConnector c = (HttpConnector)createConnector();
         c.initialise();
         UMOMessageDispatcher d = c.getDispatcher(request.getAddress());
-        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test", request, c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, null));
+        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test", request, c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null));
         UMOMessage m = d.send(e);
         assertNotNull(m);
         assertNotNull(m.getPayload());
@@ -122,7 +122,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         HttpConnector c = (HttpConnector)createConnector();
         c.initialise();
         UMOMessageDispatcher d = c.getDispatcher(request.getAddress());
-        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test", request, c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, null));
+        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test", request, c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null));
         UMOMessage m = d.send(e);
         assertNotNull(m);
         assertNotNull(m.getPayload());

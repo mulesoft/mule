@@ -16,8 +16,8 @@ package org.mule.providers.tcp;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.ResponseOutputStream;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -27,11 +27,7 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URI;
 
@@ -80,7 +76,6 @@ public class TcpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
     {
         Thread.sleep(3000);
         assertEquals(100, callbackCount);
-
     }
 
     protected UMOEndpointURI getInDest()

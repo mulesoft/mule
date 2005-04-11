@@ -518,7 +518,7 @@ public class MuleClient
             connector.start();
             endpoint = new MuleEndpoint("muleClientProvider",
                     defaultEndpointUri, connector, null,
-                    UMOEndpoint.ENDPOINT_TYPE_RECEIVER, null);
+                    UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null);
         }
         if (endpoint != null)
         {

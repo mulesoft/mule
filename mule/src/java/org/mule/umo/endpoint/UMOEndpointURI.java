@@ -81,4 +81,8 @@ public interface UMOEndpointURI extends Serializable
     String getConnectorName();
 
     String getResourceInfo();
+
+    String getUsername();
+
+    String getPassword();
 }

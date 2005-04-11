@@ -272,14 +272,14 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         ObjectToJMSMessage outTrans = new ObjectToJMSMessage();
 
         UMOEndpoint endpoint = new MuleEndpoint("testIn", getInDest(), connector, inTrans,
-                UMOEndpoint.ENDPOINT_TYPE_RECEIVER, null);
+                UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null);
 
         UMOTransactionConfig txConfig = new MuleTransactionConfig();
         txConfig.setFactory(getTransactionFactory());
         txConfig.setAction(txBeginAction);
 
         UMOEndpoint outProvider = new MuleEndpoint("testOut", getOutDest(), connector, outTrans,
-                UMOEndpoint.ENDPOINT_TYPE_SENDER, null);
+                UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null);
 
         endpoint.setTransactionConfig(txConfig);
 

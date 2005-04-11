@@ -20,6 +20,7 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.soap.Person;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOEvent;
@@ -27,7 +28,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.util.MuleObjectHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
 
     public void testReceiveSimple() throws Throwable
     {
-        UMOConnector c = MuleObjectHelper.getConnectorByProtocol("glue");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol("glue");
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/services/mycomponent?method=getDate"), 0);
@@ -71,7 +71,7 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
 
     public void testReceiveComplex() throws Throwable
     {
-        UMOConnector c = MuleObjectHelper.getConnectorByProtocol("glue");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol("glue");
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=getPerson&param=Fred"), 0);
@@ -83,12 +83,12 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
 
     public void testSendComplex() throws Throwable
     {
-        UMOConnector c = MuleObjectHelper.getConnectorByProtocol("glue");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol("glue");
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOEndpoint endpoint = new MuleEndpoint("test",
                 new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=addPerson"),
-                c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, null);
+                c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null);
         UMOEvent event = getTestEvent(new Person("Ross", "Mason"), endpoint);
 
         UMOMessage result = dispatcher.send(event);
@@ -104,7 +104,7 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
 
     public void testReceiveComplexCollection() throws Throwable
     {
-        UMOConnector c = MuleObjectHelper.getConnectorByProtocol("glue");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol("glue");
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=getPeople"), 0);
