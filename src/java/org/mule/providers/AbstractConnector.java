@@ -571,6 +571,11 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     protected void disposeConnector()
     {
+        try {
+            stopConnector();
+        } catch (UMOException e) {
+            logger.warn("Fialed to stop during shutdown: " + e.getMessage(), e);
+        }
     }
 
     public void doInitialise() throws InitialisationException

@@ -281,7 +281,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getPath()
     {
-        return ("".equals(uri.getPath()) ? null : uri.getPath());
+        return uri.getPath();
     }
 
     public String getRawQuery()
