@@ -22,6 +22,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.*;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
@@ -82,6 +83,18 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 	 */
     public final void dispatch(UMOEvent event) throws Exception {
         try {
+            //Apply Security filter if one is set
+            UMOEndpoint endpoint = event.getEndpoint();
+            if (endpoint.getSecurityFilter() != null) {
+                try {
+                    endpoint.getSecurityFilter().authenticate(event);
+                } catch (org.mule.umo.security.SecurityException e) {
+                    logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
+                    connector.handleException(e);
+                    return;
+                }
+            }
+
             event.setSynchronous(false);
             event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
             RequestContext.setEvent(event);
@@ -89,25 +102,34 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             if (doThreading && !event.isSynchronous() && tx == null) {
                 workManager.scheduleWork(new Worker(event));
             } else {
-                try {
-                    doDispatch(event);
-                } finally {
-                    if (disposeOnCompletion) {
-                        dispose();
-                    }
-                }
+                doDispatch(event);
             }
         } catch (Exception e) {
             //automatically dispose if there were failures
             logger.info("Exception occurred while executing on this dispatcher. disposing before continuing");
             dispose();
             throw e;
+        } finally{
+            if (disposeOnCompletion) {
+                dispose();
+            }
         }
     }
 
 
     public final UMOMessage send(UMOEvent event) throws Exception {
         try {
+            //Apply Security filter if one is set
+            UMOEndpoint endpoint = event.getEndpoint();
+            if (endpoint.getSecurityFilter() != null) {
+                try {
+                    endpoint.getSecurityFilter().authenticate(event);
+                } catch (org.mule.umo.security.SecurityException e) {
+                    logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
+                    connector.handleException(e);
+                    return event.getMessage();
+                }
+            }
             try {
                 event.setSynchronous(true);
                 event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
