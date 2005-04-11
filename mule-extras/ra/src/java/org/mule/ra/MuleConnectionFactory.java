@@ -13,9 +13,10 @@
  */
 package org.mule.ra;
 
+import javax.naming.Referenceable;
 import javax.resource.ResourceException;
-import javax.resource.cci.ConnectionFactory;
 import javax.resource.spi.ConnectionManager;
+import java.io.Serializable;
 
 /**
  * <code>MuleConnectionFactory</code> defines the connection factory interface that
@@ -24,7 +25,7 @@ import javax.resource.spi.ConnectionManager;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public interface MuleConnectionFactory extends ConnectionFactory
+public interface MuleConnectionFactory extends Serializable, Referenceable
  {
     MuleConnection createConnection() throws ResourceException;
 
