@@ -33,8 +33,8 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
-import java.util.HashMap;
 import java.beans.ExceptionListener;
+import java.util.HashMap;
 
 
 /**
@@ -148,7 +148,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         UMOComponent component = MuleManager.getInstance().getModel().registerComponent(d);
         UMOEndpoint endpoint = new MuleEndpoint("test", new MuleEndpointURI(getTestEndpointURI()),
-            connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, null);
+            connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null);
 
         try
         {

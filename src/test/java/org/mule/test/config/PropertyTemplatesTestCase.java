@@ -67,6 +67,7 @@ public class PropertyTemplatesTestCase extends NamedTestCase
         assertNotNull(d);
         UMOEndpoint endpoint = d.getInboundRouter().getEndpoint("ep2");
         assertNotNull(endpoint);
+        assertEquals("test://embedded", endpoint.getEndpointURI().getUri().toString());
         assertNotNull(endpoint.getProperties());
         assertEquals(3, endpoint.getProperties().size());
         assertEquals("value1", endpoint.getProperties().get("prop1"));

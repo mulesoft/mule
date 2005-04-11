@@ -281,7 +281,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getPath()
     {
-        return uri.getPath();
+        return ("".equals(uri.getPath()) ? null : uri.getPath());
     }
 
     public String getRawQuery()
@@ -347,6 +347,29 @@ public class MuleEndpointURI implements UMOEndpointURI
     public void setEndpointName(String name)
     {
         endpointName = name;
+    }
+
+    public String getUsername() {
+        if(uri.getUserInfo()!=null && !"".equals(uri.getUserInfo())) {
+            int i = uri.getUserInfo().indexOf(":");
+            if(i ==-1) {
+                return uri.getUserInfo();
+            } else {
+                return  uri.getUserInfo().substring(0, i);
+            }
+        }
+        return null;
+    }
+
+    public String getPassword()
+    {
+        if(uri.getUserInfo()!=null && !"".equals(uri.getUserInfo())) {
+            int i = uri.getUserInfo().indexOf(":");
+            if(i > -1) {
+                return  uri.getUserInfo().substring(i+1);
+            }
+        }
+        return null;
     }
 
     public boolean equals(Object o) {

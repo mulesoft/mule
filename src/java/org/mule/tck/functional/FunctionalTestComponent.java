@@ -40,15 +40,9 @@ public class FunctionalTestComponent implements Callable
     {
         String contents = context.getMessageAsString();
         String msg = null;
-        if(contents.length() > 100) {
-            msg = StringMessageHelper.getBoilerPlate("Message Received in component: " +
-                context.getComponentDescriptor().getName() + ". Content length is: " + contents.length(), '*', 80);
-        }else {
-            msg = StringMessageHelper.getBoilerPlate("Message Received in component: " +
-                context.getComponentDescriptor().getName() + ". Content is: " + contents, '*', 80);
-        }
+        msg = StringMessageHelper.getBoilerPlate("Message Received in component: " +
+            context.getComponentDescriptor().getName() + ". Content is: " + StringMessageHelper.truncate(contents, 100, true), '*', 80);
         logger.info(msg);
-
 
         contents += " Received";
         if (eventCallback != null)

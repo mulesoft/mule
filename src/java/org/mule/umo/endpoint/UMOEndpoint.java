@@ -145,4 +145,6 @@ public interface UMOEndpoint extends UMOImmutableEndpoint
      * thread. This property is only used when the endpoint is of type 'receiver'
      */
     public void setSynchronous(boolean synchronous);
+
+    void setCreateConnector(int action);
 }

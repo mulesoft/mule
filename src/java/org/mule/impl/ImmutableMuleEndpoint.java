@@ -140,13 +140,14 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      * Default constructor
      */
     public ImmutableMuleEndpoint(String name, UMOEndpointURI endpointUri, UMOConnector connector,
-                                           UMOTransformer transformer, String type,
+                                           UMOTransformer transformer, String type, int createConnector,
                                            Map properties)
     {
         this.name = name;
         this.endpointUri = endpointUri;
         this.connector = connector;
         this.transformer = transformer;
+        this.createConnector = createConnector;
         if(transformer != null) {
             getTransformer().setEndpoint(this);
         }
@@ -240,7 +241,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public Object clone()// throws CloneNotSupportedException
     {
-        UMOEndpoint clone = new MuleEndpoint(name, endpointUri, connector, transformer, type, (properties==null ? null : new HashMap(properties)));
+        UMOEndpoint clone = new MuleEndpoint(name, endpointUri, connector, transformer, type, createConnector, (properties==null ? null : new HashMap(properties)));
         clone.setTransactionConfig(transactionConfig);
         clone.setFilter(filter);
         return clone;
@@ -406,6 +407,10 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public void initialise() throws InitialisationException, RecoverableException
     {
+        if(initialised.get()) {
+            logger.debug("Already initialised: " + toString());
+            return;
+        }
         if(connector==null) {
             if(endpointUri.getConnectorName()!=null) {
                 connector = MuleManager.getInstance().lookupConnector(endpointUri.getConnectorName());
@@ -413,15 +418,9 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             } else {
                 try
                 {
-                    if(createConnector == ConnectorFactory.ALWAYS_CREATE_CONNECTOR) {
-                        connector = ConnectorFactory.createConnector(endpointUri);
-                    } else if(createConnector == ConnectorFactory.NEVER_CREATE_CONNECTOR) {
-                        connector = MuleObjectHelper.getConnectorByProtocol(endpointUri.getScheme());
-                        if(connector==null) {
-                            throw new InitialisationException(new Message(Messages.CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED, endpointUri.getScheme()), this);
-                        }
-                    } else {
-                        connector = MuleObjectHelper.getOrCreateConnectorByProtocol(endpointUri);
+                    connector = ConnectorFactory.getOrCreateConnectorByProtocol(this);
+                    if(connector==null) {
+                        throw new InitialisationException(new Message(Messages.CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED, endpointUri.getScheme()), this);
                     }
                 } catch (ConnectorFactoryException e)
                 {
@@ -436,6 +435,13 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         if(name==null) {
             name = "_" + endpointUri.getScheme() + "Endpoint#" + hashCode();
             endpointUri.setEndpointName(name);
+        }
+        String sync = endpointUri.getParams().getProperty("synchronous", null);
+        if(sync!=null) {
+            synchronous = Boolean.valueOf(sync);
+        }
+        if(properties!=null && endpointUri.getParams() != null) {
+            properties.putAll(endpointUri.getParams());
         }
 
         if(endpointUri.getTransformers()!=null) {
@@ -465,15 +471,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             securityFilter.setEndpoint(this);
             securityFilter.initialise();
         }
-
-        String sync = endpointUri.getParams().getProperty("synchronous", null);
-        if(sync!=null) {
-            synchronous = Boolean.valueOf(sync);
-        }
-        if(properties!=null && endpointUri.getParams() != null) {
-            properties.putAll(endpointUri.getParams());
-        }
-        
+        initialised.set(true);
     }
 
     /**

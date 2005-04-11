@@ -61,7 +61,7 @@ public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
             } else
             {
                 address = uri.getUserInfo() + "@" + address;
-            }
+           }
         } else
         {
             throw new MalformedEndpointException("User info is not set");

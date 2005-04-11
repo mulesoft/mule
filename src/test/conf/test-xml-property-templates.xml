@@ -34,7 +34,7 @@
 
         <mule-descriptor name="test3" implementation="org.mule.components.simple.EchoComponent">
         <inbound-router>
-            <endpoint address="test://blah2" name="ep2">
+            <endpoint address="test://${test.embedded}" name="ep2">
                 <properties>
                     <property name="prop2" value="overrideValue2"/>
                     <file-properties location="test-dummy.properties" override="true"/>

@@ -13,7 +13,6 @@
  */
 package org.mule.util;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -21,16 +20,12 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.providers.service.ConnectorFactory;
-import org.mule.providers.service.ConnectorFactoryException;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOManager;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Iterator;
@@ -118,55 +113,4 @@ public class MuleObjectHelper
         }
         return null;
     }
-
-    public static UMOConnector getConnectorByProtocol(String protocol) {
-        UMOConnector connector;
-        Map connectors = MuleManager.getInstance().getConnectors();
-        for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();)
-        {
-            connector = (UMOConnector) iterator.next();
-            if (connector.getProtocol().equalsIgnoreCase(protocol))
-            {
-                return connector;
-            }
-        }
-        return null;
-    }
-
-    public static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI url) throws ConnectorFactoryException
-    {
-        UMOConnector connector = getConnectorByProtocol(url.getSchemeMetaInfo());
-        if(connector==null) {
-            connector = ConnectorFactory.createConnector(url);
-            try
-            {
-                BeanUtils.populate(connector, url.getParams());
-                MuleManager.getInstance().registerConnector(connector);
-
-            } catch (Exception e)
-            {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"), e);
-            }
-        }
-        return connector;
-    }
-
-//    public static UMOEndpoint getEndpointName(String endpointName, UMODescriptor descriptor) throws EndpointNotFoundException
-//    {
-//        UMOEndpoint endpoint = null;
-//        if(descriptor!=null) {
-//            endpoint = descriptor.getOutboundEndpoint();
-//            if(provider!=null && !providerName.equals(provider.getName())) {
-//                endpoint = null;
-//            }else if(provider==null) {
-//                endpoint = MuleManager.getInstance().lookupEndpoint(providerName);
-//            }
-//        } else {
-//            endpoint = MuleManager.getInstance().lookupEndpoint(providerName);
-//        }
-//        if(provider == null) {
-//            throw new EndpointNotFoundException("failed to find an outbound endpoint called: " + endpointName);
-//        }
-//        return endpoint;
-//    }
 }

@@ -190,4 +190,6 @@ public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialis
      * thread. This property is only used when the endpoint is of type 'receiver'
      */
     public boolean isSynchronous();
+
+    int getCreateConnector();
 }

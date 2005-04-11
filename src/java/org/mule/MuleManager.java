@@ -31,7 +31,6 @@ import org.mule.impl.internal.events.ServerEventManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
@@ -577,9 +576,15 @@ public class MuleManager implements UMOManager
 
     protected void initialiseEndpoints() throws InitialisationException
     {
+        UMOEndpoint ep;
         for (Iterator iterator = this.endpoints.values().iterator(); iterator.hasNext();)
         {
-            ((UMOImmutableEndpoint) iterator.next()).initialise();
+            ep = (UMOEndpoint) iterator.next();
+            ep.initialise();
+            //the connector has been created for this endpoint so lets
+            //set the create connector to 0 so that every time this endpoint
+            //is referenced we don't create another connector
+            ep.setCreateConnector(0);
         }
     }
     /**
