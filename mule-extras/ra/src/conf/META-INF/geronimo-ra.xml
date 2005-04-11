@@ -17,11 +17,11 @@
         <connectionfactory-interface>org.mule.ra.MuleConnectionFactory</connectionfactory-interface>
         <connectiondefinition-instance>
           <name>DefaultMuleConnectionFactory</name>
-          <implemented-interface>org.mule.ra.MuleConnectionFactory</implemented-interface>
+<!--          <implemented-interface>org.mule.ra.MuleConnectionFactory</implemented-interface>-->
           <connectionmanager>
-            <xa-transaction>
-              <transaction-caching/>
-            </xa-transaction>
+<!--            <xa-transaction>-->
+<!--              <transaction-caching/>-->
+<!--            </xa-transaction>-->
             <single-pool>
               <max-size>10</max-size>
               <blocking-timeout-milliseconds>5000</blocking-timeout-milliseconds>
