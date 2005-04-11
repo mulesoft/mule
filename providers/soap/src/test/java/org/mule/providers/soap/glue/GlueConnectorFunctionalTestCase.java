@@ -46,6 +46,11 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
         configBuilder.configure("glue-test-mule-config.xml");
     }
 
+    protected void tearDown() throws Exception {
+        MuleManager.getInstance().dispose();
+        super.tearDown();
+    }
+
     public void testRequestResponse() throws Throwable
     {
         IProxy proxy = proxy = Registry.bind( "http://localhost:38004/mycomponent2");
@@ -110,6 +115,6 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
         UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=getPeople"), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person[]);
-        assertEquals(4, ((Person[])result.getPayload()).length);
+        assertEquals(3, ((Person[])result.getPayload()).length);
     }
 }

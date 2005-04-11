@@ -52,7 +52,7 @@ public class XmppConnector extends AbstractServiceEnabledConnector
 		String password = endpointURI.getPassword();
 		String resource = endpointURI.getPath();
 
-		if (null == resource)
+		if (resource==null || "".equals(resource))
 		{
 			resource = DEFAULT_RESOURCE;
 		} else {

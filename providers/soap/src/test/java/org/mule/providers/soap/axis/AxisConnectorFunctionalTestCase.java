@@ -118,7 +118,7 @@ public class AxisConnectorFunctionalTestCase extends AbstractMuleTestCase
         UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38009/mycomponent3?method=getPeople"), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person[]);
-        assertEquals(4, ((Person[])result.getPayload()).length);
+        assertEquals(3, ((Person[])result.getPayload()).length);
     }
 
     public void testDispatchAsyncComplex() throws Throwable
