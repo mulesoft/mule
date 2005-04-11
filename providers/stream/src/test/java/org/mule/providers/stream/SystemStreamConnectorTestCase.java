@@ -65,6 +65,7 @@ public class SystemStreamConnectorTestCase extends AbstractConnectorTestCase
         event.expectAndReturn("getEndpoint", endpoint);
         event.expect("setProperty", C.ANY_ARGS);
         event.expectAndReturn("getTransformedMessageAsBytes", new byte[0]);
+        event.expectAndReturn("getEndpoint", getTestEndpoint("test", UMOEndpoint.ENDPOINT_TYPE_SENDER));
         connector.registerListener(component, endpoint);
         connector.start();
         connector.getDispatcher("dummy").dispatch((UMOEvent) event.proxy());
