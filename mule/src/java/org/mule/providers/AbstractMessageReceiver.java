@@ -201,7 +201,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         UMOEvent muleEvent = new MuleEvent(message, endpoint, session, synchronous, ros);
         RequestContext.setEvent(muleEvent);
 
-        //Apple Security filter if one is set
+        //Apply Security filter if one is set
         if (endpoint.getSecurityFilter() != null) {
             try {
                 endpoint.getSecurityFilter().authenticate(muleEvent);
