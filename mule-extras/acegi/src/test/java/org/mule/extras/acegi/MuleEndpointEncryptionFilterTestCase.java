@@ -13,39 +13,21 @@
  */
 package org.mule.extras.acegi;
 
-import net.sf.acegisecurity.GrantedAuthority;
-import net.sf.acegisecurity.GrantedAuthorityImpl;
-import net.sf.acegisecurity.providers.AuthenticationProvider;
-import net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider;
-import net.sf.acegisecurity.providers.dao.User;
-import net.sf.acegisecurity.providers.dao.memory.InMemoryDaoImpl;
-import net.sf.acegisecurity.providers.dao.memory.UserMap;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.mule.components.simple.EchoComponent;
-import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.config.MuleProperties;
+import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
-import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
+import org.mule.config.MuleProperties;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.security.MuleCredentials;
-import org.mule.providers.http.HttpConstants;
 import org.mule.providers.http.HttpConnector;
 import org.mule.tck.NamedTestCase;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOManager;
-import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.security.UMOSecurityProvider;
-import org.mule.umo.security.UnauthorisedException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.security.CredentialsNotSetException;
-import org.mule.MuleManager;
+import org.mule.umo.security.UnauthorisedException;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>

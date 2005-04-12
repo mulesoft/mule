@@ -15,11 +15,11 @@
 
 package org.mule.extras.jotm;
 
-import javax.transaction.TransactionManager;
-
-import org.mule.umo.UMOTransactionManagerFactory;
+import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
+
+import javax.transaction.TransactionManager;
 
 /**
  * This factory retrieves the transaction manager for <a
@@ -44,7 +44,7 @@ public class JotmTransactionManagerFactory implements
 	 * Retrieves the JOTM Current object that implements the TransactionManager
 	 * interface.
 	 * 
-	 * @see org.mule.umo.UMOTransactionManagerFactory#create()
+	 * @see org.mule.umo.manager.UMOTransactionManagerFactory#create()
 	 */
 	public TransactionManager create() throws Exception {
 		if (jotmCurrent == null) {

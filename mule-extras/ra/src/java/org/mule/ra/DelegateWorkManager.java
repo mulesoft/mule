@@ -13,8 +13,8 @@
  */
 package org.mule.ra;
 
-import org.mule.umo.UMOWorkManager;
 import org.mule.umo.UMOException;
+import org.mule.umo.manager.UMOWorkManager;
 
 import javax.resource.spi.work.*;
 

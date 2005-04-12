@@ -16,19 +16,19 @@ package org.mule.extras.spring.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.extras.spring.SpringContainerContext;
 import org.mule.impl.MuleModel;
-import org.mule.umo.UMOAgent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManager;
-import org.mule.umo.UMOTransactionManagerFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
+import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
@@ -42,11 +42,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
 
+import java.beans.ExceptionListener;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.beans.ExceptionListener;
 
 /**
  * <code>UMOManagerFactoryBean</code> is a MuleManager factory bean that is used to configure the

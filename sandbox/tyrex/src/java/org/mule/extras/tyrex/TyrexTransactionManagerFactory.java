@@ -17,7 +17,7 @@ package org.mule.extras.tyrex;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.UMOTransactionManagerFactory;
+import org.mule.umo.manager.UMOTransactionManagerFactory;
 import tyrex.tm.RecoveryException;
 import tyrex.tm.TransactionDomain;
 import tyrex.tm.impl.DomainConfig;

@@ -14,18 +14,13 @@
 package org.mule.management.agents;
 
 import com.sun.jdmk.comm.HtmlAdaptorServer;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.UMOAgent;
-import org.mule.umo.UMOException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOAgent;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
+import javax.management.*;
 import java.net.URI;
 
 /**
@@ -51,21 +46,21 @@ public class JdmkAgent implements UMOAgent {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mule.umo.UMOAgent#getName()
+	 * @see org.mule.umo.manager.UMOAgent#getName()
 	 */
 	public String getName() {
 		return this.name;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mule.umo.UMOAgent#setName(java.lang.String)
+	 * @see org.mule.umo.manager.UMOAgent#setName(java.lang.String)
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mule.umo.UMOAgent#getDescription()
+	 * @see org.mule.umo.manager.UMOAgent#getDescription()
 	 */
 	public String getDescription() {
 		return "Jdmk Http adaptor: " + jmxAdaptorUrl;
@@ -99,14 +94,14 @@ public class JdmkAgent implements UMOAgent {
 	}
 
     /* (non-Javadoc)
-	 * @see org.mule.umo.UMOAgent#registered()
+	 * @see org.mule.umo.manager.UMOAgent#registered()
 	 */
     public void registered()
     {
     }
 
     /* (non-Javadoc)
-	 * @see org.mule.umo.UMOAgent#unregistered()
+	 * @see org.mule.umo.manager.UMOAgent#unregistered()
 	 */
     public void unregistered()
     {

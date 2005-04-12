@@ -34,6 +34,7 @@ import org.mule.umo.*;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.jms.*;

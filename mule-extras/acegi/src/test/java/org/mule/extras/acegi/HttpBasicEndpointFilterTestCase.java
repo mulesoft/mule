@@ -30,7 +30,7 @@ import org.mule.impl.security.MuleSecurityManager;
 import org.mule.providers.http.HttpConstants;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOManager;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.security.UMOSecurityProvider;
 
 /**

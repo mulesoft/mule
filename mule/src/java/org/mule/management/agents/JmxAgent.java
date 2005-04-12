@@ -21,27 +21,13 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ModelEventListener;
-import org.mule.management.mbeans.ComponentService;
-import org.mule.management.mbeans.ComponentServiceMBean;
-import org.mule.management.mbeans.ModelService;
-import org.mule.management.mbeans.ModelServiceMBean;
-import org.mule.management.mbeans.MuleConfigurationService;
-import org.mule.management.mbeans.MuleConfigurationServiceMBean;
-import org.mule.management.mbeans.MuleService;
-import org.mule.management.mbeans.MuleServiceMBean;
-import org.mule.management.mbeans.StatisticsService;
-import org.mule.umo.UMOAgent;
+import org.mule.management.mbeans.*;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOServerEvent;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.manager.UMOServerEvent;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
+import javax.management.*;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
@@ -73,7 +59,7 @@ public class JmxAgent implements UMOAgent
     private List registeredMBeans = new ArrayList();
 
     /* (non-Javadoc)
-     * @see org.mule.umo.UMOAgent#getName()
+     * @see org.mule.umo.manager.UMOAgent#getName()
      */
     public String getName()
     {
@@ -81,7 +67,7 @@ public class JmxAgent implements UMOAgent
     }
 
     /* (non-Javadoc)
-     * @see org.mule.umo.UMOAgent#setName(java.lang.String)
+     * @see org.mule.umo.manager.UMOAgent#setName(java.lang.String)
      */
     public void setName(String name)
     {
@@ -89,7 +75,7 @@ public class JmxAgent implements UMOAgent
     }
 
     /* (non-Javadoc)
-     * @see org.mule.umo.UMOAgent#getDescription()
+     * @see org.mule.umo.manager.UMOAgent#getDescription()
      */
     public String getDescription()
     {
@@ -221,14 +207,14 @@ public class JmxAgent implements UMOAgent
     }
 
 /* (non-Javadoc)
-	 * @see org.mule.umo.UMOAgent#registered()
+	 * @see org.mule.umo.manager.UMOAgent#registered()
 	 */
     public void registered()
     {
     }
 
     /* (non-Javadoc)
-	 * @see org.mule.umo.UMOAgent#unregistered()
+	 * @see org.mule.umo.manager.UMOAgent#unregistered()
 	 */
     public void unregistered()
     {

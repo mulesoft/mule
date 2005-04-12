@@ -13,13 +13,13 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.umo.UMOServerEvent;
+import org.mule.umo.manager.UMOServerEvent;
 
 /**
  * <code>ManagementEvent</code> is fired when monitored resources such as internal queues reach capacity
  *
  * @see org.mule.MuleManager
- * @see org.mule.umo.UMOManager
+ * @see org.mule.umo.manager.UMOManager
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */

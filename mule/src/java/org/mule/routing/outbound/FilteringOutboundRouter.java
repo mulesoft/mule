@@ -13,6 +13,8 @@
  */
 package org.mule.routing.outbound;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.routing.filters.MessageFilter;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
@@ -20,12 +22,10 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
-import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.RoutePathNotFoundException;
-import org.mule.umo.transformer.UMOTransformer;
+import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * <code>FilteringRouter</code> is a router that accepts events based on a filter set.

@@ -16,8 +16,7 @@ package org.mule.extras.spring.events;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOManager;
-import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.UMOManager;
 import org.springframework.context.support.AbstractApplicationContext;
 
 /**

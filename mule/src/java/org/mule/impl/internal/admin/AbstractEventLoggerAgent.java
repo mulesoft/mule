@@ -15,21 +15,14 @@ package org.mule.impl.internal.admin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
-import org.mule.impl.internal.events.AdminEventListener;
-import org.mule.impl.internal.events.ComponentEventListener;
-import org.mule.impl.internal.events.CustomEventListener;
-import org.mule.impl.internal.events.ManagementEventListener;
-import org.mule.impl.internal.events.ManagerEventListener;
-import org.mule.impl.internal.events.ModelEventListener;
-import org.mule.impl.internal.events.SecurityEventListener;
-import org.mule.umo.UMOAgent;
+import org.mule.impl.internal.events.*;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManager;
-import org.mule.umo.UMOServerEvent;
-import org.mule.umo.UMOServerEventListener;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerEventListener;
 
 import java.util.HashSet;
 import java.util.Iterator;

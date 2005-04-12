@@ -13,7 +13,7 @@
  *
  */
 
-package org.mule.umo;
+package org.mule.umo.manager;
 
 import javax.transaction.TransactionManager;
 

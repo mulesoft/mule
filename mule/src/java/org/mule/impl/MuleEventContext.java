@@ -673,7 +673,7 @@ public class MuleEventContext implements UMOEventContext
      * how events are dispached.
      *
      * @return Returns true is the user has set stopFurtherProcessing.
-     * @see org.mule.umo.UMOManager
+     * @see org.mule.umo.manager.UMOManager
      * @see org.mule.umo.UMOEventContext
      * @see org.mule.umo.lifecycle.Callable
      */

@@ -14,9 +14,8 @@
 package org.mule.ra;
 
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.model.DynamicEntryPointResolver;
+import org.mule.umo.manager.UMOManager;
 import org.mule.util.Utility;
-import org.mule.umo.UMOManager;
 
 import javax.resource.spi.ConnectionRequestInfo;
 import java.io.Serializable;

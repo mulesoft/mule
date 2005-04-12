@@ -13,15 +13,15 @@
  */
 package org.mule.routing;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.ComponentRoutingException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import org.mule.umo.routing.RoutingException;
 
 /**
  * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router for any events

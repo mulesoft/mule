@@ -13,13 +13,6 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-import javax.sql.XADataSource;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.mule.MuleManager;
@@ -31,10 +24,16 @@ import org.mule.providers.jdbc.JdbcUtils;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOManager;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
+
+import javax.sql.DataSource;
+import javax.sql.XADataSource;
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Guillaume Nodet

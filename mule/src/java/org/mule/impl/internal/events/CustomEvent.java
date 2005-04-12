@@ -13,7 +13,7 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.umo.UMOServerEvent;
+import org.mule.umo.manager.UMOServerEvent;
 
 /**
  * <code>CustomEvent</code> Custom events can be used by components and other objects such as routers,

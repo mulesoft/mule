@@ -26,15 +26,11 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.events.AdminEvent;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.umo.FutureMessageResult;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 

@@ -14,14 +14,13 @@ package org.mule.extras.spring.config;
  * the LICENSE.txt file.
  */
 
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManager;
-import org.mule.umo.UMOTransactionManagerFactory;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;

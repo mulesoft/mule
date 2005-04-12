@@ -252,7 +252,7 @@ threading in every connector
 <!--
 	This element specifies the transaction manager to use (if any) in the Mule Server
 	The configuration must specify a factory attribute which is a fully qualified class
-	name of a Transaction factory that implements org.mule.umo.UMOTransactionManagerFactory
+	name of a Transaction factory that implements org.mule.umo.manager.UMOTransactionManagerFactory
 
   -->
 <!ELEMENT transaction-manager (properties?)>

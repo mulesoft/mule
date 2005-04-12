@@ -13,7 +13,7 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.umo.UMOServerEventListener;
+import org.mule.umo.manager.UMOServerEventListener;
 
 /**
  * <code>CustomEventListener</code> is an observer interface that can be used to

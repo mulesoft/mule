@@ -20,7 +20,7 @@ import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManager;
+import org.mule.umo.manager.UMOManager;
 import org.springframework.util.StringUtils;
 
 import java.io.Reader;

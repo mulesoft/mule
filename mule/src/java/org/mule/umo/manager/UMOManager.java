@@ -13,12 +13,12 @@
  *
  */
 
-package org.mule.umo;
+package org.mule.umo.manager;
 
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -211,7 +211,7 @@ public interface UMOManager extends Lifecycle
      * registers a interceptor stack list that can be referenced by other components
      * @param name the referenceable name for this stack
      * @param stack a List of interceptors
-     * @see UMOInterceptor
+     * @see org.mule.umo.UMOInterceptor
      */
     public void registerInterceptorStack(String name, List stack);
 
