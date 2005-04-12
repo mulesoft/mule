@@ -45,6 +45,8 @@
                 </endpoint>
             </inbound-router>
             <properties>
+                <property name="blah" value="${this should not be found}"/>
+                <property name="foobar" value="two tags ${foo} and ${bar}."/>
                 <map name="testMap">
                     <property name="foo" value="${foo}"/>
                 </map>
