@@ -212,7 +212,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                 return message;
             }
         }
-        //the security filter may update the payload so we need to get the latest event again
+        //the security filter may update the payload so we need to get the
+        //latest event again
         muleEvent = RequestContext.getEvent();
 
         UMOMessage resultMessage = null;
