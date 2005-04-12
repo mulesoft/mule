@@ -46,7 +46,7 @@
 	the first model is used.
 	<strong>This property currently is not used</strong>
 -->
-<!ATTLIST mule-environment-properties model							IDREF					#IMPLIED>
+<!ATTLIST mule-environment-properties model							CDATA					#IMPLIED>
 
 <!--
      The directory where mule can write any temporary files or persist messages
@@ -727,7 +727,7 @@ Can be null if fragment is not Xml.  If not set UTF-8 will be used.
 	The name to associate this mule-model with
 -->
 
-<!ATTLIST model name  			ID		#REQUIRED>
+<!ATTLIST model name  			CDATA		#REQUIRED>
 
 <!--
 	An entry Point resolver is used to determine which method on a UMO object
@@ -1011,7 +1011,7 @@ or relax dtd validation on their parser
   <i>org.mule.exception.ExceptionStrategy</i>.
   -->
   
-<!ELEMENT exception-strategy ((endpoint,global-endpoint)*, (properties)?)>
+<!ELEMENT exception-strategy (endpoint*, global-endpoint*, properties?)>
 
 <!--
 	An endpoint to dispatch ExceptionMessages (including the Message being processed)

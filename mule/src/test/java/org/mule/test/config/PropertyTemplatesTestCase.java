@@ -16,9 +16,13 @@ package org.mule.test.config;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.providers.AbstractConnector;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -41,7 +45,10 @@ public class PropertyTemplatesTestCase extends NamedTestCase
         assertEquals("blah", MuleManager.getConfiguration().getModel());
         assertEquals("blah", MuleManager.getInstance().getModel().getName());
 
-        assertNotNull(MuleManager.getInstance().lookupConnector("myTestConnector"));
+        AbstractConnector c = (AbstractConnector) MuleManager.getInstance().lookupConnector("myTestConnector");
+        assertNotNull(c);
+        assertEquals(4, c.getRetryCount());
+
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("test-from-env-props");
         assertNotNull(d);
         assertEquals(d.getInboundEndpoint().getEndpointURI().toString(), "test://test.1");
@@ -73,5 +80,18 @@ public class PropertyTemplatesTestCase extends NamedTestCase
         assertEquals("value1", endpoint.getProperties().get("prop1"));
         assertEquals("value2", endpoint.getProperties().get("prop2"));
         assertEquals("value3", endpoint.getProperties().get("prop3"));
+    }
+
+    public void testPropertyMapsListsEtc() {
+
+        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("test3");
+        assertNotNull(d);
+        Map props = (Map)d.getProperties().get("testMap");
+        assertNotNull(props);
+        assertEquals("foo entry", props.get("foo"));
+
+        List list = (List)d.getProperties().get("testList");
+        assertNotNull(list);
+        assertEquals("bar entry", list.get(0).toString());
     }
 }

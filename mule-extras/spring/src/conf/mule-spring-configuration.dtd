@@ -1001,7 +1001,7 @@ or relax dtd validation on their parser
   <i>org.mule.exception.ExceptionStrategy</i>.
   -->
   
-<!ELEMENT exception-strategy ((endpoint|global-endpoint)*, (properties)?)>
+<!ELEMENT exception-strategy (endpoint*, global-endpoint*, properties?)>
 
 <!--
 	An endpoint to dispatch ExceptionMessages (including the Message being processed)

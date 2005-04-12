@@ -21,7 +21,7 @@
         <outbound-router>
             <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                 <endpoint name="transactedOutboundEndpoint" type="sender" address="test://endpoint.out">
-                    <transaction commitAction="ALWAYS_COMMIT">
+                    <transaction action="ALWAYS_BEGIN">
                         <constraint batchSize="3" className="org.mule.transaction.constraints.BatchConstraint"/>
                     </transaction>
                 </endpoint>

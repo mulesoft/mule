@@ -1025,6 +1025,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             path += "/properties";
         }
         digester.addRule(path, new ObjectCreateRule(path , HashMap.class){
+
             //This will set the properties on the top object as bean setters if the flag is set
             public void end(String string, String string1) throws Exception
             {
@@ -1036,6 +1037,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                     props.remove(MuleConfiguration.USE_MANAGER_PROPERTIES);
                 }
                 super.end(string, string1);
+
+                //support for setting transformers as properties
                 String trans = (String)props.remove("transformer");
                 if(setAsBeanProperties)
                 {
@@ -1048,9 +1051,24 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 }
             }
         });
-        digester.addCallMethod(path + "/property", "put", 2);
-        digester.addCallParam(path + "/property", 0, "name");
-        digester.addCallParam(path + "/property", 1, "value");
+        digester.addCallMethod(path + "/property","put", 2);
+        digester.addRule(path + "/property", new CallParamRule(0, "name") {
+            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
+                //Process template tokens
+                attributes = processAttributes(attributes, endpointName1);
+                super.begin(endpointName, endpointName1, attributes);
+            }
+        });
+
+        digester.addRule(path + "/property", new CallParamRule(1, "value") {
+            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
+                //Process template tokens
+                attributes = processAttributes(attributes, endpointName1);
+                super.begin(endpointName, endpointName1, attributes);
+            }
+        });
+//        digester.addCallParam(path + "/property", 0, "name");
+//        digester.addCallParam(path + "/property", 1, "value");
 
         addPropertyFactoryRule(digester, path + "/factory-property");
         addSystemPropertyRule(digester, path + "/system-property");
@@ -1059,8 +1077,24 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         digester.addObjectCreate(path + "/map", HashMap.class);
         digester.addCallMethod(path + "/map/property", "put", 2);
-        digester.addCallParam(path + "/map/property", 0, "name");
-        digester.addCallParam(path + "/map/property", 1, "value");
+
+        digester.addRule(path + "/map/property", new CallParamRule(0, "name") {
+            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
+                //Process template tokens
+                attributes = processAttributes(attributes, endpointName1);
+                super.begin(endpointName, endpointName1, attributes);
+            }
+        });
+
+        digester.addRule(path + "/map/property", new CallParamRule(1, "value") {
+            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
+                //Process template tokens
+                attributes = processAttributes(attributes, endpointName1);
+                super.begin(endpointName, endpointName1, attributes);
+            }
+        });
+//        digester.addCallParam(path + "/map/property", 0, "name");
+//        digester.addCallParam(path + "/map/property", 1, "value");
 
         addPropertyFactoryRule(digester, path + "/map/factory-property");
         addSystemPropertyRule(digester, path + "/map/system-property");
@@ -1087,8 +1121,22 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester.addCallParam(path + "/map", 1, true);
 
         digester.addObjectCreate(path + "/list", ArrayList.class);
-        digester.addCallMethod(path + "/list/entry", "add", 1);
-        digester.addCallParam(path + "/list/entry", 0, "value");
+
+        //digester.addCallMethod(path + "/list/entry", "add", 1);
+        digester.addRule(path + "/list/entry", new CallMethodRule("add", 1) {
+            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
+                //Process template tokens
+                attributes = processAttributes(attributes, endpointName1);
+                super.begin(endpointName, endpointName1, attributes);
+            }
+        });
+        digester.addRule(path + "/list/entry", new CallParamRule(0, "value"){
+            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
+                //Process template tokens
+                attributes = processAttributes(attributes, endpointName1);
+                super.begin(endpointName, endpointName1, attributes);
+            }
+        });
 
         addPropertyFactoryRule(digester, path + "/list/factory-entry");
         addSystemPropertyRule(digester, path + "/list/system-entry");
@@ -1113,6 +1161,9 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
+                //Process template tokens
+                attributes = processAttributes(attributes, s1);
+
                 String clazz = attributes.getValue("factory");
                 String name = attributes.getValue("name");
                 Object props = digester.peek();
@@ -1140,6 +1191,9 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester.addRule(path, new Rule() {
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
+                //Process template tokens
+                attributes = processAttributes(attributes, s1);
+
                 String name = attributes.getValue("name");
                 String key = attributes.getValue("key");
                 String defaultValue = attributes.getValue("defaultValue");
@@ -1160,6 +1214,9 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester.addRule(path, new Rule() {
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
+                //Process template tokens
+                attributes = processAttributes(attributes, s1);
+
                 String location = attributes.getValue("location");
                 String temp = attributes.getValue("override");
                 boolean override = "true".equalsIgnoreCase(temp);
@@ -1189,6 +1246,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester.addRule(path, new Rule() {
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
+                attributes = processAttributes(attributes, s1);
+
                 String name = attributes.getValue("name");
                 String value = attributes.getValue("reference");
                 String required = attributes.getValue("required");
@@ -1286,37 +1345,40 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
             super.begin(attributes);
         }
+    }
 
-        private Attributes processAttributes(Attributes attributes, String elementName) throws ConfigurationException {
-            AttributesImpl attribs = new AttributesImpl(attributes);
-            String value = null;
-            String realValue = null;
-            String key = null;
-            UMOManager manager = MuleManager.getInstance();
-            for(int i = 0; i < attribs.getLength(); i++) {
-                value = attribs.getValue(i);
-                int x = value.indexOf("${");
-                while(x > -1) {
-                    int y = value.indexOf("}", x +1);
-                    if(y==-1) {
-                        throw new ConfigurationException(new Message(Messages.PROPERTY_TEMPLATE_MALFORMED_X,
-                                "<" + elementName + attribs.getLocalName(i) + "='" + value + "' ...>"));
-                    }
-                    key = value.substring(x+2, y);
-                    realValue = (String)manager.getProperty(key);
-                    if(logger.isDebugEnabled()) {
-                        logger.debug("Param is '" + value + "', Property key is '" + key + "', Property value is '" + realValue + "'");
-                    }
-                    if(realValue!=null) {
-                        value = value.substring(0, x) +  realValue + value.substring(y+1);
-                    } else {
-                        logger.info("Property for placeholder: '" + key + "' was not found.  Leaving place holder as is");
-                    }
-                    x = value.indexOf("${");
-                }
-                attribs.setValue(i, value);
-            }
-            return attribs;
+    private static Attributes processAttributes(Attributes attributes, String elementName) throws ConfigurationException {
+        AttributesImpl attribs = new AttributesImpl(attributes);
+        String value = null;
+        String realValue = null;
+        String key = null;
+        if(elementName.equals("property")) {
+            System.out.println("");
         }
+        UMOManager manager = MuleManager.getInstance();
+        for(int i = 0; i < attribs.getLength(); i++) {
+            value = attribs.getValue(i);
+            int x = value.indexOf("${");
+            while(x > -1) {
+                int y = value.indexOf("}", x +1);
+                if(y==-1) {
+                    throw new ConfigurationException(new Message(Messages.PROPERTY_TEMPLATE_MALFORMED_X,
+                            "<" + elementName + attribs.getLocalName(i) + "='" + value + "' ...>"));
+                }
+                key = value.substring(x+2, y);
+                realValue = (String)manager.getProperty(key);
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Param is '" + value + "', Property key is '" + key + "', Property value is '" + realValue + "'");
+                }
+                if(realValue!=null) {
+                    value = value.substring(0, x) +  realValue + value.substring(y+1);
+                } else {
+                    logger.info("Property for placeholder: '" + key + "' was not found.  Leaving place holder as is");
+                }
+                x = value.indexOf("${");
+            }
+            attribs.setValue(i, value);
+        }
+        return attribs;
     }
 }
