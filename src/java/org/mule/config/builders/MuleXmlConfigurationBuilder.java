@@ -58,6 +58,9 @@ import org.mule.util.queue.PersistenceStrategy;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -138,25 +141,26 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         digester = new Digester();
         digester.setEntityResolver(new MuleDtdResolver());
-        digester.setValidating(false);
+        digester.setValidating(true);
 
-//        digester.setErrorHandler(new ErrorHandler() {
-//
-//            public void error(SAXParseException exception) throws SAXException
-//            {
-//                logger.error(exception.getMessage(), exception);
-//            }
-//
-//            public void fatalError(SAXParseException exception) throws SAXException
-//            {
-//                logger.fatal(exception.getMessage(), exception);
-//            }
-//
-//            public void warning(SAXParseException exception) throws SAXException
-//            {
-//                logger.warn(exception.getMessage());
-//            }
-//        });
+        digester.setErrorHandler(new ErrorHandler() {
+            public void error(SAXParseException exception) throws SAXException
+            {
+                logger.error(exception.getMessage(), exception);
+                throw new SAXException(exception);
+            }
+
+            public void fatalError(SAXParseException exception) throws SAXException
+            {
+                logger.fatal(exception.getMessage(), exception);
+                throw new SAXException(exception);
+            }
+
+            public void warning(SAXParseException exception) throws SAXException
+            {
+                logger.warn(exception.getMessage());
+            }
+        });
 
         String path = "mule-configuration";
         addMuleConfigurationRules(digester, path);
@@ -221,12 +225,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         String[] resources = Utility.split(configResources, ",");
         MuleManager.getConfiguration().setConfigResources(resources);
-        Reader[] readers = new Reader[resources.length];
+        ReaderResource[] readers = new ReaderResource[resources.length];
         for (int i = 0; i < resources.length; i++)
         {
             try
             {
-                readers[i] = new InputStreamReader(loadConfig(resources[i].trim()), "UTF-8");
+                readers[i] = new ReaderResource(resources[i].trim(),
+                        new InputStreamReader(loadConfig(resources[i].trim()), "UTF-8"));
             } catch (UnsupportedEncodingException e)
             {
                 throw new ConfigurationException(e);
@@ -235,7 +240,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         return configure(readers);
     }
 
-    public UMOManager configure(Reader[] configResources) throws ConfigurationException
+    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
     {
         manager = MuleManager.getInstance();
 
@@ -243,11 +248,11 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         for (int i = 0; i < configResources.length; i++)
         {
             try {
-                configResource = configResources[i];
+                configResource = configResources[i].getReader();
                 digester.push(manager);
                 manager = (UMOManager)digester.parse(configResource);
             } catch (Exception e) {
-                throw new ConfigurationException(new Message(Messages.FAILED_TO_PARSE_CONFIG_RESOURCE_X, configResource), e);
+                throw new ConfigurationException(new Message(Messages.FAILED_TO_PARSE_CONFIG_RESOURCE_X, configResources[i].getDescription()), e);
             }
         }
         try
