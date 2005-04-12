@@ -141,7 +141,9 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         digester = new Digester();
         digester.setEntityResolver(new MuleDtdResolver());
-        digester.setValidating(true);
+
+        String temp = System.getProperty("org.mule.xml.validate", "true");
+        digester.setValidating((temp.equalsIgnoreCase("true")));
 
         digester.setErrorHandler(new ErrorHandler() {
             public void error(SAXParseException exception) throws SAXException
