@@ -59,8 +59,4 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
         return connector;
     }
 
-    public void testSendTransactedRollback() throws Exception
-    {
-        //todo there seems to be a problem with activeMQ rollback
-    }
 }
