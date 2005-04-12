@@ -17,10 +17,9 @@ import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOServerEvent;
-import org.mule.umo.UMOServerEventListener;
 import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerEventListener;
 
 import java.util.HashSet;
 import java.util.Iterator;

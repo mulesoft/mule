@@ -19,7 +19,7 @@ import org.mule.MuleManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.management.stats.printers.CSVPrinter;
 import org.mule.management.stats.printers.HtmlTablePrinter;
-import org.mule.umo.UMOManager;
+import org.mule.umo.manager.UMOManager;
 
 import java.io.StringWriter;
 import java.util.Collection;

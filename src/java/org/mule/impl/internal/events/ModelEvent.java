@@ -14,7 +14,7 @@
 package org.mule.impl.internal.events;
 
 import org.mule.impl.MuleModel;
-import org.mule.umo.UMOServerEvent;
+import org.mule.umo.manager.UMOServerEvent;
 
 /**
  * <code>ModelEvent</code> is fired when an event such as the model starting

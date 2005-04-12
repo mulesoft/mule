@@ -16,7 +16,7 @@ package org.mule.test.mule;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.tck.AbstractUMOManagerTestCase;
-import org.mule.umo.UMOManager;
+import org.mule.umo.manager.UMOManager;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>

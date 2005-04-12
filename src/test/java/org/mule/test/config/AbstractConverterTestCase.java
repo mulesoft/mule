@@ -18,7 +18,7 @@ import com.mockobjects.dynamic.Mock;
 import org.apache.commons.beanutils.Converter;
 import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOManager;
+import org.mule.umo.manager.UMOManager;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>

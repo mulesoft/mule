@@ -13,14 +13,14 @@
  */
 package org.mule.config.pool;
 
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleProxy;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManager;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOManager;
 import org.mule.util.ClassHelper;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;

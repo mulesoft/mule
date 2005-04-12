@@ -16,11 +16,9 @@ package org.mule.config;
 import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import EDU.oswego.cs.dl.util.concurrent.ThreadFactory;
-import org.mule.util.DisposableThreadPool;
 import org.mule.impl.work.MuleWorkManager;
-import org.mule.umo.UMOWorkManager;
-
-import javax.resource.spi.work.WorkManager;
+import org.mule.umo.manager.UMOWorkManager;
+import org.mule.util.DisposableThreadPool;
 
 /**
  * <code>ThreadingProfile</code> is used to configure a thread pool. Mule uses a few

@@ -36,7 +36,7 @@ public interface UMOSession extends Serializable
     /**
      * Returns the UMOComponent associated with the session in its current execution
      * @return the UMOComponent associated with the session in its current execution
-     * @see UMOComponent
+     * @see org.mule.umo.UMOComponent
      */
     public UMOComponent getComponent();
 
@@ -45,10 +45,10 @@ public interface UMOSession extends Serializable
      * for this session
      * @param message the message to send
      * @return the result of the send if any
-     * @throws UMOException if there is no outbound endpoint configured on the
+     * @throws org.mule.umo.UMOException if there is no outbound endpoint configured on the
      * component or the events fails during dispatch
      */
-    public UMOMessage sendEvent(UMOMessage message) throws UMOException;    
+    public UMOMessage sendEvent(UMOMessage message) throws UMOException;
 
     /**
      * Depending on the session state this methods either Passes an event

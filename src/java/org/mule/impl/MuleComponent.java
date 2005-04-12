@@ -28,6 +28,7 @@ import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.*;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
+import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;

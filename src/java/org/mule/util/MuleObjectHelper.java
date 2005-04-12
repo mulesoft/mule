@@ -23,9 +23,9 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOFilter;
-import org.mule.umo.UMOManager;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Iterator;

@@ -30,16 +30,15 @@
 package org.mule.impl.work;
 
 import EDU.oswego.cs.dl.util.concurrent.Executor;
-
-import javax.resource.spi.work.*;
-import javax.resource.spi.XATerminator;
-
-import org.mule.config.ThreadingProfile;
-import org.mule.MuleManager;
-import org.mule.umo.UMOWorkManager;
-import org.mule.umo.UMOException;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.config.ThreadingProfile;
+import org.mule.umo.UMOException;
+import org.mule.umo.manager.UMOWorkManager;
+
+import javax.resource.spi.XATerminator;
+import javax.resource.spi.work.*;
 
 /**
  * <code>MuleWorkManager</code> is a Jca Work manager implementation used to

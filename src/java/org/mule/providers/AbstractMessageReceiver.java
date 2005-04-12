@@ -30,6 +30,7 @@ import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;

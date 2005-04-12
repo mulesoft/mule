@@ -18,7 +18,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleProxy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.UMOManager;
+import org.mule.umo.manager.UMOManager;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 

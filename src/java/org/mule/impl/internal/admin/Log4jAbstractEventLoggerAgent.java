@@ -15,20 +15,15 @@ package org.mule.impl.internal.admin;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Appender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.Priority;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.RollingFileAppender;
+import org.apache.log4j.*;
 import org.apache.log4j.net.SocketAppender;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.UMOServerEvent;
-import org.mule.util.PropertiesHelper;
-import org.mule.util.Utility;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOServerEvent;
+import org.mule.util.PropertiesHelper;
+import org.mule.util.Utility;
 
 import java.io.File;
 import java.io.IOException;

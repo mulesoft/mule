@@ -20,10 +20,10 @@ import org.apache.commons.beanutils.Converter;
 import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.umo.UMOManager;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
+import org.mule.umo.manager.UMOManager;
 
 /**
  * <code>TransformerConverter</code>will obtain an endpoint name and

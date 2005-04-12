@@ -466,7 +466,7 @@ public interface UMOEventContext
      * how events are dispached.
      *
      * @return Returns true is the user has set stopFurtherProcessing.
-     * @see UMOManager
+     * @see org.mule.umo.manager.UMOManager
      * @see UMOEventContext
      * @see org.mule.umo.lifecycle.Callable
      */

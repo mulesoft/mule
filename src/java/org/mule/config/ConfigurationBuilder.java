@@ -14,7 +14,7 @@
 
 package org.mule.config;
 
-import org.mule.umo.UMOManager;
+import org.mule.umo.manager.UMOManager;
 
 import java.io.Reader;
 

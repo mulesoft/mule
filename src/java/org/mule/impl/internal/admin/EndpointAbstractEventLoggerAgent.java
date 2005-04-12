@@ -18,10 +18,10 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOServerEvent;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
 /**

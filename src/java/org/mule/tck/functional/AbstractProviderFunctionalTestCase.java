@@ -20,9 +20,13 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.HashMap;

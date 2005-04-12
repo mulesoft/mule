@@ -20,8 +20,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.ComponentRoutingException;
+import org.mule.umo.routing.RoutingException;
 
 /**
  * <code>ComponentCatchAllStrategy</code> is used to catch any events and forward

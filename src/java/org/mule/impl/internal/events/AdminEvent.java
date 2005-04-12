@@ -14,7 +14,7 @@
 package org.mule.impl.internal.events;
 
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOServerEvent;
+import org.mule.umo.manager.UMOServerEvent;
 
 import java.util.HashMap;
 import java.util.Map;

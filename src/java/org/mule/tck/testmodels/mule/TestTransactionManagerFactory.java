@@ -14,7 +14,7 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.umo.UMOTransactionManagerFactory;
+import org.mule.umo.manager.UMOTransactionManagerFactory;
 
 import javax.transaction.TransactionManager;
 import java.lang.reflect.InvocationHandler;

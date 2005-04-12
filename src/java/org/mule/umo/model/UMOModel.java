@@ -21,9 +21,9 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 
+import java.beans.ExceptionListener;
 import java.util.Iterator;
 import java.util.List;
-import java.beans.ExceptionListener;
 
 /**
  * The <code>UMOModel</code> encapsulates and manages the runtime behaviour

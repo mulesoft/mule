@@ -13,23 +13,22 @@
  */
 package org.mule.config.builders;
 
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleModel;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManager;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 import java.util.Map;

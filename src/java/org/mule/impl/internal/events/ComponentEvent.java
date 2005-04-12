@@ -14,7 +14,7 @@
 package org.mule.impl.internal.events;
 
 import org.mule.impl.MuleDescriptor;
-import org.mule.umo.UMOServerEvent;
+import org.mule.umo.manager.UMOServerEvent;
 
 /**
  * <code>ComponentEvent</code> is fired when an event such as the component starting

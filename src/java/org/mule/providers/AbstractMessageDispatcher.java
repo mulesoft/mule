@@ -21,8 +21,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.*;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
