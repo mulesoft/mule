@@ -8,6 +8,12 @@
 
     <mule-environment-properties serverUrl=""/>
 
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="securityContext.xml"/>
+        </properties>
+    </container-context>
+
     <security-manager>
         <security-provider name="memory-dao" className="org.mule.extras.acegi.AcegiProviderAdapter">
             <properties>
@@ -20,12 +26,6 @@
             </properties>
         </encryption-strategy>
     </security-manager>
-    
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <property name="configFile" value="securityContext.xml"/>
-        </properties>
-    </container-context>
     
     <model name="test">
         <mule-descriptor name="echo" 

@@ -5,6 +5,12 @@
 
 <mule-configuration id="helloSampleProperties" version="1.0">
 
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="mule-events-app-context-with-ref-props.xml"/>
+        </properties>
+    </container-context>
+
     <connector name="TestConnector"
         className="org.mule.extras.spring.events.TestConnectorWithContainerDependents">
         <properties>
@@ -12,13 +18,6 @@
                 reference="apple"/>
         </properties>
     </connector>
-
-
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <property name="configFile" value="mule-events-app-context-with-ref-props.xml"/>
-        </properties>
-    </container-context>
 
     <model name="echoSample">
         <mule-descriptor name="EchoUMO"

@@ -13,13 +13,12 @@
  */
 package org.mule.extras.spring.config;
 
-import org.mule.tck.NamedTestCase;
-import org.mule.config.MuleProperties;
+import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.MuleManager;
-import org.mule.umo.manager.UMOContainerContext;
+import org.mule.tck.NamedTestCase;
 import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.UMOContainerContext;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -29,9 +28,15 @@ public class EmbeddedBeansXmlTestCase extends NamedTestCase
 {
     protected void setUp() throws Exception {
         super.setUp();
+        System.setProperty("org.mule.xml.validate", "false");
         if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("test-embedded-spring-config.xml");
+    }
+
+    protected void tearDown() throws Exception {
+        System.setProperty("org.mule.xml.validate", "true");
+        super.tearDown();
     }
 
     public void testContainer() throws Exception

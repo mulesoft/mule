@@ -12,7 +12,7 @@
 -->
 <!ELEMENT mule-configuration (description?,environment-properties?,mule-environment-properties?,container-context*,security-manager?,
  transaction-manager?,agents?,connector*,endpoint-identifiers?,transformers?,global-endpoints?,
-		    interceptor-stack*,model+,mule-descriptor*,bean*)>
+		    interceptor-stack*,model?,mule-descriptor*,bean*)>
 
 <!--
     The id attribute allows for a unique id for this file as it is often the case that
@@ -265,7 +265,7 @@ threading in every connector
     validate user credentials
 
   -->
-<!ELEMENT security-manager (security-provider*, encryption-strategy)>
+<!ELEMENT security-manager (security-provider*, encryption-strategy*)>
 
 <!--
 	The <i>className</i> is optional and specifies the security manager to use.

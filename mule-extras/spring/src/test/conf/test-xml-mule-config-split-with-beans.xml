@@ -6,21 +6,8 @@
 
 <mule-configuration id="Test_Mule_Properties_with_beans" version="1.0">
 
-    <bean id="beanConnector" class="org.mule.providers.vm.VMConnector">
-        <spring-property name="queueEvents">
-            <value>true</value>
-        </spring-property>
-    </bean>
-
     <mule-descriptor name="appleComponent3"
         implementation="org.mule.tck.testmodels.fruit.Apple">
-
-        <bean name="exceptionListener" class="org.mule.impl.DefaultExceptionStrategy"/>
-
-        <bean name="version" class="java.lang.String">
-            <constructor-arg><value>1.1</value></constructor-arg>
-        </bean>
-
         <inbound-router>
             <endpoint name="inboundEndpoint3" type="receiver" address="test://endpoint.in33">
                 <properties>
@@ -41,8 +28,12 @@
         <properties>
             <spring-property name="springMap">
                 <spring-map>
-                    <spring-entry key="Entry1"><value>Value1</value></spring-entry>
-                    <spring-entry key="Entry2"><value>Value2</value></spring-entry>
+                    <spring-entry key="Entry1">
+                        <value>Value1</value>
+                    </spring-entry>
+                    <spring-entry key="Entry2">
+                        <value>Value2</value>
+                    </spring-entry>
                 </spring-map>
             </spring-property>
             <spring-property name="springList">
@@ -59,5 +50,19 @@
                 </set>
             </spring-property>
         </properties>
+        <bean name="exceptionListener" class="org.mule.impl.DefaultExceptionStrategy"/>
+
+        <bean name="version" class="java.lang.String">
+            <constructor-arg>
+                <value>1.1</value>
+            </constructor-arg>
+        </bean>
+
     </mule-descriptor>
+
+    <bean id="beanConnector" class="org.mule.providers.vm.VMConnector">
+        <spring-property name="queueEvents">
+            <value>true</value>
+        </spring-property>
+    </bean>
 </mule-configuration>
