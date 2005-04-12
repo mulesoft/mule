@@ -16,10 +16,10 @@ import org.mule.umo.security.UMOAuthentication;
  */
 public class PGPAuthentication implements UMOAuthentication {
 
-    boolean authenticated;
+    boolean authenticated=false;
     private String userName;
     private Message message;
-    private KeyBundle userKeyBundle;
+    private KeyBundle userKeyBundle=null;
     
     public PGPAuthentication(String userName, Message message) {
         this.userName=userName;
