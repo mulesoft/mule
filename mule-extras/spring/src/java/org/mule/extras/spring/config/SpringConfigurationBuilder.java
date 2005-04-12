@@ -17,13 +17,12 @@ package org.mule.extras.spring.config;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
+import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.manager.UMOManager;
 import org.springframework.util.StringUtils;
-
-import java.io.Reader;
 
 /**
  * <code>SpringConfigurationBuilder</code> Enables Mule to be loaded from
@@ -49,7 +48,7 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
      * @throws org.mule.config.ConfigurationException
      *
      */
-    public UMOManager configure(Reader[] configResources) throws ConfigurationException
+    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
     {
         throw new UnsupportedOperationException("Not implemented yet");
     }

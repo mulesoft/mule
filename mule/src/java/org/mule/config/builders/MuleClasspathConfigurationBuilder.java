@@ -16,12 +16,16 @@ package org.mule.config.builders;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
+import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.UMOManager;
 
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * <code>MuleClasspathConfigurationBuilder</code> can be used to configure a MuleManager
@@ -66,19 +70,23 @@ public class MuleClasspathConfigurationBuilder extends MuleXmlConfigurationBuild
         }
 
         URL url = null;
+        List list = new ArrayList();
         try
         {
             Enumeration e = Thread.currentThread().getContextClassLoader().getResources(configResources);
+
             while(e.hasMoreElements()) {
                 url = (URL)e.nextElement();
                 logger.info("Loading resource: " + url.toExternalForm());
-                digester.parse(url.openStream());
+                list.add(new ReaderResource(url.toExternalForm(), new InputStreamReader(url.openStream())));
             }
         } catch (Exception e)
         {
             throw new ConfigurationException(new Message(Messages.FAILED_LOAD_X, "Config: " + url.toString()), e);
         }
-
+        ReaderResource[] resources = new ReaderResource[list.size()];
+        resources = (ReaderResource[])list.toArray(resources);
+        configure(resources);
         return manager;
     }
 }
