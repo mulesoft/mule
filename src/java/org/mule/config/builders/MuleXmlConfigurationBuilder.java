@@ -139,7 +139,15 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         ConvertUtils.register(new TransactionFactoryConverter(), UMOTransactionFactory.class);
         ConvertUtils.register(new EndpointURIConverter(), UMOEndpointURI.class);
 
-        digester = new Digester();
+        //This is a hack to stop Digester spitting out unnecessary warnings where there is
+        // a customer error handler registered
+        digester = new Digester() {
+            public void warning(SAXParseException e) throws SAXException {
+                if(errorHandler!=null) {
+                    errorHandler.warning(e);
+                }
+            }
+        };
         digester.setEntityResolver(new MuleDtdResolver());
 
         String temp = System.getProperty("org.mule.xml.validate", "true");
@@ -1377,7 +1385,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 } else {
                     logger.info("Property for placeholder: '" + key + "' was not found.  Leaving place holder as is");
                 }
-                x = value.indexOf("${");
+                x = value.indexOf("${", y);
             }
             attribs.setValue(i, value);
         }

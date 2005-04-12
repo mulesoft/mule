@@ -93,5 +93,8 @@ public class PropertyTemplatesTestCase extends NamedTestCase
         List list = (List)d.getProperties().get("testList");
         assertNotNull(list);
         assertEquals("bar entry", list.get(0).toString());
+
+        assertEquals("${this should not be found}", d.getProperties().get("blah"));
+        assertEquals("two tags foo entry and bar entry.", d.getProperties().get("foobar"));
     }
 }
