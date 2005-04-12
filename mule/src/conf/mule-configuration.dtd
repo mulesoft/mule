@@ -75,7 +75,9 @@
      send, dispatch or receive request from a remote client. If not specified the default will
      be used of tcp://localhost:60504.
      Note users can explicitly configure the MuleManagerComponent that serves these type of
-     requests and this variable need not be set.
+     requests and this variable need not be set. Setting this to an empty string
+     "" will disable the server admin component.  Often client only and test configurations
+     will want to do this.
 -->
 <!ATTLIST mule-environment-properties serverUrl  		            CDATA          #IMPLIED>
 
