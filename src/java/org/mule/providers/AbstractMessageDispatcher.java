@@ -87,6 +87,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 	 */
     public final void dispatch(UMOEvent event) throws Exception {
         try {
+            event.setSynchronous(false);
+            event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
+            RequestContext.setEvent(event);
             //Apply Security filter if one is set
             UMOEndpoint endpoint = event.getEndpoint();
             if (endpoint.getSecurityFilter() != null) {
@@ -98,10 +101,10 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     return;
                 }
             }
+            //the security filter may update the payload so we need to get the
+            //latest event again
+            event = RequestContext.getEvent();
 
-            event.setSynchronous(false);
-            event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
-            RequestContext.setEvent(event);
             UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
             if (doThreading && !event.isSynchronous() && tx == null) {
                 workManager.scheduleWork(new Worker(event));
