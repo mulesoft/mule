@@ -58,11 +58,7 @@
             <inbound-router>
                 <endpoint address="http://localhost:8081"></endpoint>
             </inbound-router>
-            <response-router stopProcessing="false" >
-                <router className="org.mule.test.usecases.service.DummyResponseAggregator">
-                </router>
-                <endpoint address="vm://W10Response"></endpoint>
-            </response-router>
+
             <outbound-router matchAll="false">
                 <router className="org.mule.routing.outbound.MulticastingRouter">
                     <endpoint address="vm://getReportW10"></endpoint>
@@ -72,6 +68,11 @@
                     </properties>
                 </router>
             </outbound-router>
+            <response-router stopProcessing="false" >
+                <endpoint address="vm://W10Response"></endpoint>
+                <router className="org.mule.test.usecases.service.DummyResponseAggregator">
+                </router>
+            </response-router>
         </mule-descriptor>
 
         <mule-descriptor implementation="org.mule.components.simple.EchoComponent" name="W10Report">

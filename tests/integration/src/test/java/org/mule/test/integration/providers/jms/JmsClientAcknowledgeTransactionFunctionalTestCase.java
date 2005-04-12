@@ -65,15 +65,7 @@ public class JmsClientAcknowledgeTransactionFunctionalTestCase extends AbstractJ
     	// Rollback not allowed for client acknowledge
     }
 
-//    public void testSendBatchTransactedRollback() throws Exception
-//    {
-//        try
-//        {
-//            super.testSendTransactedRollback();
-//            fail("Cant roll back client acknowledge transactions");
-//        } catch (UnsupportedOperationException e)
-//        {
-//            //expected
-//        }
-//    }
+    public void testTransactedRedeliveryToDLDestination() throws Exception {
+        //messages are not marked for redelivery in Client Ack mode
+    }
 }

@@ -28,9 +28,9 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
                     <endpoint address="jms://my.queue1"/>
                     <endpoint address="jms://my.queue2"/>
+                    <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -44,9 +44,9 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <transaction action="ALWAYS_JOIN"/>
                     <endpoint address="jms://my.queue3"/>
                     <endpoint address="jms://my.queue4"/>
+                    <transaction action="ALWAYS_JOIN"/>                    
                 </router>
             </outbound-router>
         </mule-descriptor>

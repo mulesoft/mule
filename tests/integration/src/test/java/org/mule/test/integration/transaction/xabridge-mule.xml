@@ -6,6 +6,13 @@
 
    <mule-environment-properties synchronous="false" synchronousEventTimeout="5000"/>
 
+    <!-- Container context -->
+	<container-context name="spring"  className="org.mule.extras.spring.SpringContainerContext">
+		<properties>
+			<property name="configFile" value="org/mule/test/integration/transaction/xabridge-spring.xml"/>
+		</properties>
+	</container-context>
+
 	<!-- Transaction manager -->
 	<transaction-manager 
 		factory="org.mule.extras.jotm.JotmTransactionManagerFactory" />
@@ -22,6 +29,7 @@
 			</map>
 		</properties>
     </connector>
+
     <connector name="jdbcConnector" className="org.mule.providers.jdbc.JdbcConnector">
     	<properties>
 			<property name="pollingFrequency" value="1000"/>
@@ -33,13 +41,6 @@
 			</map>
     	</properties>
     </connector>
-
-	<!-- Container context -->
-	<container-context name="spring"  className="org.mule.extras.spring.SpringContainerContext">
-		<properties>
-			<property name="configFile" value="org/mule/test/integration/transaction/xabridge-spring.xml"/>
-		</properties>
-	</container-context>
 
     <model name="model">
 		
