@@ -251,6 +251,10 @@ public class MuleProxy implements Work, Lifecycle
             {
                 RequestContext.setEvent(event);
                 Object replyTo = event.getMessage().getReplyTo();
+                ReplyToHandler replyToHandler = null;
+                if(replyTo!=null) {
+                    replyToHandler = ((AbstractConnector) event.getEndpoint().getConnector()).getReplyToHandler();
+                }
                 InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor, event.getMessage());
 
                 //stats
@@ -284,18 +288,13 @@ public class MuleProxy implements Work, Lifecycle
                 }
 
                 //process repltyTo if there is one
-                if (result != null && replyTo != null)
+                if (result != null && replyToHandler != null)
                 {
                     String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-
-                    ReplyToHandler replyToHandler = ((AbstractConnector) event.getEndpoint().getConnector()).getReplyToHandler();
-                    if (replyToHandler != null)
+                    if ((requestor != null && !requestor.equals(descriptor.getName())) ||
+                            requestor == null)
                     {
-                        if ((requestor != null && !requestor.equals(descriptor.getName())) ||
-                                requestor == null)
-                        {
-                            replyToHandler.processReplyTo(event, result, replyTo);
-                        }
+                        replyToHandler.processReplyTo(event, result, replyTo);
                     }
                 }
             } else

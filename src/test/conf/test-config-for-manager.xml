@@ -5,14 +5,14 @@
 
 <mule-configuration id="Test_Mule_Properties" version="1.0">
 
+    <environment-properties>
+        <property name="envProperty1" value="value1"/>
+    </environment-properties>
+
     <mule-environment-properties
         synchronous="false"
         serverUrl=""
         model="test-dev"/>
-
-    <environment-properties>
-        <property name="envProperty1" value="value1"/>
-    </environment-properties>
 
     <transaction-manager factory="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
 
