@@ -11,36 +11,47 @@
         <file-properties location="test-template.properties"/>
     </environment-properties>
 
-    <mule-environment-properties synchronous="false" model="${model.name}" serverUrl="" />
+    <mule-environment-properties synchronous="false" model="${model.name}" serverUrl=""/>
 
-    <connector name="${connector.name}" className="org.mule.tck.testmodels.mule.TestConnector">
+    <connector name="myTestConnector" className="org.mule.tck.testmodels.mule.TestConnector">
+        <properties>
+            <property name="retryCount" value="${retry.count}"/>
+        </properties>
     </connector>
 
     <model name="${model.name}">
         <mule-descriptor name="${component.name}" implementation="org.mule.components.simple.EchoComponent"
-        inboundEndpoint="${test.inbound.endpoint}"
-        outboundEndpoint="${test.outbound.endpoint}"/>
-        
+            inboundEndpoint="${test.inbound.endpoint}"
+            outboundEndpoint="${test.outbound.endpoint}"/>
+
         <mule-descriptor name="test2" implementation="org.mule.components.simple.EchoComponent">
-        <inbound-router>
-            <endpoint address="test://blah" name="ep1">
-                <properties>
-                    <property name="prop2" value="overrideValue2"/>
-                    <file-properties location="test-dummy.properties" override="false"/>
-                </properties>
-            </endpoint>
-        </inbound-router>
+            <inbound-router>
+                <endpoint address="test://blah" name="ep1">
+                    <properties>
+                        <property name="prop2" value="overrideValue2"/>
+                        <file-properties location="test-dummy.properties" override="false"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="test3" implementation="org.mule.components.simple.EchoComponent">
-        <inbound-router>
-            <endpoint address="test://${test.embedded}" name="ep2">
-                <properties>
-                    <property name="prop2" value="overrideValue2"/>
-                    <file-properties location="test-dummy.properties" override="true"/>
-                </properties>
-            </endpoint>
-        </inbound-router>
+            <inbound-router>
+                <endpoint address="test://${test.embedded}" name="ep2">
+                    <properties>
+                        <property name="prop2" value="overrideValue2"/>
+                        <file-properties location="test-dummy.properties" override="true"/>
+                    </properties>
+                </endpoint>
+            </inbound-router>
+            <properties>
+                <map name="testMap">
+                    <property name="foo" value="${foo}"/>
+                </map>
+                <list name="testList">
+                    <entry value="${bar}"/>
+                </list>
+            </properties>
         </mule-descriptor>
     </model>
 </mule-configuration>

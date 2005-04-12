@@ -6,6 +6,14 @@
 
 <mule-configuration id="Test_Mule_Properties" version="1.0">
 
+    <environment-properties>
+        <!-- Whether mule transfromers should use compression when sending and recieving messages -->
+        <property name="doCompression" value="true"/>
+        <property name="beanProperty1" value="this was set from the manager properties!"/>
+        <system-property name="OS Version" key="os.version"/>
+        <system-property name="system-prop2" key="system-prop2" defaultValue="default"/>
+    </environment-properties>
+
     <mule-environment-properties
         synchronous="false"
         model="test-model">
@@ -16,14 +24,6 @@
             <persistence-strategy className="org.mule.util.queue.SerialisationPersistence"/>
         </queue-profile>
     </mule-environment-properties>
-
-    <environment-properties>
-        <!-- Whether mule transfromers should use compression when sending and recieving messages -->
-        <property name="doCompression" value="true"/>
-        <property name="beanProperty1" value="this was set from the manager properties!"/>
-        <system-property name="OS Version" key="os.version"/>
-        <system-property name="system-prop2" key="system-prop2" defaultValue="default"/>
-    </environment-properties>
 
     <transaction-manager factory="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>
 
@@ -86,20 +86,14 @@
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
                     <endpoint address="test://catch.all"/>
                 </catch-all-strategy>
+                <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer"/>
                 <global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">
+                    <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="java.lang.String"/>
                     <properties>
                         <property name="testLocal" value="value1"/>
                     </properties>
-                    <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="java.lang.String"/>
                 </global-endpoint>
-                <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer"/>
             </inbound-router>
-
-            <response-router transformers="TestCompressionTransformer">
-                <endpoint address="test://response1"/>
-                <global-endpoint name="appleResponseEndpoint"/>
-                <router className="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
-            </response-router>
 
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
@@ -107,8 +101,18 @@
                 </router>
             </outbound-router>
 
+            <response-router transformers="TestCompressionTransformer">
+                <endpoint address="test://response1"/>
+                <global-endpoint name="appleResponseEndpoint"/>
+                <router className="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
+            </response-router>
+
             <interceptor className="default"/>
             <interceptor className="org.mule.interceptors.TimerInterceptor"/>
+
+            <exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
+                   <endpoint address="test://orange.exceptions"/>
+                </exception-strategy>
 
             <properties>
                 <factory-property name="orange" factory="org.mule.tck.testmodels.fruit.Orange"/>
@@ -130,17 +134,13 @@
                     <entry value="prop6"/>
                 </list>
             </properties>
-             <exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
-                   <endpoint address="test://orange.exceptions"/>
-                </exception-strategy>
-
         </mule-descriptor>
 
         <mule-descriptor name="appleComponent"
             implementation="org.mule.tck.testmodels.fruit.Apple">
             <inbound-router>
-                <global-endpoint name="appleInEndpoint"/>
                 <catch-all-strategy className="org.mule.tck.testmodels.mule.TestCatchAllStrategy"/>
+                <global-endpoint name="appleInEndpoint"/>
                 <router className="org.mule.routing.inbound.SelectiveConsumer">
                     <filter expectedType="java.lang.String" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
