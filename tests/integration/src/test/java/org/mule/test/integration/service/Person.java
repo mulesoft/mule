@@ -13,9 +13,6 @@
  */
 package org.mule.test.integration.service;
 
-import org.mule.providers.soap.*;
-import org.mule.providers.soap.Address;
-
 /**
  * <code>Person</code> part of the test PeopleService
  *
@@ -27,7 +24,7 @@ public class Person
 {
     private String firstName;
     private String lastName;
-    private org.mule.providers.soap.Address address =new Address();
+    private Address address =new Address();
 
     public Person()
     {

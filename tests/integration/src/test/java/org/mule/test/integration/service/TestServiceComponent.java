@@ -28,7 +28,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class TestServiceComponent extends FunctionalTestComponent implements org.mule.components.simple.EchoService, org.mule.providers.soap.DateService, PeopleService
+public class TestServiceComponent extends FunctionalTestComponent implements org.mule.components.simple.EchoService, DateService, PeopleService
 {
     private static transient Log logger = LogFactory.getLog(FunctionalTestComponent.class);
 

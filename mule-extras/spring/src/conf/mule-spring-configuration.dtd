@@ -76,7 +76,7 @@
      Note users can explicitly configure the MuleManagerComponent that serves these type of
      requests and this variable need not be set.
 -->
-<!ATTLIST mule-environment-properties serverUrl  		            NMTOKEN          #IMPLIED>
+<!ATTLIST mule-environment-properties serverUrl  		            CDATA          #IMPLIED>
 
 <!--
      Determines whether Mule's internal queues are persisted.  If the server dies unexpectedly Mule

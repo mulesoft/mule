@@ -6,36 +6,13 @@
 <mule-configuration id="endpoint_test" version="1.0">
 
     <container-context className="org.mule.extras.plexus.PlexusContainerContext">
-        <configuration>
-            <plexus>
-                <components>
-                    <component>
-                        <role>plexus-Apple</role>
-                        <implementation>org.mule.tck.testmodels.fruit.Apple</implementation>
-                    </component>
-                    <component>
-                        <role>plexus-Banana</role>
-                        <implementation>org.mule.tck.testmodels.fruit.Banana</implementation>
-                    </component>
-                    <component>
-                        <role>Orange</role>
-                        <implementation>org.mule.tck.testmodels.fruit.Orange</implementation>
-                    </component>
-                </components>
-            </plexus>
-        </configuration>
+        <properties>
+            <property name="configFile" value="org/mule/test/integration/config/plexus-config.xml"/>
+        </properties>
     </container-context>
     <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <configuration >
-            <beans>
-                <bean name="spring-Apple" class="org.mule.tck.testmodels.fruit.Apple">
-                </bean>
-                <bean name="spring-Banana" class="org.mule.tck.testmodels.fruit.Banana">
-                </bean>
-                <bean name="Orange" class="org.mule.tck.testmodels.fruit.Orange">
-                    <property name="segments"><value>8</value></property>
-                </bean>
-            </beans>
-        </configuration>
+        <properties>
+            <property name="configFile" value="org/mule/test/integration/config/spring-config.xml"/>
+        </properties>
     </container-context>
 </mule-configuration>

@@ -71,8 +71,8 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <global-endpoint name="testEndpoint2"/>
                     <endpoint address="udp://localhost:56731"/>
+                    <global-endpoint name="testEndpoint2"/>
                 </router>
             </outbound-router>
         </mule-descriptor>

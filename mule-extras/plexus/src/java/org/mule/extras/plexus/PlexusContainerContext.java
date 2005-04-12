@@ -18,17 +18,15 @@ import org.codehaus.plexus.embed.Embedder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.UMOContainerContext;
+import org.mule.impl.container.AbstractContainerContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.Utility;
-import org.mule.impl.container.AbstractContainerContext;
 
 import java.io.Reader;
 import java.net.URL;
-import java.util.Map;
 /**
  * <code>PlexusContainerContext</code> integrate the plexus container with Mule so that Mule
  * objects can be constructed using Plexus-managed objects
@@ -40,7 +38,7 @@ import java.util.Map;
 public class PlexusContainerContext extends AbstractContainerContext
 {
     protected Embedder container;
-    protected URL configFile;
+    protected String configFile;
 
     public PlexusContainerContext()
     {
@@ -81,27 +79,18 @@ public class PlexusContainerContext extends AbstractContainerContext
         }
     }
 
-    public URL getConfigFile()
+    public String getConfigFile()
     {
         return configFile;
     }
 
-    public void setConfigFile(URL configFile)
-    {
-         this.configFile = configFile;
-    }
 
     /**
      * @param configFile The configFile to set.
      */
     public void setConfigFile(String configFile) throws ConfigurationException
     {
-        URL url = Utility.getResource(configFile, getClass());
-        if (url == null)
-        {
-            throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configFile));
-        }
-        setConfigFile(url);
+        this.configFile = configFile;
     }
 
     public void initialise() throws InitialisationException, RecoverableException
@@ -109,7 +98,12 @@ public class PlexusContainerContext extends AbstractContainerContext
         if(configFile==null) return;
         try
         {
-            container.setConfiguration(configFile);
+            URL url = Utility.getResource(configFile, getClass());
+            if (url == null)
+            {
+                throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configFile));
+            }
+            container.setConfiguration(url);
             container.start();
         } catch (Exception e)
         {
