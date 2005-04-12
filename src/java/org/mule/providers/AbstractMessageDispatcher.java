@@ -126,6 +126,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     public final UMOMessage send(UMOEvent event) throws Exception {
         try {
+            event.setSynchronous(true);
+            event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
+            RequestContext.setEvent(event);
             //Apply Security filter if one is set
             UMOEndpoint endpoint = event.getEndpoint();
             if (endpoint.getSecurityFilter() != null) {
@@ -137,10 +140,10 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     return event.getMessage();
                 }
             }
+            //the security filter may update the payload so we need to get the
+            //latest event again
+            event = RequestContext.getEvent();
             try {
-                event.setSynchronous(true);
-                event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
-                RequestContext.setEvent(event);
                 UMOMessage result = doSend(event);
 
                 return result;
