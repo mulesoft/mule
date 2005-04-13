@@ -146,8 +146,9 @@
                 <!-- Disable Multicast tests unless configured -->
                 <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
 
-<!--                <exclude>**/*FunctionalTestCase.*</exclude>-->
-<!--                <exclude>**/Https*.*</exclude>-->
+                <!-- this fail unless as security patch is applied to JAVA_HOME/lib -->
+                <exclude>**/KeyBasedEncryptionStrategyTestCase.*</exclude>
+                <exclude>**/PGPSecurityFilterTestCase.*</exclude>
 
                 <!-- sometimes fails failing to bind -->
                 <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
