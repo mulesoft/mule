@@ -52,7 +52,7 @@ public class ThreadingProfile
     /**
      * Default value for MAX_THREAD_TTL
      */
-    public static final long DEFAULT_MAX_THREAD_TTL = -1;
+    public static final long DEFAULT_MAX_THREAD_TTL = 60000;
 
     /**
      * Default value for do threading
@@ -298,12 +298,18 @@ public class ThreadingProfile
     }
 
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("ThreadingProfile: maxActive=").append(maxThreadsActive);
-        buffer.append(", maxIdle=").append(maxThreadsIdle);
-        buffer.append(", threadTTL=").append(threadTTL);
-        buffer.append(", poolExhaustPolicy=").append(this.poolExhaustPolicy);
-        return buffer.toString();
+        return "ThreadingProfile{" +
+                "maxThreadsActive=" + maxThreadsActive +
+                ", maxThreadsIdle=" + maxThreadsIdle +
+                ", maxBufferSize=" + maxBufferSize +
+                ", threadTTL=" + threadTTL +
+                ", poolExhaustPolicy=" + poolExhaustPolicy +
+                ", doThreading=" + doThreading +
+                ", threadPriority=" + threadPriority +
+                ", workManagerFactory=" + workManagerFactory +
+                ", blockedExecutionHandler=" + blockedExecutionHandler +
+                ", threadFactory=" + threadFactory +
+                "}";
     }
 
     public static class NamedThreadFactory implements ThreadFactory
