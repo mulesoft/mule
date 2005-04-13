@@ -256,11 +256,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
     	JmsUtils.closeQuietly(producer);
     	JmsUtils.closeQuietly(consumer);
     	JmsUtils.closeQuietly(receiveSession);
-        //only close the session if a tx is not in progress.  Otherwise
-        //let the consumer close it
-        if(TransactionCoordination.getInstance().getTransaction()==null) {
-    	    JmsUtils.closeQuietly(session);
-        }
+    	JmsUtils.closeQuietly(session);
         producer = null;
         consumer = null;
         receiveSession = null;

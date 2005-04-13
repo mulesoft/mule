@@ -18,7 +18,6 @@ import org.mule.providers.DefaultReplyToHandler;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 
@@ -31,22 +30,21 @@ import javax.jms.*;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposable
+public class JmsReplyToHandler extends DefaultReplyToHandler
 {
     private JmsConnector connector;
-    private Session session;
-    private MessageProducer replyToProducer;
 
-    public JmsReplyToHandler(JmsConnector connector, Session session, UMOTransformer transformer)
+    public JmsReplyToHandler(JmsConnector connector, UMOTransformer transformer)
     {
         super(transformer);
         this.connector = connector;
-        this.session = session;
     }
 
     public void processReplyTo(UMOEvent event, UMOMessage returnMessage, Object replyTo) throws UMOException
     {
         Destination replyToDestination = null;
+        MessageProducer replyToProducer = null;
+        Session session = null;
         try
         {
             // now we need to send the response
@@ -64,16 +62,14 @@ public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposab
             {
                 payload = getTransformer().transform(payload);
             }
+            session = connector.getSession(false);
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);
 
             if (logger.isDebugEnabled())
             {
                 logger.debug("Sending jms reply to: " + replyToDestination + "(" + replyToDestination.getClass().getName() + ")");
             }
-            if (replyToProducer == null)
-            {
-                replyToProducer = ((JmsConnector) connector).getJmsSupport().createProducer(session, replyToDestination);
-            }
+            replyToProducer = ((JmsConnector) connector).getJmsSupport().createProducer(session, replyToDestination);
 
             //QoS support
             String ttlString = (String) event.removeProperty("TimeToLive");
@@ -104,18 +100,8 @@ public class JmsReplyToHandler extends DefaultReplyToHandler implements Disposab
             throw new DispatchException(new org.mule.config.i18n.Message("jms", 8, replyToDestination), returnMessage, null);
         } finally
         {
-            dispose();
-        }
-    }
-
-    public void dispose()
-    {
-        try
-        {
-            if (replyToProducer != null) replyToProducer.close();
-        } catch (JMSException e)
-        {
-            logger.error("Failed to close replyTo producer: " + e.getMessage(), e);
+            JmsUtils.closeQuietly(replyToProducer);
+            JmsUtils.closeQuietly(session);
         }
     }
 }

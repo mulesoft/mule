@@ -483,15 +483,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 
     public ReplyToHandler getReplyToHandler()
     {
-        try
-        {
-            Session session = getSession(false);
-            return new JmsReplyToHandler(this, session, defaultResponseTransformer);
-        } catch (JMSException e)
-        {
-            logger.error("failed to get replyTo handler: " + e.getMessage(), e);
-            return null;
-        }
+        return new JmsReplyToHandler(this, defaultResponseTransformer);
     }
 
     public String getUsername()
