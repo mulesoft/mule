@@ -1,8 +1,15 @@
 /*
- * Project: mule-extras-pgp
- * Author : ariva
- * Created on 21-mar-2005
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
  *
+ * Copyright (c) Cubis Limited. All rights reserved.
+ * http://www.cubis.co.uk
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
  */
 package org.mule.extras.pgp.filters;
 
@@ -35,7 +42,7 @@ import java.util.Collection;
 
 /**
  * @author ariva
- *  
+ *
  */
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
     protected static transient Log logger = LogFactory.getLog(PGPSecurityFilter.class);
@@ -50,14 +57,14 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.impl.security.AbstractEndpointSecurityFilter#authenticateInbound(org.mule.umo.UMOEvent)
      */
     protected void authenticateInbound(UMOEvent event) throws SecurityException, UnauthorisedException,
             UnknownAuthenticationTypeException {
         UMOMessage message = event.getMessage();
 
-        String userId=(String)getCredentialsAccessor().getCredentials(event);
+        String userId = (String) getCredentialsAccessor().getCredentials(event);
 
         byte[] creds = null;
 
@@ -133,27 +140,20 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.impl.security.AbstractEndpointSecurityFilter#authenticateOutbound(org.mule.umo.UMOEvent)
      */
     protected void authenticateOutbound(UMOEvent event) throws SecurityException, UnauthorisedException {
-        logger.debug("authenticateOutbound:"+event.getId());
-        
-        UMOMessage message = event.getMessage();
+        logger.debug("authenticateOutbound:" + event.getId());
 
-        UMOAuthentication authentication = event.getSession().getSecurityContext().getAuthentication();
-
-        if ((authentication == null) || !(authentication instanceof PGPAuthentication) || (authentication.getDetails() == null)) {
-            if (isAuthenticate()) {
-                throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.AUTH_SET_TO_X_BUT_NO_CONTEXT,
-                        strategyName));
-            } else {
-                return;
-            }
+        if (!isAuthenticate()) {
+            return;
         }
 
-        KeyBundle userKeyBundle =keyManager.getKeyBundle((String)getCredentialsAccessor().getCredentials(event));
-        
+        UMOMessage message = event.getMessage();
+
+        KeyBundle userKeyBundle = keyManager.getKeyBundle((String) getCredentialsAccessor().getCredentials(event));
+
         PGPCryptInfo cryptInfo = new PGPCryptInfo(userKeyBundle, signRequired);
 
         byte[] msg = null;
@@ -167,9 +167,9 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
         }
 
         try {
-            String mesg=new String(msg);
+            String mesg = new String(msg);
             RequestContext.rewriteEvent(new MuleMessage(mesg, null));
-            logger.debug("Message:"+mesg);
+            logger.debug("Message:" + mesg);
         } catch (Exception e2) {
             throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(), event.getEndpoint(),
                     this);
@@ -178,7 +178,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.impl.security.AbstractEndpointSecurityFilter#doInitialise()
      */
     protected void doInitialise() throws InitialisationException {
