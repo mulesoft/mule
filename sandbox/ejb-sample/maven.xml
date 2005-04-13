@@ -18,7 +18,7 @@
     
     <preGoal name="ejb:ejb">
     	<echo>copying appserver files from ${maven.src.dir}/conf/${appserver} to ${maven.build.dir}/classes</echo>
-    	<ant:copy todir="${maven.build.dir}/classes">
+    	<ant:copy todir="${maven.build.dir}/classes/META-INF">
     	    <ant:fileset dir="${maven.src.dir}/conf/${appserver}" includes="*"/>
     	</ant:copy>
     </preGoal>

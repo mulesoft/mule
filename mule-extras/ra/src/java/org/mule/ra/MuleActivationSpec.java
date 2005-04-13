@@ -39,7 +39,8 @@ public class MuleActivationSpec implements ActivationSpec
     private String connectorName;
     private int createConnector;
     private MuleResourceAdapter resourceAdapter;
-    private UMOEndpointURI endpoint;
+    private String endpoint;
+    private UMOEndpointURI endpointURI;
 
     public Properties getPropertiesMap() {
         return propertiesMap;
@@ -88,27 +89,34 @@ public class MuleActivationSpec implements ActivationSpec
     }
 
 
-    public UMOEndpointURI getEndpoint() {
+    public String getEndpoint() {
         return endpoint;
     }
 
-    public void setEndpoint(UMOEndpointURI endpoint) {
+    public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
-    }
 
-    public void setEndpoint(String endpoint) throws MalformedEndpointException {
-        this.endpoint = new MuleEndpointURI(endpoint);
-        if(propertiesMap!=null) {
-            propertiesMap.putAll(this.endpoint.getParams());
-        } else {
-            propertiesMap = this.endpoint.getParams();
-        }
     }
 
     public void validate() throws InvalidPropertyException
     {
+        try {
+            this.endpointURI = new MuleEndpointURI(endpoint);
+        } catch (MalformedEndpointException e) {
+            throw new InvalidPropertyException(e);
+        }
+
+        if(propertiesMap!=null) {
+            propertiesMap.putAll(this.endpointURI.getParams());
+        } else {
+            propertiesMap = this.endpointURI.getParams();
+        }
         if(endpoint==null) {
-            throw new InvalidPropertyException("endpoint");
+            throw new InvalidPropertyException("endpoint is null");
+        }
+
+        if(endpointURI==null) {
+            throw new InvalidPropertyException("endpointURI is null");
         }
     }
 

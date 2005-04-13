@@ -39,7 +39,7 @@
          <ejb-class>org.mule.samples.ejb.SimpleReceiverMessageBean</ejb-class>
          <messaging-type>org.mule.umo.lifecycle.Callable</messaging-type>
          <transaction-type>Container</transaction-type>
-         <activation-config>
+        <activation-config>
             <activation-config-property>
                <activation-config-property-name>endpoint</activation-config-property-name>
                <activation-config-property-value>tcp://localhost:12345</activation-config-property-value>

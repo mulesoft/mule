@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openejb-jar
+    xmlns="http://www.openejb.org/xml/ns/openejb-jar"
+    configId="org/mule/samples/ejb"
+    parentId="org/apache/geronimo/Server">
+
+    <enterprise-beans>
+        <session>
+            <ejb-name>SenderEJB</ejb-name>
+            <jndi-name>local/SenderEJB</jndi-name>
+        </session>
+        <message-driven>
+            <ejb-name>TcpReceiverMDB</ejb-name>
+            <resource-adapter>
+                <resource-link>org/mule/ra/Server</resource-link>
+            </resource-adapter>
+        </message-driven>
+    </enterprise-beans>
+</openejb-jar>

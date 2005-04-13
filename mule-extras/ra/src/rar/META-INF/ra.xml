@@ -50,13 +50,13 @@
             <description>The default user name that will be used to log on to the Mule server.</description>
             <config-property-name>Username</config-property-name>
             <config-property-type>java.lang.String</config-property-type>
-            <config-property-value>defaultUser</config-property-value>
+            <config-property-value></config-property-value>
         </config-property>
         <config-property>
             <description>The password for the default User.</description>
             <config-property-name>Password</config-property-name>
             <config-property-type>java.lang.String</config-property-type>
-            <config-property-value>defaultPassword</config-property-value>
+            <config-property-value></config-property-value>
         </config-property>
         <outbound-resourceadapter>
             <connection-definition>
@@ -73,6 +73,7 @@
             </authentication-mechanism>
             <reauthentication-support>false</reauthentication-support>
         </outbound-resourceadapter>
+
         <inbound-resourceadapter>
             <messageadapter>
                 <messagelistener>

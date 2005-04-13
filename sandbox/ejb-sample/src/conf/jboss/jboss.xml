@@ -3,9 +3,8 @@
   <!DOCTYPE jboss PUBLIC "-//JBoss//DTD JBOSS 4.0//EN" "http://www.jboss.org/j2ee/dtd/jboss_4_0.dtd">
 
 <jboss>
-<!--   <jmx-name>mule-ra.rar:name=jbossTest</jmx-name>-->
+   <jmx-name>mule-ra-SNAPSHOT.rar:name=jbossTest</jmx-name>
    <enterprise-beans>
-
       <session>
          <ejb-name>SenderEJB</ejb-name>
          <resource-ref>
@@ -19,20 +18,7 @@
          <resource-adapter-name>mule-ra-SNAPSHOT.rar</resource-adapter-name>
          <configuration-name>Mule Container</configuration-name>
       </message-driven>
-<!---->
-<!--      <message-driven>-->
-<!--         <ejb-name>FileReceiverMDB</ejb-name>-->
-<!--         <resource-adapter-name>mule-ra-SNAPSHOT.rar</resource-adapter-name>-->
-<!--         <configuration-name>Mule Container</configuration-name>-->
-<!--      </message-driven>-->
    </enterprise-beans>
-
-<!--   <assembly-descriptor>-->
-<!--      <message-destination>-->
-<!--         <message-destination-name>TestEndpoint</message-destination-name>-->
-<!--         <jndi-name>mule/endpoint/outbound</jndi-name>-->
-<!--      </message-destination>-->
-<!--   </assembly-descriptor>-->
 
    <resource-managers>
       <resource-manager>
