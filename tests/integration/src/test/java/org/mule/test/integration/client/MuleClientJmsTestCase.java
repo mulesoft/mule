@@ -124,7 +124,7 @@ public class MuleClientJmsTestCase extends AbstractMuleTestCase
 
         start = System.currentTimeMillis();
         for( i = 0;i < 100;i++) {
-            UMOMessage message = client.receive("jms://replyTo.queue", 3000);
+            UMOMessage message = client.receive("jms://replyTo.queue", 5000);
             System.out.println("Count is " + i);
             assertNotNull(message);
             System.out.println(((TextMessage)message.getPayload()).getText());
