@@ -10,9 +10,9 @@
 
  * 
 
- * Copyright (c) Cubis Limited. All rights reserved.
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
 
- * http://www.cubis.co.uk 
+ * http://www.symphonysoft.com
 
  * 
 
@@ -30,7 +30,6 @@ package org.mule.providers.vm;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -38,15 +37,15 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.DispatchException;
 import org.mule.util.queue.BoundedPersistentQueue;
 
 /**
  * <code>VMMessageDispatcher</code> TODO
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class VMMessageDispatcher extends AbstractMessageDispatcher

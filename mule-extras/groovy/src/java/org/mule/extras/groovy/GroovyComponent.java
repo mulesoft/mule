@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -16,13 +16,12 @@ package org.mule.extras.groovy;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyObject;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.components.script.AbstractScriptComponent;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassHelper;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +31,7 @@ import java.net.URL;
  * <code>GroovyComponent</code> allows a grooy object ot managed as a Mule
  * component.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class GroovyComponent extends AbstractScriptComponent

@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,23 +13,22 @@
  */
 package org.mule.providers.jdbc;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapListHandler;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.TransactedPollingMessageReceiver;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Guillaume Nodet

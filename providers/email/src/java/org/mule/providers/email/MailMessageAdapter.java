@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -15,11 +15,11 @@
 
 package org.mule.providers.email;
 
+import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.Utility;
-import org.mule.config.i18n.Messages;
 
 import javax.mail.Address;
 import javax.mail.Header;
@@ -29,7 +29,7 @@ import java.util.Enumeration;
 /**
  * <code>MailMessageAdapter</code> is a wrapper for a javax.mail.Message.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MailMessageAdapter extends AbstractMessageAdapter

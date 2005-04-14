@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -14,20 +14,19 @@
 package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
-import org.mule.providers.vm.VMConnector;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.providers.vm.VMConnector;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOConnector;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestCase

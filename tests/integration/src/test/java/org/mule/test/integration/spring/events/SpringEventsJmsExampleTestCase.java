@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -28,7 +28,7 @@ import javax.jms.TextMessage;
  * in the docco.  this test is not run when building this module as it relies on Jms, it's
  * used to verify the example config works.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class SpringEventsJmsExampleTestCase extends AbstractMuleTestCase

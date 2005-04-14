@@ -2,7 +2,7 @@
 	Mule - Universal Message Objects <font size="-2">(TM)</font>
 	This DTD describes the grammar of the mule configuration properties
 	<p>
-	Author: Ross Mason, Cubis Limited &#169; 2003-2005
+	Author: Ross Mason, SymphonySoft Limited &#169; 2003-2005
 	</p>
 	The mule is the root element of a <i>mule-config.xml</i> file.
 	It consists of one connection-descriptor and at least one
@@ -700,11 +700,11 @@ specific configuration in a Mule Xml document
 The doctype declaration to use for the configuration fragment.
 can be null if no validation is to be performed or the fragment is not Xml
 the doc type can be in the form of :
-<!DOCTYPE mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
-  "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+  "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 or
-mule-configuration PUBLIC "-//Cubis //DTD mule-configuration XML V1.0//EN"
-"http://www.cubis.co.uk/dtds/mule-configuration.dtd"
+mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+"http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd"
 -->
 <!ATTLIST configuration         doctype         CDATA       #IMPLIED>
 

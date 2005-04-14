@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -17,11 +17,7 @@ package org.mule.test.mule.model;
 
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.tck.model.AbstractEntryPointDiscoveryTestCase;
-import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.tck.testmodels.fruit.FruitLover;
-import org.mule.tck.testmodels.fruit.ObjectToFruitLover;
-import org.mule.tck.testmodels.fruit.WaterMelon;
+import org.mule.tck.testmodels.fruit.*;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -31,7 +27,7 @@ import org.mule.umo.model.UMOEntryPointResolver;
 import java.util.EventObject;
 
 /**
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDiscoveryTestCase

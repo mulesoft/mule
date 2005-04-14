@@ -10,9 +10,9 @@
 
  * 
 
- * Copyright (c) Cubis Limited. All rights reserved.
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
 
- * http://www.cubis.co.uk 
+ * http://www.symphonysoft.com
 
  * 
 
@@ -43,7 +43,7 @@ import org.mule.umo.provider.UMOMessageReceiver;
  * <p/>
  * a pop3 and smtp endpoint for convenience
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MailConnector extends AbstractConnector

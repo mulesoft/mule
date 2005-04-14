@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -16,14 +16,12 @@ package org.mule.config.builders;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.ContainerKeyPair;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.UMOContainerContext;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +31,7 @@ import java.util.Map;
  * MuleXmlConfigurationBuilder that gets wired once the configuration documents
  * have been loaded
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class ContainerReference

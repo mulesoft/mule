@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 <!--
     This example uses http as the transport. The configuration is identical to the other
     helllo world example, except that an Http connector is used rather than the System

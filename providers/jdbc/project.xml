@@ -10,7 +10,7 @@
     </description>
     <shortDescription>email</shortDescription>
     <url>http://www.muleumo.org/doc/providers/jdbc/</url>
-    <siteDirectory>/home/http/cubis.co.uk/html/mule/reference/providers/jdbc/</siteDirectory>
+    <siteDirectory>/home/http/symphonysoft.com/html/mule/reference/providers/jdbc/</siteDirectory>
     <dependencies>
         <dependency>
             <groupId>commons-dbutils</groupId>

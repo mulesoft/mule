@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -22,8 +22,8 @@ import org.mule.impl.endpoint.EndpointBuilder;
 import org.mule.impl.endpoint.UrlEndpointBuilder;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -34,7 +34,6 @@ import org.mule.util.ClassHelper;
 import org.mule.util.ObjectFactory;
 
 import java.util.Properties;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * <code>ConnectorServiceDescriptor</code> describes the necessery information for creating a connector
@@ -56,7 +55,7 @@ import java.lang.reflect.InvocationTargetException;
  * Any other properties set in the descriptor are made available using the getParams() method on this
  * discriptor.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

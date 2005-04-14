@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -15,25 +15,20 @@
 
 package org.mule.transaction;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
-
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOTransaction;
 import org.mule.umo.TransactionException;
+import org.mule.umo.UMOTransaction;
+
+import javax.transaction.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p><code>XaTransaction</code> represents an XA transaction in Mule.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
  */

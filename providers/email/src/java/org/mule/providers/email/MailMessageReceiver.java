@@ -10,9 +10,9 @@
 
  * 
 
- * Copyright (c) Cubis Limited. All rights reserved.
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
 
- * http://www.cubis.co.uk 
+ * http://www.symphonysoft.com
 
  * 
 
@@ -30,7 +30,6 @@
 package org.mule.providers.email;
 
 
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -38,9 +37,10 @@ import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.routing.RoutingException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.routing.RoutingException;
 import org.mule.util.UUID;
 import org.mule.util.Utility;
 
@@ -61,7 +61,7 @@ import java.io.IOException;
  * <code>MailMessageReceiver</code> polls a pop3 mailbox for messages
  * removes the messages and routes them as events into Mule.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

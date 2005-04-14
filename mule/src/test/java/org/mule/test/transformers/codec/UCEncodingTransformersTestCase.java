@@ -5,7 +5,7 @@
  * 06:45:02 $
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved. http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD style
  * license a copy of which has been included with this distribution in the
@@ -16,16 +16,12 @@
 package org.mule.test.transformers.codec;
 
 import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.transformers.codec.Base64Encoder;
-import org.mule.transformers.codec.Base64Decoder;
-import org.mule.transformers.codec.UUEncoder;
-import org.mule.transformers.codec.UUDecoder;
-import org.mule.transformers.codec.UCEncoder;
 import org.mule.transformers.codec.UCDecoder;
+import org.mule.transformers.codec.UCEncoder;
+import org.mule.umo.transformer.UMOTransformer;
 
 /**
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class UCEncodingTransformersTestCase extends AbstractTransformerTestCase

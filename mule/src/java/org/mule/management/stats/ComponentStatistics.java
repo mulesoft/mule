@@ -9,7 +9,7 @@ import java.io.PrintWriter;
  * statistics that can be exposed via management services such as JMX.
  * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane </a>
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason </a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
  * @version $Revision$
  */
 public class ComponentStatistics implements Statistics {

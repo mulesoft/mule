@@ -11,7 +11,7 @@
     </description>
     <shortDescription>email</shortDescription>
     <url>http://www.muleumo.org/doc/providers/email/</url>
-    <siteDirectory>/home/http/cubis.co.uk/html/mule/reference/providers/email/</siteDirectory>
+    <siteDirectory>/home/http/symphonysoft.com/html/mule/reference/providers/email/</siteDirectory>
     <dependencies>
         <dependency>
             <groupId>javamail</groupId>

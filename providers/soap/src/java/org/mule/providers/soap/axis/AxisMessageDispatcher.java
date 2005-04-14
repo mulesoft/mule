@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,11 +13,7 @@
  */
 package org.mule.providers.soap.axis;
 
-import org.apache.axis.Handler;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.SimpleChain;
-import org.apache.axis.SimpleTargetedChain;
+import org.apache.axis.*;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
@@ -48,7 +44,7 @@ import java.util.Properties;
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the
  * Axis soap client.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class AxisMessageDispatcher extends AbstractMessageDispatcher

@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -23,12 +23,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.model.DynamicEntryPoint;
 import org.mule.model.DynamicEntryPointResolver;
-import org.mule.umo.Invocation;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.*;
 import org.mule.umo.lifecycle.*;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.util.ClassHelper;
@@ -40,7 +35,7 @@ import java.lang.reflect.Method;
  * Mule managed components.  It's possible to plugin custom lifecycle adapters,
  * this can provide additional lifecycle methods triggered by an external source.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class DefaultLifecycleAdapter implements UMOLifecycleAdapter

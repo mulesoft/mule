@@ -79,8 +79,8 @@
             <fileset file="${basedir}/mule-extras/spring/src/conf/mule-spring-configuration.dtd"/>
         </copy>
 
-        <u:available file="/var/www/html/cubis.co.uk/dtds">
-            <copy todir="/var/www/html/cubis.co.uk/dtds">
+        <u:available file="/var/www/html/symphonysoft.com/dtds">
+            <copy todir="/var/www/html/symphonysoft.com/dtds">
                 <fileset file="${basedir}/src/conf/mule-configuration.dtd"/>
                 <fileset file="${basedir}/src/conf/mule-spring-configuration.dtd"/>
             </copy>

@@ -10,9 +10,9 @@
 
  * 
 
- * Copyright (c) Cubis Limited. All rights reserved.
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
 
- * http://www.cubis.co.uk 
+ * http://www.symphonysoft.com
 
  * 
 
@@ -51,7 +51,7 @@ import java.util.Properties;
  * <code>SmtpConnector</code> is used to connect to and send data to
  * an SMTP mail server
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class SmtpConnector extends AbstractServiceEnabledConnector

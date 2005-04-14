@@ -10,9 +10,9 @@
 
  * 
 
- * Copyright (c) Cubis Limited. All rights reserved.
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
 
- * http://www.cubis.co.uk 
+ * http://www.symphonysoft.com
 
  * 
 
@@ -46,7 +46,7 @@ import org.mule.providers.tcp.TcpConnector;
  * <li>proxyPassword - If the proxy requires authentication supply a password</li>
  * </ul>
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

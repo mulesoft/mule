@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <mule-configuration version="1.0">
     <mule-environment-properties synchronous="true"></mule-environment-properties>

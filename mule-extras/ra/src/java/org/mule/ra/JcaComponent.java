@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -19,7 +19,6 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
-import org.mule.config.PoolingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
@@ -31,16 +30,14 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPoint;
-import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.util.ClassHelper;
-import org.mule.util.ObjectPool;
 
 import java.lang.reflect.Method;
 
 /**
  * <code>JcaComponent</code> TODO
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class JcaComponent implements UMOComponent

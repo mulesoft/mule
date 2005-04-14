@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,9 +13,9 @@
  */
 package org.mule.providers.jdbc;
 
-import java.util.Map;
-
 import org.mule.providers.AbstractMessageAdapter;
+
+import java.util.Map;
 
 /**
  * @author Guillaume Nodet

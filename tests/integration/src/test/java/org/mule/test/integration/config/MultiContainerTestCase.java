@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,17 +13,17 @@
  */
 package org.mule.test.integration.config;
 
-import org.mule.tck.NamedTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.MuleManager;
-import org.mule.impl.container.ContainerKeyPair;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.impl.container.ContainerKeyPair;
+import org.mule.tck.NamedTestCase;
+import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.umo.manager.ObjectNotFoundException;
+import org.mule.umo.manager.UMOContainerContext;
 
 /**
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MultiContainerTestCase extends NamedTestCase

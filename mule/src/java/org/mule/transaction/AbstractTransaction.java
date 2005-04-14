@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -16,10 +16,10 @@ package org.mule.transaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.TransactionException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.TransactionException;
+import org.mule.umo.UMOTransaction;
 
 /**
  * This base class provides low level features for transactions

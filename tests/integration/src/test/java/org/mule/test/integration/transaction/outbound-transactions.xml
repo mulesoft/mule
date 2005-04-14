@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <mule-configuration id="test" version="1.0">
 
@@ -46,7 +46,7 @@
                 <router className="org.mule.routing.outbound.MulticastingRouter">
                     <endpoint address="jms://my.queue3"/>
                     <endpoint address="jms://my.queue4"/>
-                    <transaction action="ALWAYS_JOIN"/>                    
+                    <transaction action="ALWAYS_JOIN"/>
                 </router>
             </outbound-router>
         </mule-descriptor>

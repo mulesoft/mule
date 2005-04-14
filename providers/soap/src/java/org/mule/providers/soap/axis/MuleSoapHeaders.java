@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -14,25 +14,19 @@
 package org.mule.providers.soap.axis;
 
 import org.apache.axis.MessageContext;
-import org.apache.axis.encoding.Base64;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.utils.XMLUtils;
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOEvent;
 
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPHeaderElement;
+import javax.xml.soap.*;
 import java.util.Iterator;
 
 /**
  * <code>MuleSoapHeaders</code> is a helper class for extracting and writing
  * Mule header properties to s Soap message
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleSoapHeaders

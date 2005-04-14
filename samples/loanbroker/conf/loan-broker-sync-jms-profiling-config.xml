@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <mule-configuration id="Loan_broker_Sync" version="1.0">
 
@@ -114,7 +114,7 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="vm://LdapAuthenticator"/>                    
+                    <endpoint address="vm://LdapAuthenticator"/>
                     <filter expression="authenticate=true" className="org.mule.routing.filters.UMOEventFilter"/>
                 </router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">

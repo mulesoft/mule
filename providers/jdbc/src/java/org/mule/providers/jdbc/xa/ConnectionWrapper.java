@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,23 +13,15 @@
  */
 package org.mule.providers.jdbc.xa;
 
+import javax.sql.XAConnection;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.sql.Savepoint;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Map;
-
-import javax.sql.XAConnection;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

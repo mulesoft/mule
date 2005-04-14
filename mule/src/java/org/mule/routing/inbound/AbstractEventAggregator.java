@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -16,9 +16,9 @@ package org.mule.routing.inbound;
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.impl.MuleEvent;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.MessagingException;
 import org.mule.umo.routing.RoutingException;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a single message
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

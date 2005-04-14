@@ -9,8 +9,8 @@
     <currentVersion>SNAPSHOT</currentVersion>
     <organization>
         <name>SymphonySoft Limited</name>
-<!--url>http://www.cubis.co.uk/</url>
-        <logo>/images/cubis-logo.gif</logo-->
+        <url>http://www.symphonysoft.com</url>
+        <!--<logo>/images/symphonysoft-logo.gif</logo-->
     </organization>
 
     <inceptionYear>2003</inceptionYear>
@@ -61,8 +61,8 @@
         <developer>
             <name>Ross Mason</name>
             <id>rossmason</id>
-            <email>ross.mason@cubis.co.uk</email>
-            <organization>Cubis Limited</organization>
+            <email>ross.mason@symphonysoft.com</email>
+            <organization>SymphonySoft Limited</organization>
         </developer>
         <developer>
             <name>Guillaume Nodet</name>

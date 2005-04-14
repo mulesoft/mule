@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -15,12 +15,12 @@ package org.mule.providers.http.transformers;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.config.MuleProperties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
  * <code>HttpClientMethodResponseToObject</code> transforms a http client response to a
  * MuleMessage.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

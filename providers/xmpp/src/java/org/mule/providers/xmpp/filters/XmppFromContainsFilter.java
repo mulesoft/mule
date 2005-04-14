@@ -7,7 +7,7 @@ import org.jivesoftware.smack.filter.PacketFilter;
  * <code>XmppFromContainsFilter</code> is an Xmpp FromContainsfilter
  * adapter.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class XmppFromContainsFilter extends AbstractXmppFilter

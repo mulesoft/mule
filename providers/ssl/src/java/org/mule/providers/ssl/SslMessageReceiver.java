@@ -10,9 +10,9 @@
 
  *
 
- * Copyright (c) Cubis Limited. All rights reserved.
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
 
- * http://www.cubis.co.uk
+ * http://www.symphonysoft.com
 
  *
 
@@ -27,12 +27,11 @@
  */
 package org.mule.providers.ssl;
 
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLContext;
@@ -48,7 +47,7 @@ import java.security.NoSuchAlgorithmException;
  * <code>SslMessageReceiver</code> acts like a tcp server to receive socket
  * requests using SSL.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class SslMessageReceiver extends TcpMessageReceiver

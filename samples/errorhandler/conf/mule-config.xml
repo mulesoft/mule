@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-                                "http://www.cubis.co.uk/dtds/mule-configuration.dtd">
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <mule-configuration id="Test_Mule_Properties" version="1.0">
 
@@ -108,9 +108,9 @@
                     </properties>
                 </router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="smtp://exceptions@cubis.co.uk" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
+                    <endpoint address="smtp://exceptions@symphonysoft.com" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
                         <properties>
-                            <property name="ccAddresses" value="anotheremail@cubis.co.uk"/>
+                            <property name="ccAddresses" value="anotheremail@symphonysoft.com"/>
                         </properties>
                     </endpoint>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.umo.lifecycle.FatalException"/>

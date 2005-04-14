@@ -18,12 +18,11 @@ import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.transformer.TransformerException;
 
 import java.io.File;
 import java.net.URL;
@@ -40,7 +39,7 @@ import java.net.URL;
  * after it has transformed the supplied source
  *
  * @author <a href="mailto:ian@zenaptix.com">Ian de Beer</a>
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

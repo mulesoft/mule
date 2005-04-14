@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,26 +13,26 @@
  */
 package org.mule.impl.container;
 
-import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.ObjectNotFoundException;
 
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.naming.Name;
+import javax.naming.NamingException;
 import java.io.Reader;
-import java.util.Map;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * <code>JndiContainerContext</code> is a container implementaiton that exposes
  * a jndi context.  What ever properties are set on the container in configuration
  * will be passed to the initial context.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class JndiContainerContext extends AbstractContainerContext

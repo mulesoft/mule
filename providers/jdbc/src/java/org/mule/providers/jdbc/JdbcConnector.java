@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,27 +13,25 @@
  */
 package org.mule.providers.jdbc;
 
-import java.sql.Connection;
-import java.util.Hashtable;
-import java.util.Map;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.umo.TransactionException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOMessageReceiver;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.TransactionException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOMessageReceiver;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
+import java.sql.Connection;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * @author Guillaume Nodet

@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,31 +13,23 @@
  */
 package org.mule.impl.security.filters;
 
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.security.AbstractEndpointSecurityFilter;
 import org.mule.impl.security.MuleAuthentication;
-import org.mule.impl.security.MuleHeaderCredentialsAccessor;
 import org.mule.impl.security.MuleCredentials;
+import org.mule.impl.security.MuleHeaderCredentialsAccessor;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.UMOAuthentication;
-import org.mule.umo.security.UMOCredentials;
-import org.mule.umo.security.UMOSecurityContext;
+import org.mule.umo.security.*;
 import org.mule.umo.security.SecurityException;
-import org.mule.umo.security.UnauthorisedException;
-import org.mule.umo.security.CredentialsNotSetException;
-import org.mule.umo.security.CryptoFailureException;
-import org.mule.umo.security.SecurityProviderNotFoundException;
-import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
  * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based encription
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecurityFilter

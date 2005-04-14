@@ -4,9 +4,9 @@ import junit.framework.Assert;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ConfigurationException;
 import org.mule.config.PoolingProfile;
 import org.mule.config.ThreadingProfile;
-import org.mule.config.ConfigurationException;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.impl.MuleDescriptor;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase

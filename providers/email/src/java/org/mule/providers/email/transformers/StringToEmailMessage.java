@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -16,12 +16,8 @@ package org.mule.providers.email.transformers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.providers.email.MailConnector;
-import org.mule.providers.email.Pop3Connector;
-import org.mule.providers.email.SmtpConnector;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
 import javax.mail.Message;
@@ -37,7 +33,7 @@ import java.util.Calendar;
  * string as the contents.  This implementation uses properties on the transformer
  * to determine the to and subject fields.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class StringToEmailMessage extends AbstractEventAwareTransformer

@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -33,7 +33,7 @@ import java.io.InputStream;
  * <code>TyrexTransactionManagerFactory</code> is an implementation of <i>UMOTransactionManagerFactory</i>
  * that creates a Tyrex Transaction Manager for use by the Mule Manager
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class TyrexTransactionManagerFactory implements UMOTransactionManagerFactory

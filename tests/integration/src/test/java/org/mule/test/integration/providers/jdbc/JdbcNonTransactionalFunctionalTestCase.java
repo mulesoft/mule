@@ -4,18 +4,14 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
 package org.mule.test.integration.providers.jdbc;
-
-import java.util.HashMap;
-
-import javax.sql.DataSource;
 
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.mule.MuleManager;
@@ -29,6 +25,9 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+
+import javax.sql.DataSource;
+import java.util.HashMap;
 
 /**
  * @author Guillaume Nodet

@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -16,14 +16,13 @@ package org.mule.extras.picocontainer;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.container.AbstractContainerContext;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
-import org.mule.impl.container.AbstractContainerContext;
 import org.nanocontainer.integrationkit.ContainerBuilder;
 import org.nanocontainer.integrationkit.PicoCompositionException;
 import org.nanocontainer.script.ScriptedContainerBuilderFactory;
@@ -38,7 +37,7 @@ import java.io.StringReader;
  * components for use in the Mule framework.
  *
  * @author <a href="mailto:antonio.lopez@4clerks.com">Antonio Lopez</a>
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class PicoContainerContext extends AbstractContainerContext

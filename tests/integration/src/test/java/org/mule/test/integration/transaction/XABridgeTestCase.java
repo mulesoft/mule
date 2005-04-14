@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,25 +13,19 @@
  */
 package org.mule.test.integration.transaction;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.extras.client.MuleClient;
 import org.mule.providers.jdbc.JdbcUtils;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,12 +13,7 @@
  */
 package org.mule.providers.soap.axis;
 
-import org.apache.axis.AxisEngine;
-import org.apache.axis.AxisFault;
-import org.apache.axis.ConfigurationException;
-import org.apache.axis.Constants;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
+import org.apache.axis.*;
 import org.apache.axis.components.logger.LogFactory;
 import org.apache.axis.description.OperationDesc;
 import org.apache.axis.description.ServiceDesc;
@@ -31,7 +26,6 @@ import org.apache.axis.transport.http.ServletEndpointContextImpl;
 import org.apache.axis.utils.Admin;
 import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -71,7 +65,7 @@ import java.util.Properties;
  * support is added to the Http Connector</li>
  * </ol>
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

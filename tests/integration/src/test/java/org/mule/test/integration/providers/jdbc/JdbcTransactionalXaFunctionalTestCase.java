@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,15 +13,15 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
-
 import org.enhydra.jdbc.standard.StandardXADataSource;
 import org.mule.providers.jdbc.xa.DataSourceWrapper;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
+
+import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
 
 /**
  * @author Guillaume Nodet

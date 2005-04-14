@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -30,7 +30,7 @@ import java.util.Enumeration;
  * <code>JmsMessageAdapter</code> allows a <code>MuleEvent</code> to access the properties and payload of a JMS Message in a uniform way.  The JmsMessageAdapter expects a message of type <i>javax.jms.Message</i> and will throw an IllegalArgumentException if the source message type is not compatible.
  * The JmsMessageAdapter should be suitable for all JMS Connector implementations.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class JmsMessageAdapter extends AbstractMessageAdapter

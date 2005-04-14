@@ -6,7 +6,7 @@
 
  * 
 
- * Copyright (c) Cubis Limited. All rights reserved. http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
 
  * 
 
@@ -52,7 +52,7 @@ import java.util.Properties;
  * for writing files to a directory.  The connecotry provides support for defining
  * file output patterns and filters for receiving files.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

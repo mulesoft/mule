@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,22 +13,19 @@
  */
 package org.mule.providers.dq;
 
-import org.apache.commons.lang.StringUtils;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.PollingMessageReceiver;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.DataQueue;
 import com.ibm.as400.access.DataQueueEntry;
 import com.ibm.as400.access.RecordFormat;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.MuleMessage;
+import org.mule.providers.PollingMessageReceiver;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
 
 /**
  * @author m999svm

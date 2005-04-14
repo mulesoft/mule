@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -14,8 +14,8 @@
 package org.mule.providers.file;
 
 import org.mule.umo.UMOEvent;
-import org.mule.util.Utility;
 import org.mule.util.UUID;
+import org.mule.util.Utility;
 
 /**
  * <code>SimpleFilenameParser</code> understands a limited set of tokens, namely
@@ -32,7 +32,7 @@ import org.mule.util.UUID;
  * defining the file output pattern in a Mule Url endpointUri where the curl bracket is an
  * invalid character.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

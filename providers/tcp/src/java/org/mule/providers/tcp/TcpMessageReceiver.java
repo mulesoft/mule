@@ -10,9 +10,9 @@
 
  *
 
- * Copyright (c) Cubis Limited. All rights reserved.
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
 
- * http://www.cubis.co.uk
+ * http://www.symphonysoft.com
 
  *
 
@@ -27,48 +27,32 @@
  */
 package org.mule.providers.tcp;
 
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import EDU.oswego.cs.dl.util.concurrent.ThreadFactory;
-import org.mule.umo.lifecycle.DisposeException;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.DisposeException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.URI;
+import java.io.*;
+import java.net.*;
 
 /**
  * <code>TcpMessageReceiver</code> acts like a tcp server to receive socket
  * requests.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class TcpMessageReceiver extends AbstractMessageReceiver implements Work

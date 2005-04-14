@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,29 +13,29 @@
  */
 package org.mule.ra;
 
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import javax.resource.spi.ManagedConnectionFactory;
+import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
 import javax.resource.spi.ConnectionRequestInfo;
 import javax.resource.spi.ManagedConnection;
+import javax.resource.spi.ManagedConnectionFactory;
 import javax.resource.spi.security.PasswordCredential;
-import javax.resource.ResourceException;
 import javax.security.auth.Subject;
-import java.io.Serializable;
-import java.io.PrintWriter;
-import java.io.ObjectInputStream;
-import java.io.IOException;
-import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
  * <code>MuleManagedConnectionFactory</code> TODO
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
