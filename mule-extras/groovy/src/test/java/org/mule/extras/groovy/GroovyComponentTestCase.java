@@ -40,7 +40,7 @@ public class GroovyComponentTestCase extends NamedTestCase
 
     public void testFunctionBehaviour() throws Exception
     {
-        MuleClient client = new MuleClient(true);
+        MuleClient client = new MuleClient();
         UMOMessage m = client.send("vm://localhost/groovy.1", "Groovy Test: ", null);
         assertNotNull(m);
         assertEquals("Groovy Test: Received by component 1: Received by component 2:", m.getPayloadAsString());

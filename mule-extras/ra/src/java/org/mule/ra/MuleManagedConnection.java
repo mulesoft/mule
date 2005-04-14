@@ -102,7 +102,7 @@ public class MuleManagedConnection implements ManagedConnection {
         String password;
         MuleConnectionRequestInfo info = (MuleConnectionRequestInfo)connectionRequestInfo;
 
-        user = info.getUsername();
+        user = info.getUserName();
         password = info.getPassword();
         if(user==null) {
             // Use default values

@@ -47,7 +47,7 @@ public class RaHelper
                         (MuleConnectionRequestInfo) info;
 
                 // Can't create a PC with null values
-                if (muleInfo.getUsername() == null || muleInfo.getPassword() == null) {
+                if (muleInfo.getUserName() == null || muleInfo.getPassword() == null) {
                     //logger.info("\tUtil::GetPasswordCred: User or password is null");
                     return null;
                 }
@@ -55,7 +55,7 @@ public class RaHelper
                 char[] password = muleInfo.getPassword().toCharArray();
 
                 PasswordCredential pc =
-                        new PasswordCredential(muleInfo.getUsername(), password);
+                        new PasswordCredential(muleInfo.getUserName(), password);
 
                 pc.setManagedConnectionFactory(mcf);
                 //logger.info("\tUtil::GetPasswordCred: returning a created PC");

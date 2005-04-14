@@ -17,11 +17,11 @@ import EDU.oswego.cs.dl.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
-import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
@@ -32,10 +32,10 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.*;
-import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
@@ -678,25 +678,6 @@ public class MuleClient implements Disposable
         builder.unregisterComponent(name);
     }
 
-    /**
-     * Distroys any resources created by this client session
-     *
-     * @throws UMOException
-     */
-    public void close() throws UMOException
-    {
-        synchronized (dispatchers)
-        {
-            for (Iterator iterator = dispatchers.iterator(); iterator.hasNext();)
-            {
-                RemoteDispatcher remoteDispatcher = (RemoteDispatcher) iterator.next();
-                remoteDispatcher.close();
-                dispatchers.remove(remoteDispatcher);
-                remoteDispatcher = null;
-            }
-        }
-    }
-
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws MalformedEndpointException
     {
         RemoteDispatcher rd = new RemoteDispatcher(this, serverEndpoint);
@@ -717,9 +698,15 @@ public class MuleClient implements Disposable
      */
     public void dispose()
     {
-        for (Iterator iterator = dispatchers.iterator(); iterator.hasNext();) {
-            RemoteDispatcher remoteDispatcher = (RemoteDispatcher) iterator.next();
-            remoteDispatcher.close();
+        synchronized (dispatchers)
+        {
+            for (Iterator iterator = dispatchers.iterator(); iterator.hasNext();)
+            {
+                RemoteDispatcher remoteDispatcher = (RemoteDispatcher) iterator.next();
+                remoteDispatcher.dispose();
+                dispatchers.remove(remoteDispatcher);
+                remoteDispatcher = null;
+            }
         }
         //Dispose the manager only if the manager was created for this client
         if(MuleManager.getConfiguration().isClientMode()) {
