@@ -173,9 +173,7 @@ public class MuleManager implements UMOManager
     {
         if(config==null) config = new MuleConfiguration();
         setModel(new MuleModel());
-        if(!config.isClientMode()) {
-            eventManager = new ServerEventManager();
-        }
+        eventManager = new ServerEventManager();
         containerContext = new MultiContainerContext();
     }
 
@@ -552,10 +550,7 @@ public class MuleManager implements UMOManager
                     logger.info("Server endpointUri is null, not registering Mule Admin agent");
                     disable=true;
                 }
-                if(config.isClientMode()) {
-                    disable = true;
-                }
-
+                
                 if (!disable)
                 {
                     registerAgent(new MuleAdminAgent());
