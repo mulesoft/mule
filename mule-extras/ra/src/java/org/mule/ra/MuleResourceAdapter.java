@@ -213,8 +213,8 @@ public class MuleResourceAdapter implements ResourceAdapter {
     /**
      * @return
      */
-    public String getUsername() {
-        return info.getUsername();
+    public String getUserName() {
+        return info.getUserName();
     }
 
     /**
@@ -234,8 +234,8 @@ public class MuleResourceAdapter implements ResourceAdapter {
     /**
      * @param userid
      */
-    public void setUsername(String userid) {
-        info.setUsername(userid);
+    public void setUserName(String userid) {
+        info.setUserName(userid);
     }
 
 

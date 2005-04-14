@@ -385,5 +385,6 @@ public class MuleConfiguration
 
     public void setClientMode(boolean clientMode) {
         this.clientMode = clientMode;
+        setServerUrl("");
     }
 }

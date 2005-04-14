@@ -48,7 +48,7 @@
 <!--        </config-property>-->
         <config-property>
             <description>The default user name that will be used to log on to the Mule server.</description>
-            <config-property-name>Username</config-property-name>
+            <config-property-name>UserName</config-property-name>
             <config-property-type>java.lang.String</config-property-type>
             <config-property-value></config-property-value>
         </config-property>

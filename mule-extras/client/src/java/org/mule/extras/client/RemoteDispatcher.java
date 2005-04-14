@@ -29,6 +29,7 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.*;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
@@ -37,13 +38,15 @@ import org.mule.util.MuleObjectHelper;
 import java.util.Map;
 
 /**
- * <code>RemoteDispatcher</code> TODO
+ * <code>RemoteDispatcher</code> is used to make and recieve requests to a remote
+ * Mule instance.  It is used to proxy requests to Mule using the Server Url as the
+ * the transport channel.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class RemoteDispatcher
+public class RemoteDispatcher implements Disposable
 {
     /**
      * logger used by this class
@@ -254,7 +257,7 @@ public class RemoteDispatcher
         return result;
     }
 
-    public void close() throws UMOException {
+    public void dispose() {
 
     }
 }

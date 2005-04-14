@@ -18,7 +18,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ConfigurationException;
 import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
@@ -29,6 +32,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.*;
+import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -71,7 +75,7 @@ import java.util.*;
  * @version $Revision$
  * @see org.mule.impl.endpoint.MuleEndpointURI
  */
-public class MuleClient
+public class MuleClient implements Disposable
 {
     /**
      * logger used by this class
@@ -91,8 +95,6 @@ public class MuleClient
 
     private MuleCredentials user;
 
-    private UMOEncryptionStrategy encryption;
-
     /**
      * Creates a default Mule client that will use the default serverEndpoint
      * to connect to a remote server instance.
@@ -101,23 +103,66 @@ public class MuleClient
      */
     public MuleClient() throws UMOException
     {
-        this(MuleManager.getConfiguration().isSynchronous());
+        init();
     }
 
+    /**
+     * Configures a Mule CLient instance using the the default MuleXmlConfigurationBuilder
+     * to parse the config resources
+     * @param configResources a config resource location to configure this client with
+     * @throws ConfigurationException is there is a MuleManager instance already
+     * running in this JVM or if the builder fails to configure the Manager
+     */
+    public MuleClient(String configResources) throws UMOException
+    {
+        this(configResources, new MuleXmlConfigurationBuilder());
+    }
+
+    /**
+     * Configures a new MuleClient and either uses an existing Manager running in this
+     * JVM or creates a new empty manager
+     * @param user the username to use when connecting to a remote server instance
+     * @param password the password for the user
+     * @throws UMOException
+     */
     public MuleClient(String user, String password) throws UMOException
     {
-        this(MuleManager.getConfiguration().isSynchronous());
+        init();
         this.user = new MuleCredentials(user, password.toCharArray());
     }
 
-    public MuleClient(boolean synchronous) throws UMOException
+    /**
+     * Configures a Mule CLient instance
+     * @param configResources a config resource location to configure this client with
+     * @param builder the configuration builder to use
+     * @throws ConfigurationException is there is a MuleManager instance already
+     * running in this JVM or if the builder fails to configure the Manager
+     */
+    public MuleClient(String configResources, ConfigurationBuilder builder) throws ConfigurationException
     {
-        init(synchronous);
+        if(MuleManager.isInstanciated()) {
+            throw new ConfigurationException(new Message(Messages.MANAGER_IS_ALREADY_CONFIGURED));
+        }
+        if(builder==null) {
+            logger.info("Builder passed in was null, using default builder: " +  MuleXmlConfigurationBuilder.class.getName());
+            builder = new MuleXmlConfigurationBuilder();
+        }
+        manager = builder.configure(configResources);
     }
 
-    public MuleClient(boolean synchronous, String user, String password) throws UMOException
+
+    /**
+     * Configures a Mule CLient instance
+     * @param configResources a config resource location to configure this client with
+     * @param builder the configuration builder to use
+     * @param user the username to use when connecting to a remote server instance
+     * @param password the password for the user
+     * @throws ConfigurationException is there is a MuleManager instance already
+     * running in this JVM or if the builder fails to configure the Manager
+     */
+    public MuleClient(String configResources, ConfigurationBuilder builder, String user, String password) throws ConfigurationException
     {
-        init(synchronous);
+        this(configResources, builder);
         this.user = new MuleCredentials(user, password.toCharArray());
     }
 
@@ -126,19 +171,15 @@ public class MuleClient
      *
      * @throws UMOException
      */
-    private void init(boolean synchronous) throws UMOException
+    private void init() throws UMOException
     {
-        //if we are creating a server for this client don't initialise the
-        //server connections
-        if (!MuleManager.isInstanciated())
-        {
-            MuleManager.getConfiguration().setServerUrl("");
-            //MuleManager.getConfiguration().setClientMode(true);
-        }
+        //if we are creating a server for this client then set client mode
+        //this will disable Admin connections by default;
+        MuleManager.getConfiguration().setClientMode(
+            !MuleManager.isInstanciated());
 
         manager = MuleManager.getInstance();
         builder = new QuickConfigurationBuilder();
-        MuleManager.getConfiguration().setSynchronous(synchronous);
         //If there is no local manager present create a default manager
         if (!manager.isInitialised())
         {
@@ -670,9 +711,20 @@ public class MuleClient
         return rd;
     }
 
-    public void shutdownServer()
+    /**
+     * Will dispose the MUleManager instance *IF* a new instance was created for
+     * this client.  Otherwise this method only cleans up resources no longer needed
+     */
+    public void dispose()
     {
-        manager.dispose();
+        for (Iterator iterator = dispatchers.iterator(); iterator.hasNext();) {
+            RemoteDispatcher remoteDispatcher = (RemoteDispatcher) iterator.next();
+            remoteDispatcher.close();
+        }
+        //Dispose the manager only if the manager was created for this client
+        if(MuleManager.getConfiguration().isClientMode()) {
+            manager.dispose();
+        }
 
     }
 }
