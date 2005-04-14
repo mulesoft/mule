@@ -4,7 +4,7 @@
  * 05:49:12 $
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved. http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD style
  * license a copy of which has been included with this distribution in the
@@ -25,11 +25,7 @@ import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <code>EndpointList</code> encapsulates two lists of ProviderDescriptors;
@@ -37,7 +33,7 @@ import java.util.Map;
  * query manipulate and maintain state of the lists.
  *
  * @deprecated
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class EndpointList

@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -27,8 +27,6 @@ import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 import java.util.Iterator;
 import java.util.List;
@@ -38,7 +36,7 @@ import java.util.List;
  * how the response in a request/response message flow is created.  Main usecase
  * is to aggregate a set of asynchonous events into a single response
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class ResponseMessageRouter extends AbstractRouterCollection implements UMOResponseMessageRouter

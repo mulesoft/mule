@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -14,7 +14,6 @@
 package org.mule.tck;
 
 import junit.framework.TestCase;
-
 import org.mule.config.MuleProperties;
 import org.mule.util.StringMessageHelper;
 import org.mule.util.Utility;

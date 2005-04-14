@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -18,23 +18,26 @@ package org.mule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.ExceptionHelper;
 import org.mule.config.ConfigurationException;
+import org.mule.config.ExceptionHelper;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.umo.UMOException;
 import org.mule.util.ClassHelper;
 import org.mule.util.StringMessageHelper;
-import org.mule.umo.UMOException;
 
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * <code>MuleServer</code> is a simple application that represents a local
  * Mule Server deamon. It is initalised with a mule-configuration.xml file.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleServer implements Runnable

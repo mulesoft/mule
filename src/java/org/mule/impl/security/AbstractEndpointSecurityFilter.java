@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -13,31 +13,24 @@
  */
 package org.mule.impl.security;
 
-import org.mule.umo.lifecycle.InitialisationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.security.UMOEndpointSecurityFilter;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.*;
 import org.mule.umo.security.SecurityException;
-import org.mule.umo.security.UMOSecurityManager;
-import org.mule.umo.security.UMOSecurityProvider;
-import org.mule.umo.security.UMOCredentialsAccessor;
-import org.mule.umo.security.CryptoFailureException;
-import org.mule.umo.security.SecurityProviderNotFoundException;
-import org.mule.umo.security.UnknownAuthenticationTypeException;
 import org.mule.util.Utility;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation for all security filters,
  * namely configuring the SecurityManager for this instance
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

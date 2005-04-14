@@ -5,7 +5,7 @@
  * 09:58:47 $
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved. http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD style
  * license a copy of which has been included with this distribution in the
@@ -35,7 +35,7 @@ import org.mule.util.ClassHelper;
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases.  This
  * implementation provides services to test code for creating mock and test objects.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public abstract class AbstractMuleTestCase extends NamedTestCase

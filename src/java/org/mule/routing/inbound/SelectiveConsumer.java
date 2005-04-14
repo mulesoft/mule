@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -15,15 +15,15 @@ package org.mule.routing.inbound;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.management.stats.RouterStatistics;
+import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOFilter;
-import org.mule.umo.MessagingException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 /**
  * <code>SelectiveConsumer</code> is an inbound router used to filter out unwanted events.
@@ -31,7 +31,7 @@ import org.mule.config.i18n.Messages;
  * does not match the filter a <code>UMOROutnerCatchAllStrategy</code> can be set on this router
  * to route unwanted events.  If a catch strategy is not set the router just returns null.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

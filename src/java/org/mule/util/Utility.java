@@ -4,7 +4,7 @@
  * 09:34:02 $
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved. http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD style
  * license a copy of which has been included with this distribution in the
@@ -13,19 +13,9 @@
  */
 package org.mule.util;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.URL;
+import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,7 +25,7 @@ import java.util.StringTokenizer;
  * <code>Utility</code> is a singleton grouping common functionality like
  * converting java.lang.String to different data types, reading files, etc
  * 
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 

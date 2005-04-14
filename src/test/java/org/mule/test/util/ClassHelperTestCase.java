@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -16,18 +16,13 @@
 package org.mule.test.util;
 
 import junit.framework.TestCase;
-import org.mule.tck.testmodels.fruit.AbstractFruit;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.tck.testmodels.fruit.Fruit;
-import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.fruit.*;
 import org.mule.util.ClassHelper;
 
 /**
  * <code>ReflectionHelperTestCase</code> TODO (document class)
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class ClassHelperTestCase extends TestCase

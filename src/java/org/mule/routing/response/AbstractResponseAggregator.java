@@ -4,8 +4,8 @@
  * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) Cubis Limited. All rights reserved.
- * http://www.cubis.co.uk
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
@@ -25,8 +25,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.ResponseTimeoutException;
+import org.mule.umo.routing.RoutingException;
 
 import java.util.Map;
 
@@ -35,7 +35,7 @@ import java.util.Map;
  * response aggregator routers. This provides a thread-safe implemenetation and allows
  * developers to customise how and when events are grouped and collated.
  *
- * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public abstract class AbstractResponseAggregator extends AbstractResponseRouter
