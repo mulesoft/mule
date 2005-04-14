@@ -823,8 +823,8 @@ public class MuleManager implements UMOManager
         if (att.values().size() > 0)
         {
             message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Title"), notset)
-                    + new Message(Messages.VERSION).getMessage() + PropertiesHelper.getStringProperty(att,
-                            new Attributes.Name("Implementation-Version"), notset));
+                    + " " + new Message(Messages.VERSION).getMessage() + PropertiesHelper.getStringProperty(att,
+                      " " + new Attributes.Name("Implementation-Version"), notset));
 
             message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Vendor"), notset));
             message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Implementation-Vendor"), notset));
@@ -833,7 +833,7 @@ public class MuleManager implements UMOManager
             message.add(new Message(Messages.VERSION_INFO_NOT_SET).getMessage());
         }
         message.add(" ");
-        message.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(getStartDate())).getMessage());
+        message.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(getStartDate()).toString()).getMessage());
         message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
         message.add(" ");
         if(agents.size()==0) {
@@ -853,7 +853,7 @@ public class MuleManager implements UMOManager
     private String getEndSplash() {
         List message = new ArrayList(2);
         long currentTime = System.currentTimeMillis();
-        message.add(new Message(Messages.SHUTDOWN_NORMALLY_ON_X, new Date()).getMessage());
+        message.add(new Message(Messages.SHUTDOWN_NORMALLY_ON_X, new Date().toString()).getMessage());
         long duration = currentTime;
         if(startDate > 0) duration = currentTime -startDate;
         message.add(new Message(Messages.SERVER_WAS_UP_FOR_X, Utility.getFormattedDuration(duration)).getMessage());
