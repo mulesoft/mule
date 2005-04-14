@@ -15,20 +15,26 @@ the different components are made from the loan broker component (a la hub and s
 
 <mule-configuration id="Loan_broker_Async" version="1.0">
 
-    <mule-environment-properties serverUrl="" >
+    <mule-environment-properties serverUrl="">
         <threading-profile maxThreadsActive="20" maxThreadsIdle="20" maxBufferSize="500" poolExhaustedAction="WAIT"/>
-        <pooling-profile exhaustedAction="GROW" maxActive="20" maxIdle="20" maxWait="-1" initialisationPolicy="INITIALISE_ALL" />
+        <pooling-profile exhaustedAction="GROW" maxActive="20" maxIdle="20" maxWait="-1" initialisationPolicy="INITIALISE_ALL"/>
         <queue-profile maxOutstandingMessages="5000"/>
     </mule-environment-properties>
 
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+    </agents>
+
+
     <!-- Testing with ActiveMq -->
-<!--    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
-<!--        <properties>-->
-<!--            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>-->
-<!--            <property name="jndiInitialFactory" value="org.codehaus.activemq.jndi.ActiveMQInitialContextFactory"/>-->
-<!--            <property name="specification" value="1.1"/>-->
-<!--        </properties>-->
-<!--    </connector>-->
+    <!--    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
+    <!--        <properties>-->
+    <!--            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>-->
+    <!--            <property name="jndiInitialFactory" value="org.codehaus.activemq.jndi.ActiveMQInitialContextFactory"/>-->
+    <!--            <property name="specification" value="1.1"/>-->
+    <!--        </properties>-->
+    <!--    </connector>-->
 
     <!-- testing with OpenJms -->
     <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
@@ -56,14 +62,9 @@ the different components are made from the loan broker component (a la hub and s
         <endpoint-identifier name="Bank5" value="jms://bank5"/>
     </endpoint-identifiers>
 
-    <agents>
-        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
-        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
-    </agents>
-
-     <!--
-        The Mule model initialises and manages your UMO components
-    -->
+    <!--
+       The Mule model initialises and manages your UMO components
+   -->
     <model name="loan-broker">
         <!--
         The loan broker is used to receive loan requests

@@ -17,10 +17,17 @@ the different components are made from the loan broker component (a la hub and s
 
 
     <mule-environment-properties serverUrl="">
-        <threading-profile maxBufferSize="0" maxThreadsActive="5" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="300000" />
+        <threading-profile maxBufferSize="0" maxThreadsActive="5" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="300000"/>
         <pooling-profile maxActive="5" maxIdle="5" exhaustedAction="GROW" maxWait="1000"/>
         <queue-profile maxOutstandingMessages="500"/>
     </mule-environment-properties>
+
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+        <!--       <agent name="Mx4jAgent" className="org.mule.management.agents.Mx4jAgent" />-->
+        <!--       <agent name="Log4jAgent" className="org.mule.management.agents.Log4jAgent" />-->
+    </agents>
 
     <!--
     Setting global endpoints can help simplify configuration by defining an actual
@@ -39,35 +46,29 @@ the different components are made from the loan broker component (a la hub and s
         <endpoint-identifier name="Bank5" value="axis:http://localhost:50080/mule"/>
     </endpoint-identifiers>
 
-<!--    <endpoint-identifiers>-->
-<!--        <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>-->
-<!--        <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerQuotes"/>-->
-<!--        <endpoint-identifier name="CreditAgency" value="glue:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>-->
-<!--        <endpoint-identifier name="CreditAgencyReceiver" value="glue:http://localhost:18080/mule"/>-->
-<!--        <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>-->
-<!--        <endpoint-identifier name="Bank1" value="glue:http://localhost:10080/mule"/>-->
-<!--        <endpoint-identifier name="Bank2" value="glue:http://localhost:20080/mule"/>-->
-<!--        <endpoint-identifier name="Bank3" value="glue:http://localhost:30080/mule"/>-->
-<!--        <endpoint-identifier name="Bank4" value="glue:http://localhost:40080/mule"/>-->
-<!--        <endpoint-identifier name="Bank5" value="glue:http://localhost:50080/mule"/>-->
-<!--    </endpoint-identifiers>-->
+    <!--    <endpoint-identifiers>-->
+    <!--        <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>-->
+    <!--        <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerQuotes"/>-->
+    <!--        <endpoint-identifier name="CreditAgency" value="glue:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>-->
+    <!--        <endpoint-identifier name="CreditAgencyReceiver" value="glue:http://localhost:18080/mule"/>-->
+    <!--        <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>-->
+    <!--        <endpoint-identifier name="Bank1" value="glue:http://localhost:10080/mule"/>-->
+    <!--        <endpoint-identifier name="Bank2" value="glue:http://localhost:20080/mule"/>-->
+    <!--        <endpoint-identifier name="Bank3" value="glue:http://localhost:30080/mule"/>-->
+    <!--        <endpoint-identifier name="Bank4" value="glue:http://localhost:40080/mule"/>-->
+    <!--        <endpoint-identifier name="Bank5" value="glue:http://localhost:50080/mule"/>-->
+    <!--    </endpoint-identifiers>-->
 
-    <agents>
-       <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent" />
-       <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent" />
-<!--       <agent name="Mx4jAgent" className="org.mule.management.agents.Mx4jAgent" />-->
-<!--       <agent name="Log4jAgent" className="org.mule.management.agents.Log4jAgent" />-->
-  </agents>
-     <!--
-        The Mule model initialises and manages your UMO components
-    -->
+    <!--
+       The Mule model initialises and manages your UMO components
+   -->
     <model name="loan-broker">
         <!-- by declaring the Axis service component we can overload its default
         configuration to add more threads or pooled resources -->
         <mule-descriptor name="_axisServiceComponent"
             implementation="org.mule.providers.soap.axis.AxisServiceComponent">
-            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20" />
-            <pooling-profile exhaustedAction="WAIT" maxActive="20" maxIdle="20" maxWait="20000" />
+            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20"/>
+            <pooling-profile exhaustedAction="WAIT" maxActive="20" maxIdle="20" maxWait="20000"/>
         </mule-descriptor>
         <!--
         The loan broker is used to receive loan requests
@@ -88,9 +89,9 @@ the different components are made from the loan broker component (a la hub and s
                     <filter expectedType="org.mule.samples.loanbroker.LoanQuote" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </inbound-router>
-<!--            <queue-profile maxOutstandingMessages="150" blockWait="3000" />-->
-<!--            <pooling-profile maxActive="20" maxIdle="10" exhaustedAction="GROW" maxWait="10000" />-->
-<!--            <threading-profile maxBufferSize="100" maxThreadsActive="20" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="60000" />-->
+            <!--            <queue-profile maxOutstandingMessages="150" blockWait="3000" />-->
+            <!--            <pooling-profile maxActive="20" maxIdle="10" exhaustedAction="GROW" maxWait="10000" />-->
+            <!--            <threading-profile maxBufferSize="100" maxThreadsActive="20" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="60000" />-->
         </mule-descriptor>
 
         <!--

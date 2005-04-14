@@ -7,6 +7,11 @@
 
     <mule-environment-properties synchronous="true" serverUrl=""/>
 
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+    </agents>
+
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
         <endpoint-identifier name="LoanQuotes" value="vm://LoanQuotes"/>
@@ -19,21 +24,13 @@
         <endpoint-identifier name="Bank5" value="vm://Bank5"/>
     </endpoint-identifiers>
 
-    <agents>
-        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
-        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
-    </agents>
-
     <model name="loan-broker">
         <mule-descriptor name="LoanBroker" 
             implementation="org.mule.samples.loanbroker.SyncLoanBroker">
             <inbound-router>
                 <endpoint address="LoanBrokerRequests"/>
             </inbound-router>
-            <response-router>
-                <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
-                <endpoint address="LoanQuotes"/>
-            </response-router>
+
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="CreditAgency"/>
@@ -50,6 +47,12 @@
                     <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </outbound-router>
+
+            <response-router>
+                <endpoint address="LoanQuotes"/>
+                <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
+            </response-router>
+
             <pooling-profile initialisationPolicy="INITIALISE_ALL"/>
         </mule-descriptor>
 

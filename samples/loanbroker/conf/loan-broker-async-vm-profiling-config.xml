@@ -20,6 +20,12 @@ the different components are made from the loan broker component (a la hub and s
         <pooling-profile exhaustedAction="GROW" maxActive="20" maxIdle="20" maxWait="-1" initialisationPolicy="INITIALISE_ALL" />
         <queue-profile maxOutstandingMessages="5000"/>
     </mule-environment-properties>
+
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+    </agents>
+
     <!--
     Setting global endpoints can help simplify configuration by defining an actual
     url endpointUri in one place. The endpointUri name can be used in place of the url.
@@ -36,11 +42,6 @@ the different components are made from the loan broker component (a la hub and s
         <endpoint-identifier name="Bank4" value="vm://Bank4"/>
         <endpoint-identifier name="Bank5" value="vm://Bank5"/>
     </endpoint-identifiers>
-
-    <agents>
-        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
-        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
-    </agents>
 
      <!--
         The Mule model initialises and manages your UMO components

@@ -6,7 +6,11 @@
 <!-- my local test config -->
 <mule-configuration id="Test_Mule_Properties" version="1.0">
 
-    <connector name="VMConnector" className="org.mule.providers.vm.VMConnector"/>
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="src/samples/errorhandler/conf/applicationContext.xml"/>
+        </properties>
+    </container-context>
 
     <connector name="FileConnector" className="org.mule.providers.file.FileConnector">
         <properties>
@@ -80,12 +84,6 @@
         <interceptor className="org.mule.interceptors.TimerInterceptor"/>
     </interceptor-stack>
 
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
-        <properties>
-            <property name="configFile" value="src/samples/errorhandler/conf/applicationContext.xml"/>
-        </properties>
-    </container-context>
-
     <model name="errorhandler-test">
 
         <!-- this uses an Url endpointUri instead of a provider config.  Note that this specifies a relative path
@@ -99,37 +97,36 @@
             <outbound-router>
                 <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <properties>
-                        <property name="transformer" value="ErrorMessageToException"/>
-                    </properties>
                     <endpoint address="file://?endpointUri=./test-data/samples/errorhandler/exceptions" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
                         <properties>
                             <property name="outputPattern" value="Exception-${UUID}.xml"/>
                         </properties>
                     </endpoint>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.MuleException"/>
-                </router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <properties>
                         <property name="transformer" value="ErrorMessageToException"/>
                     </properties>
+                </router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="smtp://exceptions@cubis.co.uk" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
                         <properties>
                             <property name="ccAddresses" value="anotheremail@cubis.co.uk"/>
                         </properties>
                     </endpoint>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.umo.lifecycle.FatalException"/>
-                </router>
-
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <properties>
                         <property name="transformer" value="ErrorMessageToException"/>
                     </properties>
+                </router>
+
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="jms://exception.queue" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
+                    <properties>
+                        <property name="transformer" value="ErrorMessageToException"/>
+                    </properties>
                 </router>
             </outbound-router>
-
             <interceptor className="default"/>
         </mule-descriptor>
 

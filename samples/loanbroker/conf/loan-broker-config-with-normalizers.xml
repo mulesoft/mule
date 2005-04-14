@@ -13,7 +13,12 @@ the different components are made from the loan broker component (a la hub and s
 
 <mule-configuration id="Loan_broker_Async" version="1.0">
 
-    <mule-environment-properties serverUrl=""/> 
+    <mule-environment-properties serverUrl=""/>
+
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+    </agents>
     <!--
     Setting global endpoints can help simplify configuration by defining an actual
     url endpointUri in one place. The endpointUri name can be used in place of the url.
@@ -30,10 +35,6 @@ the different components are made from the loan broker component (a la hub and s
         <endpoint-identifier name="Bank5" value="glue:http://localhost:50080/mule"/>
     </endpoint-identifiers>
 
-    <agents>
-        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
-        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
-    </agents>
      <!--
         The Mule model initialises and manages your UMO components
     -->
@@ -50,9 +51,9 @@ the different components are made from the loan broker component (a la hub and s
             types the catch all strategy is invoked, which simply passes the event to the component
             -->
             <inbound-router>
-                <endpoint address="vm://LoanBrokerRequests" name="LoanRequests"/>
-                <global-endpoint name="LoanBroker"/> 
                 <catch-all-strategy className="org.mule.routing.ComponentCatchAllStrategy"/>
+                <endpoint address="vm://LoanBrokerRequests" name="LoanRequests"/>
+                <endpoint address="LoanBroker"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesAggregator">
                     <filter expectedType="org.mule.samples.loanbroker.LoanQuote" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>

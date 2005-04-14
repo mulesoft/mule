@@ -7,6 +7,10 @@
 
     <mule-environment-properties synchronous="true" serverUrl="" synchronousReceive="true" />
 
+    <agents>
+        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
+        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
+    </agents>
      <!-- Testing with ActiveMq -->
 <!--    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
 <!--        <properties>-->
@@ -35,11 +39,6 @@
         <endpoint-identifier name="Bank4" value="jms://Bank4"/>
         <endpoint-identifier name="Bank5" value="jms://Bank5"/>
     </endpoint-identifiers>
-
-    <agents>
-        <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
-        <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
-    </agents>
 
     <model name="loan-broker">
         <mule-descriptor name="LoanBroker" 
@@ -115,8 +114,8 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                    <endpoint address="vm://LdapAuthenticator"/>                    
                     <filter expression="authenticate=true" className="org.mule.routing.filters.UMOEventFilter"/>
-                    <endpoint address="vm://LdapAuthenticator"/>
                 </router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <endpoint address="vm://JMSMessagingManager"/>

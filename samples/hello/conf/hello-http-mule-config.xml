@@ -42,17 +42,6 @@
             returnClass="java.lang.String"/>    
     </transformers>
 
-    <!--
-        An interceptor is a peice of code that can be configued to execute
-        before and/or after an event is received for a component.
-        You can define a stack of interceptors that will be executed in sequence.
-        You can then configure the stack on your components.
-    -->
-    <interceptor-stack name="default">
-        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
-        <interceptor className="org.mule.interceptors.TimerInterceptor"/>
-    </interceptor-stack>
-
     <global-endpoints>
         <endpoint name="httpEndpoint" address="http://localhost:8888" transformers="HttpRequestToString StringToNameString" >
             <!-- filter out the favicon request -->
@@ -64,6 +53,17 @@
             </properties>
         </endpoint>
     </global-endpoints>
+
+    <!--
+        An interceptor is a peice of code that can be configued to execute
+        before and/or after an event is received for a component.
+        You can define a stack of interceptors that will be executed in sequence.
+        You can then configure the stack on your components.
+    -->
+    <interceptor-stack name="default">
+        <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
+        <interceptor className="org.mule.interceptors.TimerInterceptor"/>
+    </interceptor-stack>
 
     <!--
         The Mule model initialises and manages your UMO components

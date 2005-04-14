@@ -6,9 +6,9 @@
 <mule-configuration id="Test_Mule_Properties" version="1.0">
 
     <environment-properties>
-         <!-- provider properties-->
-         <property name="java.naming.username" value="[% Your Jndi User name %]"/>
-         <property name="java.naming.password" value="[% Your Jndi Password %]"/>
+        <!-- provider properties-->
+        <property name="java.naming.username" value="[% Your Jndi User name %]"/>
+        <property name="java.naming.password" value="[% Your Jndi Password %]"/>
         <!-- The initial context factory for a JNDI initial context -->
         <!--property name="java.naming.factory.initial" value="org.exolab.jms.jndi.InitialContextFactory"/-->
         <property name="java.naming.factory.initial" value="[% Your Jndi connection factory %]"/>
@@ -16,6 +16,12 @@
         <!--property name="java.naming.provider.url" value="tcp://localhost:3035"/-->
         <property name="java.naming.provider.url" value="[% Your Provider Url %]"/>
     </environment-properties>
+
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <property name="configFile" value="../conf/applicationContext.xml"/>
+        </properties>
+    </container-context>
 
     <connector name="FileConnector" className="org.mule.providers.file.FileConnector">
         <properties>
@@ -46,7 +52,7 @@
             <property name="connectionFactoryJndiName" value="[% Your Connection Factory Name %]"/>
             <map name="providerProperties">
                 <property name="org.mule.useManagerProperties" value="true"/>
-             </map>
+            </map>
         </properties>
     </connector>
 
@@ -55,6 +61,8 @@
         <transformer name="XMLToExceptionBean" className="org.mule.transformers.xml.XmlToObject"
             returnClass="org.mule.samples.errorhandler.ExceptionBean"/>
         <transformer name="ExceptionBeanToXML" className="org.mule.transformers.xml.ObjectToXml"
+            returnClass="java.lang.String"/>
+        <transformer name="FileMessageToObject" className="org.mule.providers.file.transformers.FileMessageToObject"
             returnClass="java.lang.String"/>
         <transformer name="ExceptionBeanToErrorMessage" className="org.mule.samples.errorhandler.ExceptionBeanToErrorMessage"
             returnClass="org.mule.samples.errorhandler.ErrorMessage"/>
@@ -66,9 +74,6 @@
             returnClass="javax.mail.Message"/>
         <transformer name="ObjectToJMSMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage"
             returnClass="javax.jms.TextMessage">
-            <properties>
-                <property name="org.mule.useManagerProperties" value="true"/>
-            </properties>
         </transformer>
         <transformer name="JMSMessageToObject" className="org.mule.providers.jms.transformers.JMSMessageToObject"
             returnClass="java.lang.String"/>
@@ -78,12 +83,6 @@
         <interceptor className="org.mule.interceptors.LoggingInterceptor"/>
         <interceptor className="org.mule.interceptors.TimerInterceptor"/>
     </interceptor-stack>
-
-    <container-context className="org.mule.extras.spring.SpringContainerContext">
-            <properties>
-                <property name="configFile" value="../conf/applicationContext.xml"/>
-            </properties>
-        </container-context>
 
     <model name="errorhandler-test">
 
@@ -98,34 +97,34 @@
             <outbound-router>
                 <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <properties>
-                        <property name="transformer" value="ErrorMessageToException"/>
-                    </properties>
                     <endpoint address="file:./test-data/samples/errorhandler/exceptions" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
                         <properties>
                             <property name="outputPattern" value="Exception-${UUID}.xml"/>
                         </properties>
                     </endpoint>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.MuleException"/>
-                </router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <properties>
                         <property name="transformer" value="ErrorMessageToException"/>
                     </properties>
+                </router>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="smtp://exceptions@cubis.co.uk" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
                         <properties>
                             <property name="ccAddresses" value="anotheremail@cubis.co.uk"/>
                         </properties>
                     </endpoint>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.umo.lifecycle.FatalException"/>
-                </router>
-
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <properties>
                         <property name="transformer" value="ErrorMessageToException"/>
                     </properties>
+                </router>
+
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="jms://exception.queue" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
+                    <properties>
+                        <property name="transformer" value="ErrorMessageToException"/>
+                    </properties>
                 </router>
             </outbound-router>
 
