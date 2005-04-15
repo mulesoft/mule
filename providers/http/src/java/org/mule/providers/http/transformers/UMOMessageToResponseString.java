@@ -58,10 +58,11 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
         String version = (String)context.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
         String date = format.format(new Date());
         byte[] response = null;
+        String contentType = (String)context.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if(src instanceof byte[]) {
             response = (byte[])src;
-        } else if (src instanceof String) {
-            response = ((String)src).getBytes();
+        } else if(contentType != null && contentType.startsWith("text/")) {
+            response = src.toString().getBytes();
         } else {
             try
             {
@@ -86,7 +87,6 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
         }
 
         httpMessage.append(HttpConstants.HEADER_CONTENT_TYPE);
-        String contentType = (String)context.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if(contentType==null) {
             httpMessage.append(": ").append("text/xml").append(HttpConstants.CRLF);
         } else {
