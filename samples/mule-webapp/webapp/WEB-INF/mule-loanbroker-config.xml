@@ -45,10 +45,7 @@ the different components are made from the loan broker component (a la hub and s
         <inbound-router>
             <endpoint address="LoanBroker"/>
         </inbound-router>
-        <response-router>
-            <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
-            <endpoint address="LoanQuotes"/>
-        </response-router>
+
         <outbound-router>
             <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                 <endpoint address="CreditAgency"/>
@@ -65,6 +62,11 @@ the different components are made from the loan broker component (a la hub and s
                 <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
             </router>
         </outbound-router>
+
+        <response-router>
+            <endpoint address="LoanQuotes"/>
+            <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
+        </response-router>
     </mule-descriptor>
 
     <mule-descriptor name="CreditAgencyService"
