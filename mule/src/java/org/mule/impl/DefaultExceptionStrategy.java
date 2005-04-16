@@ -53,6 +53,8 @@ public class DefaultExceptionStrategy extends AbstractExceptionListener
     
     protected void defaultHandler(Throwable t) {
         logException(t);
-        RequestContext.setExceptionPayload(new ExceptionPayload(t));
+        if(RequestContext.getEvent()!=null) {
+            RequestContext.setExceptionPayload(new ExceptionPayload(t));
+        }
     }
 }
