@@ -31,6 +31,7 @@ public class FileToString extends AbstractTransformer
     public FileToString()
     {
         registerSourceType(File.class);
+        registerSourceType(String.class);
         registerSourceType(byte[].class);
         setReturnClass(String.class);
     }
@@ -38,6 +39,7 @@ public class FileToString extends AbstractTransformer
     public Object doTransform(Object src) throws TransformerException
     {
         if(src instanceof byte[]) return new String((byte[])src);
+        if(src instanceof String) return src.toString();
         
         StringBuffer sb = new StringBuffer(new Long(((File)src).length()).intValue());
         char[] buf = new char[1024 * 8];

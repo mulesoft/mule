@@ -21,9 +21,7 @@
         <mule-descriptor name="Distributor"
             inboundEndpoint="vm://distributor.queue"
             implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <router className="org.mule.routing.inbound.ForwardingConsumer"/>
-            </inbound-router>
+
             <outbound-router>
                 <router className="org.mule.routing.outbound.StaticRecipientList">
                     <properties>
@@ -40,20 +38,15 @@
         <mule-descriptor name="QuoteProviderOne"
             inboundEndpoint="vm://quoteprovider1.queue"
             outboundEndpoint="vm://Aggregator.queue"
-            implementation="org.mule.components.simple.NullComponent">
-            <inbound-router>
-                <router className="org.mule.routing.inbound.ForwardingConsumer"/>
-            </inbound-router>
+            implementation="org.mule.components.simple.EchoComponent">
         </mule-descriptor>
 
         <!-- This is a quotation system -->
         <mule-descriptor name="QuoteProviderTwo"
             inboundEndpoint="vm://quoteprovider2.queue"
             outboundEndpoint="vm://Aggregator.queue"
-            implementation="org.mule.components.simple.NullComponent">
-            <inbound-router>
-                <router className="org.mule.routing.inbound.ForwardingConsumer"/>
-            </inbound-router>
+            implementation="org.mule.components.simple.EchoComponent">
+
         </mule-descriptor>
 
         <mule-descriptor name="QuoteAggregator"

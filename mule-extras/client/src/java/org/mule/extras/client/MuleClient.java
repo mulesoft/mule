@@ -410,13 +410,11 @@ public class MuleClient implements Disposable
      */
     public UMOMessage send(String url, Object payload, Map messageProperties, int timeout) throws UMOException
     {
-        if (!MuleManager.getConfiguration().isSynchronous())
-        {
-            logger.warn("The mule manager is running asynchronously, a null message payload will be returned");
-        }
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
         if (messageProperties == null) messageProperties = new HashMap();
-        //messageProperties.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "true");
+        if(messageProperties.get(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY)==null) {
+            messageProperties.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "true");
+        }
         UMOMessage message = new MuleMessage(payload, messageProperties);
         UMOEvent event = getEvent(message, muleEndpoint, true);
         event.setTimeout(timeout);
