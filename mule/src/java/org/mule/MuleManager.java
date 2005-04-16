@@ -823,7 +823,7 @@ public class MuleManager implements UMOManager
         if (att.values().size() > 0)
         {
             message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Title"), notset)
-                    + " " + new Message(Messages.VERSION).getMessage() + PropertiesHelper.getStringProperty(att,
+                    + " " + new Message(Messages.VERSION).getMessage() + " " + PropertiesHelper.getStringProperty(att,
                       new Attributes.Name("Implementation-Version"), notset));
 
             message.add(PropertiesHelper.getStringProperty(att, new Attributes.Name("Specification-Vendor"), notset));
