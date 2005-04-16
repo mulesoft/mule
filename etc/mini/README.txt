@@ -27,19 +27,18 @@ The distribution you have downloaded contains the following -
 Getting Started
 ---------------
 To get started:
-http://wiki.muleumo.org/display/MULEPROJ/Getting+Started
+http://www.muleumo.org/Getting+Started
 
-Mule Documentation:
-http://wiki.muleumo.org/display/MULE
+Mule User Documentation:
+http://www.muleumo.org/User+Guide
 
 Example Applications:
-http://wiki.muleumo.org/display/MULE/Mule+Examples
+http://www.muleumo.org/Mule+Examples
 
 Feedback
 --------
 We hope you enjoy using Mule. To help us make it a better product please tell
 us about any issues (no matter how small), suggestions or other comments you have.
-You can post on the mailing list - mule-developer@lists.sourceforge.net or raise
-a Jira issues at http://jira.muleumo.org.
+You can post on the mailing list - user@mule.codehaus.org or raise issues at http://jira.muleumo.org.
 
 Enjoy!
