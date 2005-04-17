@@ -25,10 +25,7 @@
             <inbound-router>
                 <endpoint address="LoanBrokerRequests"/>
             </inbound-router>
-            <response-router>
-                <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
-                <endpoint address="LoanQuotes"/>
-            </response-router>
+
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="CreditAgency"/>
@@ -45,6 +42,12 @@
                     <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </outbound-router>
+
+            <response-router>
+                <endpoint address="LoanQuotes"/>
+                <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
+            </response-router>
+
             <pooling-profile initialisationPolicy="INITIALISE_ALL"/>
         </mule-descriptor>
 
