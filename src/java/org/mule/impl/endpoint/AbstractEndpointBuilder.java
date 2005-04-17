@@ -40,6 +40,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String endpointName;
     protected String connectorName;
     protected String transformers;
+    protected String userInfo;
 
     protected int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
 
@@ -50,7 +51,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             setEndpoint(uri, props);
         }
 
-        UMOEndpointURI ep = new MuleEndpointURI(address, endpointName,  connectorName, transformers, createConnector, props, uri);
+        UMOEndpointURI ep = new MuleEndpointURI(address, endpointName,  connectorName, transformers, createConnector, props, uri, userInfo);
         address = null;
         endpointName = null;
         connectorName = null;

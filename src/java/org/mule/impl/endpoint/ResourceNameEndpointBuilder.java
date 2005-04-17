@@ -45,9 +45,17 @@ public class ResourceNameEndpointBuilder extends AbstractEndpointBuilder
         } else {
             address = uri.getAuthority();
         }
-        int x = address.indexOf(":");
+        //is user info specified?
+        int y = address.indexOf("@");
+        if(y>-1) {
+            this.userInfo = address.substring(0, y);
+        }
+        //increment to 0 or one char past the @
+        y++;
+
+        int x = address.indexOf(":", y);
         if(x > -1) {
-            String resourceInfo = address.substring(0, x);
+            String resourceInfo = address.substring(y, x);
             props.setProperty("resourceInfo", resourceInfo);
             address = address.substring(x+1);
         }

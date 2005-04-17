@@ -28,10 +28,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
-import org.mule.util.MuleObjectHelper;
-import org.mule.util.ObjectFactory;
-import org.mule.util.SpiHelper;
+import org.mule.util.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -189,6 +186,17 @@ public class ConnectorFactory {
         if (connector.getName() == null) {
             connector.setName("_" + scheme + "Connector#" + connector.hashCode());
         }
+        //set any manager default properties for the connector
+        //these are set on the Manager with a protocol i.e.
+        //jms.specification=1.1
+        Map props = PropertiesHelper.getPropertiesWithPrefix(
+                MuleManager.getInstance().getProperties(),
+                connector.getProtocol().toLowerCase());
+        if(props.size()>0) {
+            props = PropertiesHelper.removeNamspaces(props);
+            org.mule.util.BeanUtils.populateWithoutFail(connector, props, true);
+        }
+
         return connector;
     }
 
