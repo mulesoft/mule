@@ -60,7 +60,7 @@ public class PropertiesHelper
         return eleName.substring(i + 1, eleName.length());
     }
 
-    public static HashMap removeNamspaces(HashMap properties)
+    public static Map removeNamspaces(Map properties)
     {
         HashMap props = new HashMap(properties.size());
         Map.Entry entry;
@@ -213,7 +213,7 @@ public class PropertiesHelper
         {
             entry = (Map.Entry)iterator.next();
             if(entry.getKey().toString().startsWith(prefix)) {
-                newProps.put(entry.getValue(), entry.getKey());
+                newProps.put(entry.getKey(), entry.getValue());
             }
         }
         return newProps;

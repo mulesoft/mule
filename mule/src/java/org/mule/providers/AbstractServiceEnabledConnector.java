@@ -27,7 +27,6 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.BeanUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Properties;
 
@@ -64,26 +63,21 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
         props.putAll(endpointUri.getParams());
         //auto set username and password
         if(endpointUri.getUserInfo()!=null) {
-            int i = endpointUri.getUserInfo().indexOf(":");
-            if(i == -1) {
-                props.setProperty("username", endpointUri.getUserInfo());
-            } else {
-                props.setProperty("username", endpointUri.getUserInfo().substring(0, i));
-                props.setProperty("password", endpointUri.getUserInfo().substring(i + 1));
-            }
+            props.setProperty("username", endpointUri.getUsername());
+            props.setProperty("password", endpointUri.getPassword());
         }
         if(endpointUri.getHost()!=null) {
             props.setProperty("hostname", endpointUri.getHost());
             props.setProperty("host", endpointUri.getHost());
         }
         if(endpointUri.getPort() > -1) props.setProperty("port", String.valueOf(endpointUri.getPort()));
-        try
-        {
+//        try
+//        {
             BeanUtils.populateWithoutFail(this, props, true);
-        } catch (InvocationTargetException e)
-        {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"), e, this);
-        }
+//        } catch (InvocationTargetException e)
+//        {
+//            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Connector"), e, this);
+//        }
     }
 
     protected synchronized void initFromServiceDescriptor() throws InitialisationException

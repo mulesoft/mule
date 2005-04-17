@@ -137,13 +137,16 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         }
     }
 
-    protected void initJndiContext() throws NamingException
+    protected void initJndiContext() throws NamingException, InitialisationException
     {
         if(jndiContext==null) {
             Hashtable props = new Hashtable();
 
-            if (jndiInitialFactory != null)
+            if (jndiInitialFactory != null) {
                 props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
+            } else if(providerProperties==null || !providerProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY)) {
+                throw new InitialisationException(new Message(Messages.X_IS_NULL, "jndiInitialFactory"), this);
+            }
 
             if (jndiProviderUrl != null)
                 props.put(Context.PROVIDER_URL, jndiProviderUrl);
@@ -267,7 +270,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
      */
     public String getProtocol()
     {
-        return "JMS";
+        return "jms";
     }
 
     /* (non-Javadoc)

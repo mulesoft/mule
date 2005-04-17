@@ -61,8 +61,15 @@ public class MuleEndpointURI implements UMOEndpointURI
     private int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
     private Properties params = new Properties();
     private URI uri;
+    private String userInfo;
     private String schemeMetaInfo;
     private String resourceInfo;
+
+    MuleEndpointURI(String address, String endpointName, String connectorName, String transformers, int createConnector, Properties properties, URI uri, String userInfo)
+    {
+        this(address, endpointName, connectorName, transformers, createConnector, properties, uri);
+        if(userInfo!=null) this.userInfo = userInfo;
+    }
 
     public MuleEndpointURI(String address, String endpointName, String connectorName, String transformers, int createConnector, Properties properties, URI uri)
     {
@@ -73,6 +80,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.createConnector = createConnector;
         this.params = properties;
         this.uri = uri;
+        this.userInfo = uri.getUserInfo();
         if(properties!=null) {
             resourceInfo = (String)properties.remove("resourceInfo");
         }
@@ -109,6 +117,7 @@ public class MuleEndpointURI implements UMOEndpointURI
                 uri = uri.replaceFirst(schemeMetaInfo + ":", "");
             }
             this.uri = new URI(uri);
+            this.userInfo = this.uri.getUserInfo();
         } catch (URISyntaxException e)
         {
             throw new MalformedEndpointException(uri, e);
@@ -152,6 +161,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.params = endpointUri.getParams();
         this.uri = endpointUri.getUri();
         this.resourceInfo = endpointUri.getResourceInfo();
+        this.userInfo = endpointUri.getUserInfo();
     }
 
     public String getAddress()
@@ -261,7 +271,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getUserInfo()
     {
-        return uri.getUserInfo();
+        return userInfo;
     }
 
     public String getHost()
@@ -350,12 +360,12 @@ public class MuleEndpointURI implements UMOEndpointURI
     }
 
     public String getUsername() {
-        if(uri.getUserInfo()!=null && !"".equals(uri.getUserInfo())) {
-            int i = uri.getUserInfo().indexOf(":");
+        if(userInfo!=null && !"".equals(userInfo)) {
+            int i = userInfo.indexOf(":");
             if(i ==-1) {
-                return uri.getUserInfo();
+                return userInfo;
             } else {
-                return  uri.getUserInfo().substring(0, i);
+                return  userInfo.substring(0, i);
             }
         }
         return null;
@@ -363,10 +373,10 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getPassword()
     {
-        if(uri.getUserInfo()!=null && !"".equals(uri.getUserInfo())) {
-            int i = uri.getUserInfo().indexOf(":");
+        if(userInfo!=null && !"".equals(userInfo)) {
+            int i = userInfo.indexOf(":");
             if(i > -1) {
-                return  uri.getUserInfo().substring(i+1);
+                return  userInfo.substring(i+1);
             }
         }
         return null;

@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p><code>PropertiesHelperTestCase</code> TODO (document class)
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -89,7 +87,7 @@ public class PropertiesHelperTestCase extends TestCase
 
     public void testRemoveNamespaces() throws Exception
     {
-        HashMap props = new HashMap();
+        Map props = new HashMap();
 
         props.put("blah.booleanProperty", "true");
         props.put("blah.blah.doubleProperty", "0.1243");

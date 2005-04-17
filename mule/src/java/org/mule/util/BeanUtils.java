@@ -16,7 +16,6 @@ package org.mule.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -39,7 +38,7 @@ public class BeanUtils
      * @param object
      * @param props
      */
-    public static void populateWithoutFail(Object object, Map props, boolean logWarnings) throws InvocationTargetException {
+    public static void populateWithoutFail(Object object, Map props, boolean logWarnings) {
         Map.Entry entry;
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
         {
@@ -47,7 +46,7 @@ public class BeanUtils
             try
             {
                 org.apache.commons.beanutils.BeanUtils.setProperty(object, entry.getKey().toString(), entry.getValue());
-            } catch (IllegalAccessException e)
+            } catch (Exception e)
             {
                 if(logWarnings) {
                     logger.warn("Property: " + entry.getKey() + "=" + entry.getValue() + " not found on object: " + object.getClass().getName());

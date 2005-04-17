@@ -710,6 +710,13 @@ public class MuleClient implements Disposable
         if(MuleManager.getConfiguration().isClientMode()) {
             manager.dispose();
         }
+    }
 
+    public void setProperty(Object key, Object value) {
+        manager.setProperty(key, value);
+    }
+
+    public Object getProperty(Object key) {
+        return manager.getProperty(key);
     }
 }

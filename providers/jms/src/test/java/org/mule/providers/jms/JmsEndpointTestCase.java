@@ -82,4 +82,29 @@ public class JmsEndpointTestCase extends NamedTestCase
         assertEquals("topic", url.getResourceInfo());
         assertEquals("jms://jmsProvider/topic:topic1", url.toString());
     }
+
+    public void testJmsTopicWithUserInfo() throws Exception
+    {
+        UMOEndpointURI url = new MuleEndpointURI("jms://user:password@topic:topic1");
+        assertEquals("jms", url.getScheme());
+        assertEquals("topic1", url.getAddress());
+        assertEquals("topic", url.getResourceInfo());
+        assertEquals("user:password", url.getUserInfo());
+        assertEquals("user", url.getUsername());
+        assertEquals("password", url.getPassword());
+        assertEquals("jms://user:password@topic:topic1", url.toString());
+    }
+
+    public void testJmsTopicWithUserInfoAndProvider() throws Exception
+    {
+        UMOEndpointURI url = new MuleEndpointURI("jms://user:password@jmsProvider/topic:topic1");
+        assertEquals("jms", url.getScheme());
+        assertEquals("topic1", url.getAddress());
+        assertEquals("jmsProvider", url.getEndpointName());
+        assertEquals("topic", url.getResourceInfo());
+        assertEquals("user:password", url.getUserInfo());
+        assertEquals("user", url.getUsername());
+        assertEquals("password", url.getPassword());
+        assertEquals("jms://user:password@jmsProvider/topic:topic1", url.toString());
+    }
 }
