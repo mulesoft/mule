@@ -209,7 +209,7 @@
                 <rar.bundle>false</rar.bundle>
                 <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
-                <mule.mini>false</mule.mini>
+                <mule.mini>true</mule.mini>
             </properties>
         </dependency>
 
@@ -219,7 +219,7 @@
             <version>${geronimo_spec_j2ee_management_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-                <mule.mini>false</mule.mini>
+                <mule.mini>true</mule.mini>
                 <rar.bundle>false</rar.bundle>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -231,23 +231,23 @@
             <version>${geronimo_spec_j2ee_connector_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
-                <mule.mini>false</mule.mini>
+                <mule.mini>true</mule.mini>
                 <rar.bundle>false</rar.bundle>
                 <war.bundle>true</war.bundle>
             </properties>
         </dependency>
 
         <dependency>
-                    <groupId>geronimo-spec</groupId>
-                    <artifactId>geronimo-spec-j2ee-connector</artifactId>
-                    <version>${geronimo_spec_j2ee_connector_version}</version>
-                    <properties>
-                        <mule.core.jar>true</mule.core.jar>
-                        <mule.mini>false</mule.mini>
-                        <rar.bundle>false</rar.bundle>
-                        <war.bundle>true</war.bundle>
-                    </properties>
-                </dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee-connector</artifactId>
+            <version>${geronimo_spec_j2ee_connector_version}</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>true</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
 
         <dependency>
             <groupId>geronimo-spec</groupId>
