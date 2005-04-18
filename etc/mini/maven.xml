@@ -127,13 +127,13 @@
 	<replace file="${samples.dist}/mule-webapp/maven.xml" token="@VERSION@" value="${pom.currentVersion}"/>
 
         <delete file="${samples.dist}/mule-webapp/webapp/WEB-INF/mule-loanbroker-async-config.xml"/>
-        <delete>
+        <delete includeemptydirs="true">
             <fileset dir="${samples.dist}/hello">
-                <includes name="*spring*"/>
-                <includes name="*http*"/>
+                <include name="**/*spring*"/>
+                <include name="**/*http*"/>
             </fileset>
         </delete>
-      
+
     </goal>
 
     <goal name="mule:zip-release" prereqs="setvars">
