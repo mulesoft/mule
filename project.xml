@@ -6,7 +6,7 @@
     <id>mule</id>
     <groupId>mule</groupId>
     <artifactId>mule</artifactId>
-    <currentVersion>1.1-SNAPHOT</currentVersion>
+    <currentVersion>1.1-SNAPSHOT</currentVersion>
     <organization>
         <name>SymphonySoft Limited</name>
         <url>http://www.symphonysoft.com</url>
