@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <groupId>mule</groupId>
+    <id>mule-extras-quartz</id>
+    <artifactId>mule-extras-quartz</artifactId>
+    <name>Quartz / Spring Extensions</name>
+    <description>Provides extensions to use Quartz / Spring with Mule</description>
+    <dependencies>
+        <dependency>
+            <artifactId>mule-extras-client</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <artifactId>mule-extras-spring</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>quartz</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz_version}</version>
+            <url>http://www.opensymphony.com/quartz/</url>
+        </dependency>
+        <dependency>
+            <artifactId>spring</artifactId>
+            <groupId>springframework</groupId>
+            <version>${spring_version}</version>
+            <url>http://www.springframework.org</url>
+        </dependency>
+    </dependencies>
+</project>
