@@ -19,19 +19,19 @@
     <!--            ignoreFailures="false"/>-->
     <!--    </goal>-->
 
-    <preGoal name="multiproject:install">
-        <attainGoal name="clean"/>
-        <attainGoal name="multiproject:clean"/>
-    </preGoal>
+    <!--    <preGoal name="multiproject:install">-->
+    <!--        <attainGoal name="clean"/>-->
+    <!--        <attainGoal name="multiproject:clean"/>-->
+    <!--    </preGoal>-->
 
     <postGoal name="multiproject:install">
         <attainGoal name="all-jars"/>
     </postGoal>
 
-    <preGoal name="multiproject:install-snapshot">
-        <attainGoal name="clean"/>
-        <attainGoal name="multiproject:clean"/>
-    </preGoal>
+    <!--    <preGoal name="multiproject:install-snapshot">-->
+    <!--        <attainGoal name="clean"/>-->
+    <!--        <attainGoal name="multiproject:clean"/>-->
+    <!--    </preGoal>-->
 
     <postGoal name="multiproject:install-snapshot">
         <attainGoal name="all-jars"/>
