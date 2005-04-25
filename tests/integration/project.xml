@@ -10,17 +10,7 @@
     <shortDescription>integration-tests</shortDescription>
     <url>http://www.muleumo.org/</url>
     <dependencies>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jms</artifactId>
-            <version>${geronimo_spec_jms_version}</version>
-            <properties>
-                <mule.core.jar>false</mule.core.jar>
-                <mule.mini>false</mule.mini>
-                <rar.bundle>false</rar.bundle>
-                <war.bundle>false</war.bundle>
-            </properties>
-        </dependency>
+        
    </dependencies>
     <unitTest>
             <includes>

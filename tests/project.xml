@@ -11,8 +11,8 @@
     <logo>http://www.muleumo.org/images/mule-logo.gif</logo>
     <shortDescription>mule-tests</shortDescription>
     <description>
-    Integration tests ensure that Mule sub projects work well to together. Use cases
-    are scenarios presented o the Mailing lists
+        Integration tests ensure that Mule sub projects work well to together. Use cases
+        are scenarios presented o the Mailing lists
     </description>
     <url>http://wiki.muleumo.org/display/MULEPROJ/Integration+Tests</url>
     <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
@@ -94,6 +94,9 @@
                 <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
+
+        <!-- JDBC deps -->
+
         <dependency>
             <id>mule:mule-jdbc-provider</id>
             <version>${pom.currentVersion}</version>
@@ -104,16 +107,104 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-jms-provider</id>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <version>${commons_dbutils_version}</version>
+            <url>http://jakarta.apache.org/commons/dbutils/index.html</url>
+        </dependency>
+        <dependency>
+            <groupId>xapool</groupId>
+            <artifactId>xapool</artifactId>
+            <version>${xapool_version}</version>
+            <type>jar</type>
+            <url>http://xapool.experlog.com/</url>
+            <properties/>
+        </dependency>
+        <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb_version}</version>
+            <url>http://hsqldb.sourceforge.net/</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+
+        <!-- Jms deps -->
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jms</artifactId>
+            <version>${geronimo_spec_jms_version}</version>
+            <properties>
+                <mule.core.jar>false</mule.core.jar>
+                <mule.mini>false</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>false</war.bundle>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-jms-provider</artifactId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+
+        <!-- SOAP Deps -->
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-soap-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <artifactId>glue</artifactId>
+            <groupId>glue</groupId>
+            <version>${glue_version}</version>
+            <properties>
+                <!-- cannot ship Glue jar due to license restrictions -->
+                <ignore>true</ignore>
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-extras-client</id>
+            <artifactId>axis</artifactId>
+            <groupId>axis</groupId>
+            <version>${axis_version}</version>
+            <url>http://ws.apache.org</url>
+        </dependency>
+        <dependency>
+            <artifactId>axis-jaxrpc</artifactId>
+            <groupId>axis</groupId>
+            <version>${axis_jaxrpc_version}</version>
+            <url>http://ws.apache.org</url>
+        </dependency>
+        <dependency>
+            <artifactId>axis-saaj</artifactId>
+            <groupId>axis</groupId>
+            <version>${axis_saaj_version}</version>
+            <url>http://ws.apache.org</url>
+        </dependency>
+        <dependency>
+            <artifactId>axis-wsdl4j</artifactId>
+            <groupId>axis</groupId>
+            <version>${axis_wsdl4j_version}</version>
+            <url>http://ws.apache.org</url>
+        </dependency>
+
+        <!-- Xmpp -->
+
+        <dependency>
+            <artifactId>mule-xmpp-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -121,6 +212,33 @@
                 <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
+
+        <dependency>
+            <groupId>smack</groupId>
+            <artifactId>smack</artifactId>
+            <version>${smack_version}</version>
+            <url>http://www.jivesoftware.org</url>
+        </dependency>
+        <dependency>
+            <groupId>smack</groupId>
+            <artifactId>smackx</artifactId>
+            <version>${smackx_version}</version>
+            <url>http://www.jivesoftware.org</url>
+        </dependency>
+
+
+        <dependency>
+            <artifactId>mule-extras-client</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+
+
         <dependency>
             <id>mule:mule-extras-jotm</id>
             <version>${pom.currentVersion}</version>
@@ -303,10 +421,10 @@
             </properties>
         </dependency>
         <dependency>
-        	<groupId>hsqldb</groupId>
-        	<artifactId>hsqldb</artifactId>
-        	<version>${hsqldb_version}</version>
-        	<url>http://hsqldb.sourceforge.net/</url>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb_version}</version>
+            <url>http://hsqldb.sourceforge.net/</url>
         </dependency>
     </dependencies>
     <build>
