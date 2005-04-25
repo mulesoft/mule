@@ -32,6 +32,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.BeanUtils;
 
 import javax.xml.rpc.ServiceException;
 import javax.xml.soap.SOAPEnvelope;
@@ -113,7 +114,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         String method = (String) endpointUri.getParams().remove("method");
-
+        
         if (method == null)
         {
             method = (String) event.getEndpoint().getProperties().get("method");
@@ -122,7 +123,11 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
                 throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),  event.getEndpoint());
             }
         }
+
         Call call = (Call) service.createCall();
+        //set properties on the call from the endpoint properties
+        BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
+
         call.setTargetEndpointAddress(endpointUri.getAddress());
         call.setSOAPActionURI(endpointUri.getAddress());
         call.setOperationName(method);
