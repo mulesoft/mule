@@ -13,24 +13,30 @@
  */
 package org.mule.providers.soap.axis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.soap.Person;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -45,6 +51,29 @@ public class AxisConnectorFunctionalTestCase extends AbstractMuleTestCase
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("axis-test-mule-config.xml");
     }
+	
+	static public class ComponentWithoutInterfaces {
+		public String echo(String msg) {
+			return msg;
+		}
+	}	
+	
+	public void testComponentWithoutInterfaces() throws Throwable {
+		try {
+	        UMOConnector c = ConnectorFactory.getConnectorByProtocol("axis");
+	        UMODescriptor descriptor = new MuleDescriptor();
+	        descriptor.setExceptionListener(new DefaultExceptionStrategy());
+	        descriptor.setName("testComponentWithoutInterfaces");
+	        descriptor.setImplementation(ComponentWithoutInterfaces.class.getName());
+			UMOEndpoint endpoint = new MuleEndpoint("testIn", new MuleEndpointURI("axis:http://localhost:38011/mule/test"),
+					c, null, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null);
+			descriptor.setInboundEndpoint(endpoint);
+			UMOComponent component = MuleManager.getInstance().getModel().registerComponent(descriptor);
+			fail();
+		} catch (InitialisationException e) {
+			assertEquals(Messages.X_MUST_IMPLEMENT_AN_INTERFACE, e.getMessageCode());
+		}
+	}
 
     public void testRequestResponse() throws Throwable
     {

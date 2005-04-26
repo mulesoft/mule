@@ -206,6 +206,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         }
         //set method names
         Class[] interfaces = ServiceProxy.getInterfacesForComponent(receiver.getComponent());
+		if (interfaces.length == 0) {
+            throw new InitialisationException(new Message(Messages.X_MUST_IMPLEMENT_AN_INTERFACE, serviceName), receiver.getComponent());
+		}
         //You must supply a class name if you want to restrict methods
         //or specify the 'allowedMethods' property in the axisOptions property
         String methodNames = "*";
@@ -216,7 +219,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         {
             buf.append(methods[i]).append(",");
         }
-        String className = interfaces[0].getName();
+		String className = interfaces[0].getName();
         methodNames = buf.toString();
         methodNames = methodNames.substring(0, methodNames.length() -1);
 
