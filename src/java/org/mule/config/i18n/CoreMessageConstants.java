@@ -175,5 +175,6 @@ public interface CoreMessageConstants
     public static final int X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X = 157;
     public static final int PROPERTY_TEMPLATE_MALFORMED_X = 158;
     public static final int MANAGER_IS_ALREADY_CONFIGURED = 159;
+	public static final int X_MUST_IMPLEMENT_AN_INTERFACE = 160;
 
 }
