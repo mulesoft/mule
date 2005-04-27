@@ -1,3 +1,17 @@
+/* 
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ * 
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ * 
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file. 
+ *
+ */
 package org.mule.extras.quartz;
 
 import org.mule.extras.client.MuleClient;
@@ -6,6 +20,13 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+/**
+ * Simple quartz Job able to send / dispatch a simple message
+ * specified as an object to a mule local or remote endpoint. 
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @version $Revision$
+ */
 public class MuleJobBean extends QuartzJobBean {
 
 	private String endpoint;
@@ -98,8 +119,5 @@ public class MuleJobBean extends QuartzJobBean {
 	public boolean isSynchronous() {
 		return synchronous;
 	}
-	
-	
-	
 
 }
