@@ -20,12 +20,16 @@ public class ExceptionListenerTestCase extends NamedTestCase
     public void testExceptionStrategy() throws Exception
     {
         MuleClient client = new MuleClient();
-        client.send("vm://mycomponent", "test", null);
 
-        UMOMessage message = client.receive("vm:/mycomponent.out", 2000);
+        UMOMessage message = client.receive("vm://error.queue", 2000);
         assertNull(message);
 
-        message = client.receive("vm:/error.queue", 2000);
+        client.send("vm://mycomponent", "test", null);
+
+        message = client.receive("vm://mycomponent.out", 2000);
+        assertNull(message);
+
+        message = client.receive("vm://error.queue", 2000);
         assertNotNull(message);
         Object payload = message.getPayload();
         assertTrue(payload instanceof ExceptionMessage);

@@ -25,9 +25,7 @@
  *
 
  */
-
 package org.mule.providers.vm;
-
 
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
@@ -45,6 +43,9 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.queue.BoundedPersistentQueue;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
 
 /**
  * <code>VMMessageReceiver</code> is a listener of events from a mule component which then simply
@@ -54,20 +55,21 @@ import org.mule.util.queue.BoundedPersistentQueue;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-
-public class VMMessageReceiver extends AbstractMessageReceiver implements Runnable
+public class VMMessageReceiver extends AbstractMessageReceiver implements Work
 {
     private BoundedPersistentQueue queue;
-    private Thread worker;
     private Object lock = new Object();
 
     public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint, BoundedPersistentQueue queue) throws InitialisationException
     {
         create(connector, component, endpoint);
         this.queue = queue;
-        if(queue!=null) {
-            worker = new Thread(this);
-            worker.start();
+        if (queue != null) {
+            try {
+                getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
+            } catch (WorkException e) {
+                throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
+            }
         }
     }
 
@@ -78,14 +80,12 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
      */
     public void onEvent(UMOEvent event) throws UMOException
     {
-        if(queue!=null) {
-            try
-            {
-                synchronized(queue) {
+        if (queue != null) {
+            try {
+                synchronized (queue) {
                     queue.put(event);
                 }
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 throw new MuleException(new Message(Messages.INTERRUPTED_QUEUING_EVENT_FOR_X, this.endpoint.getEndpointURI()), e);
             }
         } else {
@@ -95,7 +95,7 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
             UMOMessageAdapter adapter = connector.getMessageAdapter(new MuleMessage(event.getTransformedMessage(), event.getProperties()));
             UMOMessage message = new MuleMessage(adapter);
 
-            synchronized(lock) {
+            synchronized (lock) {
                 routeMessage(message, event.isSynchronous());
             }
         }
@@ -112,32 +112,26 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
 
     public void run()
     {
-        while(!disposing.get())
-        {
-            if(connector.isStarted())
-            {
+        while (!disposing.get()) {
+            if (connector.isStarted()) {
                 UMOEvent event = null;
-                try
-                {
-                    try
-                    {
-                        event = (UMOEvent)queue.take();
+                try {
+                    try {
+                        event = (UMOEvent) queue.take();
                         UMOMessageAdapter adapter = connector.getMessageAdapter(new MuleMessage(event.getTransformedMessage(), event.getProperties()));
                         routeMessage(new MuleMessage(adapter), event.isSynchronous());
-                    } catch (InterruptedException e)
-                    {
+                    } catch (InterruptedException e) {
                         //ignore
                     }
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     logger.error("Failed to dispatch event from VM receiver: " + e.getMessage(), e);
-                    if(e instanceof UMOException) {
+                    if (e instanceof UMOException) {
                         connector.getExceptionListener().exceptionThrown(e);
                     } else {
                         connector.getExceptionListener().exceptionThrown(new DispatchException(event.getMessage(), event.getEndpoint(), e));
                     }
                 } finally {
-                    if(event!=null) {
+                    if (event != null) {
                         queue.remove(event);
                     }
                 }
@@ -149,9 +143,7 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Runnab
         return queue;
     }
 
-    public void doDispose()
-    {
-        if(worker!=null) worker.interrupt();
-        worker=null;
+    public void release() {
+
     }
 }

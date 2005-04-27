@@ -208,7 +208,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
         }
         catch (Exception e)
         {
-            throw new MuleException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: " + descriptor.getName()), e);                            
+            throw new MessagingException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: " + descriptor.getName()), event.getMessage(), e);                            
         }
     }
 
