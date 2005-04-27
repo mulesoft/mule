@@ -21,6 +21,7 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.manager.UMOServerEventListener;
 
+import javax.resource.spi.work.Work;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,7 +32,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ServerEventManager implements Runnable, Disposable
+public class ServerEventManager implements Work, Disposable
 {
     /**
      * logger used by this class
@@ -156,6 +157,7 @@ public class ServerEventManager implements Runnable, Disposable
 
     public void dispose()
     {
+        eventLoop.interrupt();
         clear();
         disposed = true;
     }
@@ -230,6 +232,10 @@ public class ServerEventManager implements Runnable, Disposable
         {
             throw new IllegalArgumentException("Event type not recognised: " + event.getClass().getName());
         }
+    }
+
+    public void release() {
+        dispose();
     }
 
     /**
