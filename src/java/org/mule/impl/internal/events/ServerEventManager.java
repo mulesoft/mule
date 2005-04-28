@@ -157,9 +157,9 @@ public class ServerEventManager implements Work, Disposable
 
     public void dispose()
     {
+        disposed = true;
         eventLoop.interrupt();
         clear();
-        disposed = true;
     }
 
     protected void notifyListeners(UMOServerEvent event)
@@ -260,7 +260,9 @@ public class ServerEventManager implements Work, Disposable
                 notifyListeners(event);
             } catch (InterruptedException e)
             {
-                logger.error("Failed to take event from server event queue", e);
+				if (!disposed) {
+					logger.error("Failed to take event from server event queue", e);
+				}
             }
         }
     }
