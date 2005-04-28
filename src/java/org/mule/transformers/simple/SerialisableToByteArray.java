@@ -25,6 +25,8 @@ import java.io.Serializable;
  * <code>SerialisableToByteArray</code> converts a serialisable object or a String
  * to a byte array.
  *
+ * @deprecated use SerializableToByteArray
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

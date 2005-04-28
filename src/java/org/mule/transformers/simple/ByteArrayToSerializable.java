@@ -23,17 +23,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 /**
- * <code>ByteArrayToSerialisable</code> converts a Serialised object to its
+ * <code>ByteArrayToSerializable</code> converts a serialized object to its
  * object representation
- * 
- * @deprecated use ByteArrayToSerializable
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ByteArrayToSerialisable extends AbstractTransformer
+public class ByteArrayToSerializable extends AbstractTransformer
 {
-    public ByteArrayToSerialisable()
+    public ByteArrayToSerializable()
     {
         registerSourceType(byte[].class);
     }
