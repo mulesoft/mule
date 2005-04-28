@@ -38,6 +38,8 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool {
     private ThreadingProfile profile;
 
     private String name;
+	
+	private static final long SHUTDOWN_TIMEOUT = 5000L;
 
     /**
      * Creates a pool with the specified minimum and maximum sizes. The Channel
@@ -109,11 +111,21 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool {
 
     /**
      * Stops this pool. Prior to stop this pool, all the enqueued Work instances
-     * are processed. This is an orderly shutdown.
+     * are processed, if possible, in the allowed timeout.  After what, all
+     * threads are interrupted and waited for.  
+     * This is an mix orderly / abrupt shutdown.
      */
     public WorkExecutorPool stop() {
         int maxSize = getMaximumPoolSize();
-        pooledExecutor.shutdownAfterProcessingCurrentlyQueuedTasks();
+		pooledExecutor.shutdownAfterProcessingCurrentlyQueuedTasks();
+		try {
+			if (!pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT)) {
+		        pooledExecutor.interruptAll();
+				pooledExecutor.awaitTerminationAfterShutdown();
+			}
+		} catch (InterruptedException e) {
+			// Continue
+		}
         return new NullWorkExecutorPool(profile, name);
     }
 
