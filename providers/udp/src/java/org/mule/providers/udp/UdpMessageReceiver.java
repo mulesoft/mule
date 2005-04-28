@@ -19,6 +19,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -54,22 +55,26 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         create(connector, component, endpoint);
         bufferSize = ((UdpConnector) connector).getBufferSize();
 
-        uri = endpoint.getEndpointURI().getUri();
-
-        try
+		uri = endpoint.getEndpointURI().getUri();
+        
+		try
         {
             inetAddress = InetAddress.getByName(uri.getHost());
         } catch (UnknownHostException e)
         {
             throw new InitialisationException(new Message("udp", 2, uri), e, this);
         }
+    }
+	
+	public void start() throws UMOException {
         connect(uri);
         try {
             getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
         } catch (WorkException e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
-    }
+	}
+	
 
     protected void connect(URI uri) throws InitialisationException
     {

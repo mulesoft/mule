@@ -35,6 +35,7 @@ import org.mule.impl.ResponseOutputStream;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -64,15 +65,17 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                               UMOEndpoint endpoint) throws InitialisationException
     {
         create(connector, component, endpoint);
+    }
+	
+	public void start() throws UMOException {
         URI uri = endpoint.getEndpointURI().getUri();
-
         connect(uri);
         try {
             getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
         } catch (WorkException e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
-    }
+	}
 
     protected void connect(URI uri) throws InitialisationException
     {

@@ -55,6 +55,7 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
         connector.setProviderProperties(props);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
+		connector.getReceiverThreadingProfile().setMaxThreadsActive(1);
 
         return connector;
     }

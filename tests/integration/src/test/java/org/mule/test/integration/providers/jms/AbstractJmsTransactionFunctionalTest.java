@@ -253,6 +253,9 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         assertTrue("Only " + (countDown.initialCount() - countDown.currentCount()) + " of " + countDown.initialCount() + " checkpoints hit",
                 countDown.attempt(0));
 
+		// Sleep a while to allow transaction to be rolled back
+		afterInitialise();
+		
         assertNull(currentMsg);
         assertTrue(callbackCalled);
         assertTrue(currentTx.isRolledBack());

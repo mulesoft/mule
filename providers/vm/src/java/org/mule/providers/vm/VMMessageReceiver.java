@@ -64,6 +64,9 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Work
     {
         create(connector, component, endpoint);
         this.queue = queue;
+    }
+	
+	public void start() throws UMOException {
         if (queue != null) {
             try {
                 getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
@@ -71,7 +74,7 @@ public class VMMessageReceiver extends AbstractMessageReceiver implements Work
                 throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
             }
         }
-    }
+	}
 
 
 

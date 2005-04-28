@@ -469,6 +469,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         } else
         {
             receiver = createReceiver(component, endpoint);
+			receiver.start();
             receivers.put(getReceiverKey(component, endpoint), receiver);
         }
         return receiver;

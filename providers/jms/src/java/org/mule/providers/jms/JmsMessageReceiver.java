@@ -30,19 +30,42 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
+ * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
+ * 
+ * TODO: make frequency, reuseConsumer, resuseSession properties configurable
  */
 public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 
 	protected JmsConnector connector;
 	protected boolean reuseConsumer;
 	protected boolean reuseSession;
-	protected Session session;
-	protected MessageConsumer consumer;
+	protected ThreadContextLocal context = new ThreadContextLocal();
 	protected long frequency;
     protected RedeliveryHandler redeliveryHandler;
 
+	/**
+	 * Holder receiving the session and consumer for this thread. 
+	 * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
+	 */
+	protected static class JmsThreadContext {
+		public Session session;
+		public MessageConsumer consumer;
+	}
+
+	/**
+	 * Strongly typed ThreadLocal for ThreadContext.
+	 * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
+	 */
+	protected static class ThreadContextLocal extends ThreadLocal {
+		public JmsThreadContext getContext() {
+			return (JmsThreadContext) get();
+		}
+	    protected Object initialValue() {
+	        return new JmsThreadContext();
+	    }
+	}
+	
 	public JmsMessageReceiver() {
 	}
 	
@@ -54,7 +77,7 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
     	this.frequency = 10000;
     	this.reuseConsumer = true;
     	this.reuseSession = true;
-        receiveMessagesInTransaction = (endpoint.getTransactionConfig() != null);
+        receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
         try {
             redeliveryHandler = this.connector.createRedeliveryHandler();
             redeliveryHandler.setConnector(this.connector);
@@ -69,8 +92,9 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
     public void poll() throws Exception
     {
     	try {
+			JmsThreadContext ctx = context.getContext();
 			// Create consumer if necessary
-			if (consumer == null) {
+			if (ctx.consumer == null) {
 				createConsumer();
 			}
 			// Do polling
@@ -87,13 +111,15 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 	protected List getMessages() throws Exception {
 		// As the session is created outside the transaction, it is not
 		// bound to it yet
+		JmsThreadContext ctx = context.getContext();
+		
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null) {
-        	tx.bindResource(connector.getConnection(), session);
+        	tx.bindResource(connector.getConnection(), ctx.session);
         }
 		
         // Retrieve message
-		Message message = consumer.receive(frequency);
+		Message message = ctx.consumer.receive(frequency);
         if (message == null) {
         	if (tx != null) {
         		tx.setRollbackOnly();
@@ -136,16 +162,17 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 	}
 	
 	protected void closeConsumer() {
+		JmsThreadContext ctx = context.getContext();
 		// Close consumer
 		if (!reuseSession || !reuseConsumer) {
-			JmsUtils.closeQuietly(consumer);
-			consumer = null;
+			JmsUtils.closeQuietly(ctx.consumer);
+			ctx.consumer = null;
 		}
 		// Do not close session if a transaction is in progress
 		// the session will be close by the transaction
 		if (!reuseSession) {
-			JmsUtils.closeQuietly(session);
-			session = null;
+			JmsUtils.closeQuietly(ctx.session);
+			ctx.session = null;
 		}
 	}
 
@@ -155,16 +182,16 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 	 */
 	protected void createConsumer() throws Exception {
 		JmsSupport jmsSupport = this.connector.getJmsSupport();
-		
+		JmsThreadContext ctx = context.getContext();
 		// Create session if none exists
-		if (session == null) {
-			session = (Session) this.connector.getSession(endpoint);
+		if (ctx.session == null) {
+			ctx.session = (Session) this.connector.getSession(endpoint);
 		}
 		
 		// Create destination
         String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
         boolean topic = (resourceInfo!=null && "topic".equalsIgnoreCase(resourceInfo));
-        Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
+        Destination dest = jmsSupport.createDestination(ctx.session, endpoint.getEndpointURI().getAddress(), topic);
 
         // Extract jms selector
         String selector=null;
@@ -188,6 +215,6 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
         }
 
         // Create consumer
-        consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName);
+		ctx.consumer = jmsSupport.createConsumer(ctx.session, dest, selector, connector.isNoLocal(), durableName);
 	}
 }
