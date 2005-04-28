@@ -4,3 +4,4 @@ test
 .classpath
 .project
 target
+bin

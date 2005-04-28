@@ -20,7 +20,7 @@
     <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
     <dependencies>
         <dependency>
-            <artifactId>mule</artifactId>
+            <artifactId>mule-core</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>

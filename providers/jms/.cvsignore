@@ -2,3 +2,4 @@ maven.log
 .classpath
 .project
 target
+bin
