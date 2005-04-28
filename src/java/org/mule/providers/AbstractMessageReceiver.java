@@ -107,6 +107,12 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
             }
         }
     }
+	
+	/* (non-Javadoc)
+	 * @see org.mule.provider.UMOMessageReceiver#start()
+	 */
+	public void start() throws UMOException {
+	}
 
     /* (non-Javadoc)
      * @see org.mule.umo.provider.UMOMessageReceiver#getEndpointName()
@@ -126,7 +132,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         UMOMessage message = RequestContext.getEvent().getMessage();
         if (propName != null && message != null) {
             String code = ExceptionHelper.getErrorMapping(connector.getProtocol(), exception.getClass());
-            if (logger.isDebugEnabled()) logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
+            if (logger.isDebugEnabled()) {
+				logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
+            }
             message.setProperty(propName, code);
         }
     }
@@ -243,7 +251,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
      * @see org.mule.umo.provider.UMOMessageReceiver#setEndpoint(org.mule.umo.endpoint.UMOEndpoint)
      */
     public void setEndpoint(UMOEndpoint endpoint) {
-        if (endpoint == null) throw new IllegalArgumentException("Provider cannot be null");
+        if (endpoint == null) {
+			throw new IllegalArgumentException("Provider cannot be null");
+        }
         if (endpoint.getFilter() != null && !allowFilter(endpoint.getFilter())) {
             throw new UnsupportedOperationException("Message filter: " + endpoint.getFilter().getClass().getName() + " is not supported by this connector: " + connector.getClass().getName());
         }
@@ -254,7 +264,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
      * @see org.mule.umo.provider.UMOMessageReceiver#setSession(org.mule.umo.UMOSession)
      */
     public void setComponent(UMOComponent component) {
-        if (component == null) throw new IllegalArgumentException("Component cannot be null");
+        if (component == null) {
+			throw new IllegalArgumentException("Component cannot be null");
+        }
         this.component = component;
     }
 

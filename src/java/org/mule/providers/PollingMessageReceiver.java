@@ -12,12 +12,12 @@
  * the LICENSE.txt file. 
  *
  */
-
 package org.mule.providers;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -33,7 +33,7 @@ import javax.resource.spi.work.WorkManager;
  * connector is not started.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author Guillaume Nodet
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
 public abstract class PollingMessageReceiver extends AbstractMessageReceiver implements Work
@@ -48,18 +48,19 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
     
     public PollingMessageReceiver(UMOConnector connector,
                                   UMOComponent component,
-                                  final UMOEndpoint endpoint, Long frequency) throws InitialisationException
-    {
+                                  final UMOEndpoint endpoint, 
+                                  Long frequency) throws InitialisationException {
         create(connector, component, endpoint);
         this.frequency = frequency.longValue();
-
+    }
+	
+	public void start() throws UMOException {
         try {
             getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
         } catch (WorkException e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
-
-    }
+	}
     
     public void run() {
     	try {
@@ -70,6 +71,8 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
 	            }
 	            Thread.sleep(frequency);
 	    	}
+    	} catch (InterruptedException e) {
+			// Exit thread
     	} catch (Exception e) {
 	        connector.handleException(e);
     	}
@@ -79,26 +82,19 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
         this.dispose();
     }
 
-    public void setFrequency(long l)
-    {
-        if (l <= 0)
-        {
+    public void setFrequency(long l) {
+        if (l <= 0) {
             frequency = DEFAULT_POLL_FREQUENCY;
-        }
-        else
-        {
+        } else {
             frequency = l;
         }
     }
 
-    public long getFrequency()
-    {
+    public long getFrequency() {
         return frequency;
     }
 
-    protected void doDispose()
-    {
-  
+    protected void doDispose() {
     }
 
     public abstract void poll() throws Exception;

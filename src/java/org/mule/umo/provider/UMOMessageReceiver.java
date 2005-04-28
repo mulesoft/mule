@@ -20,6 +20,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Startable;
 
 /**
  * <code>UMOMessageReceiver</code> is used to receive data from an external system.
@@ -33,7 +34,7 @@ import org.mule.umo.lifecycle.InitialisationException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOMessageReceiver extends Disposable
+public interface UMOMessageReceiver extends Startable, Disposable
 {
 
     /**
