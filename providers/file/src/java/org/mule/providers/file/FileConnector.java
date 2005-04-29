@@ -31,8 +31,8 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.transformers.simple.ByteArrayToSerialisable;
-import org.mule.transformers.simple.SerialisableToByteArray;
+import org.mule.transformers.simple.ByteArrayToSerializable;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -378,8 +378,8 @@ public class FileConnector extends AbstractServiceEnabledConnector
         //set serialisable transformers on the connector if this is set
         if(serialiseObjects) {
             if(serviceOverrides==null) serviceOverrides = new Properties();
-            serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, ByteArrayToSerialisable.class.getName());
-            serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, SerialisableToByteArray.class.getName());
+            serviceOverrides.setProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER, ByteArrayToSerializable.class.getName());
+            serviceOverrides.setProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER, SerializableToByteArray.class.getName());
         }
 
         this.serialiseObjects = serialiseObjects;

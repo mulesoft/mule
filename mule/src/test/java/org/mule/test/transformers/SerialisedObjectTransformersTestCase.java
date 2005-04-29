@@ -14,8 +14,8 @@
 package org.mule.test.transformers;
 
 import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.transformers.simple.ByteArrayToSerialisable;
-import org.mule.transformers.simple.SerialisableToByteArray;
+import org.mule.transformers.simple.ByteArrayToSerializable;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.io.ByteArrayOutputStream;
@@ -33,12 +33,12 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
 
     public UMOTransformer getTransformer() throws Exception
     {
-        return new SerialisableToByteArray();
+        return new SerializableToByteArray();
     }
 
     public UMOTransformer getRoundTripTransformer() throws Exception
     {
-        return new ByteArrayToSerialisable();
+        return new ByteArrayToSerializable();
     }
 
     public Object getTestData()

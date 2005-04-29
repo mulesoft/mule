@@ -16,7 +16,7 @@ package org.mule.providers.soap.axis;
 import org.apache.axis.MessageContext;
 import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.transformers.simple.SerialisableToByteArray;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.transformer.UMOTransformer;
 
@@ -31,7 +31,7 @@ import javax.xml.soap.SOAPException;
 public class AxisMessageAdapter extends AbstractMessageAdapter
 {
     private Object message;
-    private UMOTransformer trans = new SerialisableToByteArray();
+    private UMOTransformer trans = new SerializableToByteArray();
 
     public AxisMessageAdapter(Object message) throws MessagingException
     {

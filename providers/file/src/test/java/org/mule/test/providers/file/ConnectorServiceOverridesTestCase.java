@@ -20,8 +20,8 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.file.FileConnector;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformers.simple.ByteArrayToSerialisable;
-import org.mule.transformers.simple.SerialisableToByteArray;
+import org.mule.transformers.simple.ByteArrayToSerializable;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -50,8 +50,8 @@ public class ConnectorServiceOverridesTestCase extends AbstractMuleTestCase
         assertEquals("org.mule.transformers.simple.ByteArrayToSerialisable", c.getServiceOverrides().get("inbound.transformer"));
         assertNotNull(c.getDefaultInboundTransformer());
         assertNotNull(c.getDefaultOutboundTransformer());
-        assertTrue(c.getDefaultInboundTransformer() instanceof ByteArrayToSerialisable);
-        assertTrue(c.getDefaultOutboundTransformer() instanceof SerialisableToByteArray);
+        assertTrue(c.getDefaultInboundTransformer() instanceof ByteArrayToSerializable);
+        assertTrue(c.getDefaultOutboundTransformer() instanceof SerializableToByteArray);
     }
 
     public void testSerivceOverrides2() throws InterruptedException

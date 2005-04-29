@@ -17,7 +17,7 @@ import electric.glue.context.ThreadContext;
 import electric.service.IService;
 import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.transformers.simple.SerialisableToByteArray;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IteratorAdapter;
 
@@ -30,7 +30,7 @@ import org.mule.util.IteratorAdapter;
 public class GlueMessageAdapter extends AbstractMessageAdapter
 {
     private Object message;
-    private UMOTransformer trans = new SerialisableToByteArray();
+    private UMOTransformer trans = new SerializableToByteArray();
 
     public GlueMessageAdapter(Object message)
     {

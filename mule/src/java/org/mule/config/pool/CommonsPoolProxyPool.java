@@ -65,8 +65,7 @@ public class CommonsPoolProxyPool implements ObjectPool
         config.maxIdle = descriptor.getPoolingProfile().getMaxIdle();
         config.maxActive = descriptor.getPoolingProfile().getMaxActive();
         config.maxWait = descriptor.getPoolingProfile().getMaxWait();
-        config.whenExhaustedAction = new Integer(descriptor.getPoolingProfile().getExhaustedAction()).byteValue();
-        config.whenExhaustedAction = new Integer(descriptor.getPoolingProfile().getExhaustedAction()).byteValue();
+        config.whenExhaustedAction = (byte) descriptor.getPoolingProfile().getExhaustedAction();
 
         init(descriptor, config);
 
