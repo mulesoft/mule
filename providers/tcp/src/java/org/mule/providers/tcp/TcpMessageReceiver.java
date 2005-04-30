@@ -42,6 +42,7 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.transformer.UMOTransformer;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -59,14 +60,25 @@ import java.net.*;
 public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     private ServerSocket serverSocket = null;
+    protected UMOTransformer responseTransformer = null;
 
     public TcpMessageReceiver(AbstractConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint) throws InitialisationException
     {
         create(connector, component, endpoint);
+        responseTransformer = getResponseTransformer();
     }
 	
+    protected UMOTransformer getResponseTransformer() throws InitialisationException
+    {
+		UMOTransformer transformer = component.getDescriptor().getResponseTransformer();
+		if (transformer == null) {
+			return ((AbstractConnector) connector).getDefaultResponseTransformer();
+		}
+		return transformer;
+    }
+
 	public void start() throws UMOException {
         URI uri = endpoint.getEndpointURI().getUri();
         connect(uri);
@@ -236,7 +248,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             {
                 dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-                int counter=0;
+                int counter = 0;
                 while (!socket.isClosed() && !disposing.get())
                 {
                     if (isServerSide() && ++counter > 500) {
@@ -246,10 +258,12 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
                     byte[] b = readStream(dataIn);
                     //end of stream
-                    if (b == null) break;
+                    if (b == null) {
+						break;
+                    }
 
                     byte[] result = processData(b);
-                    if(result!=null) {
+                    if (result != null) {
                         dataOut.write(result);
                     }
                     dataOut.flush();
@@ -267,9 +281,17 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             UMOMessageAdapter adapter = connector.getMessageAdapter(data);
             OutputStream os = new ResponseOutputStream(socket.getOutputStream(), socket);
             UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous(), os);
-            if (returnMessage != null)
-            {
-                return returnMessage.getPayloadAsBytes();
+            if (returnMessage != null) {
+				if (responseTransformer != null) {
+	                Object response = responseTransformer.transform(returnMessage.getPayload());
+	                if (response instanceof byte[]) {
+	                    return (byte[]) response;
+	                } else {
+	                    return response.toString().getBytes();
+	                }
+				} else {
+					return returnMessage.getPayloadAsBytes();
+				}
             } else {
                 return null;
             }

@@ -36,7 +36,6 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.tcp.TcpMessageReceiver;
-import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
@@ -62,7 +61,6 @@ import java.util.Properties;
  */
 public class HttpMessageReceiver extends TcpMessageReceiver
 {
-    private UMOTransformer responseTransformer = null;
     private ExpiryMonitor keepAliveMonitor;
 
     public HttpMessageReceiver(AbstractConnector connector, UMOComponent component, UMOEndpoint endpoint)
@@ -73,25 +71,19 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         {
             keepAliveMonitor = new ExpiryMonitor(1000);
         }
-        responseTransformer = getResponseTransformer();
     }
 
-    private UMOTransformer getResponseTransformer() throws InitialisationException
-    {
-        if (responseTransformer == null)
-        {
-            responseTransformer = (AbstractEventAwareTransformer) ((AbstractConnector) connector).getDefaultResponseTransformer();
-            if (responseTransformer == null)
-            {
-                throw new InitialisationException(new Message("http", 1), this);
-            }
+    protected UMOTransformer getResponseTransformer() throws InitialisationException {
+		UMOTransformer transformer = super.getResponseTransformer();
+        if (transformer == null) {
+            throw new InitialisationException(new Message("http", 1), this);
         }
-        if(!responseTransformer.getReturnClass().equals(String.class) &&
-                !responseTransformer.getReturnClass().equals(byte[].class) &&
-                !responseTransformer.getReturnClass().equals(Object.class)) {
+        if(!transformer.getReturnClass().equals(String.class) &&
+           !transformer.getReturnClass().equals(byte[].class) &&
+           !transformer.getReturnClass().equals(Object.class)) {
             throw new InitialisationException(new Message("http", 2, getConnector().getName()), this);
         }
-        return responseTransformer;
+        return transformer;
     }
 
     protected Work createWork(Socket socket)
@@ -128,29 +120,27 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             try
             {
                 int counter = 0;
+                dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                 do
                 {
                     //useful if keep alive is implemented
-                    if (isServerSide() && ++counter > 500)
-                    {
+                    if (isServerSide() && ++counter > 500) {
                         counter = 0;
                         Thread.yield();
                     }
-                    if (disposing.get() || socket.isClosed())
-                    {
+                    if (disposing.get() || socket.isClosed()) {
                         logger.debug("Peer closed connection");
                         break;
                     }
-                    dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-                    dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-
-                    UMOMessageAdapter adapter = null;
 
                     Properties headers = new Properties();
                     byte[] payload = parseRequest(dataIn, headers);
-                    if (payload == null) break;
+                    if (payload == null) {
+						break;
+                    }
 
-                    adapter = connector.getMessageAdapter(new Object[]{payload, headers});
+                    UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{payload, headers});
 
                     boolean http11 = ((String) adapter.getProperty(HttpConnector.HTTP_VERSION_PROPERTY))
                             .equalsIgnoreCase(HttpConstants.HTTP11);
@@ -168,14 +158,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             keepAlive = true;
                         }
                     }
-                    if (keepAlive && !keepAliveRegistered)
-                    {
+                    if (keepAlive && !keepAliveRegistered) 
+					{
                         keepAliveRegistered = true;
-                        if (keepAliveMonitor != null)
-                        {
-                            keepAliveMonitor.addExpirable(((HttpConnector)connector).getKeepAliveTimeout(), this);
-                        } else
-                        {
+                        if (keepAliveMonitor != null) {
+                            keepAliveMonitor.addExpirable(((HttpConnector) connector).getKeepAliveTimeout(), this);
+                        } else {
                             logger.info("Request has Keep alive set but the HttpConnector has keep alive disables");
                             keepAlive = false;
                         }
@@ -185,8 +173,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     {
                         UMOMessage message = new MuleMessage(adapter);
 
-                        if (logger.isDebugEnabled())
-                        {
+                        if (logger.isDebugEnabled()) {
                             logger.debug((String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
                         }
                         OutputStream os = new ResponseOutputStream(dataOut, socket);
@@ -207,7 +194,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
                         Object response = responseTransformer.transform(returnMessage.getPayload());
                         if(response instanceof byte[]) {
-                            dataOut.write((byte[])response);
+                            dataOut.write((byte[]) response);
                         } else {
                             dataOut.write(response.toString().getBytes());
                         }
@@ -224,7 +211,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 handleException(e);
             } finally
             {
-                if(keepAliveMonitor!=null) {
+                if (keepAliveMonitor != null) {
                     keepAliveMonitor.removeExpirable(this);
                 }
                 dispose();

@@ -1337,6 +1337,11 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 addTransformerReference("outboundTransformer", transformerNames, digester.peek());
             }
 
+            transformerNames = attributes.getValue("responseTransformer");
+            if(transformerNames!=null) {
+                addTransformerReference("responseTransformer", transformerNames, digester.peek());
+            }
+
             //Special case handling of global endpoint refs on the inboundEndpoint/
             //outboundendpoint attributes of the descriptor
             String endpoint = attributes.getValue("inboundEndpoint");

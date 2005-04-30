@@ -103,6 +103,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected HashMap properties = new HashMap();
 
     /**
+     * The transformer for the response
+     */
+    protected UMOTransformer responseTransformer = null;
+
+    /**
      * The descriptors version
      */
     protected String version = "1.0";
@@ -158,6 +163,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         outboundRouter = descriptor.getOutboundRouter();
         inboundTransformer = descriptor.getInboundTransformer();
         outboundTransformer = descriptor.getOutboundTransformer();
+		responseTransformer = descriptor.getResponseTransformer();
         implementationReference = descriptor.getImplementation();
         version = descriptor.getVersion();
         intecerptorList = descriptor.getInterceptors();
@@ -210,6 +216,14 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public UMOTransformer getOutboundTransformer()
     {
         return outboundTransformer;
+    }
+
+    /* (non-Javadoc)
+     * @see org.mule.impl.MuleDescriptor#getResponseTransformer()
+     */
+    public UMOTransformer getResponseTransformer()
+    {
+        return responseTransformer;
     }
 
     /* (non-Javadoc)

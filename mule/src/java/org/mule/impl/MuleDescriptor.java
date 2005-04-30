@@ -118,6 +118,14 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     }
 
     /* (non-Javadoc)
+     * @see org.mule.umo.UMODescriptor#setResponseTransformer(UMOTransformer)
+     */
+    public void setResponseTransformer(UMOTransformer transformer)
+    {
+        responseTransformer = transformer;
+    }
+
+    /* (non-Javadoc)
      * @see org.mule.umo.UMODescriptor#getPropertiesForURI(java.util.Properties)
      */
     public void setProperties(HashMap props)

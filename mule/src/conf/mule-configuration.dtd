@@ -808,6 +808,10 @@ Can be null if fragment is not Xml.  If not set UTF-8 will be used.
 -->
 <!ATTLIST mule-descriptor outboundTransformer			IDREFS	        #IMPLIED>
 <!--
+	The transformer to use when sending events back. 
+-->
+<!ATTLIST mule-descriptor responseTransformer			IDREFS	        #IMPLIED>
+<!--
 	The class of the object or an object reference of the component being registered as an UMO. 
 	If the implementation is an object reference then it will be resolved using the component resolver
 	configured on the model

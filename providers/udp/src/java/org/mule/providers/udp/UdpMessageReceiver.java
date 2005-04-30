@@ -25,6 +25,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.umo.transformer.UMOTransformer;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
@@ -48,6 +49,8 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
     private URI uri;
 
+    protected UMOTransformer responseTransformer = null;
+	
     public UdpMessageReceiver(AbstractConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint) throws InitialisationException
@@ -64,8 +67,19 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         {
             throw new InitialisationException(new Message("udp", 2, uri), e, this);
         }
-    }
+
+        responseTransformer = getResponseTransformer();
+	}
 	
+    protected UMOTransformer getResponseTransformer() throws InitialisationException
+    {
+		UMOTransformer transformer = component.getDescriptor().getResponseTransformer();
+		if (transformer == null) {
+			return ((AbstractConnector) connector).getDefaultResponseTransformer();
+		}
+		return transformer;
+    }
+
 	public void start() throws UMOException {
         connect(uri);
         try {
@@ -220,7 +234,17 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
                 if (returnMessage != null)
                 {
-                    byte[] data = returnMessage.getPayloadAsBytes();
+					byte[] data;
+					if (responseTransformer != null) {
+		                Object response = responseTransformer.transform(returnMessage.getPayload());
+		                if (response instanceof byte[]) {
+		                    data = (byte[]) response;
+		                } else {
+		                    data = response.toString().getBytes();
+		                }
+					} else {
+						data = returnMessage.getPayloadAsBytes();
+					}
                     DatagramPacket result = new DatagramPacket(data, data.length, packet.getAddress(), packet.getPort());
                     socket.send(result);
                 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+	<!-- Mule properties -->
+	<mule-environment-properties synchronous="false" synchronousReceive="false" />
+	
+	<connector name="tcpConnector" className="org.mule.providers.tcp.TcpConnector">
+		
+	</connector>
+	
+	<transformers>
+		<transformer name="transformer" className="org.mule.transformers.xml.ObjectToXml"></transformer>
+	</transformers>
+	
+	<model name="model">
+		<mule-descriptor name="TcpReceiver" 
+			implementation="org.mule.components.simple.EchoComponent"
+			inboundEndpoint="tcp://localhost:4444/?synchronous=true"
+			responseTransformer="transformer">
+		</mule-descriptor>
+
+	</model>
+	
+</mule-configuration>
