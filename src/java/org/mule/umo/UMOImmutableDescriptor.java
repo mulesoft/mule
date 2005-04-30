@@ -148,4 +148,11 @@ public interface UMOImmutableDescriptor
      * @return the Outbound transformer to use
      */
     public UMOTransformer getOutboundTransformer();
+
+    /**
+     * The transformer to use when sending events or data back as a response.
+     *
+     * @return the response transformer to use
+     */
+    public UMOTransformer getResponseTransformer();
 }

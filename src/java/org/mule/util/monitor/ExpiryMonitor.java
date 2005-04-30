@@ -69,7 +69,7 @@ public class ExpiryMonitor extends TimerTask implements Disposable
             resetExpirable(expirable);
         } else {
             if(logger.isDebugEnabled()) logger.debug("Adding new expirable: " + expirable);
-            monitors.put(expirable, new ExpriableHolder(milliseconds, expirable));
+            monitors.put(expirable, new ExpirableHolder(milliseconds, expirable));
         }
     }
 
@@ -86,7 +86,7 @@ public class ExpiryMonitor extends TimerTask implements Disposable
 
     public void resetExpirable(Expirable expirable)
     {
-        ExpriableHolder eh = (ExpriableHolder)monitors.get(expirable);
+        ExpirableHolder eh = (ExpirableHolder)monitors.get(expirable);
         if(eh!=null) {
             eh.reset();
             if(logger.isDebugEnabled()) logger.debug("Reset expirable: " + expirable);
@@ -98,10 +98,10 @@ public class ExpiryMonitor extends TimerTask implements Disposable
      */
     public void run()
     {
-        ExpriableHolder holder;
+        ExpirableHolder holder;
         for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
         {
-            holder = (ExpriableHolder)iterator.next();
+            holder = (ExpirableHolder)iterator.next();
             if(holder.isExpired()) {
                 removeExpirable(holder.getExpirable());
                 holder.getExpirable().expired();
@@ -113,10 +113,10 @@ public class ExpiryMonitor extends TimerTask implements Disposable
     {
         logger.info("disposing monitor");
         timer.cancel();
-        ExpriableHolder holder;
+        ExpirableHolder holder;
         for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
         {
-            holder = (ExpriableHolder)iterator.next();
+            holder = (ExpirableHolder)iterator.next();
             removeExpirable(holder.getExpirable());
             try
             {
@@ -128,13 +128,13 @@ public class ExpiryMonitor extends TimerTask implements Disposable
         }
     }
 
-    private class ExpriableHolder {
+    private class ExpirableHolder {
 
         private long milliseconds;
         private Expirable expirable;
         private long created;
 
-        public ExpriableHolder(long milliseconds, Expirable expirable)
+        public ExpirableHolder(long milliseconds, Expirable expirable)
         {
             this.milliseconds = milliseconds;
             this.expirable = expirable;
