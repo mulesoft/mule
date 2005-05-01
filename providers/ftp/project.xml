@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-ftp-provider</artifactId>
+    <name>Mule Ftp Provider</name>
+    <description>A Mule provider for Ftp Connectivity. For more information see the
+        <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
+    </description>
+    <shortDescription>ftp</shortDescription>
+    <url>http://www.muleumo.org/doc/providers/ftp/</url>
+    <dependencies>
+        <dependency>
+            <artifactId>commons-net</artifactId>
+            <groupId>commons-net</groupId>
+            <version>${commons_net_version}</version>
+            <url>http://jakarta.apache.org/commons/net/index.html</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <artifactId>commons-pool</artifactId>
+            <groupId>commons-pool</groupId>
+            <version>${commons_pool_version}</version>
+            <url>http://jakarta.apache.org/commons/pool/index.html</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+            </properties>
+        </dependency>
+        <dependency>
+        	<artifactId>oro</artifactId>
+        	<groupId>oro</groupId>
+        	<version>${oro_version}</version>
+        	<url>http://jakarta.apache.org/oro/</url>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-file-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+    </dependencies>
+</project>

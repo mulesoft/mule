@@ -1,0 +1,5 @@
+connector=org.mule.providers.ftp.FtpConnector
+dispatcher.factory=org.mule.providers.ftp.FtpMessageDispatcherFactory
+message.receiver=org.mule.providers.ftp.FtpMessageReceiver
+message.adapter=org.mule.providers.ftp.FtpMessageAdapter
+endpoint.builder=org.mule.impl.endpoint.SocketEndpointBuilder
