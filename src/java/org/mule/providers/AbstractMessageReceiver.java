@@ -272,8 +272,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     public final void dispose() {
         disposing.set(true);
-        workManager.dispose();
         doDispose();
+        workManager.dispose();
     }
 
     /**

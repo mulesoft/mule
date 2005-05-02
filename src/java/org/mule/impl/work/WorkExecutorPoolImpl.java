@@ -121,7 +121,7 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool {
 		try {
 			if (!pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT)) {
 		        pooledExecutor.interruptAll();
-				pooledExecutor.awaitTerminationAfterShutdown();
+				pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT);
 			}
 		} catch (InterruptedException e) {
 			// Continue
