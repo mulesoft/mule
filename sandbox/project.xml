@@ -31,24 +31,6 @@
         </dependency>
     </dependencies>
     <build>
-        <sourceDirectory>${basedir}/src/java</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
-        <unitTest>
-            <resources>
-                <resource>
-                    <directory>${basedir}/src/test/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-                <resource>
-                    <directory>${basedir}/src/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-            </resources>
-        </unitTest>
         <resources>
             <includes>
                 <include>${basedir}/../LICENSE.txt</include>

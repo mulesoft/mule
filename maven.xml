@@ -8,6 +8,16 @@
         <attainGoal name="idea:multiproject"/>
 <!--        <copy todir="${basedir}" file="${basedir}/tools/idea/workspace/_root.iml"/>-->
     </preGoal>
+    
+    <goal name="mule:eclipse">
+        <j:set var="goal" value="eclipse"/>
+        <attainGoal name="multiproject:goal"/>
+    </goal>
+    
+    <postGoal name="eclipse">
+    	<mkdir dir="${basedir}/src/conf" />
+    	<mkdir dir="${basedir}/src/test/conf" />
+    </postGoal>
 
     <!--    <goal name="mule:idea">-->
     <!--        <maven:reactor-->
