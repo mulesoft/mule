@@ -18,10 +18,8 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.Startable;
-import org.mule.umo.lifecycle.Stoppable;
+import org.mule.umo.lifecycle.Lifecycle;
 
 import java.beans.ExceptionListener;
 
@@ -32,7 +30,7 @@ import java.beans.ExceptionListener;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOConnector extends Startable, Stoppable, Disposable, Initialisable
+public interface UMOConnector extends Lifecycle, Initialisable
 {
     /**
      * This creates a <code>UMOMessageReceiver</code> associated with this endpoint and registers it
