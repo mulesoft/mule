@@ -14,7 +14,6 @@
 package org.mule.providers.rmi;
 
 import org.mule.providers.AbstractMessageAdapter;
-import org.mule.umo.MessageException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.Utility;
 
@@ -29,8 +28,10 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
 {
     private Object message;
 
-    public RmiMessageAdapter(Object message) throws MessageException {
-
+    public RmiMessageAdapter(Object message) throws MessageTypeNotSupportedException {
+		if (message == null) {
+            throw new MessageTypeNotSupportedException(null, getClass());
+		}
         this.message = message;
     }
 

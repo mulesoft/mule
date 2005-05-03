@@ -31,4 +31,9 @@ public class RmiMessageAdapterTestCase extends AbstractMessageAdapterTestCase
     {
         return new RmiMessageAdapter(payload);
     }
+
+    public Object getInvalidMessage()
+    {
+        return null;
+    }
 }

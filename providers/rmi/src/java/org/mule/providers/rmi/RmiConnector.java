@@ -13,15 +13,12 @@
  */
 package org.mule.providers.rmi;
 
+import java.net.URL;
+import java.util.ArrayList;
+
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
-
-import java.io.IOException;
-import java.io.File;
-import java.util.ArrayList;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 
 /**
@@ -76,21 +73,15 @@ public class RmiConnector extends AbstractServiceEnabledConnector
     /**
      * @param path The securityPolicy to set.
      */
-    public void setSecurityPolicy(String path) throws IOException, URISyntaxException
+    public void setSecurityPolicy(String path)
     {
-        this.securityPolicy = path;
-
         //verify securityPolicy existence
-        if (securityPolicy != null)
-        {
-
-            File securityPolicyFile = new File(new URI(securityPolicy));
-
-            if (!securityPolicyFile.canRead())
-            {
-                throw new IOException("Error on initialization, RMI security policy does not exist");
+        if (path != null) {
+			URL url = Utility.getResource(path, RmiConnector.class);
+            if (url == null) {
+                throw new IllegalArgumentException("Error on initialization, RMI security policy does not exist");
             }
-
+	        this.securityPolicy = url.toString();
         }
     }
 

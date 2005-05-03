@@ -13,12 +13,7 @@
  */
 package org.mule.providers.rmi;
 
-import org.mule.impl.MuleDescriptor;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
 /**
@@ -50,11 +45,11 @@ public class RmiConnectorTestCase extends AbstractConnectorTestCase
     {
         RmiConnector c = (RmiConnector)connector;
 
-        String securityPolicy = "file:///E:/projects/MyTesting/JAVA/rmi/rmi.policy";
-        String serverCodebase = "file:///E:\projects\MyTesting\JAVA\rmi\classes\"
+        String securityPolicy = "rmi.policy";
+        String serverCodebase = "file:///E:/projects/MyTesting/JAVA/rmi/classes/";
 
         c.setSecurityPolicy(securityPolicy);
-        assertEquals(securityPolicy, c.getSecurityPolicy());
+        assertNotNull(c.getSecurityPolicy());
         c.setServerCodebase(serverCodebase);
         assertEquals(serverCodebase, c.getServerCodebase());
     }

@@ -13,39 +13,33 @@
  */
 package org.mule.providers.rmi;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RMISecurityManager;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 
-import org.mule.MuleException;
-//import org.mule.config.i18n.Message;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
-
-import org.mule.util.Utility;
 import org.mule.util.PropertiesHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.rmi.RMISecurityManager;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
  * <code>RmiMessageDispatcher</code> will send transformed mule events over RMI-JRMP.
@@ -138,9 +132,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
             methodName = (String) event.getEndpoint().getProperties().get(RmiConnector.PARAM_SERVICE_METHOD);
             if (methodName == null)
             {
-                //TODO - ?? how to achieve the following?
-                //throw new DispatchException(new org.mule.config.i18n.Message("rmi", RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), event.getMessage(),  event.getEndpoint());
-                throw new DispatchException("RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET");
+                throw new DispatchException(new org.mule.config.i18n.Message("rmi", RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), event.getMessage(),  event.getEndpoint());
             }
         }
 
@@ -149,9 +141,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
 
         if (methodArgumentTypes == null)
         {
-            //TODO - ?? how to achieve the following?
-            //throw new DispatchException(new org.mule.config.i18n.Message("rmi", RmiConnector.MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET), event.getMessage(),  event.getEndpoint());
-            throw new DispatchException("RmiConnector.MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET");
+            throw new DispatchException(new org.mule.config.i18n.Message("rmi", RmiConnector.MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET), event.getMessage(),  event.getEndpoint());
         }
         else{
             connector.setMethodArgumentTypes(methodArgumentTypes);
@@ -159,7 +149,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
 
             if (argTypes == null)
             {
-                throw new DispatchException("RmiConnector.MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET");
+	            throw new DispatchException(new org.mule.config.i18n.Message("rmi", RmiConnector.MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET), event.getMessage(),  event.getEndpoint());
             }
         }
 
@@ -246,7 +236,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
     }
 
 
-    public void doDispose() throws UMOException
+    public void doDispose()
     {
     }
 
