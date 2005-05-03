@@ -18,17 +18,16 @@ import java.io.File;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.objectweb.howl.log.Configuration;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class HowlPersistenceTestCase extends AbstractTransactionQueueManagerTestCase {
+public class JournalPersistenceTestCase extends AbstractTransactionQueueManagerTestCase {
 
-	private static final Log logger = LogFactory.getLog(HowlPersistenceTestCase.class);
+	private static final Log logger = LogFactory.getLog(JournalPersistenceTestCase.class);
 	
-	protected static final String STORE_DIR = "./target/howl";
+	protected static final String STORE_DIR = "./target/journal";
 	
 	protected void deleteWholeDir(File f) {
 		if (f.exists()) {
@@ -55,12 +54,8 @@ public class HowlPersistenceTestCase extends AbstractTransactionQueueManagerTest
 	
 	protected TransactionalQueueManager createQueueManager() throws Exception {
 		TransactionalQueueManager mgr = new TransactionalQueueManager();
-		Configuration cfg = new Configuration();
-		cfg.setLogFileDir(new File(STORE_DIR).getCanonicalPath());
-		cfg.setBufferSize(32);
-		cfg.setMaxBlocksPerFile(64);
-		cfg.setFlushSleepTime(2000);
-		mgr.setPersistenceStrategy(new HowlPersistenceStrategy(cfg));
+		mgr.setPersistenceStrategy(new JournalPersistenceStrategy(new File(STORE_DIR)));
+		mgr.setDefaultQueueConfiguration(new QueueConfiguration(true));
 		return mgr;
 	}
 
@@ -69,12 +64,6 @@ public class HowlPersistenceTestCase extends AbstractTransactionQueueManagerTest
 	 */
 	protected boolean isPersistent() {
 		return true;
-	}
-	
-	public static void main(String[] args) throws Exception {
-		HowlPersistenceTestCase test = new HowlPersistenceTestCase();
-		//test.setUp();
-		test.testBench();
 	}
 	
 }

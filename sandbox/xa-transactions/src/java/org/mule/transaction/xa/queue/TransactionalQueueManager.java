@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,33 +36,39 @@ import org.mule.transaction.xa.ResourceManagerSystemException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class TransactionalQueueManager extends AbstractXAResourceManager {
+public class TransactionalQueueManager extends AbstractXAResourceManager implements QueueManager {
 
 	private static Log logger = LogFactory.getLog(TransactionalQueueManager.class);
 	
 	private Map queues = new HashMap();
 	
+	private QueuePersistenceStrategy memoryPersistenceStrategy = new MemoryPersistenceStrategy();
 	private QueuePersistenceStrategy persistenceStrategy;
 	
+	private QueueConfiguration defaultQueueConfiguration = new QueueConfiguration(false);
+	
 	public synchronized QueueSession getQueueSession() {
-		if (persistenceStrategy == null) {
-			logger.warn("No persistence strategy set, defaulting to MemoryPersistenceStrategy");
-			persistenceStrategy = new MemoryPersistenceStrategy();
-		}
 		return new QueueSessionImpl();
 	}
 	
-	protected Queue getQueue(String name) {
-		Queue  q  = (Queue) queues.get(name);
+	public synchronized void setDefaultQueueConfiguration(QueueConfiguration config) {
+		this.defaultQueueConfiguration = config;
+	}
+	
+	public synchronized void setQueueConfiguration(String queueName, QueueConfiguration config) {
+		getQueue(queueName).config = config;
+	}
+	
+	protected synchronized QueueInfo getQueue(String name) {
+		QueueInfo q = (QueueInfo) queues.get(name);
 		if (q == null) {
-			q = createQueue();
+			q = new QueueInfo();
+			q.name = name;
+			q.list = new LinkedList();
+			q.config = defaultQueueConfiguration;
 			queues.put(name, q);
 		}
 		return q;
-	}
-	
-	protected Queue createQueue() {
-		return new BasicQueue();
 	}
 	
 	/* (non-Javadoc)
@@ -71,6 +78,14 @@ public class TransactionalQueueManager extends AbstractXAResourceManager {
 		return logger;
 	}
 
+	public void close() {
+		try {
+			stop(SHUTDOWN_MODE_NORMAL);
+		} catch (ResourceManagerException e) {
+			logger.error("Error disposing manager", e);
+		}
+	}
+	
     protected boolean shutdown(int mode, long timeoutMSecs) {
     	try {
 	    	if (persistenceStrategy != null) {
@@ -89,8 +104,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager {
     			for (Iterator it = msgs.iterator(); it.hasNext();) {
     				Object id = it.next();
     				Holder h  = (Holder) persistenceStrategy.load(id);
-    				Queue  q  = getQueue(h.queueName);
-    				q.put(id);
+    				getQueue(h.queueName).putNow(id);
     			}
     		} catch (Exception e) {
     			throw new ResourceManagerSystemException(e);
@@ -129,14 +143,13 @@ public class TransactionalQueueManager extends AbstractXAResourceManager {
 			if (ctx.added != null) {
 				for (Iterator it = ctx.added.entrySet().iterator(); it.hasNext();) {
 					Map.Entry entry = (Map.Entry) it.next();
-					String queueName = (String) entry.getKey();
+					QueueInfo queue = (QueueInfo) entry.getKey();
 					List queueAdded = (List) entry.getValue();
 					if (queueAdded != null && queueAdded.size() > 0) {
-						Queue queue = getQueue(queueName);
 						for (Iterator itAdded = queueAdded.iterator(); itAdded.hasNext();) {
 							Object object = itAdded.next();
-							Object id = doStore(queueName, object);
-							queue.put(id);
+							Object id = doStore(queue, object);
+							queue.putNow(id);
 						}
 					}
 				}
@@ -144,32 +157,45 @@ public class TransactionalQueueManager extends AbstractXAResourceManager {
 			if (ctx.removed != null) {
 				for (Iterator it = ctx.removed.entrySet().iterator(); it.hasNext();) {
 					Map.Entry entry = (Map.Entry) it.next();
-					String queueName = (String) entry.getKey();
+					QueueInfo queue = (QueueInfo) entry.getKey();
 					List queueRemoved = (List) entry.getValue();
 					if (queueRemoved != null && queueRemoved.size() > 0) {
 						for (Iterator itRemoved = queueRemoved.iterator(); itRemoved.hasNext();) {
 							Object id = itRemoved.next();
-							doRemove(queueName, id);
+							doRemove(queue, id);
 						}
 					}
 				}
 			}
-		} catch (IOException e) {
-			throw new ResourceManagerException("Could not persist object", e);
+		} catch (Exception e) {
+			throw new ResourceManagerException("Could not commit transaction", e);
 		}
 	}
 	
-	protected Object doStore(String queueName, Object object) throws IOException {
-		return persistenceStrategy.store(getHolder(queueName, object));
+	protected Object doStore(QueueInfo queue, Object object) throws IOException {
+		if (queue.config.persistent) {
+			return persistenceStrategy.store(getHolder(queue.name, object));
+		} else {
+			return memoryPersistenceStrategy.store(getHolder(queue.name, object));
+		}
 	}
 
-	protected void doRemove(String queueName, Object id) throws IOException {
-		persistenceStrategy.remove(id);
+	protected void doRemove(QueueInfo queue, Object id) throws IOException {
+		if (queue.config.persistent) {
+			persistenceStrategy.remove(id);
+		} else {
+			memoryPersistenceStrategy.remove(id);
+		}
 	}
 	
-	protected Object doLoad(Object id) throws IOException {
-		Object h = persistenceStrategy.load(id);
-		return ((Holder) h).object;
+	protected Object doLoad(QueueInfo queue, Object id) throws IOException {
+		if (queue.config.persistent) {
+			Object h = persistenceStrategy.load(id);
+			return ((Holder) h).object;
+		} else {
+			Object h = memoryPersistenceStrategy.load(id);
+			return ((Holder) h).object;
+		}
 	}
 	
 	protected Holder getHolder(String queueName, Object object) {
@@ -184,17 +210,70 @@ public class TransactionalQueueManager extends AbstractXAResourceManager {
 		if (ctx.removed != null) {
 			for (Iterator it = ctx.removed.entrySet().iterator(); it.hasNext();) {
 				Map.Entry entry = (Map.Entry) it.next(); 
-				String queueName = (String) entry.getKey();
+				QueueInfo queue = (QueueInfo) entry.getKey();
 				List queueRemoved = (List) entry.getValue();
 				if (queueRemoved != null && queueRemoved.size() > 0) {
-					Queue queue = getQueue(queueName);
 					for (Iterator itRemoved = queueRemoved.iterator(); itRemoved.hasNext();) {
 						Object id = itRemoved.next();
-						queue.put(id);
+						queue.putNow(id);
 					}
 				}
 			}
 		}
+	}
+	
+	public static class QueueInfo {
+		protected LinkedList list;
+		protected String name;
+		protected QueueConfiguration config;
+		public boolean equals(Object obj) {
+			return (obj instanceof QueueInfo && name.equals(((QueueInfo) obj).name));
+		}
+		public int hashCode() {
+			return name.hashCode();
+		}
+		
+		public void putNow(Object o) {
+			synchronized (list) {
+				list.addLast(o);
+				list.notifyAll();
+			}
+		}
+		
+		public void putWhenRoom(Object o, int room) throws InterruptedException {
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
+			}
+			synchronized (list) {
+				if (config.capacity > 0) {
+					if (config.capacity <= room) {
+						throw new IllegalStateException("Can not add more objects than the capacity in one time");
+					}
+					while (list.size() >= config.capacity - room) {
+						list.wait();
+					}
+				}
+				if (o != null) {
+					list.addLast(o);
+				}
+				list.notifyAll();
+			}
+		}
+		
+		public Object takeBlock() throws InterruptedException {
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
+			}
+			synchronized (list) {
+				while (list.isEmpty()) {
+					list.wait();
+				}
+				Object o = list.removeFirst();
+				list.notifyAll();
+				return o;
+			}
+		}
+		
 	}
 	
 	public static class Holder implements Serializable {
@@ -222,62 +301,50 @@ public class TransactionalQueueManager extends AbstractXAResourceManager {
 	protected class QueueTransactionContext extends AbstractTransactionContext {
 		protected Map added;
 		protected Map removed;
-		
-		public QueueTransactionContext() {
-		}
 
-		/* (non-Javadoc)
-		 * @see EDU.oswego.cs.dl.util.concurrent.Channel#put(java.lang.Object)
-		 */
-		public void put(String queueName, Object item) {
+		public void put(QueueInfo queue, Object item) throws InterruptedException {
 			readOnly = false;
 			if (added == null) {
 				added = new HashMap();
 			}
-			List queueAdded = (List) added.get(queueName);
+			List queueAdded = (List) added.get(queue);
 			if (queueAdded == null) {
 				queueAdded = new ArrayList();
-				added.put(queueName, queueAdded);
+				added.put(queue, queueAdded);
 			}
+			// wait for enough room
+			queue.putWhenRoom(null, queueAdded.size());
 			queueAdded.add(item);
 		}
 
-		/* (non-Javadoc)
-		 * @see EDU.oswego.cs.dl.util.concurrent.Channel#take()
-		 */
-		public Object take(String queueName) throws IOException {
+		public Object take(QueueInfo queue) throws IOException, InterruptedException {
 			readOnly = false;
 			if (added != null) {
-				List queueAdded = (List) added.get(queueName);
+				List queueAdded = (List) added.get(queue);
 				if (queueAdded != null) {
 					return queueAdded.remove(queueAdded.size() - 1);
 				}
 			}
-			Queue queue = TransactionalQueueManager.this.getQueue(queueName);
-			Object o = queue.take();
+			Object o = queue.takeBlock();
 			if (o != null) {
 				if (removed == null) {
 					removed = new HashMap();
 				}
-				List queueRemoved = (List) removed.get(queueName);
+				List queueRemoved = (List) removed.get(queue);
 				if (queueRemoved == null) {
 					queueRemoved = new ArrayList();
-					removed.put(queueName, queueRemoved);
+					removed.put(queue, queueRemoved);
 				}
 				queueRemoved.add(o);
-				o = doLoad(o);
+				o = doLoad(queue, o);
 			}
 			return o;
 		}
 
-		/* (non-Javadoc)
-		 * @see EDU.oswego.cs.dl.util.concurrent.Channel#poll(long)
-		 */
-		public int size(String queueName) {
-			Queue queue = TransactionalQueueManager.this.getQueue(queueName);
-			int sz = queue.size();
+		public int size(QueueInfo queue) {
+			int sz = queue.list.size();
 			if (added != null) {
-				List queueAdded = (List) added.get(queueName);
+				List queueAdded = (List) added.get(queue);
 				if( queueAdded != null) {
 					sz += queueAdded.size();
 				}
@@ -293,30 +360,28 @@ public class TransactionalQueueManager extends AbstractXAResourceManager {
 		 * @see org.mule.transaction.xa.queue.QueueSession#getQueue(java.lang.String)
 		 */
 		public Queue getQueue(String name) {
-			Queue queue = TransactionalQueueManager.this.getQueue(name);
-			return new QueueImpl(queue, name);
+			QueueInfo queue = TransactionalQueueManager.this.getQueue(name);
+			return new QueueImpl(queue);
 		}
 		
 		protected class QueueImpl implements Queue {
 			
-			protected Queue queue;
-			protected String queueName;
+			protected QueueInfo queue;
 			
-			public QueueImpl(Queue queue, String queueName) {
+			public QueueImpl(QueueInfo queue) {
 				this.queue = queue;
-				this.queueName = queueName;
 			}
 			
 			/* (non-Javadoc)
 			 * @see EDU.oswego.cs.dl.util.concurrent.Channel#put(java.lang.Object)
 			 */
-			public void put(Object item)  {
+			public void put(Object item) throws InterruptedException {
 				if (localContext != null) {
-					((QueueTransactionContext) localContext).put(queueName, item);
+					((QueueTransactionContext) localContext).put(queue, item);
 				} else {
 					try {
-						Object id = doStore(queueName, item);
-						queue.put(id);
+						Object id = doStore(queue, item);
+						queue.putWhenRoom(id, 0);
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
@@ -326,15 +391,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager {
 			/* (non-Javadoc)
 			 * @see EDU.oswego.cs.dl.util.concurrent.Channel#take()
 			 */
-			public Object take() {
+			public Object take() throws InterruptedException {
 				try {
 					if (localContext != null) {
-						return ((QueueTransactionContext) localContext).take(queueName);
+						return ((QueueTransactionContext) localContext).take(queue);
 					} else {
-						Object id = queue.take();
+						Object id = queue.takeBlock();
 						if (id != null) {
-							Object item = doLoad(id);
-							doRemove(queueName, id);
+							Object item = doLoad(queue, id);
+							doRemove(queue, id);
 							return item;
 						}
 						return null;
@@ -343,14 +408,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager {
 					throw new RuntimeException(e);
 				}
 			}
-	
+
 			public int size() {
 				if (localContext != null) {
-					return ((QueueTransactionContext) localContext).size(queueName);
+					return ((QueueTransactionContext) localContext).size(queue);
 				} else {
-					return queue.size();
+					return queue.list.size();
 				}
 			}
+	
 		}
 	}
 

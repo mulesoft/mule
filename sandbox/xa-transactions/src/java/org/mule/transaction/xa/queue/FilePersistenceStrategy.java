@@ -96,8 +96,9 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy {
 	 */
 	public List restore() throws IOException {
 		try {
-			ArrayList msgs = new ArrayList();
+			List msgs = new ArrayList();
 			restoreFiles(storeDir, msgs);
+			logger.debug("Restore retrieved " + msgs.size() + " objects");
 			return msgs;
 		} catch (ClassNotFoundException e) {
 			throw (IOException) new IOException("Could not restore").initCause(e);
@@ -121,7 +122,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy {
 						name = name.substring(storeDir.getCanonicalPath().length() + 1, name.length() - EXTENSION.length());
 		                objects.put(name, object);
 		                msgs.add(name);
-		                logger.debug("File entry: " + name);
+		                //logger.debug("File entry: " + name);
 	                } finally {
 	                	if (ois != null) {
 	                		ois.close();

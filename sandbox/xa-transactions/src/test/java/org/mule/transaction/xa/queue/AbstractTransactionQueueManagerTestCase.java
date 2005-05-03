@@ -21,6 +21,8 @@ import junit.framework.TestCase;
 import org.apache.commons.logging.Log;
 import org.mule.transaction.xa.AbstractResourceManager;
 
+import EDU.oswego.cs.dl.util.concurrent.Latch;
+
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
@@ -47,14 +49,140 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
 		Queue q = s.getQueue("queue1");
 
 		assertEquals(0, q.size());
-		Object o = q.take();
-		assertNull(o);
+		//Object o = q.take();
+		//assertNull(o);
 		q.put("String1");
 		assertEquals(1, q.size());
-		o = q.take();
+		Object o = q.take();
 		assertNotNull(o);
 		assertEquals("String1", o);
 		assertEquals(0, q.size());
+		
+		mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+	}
+	
+	public void testTakePut() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+
+		final TransactionalQueueManager mgr = createQueueManager();
+		mgr.start();
+		
+		final Latch latch = new Latch();
+		
+		Thread t = new Thread() {
+			public void run() {
+				try {
+					latch.release();
+					Thread.sleep(200);
+					QueueSession s = mgr.getQueueSession();
+					Queue q = s.getQueue("queue1");
+					assertEquals(0, q.size());
+					q.put("String1");
+				} catch (Exception e) {
+				}
+			}
+		};
+		t.start();
+		latch.acquire();
+		long t0 = System.currentTimeMillis();
+		QueueSession s = mgr.getQueueSession();
+		Queue q = s.getQueue("queue1");
+		assertEquals(0, q.size());
+		Object o = q.take();
+		long t1 = System.currentTimeMillis();
+		t.join();
+		assertNotNull(o);
+		assertEquals("String1", o);
+		assertEquals(0, q.size());
+		assertTrue(t1 - t0 > 100);
+		
+		mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+	}
+	
+	public void testTakePutRollbackPut() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+
+		final TransactionalQueueManager mgr = createQueueManager();
+		mgr.start();
+		
+		final Latch latch = new Latch();
+		
+		Thread t = new Thread() {
+			public void run() {
+				try {
+					latch.release();
+					Thread.sleep(200);
+					QueueSession s = mgr.getQueueSession();
+					Queue q = s.getQueue("queue1");
+					assertEquals(0, q.size());
+					s.begin();
+					q.put("String1");
+					s.rollback();
+					s.begin();
+					q.put("String2");
+					s.commit();
+				} catch (Exception e) {
+				}
+			}
+		};
+		t.start();
+		latch.acquire();
+		long t0 = System.currentTimeMillis();
+		QueueSession s = mgr.getQueueSession();
+		Queue q = s.getQueue("queue1");
+		assertEquals(0, q.size());
+		Object o = q.take();
+		long t1 = System.currentTimeMillis();
+		t.join();
+		assertNotNull(o);
+		assertEquals("String2", o);
+		assertEquals(0, q.size());
+		assertTrue(t1 - t0 > 100);
+		
+		mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+	}
+	
+	public void testTakePutOverCapacity() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+
+		final TransactionalQueueManager mgr = createQueueManager();
+		mgr.start();
+		mgr.setDefaultQueueConfiguration(new QueueConfiguration(2));
+		
+		final Latch latch = new Latch();
+		
+		Thread t = new Thread() {
+			public void run() {
+				try {
+					latch.acquire();
+					Thread.sleep(200);
+					QueueSession s = mgr.getQueueSession();
+					Queue q = s.getQueue("queue1");
+					Object o = q.take();
+					assertEquals("String1", o);
+				} catch (Exception e) {
+				}
+			}
+		};
+		t.start();
+		QueueSession s = mgr.getQueueSession();
+		Queue q = s.getQueue("queue1");
+		assertEquals(0, q.size());
+		q.put("String1");
+		q.put("String2");
+		latch.release();
+		long t0 = System.currentTimeMillis();
+		q.put("String3");
+		long t1 = System.currentTimeMillis();
+		t.join();
+		assertEquals(2, q.size());
+		assertTrue(t1 - t0 > 100);
 		
 		mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 	}

@@ -35,6 +35,7 @@ public class NoPersistenceTestCase extends
 	 */
 	protected TransactionalQueueManager createQueueManager() throws Exception {
 		TransactionalQueueManager mgr = new TransactionalQueueManager();
+		mgr.setPersistenceStrategy(new MemoryPersistenceStrategy());
 		return mgr;
 	}
 

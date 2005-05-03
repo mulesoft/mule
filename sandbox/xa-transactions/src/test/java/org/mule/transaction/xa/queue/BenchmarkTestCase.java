@@ -17,12 +17,11 @@ package org.mule.transaction.xa.queue;
 import java.io.File;
 import java.util.Random;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.transaction.xa.AbstractResourceManager;
-import org.objectweb.howl.log.Configuration;
-
-import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -34,6 +33,15 @@ public class BenchmarkTestCase extends TestCase {
 	
 	protected static final String FILE_DIR = "./target/file";
 	protected static final String HOWL_DIR = "./target/howl";
+	protected static final String JOURNAL_DIR = "./target/journal";
+	
+	//private static final int WORKERS = 10;
+	//private static final int OUTERLOOP = 100;
+	//private static final int INNERLOOP = 500;
+	private static final int WORKERS = 1;
+	private static final int OUTERLOOP = 1;
+	private static final int INNERLOOP = 1;
+	private static final int OBJSIZE = 256;
 	
 	protected TransactionalQueueManager createFileQueueManager() throws Exception {
 		TransactionalQueueManager mgr = new TransactionalQueueManager();
@@ -41,25 +49,49 @@ public class BenchmarkTestCase extends TestCase {
 		return mgr;
 	}
 
-	protected TransactionalQueueManager createHowlQueueManager() throws Exception {
+	protected TransactionalQueueManager createJournalQueueManager() throws Exception {
 		TransactionalQueueManager mgr = new TransactionalQueueManager();
-		Configuration cfg = new Configuration();
-		cfg.setLogFileDir(new File(HOWL_DIR).getCanonicalPath());
-		cfg.setBufferSize(32);
-		cfg.setMaxBlocksPerFile(64);
-		cfg.setFlushSleepTime(2000);
-		mgr.setPersistenceStrategy(new HowlPersistenceStrategy(cfg));
+		mgr.setPersistenceStrategy(new JournalPersistenceStrategy(new File(JOURNAL_DIR)));
 		return mgr;
 	}
 
 	
 	public void testBench() throws Exception {
+		benchmark(createJournalQueueManager());
 		benchmark(createFileQueueManager());
-		benchmark(createHowlQueueManager());
 	}
 	
 	public static void main(String[] args) throws Exception {
 		new BenchmarkTestCase().testBench();
+	}
+
+	protected static class Worker extends Thread {
+		private TransactionalQueueManager mgr;
+		private String queue;
+		public Worker(TransactionalQueueManager mgr, String queue) {
+			this.mgr = mgr;
+			this.queue = queue;
+		}
+		public void run() {
+			Random rnd = new Random(); 
+			try {
+				QueueSession s = mgr.getQueueSession();
+				Queue q = s.getQueue(queue);
+				
+				long t0 = System.currentTimeMillis();
+				for (int i = 0; i < OUTERLOOP; i++) {
+					for (int j = 0; j < INNERLOOP; j++) {
+						byte[] o = new byte[(rnd.nextInt(16) + 1) * OBJSIZE];
+						q.put(o);
+					}
+					while (q.size() > 0) {
+						q.take();
+					}
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	protected void benchmark(TransactionalQueueManager mgr) throws Exception {
@@ -70,20 +102,15 @@ public class BenchmarkTestCase extends TestCase {
 		try {
 			mgr.start();
 		
-			QueueSession s = mgr.getQueueSession();
-			Queue q = s.getQueue("queue1");
-			
-			Random rnd = new Random();
 			long t0 = System.currentTimeMillis();
-			for (int i = 0; i < 10; i++) {
-				for (int j = 0; j < 500; j++) {
-					byte[] o = new byte[2048];
-					rnd.nextBytes(o);
-					q.put(o);
-				}
-				while (q.size() > 0) {
-					q.take();
-				}
+			Worker[] w = new Worker[WORKERS];
+			for (int i = 0; i < w.length; i++) {
+				w[i] = new Worker(mgr, "queue" + i);
+				w[i].setDaemon(true);
+				w[i].start();
+			}
+			for (int i = 0; i < w.length; i++) {
+				w[i].join();
 			}
 			long t1 = System.currentTimeMillis();
 	

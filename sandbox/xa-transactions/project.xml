@@ -64,12 +64,12 @@
             <url>http://jotm.objectweb.org</url>
         </dependency>
         <dependency>
-            <groupId>howl</groupId>
-            <artifactId>howl</artifactId>
-            <version>${howl_version}</version>
+            <groupId>activeio</groupId>
+            <artifactId>activeio</artifactId>
+            <version>${activeio_version}</version>
             <type>jar</type>
             <properties/>
-            <url>http://howl.objectweb.org</url>
+            <url>http://www.activeio.org</url>
         </dependency>
     </dependencies>
     <build>
