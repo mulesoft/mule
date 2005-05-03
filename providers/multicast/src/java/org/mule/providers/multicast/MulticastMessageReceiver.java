@@ -48,17 +48,30 @@ public class MulticastMessageReceiver extends UdpMessageReceiver
 
     protected Work createWork(DatagramPacket packet) throws IOException
     {
-        return new UdpWorker(socket, packet);
+        return new MulticastWorker(packet);
     }
+	
+	public class MulticastWorker extends UdpWorker {
+		public MulticastWorker(DatagramPacket packet) {
+			super(socket, packet);
+		}
+        public void dispose() {
+			// Do not close socket as we reuse it
+			// So do not call super.doDispose();
+        }
+	}
 
     public void doDispose()
     {
-        try
-        {
-            ((MulticastSocket)socket).leaveGroup(inetAddress);
-        } catch (IOException e)
-        {
-            logger.error("failed to leave group: " + e.getMessage(), e);
-        }
+		if (socket != null && !socket.isClosed()) {
+	        try
+	        {
+	            ((MulticastSocket) socket).leaveGroup(inetAddress);
+	        } catch (IOException e)
+	        {
+	            logger.error("failed to leave group: " + e.getMessage(), e);
+	        }
+		}
+		super.doDispose();
     }
 }
