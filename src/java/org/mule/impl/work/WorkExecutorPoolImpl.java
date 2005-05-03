@@ -117,12 +117,9 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool {
      */
     public WorkExecutorPool stop() {
         int maxSize = getMaximumPoolSize();
-		pooledExecutor.shutdownAfterProcessingCurrentlyQueuedTasks();
+		pooledExecutor.shutdownNow();
 		try {
-			if (!pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT)) {
-		        pooledExecutor.interruptAll();
-				pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT);
-			}
+			pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT);
 		} catch (InterruptedException e) {
 			// Continue
 		}

@@ -43,9 +43,6 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
 
     private long frequency = DEFAULT_POLL_FREQUENCY;
 
-    public PollingMessageReceiver() {
-    }
-    
     public PollingMessageReceiver(UMOConnector connector,
                                   UMOComponent component,
                                   final UMOEndpoint endpoint, 
