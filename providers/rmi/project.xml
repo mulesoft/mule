@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-rmi-provider</artifactId>
+    <name>Mule Rmi Provider</name>
+    <description>A Mule provider for Rmi Connectivity. For more information see
+        the <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
+    </description>
+    <shortDescription>rmi</shortDescription>
+    <url>http://www.muleumo.org/doc/providers/rmi/</url>
+    <dependencies/>
+</project>
