@@ -27,6 +27,7 @@
             <url>http://www.muleumo.org</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
         <dependency>
@@ -334,6 +335,11 @@
             <version>${commons_codec_version}</version>
         </dependency>
         <dependency>
+            <artifactId>commons-dbutils</artifactId>
+            <groupId>commons-dbutils</groupId>
+            <version>${commons_dbutils_version}</version>
+        </dependency>
+        <dependency>
             <artifactId>ehcache</artifactId>
             <groupId>ehcache</groupId>
             <version>${ehcache_version}</version>
@@ -426,30 +432,15 @@
             <version>${hsqldb_version}</version>
             <url>http://hsqldb.sourceforge.net/</url>
         </dependency>
+        <dependency>
+        	<groupId>xapool</groupId>
+        	<artifactId>xapool</artifactId>
+        	<version>${xapool_version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>hibernate</groupId>
+        	<artifactId>hibernate</artifactId>
+        	<version>${hibernate_version}</version>
+        </dependency>
     </dependencies>
-    <build>
-        <sourceDirectory>src/test/java</sourceDirectory>
-        <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
-        <unitTest>
-            <resources>
-                <resource>
-                    <directory>src/test/conf</directory>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </resource>
-            </resources>
-        </unitTest>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/test/conf</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-            <includes>
-                <include>${basedir}/../LICENSE.txt</include>
-            </includes>
-        </resources>
-    </build>
 </project>
