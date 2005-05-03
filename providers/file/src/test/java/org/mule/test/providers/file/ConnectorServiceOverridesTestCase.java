@@ -40,14 +40,14 @@ public class ConnectorServiceOverridesTestCase extends AbstractMuleTestCase
         configBuilder.configure("test-connector-config.xml");
     }
 
-    public void testSerivceOverrides() throws InterruptedException
+    public void testServiceOverrides() throws InterruptedException
     {
         //todo initialised wait?
         Thread.sleep(1000);
         FileConnector c = (FileConnector)MuleManager.getInstance().lookupConnector("fileConnector2");
         assertNotNull(c);
         assertNotNull(c.getServiceOverrides());
-        assertEquals("org.mule.transformers.simple.ByteArrayToSerialisable", c.getServiceOverrides().get("inbound.transformer"));
+        assertEquals("org.mule.transformers.simple.ByteArrayToSerializable", c.getServiceOverrides().get("inbound.transformer"));
         assertNotNull(c.getDefaultInboundTransformer());
         assertNotNull(c.getDefaultOutboundTransformer());
         assertTrue(c.getDefaultInboundTransformer() instanceof ByteArrayToSerializable);

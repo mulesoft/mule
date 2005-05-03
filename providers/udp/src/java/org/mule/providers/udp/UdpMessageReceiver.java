@@ -24,6 +24,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 
@@ -51,7 +52,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
     protected UMOTransformer responseTransformer = null;
 	
-    public UdpMessageReceiver(AbstractConnector connector,
+    public UdpMessageReceiver(UMOConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint) throws InitialisationException
     {
@@ -190,8 +191,11 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
     public void doDispose()
     {
-        socket.close();
-        logger.info("Closed Udp connection: " + uri);
+		if (socket != null && !socket.isClosed()) {
+			logger.debug("Closing Udp connection: " + uri);
+			socket.close();
+			logger.info("Closed Udp connection: " + uri);
+		}
     }
 
     protected Work createWork(DatagramPacket packet) throws IOException
@@ -217,7 +221,13 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
         public void dispose()
         {
-            if (socket != null) socket.close();
+            if (socket != null && !socket.isClosed()) {
+                try {
+                    socket.close();
+                } catch (Exception e) {
+                    logger.error("Socket close failed", e);
+                }
+            }
             socket = null;
         }
 
@@ -250,16 +260,12 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                 }
             } catch (Exception e)
             {
-                handleException(e);
+				if (!disposing.get()) {
+					handleException(e);
+				}
             } finally
             {
-                try
-                {
-                    socket.close();
-                } catch (Exception e)
-                {
-                    logger.error("Socket close failed with: " + e);
-                }
+				dispose();
             }
         }
     }

@@ -41,6 +41,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 
@@ -62,7 +63,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
     private ServerSocket serverSocket = null;
     protected UMOTransformer responseTransformer = null;
 
-    public TcpMessageReceiver(AbstractConnector connector,
+    public TcpMessageReceiver(UMOConnector connector,
                               UMOComponent component,
                               UMOEndpoint endpoint) throws InitialisationException
     {

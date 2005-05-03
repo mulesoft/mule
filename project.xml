@@ -144,7 +144,7 @@
                 <exclude>**/CompressionTransformerTestCase.*</exclude>
 
                 <!-- Disable Multicast tests unless configured -->
-                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
+<!--                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>-->
 
                 <!-- this fail unless as security patch is applied to JAVA_HOME/lib -->
                 <exclude>**/KeyBasedEncryptionStrategyTestCase.*</exclude>
@@ -161,9 +161,12 @@
                 <exclude>**/OpenJms*.*</exclude>
                 <exclude>**/Joram*.*</exclude>
                 <exclude>**/SpiritWave*.*</exclude>
+                
+                <!-- Disable ftp because it needs a server -->
+                <exclude>**/FtpConnectorFunctionalTestCase.*</exclude>
 
                 <!-- Active MQ rollback seems a little off need to investigate -->
-                <exclude>**/ActiveMQJmsXaTransactionFunctionalTestCase.*</exclude>
+<!--                <exclude>**/ActiveMQJmsXaTransactionFunctionalTestCase.*</exclude>-->
             </excludes>
 
             <resources>

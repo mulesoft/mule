@@ -50,9 +50,6 @@ public abstract class TransactedPollingMessageReceiver extends
 
 	protected boolean receiveMessagesInTransaction = true;
 	
-	public TransactedPollingMessageReceiver() {
-	}
-	
     public TransactedPollingMessageReceiver(UMOConnector connector,
             UMOComponent component,
             final UMOEndpoint endpoint, Long frequency) throws InitialisationException {

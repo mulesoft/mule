@@ -34,13 +34,13 @@ import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.monitor.Expirable;
@@ -63,7 +63,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 {
     private ExpiryMonitor keepAliveMonitor;
 
-    public HttpMessageReceiver(AbstractConnector connector, UMOComponent component, UMOEndpoint endpoint)
+    public HttpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException
     {
         super(connector, component, endpoint);

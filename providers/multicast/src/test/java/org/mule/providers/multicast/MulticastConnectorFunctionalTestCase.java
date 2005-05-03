@@ -32,7 +32,8 @@ import java.net.URI;
 
 public class MulticastConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
-    private MulticastSocket s = null;
+    private MulticastSocket s1 = null;
+    private MulticastSocket s2 = null;
     private InetAddress inet = null;
     private URI uri;
 
@@ -47,11 +48,13 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
 
     protected void tearDown() throws Exception
     {
-        try
-        {
-            s.close();
-        } catch (Exception e)
-        {
+        try {
+            s1.close();
+        } catch (Exception e) {
+        }
+        try {
+            s2.close();
+        } catch (Exception e) {
         }
         super.tearDown();
     }
@@ -78,8 +81,12 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
     protected void sendTestData(int iterations) throws Exception
     {
 
-        s = new MulticastSocket(uri.getPort());
-        s.joinGroup(inet);
+        s1 = new MulticastSocket(uri.getPort());
+        s1.joinGroup(inet);
+		
+        s2 = new MulticastSocket(uri.getPort());
+        s2.joinGroup(inet);
+		
         for (int i = 0; i < iterations; i++)
         {
             String msg = "Hello" + i;
@@ -87,36 +94,24 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
             DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), inet, uri.getPort());
 
             System.out.println("sending message: " + i);
-            s.send(packet);
+            s1.send(packet);
         }
     }
 
     protected void receiveAndTestResults() throws Exception
     {
-        int i = 0;
-//        URI uri = new URI(getOutDest());
-//        InetAddress inet = InetAddress.getByName(uri.getHost());
-        MulticastSocket s = new MulticastSocket(uri.getPort());
-        try
+        s2.setSoTimeout(2000);
+        for (int i = 0; i < 100; i++)
         {
-            s.joinGroup(inet);
-            s.setSoTimeout(2000);
-            for (i = 0; i < 100; i++)
-            {
 
-                DatagramPacket packet = new DatagramPacket(new byte[32], 32, inet, uri.getPort());
+            DatagramPacket packet = new DatagramPacket(new byte[32], 32, inet, uri.getPort());
 
-                s.receive(packet);
-                UdpMessageAdapter adapter = new UdpMessageAdapter(packet);
-                System.out.println("Received message: " + adapter.getPayloadAsString());
+            s2.receive(packet);
+            UdpMessageAdapter adapter = new UdpMessageAdapter(packet);
+            System.out.println("Received message: " + adapter.getPayloadAsString());
 
-            }
-            assertEquals(100, i);
-        } finally
-        {
-            s.leaveGroup(inet);
-            s.close();
         }
+		Thread.sleep(3000);
     }
 
     protected UMOEndpointURI getInDest()

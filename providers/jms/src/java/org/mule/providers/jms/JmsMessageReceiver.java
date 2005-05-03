@@ -66,9 +66,6 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 	    }
 	}
 	
-	public JmsMessageReceiver() {
-	}
-	
     public JmsMessageReceiver(UMOConnector connector,
             				  UMOComponent component,
             				  UMOEndpoint endpoint) throws InitialisationException {
