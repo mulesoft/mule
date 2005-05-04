@@ -16,9 +16,11 @@ package org.mule.routing.inbound;
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.impl.MuleEvent;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 
 import java.util.Map;
@@ -54,7 +56,10 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
             synchronized(lock) {
                 UMOMessage returnMessage = aggregateEvents(eg);
                 removeGroup(eg.getGroupId());
-                UMOEvent returnEvent = new MuleEvent(returnMessage, event.getEndpoint(), event.getComponent(), event);
+				UMOEndpoint endpoint = new MuleEndpoint(event.getEndpoint());
+				endpoint.setTransformer(null);
+				endpoint.setName(getClass().getName());
+				UMOEvent returnEvent = new MuleEvent(returnMessage, endpoint, event.getComponent(), event);
                 return new UMOEvent[]{returnEvent};
             }
         }
