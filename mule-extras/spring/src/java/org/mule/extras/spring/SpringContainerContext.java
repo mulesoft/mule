@@ -1,15 +1,15 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.extras.spring;
@@ -30,6 +30,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.io.InputStreamResource;
@@ -170,6 +171,14 @@ public class SpringContainerContext extends AbstractContainerContext implements 
                     new ConfigurationException(
                             new Message(Messages.FAILED_LOAD_X, "Application Context: " + configFile), e), this);
         }
+    }
+
+    public void dispose() {
+    	if (externalBeanFactory instanceof ConfigurableApplicationContext) {
+        	((ConfigurableApplicationContext) externalBeanFactory).close();
+        }
+        super.dispose();
+
     }
 
 }

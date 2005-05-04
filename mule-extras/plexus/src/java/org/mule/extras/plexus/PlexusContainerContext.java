@@ -110,4 +110,14 @@ public class PlexusContainerContext extends AbstractContainerContext
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Plexus container", this.configFile), this);
         }
     }
+	
+	public void dispose() {
+		if (container != null) {
+			try {
+				container.stop();
+			} catch (Exception e) {
+				logger.info("Plexus container", e);
+			}
+		}
+	}
 }

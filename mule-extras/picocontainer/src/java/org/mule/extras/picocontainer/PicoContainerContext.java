@@ -173,4 +173,10 @@ public class PicoContainerContext extends AbstractContainerContext
             throw new PicoCompositionException(e);
         }
     }
+	
+	public void dispose() {
+		if (container != null) {
+			container.dispose();
+		}
+	}
 }
