@@ -383,9 +383,9 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                     cfg.setMessageDispatcherThreadingProfile(tp);
                     cfg.setMessageReceiverThreadingProfile(tp);
                     cfg.setComponentThreadingProfile(tp);
-                } else if ("messageReceiver".equals(id)) {
+                } else if ("messageReceiver".equals(id) || "receiver".equals(id)) {
                     cfg.setMessageReceiverThreadingProfile(tp);
-                } else if ("messageDispatcher".equals(id)) {
+                } else if ("messageDispatcher".equals(id) || "dispatcher".equals(id)) {
                     cfg.setMessageDispatcherThreadingProfile(tp);
                 }  else if ("component".equals(id)) {
                     cfg.setComponentThreadingProfile(tp);
