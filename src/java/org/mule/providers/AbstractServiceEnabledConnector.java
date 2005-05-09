@@ -64,11 +64,15 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
         //auto set username and password
         if(endpointUri.getUserInfo()!=null) {
             props.setProperty("username", endpointUri.getUsername());
-            props.setProperty("password", endpointUri.getPassword());
+			String passwd = endpointUri.getPassword();
+			if (passwd != null) {
+				props.setProperty("password", passwd);
+			}
         }
-        if(endpointUri.getHost()!=null) {
-            props.setProperty("hostname", endpointUri.getHost());
-            props.setProperty("host", endpointUri.getHost());
+		String host = endpointUri.getHost();
+        if (host != null) {
+            props.setProperty("hostname", host);
+            props.setProperty("host", host);
         }
         if(endpointUri.getPort() > -1) props.setProperty("port", String.valueOf(endpointUri.getPort()));
 //        try
