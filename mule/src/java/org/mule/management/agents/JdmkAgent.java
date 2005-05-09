@@ -85,12 +85,26 @@ public class JdmkAgent implements UMOAgent {
 	 * @see org.mule.umo.lifecycle.Stoppable#stop()
 	 */
 	public void stop() throws UMOException {
+		try {
+			mBeanServer.invoke(adaptorName, "stop", null, null);
+		} catch (InstanceNotFoundException e) {
+			throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"), adaptorName, e);
+		} catch (MBeanException e) {
+			throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"), adaptorName, e);
+		} catch (ReflectionException e) {
+			//ignore
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.mule.umo.lifecycle.Disposable#dispose()
 	 */
 	public void dispose() {
+		try {
+			stop();
+		} catch (Exception e) {
+			// TODO: log an exception
+		}
 	}
 
     /* (non-Javadoc)
