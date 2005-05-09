@@ -74,7 +74,7 @@ public interface UMOImmutableDescriptor
     public HashMap getProperties();
 
     /**
-     * Retuens a list of interceptor objects that will be executed before/after
+     * Returns a list of interceptor objects that will be executed before/after
      *  the Mule UMO has executed
      * @return a list of interceptor objects that will be executed before/after
      *  the Mule UMO has executed
