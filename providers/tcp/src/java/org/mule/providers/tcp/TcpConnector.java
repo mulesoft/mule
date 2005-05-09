@@ -37,7 +37,6 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     private int backlog = DEFAULT_BACKLOG;
 
-
     public String getProtocol()
     {
         return "TCP";

@@ -105,7 +105,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
             if (serverSide) {
                 tp.setThreadPriority(Thread.NORM_PRIORITY + 2);
             }
-            workManager = tp.createWorkManager(connector.getName() + ".receiver");
+            workManager = tp.createWorkManager(connector.getName() + "." + endpoint.getName() + ".receiver");
             try {
                 workManager.start();
             } catch (UMOException e) {

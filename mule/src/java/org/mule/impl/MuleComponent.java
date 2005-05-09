@@ -13,10 +13,15 @@
  */
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.beans.ExceptionListener;
+import java.util.NoSuchElementException;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
@@ -25,7 +30,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.events.ComponentEvent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.*;
+import org.mule.umo.ComponentException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOWorkManager;
@@ -34,13 +44,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.BoundedPersistentQueue;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
 
 /**
  * <code>MuleComponent</code> manages the interaction and distribution of
@@ -49,7 +54,6 @@ import java.util.NoSuchElementException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-
 public final class MuleComponent implements UMOComponent, Work
 {
     /**
@@ -86,7 +90,7 @@ public final class MuleComponent implements UMOComponent, Work
     /**
      * Determines if the component has been paused
      */
-    private SynchronizedBoolean paused = new SynchronizedBoolean(false);
+    private WaitableBoolean paused = new WaitableBoolean(false);
 
     /**
      * determines if the proxy pool has been initialised
@@ -155,11 +159,6 @@ public final class MuleComponent implements UMOComponent, Work
         //Create thread pool
         ThreadingProfile tp = descriptor.getThreadingProfile();
         workManager = tp.createWorkManager(descriptor.getName());
-        try {
-            workManager.start();
-        } catch (UMOException e) {
-            throw new InitialisationException(e, this);
-        }
         try
         {
             //Setup event Queue (used for VM execution)
@@ -189,15 +188,10 @@ public final class MuleComponent implements UMOComponent, Work
 
             if (descriptor.getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS)
             {
-                List components = new ArrayList();
                 int threads = descriptor.getPoolingProfile().getMaxActive();
                 for (int i = 0; i < threads; i++)
                 {
-                    components.add(proxyPool.borrowObject());
-                }
-                for (int i = 0; i < threads; i++)
-                {
-                    proxyPool.returnObject(components.remove(0));
+	                proxyPool.returnObject(proxyPool.borrowObject());
                 }
             } else if (descriptor.getPoolingProfile().getInitialisationPolicy() == PoolingProfile.POOL_INITIALISE_ONE_COMPONENT)
             {
@@ -222,24 +216,7 @@ public final class MuleComponent implements UMOComponent, Work
         {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
-//            try
-//            {
-//                proxyPool.stop();
-//            } catch (Exception e)
-//            {
-//                throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Component: " + descriptor.getName()), e, this);
-//            }
-//            if (worker != null)
-//            {
-//                try
-//                {
-//                    worker.interrupt();
-//                    worker = null;
-//                } catch (Exception e)
-//                {
-//                    logger.error("Component worker thread did not close properly: " + e);
-//                }
-//            }
+			workManager.stop();
             stopped.set(true);
             stopping.set(false);
             model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_STOPPED));
@@ -261,6 +238,7 @@ public final class MuleComponent implements UMOComponent, Work
                     initialisePool();
                 }
                 proxyPool.start();
+	            workManager.start();
                 workManager.scheduleWork(this, WorkManager.INDEFINITE, null, null);
             } catch (Exception e)
             {
@@ -332,6 +310,9 @@ public final class MuleComponent implements UMOComponent, Work
 
     public void dispatchEvent(UMOEvent event) throws UMOException
     {
+		// Dispatching event to an inbound endpoint 
+		// TODO: remove this code as it is already done
+		// in the MuleSession#dispatchEvent
         if(!event.getEndpoint().canReceive()) {
             UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
             try
@@ -343,37 +324,27 @@ public final class MuleComponent implements UMOComponent, Work
             }
             return;
         }
+		
+		// Dispatching event to the component
         if (stats.isEnabled())
             stats.incReceivedEventASync();
 
-        logger.debug("Component: " + descriptor.getName() + " has received asynchronous event on: " + event.getEndpoint().getEndpointURI());
+		if (logger.isDebugEnabled()) {
+			logger.debug("Component: " + descriptor.getName() + " has received asynchronous event on: " + event.getEndpoint().getEndpointURI());
+		}
 
-        if (queue.size() >= qProfile.getMaxOutstandingMessages())
-        {
-            //Block until we can queue the next event
-            logger.trace("process maxQueueSize reached:" + qProfile.getMaxOutstandingMessages());
-            while (queue.size() >= qProfile.getMaxOutstandingMessages())
-            {
-
-                synchronized (queue)
-                {
-                    try
-                    {
-                        Thread.yield();
-                        queue.wait(qProfile.getBlockWait());
-                    } catch (Exception ie)
-                    {
-                    }
-
-                }
-            }
-        }
+		if (logger.isTraceEnabled()) {
+			if (queue.size() >= qProfile.getMaxOutstandingMessages()) {
+	            logger.trace("process maxQueueSize reached:" + qProfile.getMaxOutstandingMessages());
+			}
+		}
+        // Block until we can queue the next event
         try
         {
             queue.put(event);
-
-            if (stats.isEnabled())
+            if (stats.isEnabled()) {
                 stats.incQueuedEvent();
+            }
 
         } catch (InterruptedException e)
         {
@@ -385,21 +356,18 @@ public final class MuleComponent implements UMOComponent, Work
 
     public UMOMessage sendEvent(UMOEvent event) throws UMOException
     {
-        while (paused.get())
-        {
-            if (logger.isDebugEnabled()) logger.debug("Component: " + descriptor.getName() + " is paused. Blocking call until resume is called");
-            try
-            {
-                Thread.sleep(1000);
-            } catch (InterruptedException e)
-            {
-                //ignore
-            }
+		if (logger.isDebugEnabled() && paused.get()) {
+			logger.debug("Component: " + descriptor.getName() + " is paused. Blocking call until resume is called");
+		}
+        try {
+			paused.whenFalse(null);
+        } catch (InterruptedException e) {
+			// TODO: add a subclass for wrapping InterruptedException ?
+            throw new ComponentException(event.getMessage(), this, e);
         }
 
         if (stats.isEnabled())
             stats.incReceivedEventSync();
-
 
         logger.debug("Component: " + descriptor.getName() + " has received synchronous event on: " + event.getEndpoint().getEndpointURI());
         UMOMessage result = null;
@@ -416,22 +384,19 @@ public final class MuleComponent implements UMOComponent, Work
                         + " = " + proxy);
             }
             result = (UMOMessage) proxy.onCall(event);
-            proxyPool.returnObject(proxy);
-        } catch (Exception e)
-        {
-            try
-            {
-                proxyPool.returnObject(proxy);
-            } catch (Exception ignore)
-            {
-            }
-            if (e instanceof UMOException)
-            {
-                throw (MuleException) e;
-            } else
-            {
-                throw new ComponentException(event.getMessage(), this, e);
-            }
+        } catch (UMOException e) {
+			throw e;
+        } catch (Exception e) {
+            throw new ComponentException(event.getMessage(), this, e);
+        } finally {
+			try {
+				if (proxy != null) {
+					proxyPool.returnObject(proxy);
+				}
+			} catch (Exception e) {
+				throw new ComponentException(event.getMessage(), this, e);
+			}
+	        getStatistics().setComponentPoolSize(proxyPool.getSize());
         }
         return result;
     }
@@ -489,63 +454,44 @@ public final class MuleComponent implements UMOComponent, Work
 
         while (!stopped.get() && !stopping.get())
         {
-            if (!paused.get())
-            {
+			try {
+				// Wait if the component is paused
+				paused.whenFalse(null);
+				// Wait until an event is available
+                event = (MuleEvent) queue.take();
 
-                try
-                {
-                    event = (MuleEvent) queue.take();
-                } catch (InterruptedException e)
-                {
-                    break;
-                }
-                if (stats.isEnabled())
-                    stats.decQueuedEvent();
+	            if (stats.isEnabled())
+	                stats.decQueuedEvent();
 
-                if (event != null)
-                {
-                    logger.debug("Component: " + descriptor.getName() + " dequeued event on: " + event.getEndpoint().getEndpointURI());
+	            if (logger.isDebugEnabled()) {
+	                logger.debug("Component: " + descriptor.getName() + " dequeued event on: " + event.getEndpoint().getEndpointURI());
+	            }
 
-                    try
-                    {
-                        proxy = (MuleProxy) proxyPool.borrowObject();
-                        getStatistics().setComponentPoolSize(proxyPool.getSize());
-                        proxy.setStatistics(getStatistics());
-                    } catch (NoSuchElementException e)
-                    {
-                        handleException(new ComponentException(new Message(Messages.PROXY_POOL_TIMED_OUT), event.getMessage(), this, e));
-                    } catch (UMOException e)
-                    {
-                        handleException(e);
-                    } catch (Exception e)
-                    {
-                        handleException(new ComponentException(new Message(Messages.FAILED_TO_GET_POOLED_OBJECT), event.getMessage(), this, e));
-                    }
-
-                    if (proxy == null)
-                    {
-                        handleException(new ComponentException(new Message(Messages.FAILED_TO_GET_POOLED_OBJECT), event.getMessage(), this));
-                    }
-
-                    if (!proxy.isStarted())
-                    {
-                        try
-                        {
-                            proxy.start();
-                        } catch (UMOException e)
-                        {
-                            handleException(e);
-                        }
-                    }
-                    proxy.onEvent(event);
-                    try
-                    {
-                        workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, null);
-                    } catch (WorkException e)
-                    {
-                        handleException(new ComponentException(new Message(Messages.EVENT_PROCIESSING_FAILED_FOR_X, descriptor.getName()), event.getMessage(), this, e));
-                    }
-                }
+                proxy = (MuleProxy) proxyPool.borrowObject();
+                getStatistics().setComponentPoolSize(proxyPool.getSize());
+                proxy.setStatistics(getStatistics());
+                proxy.start();
+	            proxy.onEvent(event);
+                workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, null);
+			} catch (Exception e) {
+				if (e instanceof InterruptedException) {
+					break;
+				} else if (e instanceof NoSuchElementException) {
+	                handleException(new ComponentException(new Message(Messages.PROXY_POOL_TIMED_OUT), event.getMessage(), this, e));
+				} else if (e instanceof UMOException) {
+	                handleException(e);
+				} else if (e instanceof WorkException) {
+	                handleException(new ComponentException(new Message(Messages.EVENT_PROCIESSING_FAILED_FOR_X, descriptor.getName()), event.getMessage(), this, e));
+				} else {
+	                handleException(new ComponentException(new Message(Messages.FAILED_TO_GET_POOLED_OBJECT), event.getMessage(), this, e));
+				}
+				if (proxy != null) {
+					try {
+						proxyPool.returnObject(proxy);
+					} catch (Exception e2) {
+						logger.info("Failed to return proxy to pool", e2);
+					}
+				}
             }
         }
     }

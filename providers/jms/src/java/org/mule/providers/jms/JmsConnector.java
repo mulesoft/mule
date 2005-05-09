@@ -113,7 +113,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         super.doInitialise();
         try
         {
-        	setDisposeDispatcherOnCompletion(true);
             //If we have a connection factory, there is no need to initialise
             //the JndiContext
             if(connectionFactory==null || (connectionFactory!=null && jndiInitialFactory!=null)) {
@@ -218,17 +217,26 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     	}
     }
     
-    public Session getSession(boolean transacted) throws JMSException
-    {
+	public Session getCurrentSession() {
 		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
 		if (tx != null) {
 			if (tx.hasResource(connection)) {
-				logger.debug("Retrieving jms session from current transaction");
 				return (Session) tx.getResource(connection);
 			}
 		}
+		return null;
+	}
+	
+    public Session getSession(boolean transacted) throws JMSException
+    {
+		Session session = getCurrentSession();
+		if (session != null) {
+			logger.debug("Retrieving jms session from current transaction");
+			return session;
+		}
 		logger.debug("Retrieving new jms session from connection");
-    	Session session = jmsSupport.createSession(connection, transacted, acknowledgementMode, noLocal);
+    	session = jmsSupport.createSession(connection, transacted, acknowledgementMode, noLocal);
+		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
 		if (tx != null) {
 			logger.debug("Binding session to current transaction");
 			try {
@@ -411,7 +419,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         this.jndiProviderUrl = jndiProviderUrl;
     }
 
-    public Object getSession(UMOEndpoint endpoint) throws Exception
+    public Session getSession(UMOEndpoint endpoint) throws Exception
     {
         return getSession(endpoint.getTransactionConfig().isTransacted());
     }

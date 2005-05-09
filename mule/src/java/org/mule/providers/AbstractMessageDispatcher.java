@@ -12,6 +12,10 @@
 
 package org.mule.providers;
 
+import java.beans.ExceptionListener;
+
+import javax.resource.spi.work.Work;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
@@ -29,9 +33,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
-
-import javax.resource.spi.work.Work;
-import java.beans.ExceptionListener;
 
 /**
  * <p/>
@@ -51,8 +52,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      */
     protected UMOWorkManager workManager = null;
 
-    protected boolean disposeOnCompletion = false;
-
     protected AbstractConnector connector;
 
     protected boolean disposed = false;
@@ -61,7 +60,6 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     public AbstractMessageDispatcher(AbstractConnector connector) {
         init(connector);
-        disposeOnCompletion = ((AbstractConnector) connector).isDisposeDispatcherOnCompletion();
     }
 
     private void init(AbstractConnector connector) {
@@ -70,7 +68,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             ThreadingProfile profile = ((AbstractConnector) connector).getDispatcherThreadingProfile();
             doThreading = profile.isDoThreading();
             if (doThreading) {
-                workManager = profile.createWorkManager(connector.getName());
+                workManager = profile.createWorkManager(connector.getName() + ".dispatcher");
                 try {
                     workManager.start();
                 } catch (UMOException e) {
@@ -114,49 +112,35 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         } catch (Exception e) {
             //automatically dispose if there were failures
             logger.info("Exception occurred while executing on this dispatcher. disposing before continuing");
-            dispose();
             throw e;
-        } finally{
-            if (disposeOnCompletion) {
-                dispose();
-            }
         }
     }
 
 
     public final UMOMessage send(UMOEvent event) throws Exception {
-        try {
-            event.setSynchronous(true);
-            event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
-            RequestContext.setEvent(event);
-            //Apply Security filter if one is set
-            UMOEndpoint endpoint = event.getEndpoint();
-            if (endpoint.getSecurityFilter() != null) {
-                try {
-                    endpoint.getSecurityFilter().authenticate(event);
-                } catch (org.mule.umo.security.SecurityException e) {
-                    logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                    connector.handleException(e);
-                    return event.getMessage();
-                }
-            }
-            //the security filter may update the payload so we need to get the
-            //latest event again
-            event = RequestContext.getEvent();
+        event.setSynchronous(true);
+        event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
+        RequestContext.setEvent(event);
+        //Apply Security filter if one is set
+        UMOEndpoint endpoint = event.getEndpoint();
+        if (endpoint.getSecurityFilter() != null) {
             try {
-                UMOMessage result = doSend(event);
-
-                return result;
-            } catch (Exception e) {
-                //automatically dispose if there were failures
-                logger.info("Exception occurred while executing on this dispatcher. disposing before continuing");
-                dispose();
-                throw e;
+                endpoint.getSecurityFilter().authenticate(event);
+            } catch (org.mule.umo.security.SecurityException e) {
+                logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
+                connector.handleException(e);
+                return event.getMessage();
             }
-        } finally {
-            if (disposeOnCompletion) {
-                dispose();
-            }
+        }
+        //the security filter may update the payload so we need to get the
+        //latest event again
+        event = RequestContext.getEvent();
+        try {
+            UMOMessage result = doSend(event);
+            return result;
+        } catch (Exception e) {
+            logger.info("Exception occurred while executing on this dispatcher. disposing before continuing");
+            throw e;
         }
     }
 
@@ -171,7 +155,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
 
     }
 
-    public boolean isDisposed() {
+    public synchronized final boolean isDisposed() {
         return disposed;
     }
 
@@ -179,10 +163,11 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      * Template method to destroy any resources.  some connector will want to cache
      * dispatchers and destroy them themselves
      */
-    public final void dispose() {
+    public synchronized final void dispose() {
         if (!disposed) {
             try {
                 doDispose();
+				workManager.dispose();
             } finally {
                 connector.getDispatchers().values().remove(this);
                 disposed = true;
@@ -217,14 +202,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             try {
                 RequestContext.setEvent(event);
                 doDispatch(event);
-
             } catch (Exception e) {
-                dispose();
                 getConnector().handleException(e);
-            } finally {
-                if (disposeOnCompletion) {
-                    dispose();
-                }
             }
         }
 

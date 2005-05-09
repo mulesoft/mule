@@ -13,8 +13,6 @@
  */
 package org.mule.util.monitor;
 
-import org.mule.util.monitor.FileMonitor.FileMonitorNotifier;
-
 import java.beans.ExceptionListener;
 import java.io.File;
 import java.io.IOException;

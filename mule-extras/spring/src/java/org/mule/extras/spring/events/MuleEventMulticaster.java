@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
-import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Message;
 import org.mule.extras.spring.SpringContainerContext;

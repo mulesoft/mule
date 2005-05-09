@@ -573,7 +573,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
                 //use the global tp as a template
-                MuleConfiguration cfg = ((MuleManager)digester.getRoot()).getConfiguration();
+                MuleConfiguration cfg = MuleManager.getConfiguration();
                 id = attributes.getValue("id");
                 if("default".equals(id)) {
                     digester.push(cfg.getDefaultThreadingProfile());
@@ -765,7 +765,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
                 //use the default as a template
-                MuleConfiguration cfg = ((MuleManager)digester.getRoot()).getConfiguration();
+                MuleConfiguration cfg = MuleManager.getConfiguration();
                 if("component".equals(type)) {
                     digester.push(cfg.getComponentThreadingProfile());
                 } else  if("messageReceiver".equals(type)) {
@@ -796,7 +796,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             public void begin(String s, String s1, Attributes attributes) throws Exception
             {
                 //use the default as a template
-                MuleConfiguration cfg = ((MuleManager)digester.getRoot()).getConfiguration();
+                MuleConfiguration cfg = MuleManager.getConfiguration();
                 digester.push(cfg.getPoolingProfile());
             }
 

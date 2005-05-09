@@ -35,5 +35,31 @@
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
+        <dependency>
+            <artifactId>mule-jdbc-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jms</artifactId>
+            <version>${geronimo_spec_jms_version}</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>true</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+        	<groupId>hibernate</groupId>
+        	<artifactId>hibernate</artifactId>
+        	<version>${hibernate_version}</version>
+        </dependency>
     </dependencies>
 </project>

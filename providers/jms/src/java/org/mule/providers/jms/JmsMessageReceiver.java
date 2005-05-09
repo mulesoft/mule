@@ -129,15 +129,16 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
         {
             logger.debug("Message received it is of type: " + message.getClass().getName());
             logger.debug("Message received on " + message.getJMSDestination() + " (" + message.getJMSDestination().getClass().getName() + ")");
+	        logger.debug("Message CorrelationId is: " + message.getJMSCorrelationID());
+	        logger.debug("Jms Message Id is: " + message.getJMSMessageID());
         }
-
-        String correlationId = message.getJMSCorrelationID();
-        logger.debug("Message CorrelationId is: " + correlationId);
-        logger.info("Jms Message Id is: " + message.getJMSMessageID());
 
         if (message.getJMSRedelivered())
         {
-            logger.info("Message with correlationId: " + correlationId + " is redelivered. handing off to Exception Handler");
+	        if (logger.isDebugEnabled())
+	        {
+				logger.debug("Message with correlationId: " + message.getJMSCorrelationID() + " is redelivered. handing off to Exception Handler");
+	        }
             redeliveryHandler.handleRedelivery(message);
         }
 
@@ -182,7 +183,7 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 		JmsThreadContext ctx = context.getContext();
 		// Create session if none exists
 		if (ctx.session == null) {
-			ctx.session = (Session) this.connector.getSession(endpoint);
+			ctx.session = this.connector.getSession(endpoint);
 		}
 		
 		// Create destination
@@ -199,7 +200,7 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
             //to be backward compatable
             selector = (String) endpoint.getProperties().get(JmsConnector.JMS_SELECTOR_PROPERTY);
         }
-        String tempDurable = (String)endpoint.getProperties().get("durable");
+        String tempDurable = (String) endpoint.getProperties().get("durable");
         boolean durable = connector.isDurable();
         if(tempDurable!=null) durable = Boolean.valueOf(tempDurable).booleanValue();
 

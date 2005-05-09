@@ -1,29 +1,16 @@
 /* 
-
  * $Header$
-
  * $Revision$
-
  * $Date$
-
  * ------------------------------------------------------------------------------------------------------
-
  * 
-
  * Copyright (c) SymphonySoft Limited. All rights reserved.
-
  * http://www.symphonysoft.com
-
  * 
-
  * The software in this package is published under the terms of the BSD
-
  * style license a copy of which has been included with this distribution in
-
  * the LICENSE.txt file. 
-
  *
-
  */
 
 package org.mule.providers.vm;
@@ -109,11 +96,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             throw new DispatchException(new Message(Messages.X_IS_NULL, "Endpoint"), event.getMessage(), event.getEndpoint());
         }
         if(connector.isQueueEvents()) {
-            BoundedPersistentQueue queue = connector.getQueue(endpointUri.getAddress());
-            if(queue==null) {
-                logger.info("Creating vm Queue: " + endpointUri.getAddress());
-                queue = connector.createQueue(endpointUri.getAddress());
-            }
+            BoundedPersistentQueue queue = connector.createQueue(endpointUri.getAddress());
             queue.put(event);
         } else {
             VMMessageReceiver receiver = connector.getReceiver(event.getEndpoint().getEndpointURI());
