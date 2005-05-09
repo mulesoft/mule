@@ -28,7 +28,7 @@ import java.util.*;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractTablePrinter extends PrintWriter
+public class AbstractTablePrinter extends PrintWriter
 {
 
     public AbstractTablePrinter(Writer out)
@@ -182,5 +182,7 @@ public abstract class AbstractTablePrinter extends PrintWriter
         println();
     }
 
-    public abstract void print(Collection c);
+    public void print(Collection c) {
+		throw new UnsupportedOperationException();
+    }
 }
