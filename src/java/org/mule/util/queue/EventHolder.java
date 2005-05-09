@@ -59,8 +59,15 @@ import java.io.Serializable;
                 throw new InitialisationException(new Message(Messages.NO_SESSION_FOR_COMPONENT_X, componentName), this);
             }
             UMOEndpoint endpoint = session.getComponent().getDescriptor().getInboundRouter().getEndpoint(endpointName);
-            if(endpoint == null) {
-                endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
+            if (endpoint == null) {
+		         endpoint = session.getComponent().getDescriptor().getInboundEndpoint();
+		         if (endpoint != null && !endpoint.getName().equals(endpointName)) {
+					 // this an't it...
+		             endpoint = null;
+		         }
+	            if (endpoint == null) {
+	                endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
+	            }
                 if(endpoint == null) {
                     throw new InitialisationException(new Message(Messages.NO_ENDPOINT_X_FOR_COMPONENT_X, componentName), this);
                 }

@@ -25,6 +25,7 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
@@ -171,6 +172,10 @@ public abstract class AbstractMuleTestCase extends NamedTestCase
     {
         return new Mock(UMOEndpoint.class, "umoEndpoint");
     }
+	
+	public static Mock getMockEndpointURI() {
+		return new Mock(UMOEndpointURI.class, "umoEndpointUri");
+	}
 
     public static Mock getMockDescriptor()
     {

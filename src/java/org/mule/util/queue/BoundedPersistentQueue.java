@@ -33,6 +33,8 @@ public class BoundedPersistentQueue extends BoundedBuffer implements Disposable
     private PersistenceStrategy ps;
 
     private boolean deleteOnTake = true;
+	
+	private String name;
 
     public BoundedPersistentQueue(int i) throws IllegalArgumentException
     {
@@ -44,13 +46,22 @@ public class BoundedPersistentQueue extends BoundedBuffer implements Disposable
         super(i);
         this.ps = ps;
         this.deleteOnTake = deleteOnTake;
+		this.name = name;
         if(ps!=null) ps.initialise(this, name);
     }
 
     public void put(Object o) throws InterruptedException
     {
-        if(ps!= null) ps.store((UMOEvent)o);
-        super.put(o);
+        if(ps!= null) ps.store(name, (UMOEvent)o);
+		try {
+			super.put(o);
+		} catch (InterruptedException e) {
+			ps.remove(name, (UMOEvent)o);
+			throw e;
+		} catch (RuntimeException e) {
+			ps.remove(name, (UMOEvent)o);
+			throw e;
+		}
     }
 
     public Object take() throws InterruptedException
@@ -63,7 +74,7 @@ public class BoundedPersistentQueue extends BoundedBuffer implements Disposable
     public boolean remove(Object o) throws PersistentQueueException
     {
          if(ps!= null) {
-             return ps.remove((UMOEvent)o);
+             return ps.remove(name, (UMOEvent)o);
          } else {
              return false;
          }
