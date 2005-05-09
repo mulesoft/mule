@@ -82,14 +82,20 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             } else
             {
                 PostMethod postMethod = new PostMethod(uri.toString());
-                if(src instanceof String) {
-                    postMethod.setRequestBody(src.toString());
-                    postMethod.setRequestContentLength(src.toString().length());
-                } else {
-                    byte[] buffer = Utility.objectToByteArray(src);
-                    postMethod.setRequestBody(new ByteArrayInputStream(buffer));
-                    postMethod.setRequestContentLength(buffer.length);
-                }
+				String paramName = (String) context.getProperty(
+						HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
+				if (paramName == null) {
+	                if (src instanceof String) {
+	                    postMethod.setRequestBody(src.toString());
+	                    postMethod.setRequestContentLength(src.toString().length());
+	                } else {
+	                    byte[] buffer = Utility.objectToByteArray(src);
+	                    postMethod.setRequestBody(new ByteArrayInputStream(buffer));
+	                    postMethod.setRequestContentLength(buffer.length);
+	                }
+				} else {
+					postMethod.addParameter(paramName, src.toString());
+				}
                 httpMethod = postMethod;
             }
             //Standard requestHeaders

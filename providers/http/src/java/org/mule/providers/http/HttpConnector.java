@@ -64,6 +64,7 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_PARAMS = "http.params";
     public static final String HTTP_GET_BODY_PARAM_PROPERTY = "http.get.body.param";
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
+	public static final String HTTP_POST_BODY_PARAM_PROPERTY = "http.post.body.param";
 
     public static final int DEFAULT_PORT = 80;
     public static String DEFAULT_HTTP_VERSION = HttpConstants.HTTP11;
