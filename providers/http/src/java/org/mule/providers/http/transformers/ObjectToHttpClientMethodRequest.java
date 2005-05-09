@@ -72,10 +72,10 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                         HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
 
                 String query = uri.getQuery();
-                if(query==null) {
-                    query = paramName + "=" + paramName;
+                if (query == null) {
+                    query = paramName + "=" + src.toString();
                 } else {
-                    query += "&" + paramName + "=" + paramName;
+                    query += "&" + paramName + "=" + src.toString();
                 }
                 httpMethod.setQueryString(query);
 
