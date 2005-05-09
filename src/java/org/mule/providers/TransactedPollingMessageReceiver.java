@@ -1,6 +1,5 @@
 /* 
-
- *  * $Header$
+ * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
@@ -36,11 +35,8 @@ import EDU.oswego.cs.dl.util.concurrent.Sync;
  * The TransactedPollingMessageReceiver is an abstract receiver
  * that handles polling and transaction management.
  * Derived implementations of these class must be thread safe
- * as several threads can be started at once for an improved¨µ
- * 
- * m:
- * 
- * th^^ùput.
+ * as several threads can be started at once for an improveded
+ * throuput.
  * 
  * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$

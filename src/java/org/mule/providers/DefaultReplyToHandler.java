@@ -58,7 +58,9 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
     public void processReplyTo(UMOEvent event, UMOMessage returnMessage, Object replyTo) throws UMOException
     {
-        logger.info("sending reply to: " + returnMessage.getReplyTo());
+		if (logger.isDebugEnabled()) {
+			logger.debug("sending reply to: " + returnMessage.getReplyTo());
+		}
         String replytToEndpoint = replyTo.toString();
 
         //get the endpoint for this url
@@ -78,7 +80,9 @@ public class DefaultReplyToHandler implements ReplyToHandler
         try
         {
             endpoint.getConnector().getDispatcher(replyTo.toString()).dispatch(replyToEvent);
-            logger.info("reply to sent: " + endpoint);
+			if (logger.isDebugEnabled()) {
+				logger.debug("reply to sent: " + endpoint);
+			}
             ((MuleComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
         } catch (Exception e)
         {

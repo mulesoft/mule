@@ -41,9 +41,10 @@ public abstract class CorrelationAggregator extends AbstractEventAggregator
             logger.warn("Correlation Group Size not set, but CorrelationAggregator is being used.  Message is being forwarded");
             return true;
         }
-
-        logger.info("Aggregator: Current Event groups = " + eventGroups.size());
-        logger.info("correlation size is " + size + ". current event group size is " + events.getSize() + " for correlation " + events.getGroupId());
+		if (logger.isDebugEnabled()) {
+	        logger.debug("Aggregator: Current Event groups = " + eventGroups.size());
+	        logger.debug("correlation size is " + size + ". current event group size is " + events.getSize() + " for correlation " + events.getGroupId());
+		}
         return size == events.getSize();
     }
 

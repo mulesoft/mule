@@ -18,7 +18,6 @@ package org.mule.tck.testmodels.mule;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.providers.AbstractMessageReceiver;
-import org.mule.tck.testmodels.mule.TestConnector.DummyMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;

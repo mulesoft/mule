@@ -14,7 +14,6 @@
  */
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -23,13 +22,14 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.interceptors.LifecycleInterceptor;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.ReplyToHandler;
 import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.model.ModelException;
@@ -39,6 +39,8 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
 
 import javax.resource.spi.work.Work;
+
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -104,37 +106,21 @@ public class MuleProxy implements Work, Lifecycle
         UMOEntryPointResolver resolver = model.getEntryPointResolver();
         umo = model.getLifecycleAdapterFactory().create(component, descriptor, resolver);
 
-        if (descriptor.getInterceptors().size() == 0)
-        {
-            interceptorList = new CopyOnWriteArrayList();
-        } else
-        {
-            interceptorList = descriptor.getInterceptors();
-        }
-        Iterator iter = interceptorList.iterator();
-        Object temp;
-        while (iter.hasNext())
-        {
-            temp = iter.next();
-            if (temp instanceof LifecycleInterceptor)
-            {
-                try
-                {
-                    ((LifecycleInterceptor) temp).initialise();
-                } catch (Exception e)
-                {
-                    throw new ModelException(new Message(Messages.FAILED_TO_INITIALISE_INTERCEPTORS_ON_X, descriptor.getName()), e);
-                }
-            }
-        }
+		interceptorList = new ArrayList(descriptor.getInterceptors().size() + 1);
+		interceptorList.addAll(descriptor.getInterceptors());
+		interceptorList.add(umo);
 
-        interceptorList.add(interceptorList.size(), umo);
-        try
-        {
-            umo.initialise();
-        } catch (Exception e)
-        {
-            throw new ModelException(new Message(Messages.X_FAILED_TO_INITIALISE, "Component '" + descriptor.getName() + "'"), e);
+        for (Iterator iter = interceptorList.iterator(); iter.hasNext();) {
+			UMOInterceptor interceptor = (UMOInterceptor) iter.next();
+			if (interceptor instanceof Initialisable) {
+		        try
+		        {
+		            ((Initialisable) interceptor).initialise();
+		        } catch (Exception e)
+		        {
+		            throw new ModelException(new Message(Messages.X_FAILED_TO_INITIALISE, "Component '" + descriptor.getName() + "'"), e);
+		        }
+			}
         }
     }
 
@@ -177,28 +163,17 @@ public class MuleProxy implements Work, Lifecycle
     public void dispose()
     {
         checkDisposed();
-        Iterator iter = interceptorList.iterator();
-        Object temp;
-        while (iter.hasNext())
-        {
-            temp = iter.next();
-            if (temp instanceof LifecycleInterceptor)
-            {
-                try
-                {
-                    ((LifecycleInterceptor) temp).dispose();
-                } catch (Exception e)
-                {
-                    logger.error(new Message(Messages.FAILED_TO_DISPOSE_X, "Interceptor '" + temp.getClass().getName() + "'"), e);
-                }
-            }
-        }
-        try
-        {
-            umo.dispose();
-        } catch (Exception e)
-        {
-            logger.error(new Message(Messages.FAILED_TO_DISPOSE_X, "Component '" + descriptor.getName() + "'"), e);
+        for (Iterator iter = interceptorList.iterator(); iter.hasNext();) {
+			UMOInterceptor interceptor = (UMOInterceptor) iter.next();
+			if (interceptor instanceof Disposable) {
+		        try
+		        {
+		            ((Disposable) interceptor).dispose();
+		        } catch (Exception e)
+		        {
+					logger.error(new Message(Messages.FAILED_TO_DISPOSE_X, "Component '" + descriptor.getName() + "'"), e);
+		        }
+			}
         }
     }
 
@@ -539,6 +514,7 @@ public class MuleProxy implements Work, Lifecycle
             {
                 logger.error("Failed to return proxy: " + e2.getMessage(), e2);
             }
+            getStatistics().setComponentPoolSize(proxyPool.getSize());
         }
     }
 

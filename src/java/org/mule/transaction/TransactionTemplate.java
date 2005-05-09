@@ -56,9 +56,9 @@ public class TransactionTemplate {
 			}
 			
 			if (action == UMOTransactionConfig.ACTION_ALWAYS_BEGIN || action == UMOTransactionConfig.ACTION_BEGIN_OR_JOIN) {
-                logger.info("Beginning transaction");
+                logger.debug("Beginning transaction");
                 tx = config.getFactory().beginTransaction();
-                logger.info("Transaction successfully started");
+                logger.debug("Transaction successfully started");
 			} else {
 				tx = null;
 			}
@@ -83,7 +83,7 @@ public class TransactionTemplate {
                     //if it has been marked for rollback (which is the default case in the
                     // AbstractExceptionListener)
                     if(tx.isRollbackOnly()) {
-                        logger.info("Exception caught: rollback transaction", e);
+                        logger.debug("Exception caught: rollback transaction", e);
                         tx.rollback();
                     } else {
                         tx.commit();

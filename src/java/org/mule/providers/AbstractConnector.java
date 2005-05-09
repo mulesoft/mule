@@ -124,12 +124,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     private long retryFrequency = 2000;
 
     /**
-     * Determines whether dispatchers should be disposed straight away
-     * of deferred until the connector is disposing
-     */
-    private boolean disposeDispatcherOnCompletion = false;
-
-    /**
      * The service descriptor can define a default inbound transformer to
      * be used on an endpoint if no other is set
      */
@@ -505,7 +499,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         if (dispatcherThreadingProfile == null)
         {
-            dispatcherThreadingProfile = MuleManager.getConfiguration().getMessageReceiverThreadingProfile();
+            dispatcherThreadingProfile = MuleManager.getConfiguration().getMessageDispatcherThreadingProfile();
 
         }
         return dispatcherThreadingProfile;
@@ -556,16 +550,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
     }
 
-    public boolean isDisposeDispatcherOnCompletion()
-    {
-        return disposeDispatcherOnCompletion;
-    }
-
-    public void setDisposeDispatcherOnCompletion(boolean disposeDispatcherOnCompletion)
-    {
-        this.disposeDispatcherOnCompletion = disposeDispatcherOnCompletion;
-    }
-
     /**
      * Template method to perform any work when destroying the connectoe
      *
@@ -575,7 +559,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         try {
             stopConnector();
         } catch (UMOException e) {
-            logger.warn("Fialed to stop during shutdown: " + e.getMessage(), e);
+            logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
         }
     }
 

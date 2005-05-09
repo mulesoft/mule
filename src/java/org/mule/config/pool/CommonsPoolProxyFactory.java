@@ -19,7 +19,6 @@ import org.apache.commons.pool.PoolableObjectFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ObjectPool;
 

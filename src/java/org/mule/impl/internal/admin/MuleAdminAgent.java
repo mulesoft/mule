@@ -18,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -116,9 +115,8 @@ public class MuleAdminAgent implements UMOAgent
                 UMOConnector connector = ConnectorFactory.getOrCreateConnectorByProtocol(endpointUri);
                 //If this connector has already been initialised i.e. it's a
                 //pre-existing connector not not reinit
-                if(manager.lookupConnector(connector.getName())==null) {
+                if (manager.lookupConnector(connector.getName()) == null) {
                     connector.setName(DEFAULT_MANAGER_PROVIDER);
-                    ((AbstractConnector) connector).setDisposeDispatcherOnCompletion(true);
                     connector.initialise();
                     manager.registerConnector(connector);
                 }
