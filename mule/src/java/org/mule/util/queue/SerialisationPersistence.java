@@ -13,7 +13,14 @@
  */
 package org.mule.util.queue;
 
-import EDU.oswego.cs.dl.util.concurrent.BoundedChannel;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -21,9 +28,8 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.queue.SerialisationPersistence.EventFilenameFilter;
 
-import java.io.*;
+import EDU.oswego.cs.dl.util.concurrent.BoundedChannel;
 
 /**
  * <code>SerialisationPersistence</code> persists event objects to disk.
@@ -46,11 +52,11 @@ public class SerialisationPersistence implements PersistenceStrategy
 
     private String queueStore = DEFAULT_QUEUE_STORE;
 
-    public void store(UMOEvent event) throws PersistentQueueException
+    public void store(String name, UMOEvent event) throws PersistentQueueException
     {
         synchronized (lock)
         {
-            File item = new File(store, event.getEndpoint().getEndpointURI().getAddress() + "/" + event.getId() + ".e");
+            File item = new File(store, name + "/" + event.getId() + ".e");
 
 //        if(item.exists()) {
 //            throw new PersistentQueueException("Event: " + event.getId() + " has already been stored at: " + item.getAbsolutePath());
@@ -70,9 +76,9 @@ public class SerialisationPersistence implements PersistenceStrategy
         }
     }
 
-    public boolean remove(UMOEvent event) throws PersistentQueueException
+    public boolean remove(String name, UMOEvent event) throws PersistentQueueException
     {
-        File item = new File(store, event.getComponent().getDescriptor().getName() + "/" + event.getId() + ".e");
+        File item = new File(store, name + "/" + event.getId() + ".e");
         if (item.exists())
         {
             synchronized (lock)

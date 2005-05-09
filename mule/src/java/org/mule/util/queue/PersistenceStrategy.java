@@ -26,9 +26,9 @@ import org.mule.umo.lifecycle.InitialisationException;
 
 public interface PersistenceStrategy
 {
-    public void store(UMOEvent event) throws PersistentQueueException;
+    public void store(String name, UMOEvent event) throws PersistentQueueException;
 
-    public boolean remove(UMOEvent event) throws PersistentQueueException;
+    public boolean remove(String name, UMOEvent event) throws PersistentQueueException;
 
     public void initialise(BoundedChannel queue, String componentName) throws InitialisationException;
 
