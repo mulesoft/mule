@@ -178,7 +178,7 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration {
 			RouterStatistics os = this.statistics.getOutboundRouterStat();
 			if (os != null) {
 				outboundName = new ObjectName(name.toString() + ",router=outbound");
-				this.server.registerMBean(new RouterStats(is), this.outboundName);
+				this.server.registerMBean(new RouterStats(os), this.outboundName);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
