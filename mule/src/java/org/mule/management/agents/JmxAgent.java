@@ -57,6 +57,7 @@ public class JmxAgent implements UMOAgent
     private JMXConnectorServer connectorServer;
     private boolean enableStatistics = true;
     private List registeredMBeans = new ArrayList();
+	private boolean serverCreated = false;
 
     /* (non-Javadoc)
      * @see org.mule.umo.manager.UMOAgent#getName()
@@ -108,6 +109,7 @@ public class JmxAgent implements UMOAgent
         if (mBeanServer == null && createServer)
         {
             mBeanServer = MBeanServerFactory.createMBeanServer();
+			serverCreated = true;
         }
         if (mBeanServer == null)
         {
@@ -201,7 +203,9 @@ public class JmxAgent implements UMOAgent
                     logger.warn("Failed to unregister MBean: " + objectName + ". Error is: " + e.getMessage());
                 }
             }
-            MBeanServerFactory.releaseMBeanServer(mBeanServer);
+			if (serverCreated) {
+				MBeanServerFactory.releaseMBeanServer(mBeanServer);
+			}
             mBeanServer = null;
         }
     }
