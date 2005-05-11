@@ -45,7 +45,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
 
     public ObjectToHttpClientMethodRequest()
     {
-        registerSourceType(String.class);
         setReturnClass(HttpMethod.class);
         requestHeaders = new ArrayList(Arrays.asList(HttpConstants.REQUEST_HEADER_NAMES));
         responseHeaders = new ArrayList(Arrays.asList(HttpConstants.RESPONSE_HEADER_NAMES));

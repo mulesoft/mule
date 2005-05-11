@@ -10,6 +10,10 @@
 	<transformers>
 		<transformer name="ByteArrayToString" 
 			className="org.mule.transformers.simple.ByteArrayToString" />
+		<transformer name="ByteArrayToSerializable" 
+			className="org.mule.transformers.simple.ByteArrayToSerializable" />
+		<transformer name="SerializableToByteArray" 
+			className="org.mule.transformers.simple.SerializableToByteArray" />
 		<transformer name="ObjectToXml" 
 			className="org.mule.transformers.xml.ObjectToXml"
 			returnClass="java.lang.String" />
@@ -27,6 +31,10 @@
 				<property name="Content-Type" value="text/plain" />
 			</properties>
 		</endpoint>
+		<endpoint name="httpEndpoint2"
+				  address="http://localhost:18081/RemoteService?method=post"
+				  synchronous="true">
+		</endpoint>
 	</global-endpoints>
 	
 	<model name="model">
@@ -37,6 +45,12 @@
 			responseTransformer="ObjectToXml Compress ToHttpResponse">
 		</mule-descriptor>
 
+		<mule-descriptor name="HttpService2" 
+			implementation="org.mule.components.simple.EchoComponent"
+			inboundEndpoint="httpEndpoint2"
+			inboundTransformer="ByteArrayToSerializable"
+			responseTransformer="SerializableToByteArray ToHttpResponse">
+		</mule-descriptor>
 	</model>
 	
 </mule-configuration>

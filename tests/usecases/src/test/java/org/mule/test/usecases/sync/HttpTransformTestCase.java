@@ -13,11 +13,14 @@
  */
 package org.mule.test.usecases.sync;
 
+import java.util.Arrays;
+
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.NamedTestCase;
 import org.mule.transformers.compression.GZipUncompressTransformer;
+import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.umo.UMOMessage;
 
 /**
@@ -33,7 +36,7 @@ public class HttpTransformTestCase extends NamedTestCase {
         builder.configure("org/mule/test/usecases/sync/http-transform.xml");
     }
 	
-    public void testSyncResponse() throws Exception
+    public void testTransform() throws Exception
     {
         MuleClient client = new MuleClient();
         UMOMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
@@ -45,4 +48,17 @@ public class HttpTransformTestCase extends NamedTestCase {
 		String result = new String(r);
         assertEquals("<string>payload</string>", result);
     }
+	
+	public void testBinary() throws Exception
+	{
+        MuleClient client = new MuleClient();
+		Object payload = Arrays.asList(new Integer[] {new Integer(42)});
+        UMOMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
+        assertNotNull(message);
+		ByteArrayToSerializable bas = new ByteArrayToSerializable();
+		assertNotNull(message.getPayload());
+		assertTrue(message.getPayload() instanceof byte[]);
+		Object result = bas.doTransform(message.getPayload());
+		assertEquals(payload, result);
+	}
 }
