@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="test" version="1.0">
+
+	<!-- Mule properties -->
+	<mule-environment-properties synchronous="false" synchronousReceive="false" />
+	
+	<transformers>
+		<transformer name="ByteArrayToString" 
+			className="org.mule.transformers.simple.ByteArrayToString" />
+		<transformer name="ObjectToXml" 
+			className="org.mule.transformers.xml.ObjectToXml"
+			returnClass="java.lang.String" />
+		<transformer name="Compress"
+			className="org.mule.transformers.compression.GZipCompressTransformer" />
+		<transformer name="ToHttpResponse"
+			className="org.mule.providers.http.transformers.UMOMessageToResponseString" />
+	</transformers>
+	
+	<global-endpoints>
+		<endpoint name="httpEndpoint"
+				  address="http://localhost:18080/RemoteService"
+				  synchronous="true">
+			<properties>
+				<property name="Content-Type" value="text/plain" />
+			</properties>
+		</endpoint>
+	</global-endpoints>
+	
+	<model name="model">
+		<mule-descriptor name="HttpService" 
+			implementation="org.mule.components.simple.EchoComponent"
+			inboundEndpoint="httpEndpoint"
+			inboundTransformer="ByteArrayToString"
+			responseTransformer="ObjectToXml Compress ToHttpResponse">
+		</mule-descriptor>
+
+	</model>
+	
+</mule-configuration>

@@ -182,7 +182,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             String status = String.valueOf(httpMethod.getStatusCode());
             h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
             logger.debug("Http response is: " + status);
-            return new MuleMessage(httpMethod.getResponseBodyAsString(), h);
+            return new MuleMessage(httpMethod.getResponseBody(), h);
         } catch (Exception e)
         {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
