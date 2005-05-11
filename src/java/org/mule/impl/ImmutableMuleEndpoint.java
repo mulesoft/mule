@@ -244,6 +244,9 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         UMOEndpoint clone = new MuleEndpoint(name, endpointUri, connector, transformer, type, createConnector, (properties==null ? null : new HashMap(properties)));
         clone.setTransactionConfig(transactionConfig);
         clone.setFilter(filter);
+		if (synchronous != null) {
+			clone.setSynchronous(synchronous.booleanValue());
+		}
         return clone;
 
     }
