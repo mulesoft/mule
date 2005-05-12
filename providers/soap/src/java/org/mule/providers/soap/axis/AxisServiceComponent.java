@@ -28,6 +28,7 @@ import org.apache.axis.utils.XMLUtils;
 import org.apache.commons.logging.Log;
 import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.WriterMessageAdapter;
 import org.mule.providers.http.HttpConnector;
@@ -749,7 +750,7 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         if (homeDir == null)
         {
-            homeDir = MuleManager.getConfiguration().getWorkingDirectoy() + DEFAULT_AXIS_HOME;
+            homeDir = MuleManager.getConfiguration().getWorkingDirectory() + DEFAULT_AXIS_HOME;
         }
         return homeDir;
     }
