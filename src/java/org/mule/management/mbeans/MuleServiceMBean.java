@@ -55,7 +55,7 @@ public interface MuleServiceMBean
 
     boolean isRecoverableMode();
 
-    String getWorkingDirectoy();
+    String getWorkingDirectory();
 
     String[] getConfigResources();
 

@@ -13,42 +13,42 @@
  */
 package org.mule.config;
 
+import org.mule.MuleManager;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.queue.BoundedPersistentQueue;
-import org.mule.util.queue.PersistenceStrategy;
+import org.mule.util.queue.QueueConfiguration;
 
 /**
  * <code>QueueProfile</code> determines how an internal queue for a component will
  * behave
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
 
 public class QueueProfile
 {
-    private int maxOutstandingMessages = 100;
-    private long blockWait = 2000;
-    private PersistenceStrategy persistenceStrategy;
+    private int maxOutstandingMessages = 0;
+    private boolean persistent = false;
 
     public QueueProfile()
     {
     }
 
-    public QueueProfile(int maxOutstandingMessages, PersistenceStrategy persistenceStrategy)
+    public QueueProfile(int maxOutstandingMessages, boolean persistent)
     {
         this.maxOutstandingMessages = maxOutstandingMessages;
-        this.persistenceStrategy = persistenceStrategy;
+        this.persistent = persistent;
     }
 
     public QueueProfile(QueueProfile queueProfile)
     {
         this.maxOutstandingMessages = queueProfile.getMaxOutstandingMessages();
-        this.persistenceStrategy = queueProfile.getPersistenceStrategy();
+        this.persistent = queueProfile.isPersistent();
     }
 
     /**
-     * This specifies the number of messages that can be queued for this component before it starts
+     * This specifies the number of messages that can be queued before it starts
      * blocking.
      *
      * @return the max number of messages that will be queued
@@ -59,7 +59,7 @@ public class QueueProfile
     }
 
     /**
-     * This specifies the number of messages that can be queued for this component before it starts
+     * This specifies the number of messages that can be queued before it starts
      * blocking.
      *
      * @param maxOutstandingMessages the max number of messages that will be queued
@@ -69,28 +69,20 @@ public class QueueProfile
         this.maxOutstandingMessages = maxOutstandingMessages;
     }
 
-    public PersistenceStrategy getPersistenceStrategy()
+    public boolean isPersistent()
     {
-        return persistenceStrategy;
+        return persistent;
     }
 
-    public void setPersistenceStrategy(PersistenceStrategy persistenceStrategy)
+    public void setPersistent(boolean persistent)
     {
-        this.persistenceStrategy = persistenceStrategy;
+        this.persistent = persistent;
     }
 
-    public BoundedPersistentQueue createQueue(String component) throws InitialisationException
+    public void configureQueue(String component) throws InitialisationException
     {
-        return new BoundedPersistentQueue(maxOutstandingMessages, persistenceStrategy, component, true);
+		QueueConfiguration qc = new QueueConfiguration(maxOutstandingMessages, persistent);
+		MuleManager.getInstance().getQueueManager().setQueueConfiguration(component, qc);
     }
 
-    public long getBlockWait()
-    {
-        return blockWait;
-    }
-
-    public void setBlockWait(long blockWait)
-    {
-        this.blockWait = blockWait;
-    }
 }

@@ -31,7 +31,7 @@
 	<i>mule-environment-params</i> are prarameters used by the Mule run-time. If none or not all
 	parameters are specified defaults will be used
 -->
-<!ELEMENT mule-environment-properties ((threading-profile)*, (pooling-profile)?, (queue-profile)?)>
+<!ELEMENT mule-environment-properties ((threading-profile)*, (pooling-profile)?, (queue-profile)?, (persistence-strategy)?)>
 
 <!--
 	Specifies whether mule should process messages sysnchonously, i.e. that a mule-model
@@ -219,7 +219,7 @@ threading in every connector
     queue events for each component managed by Mule.
 -->
 
-<!ELEMENT queue-profile (persistence-strategy?,properties?)>
+<!ELEMENT queue-profile (properties?)>
 
 <!--
     Defines the maximum number of message that can be queued.
@@ -227,10 +227,9 @@ threading in every connector
 <!ATTLIST queue-profile maxOutstandingMessages   NMTOKEN         #IMPLIED>
 
 <!--
-    The number of milliseconds to wait if the queue has reached max capacity
-    before trying to queue more events
+    Defines if this queue is persistent or not
 -->
-<!ATTLIST queue-profile blockWait   NMTOKEN         #IMPLIED>
+<!ATTLIST queue-profile persistent   (true | false)         "false">
 
 <!--
    A persistence strategy defines the mechanism used to store Mule events to a persistent store.  Primarily, this

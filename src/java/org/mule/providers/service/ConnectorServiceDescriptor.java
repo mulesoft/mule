@@ -85,7 +85,7 @@ public class ConnectorServiceDescriptor
     private UMOTransformer inboundTransformer;
     private UMOTransformer outboundTransformer;
     private UMOTransformer responseTransformer;
-    private EndpointBuilder endpointBuilderImpl;
+    //private EndpointBuilder endpointBuilderImpl;
     private ConnectorServiceFinder connectorServiceFinder;
 
     public ConnectorServiceDescriptor(String protocol, String serviceLocation, Properties props) {
@@ -137,7 +137,7 @@ public class ConnectorServiceDescriptor
         temp = props.getProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
         if(temp!=null) {
             endpointBuilder = temp;
-            endpointBuilderImpl=null;
+            //endpointBuilderImpl=null;
         }
 
         temp = props.getProperty(MuleProperties.CONNECTOR_SERVICE_FINDER);
@@ -419,7 +419,7 @@ public class ConnectorServiceDescriptor
 
     public EndpointBuilder createEndpointBuilder() throws ConnectorFactoryException
     {
-        if(endpointBuilderImpl!=null) return endpointBuilderImpl;
+        //if(endpointBuilderImpl!=null) return endpointBuilderImpl;
 
         if(endpointBuilder==null) {
             logger.debug("Endpoint resolver not set, Loading default resolver: " + UrlEndpointBuilder.class.getName());
@@ -428,8 +428,9 @@ public class ConnectorServiceDescriptor
             logger.debug("Loading endpointUri resolver: " + getEndpointBuilder());
             try
             {
-                endpointBuilderImpl = (EndpointBuilder) ClassHelper.instanciateClass(getEndpointBuilder(), ClassHelper.NO_ARGS);
-                return endpointBuilderImpl;
+                //endpointBuilderImpl = (EndpointBuilder) ClassHelper.instanciateClass(getEndpointBuilder(), ClassHelper.NO_ARGS);
+                //return endpointBuilderImpl;
+				return (EndpointBuilder) ClassHelper.instanciateClass(getEndpointBuilder(), ClassHelper.NO_ARGS);
             } catch (Exception e)
             {
                 throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X, "Endpoint Builder: " + getEndpointBuilder()), e);

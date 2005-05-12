@@ -54,7 +54,8 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
-import org.mule.util.queue.PersistenceStrategy;
+import org.mule.util.queue.EventFilePersistenceStrategy;
+import org.mule.util.queue.FilePersistenceStrategy;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
@@ -108,7 +109,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public static final String POOLING_PROFILE = PoolingProfile.class.getName();
     public static final String QUEUE_PROFILE = QueueProfile.class.getName();
 
-    public static final String PERSISTENCE_STRATEGY_INTERFACE = PersistenceStrategy.class.getName();
+    public static final String PERSISTENCE_STRATEGY_INTERFACE = EventFilePersistenceStrategy.class.getName();
     public static final String INBOUND_MESSAGE_ROUTER_INTERFACE = UMOInboundMessageRouter.class.getName();
     public static final String RESPONSE_MESSAGE_ROUTER_INTERFACE = UMOResponseMessageRouter.class.getName();
     public static final String OUTBOUND_MESSAGE_ROUTER_INTERFACE = UMOOutboundMessageRouter.class.getName();
@@ -392,6 +393,12 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 }
             }
         });
+		
+		//add persistence strategy
+        digester.addObjectCreate(path + "/persistence-strategy", PERSISTENCE_STRATEGY_INTERFACE , "className");
+        addMulePropertiesRule(path + "/persistence-strategy", digester, true);
+        digester.addSetNext(path + "/persistence-strategy", "setPersistenceStrategy");
+
 
         digester.addRule(path, new Rule(){
             public void end(String s, String s1) throws Exception
@@ -817,11 +824,6 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         digester.addObjectCreate(path + "/queue-profile", QUEUE_PROFILE);
         addSetPropertiesRule(path+ "/queue-profile", digester);
-
-        digester.addObjectCreate(path + "/queue-profile/persistence-strategy", PERSISTENCE_STRATEGY_INTERFACE , "className");
-        addMulePropertiesRule(path + "/queue-profile/persistence-strategy", digester, true);
-        digester.addSetNext(path + "/queue-profile/persistence-strategy", "setPersistenceStrategy");
-
         digester.addSetNext(path + "/queue-profile", "setQueueProfile");
     }
 

@@ -14,14 +14,15 @@
  */
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -32,10 +33,11 @@ import org.mule.util.UUID;
 import org.mule.util.Utility;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.EventObject;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -56,7 +58,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * The endpoint associated with the event
      */
     private transient UMOEndpoint endpoint = null;
-
+	
     /**
      * the Universally Unique ID for the event
      */
@@ -67,24 +69,22 @@ public class MuleEvent extends EventObject implements UMOEvent
      */
     private UMOMessage message = null;
 
-    protected transient Iterator interceptorIterator;
-
     private transient UMOSession session;
 
-    private SynchronizedBoolean stopFurtherProcessing = new SynchronizedBoolean(false);
+    private boolean stopFurtherProcessing = false;
 
-    private SynchronizedBoolean synchronous = new SynchronizedBoolean(false);
+    private boolean synchronous = false;
 
     private int timeout = TIMEOUT_WAIT_FOREVER;
 
-    private ResponseOutputStream outputStream = null;
+    private transient ResponseOutputStream outputStream = null;
 
-    private Object transformedMessage = null;
+    private transient Object transformedMessage = null;
 
     /**
      * Properties cache that only reads properties once from the inbound
      * message and merges them with any properties on the endpoint. The message
-     * properties take precidence over the endpoint properties
+     * properties take precedence over the endpoint properties
      */
     private Map properties = new HashMap();
 
@@ -93,13 +93,13 @@ public class MuleEvent extends EventObject implements UMOEvent
     {
         super(message.getPayload());
         this.message = message;
-        id = generateEventId();
-        session = previousEvent.getSession();
-        ((MuleSession)session).setComponent(component);
+		this.id = generateEventId();
+		this.session = previousEvent.getSession();
+        ((MuleSession) session).setComponent(component);
         this.endpoint = endpoint;
-        this.synchronous.set(previousEvent.isSynchronous());
-        timeout = previousEvent.getTimeout();
-        this.outputStream = (ResponseOutputStream)previousEvent.getOutputStream();
+        this.synchronous = previousEvent.isSynchronous();
+		this.timeout = previousEvent.getTimeout();
+        this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
 
         if(endpoint.getProperties()!=null) {
             properties.putAll(endpoint.getProperties());
@@ -135,9 +135,9 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.message = message;
         this.endpoint = endpoint;
         this.session = session;
-        id = generateEventId();
-        this.synchronous.set(synchronous);
-        timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
+		this.id = generateEventId();
+        this.synchronous = synchronous;
+		this.timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
         this.outputStream = outputStream;
         if(endpoint.getProperties()!=null) {
             properties.putAll(endpoint.getProperties());
@@ -159,9 +159,9 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.message = message;
         this.endpoint = endpoint;
         this.session = session;
-        id = eventId;
-        this.synchronous.set(synchronous);
-        timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
+		this.id = eventId;
+        this.synchronous = synchronous;
+		this.timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
         if(endpoint.getProperties()!=null) {
             properties.putAll(endpoint.getProperties());
         }
@@ -179,9 +179,9 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.message = message;
         this.id = rewriteEvent.getId();
         this.session = rewriteEvent.getSession();
-        ((MuleSession)session).setComponent(rewriteEvent.getComponent());
+        ((MuleSession) session).setComponent(rewriteEvent.getComponent());
         this.endpoint = rewriteEvent.getEndpoint();
-        this.synchronous.set(rewriteEvent.isSynchronous());
+        this.synchronous = rewriteEvent.isSynchronous();
         this.timeout = rewriteEvent.getTimeout();
         this.outputStream = (ResponseOutputStream)rewriteEvent.getOutputStream();
 
@@ -361,7 +361,7 @@ public class MuleEvent extends EventObject implements UMOEvent
     }
 
     /* (non-Javadoc)
-     * @see org.mule.umo.UMOEvent#getEndpointName()
+     * @see org.mule.umo.UMOEvent#getEndpoint()
      */
     public UMOEndpoint getEndpoint()
     {
@@ -413,7 +413,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      */
     public boolean isStopFurtherProcessing()
     {
-        return stopFurtherProcessing.get();
+        return stopFurtherProcessing;
     }
 
     /**
@@ -429,7 +429,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      */
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
     {
-        this.stopFurtherProcessing.set(stopFurtherProcessing);
+        this.stopFurtherProcessing = stopFurtherProcessing;
     }
 
     public boolean equals(Object o)
@@ -455,12 +455,12 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     public boolean isSynchronous()
     {
-        return synchronous.get();
+        return synchronous;
     }
 
     public void setSynchronous(boolean value)
     {
-        synchronous.set(value);
+        synchronous = value;
     }
 
     public int getTimeout()
@@ -536,4 +536,20 @@ public class MuleEvent extends EventObject implements UMOEvent
     {
         return properties.remove(key);
     }
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.defaultWriteObject();
+		out.writeObject(endpoint.getEndpointURI().toString());
+	}
+	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		String uri = (String) in.readObject();
+		try {
+			endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+		} catch (UMOException e) {
+			throw (IOException) new IOException().initCause(e);
+		}
+	}
 }
+

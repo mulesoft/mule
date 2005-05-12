@@ -23,6 +23,7 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.queue.QueueManager;
 
 import javax.transaction.TransactionManager;
 import java.util.List;
@@ -323,4 +324,8 @@ public interface UMOManager extends Lifecycle
      * incoming and outgoing event traffic and service invocations
      */
     public UMOSecurityManager getSecurityManager();
+	
+	public void setQueueManager(QueueManager queueManager);
+	
+	public QueueManager getQueueManager();
 }

@@ -16,7 +16,8 @@
 package org.mule.config;
 
 import org.mule.util.ClassHelper;
-import org.mule.util.queue.SerialisationPersistence;
+import org.mule.util.queue.EventFilePersistenceStrategy;
+import org.mule.util.queue.QueuePersistenceStrategy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,7 +85,13 @@ public class MuleConfiguration
      * Where Mule stores any runtime files to disk
      */
     public static final String DEFAULT_WORKING_DIRECTORY = "./.mule";
-    /**
+
+	/**
+	 * The default queueStore directory for persistence
+	 */
+	public static final String DEFAULT_QUEUE_STORE = "queuestore";
+	
+	/**
      * holds the value for SYNCHRONOUS
      */
     private boolean synchronous = DEFAULT_SYNCHRONOUS;
@@ -111,7 +118,9 @@ public class MuleConfiguration
      */
     private ThreadingProfile componentPoolThreadingProfile = null;
 
-    private QueueProfile queueProfile = new QueueProfile(DEFAULT_MAX_OUTSTANDING_MESSAGES, null);
+    private QueueProfile queueProfile = new QueueProfile(DEFAULT_MAX_OUTSTANDING_MESSAGES, false);
+	
+	private QueuePersistenceStrategy persistenceStrategy = new EventFilePersistenceStrategy();
 
     /**
      * When running sychonously, return events can be received over transports that support ack or replyTo
@@ -145,7 +154,7 @@ public class MuleConfiguration
     /**
      * Where mule will store any runtime files to disk
      */
-    private String workingDirectoy = DEFAULT_WORKING_DIRECTORY;
+    private String workingDirectory = DEFAULT_WORKING_DIRECTORY;
 
     /**
      * The configuration resources used to configure the MuleManager instance
@@ -287,19 +296,19 @@ public class MuleConfiguration
     public void setRecoverableMode(boolean recoverableMode)
     {
         this.recoverableMode = recoverableMode;
-        if(recoverableMode && queueProfile.getPersistenceStrategy() == null) {
-            queueProfile = new QueueProfile(queueProfile.getMaxOutstandingMessages(), new SerialisationPersistence());
+        if (recoverableMode) {
+			queueProfile.setPersistent(true);
         }
     }
 
-    public String getWorkingDirectoy()
+    public String getWorkingDirectory()
     {
-        return workingDirectoy;
+        return workingDirectory;
     }
 
     public void setWorkingDirectory(String workingDirectory)
     {
-        this.workingDirectoy = workingDirectory;
+        this.workingDirectory = workingDirectory;
     }
 
     public String[] getConfigResources()
@@ -387,4 +396,12 @@ public class MuleConfiguration
         this.clientMode = clientMode;
         setServerUrl("");
     }
+
+	public QueuePersistenceStrategy getPersistenceStrategy() {
+		return persistenceStrategy;
+	}
+
+	public void setPersistenceStrategy(QueuePersistenceStrategy persistenceStrategy) {
+		this.persistenceStrategy = persistenceStrategy;
+	}
 }

@@ -14,7 +14,19 @@
  */
 package org.mule;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+
+import javax.transaction.TransactionManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
@@ -32,7 +44,11 @@ import org.mule.management.stats.AllStatistics;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.*;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerEventListener;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -41,11 +57,14 @@ import org.mule.util.PropertiesHelper;
 import org.mule.util.SpiHelper;
 import org.mule.util.StringMessageHelper;
 import org.mule.util.Utility;
+import org.mule.util.queue.CachingPersistenceStrategy;
+import org.mule.util.queue.EventFilePersistenceStrategy;
+import org.mule.util.queue.JournalPersistenceStrategy;
+import org.mule.util.queue.QueueManager;
+import org.mule.util.queue.QueuePersistenceStrategy;
+import org.mule.util.queue.TransactionalQueueManager;
 
-import javax.transaction.TransactionManager;
-import java.util.*;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule instance.
@@ -160,6 +179,11 @@ public class MuleManager implements UMOManager
     private MultiContainerContext containerContext = null;
 
     private UMOSecurityManager securityManager;
+	
+	/**
+	 * The queue manager to use for component queues and vm connector
+	 */
+	private QueueManager queueManager;
 
     /**
      * logger used by this class
@@ -540,6 +564,16 @@ public class MuleManager implements UMOManager
                 if(securityManager!=null) {
                     securityManager.initialise();
                 }
+				if (queueManager == null) {
+					try {
+						TransactionalQueueManager queueMgr = new TransactionalQueueManager();
+						QueuePersistenceStrategy ps = new CachingPersistenceStrategy(getConfiguration().getPersistenceStrategy());
+						queueMgr.setPersistenceStrategy(ps);
+						queueManager = queueMgr;
+					} catch (Exception e) {
+						throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X, "QueueManager"), e);
+					}
+				}
                 //Allows users to disable all server components and connections
                 //this can be useful for testing
                 boolean disable = PropertiesHelper.getBooleanProperty(System.getProperties(),
@@ -597,7 +631,7 @@ public class MuleManager implements UMOManager
             startDate = System.currentTimeMillis();
             starting.set(true);
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STARTING));
-
+			queueManager.start();
             startConnectors();
             startAgents();
             model.start();
@@ -663,6 +697,7 @@ public class MuleManager implements UMOManager
         logger.debug("Stopping connectors...");
         stopConnectors();
         stopAgents();
+		queueManager.stop();
         logger.debug("Stopping model...");
         model.stop();
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STOPPED));
@@ -1116,5 +1151,13 @@ public class MuleManager implements UMOManager
     {
         return securityManager;
     }
+
+	public QueueManager getQueueManager() {
+		return queueManager;
+	}
+
+	public void setQueueManager(QueueManager queueManager) {
+		this.queueManager = queueManager;
+	}
 
 }

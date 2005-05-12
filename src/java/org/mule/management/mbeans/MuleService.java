@@ -123,9 +123,9 @@ public class MuleService implements MuleServiceMBean
         return MuleManager.getConfiguration().isRecoverableMode();
     }
 
-    public String getWorkingDirectoy()
+    public String getWorkingDirectory()
     {
-        return MuleManager.getConfiguration().getWorkingDirectoy();
+        return MuleManager.getConfiguration().getWorkingDirectory();
     }
 
     public String[] getConfigResources()

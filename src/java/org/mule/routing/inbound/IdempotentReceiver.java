@@ -53,7 +53,7 @@ public class IdempotentReceiver extends SelectiveConsumer
 
     public IdempotentReceiver() {
         messageIds = new HashSet();
-        DEFAULT_STORE_PATH = MuleManager.getConfiguration().getWorkingDirectoy() + "/idempotent";
+        DEFAULT_STORE_PATH = MuleManager.getConfiguration().getWorkingDirectory() + "/idempotent";
         setStorePath(DEFAULT_STORE_PATH);
     }
 
