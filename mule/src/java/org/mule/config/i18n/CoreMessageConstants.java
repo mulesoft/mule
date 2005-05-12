@@ -176,5 +176,8 @@ public interface CoreMessageConstants
     public static final int PROPERTY_TEMPLATE_MALFORMED_X = 158;
     public static final int MANAGER_IS_ALREADY_CONFIGURED = 159;
 	public static final int X_MUST_IMPLEMENT_AN_INTERFACE = 160;
+	public static final int RESOURCE_MANAGER_NOT_STARTED = 161;
+	public static final int RESOURCE_MANAGER_DIRTY = 162;
+	public static final int RESOURCE_MANAGER_NOT_READY = 163;
 
 }

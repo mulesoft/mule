@@ -65,6 +65,7 @@
             <xsl:apply-templates select="threading-profile" mode="global"/>
             <xsl:apply-templates select="queue-profile"/>
             <xsl:apply-templates select="pooling-profile"/>
+            <xsl:apply-templates select="persistence-strategy"/>
         </bean>
     </xsl:template>
 
@@ -576,7 +577,6 @@
         <property name="queueProfile">
             <bean name="queue-profile" class="org.mule.config.QueueProfile">
                 <xsl:apply-templates select="@*" mode="addProperties"/>
-                <xsl:apply-templates select="persistence-strategy"/>
             </bean>
         </property>
     </xsl:template>

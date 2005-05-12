@@ -16,7 +16,8 @@
 package org.mule.providers.vm;
 
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import java.util.Iterator;
+
 import org.mule.MuleManager;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.Message;
@@ -25,8 +26,11 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.MessagingException;
+import org.mule.umo.TransactionException;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -35,9 +39,8 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassHelper;
-import org.mule.util.queue.BoundedPersistentQueue;
-
-import java.util.Iterator;
+import org.mule.util.queue.QueueManager;
+import org.mule.util.queue.QueueSession;
 
 
 /**
@@ -46,6 +49,7 @@ import java.util.Iterator;
  * be accessed from an endpoint
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
 
@@ -53,7 +57,6 @@ public class VMConnector extends AbstractServiceEnabledConnector
 {
     private boolean queueEvents = false;
     private int maxQueues = 16;
-    private ConcurrentHashMap queues = null;
     private QueueProfile queueProfile;
     private Class adapterClass = null;
 
@@ -64,9 +67,8 @@ public class VMConnector extends AbstractServiceEnabledConnector
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        if(queueEvents) {
-            queues = new ConcurrentHashMap(maxQueues);
-            if(queueProfile== null) {
+        if (queueEvents) {
+            if (queueProfile == null) {
                 queueProfile = MuleManager.getConfiguration().getQueueProfile();
             }
         }
@@ -86,12 +88,10 @@ public class VMConnector extends AbstractServiceEnabledConnector
      */
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        BoundedPersistentQueue queue = null;
-        if(queueEvents) {
-            queue = queueProfile.createQueue(endpoint.getEndpointURI().getAddress());
-            queues.put(endpoint.getEndpointURI().getAddress(), queue);
+        if (queueEvents) {
+            queueProfile.configureQueue(endpoint.getEndpointURI().getAddress());
         }
-        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{queue});
+        return serviceDescriptor.createMessageReceiver(this, component, endpoint);
     }
 
     /* (non-Javadoc)
@@ -124,15 +124,6 @@ public class VMConnector extends AbstractServiceEnabledConnector
      */
     protected void disposeConnector()
     {
-        if(queues!=null) {
-            BoundedPersistentQueue queue;
-            for (Iterator iterator = queues.values().iterator(); iterator.hasNext();)
-            {
-                queue = (BoundedPersistentQueue)iterator.next();
-                queue.dispose();
-            }
-            queues.clear();
-        }
     }
 
     public boolean isQueueEvents()
@@ -160,27 +151,32 @@ public class VMConnector extends AbstractServiceEnabledConnector
         this.maxQueues = maxQueues;
     }
 
-    BoundedPersistentQueue getQueue(String endpoint)
-    {
-        return (BoundedPersistentQueue)queues.get(endpoint);
-    }
-
     VMMessageReceiver getReceiver(UMOEndpointURI endpointUri) throws EndpointException
     {
         return (VMMessageReceiver)getReceiverByEndpoint(endpointUri);
     }
 
-    synchronized BoundedPersistentQueue createQueue(String endpoint) throws InitialisationException
+    QueueSession getQueueSession() throws InitialisationException
     {
-        BoundedPersistentQueue queue = (BoundedPersistentQueue)queues.get(endpoint);
-        if(queue!=null)  {
-            return queue;
-        } else {
-            logger.info("Creating vm Queue: " + endpoint);
-            queue = queueProfile.createQueue(endpoint);
-            queues.put(endpoint, queue);
-            return queue;
-        }
+		QueueManager qm = MuleManager.getInstance().getQueueManager();
+		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+		if (tx != null) {
+			if (tx.hasResource(qm)) {
+				logger.debug("Retrieving queue session from current transaction");
+				return (QueueSession) tx.getResource(qm);
+			}
+		}
+		logger.debug("Retrieving new queue session from queue manager");
+		QueueSession session = qm.getQueueSession();
+		if (tx != null) {
+			logger.debug("Binding queue session to current transaction");
+			try {
+				tx.bindResource(qm, session);
+			} catch (TransactionException e) {
+				throw new RuntimeException("Could not bind queue session to current transaction", e);
+			}
+		}
+		return session;
     }
 
     protected UMOMessageReceiver getReceiverByEndpoint(UMOEndpointURI endpointUri) throws EndpointException

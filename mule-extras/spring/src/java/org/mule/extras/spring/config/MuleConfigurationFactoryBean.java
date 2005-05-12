@@ -161,14 +161,14 @@ public class MuleConfigurationFactoryBean implements FactoryBean
         muleConfiguration.setRecoverableMode(recoverableMode);
     }
 
-    public String getWorkingDirectoy()
+    public String getWorkingDirectory()
     {
-        return muleConfiguration.getWorkingDirectoy();
+        return muleConfiguration.getWorkingDirectory();
     }
 
-    public void setWorkingDirectoy(String workingDirectoy)
+    public void setWorkingDirectory(String workingDirectory)
     {
-        muleConfiguration.setWorkingDirectory(workingDirectoy);
+        muleConfiguration.setWorkingDirectory(workingDirectory);
     }
 
     public String[] getConfigResources()

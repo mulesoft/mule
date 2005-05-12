@@ -45,7 +45,6 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.*;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
-import org.mule.util.queue.SerialisationPersistence;
 
 import java.util.List;
 import java.util.Map;
@@ -365,21 +364,19 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         //test config
         QueueProfile qp = MuleManager.getConfiguration().getQueueProfile();
         assertEquals(100, qp.getMaxOutstandingMessages());
-        assertNotNull(qp.getPersistenceStrategy());
-        assertTrue(qp.getPersistenceStrategy() instanceof SerialisationPersistence);
+        assertTrue(qp.isPersistent());
 
         //test inherit
         MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
         qp = descriptor.getQueueProfile();
         assertEquals(100, qp.getMaxOutstandingMessages());
-        assertNotNull(qp.getPersistenceStrategy());
-        assertTrue(qp.getPersistenceStrategy() instanceof SerialisationPersistence);
+        assertTrue(qp.isPersistent());
 
         //test override
         descriptor = (MuleDescriptor) MuleManager.getInstance().getModel().getDescriptor("appleComponent2");
         qp = descriptor.getQueueProfile();
         assertEquals(102, qp.getMaxOutstandingMessages());
-        assertNull(qp.getPersistenceStrategy());
+        assertFalse(qp.isPersistent());
     }
 
     public void testEndpointProperties() throws Exception {

@@ -27,7 +27,7 @@ public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        receiver = new VMMessageReceiver(connector, component, endpoint, null);
+        receiver = new VMMessageReceiver(connector, component, endpoint);
     }
 
 //    public void testSyncReceive() throws Exception

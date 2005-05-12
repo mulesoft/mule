@@ -82,7 +82,7 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
         setFolder(folder);
         if ("".equals(backupFolder))
         {
-            this.backupFolder = MuleManager.getConfiguration().getWorkingDirectoy() + "/mail/" + folder.getName();
+            this.backupFolder = MuleManager.getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
         }
         else
         {

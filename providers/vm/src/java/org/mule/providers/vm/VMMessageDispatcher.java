@@ -27,12 +27,14 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.queue.BoundedPersistentQueue;
+import org.mule.util.queue.Queue;
+import org.mule.util.queue.QueueSession;
 
 /**
  * <code>VMMessageDispatcher</code> TODO
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
 public class VMMessageDispatcher extends AbstractMessageDispatcher
@@ -63,26 +65,34 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
      */
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
-        if(!connector.isQueueEvents()) {
+        if (!connector.isQueueEvents()) {
             throw new UnsupportedOperationException("Receive only supported on the VM Queue Connector");
         }
-        BoundedPersistentQueue queue = connector.getQueue(endpointUri.getAddress());
-        if(queue == null) {
-            return null;
-        } else {
-            UMOEvent event = null;
-            try
-            {
-                event = (UMOEvent)queue.poll(timeout);
-            } catch (InterruptedException e)
-            {
-                logger.error("failed to receive event from queue: " + endpointUri);
-            }
-            if(event != null) {
-                return event.getMessage();
-            }
-            return null;
-        }
+		QueueSession queueSession = null;
+		try {
+			queueSession = connector.getQueueSession();
+			Queue queue = queueSession.getQueue(endpointUri.getAddress());
+	        if (queue == null) {
+	            return null;
+	        } else {
+	            UMOEvent event = null;
+	            try
+	            {
+					// TODO: add a poll method
+	                //event = (UMOEvent) queue.poll(timeout);
+					event = (UMOEvent) queue.take();
+	            } catch (InterruptedException e)
+	            {
+	                logger.error("failed to receive event from queue: " + endpointUri);
+	            }
+	            if (event != null) {
+	                return event.getMessage();
+	            }
+	            return null;
+	        }
+		} catch (Exception e) {
+			throw e;
+		}
     }
 
     /* (non-Javadoc)
@@ -91,13 +101,14 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     public void doDispatch(UMOEvent event) throws Exception
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-
-        if(endpointUri==null) {
+		
+        if (endpointUri==null) {
             throw new DispatchException(new Message(Messages.X_IS_NULL, "Endpoint"), event.getMessage(), event.getEndpoint());
         }
-        if(connector.isQueueEvents()) {
-            BoundedPersistentQueue queue = connector.createQueue(endpointUri.getAddress());
-            queue.put(event);
+        if (connector.isQueueEvents()) {
+			QueueSession session = connector.getQueueSession();
+			Queue queue = session.getQueue(endpointUri.getAddress());
+			queue.put(event);
         } else {
             VMMessageReceiver receiver = connector.getReceiver(event.getEndpoint().getEndpointURI());
             if(receiver==null) {

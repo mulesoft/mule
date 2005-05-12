@@ -37,6 +37,7 @@ import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
+import org.mule.util.queue.QueueSession;
 
 import javax.resource.spi.work.Work;
 
@@ -63,7 +64,7 @@ public class MuleProxy implements Work, Lifecycle
     /**
      * Holds the current event being processed
      */
-    private MuleEvent event;
+    private UMOEvent event;
 
     /**
      * Holds the actual UMO
@@ -84,9 +85,9 @@ public class MuleProxy implements Work, Lifecycle
 
     private ObjectPool proxyPool;
 
-    private Object lock = new Object();
-
     private ComponentStatistics stat = null;
+	
+	private QueueSession queueSession = null;
 
     /**
      * Constructs a Proxy using the UMO's AbstractMessageDispatcher and the UMO itself
@@ -190,12 +191,10 @@ public class MuleProxy implements Work, Lifecycle
      *
      * @param event the event being processed
      */
-    public void onEvent(UMOEvent event)
+    public void onEvent(QueueSession session, UMOEvent event)
     {
-        synchronized (lock)
-        {
-            this.event = (MuleEvent) event;
-        }
+		this.queueSession = session;
+        this.event = (MuleEvent) event;
     }
 
     public ComponentStatistics getStatistics()
@@ -427,7 +426,7 @@ public class MuleProxy implements Work, Lifecycle
             replyToEvent.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
 
             //queue the event
-            onEvent(replyToEvent);
+            onEvent(queueSession, replyToEvent);
             logger.info("reply to sent: " + returnMessage.getReplyTo());
             if (stat.isEnabled()) stat.incSentReplyToEvent();
         }
@@ -507,6 +506,14 @@ public class MuleProxy implements Work, Lifecycle
             }
         } finally
         {
+			/*
+			try
+			{
+				queueSession.commit();
+			} catch (Exception e2) {
+				logger.error("Error when commiting event queue: " + e2.getMessage(), e2);
+			}
+			*/
             try
             {
                 proxyPool.returnObject(this);

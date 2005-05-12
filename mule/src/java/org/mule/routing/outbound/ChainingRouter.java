@@ -59,7 +59,7 @@ public class ChainingRouter extends FilteringOutboundRouter
 
             } else
             {
-                logger.info("Invocation is asynchronous no result will be returned for any further inocations");
+                logger.info("Invocation is asynchronous no result will be returned for any further invocations");
                 dispatch(session, message, (UMOEndpoint) endpoints.get(0));
             }
         } catch (UMOException e)

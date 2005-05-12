@@ -90,9 +90,9 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
         return config.isRecoverableMode();
     }
 
-    public String getWorkingDirectoy()
+    public String getWorkingDirectory()
     {
-        return config.getWorkingDirectoy();
+        return config.getWorkingDirectory();
     }
 
     public String[] getConfigResources()

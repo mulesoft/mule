@@ -61,7 +61,7 @@ public class ComponentException extends MessagingException
              message.setNextMessage(m);
              return message;
          } else {
-             message = new Message(-1);
+             message = new Message(0);
              return m;
          }
     }
