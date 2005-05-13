@@ -61,4 +61,17 @@ public class HttpTransformTestCase extends NamedTestCase {
 		Object result = bas.doTransform(message.getPayload());
 		assertEquals(payload, result);
 	}
+	
+	public void testBinaryWithBridge() throws Exception
+	{
+        MuleClient client = new MuleClient();
+		Object payload = Arrays.asList(new Integer[] {new Integer(42)});
+        UMOMessage message = client.send("vm://LocalService", payload, null);
+        assertNotNull(message);
+		ByteArrayToSerializable bas = new ByteArrayToSerializable();
+		assertNotNull(message.getPayload());
+		assertTrue(message.getPayload() instanceof byte[]);
+		Object result = bas.doTransform(message.getPayload());
+		assertEquals(payload, result);
+	}	
 }

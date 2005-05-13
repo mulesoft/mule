@@ -35,6 +35,10 @@
 				  address="http://localhost:18081/RemoteService?method=post"
 				  synchronous="true">
 		</endpoint>
+        <endpoint name="vmEndpoint"
+				  address="vm://LocalService"
+				  synchronous="true">
+        </endpoint>
 	</global-endpoints>
 	
 	<model name="model">
@@ -51,6 +55,18 @@
 			inboundTransformer="ByteArrayToSerializable"
 			responseTransformer="SerializableToByteArray ToHttpResponse">
 		</mule-descriptor>
+
+		<mule-descriptor name="LocalService"
+    		implementation="org.mule.components.simple.NullComponent"
+			inboundEndpoint="vmEndpoint"
+			outboundTransformer="SerializableToByteArray"
+			outboundEndpoint="httpEndpoint2">
+
+			<inbound-router>
+        		<router className="org.mule.routing.inbound.ForwardingConsumer"/>
+        	</inbound-router>
+        </mule-descriptor>
+
 	</model>
 	
 </mule-configuration>

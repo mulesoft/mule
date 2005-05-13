@@ -13,11 +13,11 @@
  */
 package org.mule.routing.inbound;
 
-import org.mule.impl.MuleMessage;
+import org.mule.impl.MuleEvent;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 
@@ -33,34 +33,25 @@ public class ForwardingConsumer extends SelectiveConsumer
 {
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
-        if(super.process(event)!=null) {
+        if (super.process(event) != null) {
 
-            UMOEndpoint endpoint = event.getComponent().getDescriptor().getOutboundEndpoint();
             UMOOutboundMessageRouter router = event.getComponent().getDescriptor().getOutboundRouter();
+			// Set the stopFurtherProcessing flag to true
+			// to inform the InboundMessageRouter not to route
+			// these events to the component
+			event.setStopFurtherProcessing(true);
+            if (router == null) {
 
-            if(endpoint == null && router==null) {
-
-                logger.debug("Descriptor has no outbound endpoint configured to forward to, continuing with normal processing");
-                return new UMOEvent[]{event};
+                logger.debug("Descriptor has no outbound router configured to forward to, continuing with normal processing");
+                return new UMOEvent[] { event };
             } else  {
                 try
                 {
-                    if(router!=null) {
-                        //this isn't ideal as the request will execute in this thread
-                        //and will not return a result in sync mode
-                        router.route(event.getMessage(), event.getSession(), event.isSynchronous());
-                        return null;
-                    } else {
-                        UMOEvent[] results = new UMOEvent[1];
-                        results[0] = event.getSession().createOutboundEvent(
-                                new MuleMessage(event.getTransformedMessage(), event.getProperties())
-                                , endpoint, event);
-                        logger.info("Forwarding event directly to: " + endpoint.getEndpointURI());
-                        return results;
-                    }
+                    UMOMessage msg = router.route(event.getMessage(), event.getSession(), event.isSynchronous());
+                    return new UMOEvent[] { new MuleEvent(msg, event) };
                 } catch (UMOException e)
                 {
-                    throw new RoutingException(event.getMessage(), endpoint, e);
+                    throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
                 }
             }
         }
