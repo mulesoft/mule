@@ -250,13 +250,15 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 
     public void stopConnector() throws UMOException
     {
-        try
-        {
-            connection.stop();
-        }
-        catch (JMSException e)
-        {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jms Connection"), e);
+		if (connection != null) {
+	        try
+	        {
+				connection.stop();
+			}
+	        catch (JMSException e)
+	        {
+	            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jms Connection"), e);
+	        }
         }
     }
 
@@ -286,14 +288,14 @@ public class JmsConnector extends AbstractServiceEnabledConnector
      */
     protected void disposeConnector()
     {
-        try
-        {
-            if(connection!=null) connection.close();
-        }
-        catch (JMSException e)
-        {
-            logger.error("Jms connector failed to close properly: " + e);
-        }
+		super.disposeConnector();
+		if (jndiContext != null) {
+			try {
+				jndiContext.close();
+			} catch (NamingException e) {
+				logger.error("Jms connector failed to close properly: " + e);
+			}
+		}
     }
 
 
