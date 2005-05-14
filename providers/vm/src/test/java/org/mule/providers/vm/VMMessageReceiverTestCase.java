@@ -13,6 +13,7 @@
 package org.mule.providers.vm;
 
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
@@ -27,6 +28,7 @@ public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
+		connector = getConnector();
         receiver = new VMMessageReceiver(connector, component, endpoint);
     }
 
@@ -109,5 +111,10 @@ public class VMMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public UMOMessageReceiver getMessageReceiver()
     {
         return receiver;
+    }
+
+    public UMOConnector getConnector() throws Exception
+    {
+		return new VMConnector();
     }
 }
