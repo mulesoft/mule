@@ -6,7 +6,7 @@
     <id>mule</id>
     <groupId>mule</groupId>
     <artifactId>mule</artifactId>
-    <currentVersion>1.1-SNAPSHOT</currentVersion>
+    <currentVersion>SNAPSHOT</currentVersion>
     <organization>
         <name>SymphonySoft Limited</name>
         <url>http://www.symphonysoft.com</url>
@@ -161,7 +161,7 @@
                 <exclude>**/OpenJms*.*</exclude>
                 <exclude>**/Joram*.*</exclude>
                 <exclude>**/SpiritWave*.*</exclude>
-                
+
                 <!-- Disable ftp because it needs a server -->
                 <exclude>**/FtpConnectorFunctionalTestCase.*</exclude>
 
