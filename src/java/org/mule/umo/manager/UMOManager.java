@@ -63,8 +63,7 @@ public interface UMOManager extends Lifecycle
 
     /**
      * Getter for a global endpoint.  Any endpoints returned from this method
-     * will be read-only as they may be shared by other components.  To change
-     * any details on the endpoint you must clone it first calling it's clone() method
+     * can be modified, as they are clones of the registered endpoints.
      *
      * @param logicalName the name of the endpoint
      * @return the <code>UMOEndpoint</code> or null if it doesn't exist

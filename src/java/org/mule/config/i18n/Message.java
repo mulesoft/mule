@@ -139,7 +139,7 @@ public class Message implements Serializable
 
     public String getMessage()
     {
-        return message + (nextMessage !=null ? " " + nextMessage.getMessage() : "");
+        return message + (nextMessage !=null ? ". " + nextMessage.getMessage() : "");
     }
 
     public void setNextMessage(Message nextMessage)
