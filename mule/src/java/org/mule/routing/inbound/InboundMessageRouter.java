@@ -207,6 +207,12 @@ public class InboundMessageRouter extends AbstractRouterCollection implements
     public void setEndpoints(List endpoints)
     {
         this.endpoints = endpoints;
+		if (endpoints != null) {
+			for (Iterator it = endpoints.iterator(); it.hasNext();) {
+				UMOEndpoint endpoint = (UMOEndpoint) it.next();
+	            endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+			}
+		}
     }
 
     /**
