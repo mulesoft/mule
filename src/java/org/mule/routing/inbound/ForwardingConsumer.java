@@ -41,14 +41,21 @@ public class ForwardingConsumer extends SelectiveConsumer
 			// these events to the component
 			event.setStopFurtherProcessing(true);
             if (router == null) {
-
                 logger.debug("Descriptor has no outbound router configured to forward to, continuing with normal processing");
                 return new UMOEvent[] { event };
             } else  {
                 try
                 {
                     UMOMessage msg = router.route(event.getMessage(), event.getSession(), event.isSynchronous());
-                    return new UMOEvent[] { new MuleEvent(msg, event) };
+                    // what's the correct behaviour for async endpoints?
+                    // maybe let router.route() return a Future for the returned msg?
+                    if (msg != null) {
+                    	return new UMOEvent[] { new MuleEvent(msg, event) };
+                    }
+                    else {
+                        return null;
+                    }
+                
                 } catch (UMOException e)
                 {
                     throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
