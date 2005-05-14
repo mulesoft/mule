@@ -200,9 +200,8 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, Object payload, Map messageProperties) throws UMOException
     {
-        UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
         UMOMessage message = new MuleMessage(payload, messageProperties);
-        UMOEvent event = getEvent(message, muleEndpoint, false);
+        UMOEvent event = getEvent(message, url, false);
         try
         {
             event.getSession().dispatchEvent(event);
@@ -410,13 +409,14 @@ public class MuleClient implements Disposable
      */
     public UMOMessage send(String url, Object payload, Map messageProperties, int timeout) throws UMOException
     {
-        UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
-        if (messageProperties == null) messageProperties = new HashMap();
-        if(messageProperties.get(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY)==null) {
+        if (messageProperties == null) {
+			messageProperties = new HashMap();
+        }
+        if (messageProperties.get(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY) == null) {
             messageProperties.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "true");
         }
         UMOMessage message = new MuleMessage(payload, messageProperties);
-        UMOEvent event = getEvent(message, muleEndpoint, true);
+        UMOEvent event = getEvent(message, url, true);
         event.setTimeout(timeout);
         UMOMessage result = null;
         try
@@ -443,16 +443,14 @@ public class MuleClient implements Disposable
      */
     public UMOMessage receive(String url, long timeout) throws UMOException
     {
-        MuleEndpointURI muleEndpoint = new MuleEndpointURI(url);
-
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint endpoint = getEndpoint(url, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         try
         {
-            UMOMessage message = endpoint.getConnector().getDispatcher(muleEndpoint.getAddress()).receive(muleEndpoint, timeout);
+            UMOMessage message = endpoint.getConnector().getDispatcher(endpoint.getEndpointURI().getAddress()).receive(endpoint.getEndpointURI(), timeout);
             return message;
         } catch (Exception e)
         {
-            throw new ReceiveException(muleEndpoint, timeout, e);
+            throw new ReceiveException(endpoint.getEndpointURI(), timeout, e);
         }
     }
 
@@ -483,7 +481,6 @@ public class MuleClient implements Disposable
      */
     public UMOMessage receive(String url, UMOTransformer transformer, long timeout) throws UMOException
     {
-
         UMOMessage message = receive(url, timeout);
         if (message != null && transformer != null)
         {
@@ -503,29 +500,35 @@ public class MuleClient implements Disposable
      * @return the UMOEvent
      * @throws UMOException
      */
-    protected UMOEvent getEvent(UMOMessage message, UMOEndpointURI uri, boolean synchronous) throws UMOException
+    protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous) throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-
+		UMOEndpoint endpoint = getEndpoint(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         if (!endpoint.getConnector().isStarted() && manager.isStarted())
         {
             endpoint.getConnector().start();
         }
-
         try
         {
             MuleSession session = new MuleSession();
-            if(user!=null) {
+            if (user != null) {
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + user.getToken());
             }
             MuleEvent event = new MuleEvent(message, endpoint, session, synchronous);
-
             return event;
         } catch (Exception e)
         {
             throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Client event"), message, endpoint, e);
         }
     }
+	
+	protected UMOEndpoint getEndpoint(String uri, String type) throws UMOException {
+		UMOEndpoint endpoint = manager.lookupEndpoint(uri);
+		if (endpoint == null) {
+			UMOEndpointURI muleEndpoint = new MuleEndpointURI(uri);
+			endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, type);
+		}
+		return endpoint;
+	}
 
     protected UMOEndpoint getDefaultClientEndpoint(UMODescriptor descriptor, Object payload) throws UMOException
     {
@@ -580,11 +583,12 @@ public class MuleClient implements Disposable
      */
     public void sendNoReceive(String url, Object payload, Map messageProperties) throws UMOException
     {
-        UMOEndpointURI muleEndpoint = new MuleEndpointURI(url);
-        if (messageProperties == null) messageProperties = new HashMap();
+        if (messageProperties == null) {
+			messageProperties = new HashMap();
+        }
         messageProperties.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
         UMOMessage message = new MuleMessage(payload, messageProperties);
-        UMOEvent event = getEvent(message, muleEndpoint, true);
+        UMOEvent event = getEvent(message, url, true);
         try
         {
             event.getSession().sendEvent(event);

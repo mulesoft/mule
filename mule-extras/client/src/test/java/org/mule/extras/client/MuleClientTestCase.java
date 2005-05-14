@@ -49,6 +49,17 @@ public class MuleClientTestCase extends AbstractMuleTestCase
         client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message", null);
     }
 
+    public void testClientSendGlobalEndpoint() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        MuleManager.getConfiguration().setSynchronous(true);
+        MuleManager.getConfiguration().setSynchronousReceive(true);
+
+        UMOMessage message = client.send("vmEndpoint", "Test Client Send message", null);
+        assertNotNull(message);
+        assertEquals("Received: Test Client Send message", message.getPayload());
+    }
+
     public void testClientSend() throws Exception
     {
         MuleClient client = new MuleClient();
@@ -82,9 +93,9 @@ public class MuleClientTestCase extends AbstractMuleTestCase
         //to init
         client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
         long start = System.currentTimeMillis();
-         for(i = 0;i < 100;i++) {
+        for(i = 0; i < 100; i++) {
             client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
-         }
+        }
         long time = System.currentTimeMillis() - start;
         System.out.println(i + " took " + time + "ms to process");
         Thread.sleep(1000);

@@ -7,6 +7,10 @@
 
     <mule-environment-properties synchronous="true"/>
 
+    <global-endpoints>
+        <endpoint name="vmEndpoint" address="vm://test.queue"/>
+    </global-endpoints>
+
     <model name="model">
         <mule-descriptor name="TestReceiverUMO"
             inboundEndpoint="vm://localhost/test.queue"
