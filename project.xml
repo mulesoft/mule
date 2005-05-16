@@ -144,7 +144,7 @@
                 <exclude>**/CompressionTransformerTestCase.*</exclude>
 
                 <!-- Disable Multicast tests unless configured -->
-<!--                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>-->
+                <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
 
                 <!-- this fail unless as security patch is applied to JAVA_HOME/lib -->
                 <exclude>**/KeyBasedEncryptionStrategyTestCase.*</exclude>
