@@ -14,9 +14,16 @@
 
 package org.mule.tck;
 
+import java.util.List;
+import java.util.Map;
+
 import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.mule.config.*;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.MuleProperties;
+import org.mule.config.PoolingProfile;
+import org.mule.config.QueueProfile;
+import org.mule.config.ThreadingProfile;
 import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -34,20 +41,30 @@ import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.mule.*;
+import org.mule.tck.testmodels.mule.TestCatchAllStrategy;
+import org.mule.tck.testmodels.mule.TestCompressionTransformer;
+import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
+import org.mule.tck.testmodels.mule.TestEntryPointResolver;
+import org.mule.tck.testmodels.mule.TestExceptionStrategy;
+import org.mule.tck.testmodels.mule.TestResponseAggregator;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.model.UMOModel;
-import org.mule.umo.routing.*;
+import org.mule.umo.routing.UMOInboundMessageRouter;
+import org.mule.umo.routing.UMOInboundRouter;
+import org.mule.umo.routing.UMOOutboundMessageRouter;
+import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.umo.routing.UMOResponseMessageRouter;
+import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -107,10 +124,10 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
     }
 
     public void testInterceptorStacks() {
-        List stack = MuleManager.getInstance().lookupInterceptorStack("default");
-        assertEquals(2, stack.size());
-        assertTrue(stack.get(0) instanceof LoggingInterceptor);
-        assertTrue(stack.get(1) instanceof TimerInterceptor);
+		UMOInterceptorStack stack = MuleManager.getInstance().lookupInterceptorStack("default");
+        assertEquals(2, stack.getInterceptors().size());
+        assertTrue(stack.getInterceptors().get(0) instanceof LoggingInterceptor);
+        assertTrue(stack.getInterceptors().get(1) instanceof TimerInterceptor);
     }
 
     public void testExceptionStrategy() {

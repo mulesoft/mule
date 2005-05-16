@@ -14,7 +14,6 @@
  */
 package org.mule;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -42,6 +41,7 @@ import org.mule.impl.internal.events.ManagerEvent;
 import org.mule.impl.internal.events.ServerEventManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
@@ -58,8 +58,6 @@ import org.mule.util.SpiHelper;
 import org.mule.util.StringMessageHelper;
 import org.mule.util.Utility;
 import org.mule.util.queue.CachingPersistenceStrategy;
-import org.mule.util.queue.EventFilePersistenceStrategy;
-import org.mule.util.queue.JournalPersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
@@ -764,7 +762,7 @@ public class MuleManager implements UMOManager
     /**
      * {@inheritDoc}
      */
-    public void registerInterceptorStack(String name, List stack)
+    public void registerInterceptorStack(String name, UMOInterceptorStack stack)
     {
         interceptorsMap.put(name, stack);
     }
@@ -772,9 +770,9 @@ public class MuleManager implements UMOManager
     /**
      * {@inheritDoc}
      */
-    public List lookupInterceptorStack(String name)
+    public UMOInterceptorStack lookupInterceptorStack(String name)
     {
-        return (List) interceptorsMap.get(name);
+        return (UMOInterceptorStack) interceptorsMap.get(name);
     }
 
     /**
