@@ -95,6 +95,7 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
         Properties props = System.getProperties();
         props.put("mail.smtp.host", getHostname());
         props.put("mail.smtp.port", String.valueOf(getPort()));
+		props.put("mail.debug", Boolean.toString(logger.isDebugEnabled()));
         session = Session.getDefaultInstance(props, null);
         session.setDebug(logger.isDebugEnabled());
         PasswordAuthentication pw = new PasswordAuthentication(getUsername(), getPassword());
