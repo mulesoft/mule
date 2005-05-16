@@ -13,6 +13,18 @@
  */
 package org.mule.extras.spring.config;
 
+import java.io.IOException;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+
+import org.dom4j.io.DOMReader;
 import org.mule.config.MuleDtdResolver;
 import org.mule.umo.transformer.UMOTransformer;
 import org.springframework.beans.BeansException;
@@ -25,12 +37,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
-
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
 
 /**
  * <code>MuleBeanDefinitionReader</code> Is a custom Spring Bean reader that
@@ -83,14 +89,14 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
             Transformer transformer = createTransformer(createXslSource());
             DOMResult result = new DOMResult();
             transformer.transform(new DOMSource(document), result);
-            //if(logger.isDebugEnabled()) {
-//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                DOMWriterImpl writer = new DOMWriterImpl();
-//                writer.writeNode(baos, result.getNode());
-//                System.out.println(baos.toString());
-//                logger.debug("Transformed document is:\n" + baos.toString());
-//                baos.close();
-            //}
+            if(logger.isDebugEnabled()) {
+				try {
+					String xml = new DOMReader().read((Document) result.getNode()).asXML();
+					logger.debug("Transformed document is:\n" + xml);
+				} catch (Exception e) { 
+					e.printStackTrace();
+				}
+            }
             return (Document) result.getNode();
         } else
         {

@@ -33,7 +33,7 @@ public class TestMuleEventBean implements MuleEventListener
     {
         MuleApplicationEvent e = (MuleApplicationEvent)event;
 
-        System.out.println(StringMessageHelper.getBoilerPlate("Recieved message on " + e.getEndpoint()));
+        System.out.println(StringMessageHelper.getBoilerPlate("Received message on " + e.getEndpoint()));
 
         if(eventCallback!= null) {
             try

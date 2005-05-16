@@ -33,16 +33,16 @@
     </bean>
     <bean id="queueProfile" class="org.mule.config.QueueProfile">
         <property name="maxOutstandingMessages"><value>100</value></property>
-        <property name="persistenceStrategy">
-            <bean id="queuePS" class="org.mule.util.queue.SerialisationPersistence"/>
-        </property>
+        <property name="persistent"><value>true</value></property>
     </bean>
+    <bean id="queuePS" class="org.mule.util.queue.FilePersistenceStrategy"/>
     <bean id="muleConfiguration" class="org.mule.config.MuleConfiguration">
         <property name="defaultThreadingProfile"><ref local="defaultThreadingProfile"/></property>
         <property name="poolingProfile"><ref local="poolingProfile"/></property>
         <property name="queueProfile"><ref local="queueProfile"/></property>
         <property name="synchronous"><value>true</value></property>
         <property name="model"><value>test-model</value></property>
+	    <property name="persistenceStrategy"><ref local="queuePS"/></property>
     </bean>
 
     <bean id="muleEndpointIdentifiers" class="java.util.HashMap">
@@ -198,13 +198,13 @@
         </constructor-arg>
     </bean>
 
-    <bean id="defaultInterceptorStack" class="java.util.ArrayList">
-        <constructor-arg>
+    <bean id="defaultInterceptorStack" class="org.mule.interceptors.InterceptorStack">
+        <property name="interceptors">
             <list>
                 <ref local="loggingInterceptor"/>
                 <ref local="timerInterceptor"/>
             </list>
-        </constructor-arg>
+        </property>
     </bean>
 
     <bean id="loggingInterceptor" class="org.mule.interceptors.LoggingInterceptor"/>

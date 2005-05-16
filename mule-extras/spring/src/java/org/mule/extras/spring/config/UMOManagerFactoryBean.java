@@ -17,6 +17,7 @@ package org.mule.extras.spring.config;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOManager;
@@ -128,7 +129,7 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
         for (Iterator iterator = interceptors.entrySet().iterator(); iterator.hasNext();)
         {
             entry = (Map.Entry)iterator.next();
-            manager.registerInterceptorStack(entry.getKey().toString(), (List)entry.getValue());
+            manager.registerInterceptorStack(entry.getKey().toString(), (UMOInterceptorStack) entry.getValue());
         }
     }
 

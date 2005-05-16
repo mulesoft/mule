@@ -183,6 +183,7 @@
             <xsl:apply-templates select="properties" mode="asMap"/>
             <xsl:apply-templates select="transaction"/>
             <xsl:apply-templates select="filter"/>
+            <xsl:apply-templates select="security-filter"/>
         </bean>
     </xsl:template>
 
@@ -203,12 +204,12 @@
             <constructor-arg>
                 <map>
                     <entry key="{@name}">
-                        <bean class="java.util.ArrayList">
-                            <constructor-arg>
+                        <bean class="org.mule.interceptors.InterceptorStack">
+                            <property name="interceptors">
                                 <list>
                                     <xsl:apply-templates select="interceptor"/>
                                 </list>
-                            </constructor-arg>
+                            </property>
                         </bean>
                     </entry>
                 </map>
@@ -580,6 +581,42 @@
             </bean>
         </property>
     </xsl:template>
+
+	<!-- security templates -->
+	<xsl:template match="security-manager">
+        <xsl:variable name="type">
+            <xsl:choose>
+                <xsl:when test="@className">
+                    <xsl:value-of select="@className"/>
+                </xsl:when>
+                <xsl:otherwise>org.mule.impl.security.MuleSecurityManager</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <bean class="{$type}">
+        	<property name="providers">
+	        	<list>
+	        		<xsl:apply-templates select="security-provider"/>
+	        	</list>
+	        </property>
+        </bean>
+	</xsl:template>
+	<xsl:template match="security-provider">
+        <xsl:variable name="type" select="@className"/>
+		<bean class="{$type}">
+			<property name="name"><value><xsl:value-of select="@name"/></value></property>
+            <xsl:apply-templates select="properties"/>
+		</bean>
+	</xsl:template>
+	<xsl:template match="security-filter">
+		<property name="securityFilter">
+			<bean class="{@className}">
+	            <xsl:apply-templates select="properties"/>
+	            <xsl:if test="@useProviders">
+	            	NOT IMPLEMENTED
+	            </xsl:if>
+			</bean>
+		</property>
+	</xsl:template>
 
     <!-- general utilities -->
     <xsl:template name="makeBean">

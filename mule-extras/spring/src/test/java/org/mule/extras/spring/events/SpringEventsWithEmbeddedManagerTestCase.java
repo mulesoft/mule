@@ -28,4 +28,9 @@ public class SpringEventsWithEmbeddedManagerTestCase extends SpringEventsTestCas
     public void testCorrectManagerLoaded() {
         assertNotNull(MuleManager.getInstance().getProperty("embeddedManager"));
     }
+
+	public void testRemovingListeners() throws Exception
+    {
+		super.testRemovingListeners();
+    }
 }

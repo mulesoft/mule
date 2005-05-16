@@ -628,7 +628,11 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             {
                 String subscription = subscriptions[i];
                 UMOEndpointURI endpointUri = new MuleEndpointURI(subscription);
-                messageRouter.addEndpoint(MuleEndpoint.getOrCreateEndpointForUri(endpointUri,  UMOEndpoint.ENDPOINT_TYPE_RECEIVER));
+				UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri,  UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+				if (!asynchronous) {
+					endpoint.setSynchronous(true);
+				}
+                messageRouter.addEndpoint(endpoint);
             }
         }
         //set the implementation name to this bean so Mule will manage it

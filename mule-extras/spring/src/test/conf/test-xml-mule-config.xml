@@ -20,9 +20,8 @@
         <threading-profile id="default" maxBufferSize="0" maxThreadsActive="8"
             maxThreadsIdle="4" poolExhaustedAction="WAIT" threadTTL="60001"/>
         <pooling-profile exhaustedAction="WAIT" maxActive="8" maxIdle="4" maxWait="4000" initialisationPolicy="INITIALISE_FIRST"/>
-        <queue-profile maxOutstandingMessages="100">
-            <persistence-strategy className="org.mule.util.queue.SerialisationPersistence"/>
-        </queue-profile>
+        <queue-profile maxOutstandingMessages="100" persistent="true"/>
+        <persistence-strategy className="org.mule.util.queue.FilePersistenceStrategy"/>
     </mule-environment-properties>
 
     <transaction-manager factory="org.mule.tck.testmodels.mule.TestTransactionManagerFactory"/>

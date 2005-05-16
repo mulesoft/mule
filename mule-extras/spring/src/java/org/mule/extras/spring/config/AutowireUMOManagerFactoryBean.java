@@ -14,6 +14,11 @@ package org.mule.extras.spring.config;
  * the LICENSE.txt file.
  */
 
+import java.beans.ExceptionListener;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -22,6 +27,7 @@ import org.mule.extras.spring.SpringContainerContext;
 import org.mule.impl.MuleModel;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
@@ -32,6 +38,7 @@ import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -41,12 +48,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
-
-import java.beans.ExceptionListener;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <code>UMOManagerFactoryBean</code> is a MuleManager factory bean that is used to configure the
@@ -75,7 +76,7 @@ import java.util.Map;
  * AutowireUMOManagerFactoryBean.MULE_ENDPOINT_MAPPINGS_BEAN_NAME.
  * <p/>
  * muleInterceptorStacks
- * A map of interceptotor stacks, where the name of the stack is the key and a list of interceptors is the value.
+ * A map of interceptor stacks, where the name of the stack is the key and a list of interceptors is the value.
  * Accessible using from your code using
  * AutowireUMOManagerFactoryBean.MULE_INTERCEPTOR_STACK_BEAN_NAME.
  *
@@ -141,6 +142,10 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
             temp = context.getBeansOfType(UMOTransactionManagerFactory.class, true, true);
             if (temp.size() > 0) manager.setTransactionManager(((UMOTransactionManagerFactory) temp.values().iterator().next()).create());
 
+			//set security manager
+			temp = context.getBeansOfType(UMOSecurityManager.class, true, true);
+			if (temp.size() > 0) manager.setSecurityManager((UMOSecurityManager) temp.values().iterator().next());
+			
             //set Endpoints
             Map endpoints = context.getBeansOfType(UMOEndpoint.class, true, true);
             setProviders(endpoints.values());
@@ -310,7 +315,7 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
         for (Iterator iterator = stacks.entrySet().iterator(); iterator.hasNext();)
         {
             entry = (Map.Entry) iterator.next();
-            manager.registerInterceptorStack(entry.getKey().toString(), (List) entry.getValue());
+            manager.registerInterceptorStack(entry.getKey().toString(), (UMOInterceptorStack) entry.getValue());
         }
     }
 

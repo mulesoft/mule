@@ -64,7 +64,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         {
             public void eventReceived(UMOEventContext context, Object o) throws Exception
             {
-                eventCount++;
+				eventCount++;
             }
         };
         subscriptionBean.setEventCallback(callback);
@@ -74,17 +74,19 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         client.send("vm://event.multicaster", "Test Spring Event", null);
 
-        assertEquals(0, eventCount);
+		assertEquals(0, eventCount);
 
         multicaster.addApplicationListener(subscriptionBean);
         client.send("vm://event.multicaster", "Test Spring Event", null);
 
+		Thread.sleep(100);
         assertEquals(1, eventCount);
         eventCount = 0;
+
         multicaster.removeAllListeners();
         client.send("vm://event.multicaster", "Test Spring Event", null);
 
-        assertEquals(0, eventCount);
+		assertEquals(0, eventCount);
         multicaster.addApplicationListener(subscriptionBean);
         context.refresh();
         subscriptionBean.setEventCallback(null);
