@@ -15,7 +15,9 @@ package org.mule.tck;
 
 import org.mule.MuleManager;
 import org.mule.impl.MuleModel;
+import org.mule.interceptors.InterceptorStack;
 import org.mule.interceptors.LoggingInterceptor;
+import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
@@ -103,18 +105,22 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
 
     public void testInterceptorStacks()
     {
-        List interceptors = MuleManager.getInstance().lookupInterceptorStack("testInterceptorStack");
+        UMOInterceptorStack stack1 = MuleManager.getInstance().lookupInterceptorStack("testInterceptorStack");
+		assertNotNull(stack1);
+		List interceptors = stack1.getInterceptors(); 
         assertEquals(2, interceptors.size());
 
+		InterceptorStack stack2 = new InterceptorStack();
         List interceptors2 = new ArrayList();
         interceptors2.add(new LoggingInterceptor());
+		stack2.setInterceptors(interceptors2);
 
-        MuleManager.getInstance().registerInterceptorStack("testInterceptors2", interceptors2);
+        MuleManager.getInstance().registerInterceptorStack("testInterceptors2", stack2);
 
-        assertEquals(1, MuleManager.getInstance().lookupInterceptorStack("testInterceptors2").size());
+        assertEquals(1, MuleManager.getInstance().lookupInterceptorStack("testInterceptors2").getInterceptors().size());
 
-        List interceptors3 = MuleManager.getInstance().lookupInterceptorStack("doesnotexist");
-        assertNull(interceptors3);
+        UMOInterceptorStack stack3 = MuleManager.getInstance().lookupInterceptorStack("doesnotexist");
+        assertNull(stack3);
     }
 
     public void testTrasactionSetting() throws Exception

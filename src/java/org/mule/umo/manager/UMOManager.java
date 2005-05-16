@@ -15,7 +15,12 @@
 
 package org.mule.umo.manager;
 
+import java.util.Map;
+
+import javax.transaction.TransactionManager;
+
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
@@ -24,10 +29,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.queue.QueueManager;
-
-import javax.transaction.TransactionManager;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <code>UMOManager</code> maintains and provides services for a UMO server
@@ -213,7 +214,7 @@ public interface UMOManager extends Lifecycle
      * @param stack a List of interceptors
      * @see org.mule.umo.UMOInterceptor
      */
-    public void registerInterceptorStack(String name, List stack);
+    public void registerInterceptorStack(String name, UMOInterceptorStack stack);
 
     /**
      * Retrieves a configured interceptor stack.
@@ -221,7 +222,7 @@ public interface UMOManager extends Lifecycle
      * @return the interceptor stack requested or null if there wasn't one configured
      * for the given name
      */
-    public List lookupInterceptorStack(String name);
+    public UMOInterceptorStack lookupInterceptorStack(String name);
 
     /**
      * Determines if the server has been started

@@ -14,21 +14,70 @@
 
 package org.mule.config.builders;
 
+import java.beans.ExceptionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.digester.*;
+import org.apache.commons.digester.CallMethodRule;
+import org.apache.commons.digester.CallParamRule;
+import org.apache.commons.digester.Digester;
+import org.apache.commons.digester.NodeCreateRule;
+import org.apache.commons.digester.ObjectCreateRule;
+import org.apache.commons.digester.Rule;
+import org.apache.commons.digester.SetPropertiesRule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.config.*;
-import org.mule.config.converters.*;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ConfigurationException;
+import org.mule.config.MuleConfiguration;
+import org.mule.config.MuleDtdResolver;
+import org.mule.config.PoolingProfile;
+import org.mule.config.PropertyFactory;
+import org.mule.config.QueueProfile;
+import org.mule.config.ReaderResource;
+import org.mule.config.ThreadingProfile;
+import org.mule.config.converters.ConnectorConverter;
+import org.mule.config.converters.EndpointConverter;
+import org.mule.config.converters.EndpointURIConverter;
+import org.mule.config.converters.TransactionFactoryConverter;
+import org.mule.config.converters.TransformerConverter;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.config.pool.CommonsPoolFactory;
-import org.mule.impl.*;
+import org.mule.impl.DefaultLifecycleAdapter;
+import org.mule.impl.MuleComponentFactory;
+import org.mule.impl.MuleDescriptor;
+import org.mule.impl.MuleModel;
+import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleSecurityManager;
+import org.mule.interceptors.InterceptorStack;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -36,11 +85,20 @@ import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.response.ResponseMessageRouter;
 import org.mule.transaction.constraints.BatchConstraint;
-import org.mule.umo.*;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOInterceptor;
+import org.mule.umo.UMOInterceptorStack;
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.*;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOTransactionManagerFactory;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.UMOInboundMessageRouter;
@@ -55,7 +113,6 @@ import org.mule.util.ClassHelper;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
 import org.mule.util.queue.EventFilePersistenceStrategy;
-import org.mule.util.queue.FilePersistenceStrategy;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
@@ -63,18 +120,6 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.beans.ExceptionListener;
-import java.io.*;
-import java.net.URL;
-import java.util.*;
 
 /**
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that builds a
@@ -646,7 +691,9 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                     list.add(0, digester.pop());
                     obj = digester.peek();
                 }
-                manager.registerInterceptorStack(digester.pop().toString(), list);
+				InterceptorStack stack = new InterceptorStack();
+				stack.setInterceptors(list);
+                manager.registerInterceptorStack(digester.pop().toString(), stack);
             }
         });
     }
@@ -713,15 +760,11 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             {
                 String value = attributes.getValue("className");
                 UMOManager man = (UMOManager) digester.getRoot();
-                List interceptorStack = man.lookupInterceptorStack(value);
+                UMOInterceptorStack interceptorStack = man.lookupInterceptorStack(value);
                 MuleDescriptor temp = (MuleDescriptor) digester.peek();
                 if (interceptorStack != null)
                 {
-                    Iterator iter = interceptorStack.iterator();
-                    while (iter.hasNext())
-                    {
-                        temp.addInterceptor((UMOInterceptor) iter.next());
-                    }
+                    temp.addInterceptor(interceptorStack);
                 }
                 else
                 {
