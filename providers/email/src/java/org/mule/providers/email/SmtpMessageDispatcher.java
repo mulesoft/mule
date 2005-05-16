@@ -68,11 +68,11 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
         String endpointAddress = endpoint.getEndpointURI().getAddress();
         Map props = event.getProperties();
-        String to = ((String) PropertiesHelper.getProperty(props, "toAddresses", connector.getCcAddresses()));
-        String cc = ((String) PropertiesHelper.getProperty(props, "ccAddresses", connector.getCcAddresses()));
-        String bcc = ((String) PropertiesHelper.getProperty(props, "bccAddresses", connector.getBccAddresses()));
-        String from = ((String) PropertiesHelper.getProperty(props, "fromAddress", connector.getFromAddress()));
-        String subject = ((String) PropertiesHelper.getProperty(props, "subject", connector.getSubject()));
+        String to = PropertiesHelper.getStringProperty(props, "toAddresses", connector.getCcAddresses());
+        String cc = PropertiesHelper.getStringProperty(props, "ccAddresses", connector.getCcAddresses());
+        String bcc = PropertiesHelper.getStringProperty(props, "bccAddresses", connector.getBccAddresses());
+        String from = PropertiesHelper.getStringProperty(props, "fromAddress", connector.getFromAddress());
+        String subject = PropertiesHelper.getStringProperty(props, "subject", connector.getSubject());
 
         Message msg = null;
 
