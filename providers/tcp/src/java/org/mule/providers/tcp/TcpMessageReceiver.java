@@ -27,7 +27,21 @@
  */
 package org.mule.providers.tcp;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URI;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -45,11 +59,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-import java.io.*;
-import java.net.*;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
  * <code>TcpMessageReceiver</code> acts like a tcp server to receive socket
@@ -159,6 +169,10 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                 try
                 {
                     socket = serverSocket.accept();
+					TcpConnector connector = (TcpConnector) this.connector; 
+			        socket.setReceiveBufferSize(connector.getBufferSize());
+			        socket.setSendBufferSize(connector.getBufferSize());
+					socket.setSoTimeout(connector.getTimeout());
                     logger.trace("Server socket Accepted on: " + serverSocket.getLocalPort());
                 } catch (java.io.InterruptedIOException iie)
                 {
@@ -215,10 +229,12 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         protected DataInputStream dataIn;
         protected DataOutputStream dataOut;
         protected SynchronizedBoolean closed = new SynchronizedBoolean(false);
+		protected TcpProtocol protocol;
 
         public TcpWorker(Socket socket)
         {
             this.socket = socket;
+			this.protocol = ((TcpConnector) connector).getTcpProtocol();
         }
 
         public void release() {
@@ -252,12 +268,13 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                 int counter = 0;
                 while (!socket.isClosed() && !disposing.get())
                 {
+					// TODO: is this loop necessary ?
                     if (isServerSide() && ++counter > 500) {
                         counter = 0;
                         Thread.yield();
                     }
 
-                    byte[] b = readStream(dataIn);
+                    byte[] b = protocol.read(dataIn);
                     //end of stream
                     if (b == null) {
 						break;
@@ -265,7 +282,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
                     byte[] result = processData(b);
                     if (result != null) {
-                        dataOut.write(result);
+                        protocol.write(dataOut, result);
                     }
                     dataOut.flush();
                 }
@@ -298,38 +315,5 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
         }
 
-        private byte[] readStream(InputStream is) throws IOException
-        {
-            ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-
-            byte[] buffer = new byte[((TcpConnector)connector).getBufferSize()];
-            int len = 0;
-            try
-            {
-                while ((len = is.read(buffer)) == 0)
-                {
-                }
-            } catch (SocketException e)
-            {
-                logger.warn(e.getMessage());
-                return null;
-            }
-            if (len == -1)
-            {
-                logger.info("The socket peer closed");
-                return null;
-            } else
-            {
-                do
-                {
-                    baos.write(buffer, 0, len);
-                    if (len < buffer.length) break;
-                } while ((len = is.read(buffer)) > 0);
-
-                baos.flush();
-                baos.close();
-                return baos.toByteArray();
-            }
-        }
     }
 }

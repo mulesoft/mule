@@ -85,22 +85,20 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void write(Socket socket, Object data) throws IOException
     {
+        TcpProtocol protocol = connector.getTcpProtocol();
+		byte[] binaryData;
         if (data instanceof String)
         {
-			PrintWriter printWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
-            printWriter.write(data.toString());
-            printWriter.flush();
+			binaryData = data.toString().getBytes();
         } else if (data instanceof byte[])
         {
-            BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
-            bos.write((byte[]) data);
-            bos.flush();
+			binaryData = (byte[]) data;
         } else {
-            BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
-            bos.write(Utility.objectToByteArray(data));
-            bos.flush();
+			binaryData = Utility.objectToByteArray(data); 
         }
-
+        BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
+		protocol.write(bos, binaryData);
+        bos.flush();
     }
 
     public UMOMessage doSend(UMOEvent event) throws Exception
@@ -142,45 +140,13 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 		}
     }
 
-    private byte[] receive(Socket socket, int timeout) throws IOException
+    protected byte[] receive(Socket socket, int timeout) throws IOException
     {
-        DataInputStream dis = new DataInputStream(socket.getInputStream());
-        if(timeout >= 0) {
+        DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+        if (timeout >= 0) {
             socket.setSoTimeout(timeout);
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(connector.getBufferSize());
-        byte[] buffer = new byte[connector.getBufferSize()];
-        int len = 0;
-        try
-        {
-            while ((len = dis.read(buffer, len, buffer.length)) != 0)
-            {
-                if (len == -1)
-                {
-                    logger.debug("The socket is closed");
-                    return null;
-                } else
-                {
-                    baos.write(buffer, 0, len);
-                    if (len != buffer.length) {
-						break;
-                    }
-                }
-            }
-            baos.flush();
-            return baos.toByteArray();
-        } finally
-        {
-            try
-            {
-                //if(dis!=null) dis.close();
-                if(baos!=null) baos.close();
-            } catch (IOException e)
-            {
-                logger.error("failed to close tcp stream: " + e);
-            }
-        }
-
+        return connector.getTcpProtocol().read(dis);
     }
 
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
