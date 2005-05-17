@@ -50,6 +50,8 @@
                 <container-property name="containerProperty" reference="java.lang.String"/> 
             </properties>
         </transformer>
+        <transformer name="TestTransformer" className="org.mule.transformers.DefaultTransformer"
+        			returnClass="[B" />
     </transformers>
 
     <global-endpoints>

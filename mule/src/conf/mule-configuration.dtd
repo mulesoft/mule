@@ -415,7 +415,7 @@ The <i>connection-descriptor</i> element specifies one or more message
     	the transformer can validate that the returnObject is of expected type before return
     	to the callee.
 -->
-<!ATTLIST transformer returnClass             NMTOKEN 			"java.lang.Object">
+<!ATTLIST transformer returnClass             CDATA 			"java.lang.Object">
 
 <!--	
 	<i>global-endpoints</i> are endpoint configurations made available to all components in
