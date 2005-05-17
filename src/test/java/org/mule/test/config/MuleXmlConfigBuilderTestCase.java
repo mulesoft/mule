@@ -114,7 +114,11 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         Assert.assertEquals(12, ((TestCompressionTransformer) t).getBeanProperty2());
 
         assertEquals(t.getReturnClass(), java.lang.String.class);
-    }
+
+        t = MuleManager.getInstance().lookupTransformer("TestTransformer");
+        assertNotNull(t);
+        assertEquals(t.getReturnClass(), byte[].class);
+	}
 
     public void testSystemPropertyOverride()
     {
