@@ -42,14 +42,18 @@ public abstract class JdbcUtils {
 	
 	public static void commitAndClose(Connection con) throws SQLException {
 		if (con != null) {
-			con.commit();
+			if (con.getAutoCommit() == false) {
+				con.commit();
+			}
 			con.close();
 		}
 	}
 	
 	public static void rollbackAndClose(Connection con) throws SQLException {
 		if (con != null) {
-			con.rollback();
+			if (con.getAutoCommit() == false) {
+				con.rollback();
+			}
 			con.close();
 		}
 	}
