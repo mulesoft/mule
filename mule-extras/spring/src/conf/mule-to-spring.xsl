@@ -660,16 +660,8 @@
         </property>
     </xsl:template>
 
-    <xsl:template match="@address|@inboundEndpoint|@outboundEndpoint" mode="addEndpointURI">
-        <xsl:variable name="name">
-            <xsl:choose>
-                <xsl:when test="local-name()='address'">endpointURI</xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="local-name()"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <property name="{$name}">
+     <xsl:template match="@address" mode="addEndpointURI">
+        <property name="endpointURI">
             <bean class="org.mule.impl.endpoint.MuleEndpointURI">
                 <constructor-arg index="0">
                     <value>
@@ -679,6 +671,22 @@
             </bean>
         </property>
     </xsl:template>
+
+    <xsl:template match="@inboundEndpoint|@outboundEndpoint" mode="addEndpointURI">
+        <property name="{local-name()}">
+            <bean class="org.mule.impl.endpoint.MuleEndpoint">
+                <property name="endpointURI">
+					<bean class="org.mule.impl.endpoint.MuleEndpointURI">
+						<constructor-arg index="0">
+							<value>
+								<xsl:value-of select="."/>
+							</value>
+						</constructor-arg>
+					</bean>
+                </property>
+            </bean>
+        </property>
+    </xsl:template> 
 
     <xsl:template match="@transformers|@inboundTransformer|@outboundTransformer" mode="addTransformers">
         <xsl:variable name="propertyName">
@@ -698,7 +706,7 @@
                     </value>
                 </constructor-arg>
                 <constructor-arg index="1">
-                    <value> </value>
+                    <value><xsl:value-of select="' '"/></value>
                 </constructor-arg>
             </bean>
         </property>

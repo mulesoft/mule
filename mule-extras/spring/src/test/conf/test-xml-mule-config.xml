@@ -50,6 +50,7 @@
                 <container-property name="containerProperty" reference="java.lang.String"/>
             </properties>
         </transformer>
+        <transformer name="Default" className="org.mule.transformers.DefaultTransformer" />
     </transformers>
 
     <global-endpoints>
@@ -75,10 +76,11 @@
         <component-lifecycle-adapter-factory className="org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory"/>
 
         <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-            <endpoint address="test://component.exceptions"/>
+            <endpoint address=" test://component.exceptions "/>
         </exception-strategy>
 
         <mule-descriptor name="orangeComponent"
+        	inboundEndpoint="Test Queue"
             implementation="local:orange">
 
             <inbound-router>
@@ -100,7 +102,7 @@
                 </router>
             </outbound-router>
 
-            <response-router transformers="TestCompressionTransformer">
+            <response-router transformers="TestCompressionTransformer Default">
                 <endpoint address="test://response1"/>
                 <global-endpoint name="appleResponseEndpoint"/>
                 <router className="org.mule.tck.testmodels.mule.TestResponseAggregator"/>

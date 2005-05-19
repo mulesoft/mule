@@ -19,6 +19,7 @@ import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.MuleObjectHelper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -36,19 +37,21 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
 
     public Object postProcessBeforeInitialization(Object o, String s) throws BeansException
     {
-        if(o instanceof UMOConnector) {
-            if(((UMOConnector)o).getName()==null || overwrite) ((UMOConnector)o).setName(s);
-        } else if(o instanceof UMOTransformer) {
-            ((UMOTransformer)o).setName(s);
-        } else if(o instanceof UMOEndpoint) {
-            if(((UMOEndpoint)o).getName()==null || overwrite) ((UMOEndpoint)o).setName(s);
-        } else if(o instanceof UMODescriptor) {
-            if(((UMODescriptor)o).getName()==null || overwrite) ((UMODescriptor)o).setName(s);
-        } else if(o instanceof UMOModel) {
-            if(((UMOModel)o).getName()==null || overwrite) ((UMOModel)o).setName(s);
-        }  else if(o instanceof UMOAgent) {
-            if(((UMOAgent)o).getName()==null || overwrite) ((UMOAgent)o).setName(s);
-        }
+		if (!MuleObjectHelper.class.getName().equals(s)) {
+	        if(o instanceof UMOConnector) {
+	            if(((UMOConnector)o).getName()==null || overwrite) ((UMOConnector)o).setName(s);
+	        } else if(o instanceof UMOTransformer) {
+				((UMOTransformer)o).setName(s);
+	        } else if(o instanceof UMOEndpoint) {
+	            if(((UMOEndpoint)o).getName()==null || overwrite) ((UMOEndpoint)o).setName(s);
+	        } else if(o instanceof UMODescriptor) {
+	            if(((UMODescriptor)o).getName()==null || overwrite) ((UMODescriptor)o).setName(s);
+	        } else if(o instanceof UMOModel) {
+	            if(((UMOModel)o).getName()==null || overwrite) ((UMOModel)o).setName(s);
+	        }  else if(o instanceof UMOAgent) {
+	            if(((UMOAgent)o).getName()==null || overwrite) ((UMOAgent)o).setName(s);
+	        }
+		}
         return o;
     }
 

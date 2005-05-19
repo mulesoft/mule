@@ -20,6 +20,8 @@ import org.mule.providers.vm.VMConnector;
 import org.mule.tck.AbstractConfigBuilderTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.routing.UMOResponseMessageRouter;
+import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.List;
 import java.util.Map;
@@ -59,6 +61,12 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
         UMOEndpoint e = (UMOEndpoint)d.getInboundRouter().getEndpoints().get(0);
         assertNotNull(e);
         assertEquals("Prop2", e.getProperties().get("testEndpointBeanProperty"));
+		
+		d = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+		assertNotNull(d);
+		e = d.getInboundEndpoint();
+		assertNotNull(e);
+		assertEquals(e.getEndpointURI().toString(), MuleManager.getInstance().getEndpointIdentifiers().get("Test Queue"));
     }
 
     public void testPropertyBeansOnDescriptors()
@@ -70,6 +78,22 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
         //assertEquals("1.1", d.getVersion());
     }
+	
+	public void testTransformers() 
+	{
+        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+		assertNotNull(d);
+		UMOResponseMessageRouter r = d.getResponseRouter();
+		assertNotNull(r);
+		UMOTransformer t = r.getTransformer();
+		assertNotNull(t);
+		assertEquals("TestCompressionTransformer", t.getName());
+		t = t.getTransformer();
+		assertNotNull(t);
+		assertEquals("Default", t.getName());
+		t = t.getTransformer();
+		assertNull(t);
+	}
 
     public void testPropertyBeansInMaps()
     {
