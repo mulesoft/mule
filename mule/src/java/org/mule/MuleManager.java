@@ -690,6 +690,7 @@ public class MuleManager implements UMOManager
      */
     public synchronized void stop() throws UMOException
     {
+		started.set(false);
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STOPPING));
 
         logger.debug("Stopping connectors...");
