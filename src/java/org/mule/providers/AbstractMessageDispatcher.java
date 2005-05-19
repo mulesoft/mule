@@ -167,7 +167,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         if (!disposed) {
             try {
                 doDispose();
-				workManager.dispose();
+				if (workManager != null) {
+					workManager.dispose();
+				}
             } finally {
                 connector.getDispatchers().values().remove(this);
                 disposed = true;
