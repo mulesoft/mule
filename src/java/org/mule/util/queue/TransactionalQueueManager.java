@@ -244,7 +244,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 			}
 		}
 		
-		public void putWhenRoom(Object o, int room) throws InterruptedException {
+		public boolean offer(Object o, int room, long timeout) throws InterruptedException {
 			if (Thread.interrupted()) {
 				throw new InterruptedException();
 			}
@@ -253,28 +253,54 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 					if (config.capacity <= room) {
 						throw new IllegalStateException("Can not add more objects than the capacity in one time");
 					}
+					long l1 = timeout > 0L ? System.currentTimeMillis() : 0L;
+					long l2 = timeout;
 					while (list.size() >= config.capacity - room) {
-						list.wait();
+						if (l2 <= 0L) {
+							return false;
+						}
+						list.wait(l2);
+						l2 = timeout - (System.currentTimeMillis() - l1);
 					}
 				}
 				if (o != null) {
 					list.addLast(o);
 				}
 				list.notifyAll();
+				return true;
 			}
 		}
 		
-		public Object takeBlock() throws InterruptedException {
+		public Object poll(long timeout) throws InterruptedException {
 			if (Thread.interrupted()) {
 				throw new InterruptedException();
 			}
 			synchronized (list) {
+				long l1 = timeout > 0L ? System.currentTimeMillis() : 0L;
+				long l2 = timeout;
 				while (list.isEmpty()) {
-					list.wait();
+					if (l2 <= 0L) {
+						return null;
+					}
+					list.wait(l2);
+					l2 = timeout - (System.currentTimeMillis() - l1);
 				}
 				Object o = list.removeFirst();
 				list.notifyAll();
 				return o;
+			}
+		}
+		
+		public Object peek() throws InterruptedException {
+			if (Thread.interrupted()) {
+				throw new InterruptedException();
+			}
+			synchronized (list) {
+				if (list.isEmpty()) {
+					return null;
+				} else {
+					return list.getFirst();
+				}
 			}
 		}
 		
@@ -284,7 +310,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 		protected Map added;
 		protected Map removed;
 
-		public void put(QueueInfo queue, Object item) throws InterruptedException {
+		public boolean offer(QueueInfo queue, Object item, long timeout) throws InterruptedException {
 			readOnly = false;
 			if (added == null) {
 				added = new HashMap();
@@ -295,11 +321,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 				added.put(queue, queueAdded);
 			}
 			// wait for enough room
-			queue.putWhenRoom(null, queueAdded.size());
-			queueAdded.add(item);
+			if (queue.offer(null, queueAdded.size(), Long.MAX_VALUE)) {
+				queueAdded.add(item);
+				return true;
+			} else {
+				return false;
+			}
 		}
-
-		public Object take(QueueInfo queue) throws IOException, InterruptedException {
+		
+		public Object poll(QueueInfo queue, long timeout) throws IOException, InterruptedException {
 			readOnly = false;
 			if (added != null) {
 				List queueAdded = (List) added.get(queue);
@@ -307,7 +337,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 					return queueAdded.remove(queueAdded.size() - 1);
 				}
 			}
-			Object o = queue.takeBlock();
+			Object o = queue.poll(Long.MAX_VALUE);
 			if (o != null) {
 				if (removed == null) {
 					removed = new HashMap();
@@ -318,6 +348,21 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 					removed.put(queue, queueRemoved);
 				}
 				queueRemoved.add(o);
+				o = doLoad(queue, o);
+			}
+			return o;
+		}
+
+		public Object peek(QueueInfo queue) throws IOException, InterruptedException {
+			readOnly = false;
+			if (added != null) {
+				List queueAdded = (List) added.get(queue);
+				if (queueAdded != null) {
+					return queueAdded.get(queueAdded.size() - 1);
+				}
+			}
+			Object o = queue.peek();
+			if (o != null) {
 				o = doLoad(queue, o);
 			}
 			return o;
@@ -353,32 +398,62 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 			public QueueImpl(QueueInfo queue) {
 				this.queue = queue;
 			}
-			
-			/* (non-Javadoc)
-			 * @see EDU.oswego.cs.dl.util.concurrent.Channel#put(java.lang.Object)
-			 */
+
 			public void put(Object item) throws InterruptedException {
+				offer(item, Long.MAX_VALUE);
+			}
+			
+			public boolean offer(Object item, long timeout) throws InterruptedException {
 				if (localContext != null) {
-					((QueueTransactionContext) localContext).put(queue, item);
+					return ((QueueTransactionContext) localContext).offer(queue, item, timeout);
 				} else {
 					try {
 						Object id = doStore(queue, item);
-						queue.putWhenRoom(id, 0);
+						try {
+							if (!queue.offer(id, 0, timeout)) {
+								doRemove(queue, item);
+								return false;
+							} else {
+								return true;
+							}
+						} catch (InterruptedException e) {
+							doRemove(queue, item);
+							throw e;
+						}
 					} catch (IOException e) {
 						throw new RuntimeException(e);
 					}
 				}
 			}
-	
-			/* (non-Javadoc)
-			 * @see EDU.oswego.cs.dl.util.concurrent.Channel#take()
-			 */
+
 			public Object take() throws InterruptedException {
+				return poll(Long.MAX_VALUE);
+			}
+			
+			public Object poll(long timeout) throws InterruptedException {
 				try {
 					if (localContext != null) {
-						return ((QueueTransactionContext) localContext).take(queue);
+						return ((QueueTransactionContext) localContext).poll(queue, timeout);
 					} else {
-						Object id = queue.takeBlock();
+						Object id = queue.poll(timeout);
+						if (id != null) {
+							Object item = doLoad(queue, id);
+							doRemove(queue, id);
+							return item;
+						}
+						return null;
+					}
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			
+			public Object peek() throws InterruptedException {
+				try {
+					if (localContext != null) {
+						return ((QueueTransactionContext) localContext).peek(queue);
+					} else {
+						Object id = queue.peek();
 						if (id != null) {
 							Object item = doLoad(queue, id);
 							doRemove(queue, id);

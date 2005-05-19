@@ -372,6 +372,119 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase {
 		}
 	}
 	
+	public void testPoll() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+
+		final TransactionalQueueManager mgr = createQueueManager();
+		
+		try {
+			mgr.start();
+		
+			QueueSession s = mgr.getQueueSession();
+			Queue q = s.getQueue("queue1");
+
+			assertEquals(q.size(), 0);
+			Object o = q.poll(0);
+			assertEquals(q.size(), 0);
+			assertNull(o);
+			o = q.poll(1000);
+			assertEquals(q.size(), 0);
+			assertNull(o);
+			q.put("String1");
+			assertEquals(q.size(), 1);
+			o = q.poll(0);
+			assertEquals(q.size(), 0);
+			assertEquals("String1", o);
+			
+			new Thread(new Runnable() { 
+				public void run() {
+					try {
+						Thread.sleep(500);
+						QueueSession s = mgr.getQueueSession();
+						Queue q = s.getQueue("queue1");
+						q.put("String1");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+			o = q.poll(1000);
+			assertEquals(q.size(), 0);
+			assertEquals("String1", o);
+			
+		} finally {			
+			mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+		}
+	}
+	
+	public void testPeek() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+
+		TransactionalQueueManager mgr = createQueueManager();
+		
+		try {
+			mgr.start();
+		
+			QueueSession s = mgr.getQueueSession();
+			Queue q = s.getQueue("queue1");
+			
+			assertEquals(q.size(), 0);
+			Object o = q.peek();
+			assertEquals(q.size(), 0);
+			assertNull(o);
+			q.put("String1");
+			assertEquals(q.size(), 1);
+			o = q.peek();
+			assertEquals(q.size(), 1);
+			assertEquals("String1", o);
+			
+		} finally {			
+			mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+		}
+	}
+	
+	public void testOffer() throws Exception {
+		logger.info("================================");
+		logger.info("Running test: " + this.getName());
+		logger.info("================================");
+
+		final TransactionalQueueManager mgr = createQueueManager();
+		mgr.setDefaultQueueConfiguration(new QueueConfiguration(1));
+		try {
+			mgr.start();
+		
+			QueueSession s = mgr.getQueueSession();
+			Queue q = s.getQueue("queue1");
+			
+			assertEquals(q.size(), 0);
+			assertTrue(q.offer("String1", 0L));
+			assertEquals(q.size(), 1);
+			assertFalse(q.offer("String2", 1000));
+			assertEquals(q.size(), 1);
+			
+			new Thread(new Runnable() { 
+				public void run() {
+					try {
+						Thread.sleep(500);
+						QueueSession s = mgr.getQueueSession();
+						Queue q = s.getQueue("queue1");
+						assertEquals("String1", q.take());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+			assertTrue(q.offer("String2", 1000));
+			assertEquals(q.size(), 1);
+		} finally {			
+			mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+		}
+	}
+	
 	public void testBench() throws Exception {
 		logger.info("================================");
 		logger.info("Running test: " + this.getName());

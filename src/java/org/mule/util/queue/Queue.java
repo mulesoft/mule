@@ -30,7 +30,7 @@ public interface Queue {
 	int size();
 
 	/**
-	 * Puts a new object in this queue.
+	 * Puts a new object in this queue and wait if necessary.
 	 * @param o the object to put
 	 */
     void put(Object o) throws InterruptedException;
@@ -40,5 +40,11 @@ public interface Queue {
      * @return an object.
      */
     Object take() throws InterruptedException;
+	
+	Object peek() throws InterruptedException;
+	
+	Object poll(long timeout) throws InterruptedException;
+	
+	boolean offer(Object o, long timeout) throws InterruptedException;
 
 }
