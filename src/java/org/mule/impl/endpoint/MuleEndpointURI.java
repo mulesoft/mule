@@ -105,7 +105,7 @@ public class MuleEndpointURI implements UMOEndpointURI
             uri = uriIdentifier;
         }
 
-        uri = uri.replaceAll(" ", "%20");
+        uri = uri.trim().replaceAll(" ", "%20");
 
         if(!validateUrl(uri)) {
             throw new MalformedEndpointException(uri);
