@@ -73,20 +73,33 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 			queueSession = connector.getQueueSession();
 			Queue queue = queueSession.getQueue(endpointUri.getAddress());
 	        if (queue == null) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("No queue with name " + endpointUri.getAddress());
+				}
 	            return null;
 	        } else {
 	            UMOEvent event = null;
+				if (logger.isDebugEnabled()) {
+					logger.debug("Waiting for a message on " + endpointUri.getAddress());
+				}
 	            try
 	            {
 	                event = (UMOEvent) queue.poll(timeout);
 	            } catch (InterruptedException e)
 	            {
-	                logger.error("failed to receive event from queue: " + endpointUri);
+	                logger.error("Failed to receive event from queue: " + endpointUri);
 	            }
 	            if (event != null) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Event received: " + event);
+					}
 	                return event.getMessage();
+	            } else {
+					if (logger.isDebugEnabled()) {
+						logger.debug("No event received after " + timeout + " ms");
+					}
+		            return null;
 	            }
-	            return null;
 	        }
 		} catch (Exception e) {
 			throw e;
