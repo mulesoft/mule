@@ -78,9 +78,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
 	            UMOEvent event = null;
 	            try
 	            {
-					// TODO: add a poll method
-	                //event = (UMOEvent) queue.poll(timeout);
-					event = (UMOEvent) queue.take();
+	                event = (UMOEvent) queue.poll(timeout);
 	            } catch (InterruptedException e)
 	            {
 	                logger.error("failed to receive event from queue: " + endpointUri);
