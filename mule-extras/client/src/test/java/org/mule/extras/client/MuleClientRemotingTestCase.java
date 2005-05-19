@@ -64,16 +64,14 @@ public class MuleClientRemotingTestCase extends AbstractMuleTestCase
         MuleManager.getConfiguration().setSynchronous(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
-		// TODO
-		// This line makes the test fail, as the vm currently do not
-		// support receiving with a timeout (it blocks forever)
-        UMOMessage message = null; //dispatcher.receiveRemote(remoteEndpoint, 1000);
+        UMOMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);
         assertNull(message);
-        //We do a send instead of a dispatch here so the operation is synchronous
-        //thus eaiser to test
-        dispatcher.sendRemote(remoteEndpoint, "Test Remote Message 2", null);
+		
+		// Dispatch a message
+        dispatcher.dispatchRemote(remoteEndpoint, "Test Remote Message 2", null);
 
-        message = dispatcher.receiveRemote(remoteEndpoint, 100000);
+		// Receive the message
+        message = dispatcher.receiveRemote(remoteEndpoint, 500000);
         assertNotNull(message);
         assertEquals("Test Remote Message 2", message.getPayload());
 

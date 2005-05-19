@@ -147,7 +147,7 @@ public class MuleManagerComponent implements Callable, Initialisable
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
         UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(action.getEndpoint());
-        long timeout = PropertiesHelper.getLongProperty(action.getProperties(), "timeout", MuleManager.getConfiguration().getSynchronousEventTimeout());
+        long timeout = PropertiesHelper.getLongProperty(action.getProperties(), MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, MuleManager.getConfiguration().getSynchronousEventTimeout());
 
         try
         {
