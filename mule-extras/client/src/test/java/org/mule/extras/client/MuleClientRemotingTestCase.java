@@ -71,7 +71,7 @@ public class MuleClientRemotingTestCase extends AbstractMuleTestCase
         dispatcher.dispatchRemote(remoteEndpoint, "Test Remote Message 2", null);
 
 		// Receive the message
-        message = dispatcher.receiveRemote(remoteEndpoint, 500000);
+        message = dispatcher.receiveRemote(remoteEndpoint, 2000);
         assertNotNull(message);
         assertEquals("Test Remote Message 2", message.getPayload());
 
