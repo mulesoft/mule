@@ -33,8 +33,8 @@ public class AdminEvent extends UMOServerEvent
     public static final int ACTION_SEND = ADMIN_EVENT_ACTION_START_RANGE + 3;
     public static final int ACTION_INVOKE = ADMIN_EVENT_ACTION_START_RANGE + 4;
 
-    private String[] actions = new String[]{
-            "receive event","dispatch event", "send event","invoke component"};
+    private static final String[] actions = new String[]{
+            "receive event", "dispatch event", "send event", "invoke component"};
 
     private String endpoint;
     private Map properties = new HashMap();
