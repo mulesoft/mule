@@ -37,6 +37,8 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
     private String name;
 
     private ObjectName statsName;
+	
+	private ObjectName objectName;
 
 
     public ComponentService(String name) {
@@ -134,7 +136,8 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 	public ObjectName preRegister(MBeanServer server, ObjectName name)
 			throws Exception {
 		this.server = server;
-		return null;
+		this.objectName = name;
+		return name;
 	}
 
 	/* (non-Javadoc)
@@ -143,7 +146,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 	public void postRegister(Boolean registrationDone) {
 		try {
 			if (getComponent().getStatistics() != null) {
-				statsName = new ObjectName("Mule:type=statistics,name=" + getName());
+				statsName = new ObjectName(objectName.getDomain() + ":type=statistics,name=" + getName());
 				this.server.registerMBean(new ComponentStats(
 						getComponent().getStatistics()), this.statsName);
 			}
