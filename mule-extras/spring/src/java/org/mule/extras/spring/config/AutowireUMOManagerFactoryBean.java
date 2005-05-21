@@ -146,6 +146,10 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 			temp = context.getBeansOfType(UMOSecurityManager.class, true, true);
 			if (temp.size() > 0) manager.setSecurityManager((UMOSecurityManager) temp.values().iterator().next());
 			
+            //set Transformers
+            Map transformers = context.getBeansOfType(UMOTransformer.class, true, true);
+            setTransformers(transformers.values());
+
             //set Endpoints
             Map endpoints = context.getBeansOfType(UMOEndpoint.class, true, true);
             setProviders(endpoints.values());
@@ -157,10 +161,6 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
             //Set the container Context
             Map containers = context.getBeansOfType(UMOContainerContext.class, true, true);
             setContainerContext(containers);
-
-            //set Transformers
-            Map transformers = context.getBeansOfType(UMOTransformer.class, true, true);
-            setTransformers(transformers.values());
 
             //interceptors
             Map interceptors = (Map) getBean(MULE_INTERCEPTOR_STACK_BEAN_NAME, Map.class);
