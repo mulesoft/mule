@@ -88,9 +88,9 @@ public class JdmkAgent implements UMOAgent {
 		try {
 			mBeanServer.invoke(adaptorName, "stop", null, null);
 		} catch (InstanceNotFoundException e) {
-			throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"), adaptorName, e);
+			throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Jdmk agent"), adaptorName, e);
 		} catch (MBeanException e) {
-			throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jdmk agent"), adaptorName, e);
+			throw new JmxManagementException(new Message(Messages.FAILED_TO_STOP_X, "Jdmk agent"), adaptorName, e);
 		} catch (ReflectionException e) {
 			//ignore
 		}

@@ -162,7 +162,7 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration {
 	public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
 		this.server = server;
 		this.name = name;
-		return null;
+		return name;
 	}
 
 	/* (non-Javadoc)
