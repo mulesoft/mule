@@ -148,7 +148,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         UMOComponent component = MuleManager.getInstance().getModel().registerComponent(d);
         UMOEndpoint endpoint = new MuleEndpoint("test", new MuleEndpointURI(getTestEndpointURI()),
-            connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null);
+            connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, new HashMap());
 
         try
         {

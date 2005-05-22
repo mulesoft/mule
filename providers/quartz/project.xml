@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-quartz-provider</artifactId>
+    <name>Mule Quartz Provider</name>
+    <description>A Mule provider for Quartz. This provider supplies a receiver for jobs scheduled with Quartz.
+		For more information see the
+        <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
+    </description>
+    <shortDescription>quartz</shortDescription>
+    <url>http://www.muleumo.org/doc/providers/quartz/</url>
+    <dependencies>
+        <dependency>
+            <groupId>quartz</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz_version}</version>
+            <url>http://www.opensymphony.com/quartz/</url>
+        </dependency>
+    </dependencies>
+</project>
