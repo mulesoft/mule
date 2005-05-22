@@ -107,7 +107,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
 
     protected ConnectorServiceDescriptor getServiceDescriptor() {
         if(serviceDescriptor==null) {
-            throw new IllegalStateException("This connector has not yet been initiaiised: " + name);
+            throw new IllegalStateException("This connector has not yet been initialised: " + name);
         }
         return serviceDescriptor;
     }
