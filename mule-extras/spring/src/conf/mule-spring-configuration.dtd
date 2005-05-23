@@ -12,7 +12,7 @@
 -->
 <!ELEMENT mule-configuration (description?,environment-properties?,mule-environment-properties?,container-context*,security-manager?,
  transaction-manager?,agents?,connector*,endpoint-identifiers?,transformers?,global-endpoints?,
-		    interceptor-stack*,model?,mule-descriptor*,bean*)>
+		    interceptor-stack*,model?,mule-descriptor*,(import | alias | bean)*)>
 
 <!--
     The id attribute allows for a unique id for this file as it is often the case that
@@ -1204,6 +1204,33 @@ Whether the properties in the file override properties already set on this objec
  == Spring Configuration                                                   ==
  ============================================================================
 -->
+
+<!--
+	Specifies an XML bean definition resource to import.
+-->
+<!ELEMENT import EMPTY>
+
+<!--
+	The relative resource location of the XML bean definition file to import,
+	for example "myImport.xml" or "includes/myImport.xml" or "../myImport.xml".
+-->
+<!ATTLIST import resource CDATA #REQUIRED>
+
+
+<!--
+	Defines an alias for a bean, which can reside in a different definition file.
+-->
+<!ELEMENT alias EMPTY>
+
+<!--
+	The name of the bean to define an alias for.
+-->
+<!ATTLIST alias name CDATA #REQUIRED>
+
+<!--
+	The alias name to define for the bean.
+-->
+<!ATTLIST alias alias CDATA #REQUIRED>
 
 <!--
 	Defines a single named bean.

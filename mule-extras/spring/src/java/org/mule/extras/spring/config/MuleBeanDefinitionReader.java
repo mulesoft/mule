@@ -49,7 +49,7 @@ import org.xml.sax.EntityResolver;
  */
 public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 {
-    private static int contextCount = 0;
+    private int contextCount = 0;
     private int configCount = 0;
     private MuleDtdResolver dtdResolver = null;
     public MuleBeanDefinitionReader(BeanDefinitionRegistry beanDefinitionRegistry, int configCount)
@@ -88,6 +88,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         {
             Transformer transformer = createTransformer(createXslSource());
             DOMResult result = new DOMResult();
+			transformer.setParameter("firstContext", new Boolean(isFirstContext()));
             transformer.transform(new DOMSource(document), result);
             if(logger.isDebugEnabled()) {
 				try {
@@ -133,7 +134,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     }
 
 
-    public static boolean isFirstContext()
+    public boolean isFirstContext()
     {
         return contextCount == 0;
     }

@@ -3,15 +3,15 @@
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:java="http://xml.apache.org/xslt/java"
-    extension-element-prefixes="java"
     version='1.0'>
+    
+    <xsl:param name="firstContext" />
 
     <xsl:output method="xml" indent="yes" encoding="ISO-8859-1" standalone="yes"
         doctype-public="-//SPRING//DTD BEAN//EN"
         doctype-system="http://www.springframework.org/dtd/spring-beans.dtd"/>
 
     <xsl:template match="mule-configuration">
-        <xsl:variable name="firstContext" select="java:org.mule.extras.spring.config.MuleBeanDefinitionReader.isFirstContext()"/>
         <beans>
             <xsl:if test="$firstContext">
                 <bean id="muleManager" class="org.mule.extras.spring.config.AutowireUMOManagerFactoryBean"/>
@@ -166,16 +166,11 @@
 
     <!-- Endpoint Template -->
     <xsl:template match="endpoint|global-endpoint">
-        <xsl:variable name="name">
-            <xsl:choose>
-                <xsl:when test="@name">
-                    <xsl:value-of select="@name"/>
-                </xsl:when>
-                <xsl:otherwise>endpoint</xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-
-        <bean name="{$name}" class="org.mule.impl.endpoint.MuleEndpoint">
+		<xsl:element name="bean">
+			<xsl:if test="@name">
+				<xsl:attribute name="name"><xsl:value-of select="@name" /></xsl:attribute>
+			</xsl:if>
+			<xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
             <xsl:apply-templates select="@createConnector"/>
@@ -184,7 +179,7 @@
             <xsl:apply-templates select="transaction"/>
             <xsl:apply-templates select="filter"/>
             <xsl:apply-templates select="security-filter"/>
-        </bean>
+        </xsl:element>
     </xsl:template>
 
     <xsl:template match="endpoint" mode="propertyEndpoint">
