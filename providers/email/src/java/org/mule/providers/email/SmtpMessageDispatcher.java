@@ -78,14 +78,16 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
         try
         {
-            if (event.getMessage().getPayload() instanceof String)
+            Object data = event.getTransformedMessage();
+			
+            if (!(data instanceof Message))
             {
-                msg = connector.createMessage(from, endpointAddress, cc, bcc, subject, (String) event.getMessage().getPayload(), session);
+                msg = connector.createMessage(from, endpointAddress, cc, bcc, subject, data == null ? null : data.toString(), session);
             }
             else
             {
                 //Check the message for any unset data and use defaults
-                msg = (Message) event.getTransformedMessage();
+                msg = (Message) data;
 
                 if (msg.getRecipients(Message.RecipientType.TO) == null)
                 {
