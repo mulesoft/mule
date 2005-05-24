@@ -10,7 +10,11 @@
     <shortDescription>integration-tests</shortDescription>
     <url>http://www.muleumo.org/</url>
     <dependencies>
-        
+        <dependency>
+        	<groupId>cglib</groupId>
+        	<artifactId>cglib-full</artifactId>
+        	<version>${cglib_full_version}</version>
+        </dependency>
    </dependencies>
     <unitTest>
             <includes>
