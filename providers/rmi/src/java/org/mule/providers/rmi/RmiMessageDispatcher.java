@@ -135,24 +135,25 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
                 throw new DispatchException(new org.mule.config.i18n.Message("rmi", RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), event.getMessage(),  event.getEndpoint());
             }
         }
-
-        ArrayList methodArgumentTypes = (ArrayList) event.getEndpoint().getProperties().get(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
+        
+        ArrayList methodArgumentTypes = null;
+        
+        try
+		{
+        	methodArgumentTypes = (ArrayList) event.getEndpoint().getProperties().get(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
+		}
+        catch(Exception e)
+		{
+		}
+        
         Class[] argTypes;
 
-        if (methodArgumentTypes == null)
-        {
-            throw new DispatchException(new org.mule.config.i18n.Message("rmi", RmiConnector.MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET), event.getMessage(),  event.getEndpoint());
+        if (methodArgumentTypes != null)
+        {            
+            connector.setMethodArgumentTypes(methodArgumentTypes);            
         }
-        else{
-            connector.setMethodArgumentTypes(methodArgumentTypes);
-            argTypes = connector.getArgumentClasses();
-
-            if (argTypes == null)
-            {
-	            throw new DispatchException(new org.mule.config.i18n.Message("rmi", RmiConnector.MSG_PROPERTY_SERVICE_METHOD_PARAM_TYPES_NOT_SET), event.getMessage(),  event.getEndpoint());
-            }
-        }
-
+        
+        argTypes = connector.getArgumentClasses();
         method = remoteObject.getClass().getMethod(methodName, argTypes);
 
         return method;

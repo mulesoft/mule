@@ -149,16 +149,20 @@ public class RmiConnector extends AbstractServiceEnabledConnector
      *
      */
     public void setMethodArgumentTypes(ArrayList methodArgumentTypes) throws ClassNotFoundException{
-        this.methodArgumentTypes = methodArgumentTypes;
+    	Class argumentClasses[] = null;
+    	
+    	this.methodArgumentTypes = methodArgumentTypes;
+        
+        if (getMethodArgumentTypes() != null)
+        	
+        {        
+        	argumentClasses = new Class[methodArgumentTypes.size()];
 
-        //String classNames[] = methodArgumentTypes.split(",");
-
-        Class argumentClasses[] = new Class[methodArgumentTypes.size()];
-
-        for (int i = 0; i < methodArgumentTypes.size() ;i++)
-        {
-            String className = (String)methodArgumentTypes.get(i);
-            argumentClasses[i] = ClassHelper.loadClass(className.trim(), this.getClass());
+	        for (int i = 0; i < methodArgumentTypes.size() ;i++)
+	        {
+	            String className = (String)methodArgumentTypes.get(i);
+	            argumentClasses[i] = ClassHelper.loadClass(className.trim(), this.getClass());
+	        }
         }
 
         setArgumentClasses(argumentClasses);
