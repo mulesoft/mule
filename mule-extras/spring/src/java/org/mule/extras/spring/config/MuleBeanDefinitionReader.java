@@ -93,7 +93,9 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
             if(logger.isDebugEnabled()) {
 				try {
 					String xml = new DOMReader().read((Document) result.getNode()).asXML();
-					logger.debug("Transformed document is:\n" + xml);
+					if (logger.isDebugEnabled()) {
+						logger.debug("Transformed document is:\n" + xml);
+					}
 				} catch (Exception e) { 
 					e.printStackTrace();
 				}

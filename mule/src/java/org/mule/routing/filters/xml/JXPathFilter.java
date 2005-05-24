@@ -27,7 +27,7 @@ import org.mule.umo.UMOFilter;
  */
 public class JXPathFilter implements UMOFilter {
 
-	private static final Logger log = Logger.getLogger(JXPathFilter.class);
+	private static final Logger logger = Logger.getLogger(JXPathFilter.class);
 
 	private String expression;
 
@@ -38,12 +38,14 @@ public class JXPathFilter implements UMOFilter {
 			return false;
 
 		if (expression == null) {
-			log.warn("Expression for JXPathFilter is not set");
+			logger.warn("Expression for JXPathFilter is not set");
 			return false;
 		}
 
 		if (value == null) {
-			log.debug("Value for JXPathFilter is not set : true by default");
+	        if (logger.isDebugEnabled()) {
+				logger.debug("Value for JXPathFilter is not set : true by default");
+	        }
 			value = Boolean.TRUE.toString();
 		}
 
@@ -59,28 +61,31 @@ public class JXPathFilter implements UMOFilter {
 		     }
 		     else
 		     {
-		     JXPathContext context = JXPathContext.newContext(obj);
-		     o =context.getValue(expression);
+			     JXPathContext context = JXPathContext.newContext(obj);
+			     o =context.getValue(expression);
 		     }
 
-			log.debug("JXPathFilter Expression result='" + o
-					+ "' -  Expected value='" + value + "'");
+	        if (logger.isDebugEnabled()) {
+				logger.debug("JXPathFilter Expression result='" + o
+						+ "' -  Expected value='" + value + "'");
+	        }
 
-		   if(o!=null)
-			res = value.equals(o.toString());
+	        if (o!=null) {
+				res = value.equals(o.toString());
+	        }
            else
            {
            	res=false;
-    		log.warn("JXPathFilter Expression result is null (" + expression
-					+ ")");
-
+    		logger.warn("JXPathFilter Expression result is null (" + expression + ")");
            }
 		} catch (Exception e) {
-			log.warn("JXPathFilter cannot evaluate expression (" + expression
+			logger.warn("JXPathFilter cannot evaluate expression (" + expression
 					+ ") :" + e.getMessage(), e);
 		}
 
-		log.debug("JXPathFilter accept object  : " + res);
+        if (logger.isDebugEnabled()) {
+			logger.debug("JXPathFilter accept object  : " + res);
+        }
 		return res;
 
 	}

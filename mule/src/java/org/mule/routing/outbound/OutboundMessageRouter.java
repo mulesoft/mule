@@ -98,9 +98,11 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
 
         if (!matchfound && getCatchAllStrategy() != null)
         {
-            logger.debug("Message did not match any routers on: "
-                    + session.getComponent().getDescriptor().getName()
-                    + " invoking catch all strategy");
+            if (logger.isDebugEnabled()) {
+	            logger.debug("Message did not match any routers on: "
+	                    + session.getComponent().getDescriptor().getName()
+	                    + " invoking catch all strategy");
+            }
             return catchAll(message, session, synchronous);
         } else if (!matchfound)
         {

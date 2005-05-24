@@ -53,9 +53,15 @@ public class JMSMessageToObject extends AbstractJmsTransformer
 
         try
         {
-            logger.debug("Source object is " + src.getClass().getName());
-            result = transformFromMessage((Message) src);
-            logger.debug("Resulting object is " + result.getClass().getName());
+        	if (logger.isDebugEnabled()) {
+            	logger.debug("Source object is " + src.getClass().getName());
+        	}
+
+        	result = transformFromMessage((Message) src);
+
+        	if (logger.isDebugEnabled()) {
+            	logger.debug("Resulting object is " + result.getClass().getName());
+        	}
         }
         catch (Exception e)
         {

@@ -163,7 +163,9 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 }
 
                 ctx.sendEvent(new MuleMessage(msg, null), endpoint);
-                logger.debug("routed Exception message via " + endpoint);
+                if (logger.isDebugEnabled()) {
+                	logger.debug("routed Exception message via " + endpoint);
+                }
 
             } catch (UMOException e) {
                 logFatal(message, e);

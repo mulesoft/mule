@@ -251,10 +251,16 @@ public class MuleClient implements Disposable
         UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(), payload);
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
 
-        logger.debug("MuleClient sending event direct to: " + component + ". Event is: " + event);
+        if (logger.isDebugEnabled()) {
+            logger.debug("MuleClient sending event direct to: " + component + ". Event is: " + event);
+        }
+
         UMOMessage result = event.getComponent().sendEvent(event);
 
-        logger.debug("Result of MuleClient sendDirect is: " + (result == null ? "null" : result.getPayload()));
+        if (logger.isDebugEnabled()) {
+            logger.debug("Result of MuleClient sendDirect is: " + (result == null ? "null" : result.getPayload()));
+        }
+
         if (result != null && trans != null)
         {
             return new MuleMessage(trans.transform(result.getPayload()), null);
@@ -290,7 +296,10 @@ public class MuleClient implements Disposable
         UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(), payload);
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
 
-        logger.debug("MuleClient dispatching event direct to: " + component + ". Event is: " + event);
+        if (logger.isDebugEnabled()) {
+            logger.debug("MuleClient dispatching event direct to: " + component + ". Event is: " + event);
+        }
+
         event.getComponent().dispatchEvent(event);
     }
 

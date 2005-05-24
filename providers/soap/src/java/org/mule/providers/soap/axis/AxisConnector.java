@@ -83,7 +83,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public static final String AXIS_SERVICE_COMPONENT_NAME = "_axisServiceComponent";
 
     public static final String SERVICE_PROPERTY_COMPONENT_NAME = "componentName";
-    public static final String SERVICE_PROPERTY_SERVCE_PATH = "servicePath";
+    public static final String SERVICE_PROPERTY_SERVICE_PATH = "servicePath";
     private String serverConfig;
     private AxisServer axisServer;
     private SimpleProvider serverProvider;
@@ -168,7 +168,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         if(endpoint instanceof ImmutableMuleEndpoint  &&
                 !((ImmutableMuleEndpoint)endpoint).isSynchronousExplicitlySet()) {
             if(!endpoint.isSynchronous()) {
-                logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
+                if (logger.isDebugEnabled()) {
+                	logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
+                }
                 endpoint.setSynchronous(true);
             }
         }
@@ -189,7 +191,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         String servicePath = uri.getPath();
         service.setOption(serviceName, receiver);
-        service.setOption(SERVICE_PROPERTY_SERVCE_PATH, servicePath);
+        service.setOption(SERVICE_PROPERTY_SERVICE_PATH, servicePath);
         service.setOption(SERVICE_PROPERTY_COMPONENT_NAME, serviceName);
         service.setName(serviceName);
 
@@ -201,7 +203,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             {
                 entry =  (Map.Entry)iterator.next();
                 service.setOption(entry.getKey().toString(), entry.getValue());
-                logger.debug("Adding Axis option: " + entry);
+                if (logger.isDebugEnabled()) {
+                	logger.debug("Adding Axis option: " + entry);
+                }
             }
         }
         //set method names

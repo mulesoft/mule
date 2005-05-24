@@ -50,7 +50,9 @@ public class CompressionHelper
                 {
                     //Object o = DiscoverSingleton.find(CompressionStrategy.class, CompressionStrategy.COMPRESSION_DEFAULT);
                     Object o = ClassHelper.loadClass(CompressionStrategy.COMPRESSION_DEFAULT, CompressionHelper.class).newInstance();
-                    logger.debug("Found CompressionStrategy: " + o.getClass().getName());
+                    if (logger.isDebugEnabled()) {
+						logger.debug("Found CompressionStrategy: " + o.getClass().getName());
+                    }
                     return o;
                 } catch (Exception e)
                 {

@@ -94,7 +94,11 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
 		try
 		{
 			Message message = (Message)event.getTransformedMessage();
-			logger.debug("Transformed message: " + message.toXML());
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("Transformed message: " + message.toXML());
+			}
+
 			while (!xmppConnection.isConnected() && !initialized.get())
 			{
 				initialize(null);

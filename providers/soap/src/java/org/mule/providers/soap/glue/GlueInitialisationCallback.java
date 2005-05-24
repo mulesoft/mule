@@ -56,7 +56,9 @@ public class GlueInitialisationCallback implements InitialisationCallback
         //only call this once
         if(invoked) return;
         if(component instanceof GlueInitialisable) {
-            logger.debug("Calling axis initialisation for component: " + component.getClass().getName());
+            if (logger.isDebugEnabled()) {
+            	logger.debug("Calling axis initialisation for component: " + component.getClass().getName());
+            }
             ((GlueInitialisable)component).initialise(service, context);
         }
         invoked = true;

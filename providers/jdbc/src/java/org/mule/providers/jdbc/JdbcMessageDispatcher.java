@@ -54,7 +54,9 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher {
 	 * @see org.mule.providers.AbstractMessageDispatcher#doDispatch(org.mule.umo.UMOEvent)
 	 */
 	public void doDispatch(UMOEvent event) throws Exception {
-		logger.debug("Dispatch event: " + event);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Dispatch event: " + event);
+		}
 		
 		UMOEndpoint endpoint = event.getEndpoint();
 		UMOEndpointURI endpointURI = endpoint.getEndpointURI();
@@ -109,8 +111,9 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher {
 	 * @see org.mule.umo.provider.UMOMessageDispatcher#receive(org.mule.umo.endpoint.UMOEndpointURI, long)
 	 */
 	public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
-
-		logger.debug("Trying to receive a message with a timeout of " + timeout);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Trying to receive a message with a timeout of " + timeout);
+		}
 		
 		String[] stmts = this.connector.getReadAndAckStatements(endpointUri, null);
 		String readStmt = stmts[0];
@@ -131,12 +134,16 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher {
 			do {
 				result = new QueryRunner().query(con, readStmt, JdbcUtils.getParams(endpointUri, readParams, null), new MapHandler());
 				if (result != null) {
-					logger.debug("Received: " + result);
+					if (logger.isDebugEnabled()) {
+						logger.debug("Received: " + result);
+					}
 					break;
 				}
 				long sleep = Math.min(this.connector.getPollingFrequency(), timeout - (System.currentTimeMillis() - t0));
 				if (sleep > 0) {
-					logger.debug("No results, sleeping for " + sleep);
+					if (logger.isDebugEnabled()) {
+						logger.debug("No results, sleeping for " + sleep);
+					}
 					Thread.sleep(sleep);
 				} else {
 					logger.debug("Timeout");

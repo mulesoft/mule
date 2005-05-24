@@ -128,7 +128,9 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
             }
             receiver.onEvent(event);
         }
-        logger.debug("dispatched Event on endpointUri: " + endpointUri);
+        if (logger.isDebugEnabled()) {
+        	logger.debug("dispatched Event on endpointUri: " + endpointUri);
+        }
     }
 
     /* (non-Javadoc)

@@ -83,7 +83,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
                     if(result!=null) {
                         results.add(result.getPayload());
                     } else {
-                        logger.debug("No result was returned for sync call to: " + endpoint.getEndpointURI());
+                        if (logger.isDebugEnabled()) {
+                        	logger.debug("No result was returned for sync call to: " + endpoint.getEndpointURI());
+                        }
                     }
                 } else
                 {
