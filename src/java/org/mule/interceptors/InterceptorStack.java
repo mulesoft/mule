@@ -52,7 +52,7 @@ public class InterceptorStack implements UMOInterceptorStack, Initialisable, Dis
 		private int cursor = 0;
 		private Invocation invocation;
 		public Invoc(Invocation invocation) {
-			super(null, invocation.getMessage(), invocation);
+			super(invocation.getDescriptor(), invocation.getMessage(), invocation);
 			this.invocation = invocation;
 		}
 	    public UMOMessage execute() throws UMOException
