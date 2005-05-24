@@ -101,9 +101,11 @@ public class InboundMessageRouter extends AbstractRouterCollection implements
 	            {
 	                if (getCatchAllStrategy() != null)
 	                {
-	
-	                    logger.debug("Message did not match any routers on: " + componentName
-	                            + " invoking catch all strategy");
+	                    if (logger.isDebugEnabled()) {
+		                    logger.debug("Message did not match any routers on: "
+		                    		+ componentName
+		                    		+ " - invoking catch all strategy");
+	                    }
 	                    getStatistics().incrementCaughtMessage();
 	                    return getCatchAllStrategy().catchMessage(event.getMessage(), event.getSession(), event.isSynchronous());
 	
