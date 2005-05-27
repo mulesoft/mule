@@ -14,10 +14,12 @@
 package org.mule.providers.soap.axis.extensions;
 
 import org.apache.axis.AxisFault;
+import org.apache.axis.Constants;
 import org.apache.axis.MessageContext;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.providers.java.RPCProvider;
 import org.mule.MuleManager;
+import org.mule.impl.RequestContext;
 import org.mule.providers.soap.ServiceProxy;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageReceiver;
@@ -64,5 +66,20 @@ public class MuleProvider extends RPCProvider
         }
     }
 
+    public void invoke(MessageContext msgContext) throws AxisFault
+    {
+		super.invoke(msgContext);
+		if (RequestContext.getExceptionPayload() != null) {
+			Throwable t = RequestContext.getExceptionPayload().getException();
+			if (t instanceof Exception) {
+	            AxisFault fault = AxisFault.makeFault((Exception) t);
+	            if(t instanceof RuntimeException)
+	                fault.addFaultDetail(Constants.QNAME_FAULTDETAIL_RUNTIMEEXCEPTION, "true");
+	            throw fault;
+			} else {
+				throw (Error) t;
+			}
+		}
+    }
 
 }

@@ -16,6 +16,7 @@ package org.mule.providers.soap.axis;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.mule.MuleManager;
@@ -29,7 +30,6 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.soap.Person;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -68,7 +68,7 @@ public class AxisConnectorFunctionalTestCase extends AbstractMuleTestCase
 			UMOEndpoint endpoint = new MuleEndpoint("testIn", new MuleEndpointURI("axis:http://localhost:38011/mule/test"),
 					c, null, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null);
 			descriptor.setInboundEndpoint(endpoint);
-			UMOComponent component = MuleManager.getInstance().getModel().registerComponent(descriptor);
+			MuleManager.getInstance().getModel().registerComponent(descriptor);
 			fail();
 		} catch (InitialisationException e) {
 			assertEquals(Messages.X_MUST_IMPLEMENT_AN_INTERFACE, e.getMessageCode());
@@ -169,4 +169,22 @@ public class AxisConnectorFunctionalTestCase extends AbstractMuleTestCase
         assertEquals("Rossco", ((Person)result.getPayload()).getFirstName());
         assertEquals("Pico", ((Person)result.getPayload()).getLastName());
     }
+
+    public void testException() throws Throwable
+    {
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol("axis");
+        assertNotNull(c);
+        UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
+        UMOEndpoint endpoint = new MuleEndpoint("test",
+                new MuleEndpointURI("http://localhost:38009/mycomponent3?method=addPerson"),
+                        c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null);
+        UMOEvent event = getTestEvent(new Person("Nodet", "Guillaume"), endpoint);
+        try {
+        	UMOMessage result = dispatcher.send(event);
+        	fail("An AxisFault should have been raised");
+        } catch (AxisFault f) {
+        	// This is ok
+        }
+    }
+
 }

@@ -86,7 +86,6 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     private String transportName = "http";
     private ServletSecurityProvider securityProvider;
-    private static boolean isDebug = true;
     private boolean enableList;
     private String homeDir;
     private AxisServer axisServer;
@@ -233,8 +232,9 @@ public class AxisServiceComponent implements Initialisable, Callable
         {
             exceptionLog.info(Messages.getMessage("axisFault00"), fault);
             fault.removeFaultDetail(Constants.QNAME_FAULTDETAIL_RUNTIMEEXCEPTION);
-        } else if (exceptionLog.isDebugEnabled())
+        } else if (exceptionLog.isDebugEnabled()) {
             exceptionLog.debug(Messages.getMessage("axisFault00"), fault);
+        }
 
     }
 
@@ -297,8 +297,9 @@ public class AxisServiceComponent implements Initialisable, Callable
                 XMLUtils.DocumentToWriter(doc, response.getWriter());
             } else
             {
-                if (logger.isDebugEnabled())
+                if (logger.isDebugEnabled()) {
                     logger.debug("processWsdlRequest: failed to create WSDL");
+                }
                 reportNoWSDL(response, "noWSDL02", null);
             }
         } catch (AxisFault axisFault)
@@ -484,10 +485,12 @@ public class AxisServiceComponent implements Initialisable, Callable
             throw se;
         }
         MessageContext msgContext = new MessageContext(engine);
-        if (isDebug)
+        if (logger.isDebugEnabled()) {
             logger.debug("Enter: doPost()");
-        if (tlog.isDebugEnabled())
+        }
+        if (tlog.isDebugEnabled()) {
             t0 = System.currentTimeMillis();
+        }
         Message responseMsg = null;
         String contentType = null;
         try
@@ -496,15 +499,20 @@ public class AxisServiceComponent implements Initialisable, Callable
             populateMessageContext(msgContext, context, endpointUri);
             if (securityProvider != null)
             {
-                if (isDebug)
+                if (logger.isDebugEnabled()) {
                     logger.debug("securityProvider:" + securityProvider);
+                }
                 msgContext.setProperty("securityProvider", securityProvider);
             }
-            Message requestMsg = new Message(context.getTransformedMessageAsString(), false,
+
+            String request = context.getTransformedMessageAsString();
+            Message requestMsg = new Message(request, false,
                     (String) context.getProperty(HTTPConstants.HEADER_CONTENT_TYPE),
                     (String) context.getProperty(HTTPConstants.HEADER_CONTENT_LOCATION));
 
-            if (isDebug) logger.debug("Request Message:" + requestMsg);
+            if (logger.isDebugEnabled()) {
+            	logger.debug("Request Message:" + requestMsg);
+            }
             msgContext.setRequestMessage(requestMsg);
             msgContext.setProperty("transport.url", endpointUri.toString());
 
@@ -516,15 +524,22 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
             //todo session support
             //msgContext.setSession(new AxisHttpSession(req));
-            if (tlog.isDebugEnabled())
+            if (tlog.isDebugEnabled()) {
                 t1 = System.currentTimeMillis();
-            if (isDebug)
+            }
+            if (logger.isDebugEnabled()) {
                 logger.debug("Invoking Axis Engine.");
+            }
             engine.invoke(msgContext);
-            if (isDebug)
+            if (logger.isDebugEnabled()) {
                 logger.debug("Return from Axis Engine.");
-            if (tlog.isDebugEnabled())
+            }
+            if (tlog.isDebugEnabled()) {
                 t2 = System.currentTimeMillis();
+            }
+			if (RequestContext.getExceptionPayload() instanceof Exception) {
+				throw (Exception) RequestContext.getExceptionPayload().getException();
+			}
             responseMsg = msgContext.getResponseMessage();
             if (responseMsg == null)
                 throw new Exception(Messages.getMessage("noResponse01"));
@@ -547,7 +562,7 @@ public class AxisServiceComponent implements Initialisable, Callable
             t3 = System.currentTimeMillis();
         if (responseMsg != null)
             sendResponse((String) context.getProperty(HttpConnector.HTTP_STATUS_PROPERTY), contentType, response, responseMsg);
-        if (isDebug)
+        if (logger.isDebugEnabled())
         {
             logger.debug("Response sent.");
             logger.debug("Exit: doPost()");
@@ -605,12 +620,14 @@ public class AxisServiceComponent implements Initialisable, Callable
         if (responseMsg == null)
         {
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "204");
-            if (isDebug)
+            if (logger.isDebugEnabled()) {
                 logger.debug("NO AXIS MESSAGE TO RETURN!");
+            }
         } else
         {
-            if (isDebug)
+            if (logger.isDebugEnabled()) {
                 logger.debug("Returned Content-Type:" + contentType);
+            }
             try
             {
                 response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, contentType);
@@ -628,7 +645,7 @@ public class AxisServiceComponent implements Initialisable, Callable
 
     private void populateMessageContext(MessageContext msgContext, UMOEventContext context, UMOEndpointURI endpointUri) throws AxisFault, ConfigurationException
     {
-        if (isDebug)
+        if (logger.isDebugEnabled())
         {
             logger.debug("MessageContext:" + msgContext);
             logger.debug("HEADER_CONTENT_TYPE:" + context.getProperty("Content-Type"));
@@ -677,8 +694,9 @@ public class AxisServiceComponent implements Initialisable, Callable
             throws AxisFault
     {
         String soapAction = (String) context.getProperty("SOAPAction");
-        if (isDebug)
+        if (logger.isDebugEnabled()) {
             logger.debug("HEADER_SOAP_ACTION:" + soapAction);
+        }
         if (soapAction == null)
         {
             AxisFault af = new AxisFault("Client.NoSOAPAction", Messages.getMessage("noHeader00", "SOAPAction"), null, null);

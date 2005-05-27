@@ -68,20 +68,26 @@ public class TestServiceComponent extends FunctionalTestComponent implements org
         return p;
     }
 
-    public void addPerson(Person person)
+    public void addPerson(Person person) throws Exception
     {
+		if (person == null || person.getFirstName() == null || person.getLastName() == null) {
+			throw new IllegalArgumentException("null person, first name or last name");
+		}
+		if (person.getFirstName().equals("Nodet")) {
+			throw new Exception("Nodet is banned");
+		}
         people.put(person.getFirstName(), person);
         logger.info("Added Person: " + person);
     }
 
-    public Person addPerson(String firstname, String surname)
+    public Person addPerson(String firstname, String surname) throws Exception
     {
         Person p = new Person(firstname, surname);
         addPerson(p);
         logger.info("Added Person: " + p);
         return p;
     }
-
+	
     /**
      * A lifecycle method where implementor should fee up any resources
      * If an exception is thrown it should just be logged and processing should
