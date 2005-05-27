@@ -62,7 +62,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector {
 	
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        long polling = 0;
+        long polling = pollingFrequency;
         Map props = endpoint.getProperties();
         if (props != null)
         {
