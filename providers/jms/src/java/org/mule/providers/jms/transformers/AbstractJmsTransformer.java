@@ -43,6 +43,8 @@ import java.util.Map;
 
 public abstract class AbstractJmsTransformer extends AbstractTransformer
 {
+	public static final char REPLACEMENT_CHAR = '_';
+	
     /**
      * logger used by this class
      */
@@ -148,7 +150,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                     if(MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key)) {
                         msg.setJMSCorrelationID(entry.getValue().toString());
                     }
-                    msg.setObjectProperty(key, entry.getValue());
+                    msg.setObjectProperty(encodeHeader(key), entry.getValue());
                 }
 
                 return msg;
@@ -157,6 +159,30 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         {
             throw new TransformerException(this, e);
         }
+    }
+    
+    /**
+     * Encode a string so that is is a valid java identifier
+     * 
+     * @param name
+     * @return
+     */
+    public static String encodeHeader(String name) {
+    	StringBuffer sb = new StringBuffer(name.length());
+    	for (int i = 0; i < name.length(); i++) {
+    		char c = name.charAt(i);
+    		if (i == 0) {
+    			if (!Character.isJavaIdentifierStart(c)) {
+    				c = REPLACEMENT_CHAR;
+    			}
+    		} else {
+    			if (!Character.isJavaIdentifierPart(c)) {
+    				c = REPLACEMENT_CHAR;
+    			}
+    		}
+    		sb.append(c);
+    	}
+    	return sb.toString();
     }
 
 
