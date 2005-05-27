@@ -17,7 +17,6 @@ package org.mule.providers.email;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
-import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -68,11 +67,11 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
         String endpointAddress = endpoint.getEndpointURI().getAddress();
         Map props = event.getProperties();
-        String to = PropertiesHelper.getStringProperty(props, "toAddresses", connector.getCcAddresses());
-        String cc = PropertiesHelper.getStringProperty(props, "ccAddresses", connector.getCcAddresses());
-        String bcc = PropertiesHelper.getStringProperty(props, "bccAddresses", connector.getBccAddresses());
-        String from = PropertiesHelper.getStringProperty(props, "fromAddress", connector.getFromAddress());
-        String subject = PropertiesHelper.getStringProperty(props, "subject", connector.getSubject());
+        String to = PropertiesHelper.getStringProperty(props, SmtpConnector.TO_ADDRESSES_PROPERTY, endpointAddress);
+        String cc = PropertiesHelper.getStringProperty(props, SmtpConnector.CC_ADDRESSES_PROPERTY, connector.getCcAddresses());
+        String bcc = PropertiesHelper.getStringProperty(props, SmtpConnector.BCC_ADDRESSES_PROPERTY, connector.getBccAddresses());
+        String from = PropertiesHelper.getStringProperty(props, SmtpConnector.FROM_ADDRESS_PROPERTY, connector.getFromAddress());
+        String subject = PropertiesHelper.getStringProperty(props, SmtpConnector.SUBJECT_PROPERTY, connector.getSubject());
 
         Message msg = null;
 
@@ -82,7 +81,7 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 			
             if (!(data instanceof Message))
             {
-                msg = connector.createMessage(from, endpointAddress, cc, bcc, subject, data == null ? null : data.toString(), session);
+                msg = connector.createMessage(from, to, cc, bcc, subject, data == null ? null : data.toString(), session);
             }
             else
             {
@@ -91,20 +90,13 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 
                 if (msg.getRecipients(Message.RecipientType.TO) == null)
                 {
-                    if (endpoint != null && !endpoint.equals(""))
+                    //to
+                    InternetAddress[] toAddrs = null;
+                    toAddrs = InternetAddress.parse(to, false);
+                    msg.setRecipients(Message.RecipientType.TO, toAddrs);
+                    if (logger.isDebugEnabled())
                     {
-                        //          to
-                        InternetAddress[] toAddrs = null;
-                        toAddrs = InternetAddress.parse(endpointAddress, false);
-                        msg.setRecipients(Message.RecipientType.TO, toAddrs);
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Sending message to: " + endpoint);
-                        }
-                    }
-                    else
-                    {
-                        throw new MuleException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "To Address"));
+                        logger.debug("Sending message to: " + to);
                     }
                 }
 
@@ -138,7 +130,6 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
             }
 
             sendMailMessage(msg);
-            //sendMailMessage(endpointUri, cc, bcc, subject, event.getTransformedMessage().toString());
             if (logger.isDebugEnabled())
             {
                 logger.debug("Sent message to: "

@@ -56,6 +56,16 @@ import java.util.Properties;
  */
 public class SmtpConnector extends AbstractServiceEnabledConnector
 {
+	/**
+	 * Event properties
+	 */
+	public static final String TO_ADDRESSES_PROPERTY = "toAddresses";
+	public static final String CC_ADDRESSES_PROPERTY = "ccAddresses";
+	public static final String BCC_ADDRESSES_PROPERTY = "bccAddresses";
+	public static final String FROM_ADDRESS_PROPERTY = "fromAddress";
+	public static final String SUBJECT_PROPERTY = "subject";
+	
+	
     public static final int DEFAULT_SMTP_PORT = 25;
 
     /**
