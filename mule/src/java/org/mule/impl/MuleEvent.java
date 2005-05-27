@@ -100,27 +100,14 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.synchronous = previousEvent.isSynchronous();
 		this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
-
-        if(endpoint.getProperties()!=null) {
-            properties.putAll(endpoint.getProperties());
-        }
-        properties.putAll(previousEvent.getProperties());
-        properties.putAll(message.getProperties());
-//        if (props != null && !props.isEmpty())
-//        {
-//            Object key = null;
-//            for (Iterator i = props.keySet().iterator(); i.hasNext();)
-//            {
-//                key = i.next();
-//                setProperty(key.toString(), props.get(key));
-//            }
-//        }
+        fillProperties(previousEvent);
     }
 
     public MuleEvent(UMOMessage message, UMOEndpoint endpoint, UMOSession session, boolean synchronous)
     {
         this(message, endpoint, session, synchronous, null);
     }
+    
     /**
      * Contructor.
      *
@@ -139,10 +126,7 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.synchronous = synchronous;
 		this.timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
         this.outputStream = outputStream;
-        if(endpoint.getProperties()!=null) {
-            properties.putAll(endpoint.getProperties());
-        }
-        properties.putAll(message.getProperties());
+        fillProperties(null);
     }
     
      /**
@@ -162,10 +146,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 		this.id = eventId;
         this.synchronous = synchronous;
 		this.timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
-        if(endpoint.getProperties()!=null) {
-            properties.putAll(endpoint.getProperties());
-        }
-        properties.putAll(message.getProperties());
+        fillProperties(null);
     }
 
     /**
@@ -184,32 +165,26 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.synchronous = rewriteEvent.isSynchronous();
         this.timeout = rewriteEvent.getTimeout();
         this.outputStream = (ResponseOutputStream)rewriteEvent.getOutputStream();
-
-        if(rewriteEvent instanceof MuleEvent) {
+        if (rewriteEvent instanceof MuleEvent) {
             this.transformedMessage = ((MuleEvent)rewriteEvent).getCachedMessage();
         }
-
-        if(endpoint.getProperties()!=null) {
-            properties.putAll(endpoint.getProperties());
-        }
-        Map prevProps = rewriteEvent.getProperties();
-        if(prevProps!=null) properties.putAll(prevProps);
-        properties.putAll(message.getProperties());
-//        Map props = rewriteEvent.getProperties();
-//        if (props != null && !props.isEmpty())
-//        {
-//            Object key = null;
-//            for (Iterator i = props.keySet().iterator(); i.hasNext();)
-//            {
-//                key = i.next();
-//                setProperty(key.toString(), props.get(key));
-//            }
-//        }
+        fillProperties(rewriteEvent);
     }
 
+    protected void fillProperties(UMOEvent previousEvent) {
+    	if (previousEvent != null && previousEvent.getProperties() != null) {
+    		properties.putAll(previousEvent.getProperties());
+    	}
+        if (endpoint != null && endpoint.getProperties() != null) {
+        	properties.putAll(endpoint.getProperties());
+        }
+        properties.putAll(message.getProperties());
+    }
+    
     Object getCachedMessage() {
         return transformedMessage;
     }
+    
     /* (non-Javadoc)
      * @see org.mule.umo.UMOEvent#getPayload()
      */
@@ -314,10 +289,6 @@ public class MuleEvent extends EventObject implements UMOEvent
      */
     public Object getProperty(String name)
     {
-//        Object prop = message.getProperty(name);
-//        if(prop==null && endpoint.getProperties()!= null ) {
-//            prop = endpoint.getProperties().get(name);
-//        }
         return properties.get(name);
     }
 
@@ -356,7 +327,6 @@ public class MuleEvent extends EventObject implements UMOEvent
         if(message.getReplyTo()!=null) {
             properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, message.getReplyTo());
         }
-
         return properties;
     }
 
