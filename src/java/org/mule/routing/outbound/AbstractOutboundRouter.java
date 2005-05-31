@@ -115,7 +115,7 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
             }
 
             String correlation = null;
-            Object o = propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+            Object o = propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
             if(logger.isDebugEnabled()) logger.debug("Extracted correlation Id as: " + o);
             correlation = o.toString();
 
