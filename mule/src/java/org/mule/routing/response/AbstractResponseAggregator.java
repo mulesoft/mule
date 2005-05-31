@@ -91,7 +91,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      */
     protected EventGroup addEvent(UMOEvent event) throws RoutingException
     {
-        String cId = (String)correlationExtractor.getPropertry(MuleProperties.MULE_CORRELATION_ID_PROPERTY, event.getMessage());
+        String cId = (String) correlationExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, event.getMessage());
         if (cId == null) {
             throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event.getEndpoint());
         }

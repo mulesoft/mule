@@ -30,7 +30,7 @@ import org.mule.umo.UMOMessage;
  */
 public class DefaultPropertiesExtractor implements PropertyExtractor
 {
-    public final Object getPropertry(String name, UMOMessage message)
+    public final Object getProperty(String name, UMOMessage message)
     {
         Object result = null;
         if(MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(name)){

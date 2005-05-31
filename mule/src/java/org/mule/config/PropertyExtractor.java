@@ -25,5 +25,5 @@ import org.mule.umo.UMOMessage;
  */
 public interface PropertyExtractor
 {
-    public Object getPropertry(String name, UMOMessage message);
+    public Object getProperty(String name, UMOMessage message);
 }

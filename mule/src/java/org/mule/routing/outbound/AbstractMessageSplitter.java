@@ -42,7 +42,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
-        String correlationId = (String)propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
+        String correlationId = (String) propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
         initialise(message);
 
         UMOEndpoint endpoint;
