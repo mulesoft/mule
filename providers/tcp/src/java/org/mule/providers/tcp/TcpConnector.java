@@ -69,7 +69,7 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     public void setTimeout(int timeout)
     {
-        if(timeout < 1) timeout = DEFAULT_SOCKET_TIMEOUT;
+        if(timeout < 0) timeout = DEFAULT_SOCKET_TIMEOUT;
         this.timeout = timeout;
     }
 
