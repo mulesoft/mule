@@ -17,21 +17,28 @@ package org.mule.test.providers.file;
 
 import com.mockobjects.dynamic.Mock;
 import org.mule.providers.file.FileConnector;
+import org.mule.providers.file.FileMessageReceiver;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageReceiver;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
 public class FileConnectorTestCase extends AbstractConnectorTestCase
 {
+    static final long POLLING_FREQUENCY = 1234;
+    static final long POLLING_FREQUENCY_OVERRIDE = 4321;
+
     /* (non-Javadoc)
      * @see org.mule.tck.providers.AbstractConnectorTestCase#createConnector()
      */
@@ -90,5 +97,47 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     public Object getValidMessage() throws Exception
     {
         return File.createTempFile("simple", ".mule");
+    }
+
+    /**
+     * Test polling frequency set on a connector.
+     */
+    public void testConnectorPollingFrequency() throws Exception
+    {
+        FileConnector connector = (FileConnector) getConnector();
+        connector.setPollingFrequency(POLLING_FREQUENCY);
+
+        UMOEndpoint endpoint = getTestEndpoint("simple", UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
+        UMOComponent component = getTestComponent(descriptor);
+        UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
+        assertEquals(
+                "Connector's polling frequency must not be ignored.",
+                POLLING_FREQUENCY,
+                ((FileMessageReceiver) receiver).getFrequency());
+    }
+
+    /**
+     * Test polling frequency overridden at an endpoint level.
+     */
+    public void testPollingFrequencyEndpointOverride() throws Exception
+    {
+        FileConnector connector = (FileConnector) getConnector();
+        // set some connector-level value which we are about to override
+        connector.setPollingFrequency(-1);
+
+        UMOEndpoint endpoint = getTestEndpoint("simple", UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
+
+        Properties props = new Properties();
+        // Endpoint wants String-typed properties
+        props.put(FileConnector.PROPERTY_POLLING_FREQUENCY,
+                  "" + POLLING_FREQUENCY_OVERRIDE);
+        endpoint.setProperties(props);
+
+        UMOComponent component = getTestComponent(descriptor);
+        UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
+        assertEquals(
+                "Polling frequency endpoint override must not be ignored.",
+                POLLING_FREQUENCY_OVERRIDE,
+                ((FileMessageReceiver) receiver).getFrequency());
     }
 }

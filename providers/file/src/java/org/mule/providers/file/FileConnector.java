@@ -73,6 +73,8 @@ public class FileConnector extends AbstractServiceEnabledConnector
     public static final String PROPERTY_MOVE_TO_DIRECTORY = "moveToDirectory";
     public static final String PROPERTY_DELETE_ON_READ = "autoDelete";
     public static final String PROPERTY_DIRECTORY = "directory";
+    
+    public static final long DEFAULT_POLLING_FREQUENCY = 1000;
 
     /**
      * Time in milliseconds to poll. On each poll the poll() method is called
@@ -127,7 +129,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
     {
         String readDir = endpoint.getEndpointURI().getAddress();
         File dir = null;
-        long polling = 0;
+        long polling = this.pollingFrequency;
 
         if (readDir != null)
         {
@@ -159,14 +161,14 @@ public class FileConnector extends AbstractServiceEnabledConnector
         }
         if (polling <= 0)
         {
-            polling = 1000;
+            polling = DEFAULT_POLLING_FREQUENCY;
         }
-        logger.debug("set polling frequency to: " + polling);
+        if (logger.isDebugEnabled()) {
+        	logger.debug("set polling frequency to: " + polling);
+        }
         try
         {
-
-        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{dir, moveTo, moveToPattern, new Long(polling)});
-
+        	return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{dir, moveTo, moveToPattern, new Long(polling)});
         } catch (Exception e)
         {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Message Receiver",
