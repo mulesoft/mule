@@ -47,7 +47,7 @@ public class QuartzConnectorTestCase extends AbstractConnectorTestCase {
 	 * @see org.mule.tck.providers.AbstractConnectorTestCase#getTestEndpointURI()
 	 */
 	public String getTestEndpointURI() {
-		return "quartz:/myService?interval=1000";
+		return "quartz:/myService?repeatInterval=1000";
 	}
 
     public void testConnectorMessageDispatcher() throws Exception

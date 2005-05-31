@@ -10,7 +10,7 @@
 	<global-endpoints>
 		<endpoint name="quartz.in" address="quartz:/myService">
 			<properties>
-				<property name="interval" value="1000" />
+				<property name="repeatInterval" value="1000" />
 			</properties>
 		</endpoint>
 	</global-endpoints>
