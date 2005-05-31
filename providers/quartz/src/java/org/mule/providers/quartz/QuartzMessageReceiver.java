@@ -14,7 +14,7 @@
 
 package org.mule.providers.quartz;
 
-import java.util.Calendar;
+import java.util.Date;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -69,8 +69,10 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver {
 			jb.setJobDataMap(map);
 			
 			Trigger trigger = null;
-			String cron = getStringProperty(QuartzConnector.PROPERTY_CRON);
-			String itv  = getStringProperty(QuartzConnector.PROPERTY_INTERVAL);
+			String cron = getStringProperty(QuartzConnector.PROPERTY_CRON_EXPRESSION);
+			String itv  = getStringProperty(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
+			String cnt  = getStringProperty(QuartzConnector.PROPERTY_REPEAT_COUNT);
+			String del  = getStringProperty(QuartzConnector.PROPERTY_START_DELAY);
 			if (cron != null) {
 				CronTrigger ctrigger = new CronTrigger();
 				ctrigger.setCronExpression(cron);
@@ -78,12 +80,20 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver {
 			} else if (itv != null) {
 				SimpleTrigger strigger = new SimpleTrigger();
 				strigger.setRepeatInterval(Long.parseLong(itv));
-				strigger.setRepeatCount(-1);
+				if (cnt != null) {
+					strigger.setRepeatCount(Integer.parseInt(cnt));
+				} else {
+					strigger.setRepeatCount(-1);
+				}
 				trigger = strigger;
 			} else {
 				throw new IllegalArgumentException("One of cron or interval property must be set");
 			}
-			trigger.setStartTime(Calendar.getInstance().getTime());
+			long start = System.currentTimeMillis();
+			if (del != null) {
+				start += Long.parseLong(del);
+			}
+			trigger.setStartTime(new Date(start));
 			trigger.setName(endpoint.getEndpointURI().toString());
 			trigger.setGroup("mule");
 			trigger.setJobName(endpoint.getEndpointURI().toString());

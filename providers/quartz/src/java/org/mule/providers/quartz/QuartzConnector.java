@@ -35,8 +35,10 @@ import org.quartz.impl.StdSchedulerFactory;
  */
 public class QuartzConnector extends AbstractServiceEnabledConnector {
 
-	public static final String PROPERTY_CRON = "cron";
-	public static final String PROPERTY_INTERVAL = "interval";
+	public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
+	public static final String PROPERTY_REPEAT_INTERVAL = "repeatInterval";
+	public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
+	public static final String PROPERTY_START_DELAY = "startDelay";
 	public static final String PROPERTY_PAYLOAD = "payload";
 	public static final String PROPERTY_PAYLOAD_CLASS_NAME = "payloadClassName";
 	
