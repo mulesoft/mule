@@ -32,15 +32,12 @@ public class FileEndpointBuilder extends AbstractEndpointBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
-         address = uri.getSchemeSpecificPart();
-        if(address.startsWith("///")) {
+        address = uri.getSchemeSpecificPart();
+        if (address.startsWith("//")) {
             address = address.substring(2);
         }
-        if(address.startsWith("//")) {
-            address = address.substring(1);
-        }
         int i = address.indexOf("?");
-        if(i > -1) {
+        if (i > -1) {
             address = address.substring(0, i);
         }
 

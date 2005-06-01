@@ -13,12 +13,15 @@
  */
 package org.mule.test.providers.file;
 
+import java.net.URI;
+
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
 
@@ -41,7 +44,7 @@ public class FileEndpointTestCase extends NamedTestCase
     {
         UMOEndpointURI url = new MuleEndpointURI("file://temp?endpointName=fileEndpoint");
         assertEquals("file", url.getScheme());
-        assertEquals("/temp", url.getAddress());
+        assertEquals("temp", url.getAddress());
         assertNotNull(url.getEndpointName());
         assertEquals("fileEndpoint", url.getEndpointName());
         assertEquals(-1, url.getPort());
@@ -50,7 +53,23 @@ public class FileEndpointTestCase extends NamedTestCase
         assertEquals(1, url.getParams().size());
     }
 
-    public void testrelativeFileUriAsParameter() throws Exception
+    public void testRelativeFileUriParentDir() throws Exception
+    {
+        String muleURI = "file://../test-data/in";
+        UMOEndpointURI url = new MuleEndpointURI(muleURI);
+
+        assertEquals("../test-data/in", url.getAddress());
+    }
+
+    public void testRelativeFileUriCurrentDir() throws Exception
+    {
+        String muleURI = "file://./test-data/in";
+        UMOEndpointURI url = new MuleEndpointURI(muleURI);
+
+        assertEquals("./test-data/in", url.getAddress());
+    }
+
+    public void testRelativeFileUriAsParameter() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("file://?address=./temp&endpointName=fileEndpoint");
         assertEquals("file", url.getScheme());
