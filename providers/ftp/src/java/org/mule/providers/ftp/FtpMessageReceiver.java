@@ -129,4 +129,14 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
 		}
 	}
 
+    public void doConnect() throws Exception
+    {
+        FTPClient client = (FTPClient) connector.getFtp(getEndpointURI());
+        connector.releaseFtp(getEndpointURI(), client);
+    }
+
+    public void doDisconnect() throws Exception {
+
+    }
+
 }

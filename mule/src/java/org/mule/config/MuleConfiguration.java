@@ -18,11 +18,18 @@ package org.mule.config;
 import org.mule.util.ClassHelper;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.mule.util.queue.QueuePersistenceStrategy;
+import org.mule.providers.ConnectionStrategy;
+import org.mule.providers.SingleAttemptConnectionStrategy;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.apache.commons.beanutils.BeanUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * <code>MuleConfiguration</code> holds the runtime configuration specific to the
@@ -168,9 +175,22 @@ public class MuleConfiguration
      */
     private String serverUrl = DEFAULT_SERVER_URL;
 
+    /**
+     * The Mule Jar manifest object
+     */
     private Manifest manifest = null;
 
+    /**
+     * Whether the server instance is running in client mode, which means that some services
+     * will not be started
+     */
     private boolean clientMode = false;
+
+    /**
+     * The default connection Strategy used for a connector when one hasn't been defined for the
+     * connector
+     */
+    private ConnectionStrategy connectionStrategy = new SingleAttemptConnectionStrategy();
 
     public MuleConfiguration()
     {
@@ -404,4 +424,27 @@ public class MuleConfiguration
 	public void setPersistenceStrategy(QueuePersistenceStrategy persistenceStrategy) {
 		this.persistenceStrategy = persistenceStrategy;
 	}
+
+    /**
+     * Returns a clone of the default Connection strategy.  The clone ensures that the
+     * connection strategy can be manipulated without affecting other connectors using the
+     * same strategy
+     * @return a clone of the default Connection strategy
+     */
+    public ConnectionStrategy getConnectionStrategy() {
+        try {
+            return (ConnectionStrategy)BeanUtils.cloneBean(connectionStrategy);
+        } catch (Exception e) {
+            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CLONE_X, "Connection Strategy"), e);
+        }
+    }
+
+    /**
+     * Sets the connection strategy used by all connectors managed in this Mule instance if the
+     * connector has no connection strategy specifically set on it.
+     * @param connectionStrategy the default strategy to use
+     */
+    public void setConnectionStrategy(ConnectionStrategy connectionStrategy) {
+        this.connectionStrategy = connectionStrategy;
+    }
 }

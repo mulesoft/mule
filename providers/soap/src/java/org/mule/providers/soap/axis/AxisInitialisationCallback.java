@@ -53,6 +53,5 @@ public class AxisInitialisationCallback implements InitialisationCallback
             ((AxisInitialisable)component).initialise(service);
         }
         invoked = true;
-        service.start();
     }
 }

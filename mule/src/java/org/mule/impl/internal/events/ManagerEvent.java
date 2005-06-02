@@ -15,6 +15,7 @@ package org.mule.impl.internal.events;
 
 import org.mule.MuleManager;
 import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOManager;
 
 /**
  * <code>ManagerEvent</code> is fired when an event such as the manager starting
@@ -42,14 +43,15 @@ public class ManagerEvent extends UMOServerEvent implements BlockingServerEvent
         "initialising","initialised","starting","started","stopping","stopped",
         "disposing","disposed","disposing connectors", "disposed connectors"};
 
-    public ManagerEvent(Object message, int action)
+    public ManagerEvent(UMOManager message, int action)
     {
         super(message, action);
+        resourceIdentifier = message.getId();
     }
 
     protected String getPayloadToString()
     {
-        return ((MuleManager)source).getId();
+        return ((UMOManager)source).getId();
     }
 
     protected String getActionName(int action)

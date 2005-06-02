@@ -17,12 +17,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.providers.AbstractConnector;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ModelEventListener;
 import org.mule.management.mbeans.*;
 import org.mule.umo.UMOException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOServerEvent;
@@ -138,7 +140,7 @@ public class JmxAgent implements UMOAgent
         {
             public void onEvent(UMOServerEvent event)
             {
-                if (event.getAction() == ModelEvent.MODEL_INITIALISED)
+                if (event.getAction() == ModelEvent.MODEL_STARTED)
                 {
                     try
                     {
@@ -147,6 +149,7 @@ public class JmxAgent implements UMOAgent
                         //registerConfigurationService();
                         registerModelService();
                         registerComponentServices();
+                        registerEndpointServices();
                     } catch (Exception e)
                     {
                         throw new MuleRuntimeException(new Message(Messages.X_FAILED_TO_INITIALISE, "MBeans"), e);
@@ -290,10 +293,36 @@ public class JmxAgent implements UMOAgent
             mBeanServer.registerMBean(serviceMBean, on);
             registeredMBeans.add(on);
         }
-
     }
 
 
+    protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException, MalformedObjectNameException
+    {
+        Iterator iter = MuleManager.getInstance().getConnectors().values().iterator();
+        UMOConnector connector;
+        List endpointMBeans;
+        while (iter.hasNext())
+        {
+            connector = (UMOConnector)iter.next();
+            if(connector instanceof AbstractConnector) {
+                endpointMBeans  = ((AbstractConnector)connector).getEndpointMBeans();
+                for (Iterator iterator = endpointMBeans.iterator(); iterator.hasNext();) {
+                    EndpointServiceMBean mBean = (EndpointServiceMBean) iterator.next();
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("Attempting to register service with name: " + getDomainName() + ":type=control,name=" + mBean.getName() + " EndpointService");
+                    }
+                    ObjectName on = new ObjectName(getDomainName() + ":type=control,name=" + mBean.getName() + " EndpointService");
+                    mBeanServer.registerMBean(mBean, on);
+                    registeredMBeans.add(on);
+                    logger.info("Registered Endpoint Service with name: " + on);
+                }
+            } else {
+                logger.warn("Connector: " + connector + " is not an istance of AbstractConnector, cannot obtain Endpoint MBeans from it");
+            }
+
+        }
+
+    }
     /**
      * @return Returns the createServer.
      */

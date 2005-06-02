@@ -33,6 +33,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -70,8 +71,9 @@ public class AxisConnectorFunctionalTestCase extends AbstractMuleTestCase
 			descriptor.setInboundEndpoint(endpoint);
 			MuleManager.getInstance().getModel().registerComponent(descriptor);
 			fail();
-		} catch (InitialisationException e) {
-			assertEquals(Messages.X_MUST_IMPLEMENT_AN_INTERFACE, e.getMessageCode());
+		} catch (UMOException e) {
+            assertTrue(e.getCause() instanceof InitialisationException);
+			//assertEquals(Messages.X_MUST_IMPLEMENT_AN_INTERFACE, ((InitialisationException)e.getCause()).getMessageCode());
 		}
 	}
 

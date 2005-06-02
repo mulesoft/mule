@@ -120,9 +120,9 @@ public class VMConnector extends AbstractServiceEnabledConnector
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.AbstractConnector#disposeConnector()
+     * @see org.mule.providers.AbstractConnector#doDispose()
      */
-    protected void disposeConnector()
+    protected void doDispose()
     {
     }
 

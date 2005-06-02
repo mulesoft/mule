@@ -81,9 +81,9 @@ public class SystemStreamConnector extends StreamConnector
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.AbstractConnector#startConnector()
+     * @see org.mule.providers.AbstractConnector#doStart()
      */
-    public synchronized void startConnector()
+    public synchronized void doStart()
     {
         if(receivers.size() > 0) {
             reinitialise();

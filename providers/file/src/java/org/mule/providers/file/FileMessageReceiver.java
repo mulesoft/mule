@@ -16,14 +16,17 @@
 package org.mule.providers.file;
 
 import org.mule.MuleException;
+import org.mule.util.Utility;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
+import org.mule.providers.ConnectException;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -31,6 +34,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 
 /**
  * <code>FileMessageReceiver</code> is a polling listener that reads files from
@@ -42,9 +46,13 @@ import java.io.FilenameFilter;
 
 public class FileMessageReceiver extends PollingMessageReceiver
 {
-    private File readDir = null;
+    private String readDir = null;
 
-    private File moveDir = null;
+    private String moveDir = null;
+
+    private File readDirectory = null;
+
+    private File moveDirectory = null;
 
     private String moveToPattern = null;
 
@@ -53,8 +61,8 @@ public class FileMessageReceiver extends PollingMessageReceiver
     public FileMessageReceiver(UMOConnector connector,
                                UMOComponent component,
                                UMOEndpoint endpoint,
-                               File readDir,
-                               File moveDir,
+                               String readDir,
+                               String moveDir,
                                String moveToPattern,
                                Long frequency) throws InitialisationException
     {
@@ -67,6 +75,33 @@ public class FileMessageReceiver extends PollingMessageReceiver
         } else {
             filenameFilter = new FilenameWildcardFilter("*");
         }
+    }
+
+    public void doConnect() throws Exception
+    {
+        if (readDir != null)
+        {
+            readDirectory = Utility.openDirectory(readDir);
+            if (!(readDirectory.canRead()))
+            {
+                throw new ConnectException(new Message(Messages.FILE_X_DOES_NOT_EXIST, readDirectory.getAbsolutePath()), this);
+            }
+            else
+            {
+                logger.debug("Listening on endpointUri: " + readDirectory.getAbsolutePath());
+            }
+        }
+        if (moveDir != null)
+        {
+            moveDirectory = Utility.openDirectory((moveDir));
+            if (!(moveDirectory.canRead()) || !moveDirectory.canWrite())
+            {
+                throw new ConnectException(new Message("file", 5), this);
+            }
+        }
+    }
+
+    public void doDisconnect() throws Exception {
     }
 
     public void poll()
@@ -108,7 +143,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
             //Perform some quick checks to make sure file can be processed
             if (!(file.canRead() && file.exists() && file.isFile()))
             {
-                throw new MuleException(new Message(Messages.FILE_X_DOES_NTO_EXIST, file.getName()));
+                throw new MuleException(new Message(Messages.FILE_X_DOES_NOT_EXIST, file.getName()));
             }
             else
             {
@@ -183,7 +218,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
         File[] todoFiles = new File[0];
         try
         {
-            todoFiles = readDir.listFiles(filenameFilter);
+            todoFiles = readDirectory.listFiles(filenameFilter);
         }
         catch (Exception e)
         {

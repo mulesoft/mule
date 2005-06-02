@@ -50,49 +50,13 @@ public class GlueConnector extends AbstractServiceEnabledConnector
         return "glue";
     }
 
-    /**
-     * Template method to perform any work when stopping the connectoe
-     *
-     * @throws org.mule.umo.UMOException if the method fails
-     */
-    protected void stopConnector() throws UMOException
-    {
-        String endpoint = null;
-        try
-        {
-            for (Iterator iterator = serverEndpoints.iterator(); iterator.hasNext();)
-            {
-                endpoint = (String) iterator.next();
-                HTTP.shutdown(endpoint);
-            }
-            serverEndpoints.clear();
-        } catch (IOException e)
-        {
-            throw new LifecycleException(new Message("soap", 1, endpoint), e, this);
-        }
-    }
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception {
+        boolean createServer = shouldCreateServer(endpoint.getEndpointURI().getAddress());
 
-    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception
-    {
-        if (endpoint == null || component == null)
-            throw new IllegalArgumentException("The endpoint and component cannot be null when registering a listener");
+        UMOMessageReceiver receiver = serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{new Boolean(createServer)});
 
-        if (endpoint.getEndpointURI() == null)
-        {
-            throw new InitialisationException(new Message(Messages.ENDPOINT_NULL_FOR_LISTENER), this);
-        }
-        UMOMessageReceiver receiver = null;
-
-        logger.info("registering listener: " + component.getDescriptor().getName() + " on endpointUri: " + endpoint.getEndpointURI().getAddress());
-        if (shouldCreateServer(endpoint.getEndpointURI().getAddress()))
-        {
-            receiver = new GlueMessageReceiver(this, component, endpoint, true);
-            receivers.put(endpoint.getEndpointURI().getAddress(), receiver);
+        if(createServer) {
             serverEndpoints.add(endpoint.getEndpointURI().getAddress());
-        } else
-        {
-            receiver = new GlueMessageReceiver(this, component, endpoint, false);
-            receivers.put(endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName(), receiver);
         }
         return receiver;
     }

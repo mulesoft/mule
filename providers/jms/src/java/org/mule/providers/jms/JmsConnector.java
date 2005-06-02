@@ -248,7 +248,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 		return session;
     }
 
-    public void stopConnector() throws UMOException
+    public void doStop() throws UMOException
     {
 		if (connection != null) {
 	        try
@@ -263,7 +263,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     }
 
 
-    public void startConnector() throws UMOException
+    public void doStart() throws UMOException
     {
         try
         {
@@ -284,11 +284,11 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.AbstractConnector#disposeConnector()
+     * @see org.mule.providers.AbstractConnector#doDispose()
      */
-    protected void disposeConnector()
+    protected void doDispose()
     {
-		super.disposeConnector();
+		super.doDispose();
 		if (jndiContext != null) {
 			try {
 				jndiContext.close();

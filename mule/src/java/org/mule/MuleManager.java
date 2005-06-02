@@ -31,14 +31,30 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
+import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleModel;
+import org.mule.impl.work.MuleWorkManager;
 import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.internal.admin.MuleAdminAgent;
 import org.mule.impl.internal.events.CustomEvent;
 import org.mule.impl.internal.events.ManagerEvent;
 import org.mule.impl.internal.events.ServerEventManager;
+import org.mule.impl.internal.events.ModelEvent;
+import org.mule.impl.internal.events.ComponentEvent;
+import org.mule.impl.internal.events.SecurityEvent;
+import org.mule.impl.internal.events.ManagementEvent;
+import org.mule.impl.internal.events.AdminEvent;
+import org.mule.impl.internal.events.ManagerEventListener;
+import org.mule.impl.internal.events.ModelEventListener;
+import org.mule.impl.internal.events.ComponentEventListener;
+import org.mule.impl.internal.events.SecurityEventListener;
+import org.mule.impl.internal.events.ManagementEventListener;
+import org.mule.impl.internal.events.AdminEventListener;
+import org.mule.impl.internal.events.CustomEventListener;
+import org.mule.impl.internal.events.ConnectionEvent;
+import org.mule.impl.internal.events.ConnectionEventListener;
 import org.mule.management.stats.AllStatistics;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
@@ -49,6 +65,7 @@ import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.manager.UMOServerEventListener;
+import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -183,6 +200,8 @@ public class MuleManager implements UMOManager
 	 */
 	private QueueManager queueManager;
 
+    private UMOWorkManager workManager;
+
     /**
      * logger used by this class
      */
@@ -195,7 +214,6 @@ public class MuleManager implements UMOManager
     {
         if(config==null) config = new MuleConfiguration();
         setModel(new MuleModel());
-        eventManager = new ServerEventManager();
         containerContext = new MultiContainerContext();
     }
 
@@ -338,6 +356,9 @@ public class MuleManager implements UMOManager
         if(eventManager!=null) {
             eventManager.dispose();
 
+        }
+        if(workManager!=null) {
+            workManager.dispose();
         }
         config = null;
         config = new MuleConfiguration();
@@ -553,6 +574,25 @@ public class MuleManager implements UMOManager
         if (!initialised.get())
         {
             initialising.set(true);
+            //if no work manager has been set create a default one
+            if(workManager==null) {
+                ThreadingProfile tp = config.getDefaultThreadingProfile();
+                logger.debug("Creating default work manager using default threading profile: " + tp);
+                workManager = new MuleWorkManager(tp, "UMOManager");
+                workManager.start();
+            }
+            
+            //create the event manager
+            eventManager = new ServerEventManager(workManager);
+            eventManager.registerEventType(ManagerEvent.class, ManagerEventListener.class);
+            eventManager.registerEventType(ModelEvent.class, ModelEventListener.class);
+            eventManager.registerEventType(ComponentEvent.class, ComponentEventListener.class);
+            eventManager.registerEventType(SecurityEvent.class, SecurityEventListener.class);
+            eventManager.registerEventType(ManagementEvent.class, ManagementEventListener.class);
+            eventManager.registerEventType(AdminEvent.class, AdminEventListener.class);
+            eventManager.registerEventType(CustomEvent.class, CustomEventListener.class);
+            eventManager.registerEventType(ConnectionEvent.class, ConnectionEventListener.class);
+
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_INITIALISNG));
             if(id==null) {
                 logger.warn("No unique id has be set on this manager");
@@ -1012,10 +1052,14 @@ public class MuleManager implements UMOManager
      * {@inheritDoc}
      */
     public void registerListener(UMOServerEventListener l) {
+        registerListener(l, null);
+    }
+
+    public void registerListener(UMOServerEventListener l, String resourceIdentifier) {
         if(eventManager==null) {
             throw new MuleRuntimeException(new Message(Messages.SERVER_EVENT_MANAGER_NOT_ENABLED));
         }
-        eventManager.registerListener(l);
+        eventManager.registerListener(l, resourceIdentifier);
     }
 
     /**
@@ -1050,15 +1094,15 @@ public class MuleManager implements UMOManager
      */
     public void fireEvent(UMOServerEvent event)
     {
-        if(event instanceof CustomEvent) {
+        //if(event instanceof CustomEvent) {
             if(eventManager!=null) {
                 eventManager.fireEvent(event);
             } else if(logger.isDebugEnabled()) {
                 logger.debug("Event Manager is not enabled, ignoring event: " + event);
             }
-        } else {
-            throw new UnsupportedOperationException(new Message(Messages.ONLY_CUSTOM_EVENTS_CAN_BE_FIRED).getMessage());
-        }
+//        } else {
+//            throw new UnsupportedOperationException(new Message(Messages.ONLY_CUSTOM_EVENTS_CAN_BE_FIRED).getMessage());
+//        }
     }
 
     /**
@@ -1151,12 +1195,50 @@ public class MuleManager implements UMOManager
         return securityManager;
     }
 
+    /**
+     * Obtains a workManager instance that can be used to schedule work in a thread pool.  This will
+     * be used primarially by UMOAgents wanting to schedule work.  This work Manager must <b>never</b> be
+     * used by provider implementations as they have their own workManager accible on the connector.
+     *
+     * If a workManager has not been set by the time the <code>initialise()</code> method has been called
+     * a default <code>MuleWorkManager</code> will be created using the <i>DefaultThreadingProfile</i> on the
+     * <code>MuleConfiguration</code> object.
+     *
+     * @return a workManager instance used by the current MuleManager
+     * @see org.mule.config.ThreadingProfile
+     * @see MuleConfiguration
+     */
+    public UMOWorkManager getWorkManager() {
+        return workManager;
+    }
+
+    /**
+     * Obtains a workManager instance that can be used to schedule work in a thread pool.  This will
+     * be used primarially by UMOAgents wanting to schedule work.  This work Manager must <b>never</b> be
+     * used by provider implementations as they have their own workManager accible on the connector.
+     *
+     * If a workManager has not been set by the time the <code>initialise()</code> method has been called
+     * a default <code>MuleWorkManager</code> will be created using the <i>DefaultThreadingProfile</i> on the
+     * <code>MuleConfiguration</code> object.
+     * @param workManager the workManager instance used by the current MuleManager
+     * @throws IllegalStateException if the workManager has already been set.
+     *
+     * @see org.mule.config.ThreadingProfile
+     * @see MuleConfiguration
+     * @see MuleWorkManager
+     */
+    public void setWorkManager(UMOWorkManager workManager) {
+        if(this.workManager!=null) {
+            throw new IllegalStateException(new Message(Messages.CANT_SET_X_ONCE_IT_HAS_BEEN_SET, "workManager").getMessage());
+        }
+        this.workManager = workManager;
+    }
+
 	public QueueManager getQueueManager() {
 		return queueManager;
 	}
 
 	public void setQueueManager(QueueManager queueManager) {
 		this.queueManager = queueManager;
-	}
-
+    }
 }

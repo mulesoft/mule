@@ -17,10 +17,12 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.TransactedPollingMessageReceiver;
+import org.mule.providers.ConnectException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -48,6 +50,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver {
                                String readStmt,
                                String ackStmt) throws InitialisationException {
         super(connector, component, endpoint, new Long(((JdbcConnector) connector).getPollingFrequency()));
+
         this.receiveMessagesInTransaction = false;
         this.connector = (JdbcConnector) connector;
 
@@ -56,12 +59,25 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver {
         this.ackParams = new ArrayList();
         this.ackStmt = JdbcUtils.parseStatement(ackStmt, this.ackParams);
 	}
-	
+
+    public void doConnect() throws Exception {
+        try {
+            this.connector.getConnection();
+        } catch (Exception e) {
+            throw new ConnectException(e, this);
+        }
+    }
+
+    public void doDisconnect() throws ConnectException {
+        //noop
+    }
+
 	public void processMessage(Object message) throws Exception {
 		Connection con = null;
 		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction(); 
 		try {
 			con = this.connector.getConnection();
+
 			if (this.ackStmt != null) {
 				Object[] ackParams = JdbcUtils.getParams(getEndpointURI(), this.ackParams, message);
 				int nbRows = new QueryRunner().update(con, this.ackStmt, ackParams);

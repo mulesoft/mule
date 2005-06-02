@@ -61,4 +61,18 @@ public class EmailEndpointsTestCase extends NamedTestCase
         assertEquals(0, url.getParams().size());
     }
 
+    public void testPop3UrlWithFolder() throws Exception
+    {
+        MuleEndpointURI endpointUri = new MuleEndpointURI("pop3://username:password@pop3.muleumo.org/INBOX");
+        assertEquals("pop3", endpointUri.getScheme());
+        assertEquals("username@muleumo.org", endpointUri.getAddress());
+        assertNull(endpointUri.getEndpointName());
+        assertEquals(-1, endpointUri.getPort());
+        assertEquals("pop3.muleumo.org", endpointUri.getHost());
+        assertEquals("username:password", endpointUri.getUserInfo());
+        assertEquals("pop3://username:password@pop3.muleumo.org/INBOX", endpointUri.toString());
+        assertEquals(1, endpointUri.getParams().size());
+        assertEquals("INBOX", endpointUri.getParams().get("folder"));
+
+    }
 }

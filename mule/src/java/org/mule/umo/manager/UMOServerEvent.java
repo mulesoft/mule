@@ -13,6 +13,9 @@
  */
 package org.mule.umo.manager;
 
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.util.ClassHelper;
+
 import java.util.EventObject;
 
 /**
@@ -29,7 +32,8 @@ public abstract class UMOServerEvent extends EventObject
     public static final int COMPONENT_EVENT_ACTION_START_RANGE = 300;
     public static final int SECURITY_EVENT_ACTION_START_RANGE = 400;
     public static final int MANAGEMENT_EVENT_ACTION_START_RANGE = 500;
-    public static final int ADMIN_EVENT_ACTION_START_RANGE = 500;
+    public static final int ADMIN_EVENT_ACTION_START_RANGE = 600;
+    public static final int CONNECTION_EVENT_ACTION_START_RANGE = 700;
     public static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
 
 
@@ -38,10 +42,26 @@ public abstract class UMOServerEvent extends EventObject
 
     protected int action = NULL_ACTION;
 
+    /**
+     * The resourceIdentifier is used when firing inbound server events such as Admin events
+     * or other action events triggered by an external source
+     * Used to associate the event with a particular resource.  For example, if the
+     * event was a ComponentEvent the resourceIdentifier could be the name of a particular
+     * component
+     */
+    protected String resourceIdentifier = null;
+
     public UMOServerEvent(Object message, int action)
     {
         super((message==null ? NULL_MESSAGE : message));
         this.action = action;
+    }
+
+    public UMOServerEvent(Object message, int action, String resourceIdentifier)
+    {
+        super((message==null ? NULL_MESSAGE : message));
+        this.action = action;
+        this.resourceIdentifier = resourceIdentifier;
     }
 
     public int getAction()
@@ -49,12 +69,19 @@ public abstract class UMOServerEvent extends EventObject
         return action;
     }
 
+    public String getResourceIdentifier() {
+        return resourceIdentifier;
+    }
+
+    public boolean isResourceIdentifierAnUri() {
+        return MuleEndpointURI.isMuleUri(resourceIdentifier);
+    }
+
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getClass().getName());
-        buf.append(": ").append(getPayloadToString());
-        buf.append(": Action=").append(getActionName(action));
-        return buf.toString();
+        return ClassHelper.getClassName(getClass()) + "{" +
+                "action=" + getActionName(action) +
+                ", resourceIdentifier='" + resourceIdentifier + "'" +
+                "}";
     }
 
     protected String getPayloadToString() {

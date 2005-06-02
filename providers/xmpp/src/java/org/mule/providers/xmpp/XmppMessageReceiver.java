@@ -24,9 +24,11 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.ConnectException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -43,8 +45,7 @@ import java.net.URI;
  * @author John Evans
  * @version $Revision$
  */
-public class XmppMessageReceiver extends AbstractMessageReceiver
-	implements PacketListener
+public class XmppMessageReceiver extends AbstractMessageReceiver implements PacketListener
 {
 	private XMPPConnection xmppConnection = null;
 
@@ -52,13 +53,11 @@ public class XmppMessageReceiver extends AbstractMessageReceiver
 		UMOComponent component, UMOEndpoint endpoint)
 		throws InitialisationException
 	{
-		create(connector, component, endpoint);
-		connect(endpoint.getEndpointURI().getUri());
+		super(connector, component, endpoint);
 	}
 
-	protected void connect(URI uri) throws InitialisationException
-	{
-		try
+    public void doConnect() throws Exception {
+        try
 		{
 			XmppConnector cnn = (XmppConnector)connector;
 			xmppConnection = cnn.findOrCreateXmppConnection(endpoint.getEndpointURI());
@@ -71,9 +70,16 @@ public class XmppMessageReceiver extends AbstractMessageReceiver
 		}
 		catch (XMPPException e)
 		{
-			throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X, "XMPP Connection"), e, this);
+			throw new ConnectException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X, "XMPP Connection"), e, this);
 		}
-	}
+    }
+
+    public void doDisconnect() throws Exception {
+        if(xmppConnection != null) {
+            xmppConnection.removePacketListener(this);
+            xmppConnection.close();
+        }
+    }
 
     protected boolean allowFilter(UMOFilter filter) throws UnsupportedOperationException {
         return filter instanceof PacketFilter;

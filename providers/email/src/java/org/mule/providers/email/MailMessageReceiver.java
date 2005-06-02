@@ -1,34 +1,18 @@
-/* 
-
+/*
  * $Header$
-
  * $Revision$
-
  * $Date$
-
  * ------------------------------------------------------------------------------------------------------
-
- * 
-
- * Copyright (c) SymphonySoft Limited. All rights reserved.
-
- * http://www.symphonysoft.com
-
- * 
-
- * The software in this package is published under the terms of the BSD
-
- * style license a copy of which has been included with this distribution in
-
- * the LICENSE.txt file. 
-
  *
-
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ *
  */
-
-
 package org.mule.providers.email;
-
 
 import org.mule.MuleManager;
 import org.mule.config.i18n.Messages;
@@ -39,6 +23,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Startable;
+import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.UUID;
@@ -48,6 +34,10 @@ import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.URLName;
+import javax.mail.Session;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Store;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageCountListener;
 import javax.mail.internet.MimeMessage;
@@ -55,7 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import java.util.Properties;
 
 /**
  * <code>MailMessageReceiver</code> polls a pop3 mailbox for messages
@@ -65,16 +55,17 @@ import java.io.IOException;
  * @version $Revision$
  */
 
-public class MailMessageReceiver extends PollingMessageReceiver implements MessageCountListener
+public class MailMessageReceiver extends PollingMessageReceiver implements MessageCountListener, Startable, Stoppable
 {
     private Folder folder = null;
 
     private String backupFolder = null;
 
+    protected Session session;
+
     public MailMessageReceiver(UMOConnector connector,
                                UMOComponent component,
                                UMOEndpoint endpoint,
-                               Folder folder,
                                Long checkFrequency, String backupFolder) throws InitialisationException
     {
         super(connector, component, endpoint, checkFrequency);
@@ -95,9 +86,54 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
     }
 
 
+    public void doConnect() throws Exception
+    {
+        String inbox = null;
+        if(connector.getProtocol().equals("imap") && endpoint.getEndpointURI().getParams().get("folder") != null)
+        {
+            inbox = (String)endpoint.getEndpointURI().getParams().get("folder");
+        } else {
+            inbox = Pop3Connector.MAILBOX;
+        }
+
+
+        URLName url = new URLName(endpoint.getEndpointURI().getScheme(),
+                endpoint.getEndpointURI().getHost(),
+                endpoint.getEndpointURI().getPort(),
+                inbox,
+                endpoint.getEndpointURI().getUsername(),
+                endpoint.getEndpointURI().getPassword());
+
+        Properties props = System.getProperties();
+        props.put("mail.smtp.host", endpoint.getEndpointURI().getHost());
+        props.put("mail.smtp.port", String.valueOf(endpoint.getEndpointURI().getPort()));
+        session = Session.getDefaultInstance(props, null);
+        session.setDebug(logger.isDebugEnabled());
+        PasswordAuthentication pw = new PasswordAuthentication(endpoint.getEndpointURI().getUsername(), endpoint.getEndpointURI().getPassword());
+        session.setPasswordAuthentication(url, pw);
+
+        Store store = session.getStore(url);
+        store.connect();
+        folder = store.getFolder(inbox);
+        session.setDebug(logger.isDebugEnabled());
+    }
+
+    public void doDisconnect() throws Exception {
+        if(folder!=null) folder.close(true);
+    }
+
+    public void doStop() {
+        folder.removeMessageCountListener(this);
+    }
+
+    public void doStart() throws UMOException {
+        super.doStart();
+        folder.addMessageCountListener(this);
+    }
+
     /* (non-Javadoc)
-     * @see javax.mail.event.MessageCountListener#messagesAdded(javax.mail.event.MessageCountEvent)
-     */
+               * @see javax.mail.event.MessageCountListener#messagesAdded(javax.mail.event.MessageCountEvent)
+               */
     public void messagesAdded(MessageCountEvent event)
     {
         Message messages[] = event.getMessages();

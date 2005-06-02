@@ -61,20 +61,20 @@ public abstract class StreamConnector extends AbstractServiceEnabledConnector
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.AbstractConnector#stopConnector()
+     * @see org.mule.providers.AbstractConnector#doStop()
      */
-    public synchronized void stopConnector()
+    public synchronized void doStop()
     {
     }
 
-    protected void disposeConnector()
+    protected void doDispose()
     {
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.AbstractConnector#startConnector()
+     * @see org.mule.providers.AbstractConnector#doStart()
      */
-    public synchronized void startConnector()
+    public synchronized void doStart()
     {
     }
 

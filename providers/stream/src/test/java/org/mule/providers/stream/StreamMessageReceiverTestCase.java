@@ -48,7 +48,6 @@ public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCa
         Mock connector = new Mock(UMOConnector.class);
         connector.expectAndReturn("getExceptionListener", new DefaultExceptionStrategy());
 
-        receiver.create((UMOConnector) connector.proxy(), component, endpoint);
         receiver.setFrequency(1001);
         receiver.setInputStream(System.in);
 

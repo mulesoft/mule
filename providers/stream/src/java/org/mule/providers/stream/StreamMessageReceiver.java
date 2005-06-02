@@ -18,6 +18,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -50,11 +51,19 @@ public class StreamMessageReceiver extends PollingMessageReceiver
 
     }
 
+    public void doConnect() throws Exception {
+        //noop
+    }
+
+    public void doDisconnect() throws Exception {
+        //noop
+    }
+
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
-	 */
+       * (non-Javadoc)
+       *
+       * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
+       */
     public void poll()
     {
         try

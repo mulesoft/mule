@@ -238,7 +238,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
     /*
      * @see org.mule.providers.UMOConnector#start()
      */
-    public void startConnector() throws UMOException
+    public void doStart() throws UMOException
     {
         //force connection to server
         dispatcherFactory.create(this);
@@ -247,18 +247,18 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
     /* (non-Javadoc)
      * @see org.mule.providers.UMOConnector#stop()
      */
-    public void stopConnector() throws UMOException
+    public void doStop() throws UMOException
     {
         connected = false;
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.AbstractConnector#disposeConnector()
+     * @see org.mule.providers.AbstractConnector#doDispose()
      */
-    protected void disposeConnector()
+    protected void doDispose()
     {
         try {
-            stopConnector();
+            doStop();
         } catch (UMOException e) {
             logger.error(e.getMessage(), e);
         }

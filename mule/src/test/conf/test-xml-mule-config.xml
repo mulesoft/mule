@@ -29,10 +29,16 @@
     <agents>
         <agent name="jmxAgent" className="org.mule.management.agents.JmxAgent"/>
     </agents>
-
+  
     <connector name="dummyConnector" className="org.mule.tck.testmodels.mule.TestConnector">
         <threading-profile id="dispatcher" maxBufferSize="2"/>
         <exception-strategy className="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
+        <connection-strategy className="org.mule.providers.SimpleRetryConnectionStrategy">
+            <properties>
+                <property name="retryCount" value="4"/>
+                <property name="frequency" value="3000"/>
+            </properties>
+        </connection-strategy>
     </connector>
 
     <endpoint-identifiers>

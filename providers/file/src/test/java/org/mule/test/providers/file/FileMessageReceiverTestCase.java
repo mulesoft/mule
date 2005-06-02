@@ -60,7 +60,7 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         move.deleteOnExit();
 
         return new FileMessageReceiver(endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint,
-                read, move, null, new Long(1000));
+                read.getAbsolutePath(), move.getAbsolutePath(), null, new Long(1000));
     }
 
     public static UMOEndpoint getTestProvider(String name, String type)

@@ -18,6 +18,8 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
+import java.net.URI;
+
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -97,6 +99,7 @@ public class JmsEndpointTestCase extends NamedTestCase
 
     public void testJmsTopicWithUserInfoAndProvider() throws Exception
     {
+        URI i = new URI("jms://user:password@jmsProvider/topic:topic1");
         UMOEndpointURI url = new MuleEndpointURI("jms://user:password@jmsProvider/topic:topic1");
         assertEquals("jms", url.getScheme());
         assertEquals("topic1", url.getAddress());

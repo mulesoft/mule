@@ -61,13 +61,14 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * <code>AxisConnector</code> is used to maintain one or more Services for
  * Axis server instance.
  *
  * Some of the Axis specific service initialisation code was adapted from
- * the Ivory project (http://ivory.codehaus.org). Thanks :)
+ * the Ivory project (http://ivory.codehaus.org). Thanks guys :)
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -83,7 +84,10 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public static final String AXIS_SERVICE_COMPONENT_NAME = "_axisServiceComponent";
 
     public static final String SERVICE_PROPERTY_COMPONENT_NAME = "componentName";
-    public static final String SERVICE_PROPERTY_SERVICE_PATH = "servicePath";
+    public static final String SERVICE_PROPERTY_SERVCE_PATH = "servicePath";
+
+    public static final String ENDPOINT_COUNTERS_PROPERTY = "endpointCounters";
+
     private String serverConfig;
     private AxisServer axisServer;
     private SimpleProvider serverProvider;
@@ -104,7 +108,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     {
         super.doInitialise();
         MuleManager.getInstance().registerListener(this);
-        
+
         if(serverConfig==null) serverConfig = DEFAULT_MULE_AXIS_SERVER_CONFIG;
         if(clientConfig==null) clientConfig = DEFAULT_MULE_AXIS_CLIENT_CONFIG;
         serverProvider = createAxisProvider(serverConfig);
@@ -155,6 +159,13 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         return (AxisMessageReceiver)receivers.get(name);
     }
 
+    /**
+     * The method determines the key used to store the receiver against.
+     * @param component the component for which the endpoint is being registered
+     * @param endpoint the endpoint being registered for the component
+     * @return the key to store the newly created receiver against. In this case it is the component
+     * name, which is equivilent to the Axis service name.
+     */
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
     {
         return component.getDescriptor().getName();
@@ -175,141 +186,48 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             }
         }
 
-        UMOMessageReceiver receiver = super.createReceiver(component, endpoint);
-        registerAxisComponent(receiver);
-        return receiver;
+        return super.createReceiver(component, endpoint);
     }
 
-    protected void registerAxisComponent(UMOMessageReceiver receiver) throws AxisFault, UMOException, ClassNotFoundException, URISyntaxException
+    protected void unregisterReceiverWithMuleService(UMOMessageReceiver receiver, UMOEndpointURI ep) throws UMOException
     {
-        SOAPService service = new SOAPService( new MuleProvider(this));
+        String endpointKey = getCounterEndpointKey(receiver.getEndpointURI());
 
-        service.setEngine( axisServer );
+        Map endpointCounters = (Map)axisDescriptor.getProperties().get(ENDPOINT_COUNTERS_PROPERTY);
+        if(endpointCounters==null) {
+            logger.error("There are no endpoints registered on the Axis service descriptor");
+            return;
+        }
 
-        UMOEndpointURI uri = receiver.getEndpoint().getEndpointURI();
-        String serviceName = receiver.getComponent().getDescriptor().getName();
+        Integer count = (Integer)endpointCounters.get(endpointKey);
+        if(count==null) {
+            logger.error("There are no services registered on: " + endpointKey);
+            return;
+        }
 
-        String servicePath = uri.getPath();
-        service.setOption(serviceName, receiver);
-        service.setOption(SERVICE_PROPERTY_SERVICE_PATH, servicePath);
-        service.setOption(SERVICE_PROPERTY_COMPONENT_NAME, serviceName);
-        service.setName(serviceName);
+        if(count.intValue() > 1) {
+            logger.warn("There are '" + count.intValue() + "' services registered on endpoint: " + endpointKey +
+                    ". Not unregistering the endpoint at this time");
+            count = new Integer(count.intValue() -1);
+            endpointCounters.put(endpointKey, count);
+            return;
+        } else {
+            endpointCounters.remove(endpointKey);
 
-        //Add any custom options from the Descriptor config
-        Map options = (Map)receiver.getComponent().getDescriptor().getProperties().get("axisOptions");
-        if(options!=null) {
-            Map.Entry entry;
-            for (Iterator iterator = options.entrySet().iterator(); iterator.hasNext();)
+            for (Iterator iterator = axisDescriptor.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();)
             {
-                entry =  (Map.Entry)iterator.next();
-                service.setOption(entry.getKey().toString(), entry.getValue());
-                if (logger.isDebugEnabled()) {
-                	logger.debug("Adding Axis option: " + entry);
+                UMOEndpoint umoEndpoint = (UMOEndpoint)iterator.next();
+                if(endpointKey.startsWith(umoEndpoint.getEndpointURI().getAddress()))
+                       logger.info("Unregistering Axis endpoint: " + endpointKey + " for service: " + receiver.getComponent().getDescriptor().getName());
+                try {
+                    umoEndpoint.getConnector().unregisterListener(receiver.getComponent(), receiver.getEndpoint());
+                } catch (Exception e) {
+                    logger.error("Failed to unregistering Axis endpoint: " + endpointKey + " for service: " +
+                            receiver.getComponent().getDescriptor().getName() + ". Error is: " + e.getMessage(), e);
                 }
+                break;
             }
         }
-        //set method names
-        Class[] interfaces = ServiceProxy.getInterfacesForComponent(receiver.getComponent());
-		if (interfaces.length == 0) {
-            throw new InitialisationException(new Message(Messages.X_MUST_IMPLEMENT_AN_INTERFACE, serviceName), receiver.getComponent());
-		}
-        //You must supply a class name if you want to restrict methods
-        //or specify the 'allowedMethods' property in the axisOptions property
-        String methodNames = "*";
-
-        String[] methods = ServiceProxy.getMethodNames(interfaces);
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < methods.length; i++)
-        {
-            buf.append(methods[i]).append(",");
-        }
-		String className = interfaces[0].getName();
-        methodNames = buf.toString();
-        methodNames = methodNames.substring(0, methodNames.length() -1);
-
-        // The namespace of the service.
-        String namespace =  Namespaces.makeNamespace( className );
-
-        /* Now we set up the various options for the SOAPService. We set:
-         *
-         * RPCProvider.OPTION_WSDL_SERVICEPORT
-         * In essense, this is our service name
-         *
-         * RPCProvider.OPTION_CLASSNAME
-         * This tells the serverProvider (whether it be an AvalonProvider or just
-         * JavaProvider) what class to load via "makeNewServiceObject".
-         *
-         * RPCProvider.OPTION_SCOPE
-         * How long the object loaded via "makeNewServiceObject" will persist -
-         * either request, session, or application.  We use the default for now.
-         *
-         * RPCProvider.OPTION_WSDL_TARGETNAMESPACE
-         * A namespace created from the package name of the service.
-         *
-         * RPCProvider.OPTION_ALLOWEDMETHODS
-         * What methods the service can execute on our class.
-         *
-         * We don't set:
-         * RPCProvider.OPTION_WSDL_PORTTYPE
-         * RPCProvider.OPTION_WSDL_SERVICEELEMENT
-         */
-        setOptionIfNotset(service,  RPCProvider.OPTION_WSDL_SERVICEPORT, serviceName);
-        setOptionIfNotset(service, RPCProvider.OPTION_CLASSNAME, className );
-        setOptionIfNotset(service, RPCProvider.OPTION_SCOPE, "Request");
-        setOptionIfNotset(service, RPCProvider.OPTION_WSDL_TARGETNAMESPACE, namespace  );
-
-        // Set the allowed methods, allow all if there are none specified.
-        if ( methodNames == null)
-        {
-            setOptionIfNotset(service, RPCProvider.OPTION_ALLOWEDMETHODS, "*" );
-        }
-        else
-        {
-            setOptionIfNotset(service, RPCProvider.OPTION_ALLOWEDMETHODS, methodNames );
-        }
-
-        /* Create a service description.  This tells Axis that this
-         * service exists and also what it can execute on this service.  It is
-         * created with all the options we set above.
-         */
-        ServiceDesc sd = service.getInitializedServiceDesc(null);
-        sd.setName(serviceName);
-        sd.setEndpointURL(uri.getAddress() + "/" + serviceName);
-
-        String style = (String)receiver.getComponent().getDescriptor().getProperties().get("style");
-        String use = (String)receiver.getComponent().getDescriptor().getProperties().get("use");
-        String doc = (String)receiver.getComponent().getDescriptor().getProperties().get("documentation");
-
-        //Note that Axis has specific rules to how these two variables are
-        //combined.  This is handled for us
-        //Set style: RPC/wrapped/Doc/Message
-        if(style!=null) sd.setStyle(Style.getStyle(style));
-        //Set use: Endcoded/Literal
-        if(use!=null) sd.setUse(Use.getUse(use));
-        sd.setDocumentation(doc);
-
-        // Tell Axis to try and be intelligent about serialization.
-        TypeMappingRegistryImpl registry = (TypeMappingRegistryImpl)service.getTypeMappingRegistry();
-        //TypeMappingImpl tm = (TypeMappingImpl) registry.();
-        //Handle complex bean type automatically
-        //registry.setDoAutoTypes( true );
-        //Axis 1.2 fix to handle autotypes properly
-        AxisProperties.setProperty("axis.doAutoTypes", "true");
-
-        //Load any explicitly defined bean types
-        List types = (List)receiver.getComponent().getDescriptor().getProperties().get("beanTypes");
-        registerTypes(registry, types);
-        registerTypes(registry, beanTypes);
-        service.setName(serviceName);
-
-        // Tell the axis configuration about our new service.
-        this.serverProvider.deployService( serviceName, service );
-
-        //Add initialisation callback for the Axis service
-        MuleDescriptor desc =(MuleDescriptor)receiver.getComponent().getDescriptor();
-        desc.addInitialisationCallback(new AxisInitialisationCallback(service));
-
-        registerReceiverWithMuleService(receiver, uri);
     }
 
     protected void registerReceiverWithMuleService(UMOMessageReceiver receiver, UMOEndpointURI ep) throws UMOException
@@ -329,7 +247,8 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
                 //again later
                 MuleManager.getInstance().getModel().unregisterComponent(axisDescriptor);
             }
-            //if the axis server hasn't been set, set it now
+            //if the axis server hasn't been set, set it now.  The Axis server may be set
+            //externally
             if(axisDescriptor.getProperties().get("axisServer") == null) {
                 axisDescriptor.getProperties().put("axisServer", axisServer);
             }
@@ -353,54 +272,53 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
                 endpoint += "?" + sync;
             }
         }
-        boolean registered = false;
-        for (Iterator iterator = axisDescriptor.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();)
-        {
-            UMOEndpoint umoEndpoint = (UMOEndpoint)iterator.next();
-            if((startsWith && endpoint.startsWith(umoEndpoint.getEndpointURI().getAddress())) ||
-                    (!startsWith && endpoint.startsWith(umoEndpoint.getEndpointURI().getAddress()))) {
-                registered = true;
-                break;
-            }
+
+        Map endpointCounters = (Map)axisDescriptor.getProperties().get(ENDPOINT_COUNTERS_PROPERTY);
+        if(endpointCounters==null) {
+            endpointCounters = new HashMap();
         }
-        if(!registered) {
+
+        String endpointKey = getCounterEndpointKey(receiver.getEndpointURI());
+
+        Integer count = (Integer)endpointCounters.get(endpointKey.toString());
+        if(count==null) count = new Integer(0);
+
+        if(count.intValue()==0) {
             UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
             serviceEndpoint.setName(ep.getScheme() + ":" + receiver.getComponent().getDescriptor().getName());
             //set the filter on the axis endpoint on the real receiver endpoint
             serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
             axisDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
         }
+
+        //Update the counter for this endpoint
+        count = new Integer(count.intValue() + 1);
+        endpointCounters.put(endpointKey.toString(), count);
+        axisDescriptor.getProperties().put(ENDPOINT_COUNTERS_PROPERTY, endpointCounters);
     }
 
-    protected void setOptionIfNotset(SOAPService service, String option, Object value) {
-        Object val = service.getOption(option);
-        if(val==null) service.setOption(option, value);
-    }
 
-    protected void registerTypes(TypeMappingRegistryImpl registry, List types) throws ClassNotFoundException
+    private String getCounterEndpointKey(UMOEndpointURI endpointURI)
     {
-        if(types!=null) {
-            Class clazz;
-            for (Iterator iterator = types.iterator(); iterator.hasNext();)
-            {
-                clazz = ClassHelper.loadClass(iterator.next().toString(), getClass());
-                QName xmlType = new QName(
-                Namespaces.makeNamespace( clazz.getName() ),
-                Types.getLocalNameFromFullName( clazz.getName() ) );
+        StringBuffer endpointKey = new StringBuffer();
 
-                registry.getDefaultTypeMapping().register(clazz,
-                      xmlType,
-                      new BeanSerializerFactory(clazz, xmlType),
-                      new BeanDeserializerFactory(clazz, xmlType) );
-            }
+        endpointKey.append(endpointURI.getScheme());
+        endpointKey.append("://");
+        endpointKey.append(endpointURI.getHost());
+        if(endpointURI.getPort() > -1) {
+            endpointKey.append(":");
+            endpointKey.append(endpointURI.getPort());
         }
+        return endpointKey.toString();
     }
+
+
     /**
      * Template method to perform any work when starting the connectoe
      *
      * @throws org.mule.umo.UMOException if the method fails
      */
-    protected void startConnector() throws UMOException
+    protected void doStart() throws UMOException
     {
         axisServer.start();
     }
@@ -410,7 +328,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
      *
      * @throws org.mule.umo.UMOException if the method fails
      */
-    protected void stopConnector() throws UMOException
+    protected void doStop() throws UMOException
     {
         axisServer.stop();
 //        UMOModel model = MuleManager.getInstance().getModel();
@@ -441,11 +359,11 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public void onEvent(UMOServerEvent event)
     {
         if(event.getAction()==ModelEvent.MODEL_STARTED) {
-            //We need to rgister the Axis service component once the model starts because
+            //We need to register the Axis service component once the model starts because
             //when the model starts listeners on components are started, thus all listener
             //need to be registered for this connector before the Axis service component
             //is registered.
-            //The implication of this is that to add a new serive and a different http port the
+            //The implication of this is that to add a new service and a different http port the
             //model needs to be restarted before the listener is available
             if(!MuleManager.getInstance().getModel().isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME)) {
                 try

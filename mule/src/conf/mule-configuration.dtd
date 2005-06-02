@@ -31,7 +31,7 @@
 	<i>mule-environment-params</i> are prarameters used by the Mule run-time. If none or not all
 	parameters are specified defaults will be used
 -->
-<!ELEMENT mule-environment-properties ((threading-profile)*, (pooling-profile)?, (queue-profile)?, (persistence-strategy)?)>
+<!ELEMENT mule-environment-properties (threading-profile*, pooling-profile?, queue-profile?, persistence-strategy?, connection-strategy?)>
 
 <!--
 	Specifies whether mule should process messages sysnchonously, i.e. that a mule-model
@@ -318,11 +318,11 @@ threading in every connector
 <!ATTLIST encryption-strategy name        		ID         		#REQUIRED>
 
 <!--
-The <i>connection-descriptor</i> element specifies one or more message
+The <i>connector</i> element specifies one or more message
   connections for Mule components.
 -->
   
-<!ELEMENT connector (properties?, threading-profile?, exception-strategy?)>
+<!ELEMENT connector (properties?, threading-profile?, exception-strategy?, connection-strategy?)>
 
 <!--
 	The name attribute is used to bind a connection to a logical name in the system
@@ -334,6 +334,19 @@ The <i>connection-descriptor</i> element specifies one or more message
 	The fully qualified classname to instanciate the connector with  
 -->
 <!ATTLIST connector className			NMTOKEN		#REQUIRED>
+
+<!--
+The <i>connection-strategy</i> element specifies a strategy implementation used when making
+a connection to the underlying resource
+-->
+
+<!ELEMENT connection-strategy (properties?)>
+
+<!--
+	The fully qualified classname to instanciate the connector strategy. This class must
+    implement <i>org.mule.providers.ConnectionStrategy</i>
+-->
+<!ATTLIST connection-strategy className			NMTOKEN		#REQUIRED>
 
 <!--
 	This is a grouping element for individual <i>endpoint-identifier</i> instances

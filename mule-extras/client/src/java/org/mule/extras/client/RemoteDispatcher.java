@@ -26,7 +26,11 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.events.AdminEvent;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.umo.*;
+import org.mule.umo.FutureMessageResult;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -171,7 +175,7 @@ public class RemoteDispatcher implements Disposable
 
     public UMOMessage receiveRemote(String endpoint, int timeout) throws UMOException
     {
-        AdminEvent action = new AdminEvent(AdminEvent.ACTION_RECEIVE, null, endpoint);
+        AdminEvent action = new AdminEvent(null, AdminEvent.ACTION_RECEIVE, endpoint);
         action.setProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "true");
 		action.setProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, new Long(timeout));
         UMOMessage result = dispatchAction(action, true, timeout);
@@ -199,7 +203,7 @@ public class RemoteDispatcher implements Disposable
         UMOMessage message = new MuleMessage(payload, messageProperties);
         message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, synchronous);
 
-        AdminEvent action = new AdminEvent(AdminEvent.ACTION_INVOKE, message, "mule://" + component);
+        AdminEvent action = new AdminEvent(message, AdminEvent.ACTION_INVOKE, "mule://" + component);
         UMOMessage result = dispatchAction(action, synchronous, MuleManager.getConfiguration().getSynchronousEventTimeout());
         return result;
     }
@@ -208,7 +212,7 @@ public class RemoteDispatcher implements Disposable
     {
         UMOMessage message = new MuleMessage(payload, messageProperties);
         message.setProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, String.valueOf(synchronous));
-        AdminEvent action = new AdminEvent((synchronous ? AdminEvent.ACTION_SEND : AdminEvent.ACTION_DISPATCH), message, endpoint);
+        AdminEvent action = new AdminEvent(message, (synchronous ? AdminEvent.ACTION_SEND : AdminEvent.ACTION_DISPATCH), endpoint);
 
         UMOMessage result = dispatchAction(action, synchronous, -1);
         return result;
@@ -226,7 +230,7 @@ public class RemoteDispatcher implements Disposable
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(timeout);
         if (logger.isDebugEnabled()) {
-            logger.debug("MuleClient sending remote call to: " + action.getEndpoint() + ". At " + serverEndpoint.toString() + " .Event is: " + event);
+            logger.debug("MuleClient sending remote call to: " + action.getResourceIdentifier() + ". At " + serverEndpoint.toString() + " .Event is: " + event);
         }
 
         UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(serverEndpoint.getAddress());

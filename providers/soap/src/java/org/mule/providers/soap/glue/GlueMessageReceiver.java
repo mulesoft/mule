@@ -28,6 +28,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleDescriptor;
 import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.ConnectException;
 import org.mule.providers.soap.ServiceProxy;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -37,6 +38,7 @@ import org.mule.umo.provider.UMOConnector;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.io.IOException;
 
 /**
  * <code>GlueMessageReceiver</code> is used to recieve Glue bounded services
@@ -50,17 +52,24 @@ import java.util.Map;
 
 public class GlueMessageReceiver extends AbstractMessageReceiver
 {
+    private boolean createServer = false;
+
     public GlueMessageReceiver(UMOConnector connector, UMOComponent component,
-                               UMOEndpoint endpoint, boolean createServer) throws InitialisationException
+                               UMOEndpoint endpoint, Boolean createServer) throws InitialisationException
     {
-        super.create(connector, component, endpoint);
+        super(connector, component, endpoint);
+        this.createServer = createServer.booleanValue();
+    }
+
+    public void doConnect() throws Exception
+    {
         try
         {
             Class[] interfaces = ServiceProxy.getInterfacesForComponent(component);
             if(interfaces.length==0) {
                 throw new InitialisationException(new Message("soap", 2, component.getDescriptor().getName()), this);
             }
-            VirtualService.enable();
+
             //this is always initialisaed as synchronous as ws invocations should
             //always execute in a single thread unless the endpont has explicitly
             //been set to run asynchronously
@@ -71,12 +80,15 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
                     endpoint.setSynchronous(true);
                 }
             }
-            VirtualService vService = new VirtualService(interfaces, ServiceProxy.createGlueServiceHandler(this,  endpoint.isSynchronous()));
 
             if(createServer) {
-                registerContextHeaders();
                 HTTP.startup(getEndpointURI().getScheme() + "://" + getEndpointURI().getHost() + ":" + getEndpointURI().getPort());
+                registerContextHeaders();
             }
+
+            VirtualService.enable();
+            VirtualService vService = new VirtualService(interfaces, ServiceProxy.createGlueServiceHandler(this,  endpoint.isSynchronous()));
+
             //Add initialisation callback for the Glue service
             //The callback will actually register the service
             MuleDescriptor desc =(MuleDescriptor)component.getDescriptor();
@@ -96,6 +108,17 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
         }catch (Exception e)
         {
             throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "Soap Server"), e, this);
+        }
+    }
+
+    public void doDisconnect() throws Exception
+    {
+        if(createServer) {
+            try {
+                HTTP.shutdown(getEndpointURI().getScheme() + "://" + getEndpointURI().getHost() + ":" + getEndpointURI().getPort());
+            } catch (IOException e) {
+                throw new ConnectException(e, this);
+            }
         }
     }
 

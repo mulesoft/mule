@@ -20,7 +20,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.Startable;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.Lifecycle;
 
 /**
  * <code>UMOMessageReceiver</code> is used to receive data from an external system.
@@ -34,26 +35,8 @@ import org.mule.umo.lifecycle.Startable;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOMessageReceiver extends Startable, Disposable
+public interface UMOMessageReceiver extends Lifecycle
 {
-
-    /**
-     * Creates the Message Receiver
-     *
-     * @param connector the endpoint that created this listener
-     * @param component the component to associate with the receiver.  When data is recieved the component
-     *                  <code>dispatchEvent</code> or <code>sendEvent</code> is used to dispatch the data to the relivant UMO.
-     * @param endpoint  the provider contains the endpointUri on which the
-     *                  receiver will listen on. The endpointUri can be anything and is specific to
-     *                  the receiver implementation i.e. an email address, a directory, a jms destination
-     *                  or port address.
-     * @see UMOComponent
-     * @see UMOEndpoint
-     */
-    public abstract void create(UMOConnector connector,
-                                UMOComponent component,
-                                UMOEndpoint endpoint) throws InitialisationException;
-
     /**
      * @return the receivers endpoint
      */
@@ -91,4 +74,25 @@ public interface UMOMessageReceiver extends Startable, Disposable
      * @return
      */
     public UMOEndpointURI getEndpointURI();
+
+    /**
+     * Make the connection to the underlying transport.  Once a connection is made the Message
+     * Reciever should remain in a stopped state if the MessageReceiver was stopped before
+     * this method was called
+     * @throws Exception
+     */
+    public void connect() throws Exception;
+
+    /**
+     * Disconnect the Message Receiver from the underlying transport
+     *
+     * @throws Exception
+     */
+    public void disconnect() throws Exception;
+
+    /**
+     * Determines if the the Message Receiver is connected or not
+     * @return
+     */
+    public boolean isConnected();
 }

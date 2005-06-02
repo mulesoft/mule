@@ -66,6 +66,7 @@
             <xsl:apply-templates select="queue-profile"/>
             <xsl:apply-templates select="pooling-profile"/>
             <xsl:apply-templates select="persistence-strategy"/>
+            <xsl:apply-templates select="connection-strategy"/>
         </bean>
     </xsl:template>
 
@@ -101,6 +102,7 @@
         <bean name="{$name}" class="{$type}">
             <xsl:apply-templates select="properties"/>
             <xsl:apply-templates select="exception-strategy"/>
+            <xsl:apply-templates select="connection-strategy"/>
             <xsl:apply-templates select="threading-profile" mode="global"/>
         </bean>
     </xsl:template>
@@ -265,6 +267,14 @@
                         <xsl:apply-templates select="global-endpoint"/>
                     </list>
                 </property>
+            </bean>
+        </property>
+    </xsl:template>
+
+    <xsl:template match="connection-strategy">
+        <property name="connectionStrategy">
+            <bean class="{@className}">
+                <xsl:apply-templates select="properties"/>
             </bean>
         </property>
     </xsl:template>

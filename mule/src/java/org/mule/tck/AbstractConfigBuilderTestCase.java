@@ -32,6 +32,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.interceptors.LoggingInterceptor;
 import org.mule.interceptors.TimerInterceptor;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -103,6 +104,10 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
+        assertNotNull(c.getConnectionStrategy());
+        assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
+        assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
+        assertEquals(3000, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getFrequency());
     }
 
     public void testGlobalEndpointConfig() {

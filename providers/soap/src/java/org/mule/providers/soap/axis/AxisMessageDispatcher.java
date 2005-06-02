@@ -24,6 +24,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
+import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.extensions.MuleHttpSender;
 import org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler;
 import org.mule.umo.UMOEvent;
@@ -40,6 +41,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+
+import sun.misc.BASE64Encoder;
 
 /**
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the
@@ -133,6 +136,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setOperationName(method);
         //set Mule event here so that hsandlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
+
+        if(endpointUri.getUserInfo()!=null) {
+            //Add User Creds
+            call.setUsername(endpointUri.getUsername());
+            call.setPassword(endpointUri.getPassword());
+        }
         return call;
     }
 

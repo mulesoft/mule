@@ -48,8 +48,8 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.ConnectException;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -58,7 +58,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
-
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
@@ -77,7 +76,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                               UMOComponent component,
                               UMOEndpoint endpoint) throws InitialisationException
     {
-        create(connector, component, endpoint);
+        super(connector, component, endpoint);
         responseTransformer = getResponseTransformer();
     }
 	
@@ -90,44 +89,30 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 		return transformer;
     }
 
-	public void start() throws UMOException {
+    public void doConnect() throws ConnectException
+    {
+        disposing.set(false);
         URI uri = endpoint.getEndpointURI().getUri();
-        connect(uri);
+        try {
+            serverSocket = createSocket(uri);
+        } catch (Exception e) {
+            throw new org.mule.providers.ConnectException(new Message("tcp", 1, uri), e, this);
+        }
+
         try {
             getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
         } catch (WorkException e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
+            throw new ConnectException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
-	}
+    }
 
-    protected void connect(URI uri) throws InitialisationException
-    {
-        int count = ((TcpConnector) connector).getRetryCount();
-        long freq = ((TcpConnector) connector).getRetryFrequency();
-        count++;
-        for (int i = 0; i < count; i++)
-        {
-            try
-            {
-                serverSocket = createSocket(uri);
-
-                break;
-            } catch (Exception e)
-            {
-                logger.debug("Failed to bind to uri: " + uri, e);
-                if (i < count - 1)
-                {
-                    try
-                    {
-                        Thread.sleep(freq);
-                    } catch (InterruptedException ignore)
-                    {
-                    }
-                } else
-                {
-                    throw new InitialisationException(new Message("tcp", 1, uri), e, this);
-                }
-            }
+    public void doDisconnect() throws ConnectException {
+        //this will cause the server thread to quit
+        disposing.set(true);
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            logger.warn("Failed to close server socket: " + e.getMessage(), e);
         }
     }
 
@@ -182,7 +167,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                     if (!connector.isDisposed() && !disposing.get())
                     {
                         logger.warn("Accept failed on socket: " + e, e);
-                        handleException(e);
+                        handleException(new ConnectException(e, this));
                     }
                 }
                 if (socket != null)

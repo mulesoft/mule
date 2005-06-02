@@ -109,7 +109,7 @@ public class XmppConnector extends AbstractServiceEnabledConnector
     /**
      * Template method to perform any work when destroying the connectoe
      */
-    protected void disposeConnector()
+    protected void doDispose()
     {
         for (Iterator iterator = connCache.keySet().iterator(); iterator.hasNext();) {
             UMOEndpointURI uri = (UMOEndpointURI) iterator.next();

@@ -28,6 +28,7 @@ import org.mule.umo.provider.UMOMessageReceiver;
 
 public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
+    
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         endpoint = new MuleEndpoint("tcp://localhost:10101", true);

@@ -34,6 +34,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -176,7 +178,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector {
 		}
 	}
 
-    protected void stopConnector() throws UMOException
+    protected void doStop() throws UMOException
     {
 		try {
 			for (Iterator it = pools.values().iterator(); it.hasNext();) {
@@ -184,7 +186,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector {
 				pool.close();
 			}
 		} catch (Exception e) {
-			throw new ConnectorException(null, this, e);
+			throw new ConnectorException(new Message(Messages.FAILED_TO_STOP_X, "FTP Connector"), this, e);
 		}
     }
 

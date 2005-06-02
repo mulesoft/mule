@@ -17,7 +17,7 @@ import org.mule.umo.manager.UMOServerEvent;
 
 /**
  * <code>SecurityEvent</code> is fired when a request for authorisation occurs.
- * The event may denote successful accues or denied access depending on the type
+ * The event may denote successful access or denied access depending on the type
  * of event.  Subscribing to these events developers can maintain an access log,
  * block clients, etc.
  *
@@ -28,17 +28,26 @@ import org.mule.umo.manager.UMOServerEvent;
  */
 public class SecurityEvent extends UMOServerEvent
 {
-    //todo add security actions here
+    public static final int SECURITY_AUTHENITCATION_FAILED = SECURITY_EVENT_ACTION_START_RANGE + 1;
 
-    private String[] actions = new String[]{};
-    public SecurityEvent(Object message, int action)
+
+    private String[] actions = new String[]{
+            "authentication failed"};
+
+    public SecurityEvent(org.mule.umo.security.SecurityException message, int action)
     {
         super(message, action);
+        resourceIdentifier = message.toString();
+    }
+
+     protected String getPayloadToString()
+    {
+        return source.toString();
     }
 
     protected String getActionName(int action)
     {
-        int i = action - COMPONENT_EVENT_ACTION_START_RANGE;
+        int i = action - SECURITY_EVENT_ACTION_START_RANGE;
         if(i-1 > actions.length) return String.valueOf(action);
         return actions[i-1];
     }

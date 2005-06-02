@@ -17,6 +17,7 @@ import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -47,7 +48,8 @@ public class PropertyTemplatesTestCase extends NamedTestCase
 
         AbstractConnector c = (AbstractConnector) MuleManager.getInstance().lookupConnector("myTestConnector");
         assertNotNull(c);
-        assertEquals(4, c.getRetryCount());
+        assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
+        assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
 
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("test-from-env-props");
         assertNotNull(d);

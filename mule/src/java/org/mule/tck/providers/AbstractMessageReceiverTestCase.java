@@ -22,8 +22,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
- * <code>AbstractMessageReceiver</code> TODO (document class)
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -45,9 +43,7 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
         UMOComponent component = getTestComponent(getTestDescriptor("orange", Orange.class.getName()));
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         UMOMessageReceiver receiver = getMessageReceiver();
-		receiver.start();
-        receiver.create(new TestConnector(), component, endpoint);
-
+		
         assertNotNull(receiver.getEndpoint());
         assertNotNull(receiver.getConnector());
 

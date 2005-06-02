@@ -51,7 +51,18 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 		this.connector = (VMConnector) connector;
         receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
     }
-	
+
+    public void doConnect() throws Exception {
+        if(connector.isQueueEvents()) {
+            //Ensure we can create a vm queue
+            QueueSession queueSession = connector.getQueueSession();
+            Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
+        }
+   }
+
+    public void doDisconnect() throws Exception {
+    }
+
     /* (non-Javadoc)
      * @see org.mule.umo.UMOEventListener#onEvent(org.mule.umo.UMOEvent)
      */

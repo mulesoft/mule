@@ -15,6 +15,7 @@ package org.mule.impl.internal.events;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.UMODescriptor;
 
 /**
  * <code>ComponentEvent</code> is fired when an event such as the component starting
@@ -38,9 +39,10 @@ public class ComponentEvent extends UMOServerEvent
             "initialised","started","stopped",
             "paused","resumed","disposed"};
 
-    public ComponentEvent(Object message, int action)
+    public ComponentEvent(UMODescriptor message, int action)
     {
         super(message, action);
+        resourceIdentifier = message.getName();
     }
 
      protected String getPayloadToString()

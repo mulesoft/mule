@@ -4,5 +4,5 @@ message.receiver=org.mule.providers.soap.glue.GlueMessageReceiver
 message.adapter=org.mule.providers.DefaultMessageAdapter
 inbound.transformer=
 outbound.transformer=
-endpoint.builder=org.mule.providers.soap.SoapEndpointBuilder
+endpoint.builder=org.mule.impl.endpoint.UrlEndpointBuilder
 service.finder=org.mule.providers.soap.SoapServiceFinder

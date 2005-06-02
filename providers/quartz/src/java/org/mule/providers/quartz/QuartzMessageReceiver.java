@@ -49,13 +49,13 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver {
 	private static final String PROP_DISPATCHER = "mule.quartz.dispatcher";
 	
 	public QuartzMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint) throws InitialisationException {
-		create(connector, component, endpoint);
+		super(connector, component, endpoint);
 	}
 	
 	protected void doDispose() {
 	}
 
-	public void start() throws UMOException {
+	public void doStart() throws UMOException {
 		try {
 			QuartzConnector connector = (QuartzConnector) this.connector;
 			Scheduler s = connector.getScheduler();
@@ -133,6 +133,14 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver {
 			handleException(e);
 		}
 	}
+
+    public void doConnect() throws Exception {
+        //todo
+    }
+
+    public void doDisconnect() throws Exception {
+        //todo
+    }
 
 	public static class MuleJob implements Job {
 

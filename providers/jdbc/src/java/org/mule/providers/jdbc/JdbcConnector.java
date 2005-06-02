@@ -281,6 +281,7 @@ public class JdbcConnector extends AbstractServiceEnabledConnector {
 		}
 		logger.debug("Retrieving new connection from data source");
 		Connection con = dataSource.getConnection();
+
 		if (tx != null) {
 			logger.debug("Binding connection to current transaction");
 			try {

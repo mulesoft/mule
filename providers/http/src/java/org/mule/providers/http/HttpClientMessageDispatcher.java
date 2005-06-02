@@ -39,6 +39,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
+import sun.misc.BASE64Encoder;
+
 /**
  * <p><code>HttpClientMessageDispatcher</code> dispatches Mule events over http.
  *
@@ -106,6 +108,15 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             {
                 httpMethod = new ConnectMethod(httpMethod);
             }
+            httpMethod.setDoAuthentication(true);
+            if(endpointUri.getUserInfo()!=null) {
+                //Add User Creds
+                StringBuffer header = new StringBuffer();
+                header.append("Basic ");
+                header.append(new BASE64Encoder().encode(endpointUri.getUserInfo().getBytes()));
+                httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
+            }
+
             httpMethod.execute(state, connection);
 
             if (httpMethod.getStatusCode() == HttpStatus.SC_OK)
@@ -171,6 +182,15 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 httpMethod = new ConnectMethod(httpMethod);
             }
             httpMethod.setDoAuthentication(true);
+
+            if(event.getEndpoint().getEndpointURI().getUserInfo()!=null) {
+                //Add User Creds
+                StringBuffer header = new StringBuffer();
+                header.append("Basic ");
+                header.append(new BASE64Encoder().encode(event.getEndpoint().getEndpointURI().getUserInfo().getBytes()));
+                httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
+            }
+
             httpMethod.execute(state, connection);
 
             Properties h = new Properties();

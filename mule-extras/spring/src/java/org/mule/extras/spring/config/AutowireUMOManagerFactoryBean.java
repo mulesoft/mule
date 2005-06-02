@@ -135,8 +135,8 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
             Map connectors = context.getBeansOfType(UMOConnector.class, true, true);
             setConnectors(connectors.values());
 
-            //set endpoints
-            setMessageEndpoints((Map) getBean(MULE_ENDPOINT_IDENTIFIERS_BEAN_NAME, Map.class));
+            //set endpoint Identifiers
+            setMessageEndpointIdentifiers((Map) getBean(MULE_ENDPOINT_IDENTIFIERS_BEAN_NAME, Map.class));
 
             //set mule transaction manager
             temp = context.getBeansOfType(UMOTransactionManagerFactory.class, true, true);
@@ -145,14 +145,14 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 			//set security manager
 			temp = context.getBeansOfType(UMOSecurityManager.class, true, true);
 			if (temp.size() > 0) manager.setSecurityManager((UMOSecurityManager) temp.values().iterator().next());
-			
+
             //set Transformers
             Map transformers = context.getBeansOfType(UMOTransformer.class, true, true);
             setTransformers(transformers.values());
 
             //set Endpoints
             Map endpoints = context.getBeansOfType(UMOEndpoint.class, true, true);
-            setProviders(endpoints.values());
+            setEndpoints(endpoints.values());
 
             //set Agents
             Map agents = context.getBeansOfType(UMOAgent.class, true, true);
@@ -173,7 +173,7 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
             setComponents(components.values());
         } catch (Exception e)
         {
-            throw new BeanInitializationException("Failed to wrie MuleManager together: " + e.getMessage(), e);
+            throw new BeanInitializationException("Failed to wire MuleManager together: " + e.getMessage(), e);
         }
     }
 
@@ -240,7 +240,7 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
         }
     }
 
-    protected void setMessageEndpoints(Map endpoints) throws InitialisationException
+    protected void setMessageEndpointIdentifiers(Map endpoints) throws InitialisationException
     {
         if (endpoints == null) return;
         Map.Entry entry;
@@ -287,7 +287,7 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
         }
     }
 
-    protected void setProviders(Collection endpoints) throws InitialisationException
+    protected void setEndpoints(Collection endpoints) throws InitialisationException
     {
         for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
         {

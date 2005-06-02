@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.net.*;
 
 /**
- * <code>UdpMessageReceiver</code> TODO (document class)
+ * <code>UdpMessageReceiver</code> receives UDP message packets
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -56,7 +56,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                               UMOComponent component,
                               UMOEndpoint endpoint) throws InitialisationException
     {
-        create(connector, component, endpoint);
+        super(connector, component, endpoint);
         bufferSize = ((UdpConnector) connector).getBufferSize();
 
 		uri = endpoint.getEndpointURI().getUri();
@@ -71,7 +71,33 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
         responseTransformer = getResponseTransformer();
 	}
-	
+
+    public void doConnect() throws Exception {
+        try
+            {
+            socket = createSocket(uri, inetAddress);
+            socket.setSoTimeout(((UdpConnector) connector).getTimeout());
+            socket.setReceiveBufferSize(bufferSize);
+            socket.setSendBufferSize(bufferSize);
+        } catch (Exception e)
+        {
+            throw new InitialisationException(new Message("udp", 1, uri), e, this);
+        }
+
+        try {
+            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
+        } catch (WorkException e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
+        }
+    }
+
+    public void doDisconnect() throws Exception {
+        //this will cause the server thread to quit
+        disposing.set(true);
+        if(socket!=null) socket.close();
+
+    }
+
     protected UMOTransformer getResponseTransformer() throws InitialisationException
     {
 		UMOTransformer transformer = component.getDescriptor().getResponseTransformer();
@@ -79,52 +105,6 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 			return ((AbstractConnector) connector).getDefaultResponseTransformer();
 		}
 		return transformer;
-    }
-
-	public void start() throws UMOException {
-        connect(uri);
-        try {
-            getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
-        } catch (WorkException e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
-        }
-	}
-	
-
-    protected void connect(URI uri) throws InitialisationException
-    {
-
-        logger.info("Attempting to connect to: " + uri.toString());
-        int count = ((UdpConnector) connector).getRetryCount();
-        long freq = ((UdpConnector) connector).getRetryFrequency();
-        count++;
-        for (int i = 0; i < count; i++)
-        {
-            try
-            {
-                socket = createSocket(uri, inetAddress);
-                socket.setSoTimeout(((UdpConnector) connector).getTimeout());
-                socket.setReceiveBufferSize(bufferSize);
-                socket.setSendBufferSize(bufferSize);
-                logger.info("Connected to: " + uri.toString());
-                break;
-            } catch (Exception e)
-            {
-                logger.debug("Failed to bind to uri: " + uri, e);
-                if (i < count - 1)
-                {
-                    try
-                    {
-                        Thread.sleep(freq);
-                    } catch (InterruptedException ignore)
-                    {
-                    }
-                } else
-                {
-                    throw new InitialisationException(new Message("udp", 1, uri), e, this);
-                }
-            }
-        }
     }
 
     protected DatagramSocket createSocket(URI uri, InetAddress inetAddress) throws IOException

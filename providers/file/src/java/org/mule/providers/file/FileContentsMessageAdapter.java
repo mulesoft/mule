@@ -88,7 +88,7 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
             properties.put(FileConnector.PROPERTY_DIRECTORY, this.file.getAbsolutePath());
         } catch (TransformerException e)
         {
-            throw new MessagingException(new Message(Messages.FILE_X_DOES_NTO_EXIST, file.getAbsolutePath()), e);
+            throw new MessagingException(new Message(Messages.FILE_X_DOES_NOT_EXIST, file.getAbsolutePath()), e);
         }
     }
 

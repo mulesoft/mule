@@ -40,6 +40,8 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 
     private Folder inbox;
 
+    private Session session = null;
+
     private SynchronizedBoolean initialised = new SynchronizedBoolean(false);
 
 
@@ -49,24 +51,32 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
         this.connector = connector;
     }
 
-    protected void initialise(String endpoint) throws MessagingException
+    protected void initialise(UMOEndpointURI endpoint) throws MessagingException
     {
-
-        if(!initialised.get()) {
-            URLName url = new URLName(endpoint);
+        if(!initialised.get())
+        {
+            URLName url = new URLName(endpoint.getAddress());
 
             Properties props = System.getProperties();
             props.put("mail.smtp.host", url.getHost());
             props.put("mail.smtp.port", String.valueOf(url.getPort()));
-            Session session = Session.getDefaultInstance(props, null);
+            session = Session.getDefaultInstance(props, null);
             session.setDebug(logger.isDebugEnabled());
             PasswordAuthentication pw = new PasswordAuthentication(url.getUsername(), url.getPassword());
             session.setPasswordAuthentication(url, pw);
 
             Store store = session.getStore(url);
             store.connect();
+
+            String folder = null;
+            if(connector.getProtocol().equals("imap") && endpoint.getParams().get("folder") != null)
+            {
+                folder = (String)endpoint.getParams().get("folder");
+            } else {
+                folder = Pop3Connector.MAILBOX;
+            }
             //Will always be INBOX for pop3
-            inbox = store.getFolder(connector.getMailBox());
+            inbox = store.getFolder(folder);
             if (!inbox.isOpen()) inbox.open(Folder.READ_ONLY);
         }
     }
@@ -102,7 +112,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
      */
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
-        initialise(endpointUri.getAddress());
+        initialise(endpointUri);
 
             int count = inbox.getMessageCount();
             if (count > 0)
@@ -129,7 +139,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 
     public Object getDelegateSession() throws UMOException
     {
-        return connector.getSession();
+        return session;
     }
 
     public UMOConnector getConnector()

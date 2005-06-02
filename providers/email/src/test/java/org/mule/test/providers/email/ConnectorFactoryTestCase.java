@@ -33,19 +33,11 @@ public class ConnectorFactoryTestCase extends NamedTestCase
         UMOConnector cnn = ConnectorFactory.createConnector(url);
         assertTrue(cnn instanceof Pop3Connector);
         Pop3Connector pop3 = (Pop3Connector)cnn;
-        assertEquals("pop3.muleumo.org", pop3.getHostname());
-        assertEquals(110, pop3.getPort());
-        assertEquals("ross", pop3.getUsername());
-        assertEquals("password", pop3.getPassword());
 
         url = new MuleEndpointURI("pop3://ross:password@pop3.muleumo.org:123?checkFrequency=3001");
         cnn = ConnectorFactory.createConnector(url);
         assertTrue(cnn instanceof Pop3Connector);
         pop3 = (Pop3Connector)cnn;
-        assertEquals("pop3.muleumo.org", pop3.getHostname());
-        assertEquals(123, pop3.getPort());
-        assertEquals("ross", pop3.getUsername());
-        assertEquals("password", pop3.getPassword());
         assertEquals(3001, pop3.getCheckFrequency());
     }
 

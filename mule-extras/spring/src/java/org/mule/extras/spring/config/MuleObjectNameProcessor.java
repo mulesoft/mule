@@ -20,6 +20,7 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
@@ -43,7 +44,9 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
 	        } else if(o instanceof UMOTransformer) {
 				((UMOTransformer)o).setName(s);
 	        } else if(o instanceof UMOEndpoint) {
-	            if(((UMOEndpoint)o).getName()==null || overwrite) ((UMOEndpoint)o).setName(s);
+                //spring uses the class name of the object as the name if no other id is set
+                //this is no good for endpoints
+	            if((((UMOEndpoint)o).getName()==null || overwrite) && !MuleEndpoint.class.getName().equals(s)) ((UMOEndpoint)o).setName(s);
 	        } else if(o instanceof UMODescriptor) {
 	            if(((UMODescriptor)o).getName()==null || overwrite) ((UMODescriptor)o).setName(s);
 	        } else if(o instanceof UMOModel) {

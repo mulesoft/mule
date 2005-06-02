@@ -31,6 +31,7 @@ public class UrlEndpointBuilder extends AbstractEndpointBuilder
 
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
+        address = "";
         if (uri.getHost() != null )
         {
             //set the endpointUri to be a proper url if host and port are set

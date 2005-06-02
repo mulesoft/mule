@@ -16,6 +16,7 @@ package org.mule.providers.jms;
 
 import org.mule.impl.MuleMessage;
 import org.mule.providers.TransactedPollingMessageReceiver;
+import org.mule.providers.ConnectException;
 import org.mule.providers.jms.filters.JmsSelectorFilter;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
@@ -24,6 +25,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.PropertiesHelper;
 
 import javax.jms.*;
 import java.util.List;
@@ -33,7 +35,6 @@ import java.util.List;
  * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  * 
- * TODO: make frequency, reuseConsumer, resuseSession properties configurable
  */
 public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 
@@ -68,12 +69,15 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 	
     public JmsMessageReceiver(UMOConnector connector,
             				  UMOComponent component,
-            				  UMOEndpoint endpoint) throws InitialisationException {
+            				  UMOEndpoint endpoint) throws InitialisationException
+    {
     	super(connector, component, endpoint, new Long(10));
     	this.connector = (JmsConnector) connector;
-    	this.frequency = 10000;
-    	this.reuseConsumer = true;
-    	this.reuseSession = true;
+
+    	this.frequency = PropertiesHelper.getLongProperty(endpoint.getProperties(), "frequency", 10000L);
+    	this.reuseConsumer = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseConsumer", true);
+    	this.reuseSession = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseSession", true);
+
         receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
         try {
             redeliveryHandler = this.connector.createRedeliveryHandler();
@@ -82,7 +86,33 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
             throw new InitialisationException(e, this);
         }
     }
-	
+
+    public void doConnect() throws ConnectException {
+        try {
+            createConsumer();
+        } catch (Exception e) {
+            throw new ConnectException(e, this);
+        }
+    }
+
+    public void doDisconnect() throws ConnectException {
+        try {
+            JmsThreadContext ctx = context.getContext();
+            if(ctx == null) return;
+
+            JmsUtils.closeQuietly(ctx.consumer);
+            ctx.consumer = null;
+
+            // Do not close session if a transaction is in progress
+            // the session will be close by the transaction
+            JmsUtils.closeQuietly(ctx.session);
+            ctx.session = null;
+
+        } catch (Exception e) {
+            throw new ConnectException(e, this);
+        }
+    }
+
     /**
      * The poll method is overrident from the 
      */
@@ -161,6 +191,7 @@ public class JmsMessageReceiver extends	TransactedPollingMessageReceiver {
 	
 	protected void closeConsumer() {
 		JmsThreadContext ctx = context.getContext();
+        if(ctx == null) return;
 		// Close consumer
 		if (!reuseSession || !reuseConsumer) {
 			JmsUtils.closeQuietly(ctx.consumer);

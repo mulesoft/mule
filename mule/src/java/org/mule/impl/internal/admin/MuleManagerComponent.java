@@ -90,8 +90,8 @@ public class MuleManagerComponent implements Callable, Initialisable
     protected Object invokeAction(AdminEvent action, UMOEventContext context) throws UMOException
     {
         String destComponent = null;
-        String endpoint = action.getEndpoint();
-        if(action.getEndpoint().startsWith("mule:")) {
+        String endpoint = action.getResourceIdentifier();
+        if(action.getResourceIdentifier().startsWith("mule:")) {
             destComponent = endpoint.substring(endpoint.lastIndexOf("/")+ 1);
         } else {
             destComponent = endpoint;
@@ -120,7 +120,7 @@ public class MuleManagerComponent implements Callable, Initialisable
 
     protected Object sendAction(AdminEvent action, UMOEventContext context) throws UMOException
     {
-        UMOEndpointURI endpointUri = new MuleEndpointURI(action.getEndpoint());
+        UMOEndpointURI endpointUri = new MuleEndpointURI(action.getResourceIdentifier());
         try
         {
             if(AdminEvent.ACTION_DISPATCH==action.getAction()) {
@@ -136,22 +136,22 @@ public class MuleManagerComponent implements Callable, Initialisable
             }
         } catch (Exception e)
         {
-            throw new DispatchException(action.getMessage(), new MuleEndpoint(action.getEndpoint(), true), e);
+            throw new DispatchException(action.getMessage(), new MuleEndpoint(action.getResourceIdentifier(), true), e);
         }
 
     }
 
     protected Object receiveAction(AdminEvent action, UMOEventContext context) throws UMOException
     {
-        UMOEndpointURI endpointUri = new MuleEndpointURI(action.getEndpoint());
+        UMOEndpointURI endpointUri = new MuleEndpointURI(action.getResourceIdentifier());
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
-        UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(action.getEndpoint());
+        UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(action.getResourceIdentifier());
         long timeout = PropertiesHelper.getLongProperty(action.getProperties(), MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, MuleManager.getConfiguration().getSynchronousEventTimeout());
 
         try
         {
-            UMOEndpointURI ep = new MuleEndpointURI(action.getEndpoint());
+            UMOEndpointURI ep = new MuleEndpointURI(action.getResourceIdentifier());
             UMOMessage result = dispatcher.receive(ep, timeout);
             if(result!=null) {
                 //See if there is a default transformer on the connector

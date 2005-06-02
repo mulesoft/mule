@@ -15,6 +15,7 @@ package org.mule.providers.servlet;
 
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
@@ -36,6 +37,14 @@ public class ServletMessageReceiver extends AbstractMessageReceiver
                         UMOComponent component,
                         UMOEndpoint endpoint) throws InitialisationException
      {
-        create(connector, component, endpoint);
+        super(connector, component, endpoint);
+    }
+
+    public void doConnect() throws Exception {
+
+    }
+
+    public void doDisconnect() throws Exception {
+
     }
 }

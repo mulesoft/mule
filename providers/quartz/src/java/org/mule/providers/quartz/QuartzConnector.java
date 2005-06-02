@@ -72,7 +72,7 @@ public class QuartzConnector extends AbstractServiceEnabledConnector {
 		}
 	}
 
-	protected void startConnector() throws UMOException {
+	protected void doStart() throws UMOException {
 		try {
 			scheduler.start();
 		} catch (Exception e) {
@@ -80,7 +80,7 @@ public class QuartzConnector extends AbstractServiceEnabledConnector {
 		}
 	}
 
-	protected void stopConnector() throws UMOException {
+	protected void doStop() throws UMOException {
 		try {
 			if (scheduler != null) {
 				scheduler.shutdown();

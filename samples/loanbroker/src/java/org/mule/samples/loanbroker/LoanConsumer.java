@@ -98,7 +98,11 @@ public class LoanConsumer
             Thread.sleep(1500);
         } else {
             UMOMessage result = client.send("vm://LoanBrokerRequests", request, null);
-            System.out.println("Loan Consumer received a Quote: " + result.getPayload());
+            if(result==null) {
+                System.out.println("A result was not received, an error must have occurred. Check the logs.");
+            } else {
+                System.out.println("Loan Consumer received a Quote: " + result.getPayload());
+            }
         }
     }
 

@@ -131,19 +131,19 @@ public class FileConnector extends AbstractServiceEnabledConnector
         File dir = null;
         long polling = this.pollingFrequency;
 
-        if (readDir != null)
-        {
-            dir = Utility.openDirectory(readDir);
-            if (!(dir.canRead()))
-            {
-                throw new MuleException(new Message(Messages.FILE_X_DOES_NTO_EXIST, dir.getAbsolutePath()));
-            }
-            else
-            {
-                logger.debug("Listening on endpointUri: " + dir.getAbsolutePath());
-            }
-        }
-        File moveTo = moveToDirectory;
+//        if (readDir != null)
+//        {
+//            dir = Utility.openDirectory(readDir);
+//            if (!(dir.canRead()))
+//            {
+//                throw new MuleException(new Message(Messages.FILE_X_DOES_NOT_EXIST, dir.getAbsolutePath()));
+//            }
+//            else
+//            {
+//                logger.debug("Listening on endpointUri: " + dir.getAbsolutePath());
+//            }
+//        }
+        String moveTo = moveToDirectoryName;
         Map props = endpoint.getProperties();
         if (props != null)
         {
@@ -151,7 +151,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
             String move = (String) props.get(PROPERTY_MOVE_TO_DIRECTORY);
             if (move != null)
             {
-                moveTo = Utility.openDirectory(move);
+                moveTo = move;
             }
             String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null)
@@ -168,11 +168,12 @@ public class FileConnector extends AbstractServiceEnabledConnector
         }
         try
         {
-        	return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{dir, moveTo, moveToPattern, new Long(polling)});
+            return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{readDir, moveTo, moveToPattern, new Long(polling)});
+
         } catch (Exception e)
         {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Message Receiver",
-                    serviceDescriptor.getMessageReceiver()), e);
+                    serviceDescriptor.getMessageReceiver()), e, this);
         } 
     }
 
@@ -181,7 +182,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
 	 *
 	 * @see org.mule.providers.UMOConnector#stop()
 	 */
-    protected synchronized void stopConnector() throws UMOException
+    protected synchronized void doStop() throws UMOException
     {
         if (outputStream != null)
         {
@@ -219,12 +220,12 @@ public class FileConnector extends AbstractServiceEnabledConnector
     /*
 	 * (non-Javadoc)
 	 *
-	 * @see org.mule.providers.AbstractConnector#disposeConnector()
+	 * @see org.mule.providers.AbstractConnector#doDispose()
 	 */
-    protected void disposeConnector()
+    protected void doDispose()
     {
         try {
-            stopConnector();
+            doStop();
         } catch (UMOException e) {
             logger.error(e.getMessage(), e);
         }
@@ -245,14 +246,6 @@ public class FileConnector extends AbstractServiceEnabledConnector
     public void setMoveToDirectory(String dir) throws IOException
     {
         this.moveToDirectoryName = dir;
-        if (moveToDirectoryName != null)
-        {
-            moveToDirectory = Utility.openDirectory((moveToDirectoryName));
-            if (!(moveToDirectory.canRead()) || !moveToDirectory.canWrite())
-            {
-                throw new IOException("Error on initialization, Move To directory does not exist or is not read/write");
-            }
-        }
     }
 
 
