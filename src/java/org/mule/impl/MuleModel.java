@@ -37,6 +37,7 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOComponentFactory;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
+import org.mule.MuleManager;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
@@ -538,9 +539,7 @@ public class MuleModel implements UMOModel
     }
 
     void fireEvent(UMOServerEvent event) {
-        if(listeners!=null) {
-            listeners.fireEvent(event);
-        }
+        MuleManager.getInstance().fireEvent(event);
     }
 
     public void setComponentFactory(UMOComponentFactory factory) {

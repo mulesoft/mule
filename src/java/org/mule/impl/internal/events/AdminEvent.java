@@ -36,23 +36,18 @@ public class AdminEvent extends UMOServerEvent
     private static final String[] actions = new String[]{
             "receive event", "dispatch event", "send event", "invoke component"};
 
-    private String endpoint;
     private Map properties = new HashMap();
     private UMOMessage message;
-    public AdminEvent(int action, UMOMessage message, String endpoint)
+
+    public AdminEvent(UMOMessage message, int action, String resourceIdentifier)
     {
-        super(message, action);
+        super(message, action, resourceIdentifier);
         this.message = message;
-        this.endpoint = endpoint;
     }
+
 
     public UMOMessage getMessage() {
         return message;
-    }
-
-    public String getEndpoint()
-    {
-        return endpoint;
     }
 
     public void setProperty(Object key, Object value) {

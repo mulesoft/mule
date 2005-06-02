@@ -80,6 +80,7 @@ import org.mule.impl.security.MuleSecurityManager;
 import org.mule.interceptors.InterceptorStack;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.ConnectionStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
@@ -171,6 +172,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public static final String ROUTER_INTERFACE = UMOOutboundRouter.class.getName();
     public static final String FILTER_INTERFACE = UMOFilter.class.getName();
     public static final String EXCEPTION_STRATEGY_INTERFACE = ExceptionListener.class.getName();
+    public static final String CONNECTION_STRATEGY_INTERFACE = ConnectionStrategy.class.getName();
 
     protected UMOManager manager;
     protected Digester digester;
@@ -444,6 +446,10 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         addMulePropertiesRule(path + "/persistence-strategy", digester, true);
         digester.addSetNext(path + "/persistence-strategy", "setPersistenceStrategy");
 
+        //Connection strategy
+        digester.addObjectCreate(path + "/connection-strategy", CONNECTION_STRATEGY_INTERFACE, "className");
+        addMulePropertiesRule(path + "/connection-strategy", digester, true);
+        digester.addSetNext(path + "/connection-strategy", "setConnectionStrategy");
 
         digester.addRule(path, new Rule(){
             public void end(String s, String s1) throws Exception
@@ -657,9 +663,12 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         threadingRule.addAlias("setPoolExhaustedAction", "setPoolExhaustedActionString");
         digester.addRule(path + "/threading-profile", threadingRule);
 
+        //Connection strategy
+        digester.addObjectCreate(path + "/connection-strategy", CONNECTION_STRATEGY_INTERFACE, "className");
+        addMulePropertiesRule(path + "/connection-strategy", digester, true);
+        digester.addSetNext(path + "/connection-strategy", "setConnectionStrategy");
         addExceptionStrategyRules(digester, path);
-        //initialise the connector
-        //digester.addCallMethod(path, "initialise");
+
         //register conntector
         digester.addSetRoot(path, "registerConnector");
     }
@@ -1433,7 +1442,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 if(realValue!=null) {
                     value = value.substring(0, x) +  realValue + value.substring(y+1);
                 } else {
-                    logger.info("Property for placeholder: '" + key + "' was not found.  Leaving place holder as is");
+                    logger.info("Property for placeholder: '" + key + "' was not found.  Leaving place holder as is. This is not necessarily a problem as the placeholder may not be a Mule placeholder.");
                 }
                 x = value.indexOf("${", y);
             }

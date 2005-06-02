@@ -26,6 +26,8 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+
 /**
  * <p><code>PollingMessageReceiver</code> implements a polling message receiver.
  * The receiver provides a poll method that implementations should implement to
@@ -47,14 +49,16 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
                                   UMOComponent component,
                                   final UMOEndpoint endpoint, 
                                   Long frequency) throws InitialisationException {
-        create(connector, component, endpoint);
+        super(connector, component, endpoint);
         this.frequency = frequency.longValue();
     }
 	
-	public void start() throws UMOException {
+	public void doStart() throws UMOException 
+    {
         try {
             getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, null);
         } catch (WorkException e) {
+            stopped.set(true);
             throw new InitialisationException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e, this);
         }
 	}
@@ -62,10 +66,8 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
     public void run() {
     	try {
     		Thread.sleep(STARTUP_DELAY);
-	    	while (!connector.isDisposed() && !disposing.get()) {
-	            if (connector.isStarted()) {
-    	            poll();
-	            }
+	    	while (!stopped.get()) {
+                poll();
 	            Thread.sleep(frequency);
 	    	}
     	} catch (InterruptedException e) {
@@ -76,7 +78,7 @@ public abstract class PollingMessageReceiver extends AbstractMessageReceiver imp
     }
 
     public void release() {
-        this.dispose();
+        this.stop();
     }
 
     public void setFrequency(long l) {

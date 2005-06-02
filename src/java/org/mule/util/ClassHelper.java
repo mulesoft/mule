@@ -206,6 +206,13 @@ public class ClassHelper
 
     }
 
+    public static Object instanciateClass(String name, Object[] constructorArgs, Class callingClass) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException
+    {
+        Class clazz = loadClass(name, callingClass);
+        return instanciateClass(clazz, constructorArgs);
+
+    }
+
     public static Class[] getParameterTypes(Object bean, String methodName)
     {
         if (!methodName.startsWith("set"))
@@ -332,6 +339,12 @@ public class ClassHelper
             types[0] = object.getClass();
         }
         return types;
+    }
+
+    public static String getClassName(Class clazz) {
+        if(clazz==null) return null;
+        String name = clazz.getName();
+        return name.substring(name.lastIndexOf(".") + 1);
     }
 
     public static boolean compare(Class[] c1, Class[] c2) {

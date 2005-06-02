@@ -22,7 +22,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * <code>Messages</code> TODO
+ * <code>Messages</code> provides facilities for constructing <code>Message</code> objects
+ * and access to core message constants.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

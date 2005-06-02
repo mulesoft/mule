@@ -269,6 +269,21 @@ public interface UMOManager extends Lifecycle
     public void registerListener(UMOServerEventListener l);
 
     /**
+     * Registers an intenal server event listener.  The listener will
+     * be notified when a particular event happens within the server.  Typically
+     * this is not an event in the same sense as an UMOEvent (although there is nothing
+     * stopping the implementation of this class triggering listeners when a UMOEvent
+     * is received).
+     *
+     * The types of events fired is entirely defined by the implementation of this class
+     * @param l the listener to register
+     * @param resourceIdentifier a particular resource name for the given type of listener
+     * For example, the resourceName could be the name of a component if the listener was a
+     * ComponentEventListener
+     */
+    public void registerListener(UMOServerEventListener l, String resourceIdentifier);
+
+    /**
      * Unregisters a previously registered listener.  If the listener has not already been
      * registered, this method should return without exception
      * @param l the listener to unregister
@@ -324,7 +339,25 @@ public interface UMOManager extends Lifecycle
      * incoming and outgoing event traffic and service invocations
      */
     public UMOSecurityManager getSecurityManager();
-	
+
+    /**
+     * Obtains a workManager instance that can be used to schedule work in a thread pool.  This will
+     * be used primarially by UMOAgents wanting to schedule work.  This work Manager must <b>never</b> be
+     * used by provider implementations as they have their own workManager accible on the connector.
+     *
+     * @return a workManager instance used by the current MuleManager
+     */
+    public UMOWorkManager getWorkManager();
+
+    /**
+     * Obtains a workManager instance that can be used to schedule work in a thread pool.  This will
+     * be used primarially by UMOAgents wanting to schedule work.  This work Manager must <b>never</b> be
+     * used by provider implementations as they have their own workManager accible on the connector.
+     *
+     * @param workManager the workManager instance used by the current MuleManager
+     */
+    public void setWorkManager(UMOWorkManager workManager);
+
 	public void setQueueManager(QueueManager queueManager);
 	
 	public QueueManager getQueueManager();

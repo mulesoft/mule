@@ -66,5 +66,8 @@ public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
         {
             throw new MalformedEndpointException("User info is not set");
         }
+        if(uri.getPath()!=null && !"".equals(uri.getPath())) {
+            props.put("folder", uri.getPath().substring(1));
+        }
     }
 }

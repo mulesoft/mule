@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * <code>UMOException</code> is the base exception type for the Mule server
@@ -54,13 +55,13 @@ public abstract class UMOException extends Exception
      */
     public UMOException(Message message, Throwable cause)
     {
-        super(cause);
+        super((cause instanceof InvocationTargetException ? ((InvocationTargetException)cause).getTargetException() : cause));
         setMessage(message);
     }
 
     public UMOException(Throwable cause)
     {
-        super(cause);
+        super((cause instanceof InvocationTargetException ? ((InvocationTargetException)cause).getTargetException() : cause));
         setMessage(Message.createStaticMessage(cause.getMessage() + " (" + cause.getClass().getName() + ")"));
         initialise();
     }

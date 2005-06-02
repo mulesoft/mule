@@ -2,12 +2,12 @@
  * $Header: /cvsroot/mule/mule/src/java/org/mule/providers/AbstractConnector.java,v 1.16 2003/12/11
  * 13:32:40 rossmason Exp $ $Revision$ $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD style license a copy of
  * which has been included with this distribution in the LICENSE.txt file.
- *  
+ *
  */
 
 package org.mule.providers;
@@ -16,26 +16,37 @@ import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.beanutils.BeanUtils;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.management.mbeans.EndpointService;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.impl.internal.events.ServerEventManager;
+import org.mule.impl.internal.events.ConnectionEvent;
+import org.mule.impl.internal.events.CustomEvent;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.provider.*;
 import org.mule.umo.transformer.UMOTransformer;
 
+import javax.sql.ConnectionEventListener;
 import java.beans.ExceptionListener;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all connectors provided with
@@ -57,10 +68,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
-
-    public static final long DEFAULT_RETRY_FREQUENCY = 1000;
-
-    public static final int DEFAULT_RETRY_COUNT = 3;
 
     /**
      * Specifies if the endpoint started
@@ -113,15 +120,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     private ThreadingProfile receiverThreadingProfile = null;
 
     /**
-     * How many time to retry a connection before throwing an
-     * InitialisationException
+     * Determines whether dispatchers should be disposed straight away
+     * of deferred until the connector is disposing
      */
-    private int retryCount = 2;
-
-    /**
-     * How many milliseconds to wait beween retries
-     */
-    private long retryFrequency = 2000;
+    private boolean disposeDispatcherOnCompletion = false;
 
     /**
      * The service descriptor can define a default inbound transformer to
@@ -141,17 +143,20 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     protected UMOTransformer defaultResponseTransformer = null;
 
+    private ConnectionStrategy connectionStrategy;
+
     public AbstractConnector()
     {
         //make sure we always have an exception strategy
         exceptionListener = new DefaultExceptionStrategy();
         dispatchers = new ConcurrentHashMap();
         receivers = new ConcurrentHashMap();
+        connectionStrategy = MuleManager.getConfiguration().getConnectionStrategy();
     }
 
     /*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.mule.providers.UMOConnector#getName()
 	 */
     public String getName()
@@ -161,7 +166,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.mule.providers.UMOConnector#setName(java.lang.String)
 	 */
     public void setName(String newName)
@@ -193,39 +198,19 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             ((Initialisable)exceptionListener).initialise();
         }
 
+//        if(eventManager==null) {
+//            eventManager = new ServerEventManager(MuleManager.getInstance().getWorkManager());
+//        }
+//        eventManager.registerEventType(ConnectionEvent.class, ConnectionEventListener.class);
         doInitialise();
         initialised.set(true);
     }
 
-
-
     public abstract String getProtocol();
-
-    public long getRetryFrequency()
-    {
-        return retryFrequency;
-    }
-
-    public void setRetryFrequency(long retryFrequency)
-    {
-        if (retryFrequency < 1) retryFrequency = DEFAULT_RETRY_FREQUENCY;
-        this.retryFrequency = retryFrequency;
-    }
-
-    public int getRetryCount()
-    {
-        return retryCount;
-    }
-
-    public void setRetryCount(int retryCount)
-    {
-        if (retryCount < 0) retryCount = DEFAULT_RETRY_COUNT;
-        this.retryCount = retryCount;
-    }
 
     /*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.mule.umo.provider.UMOConnector#start()
 	 */
     public final void start() throws UMOException
@@ -237,7 +222,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (!started.get())
         {
             if (logger.isInfoEnabled()) logger.info("Starting Connector: " + getClass().getName());
-            startConnector();
+            doStart();
+            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
+                AbstractMessageReceiver amr = (AbstractMessageReceiver)iterator.next();
+                logger.debug("Starting receiver on endpoint: " + amr.getEndpoint().getEndpointURI());
+                amr.start();
+            }
             started.set(true);
             if (logger.isInfoEnabled()) logger.info("Connector: " + getClass().getName() + " has been started");
         }
@@ -245,7 +235,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.mule.umo.provider.UMOConnector#isStarted()
 	 */
     public boolean isStarted()
@@ -255,7 +245,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.mule.umo.provider.UMOConnector#stop()
 	 */
     public final void stop() throws UMOException
@@ -267,7 +257,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (started.get())
         {
             if (logger.isInfoEnabled()) logger.info("Stopping Connector: " + getClass().getName());
-            stopConnector();
+            doStop();
+            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
+                AbstractMessageReceiver amr = (AbstractMessageReceiver)iterator.next();
+                logger.debug("Stopping receiver on endpoint: " + amr.getEndpoint().getEndpointURI());
+                amr.stop();
+            }
             started.set(false);
             if (logger.isInfoEnabled()) logger.info("Connector " + getClass().getName() + " has been stopped");
         }
@@ -316,7 +311,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             dispatchers.clear();
             logger.debug("Dispatchers Disposed");
         }
-        disposeConnector();
+        doDispose();
 
         if (logger.isInfoEnabled()) logger.info("Connector " + getClass().getName() + " has been disposed.");
 
@@ -463,12 +458,20 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         } else
         {
             receiver = createReceiver(component, endpoint);
-			receiver.start();
             receivers.put(getReceiverKey(component, endpoint), receiver);
+        }
+        if(started.get()) {
+            ((AbstractMessageReceiver)receiver).start();
         }
         return receiver;
     }
 
+    /**
+     * The method determines the key used to store the receiver against.
+     * @param component the component for which the endpoint is being registered
+     * @param endpoint the endpoint being registered for the component
+     * @return the key to store the newly created receiver against
+     */
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
     {
         if(endpoint.getEndpointURI().getFilterAddress()!=null) {
@@ -537,7 +540,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      *
      * @throws UMOException if the method fails
      */
-    protected void startConnector() throws UMOException
+    protected void doStart() throws UMOException
     {
     }
 
@@ -546,7 +549,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      *
      * @throws UMOException if the method fails
      */
-    protected void stopConnector() throws UMOException
+    protected void doStop() throws UMOException
     {
     }
 
@@ -554,10 +557,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * Template method to perform any work when destroying the connectoe
      *
      */
-    protected void disposeConnector()
+    protected void doDispose()
     {
         try {
-            stopConnector();
+            stop();
         } catch (UMOException e) {
             logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
         }
@@ -645,5 +648,53 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     public Map getDispatchers()
     {
         return dispatchers;
+    }
+
+    /**
+     * Fires a server event to all registered {@link org.mule.impl.internal.events.CustomEventListener}
+     * eventManager.
+     * @param event the event to fire.  This must be of type {@link org.mule.impl.internal.events.CustomEvent}
+     * otherwise an exception will be thrown.
+     * @throws UnsupportedOperationException if the event fired is not a {@link org.mule.impl.internal.events.CustomEvent}
+     */
+    public void fireEvent(UMOServerEvent event)
+    {
+        MuleManager.getInstance().fireEvent(event);
+        //if(event instanceof CustomEvent) {
+//            if(eventManager!=null) {
+//                eventManager.fireEvent(event);
+//            } else if(logger.isDebugEnabled()) {
+//                logger.debug("Event Manager is not enabled, ignoring event: " + event);
+//            }
+//        } else {
+//            throw new UnsupportedOperationException(new Message(Messages.ONLY_CUSTOM_EVENTS_CAN_BE_FIRED).getMessage());
+//        }
+    }
+
+    public ConnectionStrategy getConnectionStrategy() {
+        //not happy with this but each receiver needs its own instance
+        //of the connection strategy and using a factory just introduces extra
+        //complexity
+        try {
+            return (ConnectionStrategy)BeanUtils.cloneBean(connectionStrategy);
+        } catch (Exception e) {
+            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CLONE_X, "connectionStrategy"), e);
+        }
+    }
+
+    public void setConnectionStrategy(ConnectionStrategy connectionStrategy) {
+        this.connectionStrategy = connectionStrategy;
+    }
+
+
+    public List getEndpointMBeans() {
+        //for now only return receiver endpoints as those are the ones we can control
+        //in terms of connecting/disconnecting
+        List beans = new ArrayList(receivers.size());
+        for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
+            UMOMessageReceiver receiver = (UMOMessageReceiver) iterator.next();
+            beans.add(new EndpointService(receiver));
+        }
+        return beans;
     }
 }

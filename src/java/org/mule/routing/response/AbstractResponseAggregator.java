@@ -48,7 +48,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
     private Map responseEvents = new ConcurrentHashMap();
     private Map locks = new ConcurrentHashMap();
 
-    protected long timeout = 0;
+    protected long timeout = 5000;
 
     protected Map eventGroups = new ConcurrentHashMap();
     private Object lock = new Object();
@@ -135,7 +135,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         try
         {
             logger.debug("Waiting for response to message: " + messageId);
-            if(timeout>=0) {
+            if(timeout<=0) {
                 s.acquire();
                 b = true;
             } else {

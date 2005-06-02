@@ -1,40 +1,40 @@
-/*
+/* 
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- *
+ * 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- *
+ * 
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file.
+ * the LICENSE.txt file. 
+ *
  */
 package org.mule.impl.internal.events;
 
 import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
- * <code>SecurityEvent</code> is fired when a request for authorisation occurs.
- * The event may denote successful access or denied access depending on the type
- * of event.  Subscribing to these events developers can maintain an access log,
- * block clients, etc.
+ * todo document
  *
- * @see org.mule.MuleManager
- * @see org.mule.umo.manager.UMOManager
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SecurityEvent extends UMOServerEvent
+public class ConnectionEvent  extends UMOServerEvent
 {
-    public static final int SECURITY_AUTHENITCATION_FAILED = SECURITY_EVENT_ACTION_START_RANGE + 1;
+    public static final int CONNECTION_CONNECTED = CONNECTION_EVENT_ACTION_START_RANGE + 1;
+    public static final int CONNECTION_FAILED = CONNECTION_EVENT_ACTION_START_RANGE + 2;
+    public static final int CONNECTION_DISCONNECTED = CONNECTION_EVENT_ACTION_START_RANGE + 3;
 
 
     private String[] actions = new String[]{
-            "authentication failed"};
+            "connected","connect failed", "disconnected"};
 
-    public SecurityEvent(org.mule.umo.security.SecurityException message, int action)
+    public ConnectionEvent(UMOEndpointURI message, int action)
     {
         super(message, action);
         resourceIdentifier = message.toString();
@@ -47,7 +47,7 @@ public class SecurityEvent extends UMOServerEvent
 
     protected String getActionName(int action)
     {
-        int i = action - SECURITY_EVENT_ACTION_START_RANGE;
+        int i = action - CONNECTION_EVENT_ACTION_START_RANGE;
         if(i-1 > actions.length) return String.valueOf(action);
         return actions[i-1];
     }

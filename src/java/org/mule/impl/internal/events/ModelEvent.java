@@ -15,6 +15,7 @@ package org.mule.impl.internal.events;
 
 import org.mule.impl.MuleModel;
 import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.model.UMOModel;
 
 /**
  * <code>ModelEvent</code> is fired when an event such as the model starting
@@ -42,14 +43,15 @@ public class ModelEvent extends UMOServerEvent implements BlockingServerEvent
             "initialising","initialised", "initialising listeners","initialised listeners","starting",
             "started","stopping","stopped", "disposing","disposed"};
 
-    public ModelEvent(Object message, int action)
+    public ModelEvent(UMOModel message, int action)
     {
         super(message, action);
+        resourceIdentifier = message.getName();
     }
 
     protected String getPayloadToString()
     {
-        return ((MuleModel)source).getName();
+        return ((UMOModel)source).getName();
     }
 
     protected String getActionName(int action)

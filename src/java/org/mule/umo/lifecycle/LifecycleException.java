@@ -17,6 +17,8 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * <code>LifecycleException</code> TODO
  *

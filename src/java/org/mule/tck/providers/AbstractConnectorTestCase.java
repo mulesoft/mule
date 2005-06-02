@@ -60,6 +60,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     {
         super.setUp();
         descriptor = getTestDescriptor("orange", Orange.class.getName());
+        MuleManager.getInstance().start();
         connector = getConnector();
     }
 
@@ -232,21 +233,6 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         assertNotNull("Protocol must be set as a constant", connector.getProtocol());
 
-        //test do threading prop
-        AbstractConnector tempCnn = null;
-
-        HashMap props = new HashMap();
-
-        if (connector instanceof AbstractConnector)
-        {
-            tempCnn = (AbstractConnector) connector;
-
-            tempCnn.setRetryFrequency(-1);
-            assertEquals(AbstractConnector.DEFAULT_RETRY_FREQUENCY, tempCnn.getRetryFrequency());
-
-            tempCnn.setRetryCount(-1);
-            assertEquals(AbstractConnector.DEFAULT_RETRY_COUNT, tempCnn.getRetryCount());
-        }
     }
 
     public void testConnectorMessageAdapter() throws Exception

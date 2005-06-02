@@ -20,11 +20,18 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.manager.UMOServerEventListener;
+import org.mule.umo.manager.UMOWorkManager;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import javax.resource.spi.work.Work;
-import java.util.HashSet;
+import javax.resource.spi.work.WorkManager;
+import javax.resource.spi.work.WorkException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.Comparator;
 
 /**
  * <code>ServerEventManager</code> manages all server listeners for a Mule Instance
@@ -39,43 +46,70 @@ public class ServerEventManager implements Work, Disposable
      */
     protected static transient Log logger = LogFactory.getLog(ServerEventManager.class);
 
+    public static final String NULL_RESOURCE_IDENTIFIER = "NULL";
+
     private Map listenersMap = null;
+    private Map eventsMap = null;
     private BoundedBuffer eventQueue;
-    private Thread eventLoop;
     private boolean disposed = false;
 
-    public ServerEventManager()
+    private Comparator comparator = new Comparator() {
+        public int compare(Object o1, Object o2) {
+            return (o1.equals(o2) ? 0 : 1);
+        }
+    };
+
+    public ServerEventManager(UMOWorkManager workManager)
     {
         init();
+        try {
+            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, null);
+        } catch (WorkException e) {
+            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e);
+        }
     }
 
     private synchronized void init()
     {
-        listenersMap = new ConcurrentHashMap(4);
-        listenersMap.put(ManagerEvent.class, new HashSet());
-        listenersMap.put(ModelEvent.class, new HashSet());
-        listenersMap.put(ComponentEvent.class, new HashSet());
-        listenersMap.put(SecurityEvent.class, new HashSet());
-        listenersMap.put(ManagementEvent.class, new HashSet());
-        listenersMap.put(AdminEvent.class, new HashSet());
-        listenersMap.put(CustomEvent.class, new HashSet());
+        listenersMap = new ConcurrentHashMap();
+        eventsMap = new ConcurrentHashMap();
         eventQueue = new BoundedBuffer(1000);
-        eventLoop = new Thread(this, "Event Loop");
-        eventLoop.start();
     }
 
+    public void registerEventType(Class eventType, Class listenerType) {
+        if(UMOServerEvent.class.isAssignableFrom(eventType)) {
+            if(!listenersMap.containsKey(eventType)) {
+                listenersMap.put(eventType, new TreeMap(comparator));
+                eventsMap.put(listenerType, eventType);
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Registered event type: " + eventType);
+                    logger.debug("Binding listener type '" + listenerType + "' to event type '" + eventType + "'");
+                }
+            }
+        } else {
+            throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X,
+                    "eventType", UMOServerEvent.class.getName(), eventType.getName()).getMessage());
+        }
+    }
     public void registerListener(UMOServerEventListener listener)
     {
-        HashSet listeners = getListeners(listener.getClass());
+        registerListener(listener, null);
+    }
+
+    public void registerListener(UMOServerEventListener listener, String resourceIdentifier)
+    {
+        if(resourceIdentifier==null) resourceIdentifier = NULL_RESOURCE_IDENTIFIER;
+
+        TreeMap listeners = getListeners(listener.getClass());
         synchronized (listeners)
         {
-            listeners.add(listener);
+            listeners.put(listener, resourceIdentifier);
         }
     }
 
     public void unregisterListener(UMOServerEventListener listener)
     {
-        HashSet listeners = getListeners(listener.getClass());
+        TreeMap listeners = getListeners(listener.getClass());
         synchronized (listeners)
         {
             listeners.remove(listener);
@@ -85,7 +119,7 @@ public class ServerEventManager implements Work, Disposable
     public void clearListeners(Class listenerClass)
     {
         if (listenerClass == null) return;
-        HashSet listeners = getListeners(listenerClass);
+        TreeMap listeners = getListeners(listenerClass);
         synchronized (listeners)
         {
             listeners.clear();
@@ -96,7 +130,7 @@ public class ServerEventManager implements Work, Disposable
     {
         for (Iterator iterator = listenersMap.values().iterator(); iterator.hasNext();)
         {
-            HashSet set = (HashSet) iterator.next();
+            TreeMap set = (TreeMap) iterator.next();
             synchronized (set)
             {
                 set.clear();
@@ -106,41 +140,35 @@ public class ServerEventManager implements Work, Disposable
         init();
     }
 
-    protected HashSet getListeners(Class listenerClass)
+    protected TreeMap getListeners(Class listenerClass)
     {
         if (listenerClass == null)
         {
             throw new NullPointerException("Listener class cannot be null");
         }
-        if (ManagerEventListener.class.isAssignableFrom(listenerClass))
-        {
-            return (HashSet) listenersMap.get(ManagerEvent.class);
-        } else if (ModelEventListener.class.isAssignableFrom(listenerClass))
-        {
-            return (HashSet) listenersMap.get(ModelEvent.class);
-        } else if (ComponentEventListener.class.isAssignableFrom(listenerClass))
-        {
-            return (HashSet) listenersMap.get(ComponentEvent.class);
-        } else if (ManagementEventListener.class.isAssignableFrom(listenerClass))
-        {
-            return (HashSet) listenersMap.get(ManagementEvent.class);
-        } else if (SecurityEventListener.class.isAssignableFrom(listenerClass))
-        {
-            return (HashSet) listenersMap.get(SecurityEvent.class);
-        } else if (CustomEventListener.class.isAssignableFrom(listenerClass))
-        {
-            return (HashSet) listenersMap.get(CustomEvent.class);
-        } else if (AdminEventListener.class.isAssignableFrom(listenerClass))
-        {
-            return (HashSet) listenersMap.get(AdminEvent.class);
+        Class eventType = null;
+        for (Iterator iterator = eventsMap.keySet().iterator(); iterator.hasNext();) {
+            Class clazz =  (Class)iterator.next();
+            if(clazz.isAssignableFrom(listenerClass)) {
+                eventType = (Class)eventsMap.get(clazz);
+                break;
+            }
+        }
+
+        if(eventType!=null) {
+            return (TreeMap) listenersMap.get(eventType);
         } else
         {
-            throw new IllegalArgumentException("Listener type not recognised: " + listenerClass.getName());
+            throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X,
+                    "Listener Type", "Registered Type", listenerClass.getName()).getMessage());
         }
     }
 
     public void fireEvent(UMOServerEvent event)
     {
+        if(disposed) {
+            return;
+        }
         if (event instanceof BlockingServerEvent)
         {
             notifyListeners(event);
@@ -158,79 +186,49 @@ public class ServerEventManager implements Work, Disposable
     public void dispose()
     {
         disposed = true;
-        eventLoop.interrupt();
         clear();
     }
 
     protected void notifyListeners(UMOServerEvent event)
     {
-        HashSet listeners;
-        if (event instanceof ManagerEvent)
-        {
-            listeners = getListeners(ManagerEventListener.class);
-            ManagerEventListener l;
-            for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
-            {
-                l = (ManagerEventListener) iterator.next();
-                l.onEvent(event);
+        TreeMap listeners;
+        String resourceIdentifier = null;
+        Class listenerClass = null;
+
+        //determine the listewner class type for the current event
+        Map.Entry entry = null;
+        for (Iterator iterator = eventsMap.entrySet().iterator(); iterator.hasNext();) {
+            entry = (Map.Entry) iterator.next();
+            Class eventClass = (Class) entry.getValue();
+            if(event.getClass().isAssignableFrom(eventClass)) {
+                listenerClass = (Class)entry.getKey();
+                break;
             }
-        } else if (event instanceof ModelEvent)
-        {
-            listeners = getListeners(ModelEventListener.class);
-            ModelEventListener l;
-            for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
+        }
+
+        if(listenerClass==null) {
+            throw new IllegalArgumentException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, event.getClass().getName()).getMessage());            
+        }
+
+        listeners = getListeners(listenerClass);
+        UMOServerEventListener l;
+        synchronized(listeners) {
+            for (Iterator iterator = listeners.keySet().iterator(); iterator.hasNext();)
             {
-                l = (ModelEventListener) iterator.next();
-                l.onEvent(event);
+                l = (UMOServerEventListener) iterator.next();
+                resourceIdentifier = (String)listeners.get(l);
+                if(resourceIdentifier==null) resourceIdentifier = NULL_RESOURCE_IDENTIFIER;
+
+                //If the listener has a resource id associated with it, make sure the event
+                //is only fired if the event resource id and listener resource id match
+                if(NULL_RESOURCE_IDENTIFIER.equals(resourceIdentifier) ||
+                        resourceIdentifier.equals(event.getResourceIdentifier())) {
+                    l.onEvent(event);
+                } else {
+                    logger.trace("Resource id '" + resourceIdentifier + "' for listener " + l.getClass().getName() + " does not match Resource id '" +
+                            event.getResourceIdentifier() + "' for event, not firing event for this listener");
+                }
             }
-        } else if (event instanceof ComponentEvent)
-        {
-            listeners = getListeners(ComponentEventListener.class);
-            ComponentEventListener l;
-            for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
-            {
-                l = (ComponentEventListener) iterator.next();
-                l.onEvent(event);
-            }
-        } else if (event instanceof ManagementEvent)
-        {
-            listeners = getListeners(ManagementEventListener.class);
-            ManagementEventListener l;
-            for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
-            {
-                l = (ManagementEventListener) iterator.next();
-                l.onEvent(event);
-            }
-        } else if (event instanceof SecurityEvent)
-        {
-            listeners = getListeners(SecurityEventListener.class);
-            SecurityEventListener l;
-            for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
-            {
-                l = (SecurityEventListener) iterator.next();
-                l.onEvent(event);
-            }
-        } else if (event instanceof CustomEvent)
-        {
-            listeners = getListeners(CustomEventListener.class);
-            CustomEventListener l;
-            for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
-            {
-                l = (CustomEventListener) iterator.next();
-                l.onEvent(event);
-            }
-        } else if (event instanceof CustomEvent)
-        {
-            listeners = getListeners(CustomEventListener.class);
-            AdminEventListener l;
-            for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
-            {
-                l = (AdminEventListener) iterator.next();
-                l.onEvent(event);
-            }
-        } else
-        {
-            throw new IllegalArgumentException("Event type not recognised: " + event.getClass().getName());
         }
     }
 

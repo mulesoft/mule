@@ -164,7 +164,7 @@ public interface CoreMessageConstants
     public static final int EXCEPTION_ON_CONNECTOR_X_NO_EXCEPTION_LISTENER = 146;
     public static final int UNIQUE_ID_NOT_SUPPORTED_BY_ADAPTER_X = 147;
     public static final int FAILED_TO_PERSIST_EVENT_X = 148;
-    public static final int FILE_X_DOES_NTO_EXIST = 149;
+    public static final int FILE_X_DOES_NOT_EXIST = 149;
     public static final int SERVER_EVENT_MANAGER_NOT_ENABLED = 150;
     public static final int FAILED_TO_SCHEDULE_WORK = 151;
     public static final int AUTH_NO_CREDENTIALS = 152;
@@ -172,12 +172,16 @@ public interface CoreMessageConstants
     public static final int X_IS_INVALID = 154;
     public static final int CONTAINER_X_ALREADY_REGISTERED = 155;
     public static final int CONNECTOR_WITH_PROTOCOL_X_NOT_REGISTERED = 156;
-    public static final int X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X = 157;
+    public static final int PROPERTY_X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X = 157;
     public static final int PROPERTY_TEMPLATE_MALFORMED_X = 158;
     public static final int MANAGER_IS_ALREADY_CONFIGURED = 159;
 	public static final int X_MUST_IMPLEMENT_AN_INTERFACE = 160;
+
 	public static final int RESOURCE_MANAGER_NOT_STARTED = 161;
 	public static final int RESOURCE_MANAGER_DIRTY = 162;
 	public static final int RESOURCE_MANAGER_NOT_READY = 163;
 
+    public static final int RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X = 164;
+	public static final int CANT_SET_X_ONCE_IT_HAS_BEEN_SET = 165;
+	public static final int EVENT_TYPE_X_NOT_RECOGNISED = 166;
 }

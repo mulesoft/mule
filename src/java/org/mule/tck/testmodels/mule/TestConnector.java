@@ -46,9 +46,9 @@ public class TestConnector extends AbstractConnector
 
 
     /* (non-Javadoc)
-     * @see org.mule.providers.AbstractConnector#disposeConnector()
+     * @see org.mule.providers.AbstractConnector#doDispose()
      */
-    protected void disposeConnector()
+    protected void doDispose()
     {
 
     }
@@ -70,17 +70,17 @@ public class TestConnector extends AbstractConnector
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.AbstractConnector#startConnector()
+     * @see org.mule.providers.AbstractConnector#doStart()
      */
-    protected void startConnector() throws UMOException
+    protected void doStart() throws UMOException
     {
 
     }
 
     /* (non-Javadoc)
-     * @see org.mule.providers.AbstractConnector#stopConnector()
+     * @see org.mule.providers.AbstractConnector#doStop()
      */
-    protected void stopConnector() throws UMOException
+    protected void doStop() throws UMOException
     {
 
     }
@@ -95,13 +95,19 @@ public class TestConnector extends AbstractConnector
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        UMOMessageReceiver receiver = new AbstractMessageReceiver(){
+        UMOMessageReceiver receiver = new AbstractMessageReceiver(this, component, endpoint) {
             protected boolean allowFilter(UMOFilter filter) throws UnsupportedOperationException
             {
                 return true;
             }
+            public void doConnect() throws Exception {}
+
+            public void doDisconnect() throws Exception {}
+
+            public boolean isConnected() {
+                return false;
+            }
         };
-        receiver.create(this, component, endpoint);
         return receiver;
     }
 

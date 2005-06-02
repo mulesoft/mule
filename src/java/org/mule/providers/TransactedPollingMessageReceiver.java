@@ -52,9 +52,10 @@ public abstract class TransactedPollingMessageReceiver extends
     	super(connector, component, endpoint, frequency);
     }
 	
-	public void start() throws UMOException {
-		if (receiveMessagesInTransaction) {
-			ThreadingProfile tp = ((AbstractConnector) connector).getReceiverThreadingProfile();
+	public void doStart() throws UMOException {
+        super.doStart();
+        ThreadingProfile tp = ((AbstractConnector) connector).getReceiverThreadingProfile();
+		if (receiveMessagesInTransaction && tp.isDoThreading()) {
 			for (int i = 0; i < tp.getMaxThreadsActive(); i++) {
 				super.start();
 			}
