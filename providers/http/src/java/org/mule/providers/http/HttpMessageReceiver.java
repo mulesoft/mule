@@ -50,6 +50,7 @@ import javax.resource.spi.work.Work;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Properties;
 
 /**
@@ -234,6 +235,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         {
             line = HttpParser.readLine(is);
         } catch (SocketException e)
+        {
+            return null;
+        } catch (SocketTimeoutException e)
         {
             return null;
         }
