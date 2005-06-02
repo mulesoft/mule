@@ -228,7 +228,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         addSecurityManagerRules(digester, path);
         addTransactionManagerRules(digester, path);
         addGlobalEndpointRules(digester, path);
-        addEndpointIdentfierRules(digester, path);
+        addEndpointIdentifierRules(digester, path);
         addInterceptorStackRules(digester, path);
         addConnectorRules(digester, path);
         addAgentRules(digester, path);
@@ -577,7 +577,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         addEndpointRules(digester, path, "registerEndpoint");
     }
 
-    protected void addEndpointIdentfierRules(Digester digester, String path) throws ConfigurationException
+    protected void addEndpointIdentifierRules(Digester digester, String path) throws ConfigurationException
     {
         //Create and reqister endpoints
         path += "/endpoint-identifiers/endpoint-identifier";
