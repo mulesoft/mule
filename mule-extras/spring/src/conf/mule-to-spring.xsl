@@ -315,10 +315,14 @@
             <xsl:apply-templates select="@outboundTransformer" mode="addTransformers"/>
             <xsl:apply-templates select="properties" mode="asMap"/>
             <xsl:apply-templates select="inbound-router"/>
-            <xsl:apply-templates select="response-router"/>
             <xsl:apply-templates select="outbound-router"/>
+            <xsl:apply-templates select="response-router"/>
+            <property name="interceptors">
+				<list>
+					<xsl:apply-templates select="interceptor"/>
+				</list>
+            </property>
             <xsl:apply-templates select="exception-strategy"/>
-
             <xsl:apply-templates select="threading-profile"/>
             <xsl:apply-templates select="queue-profile"/>
             <xsl:apply-templates select="pooling-profile"/>
