@@ -12,17 +12,17 @@
 
 package org.mule.test.util;
 
-import junit.framework.TestCase;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.util.Utility;
-
 import java.io.File;
 import java.util.Date;
 
+import junit.framework.TestCase;
+
+import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.util.Utility;
+
 /**
- * <p/>
- * <code>UtilTestCase</code> TODO (document class)
- *
+ * <p/> <code>UtilTestCase</code> TODO (document class)
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -31,7 +31,6 @@ public class UtilTestCase extends TestCase
     private final String TEST_FILE = "testFile.txt";
     private final String TEST_DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
     private final String TEST_DATE_FORMAT_2 = "dd-MM-yy, hh:mm";
-
 
     public void testByteTools() throws Exception
     {
@@ -58,8 +57,7 @@ public class UtilTestCase extends TestCase
     public void testFileTools() throws Exception
     {
         File file = null;
-        try
-        {
+        try {
             file = Utility.stringToFile(TEST_FILE, "this is a test file");
             assertNotNull(file);
             assertTrue(file.exists());
@@ -102,9 +100,7 @@ public class UtilTestCase extends TestCase
             assertTrue(dir.isDirectory());
             dir.delete();
 
-        }
-        finally
-        {
+        } finally {
             if (file != null)
                 file.delete();
         }

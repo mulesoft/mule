@@ -13,7 +13,9 @@
  */
 package org.mule.routing.response;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
@@ -28,14 +30,13 @@ import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.Iterator;
-import java.util.List;
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>ResponseMessageRouter</code> is a router that can be used to control
- * how the response in a request/response message flow is created.  Main usecase
+ * how the response in a request/response message flow is created. Main usecase
  * is to aggregate a set of asynchonous events into a single response
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -49,7 +50,7 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     private List endpoints = new CopyOnWriteArrayList();
 
     private UMOTransformer transformer;
-    
+
     private boolean stopProcessing = true;
 
     public ResponseMessageRouter()
@@ -60,13 +61,11 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public void route(UMOEvent event) throws RoutingException
     {
         UMOResponseRouter router = null;
-        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
             router = (UMOResponseRouter) iterator.next();
             router.process(event);
-            //Update stats
-            if (getStatistics().isEnabled())
-            {
+            // Update stats
+            if (getStatistics().isEnabled()) {
                 getStatistics().incrementRoutedMessage(event.getEndpoint());
             }
         }
@@ -75,33 +74,27 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public UMOMessage getResponse(UMOMessage message) throws RoutingException
     {
         UMOMessage result = null;
-        if (routers.size() == 0)
-        {
+        if (routers.size() == 0) {
             result = message;
         } else {
             UMOResponseRouter router = null;
-            for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
-            {
+            for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
                 router = (UMOResponseRouter) iterator.next();
                 result = router.getResponse(message);
             }
 
-            if (result==null)
-            {
-                //Update stats
-                if (getStatistics().isEnabled())
-                {
+            if (result == null) {
+                // Update stats
+                if (getStatistics().isEnabled()) {
                     getStatistics().incrementNoRoutedMessage();
                 }
             }
         }
 
-        if(result!=null && transformer!=null) {
-            try
-            {
+        if (result != null && transformer != null) {
+            try {
                 result = new MuleMessage(transformer.transform(result.getPayload()), result.getProperties());
-            } catch (TransformerException e)
-            {
+            } catch (TransformerException e) {
                 throw new RoutingException(result, null);
             }
         }
@@ -116,23 +109,19 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
 
     public UMOResponseRouter removeRouter(UMOResponseRouter router)
     {
-        if (routers.remove(router))
-        {
+        if (routers.remove(router)) {
             return router;
-        } else
-        {
+        } else {
             return null;
         }
     }
 
     public void addEndpoint(UMOEndpoint endpoint)
     {
-        if (endpoint != null)
-        {
+        if (endpoint != null) {
             endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RESPONSE);
             endpoints.add(endpoint);
-        } else
-        {
+        } else {
             throw new NullPointerException("Endpoint cannot be null");
         }
     }
@@ -149,8 +138,7 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
 
     public void setEndpoints(List endpoints)
     {
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
             UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
             addEndpoint(endpoint);
         }
@@ -164,11 +152,9 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public UMOEndpoint getEndpoint(String name)
     {
         UMOEndpoint endpointDescriptor;
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
             endpointDescriptor = (UMOEndpoint) iterator.next();
-            if (endpointDescriptor.getName().equals(name))
-            {
+            if (endpointDescriptor.getName().equals(name)) {
                 return endpointDescriptor;
             }
         }
@@ -184,15 +170,15 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     {
         this.transformer = transformer;
     }
-    
-    public boolean isStopProcessing() 
+
+    public boolean isStopProcessing()
     {
-    	return stopProcessing;
+        return stopProcessing;
     }
-    
+
     public void setStopProcessing(boolean stopProcessing)
     {
-    	this.stopProcessing = stopProcessing;
+        this.stopProcessing = stopProcessing;
     }
 
 }

@@ -13,6 +13,8 @@
  */
 package org.mule.test.routing.inbound;
 
+import java.util.Iterator;
+
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -21,12 +23,14 @@ import org.mule.routing.inbound.EventGroup;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
-
-import java.util.Iterator;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -79,8 +83,8 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
         protected boolean shouldAggregate(EventGroup events)
         {
             eventCount++;
-            if(eventCount == eventThreshold) {
-                eventCount=0;
+            if (eventCount == eventThreshold) {
+                eventCount = 0;
                 return true;
             }
             return false;
@@ -90,14 +94,11 @@ public class EventAggregatorTestCase extends AbstractMuleTestCase
         {
             StringBuffer newPayload = new StringBuffer();
             UMOEvent event = null;
-            for (Iterator iterator = events.getEvents().iterator(); iterator.hasNext();)
-            {
+            for (Iterator iterator = events.getEvents().iterator(); iterator.hasNext();) {
                 event = (UMOEvent) iterator.next();
-                try
-                {
+                try {
                     newPayload.append(event.getMessageAsString()).append(" ");
-                } catch (UMOException e)
-                {
+                } catch (UMOException e) {
                     throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
                 }
             }

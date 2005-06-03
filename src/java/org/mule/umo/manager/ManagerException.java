@@ -17,8 +17,9 @@ import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
 /**
- * <code>ManagerException</code> is thrown when an exception occurs with Manager objects
- *
+ * <code>ManagerException</code> is thrown when an exception occurs with
+ * Manager objects
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,7 +35,7 @@ public class ManagerException extends UMOException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public ManagerException(Message message, Throwable cause)
     {

@@ -15,18 +15,18 @@
 
 package org.mule.util.compression;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.util.ClassHelper;
-
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.util.ClassHelper;
+
 /**
- * <code>CompressionHelper</code> a static class that provides facilities for compressing and uncompressing
- * byte arrays
- *
+ * <code>CompressionHelper</code> a static class that provides facilities for
+ * compressing and uncompressing byte arrays
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,20 +42,20 @@ public class CompressionHelper
 
     public static final CompressionStrategy getCompressionStrategy()
     {
-        return (CompressionStrategy) AccessController.doPrivileged(new PrivilegedAction()
-        {
+        return (CompressionStrategy) AccessController.doPrivileged(new PrivilegedAction() {
             public Object run()
             {
-                try
-                {
-                    //Object o = DiscoverSingleton.find(CompressionStrategy.class, CompressionStrategy.COMPRESSION_DEFAULT);
-                    Object o = ClassHelper.loadClass(CompressionStrategy.COMPRESSION_DEFAULT, CompressionHelper.class).newInstance();
+                try {
+                    // Object o =
+                    // DiscoverSingleton.find(CompressionStrategy.class,
+                    // CompressionStrategy.COMPRESSION_DEFAULT);
+                    Object o = ClassHelper.loadClass(CompressionStrategy.COMPRESSION_DEFAULT, CompressionHelper.class)
+                                          .newInstance();
                     if (logger.isDebugEnabled()) {
-						logger.debug("Found CompressionStrategy: " + o.getClass().getName());
+                        logger.debug("Found CompressionStrategy: " + o.getClass().getName());
                     }
                     return o;
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     logger.warn("Failed to build compression strategy: " + e.getMessage());
                 }
                 return null;
@@ -64,9 +64,9 @@ public class CompressionHelper
     }
 
     /**
-     * Used for compressing  a byte array into a new byte array using the
+     * Used for compressing a byte array into a new byte array using the
      * CompressionStategy found using discovery
-     *
+     * 
      * @param bytes An array of bytes to compress
      * @return a compressed byte array
      * @throws java.io.IOException if it fails to write to a GZIPOutputStream
@@ -81,9 +81,9 @@ public class CompressionHelper
     }
 
     /**
-     * Used for uncompressing a byte array into a uncompressed byte array using the
-     * CompressionStategy found using discovery
-     *
+     * Used for uncompressing a byte array into a uncompressed byte array using
+     * the CompressionStategy found using discovery
+     * 
      * @param bytes An array of bytes to uncompress
      * @return an uncompressed byte array
      * @throws java.io.IOException if it fails to read from a InputStream
@@ -91,10 +91,10 @@ public class CompressionHelper
     public static byte[] uncompressByteArray(byte[] bytes) throws IOException
     {
         logger.debug("Uncompressing message of size: " + bytes.length);
-        if (!strategy.isCompressed(bytes))
-        {
-            //throw a specific exception here to allow users of this method to deffientiate between
-            //general IOExceptions and an Invalid format
+        if (!strategy.isCompressed(bytes)) {
+            // throw a specific exception here to allow users of this method to
+            // deffientiate between
+            // general IOExceptions and an Invalid format
             logger.warn("data is not of type GZIP compressed. The data may not have been compressed in the first place");
             throw new CompressionException("Not in GZIP format");
         }
@@ -107,7 +107,7 @@ public class CompressionHelper
 
     /**
      * Determines if a byte array is compressed.
-     *
+     * 
      * @param bytes an array of bytes
      * @return true if the array is compressed or faluse otherwise
      * @throws java.io.IOException if the byte array couldn't be read

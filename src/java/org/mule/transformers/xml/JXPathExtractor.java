@@ -22,52 +22,54 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * The JXPathExtractor is a simple transformer that
- * evaluates an xpath expression against the given bean
- * and that returns the result.
+ * The JXPathExtractor is a simple transformer that evaluates an xpath
+ * expression against the given bean and that returns the result.
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class JXPathExtractor extends AbstractTransformer {
+public class JXPathExtractor extends AbstractTransformer
+{
 
-	private static final Logger logger = Logger.getLogger(JXPathFilter.class);
+    private static final Logger logger = Logger.getLogger(JXPathFilter.class);
 
-	private String expression;
+    private String expression;
 
-	/**
-	 * Evaluate the expression in the context of the given object and
-	 * returns the result.
-	 * If the given object is a string, it assumes it is an valid xml
-	 * and parses it before evaluating the xpath expression. 
-	 */
-	public Object doTransform(Object src) throws TransformerException {
-		try {
-			Object o = null;
-			if (src instanceof String) {
-				Document doc = DocumentHelper.parseText((String) src);
-				o = doc.valueOf(expression);
-			} else {
-				JXPathContext context = JXPathContext.newContext(src);
-				o = context.getValue(expression);
-			}
-			return o;
-		} catch (Exception e) {
-			throw new TransformerException(this, e);
-		}
-	}
+    /**
+     * Evaluate the expression in the context of the given object and returns
+     * the result. If the given object is a string, it assumes it is an valid
+     * xml and parses it before evaluating the xpath expression.
+     */
+    public Object doTransform(Object src) throws TransformerException
+    {
+        try {
+            Object o = null;
+            if (src instanceof String) {
+                Document doc = DocumentHelper.parseText((String) src);
+                o = doc.valueOf(expression);
+            } else {
+                JXPathContext context = JXPathContext.newContext(src);
+                o = context.getValue(expression);
+            }
+            return o;
+        } catch (Exception e) {
+            throw new TransformerException(this, e);
+        }
+    }
 
-	/**
-	 * @return Returns the expression.
-	 */
-	public String getExpression() {
-		return expression;
-	}
+    /**
+     * @return Returns the expression.
+     */
+    public String getExpression()
+    {
+        return expression;
+    }
 
-	/**
-	 * @param expression The expression to set.
-	 */
-	public void setExpression(String expression) {
-		this.expression = expression;
-	}
+    /**
+     * @param expression The expression to set.
+     */
+    public void setExpression(String expression)
+    {
+        this.expression = expression;
+    }
 }

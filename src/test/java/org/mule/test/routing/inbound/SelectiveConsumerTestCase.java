@@ -13,8 +13,6 @@
  */
 package org.mule.test.routing.inbound;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -31,6 +29,9 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
+
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -38,7 +39,8 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 
 public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 {
-    public void testSelectiveConsumer() throws Exception {
+    public void testSelectiveConsumer() throws Exception
+    {
         Mock session = getMockSession();
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
 
@@ -82,7 +84,8 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         session.verify();
     }
 
-    public void testSelectiveConsumerWithTransformer() throws Exception {
+    public void testSelectiveConsumerWithTransformer() throws Exception
+    {
         Mock session = getMockSession();
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
 

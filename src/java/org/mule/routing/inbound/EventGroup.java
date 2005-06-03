@@ -13,18 +13,19 @@
  */
 package org.mule.routing.inbound;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
-
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.mule.umo.UMOEvent;
+import org.mule.umo.provider.UniqueIdNotSupportedException;
+
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+
 /**
  * <code>EventGroup</code> is a holder over events grouped by a common group
- * Id.  This can be used by components such as routers to managed related events
- *
+ * Id. This can be used by components such as routers to managed related events
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -58,11 +59,13 @@ public class EventGroup implements Serializable
         return events;
     }
 
-    public void addEvent(UMOEvent event) {
+    public void addEvent(UMOEvent event)
+    {
         events.add(event);
     }
 
-    public void removeEvent(UMOEvent event) {
+    public void removeEvent(UMOEvent event)
+    {
         events.remove(event);
     }
 
@@ -71,7 +74,8 @@ public class EventGroup implements Serializable
         return created;
     }
 
-    public int getSize() {
+    public int getSize()
+    {
         return events.size();
     }
 
@@ -80,19 +84,17 @@ public class EventGroup implements Serializable
         return expectedSize;
     }
 
-    public String toString() {
+    public String toString()
+    {
         StringBuffer buf = new StringBuffer();
         buf.append("Event Group Id").append(groupId);
         buf.append(", Expected size=").append(expectedSize);
         buf.append(", current events (").append(events.size()).append(")");
-        for (Iterator iterator = events.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = events.iterator(); iterator.hasNext();) {
             UMOEvent event = (UMOEvent) iterator.next();
-            try
-            {
+            try {
                 buf.append(", ").append(event.getMessage().getUniqueId());
-            } catch (UniqueIdNotSupportedException e)
-            {
+            } catch (UniqueIdNotSupportedException e) {
                 buf.append(", ").append(e.getMessage());
             }
         }

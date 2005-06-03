@@ -32,31 +32,24 @@ public class CommonsPoolTestCase extends AbstractPoolTestCase
 {
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.test.mule.AbstractPoolTestCase#createPool(org.mule.umo.UMODescriptor,
-	 *      byte)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.test.mule.AbstractPoolTestCase#createPool(org.mule.umo.UMODescriptor,
+     *      byte)
+     */
     public ObjectPool createPool(MuleDescriptor descriptor, byte action) throws InitialisationException
     {
         GenericObjectPool.Config config = new GenericObjectPool.Config();
         config.maxActive = DEFAULT_POOL_SIZE;
         config.maxWait = DEFAULT_WAIT;
 
-        if (action == FAIL_WHEN_EXHAUSTED)
-        {
+        if (action == FAIL_WHEN_EXHAUSTED) {
             config.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_FAIL;
-        }
-        else if (action == GROW_WHEN_EXHAUSTED)
-        {
+        } else if (action == GROW_WHEN_EXHAUSTED) {
             config.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_GROW;
-        }
-        else if (action == BLOCK_WHEN_EXHAUSTED)
-        {
+        } else if (action == BLOCK_WHEN_EXHAUSTED) {
             config.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
-        }
-        else
-        {
+        } else {
             fail("Action type for pool not recognised. Type is: " + action);
         }
         return new CommonsPoolProxyPool(descriptor, config);
@@ -66,6 +59,5 @@ public class CommonsPoolTestCase extends AbstractPoolTestCase
     {
         return new CommonsPoolFactory();
     }
-
 
 }

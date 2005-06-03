@@ -13,19 +13,19 @@
  */
 package org.mule.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * <code>RequestContext</code> is a thread context where components can get
  * the current event or set response properties that will be sent on the
  * outgoing message.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,66 +35,79 @@ public class RequestContext
 
     private static ThreadLocal props = new ThreadLocal();
 
-    public static UMOEventContext getEventContext() {
+    public static UMOEventContext getEventContext()
+    {
         UMOEvent event = getEvent();
-        if(event!=null) {
+        if (event != null) {
             return new MuleEventContext(event);
         } else {
             return null;
         }
     }
 
-    public static UMOEvent getEvent() {
+    public static UMOEvent getEvent()
+    {
         return (UMOEvent) events.get();
     }
 
-    public static synchronized void setEvent(UMOEvent event) {
+    public static synchronized void setEvent(UMOEvent event)
+    {
         events.set(event);
     }
 
-    public static void setProperty(String key, Object value) {
-        Map properties = (Map)props.get();
-        if(properties==null) {
+    public static void setProperty(String key, Object value)
+    {
+        Map properties = (Map) props.get();
+        if (properties == null) {
             properties = new HashMap();
             props.set(properties);
         }
         properties.put(key, value);
     }
 
-    public static Map getProperties() {
-        return (Map)props.get();
+    public static Map getProperties()
+    {
+        return (Map) props.get();
     }
 
-    public static Object getProperty(String key) {
-        Map properties = (Map)props.get();
-        if(properties==null) return null;
+    public static Object getProperty(String key)
+    {
+        Map properties = (Map) props.get();
+        if (properties == null) {
+            return null;
+        }
         return properties.get(key);
     }
 
-    public static void rewriteEvent(UMOMessage message) {
+    public static void rewriteEvent(UMOMessage message)
+    {
         UMOEvent event = getEvent();
-        if(event!=null) {
+        if (event != null) {
             event = new MuleEvent(message, event);
             setEvent(event);
         }
     }
 
-    public static Map clearProperties() {
-        Map p = (Map)props.get();
+    public static Map clearProperties()
+    {
+        Map p = (Map) props.get();
         props.set(null);
         return p;
     }
 
-    public static void clear() {
+    public static void clear()
+    {
         setEvent(null);
         clearProperties();
     }
 
-    public static void setExceptionPayload(UMOExceptionPayload exceptionPayload) {
+    public static void setExceptionPayload(UMOExceptionPayload exceptionPayload)
+    {
         getEvent().getMessage().setExceptionPayload(exceptionPayload);
     }
 
-    public static UMOExceptionPayload getExceptionPayload() {
+    public static UMOExceptionPayload getExceptionPayload()
+    {
         return getEvent().getMessage().getExceptionPayload();
     }
 }

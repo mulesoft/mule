@@ -13,6 +13,8 @@
  */
 package org.mule.components.script;
 
+import java.io.File;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.UMODescriptorAware;
@@ -25,17 +27,16 @@ import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.util.monitor.FileListener;
 import org.mule.util.monitor.FileMonitor;
 
-import java.io.File;
-
 /**
- * <code>AbstractScriptComponent</code> is a compoennt that can execute scripts
- * as components in Mule.  This component also supports reloading if the script
- * file changes (providing the file is on  the file system)
- *
+ * <code>AbstractScriptComponent</code> is a compoennt that can execute
+ * scripts as components in Mule. This component also supports reloading if the
+ * script file changes (providing the file is on the file system)
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractScriptComponent implements Initialisable, Lifecycle, UMODescriptorAware, FileListener, Callable
+public abstract class AbstractScriptComponent implements Initialisable, Lifecycle, UMODescriptorAware, FileListener,
+        Callable
 {
     /**
      * logger used by this class
@@ -55,20 +56,21 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
 
     public void initialise() throws InitialisationException
     {
-        if(getScript()==null) {
+        if (getScript() == null) {
             String extension = getDefaultFileExtension();
-            if(!extension.startsWith(".")) {
+            if (!extension.startsWith(".")) {
                 extension = "." + extension;
             }
             setScript(descriptor.getName() + extension);
             logger.info("script name is not set, using default: " + descriptor.getName() + extension);
         }
-        //load script before creating a file monitor so that the script name can
-        //be monified
+        // load script before creating a file monitor so that the script name
+        // can
+        // be monified
         loadInterpreter(getScript());
-        if(autoReload) {
+        if (autoReload) {
             File f = new File(getScript());
-            if(f.exists()) {
+            if (f.exists()) {
                 monitor = new FileMonitor(reloadInterval);
                 monitor.addFile(f);
                 monitor.addListener(this);
@@ -101,14 +103,14 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
 
     public void start() throws UMOException
     {
-        if(monitor!=null) {
+        if (monitor != null) {
             monitor.start();
         }
     }
 
     public void stop() throws UMOException
     {
-        if(monitor!=null) {
+        if (monitor != null) {
             monitor.stop();
         }
     }

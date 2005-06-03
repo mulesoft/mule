@@ -18,7 +18,7 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>ByteArrayToString</code> converts a byte array into a String.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,7 +34,9 @@ public class ByteArrayToString extends AbstractTransformer
 
     public Object doTransform(Object src) throws TransformerException
     {
-        if(src instanceof String) return src;
-        return new String((byte[])src);
+        if (src instanceof String) {
+            return src;
+        }
+        return new String((byte[]) src);
     }
 }

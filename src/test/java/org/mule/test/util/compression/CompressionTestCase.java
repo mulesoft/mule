@@ -19,6 +19,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.util.compression.CompressionHelper;
@@ -26,7 +27,7 @@ import org.mule.util.compression.CompressionStrategy;
 
 /**
  * <code>TestCompression</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -53,9 +54,8 @@ public class CompressionTestCase extends TestCase
         super(testName);
     }
 
-
     // Test cases
-    //-------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
 
     public void testCompressDefaultGZip() throws Exception
     {
@@ -64,7 +64,8 @@ public class CompressionTestCase extends TestCase
         String temp = "This is a compressed string";
         CompressionStrategy strategy = CompressionHelper.getCompressionStrategy();
         byte[] compressed = strategy.compressByteArray(temp.getBytes());
-        //For small test data the compressed data will be bigger than the real data
+        // For small test data the compressed data will be bigger than the real
+        // data
         assertTrue(compressed.length > temp.getBytes().length);
 
         byte[] uncompressed = strategy.uncompressByteArray(compressed);
@@ -73,8 +74,7 @@ public class CompressionTestCase extends TestCase
         assertEquals(temp, new String(uncompressed));
 
         String tempLarge = temp;
-        for (int i = 0; i < 100; i++)
-        {
+        for (int i = 0; i < 100; i++) {
             tempLarge += temp;
         }
 

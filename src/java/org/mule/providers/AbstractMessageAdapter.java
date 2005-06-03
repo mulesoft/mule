@@ -15,20 +15,20 @@
 
 package org.mule.providers;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
  * <code>AbstractMessageAdapter</code> provides a base implementation for
- * simple message types that maybe don't normally allow for meta information, such
- * as File or tcp.
- *
+ * simple message types that maybe don't normally allow for meta information,
+ * such as File or tcp.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -40,18 +40,21 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     /**
      * Removes an associated property from the message
-     *
+     * 
      * @param key the key of the property to remove
      */
     public Object removeProperty(Object key)
     {
         Object prop = properties.get(key);
-        if (prop != null) properties.remove(key);
+        if (prop != null) {
+            properties.remove(key);
+        }
         return prop;
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
      */
     public Object getProperty(Object key)
@@ -59,7 +62,9 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
         return properties.get(key);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#getPropertyNames()
      */
     public Iterator getPropertyNames()
@@ -67,15 +72,18 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
         return properties.keySet().iterator();
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.providers.UMOMessageAdapter#setProperty(java.lang.Object, java.lang.Object)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.providers.UMOMessageAdapter#setProperty(java.lang.Object,
+     *      java.lang.Object)
      */
     public void setProperty(Object key, Object value)
     {
         properties.put(key, value);
     }
 
-    public String getUniqueId() throws UniqueIdNotSupportedException
+    public String getUniqueId()
     {
         throw new UniqueIdNotSupportedException(this);
     }
@@ -83,8 +91,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     public Object getProperty(String name, Object defaultValue)
     {
         Object result = properties.get(name);
-        if (result == null)
-        {
+        if (result == null) {
             return defaultValue;
         }
         return result;
@@ -93,18 +100,13 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     public int getIntProperty(String name, int defaultValue)
     {
         Object result = properties.get(name);
-        if (result != null)
-        {
-            if (result instanceof Integer)
-            {
+        if (result != null) {
+            if (result instanceof Integer) {
                 return ((Integer) result).intValue();
-            } else
-            {
-                try
-                {
+            } else {
+                try {
                     return Integer.parseInt(result.toString());
-                } catch (NumberFormatException e)
-                {
+                } catch (NumberFormatException e) {
                     return defaultValue;
                 }
             }
@@ -117,19 +119,16 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     {
         Object result = properties.get(name);
         if (result != null) {
-            if(result instanceof Long) {
+            if (result instanceof Long) {
                 return ((Long) result).longValue();
-            } else
-            {
-                try
-                {
+            } else {
+                try {
                     return Long.parseLong(result.toString());
-                } catch (NumberFormatException e)
-                {
+                } catch (NumberFormatException e) {
                     return defaultValue;
                 }
             }
-        }else {
+        } else {
             return defaultValue;
         }
     }
@@ -138,16 +137,12 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     {
         Object result = properties.get(name);
         if (result != null) {
-            if( result instanceof Double)
-            {
+            if (result instanceof Double) {
                 return ((Double) result).doubleValue();
-            } else
-            {
-                try
-                {
+            } else {
+                try {
                     return Double.parseDouble(result.toString());
-                } catch (NumberFormatException e)
-                {
+                } catch (NumberFormatException e) {
                     return defaultValue;
                 }
             }
@@ -159,17 +154,13 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
         Object result = properties.get(name);
-        if (result != null)
-        {
-            if (result instanceof Boolean)
-            {
+        if (result != null) {
+            if (result instanceof Boolean) {
                 return ((Boolean) result).booleanValue();
-            } else
-            {
+            } else {
                 return Boolean.valueOf(result.toString()).booleanValue();
             }
-        } else
-        {
+        } else {
             return defaultValue;
         }
     }
@@ -215,10 +206,10 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     }
 
     /**
-     * Gets the sequence or ordering number for this message in the
-     * the correlation group (as defined by the correlationId)
-     *
-     * @return the sequence number  or -1 if the sequence is not important
+     * Gets the sequence or ordering number for this message in the the
+     * correlation group (as defined by the correlationId)
+     * 
+     * @return the sequence number or -1 if the sequence is not important
      */
     public int getCorrelationSequence()
     {
@@ -227,10 +218,11 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
     }
 
     /**
-     * Gets the sequence or ordering number for this message in the
-     * the correlation group (as defined by the correlationId)
-     *
-     * @param sequence the sequence number  or -1 if the sequence is not important
+     * Gets the sequence or ordering number for this message in the the
+     * correlation group (as defined by the correlationId)
+     * 
+     * @param sequence the sequence number or -1 if the sequence is not
+     *            important
      */
     public void setCorrelationSequence(int sequence)
     {
@@ -239,7 +231,7 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     /**
      * Determines how many messages are in the correlation group
-     *
+     * 
      * @return total messages in this group or -1 if the size is not known
      */
     public int getCorrelationGroupSize()
@@ -249,15 +241,17 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter
 
     /**
      * Determines how many messages are in the correlation group
-     *
-     * @param size the total messages in this group or -1 if the size is not known
+     * 
+     * @param size the total messages in this group or -1 if the size is not
+     *            known
      */
     public void setCorrelationGroupSize(int size)
     {
         setIntProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, size);
     }
 
-    public UMOExceptionPayload getExceptionPayload() {
+    public UMOExceptionPayload getExceptionPayload()
+    {
         return exceptionPayload;
     }
 

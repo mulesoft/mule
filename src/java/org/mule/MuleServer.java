@@ -1,19 +1,23 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file. 
- *
  */
-
 package org.mule;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,16 +31,10 @@ import org.mule.umo.UMOException;
 import org.mule.util.ClassHelper;
 import org.mule.util.StringMessageHelper;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 /**
  * <code>MuleServer</code> is a simple application that represents a local
  * Mule Server deamon. It is initalised with a mule-configuration.xml file.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -86,39 +84,34 @@ public class MuleServer implements Runnable
         List opts = Arrays.asList(args);
         String config = null;
 
-        if(opts.size() > 0) {
+        if (opts.size() > 0) {
             config = getOption("-config", opts);
-            if(config != null) {
+            if (config != null) {
                 server.setConfigurationResources(config);
             }
         } else {
             URL configUrl = ClassHelper.getResource("mule-config.xml", MuleServer.class);
-            if(configUrl != null)
-            {
+            if (configUrl != null) {
                 config = configUrl.toExternalForm();
                 server.setConfigurationResources(config);
             }
         }
 
-        if(config==null)
-        {
+        if (config == null) {
             Message message = new Message(Messages.CONFIG_NOT_FOUND_USAGE);
             logger.fatal(message.toString());
             System.exit(0);
         }
 
         String builder = getOption("-builder", opts);
-        if(builder != null) {
-            try
-            {
-                configBuilder = (ConfigurationBuilder)ClassHelper.loadClass(builder, MuleServer.class).newInstance();
-            }
-            catch (Exception e)
-            {
+        if (builder != null) {
+            try {
+                configBuilder = (ConfigurationBuilder) ClassHelper.loadClass(builder, MuleServer.class).newInstance();
+            } catch (Exception e) {
                 logger.fatal(new Message(Messages.FAILED_LOAD_X, "Builder: " + builder), e);
             }
         } else {
-            //use this by default
+            // use this by default
             try {
                 configBuilder = new MuleXmlConfigurationBuilder();
             } catch (ConfigurationException e) {
@@ -132,9 +125,9 @@ public class MuleServer implements Runnable
 
     private static String getOption(String option, List options)
     {
-        if(options.contains(option)) {
+        if (options.contains(option)) {
             int i = options.indexOf(option);
-            if(i < options.size() -1) {
+            if (i < options.size() - 1) {
                 return options.get(i + 1).toString();
             }
         }
@@ -143,11 +136,13 @@ public class MuleServer implements Runnable
 
     /**
      * Start the mule server
-     * @param ownThread determines if the server will run in its own daemon thread
-     * or the current calling thread
+     * 
+     * @param ownThread determines if the server will run in its own daemon
+     *            thread or the current calling thread
      */
-    public void start(boolean ownThread) {
-        if(ownThread) {
+    public void start(boolean ownThread)
+    {
+        if (ownThread) {
             Thread serverThread = new Thread(this, "MuleServer");
             serverThread.setDaemon(true);
             serverThread.start();
@@ -157,24 +152,21 @@ public class MuleServer implements Runnable
     }
 
     /**
-     * Overloaded the [main] thread run method.  This calls initialise and shuts down
-     * if an exception occurs
+     * Overloaded the [main] thread run method. This calls initialise and shuts
+     * down if an exception occurs
      */
     public void run()
     {
-        try
-        {
+        try {
             initialize();
-        }
-        catch (Throwable e)
-        {
+        } catch (Throwable e) {
             shutdown(e);
         }
     }
 
     /**
      * Getter for property messengerURL.
-     *
+     * 
      * @return Value of property messengerURL.
      */
     public String getConfigurationResources()
@@ -184,8 +176,9 @@ public class MuleServer implements Runnable
 
     /**
      * Setter for property messengerURL.
-     *
-     * @param configurationResources New value of property configurationResources.
+     * 
+     * @param configurationResources New value of property
+     *            configurationResources.
      */
     public void setConfigurationResources(String configurationResources)
     {
@@ -193,9 +186,10 @@ public class MuleServer implements Runnable
     }
 
     /**
-     * gets the configuration builder used by this server.
-     * Note that if a builder is not set and the server's start method is call
-     * the default is an instance of <code>MuleXmlConfigurationBuilder</code>.
+     * gets the configuration builder used by this server. Note that if a
+     * builder is not set and the server's start method is call the default is
+     * an instance of <code>MuleXmlConfigurationBuilder</code>.
+     * 
      * @return a configuration builder or null if one has not been set
      */
     public static ConfigurationBuilder getConfigBuilder()
@@ -205,6 +199,7 @@ public class MuleServer implements Runnable
 
     /**
      * sets the configuration builder to use for this server.
+     * 
      * @param configBuilder the configuration builder instance to use
      */
     public static void setConfigBuilder(ConfigurationBuilder configBuilder)
@@ -220,23 +215,19 @@ public class MuleServer implements Runnable
     {
         logger.info("Mule Server starting...");
 
-        //registerShutdownHook();
+        // registerShutdownHook();
         // install an RMI security manager in case we expose any RMI objects
-        if (System.getSecurityManager() == null)
-        {
-            //System.setSecurityManager(new RMISecurityManager());
+        if (System.getSecurityManager() == null) {
+            // System.setSecurityManager(new RMISecurityManager());
         }
 
-        if(configBuilder == null) {
+        if (configBuilder == null) {
             configBuilder = new MuleXmlConfigurationBuilder();
         }
-        if (configBuilder.isConfigured() == false) {
-            if (configurationResources != null)
-            {
+        if (!configBuilder.isConfigured()) {
+            if (configurationResources != null) {
                 configBuilder.configure(configurationResources);
-            }
-            else
-            {
+            } else {
                 logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
                 configBuilder.configure(DEFAULT_CONFIGURATION);
             }
@@ -246,14 +237,14 @@ public class MuleServer implements Runnable
 
     /**
      * Will shut down the server displaying the cause and time of the shutdown
-     *
+     * 
      * @param e the exception that caused the shutdown
      */
     void shutdown(Throwable e)
     {
         Message msg = new Message(Messages.FATAL_ERROR_WHILE_RUNNING);
         UMOException muleException = ExceptionHelper.getRootMuleException(e);
-        if(muleException!=null) {
+        if (muleException != null) {
             logger.fatal(muleException.getDetailedMessage());
         } else {
             logger.fatal(msg.toString() + " " + e.getMessage(), e);

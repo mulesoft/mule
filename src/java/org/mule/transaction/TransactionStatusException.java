@@ -6,9 +6,9 @@
  */
 package org.mule.transaction;
 
-import org.mule.umo.TransactionException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.TransactionException;
 
 public class TransactionStatusException extends TransactionException
 {
@@ -22,7 +22,7 @@ public class TransactionStatusException extends TransactionException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public TransactionStatusException(Message message, Throwable cause)
     {

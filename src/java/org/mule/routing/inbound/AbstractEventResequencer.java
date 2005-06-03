@@ -13,17 +13,22 @@
  */
 package org.mule.routing.inbound;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 
-import java.util.*;
-
 /**
- * <code>AbstractEventResequencer</code> is used to receive a set of events, resequence them and forward
- * them on to their destination
- *
+ * <code>AbstractEventResequencer</code> is used to receive a set of events,
+ * resequence them and forward them on to their destination
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -37,15 +42,14 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
      */
     protected static transient Log logger = LogFactory.getLog(AbstractEventResequencer.class);
 
-
     private Comparator comparator;
     private Map eventGroups = new HashMap();
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
-        if(isMatch(event)) {
+        if (isMatch(event)) {
             EventGroup eg = addEvent(event);
-            if(shouldResequence(eg)) {
+            if (shouldResequence(eg)) {
                 List resequencedEvents = resequenceEvents(eg);
                 removeGroup(eg.getGroupId());
                 UMOEvent[] returnEvents = new UMOEvent[resequencedEvents.size()];
@@ -56,11 +60,14 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
         return null;
     }
 
-    protected EventGroup addEvent(UMOEvent event) {
+    protected EventGroup addEvent(UMOEvent event)
+    {
         String cId = event.getMessage().getCorrelationId();
-        if(cId==null) cId = NO_CORRELATION_ID;
+        if (cId == null) {
+            cId = NO_CORRELATION_ID;
+        }
         EventGroup eg = (EventGroup) eventGroups.get(cId);
-        if(eg==null) {
+        if (eg == null) {
             eg = new EventGroup(cId);
             eg.addEvent(event);
             eventGroups.put(eg.getGroupId(), eg);
@@ -75,9 +82,10 @@ public abstract class AbstractEventResequencer extends SelectiveConsumer
         eventGroups.remove(id);
     }
 
-    protected List resequenceEvents(EventGroup events){
+    protected List resequenceEvents(EventGroup events)
+    {
         List result = new ArrayList(events.getEvents());
-        if(comparator!=null) {
+        if (comparator != null) {
             Collections.sort(result, comparator);
         } else {
             logger.warn("Event comparator is null, events were not reordered");

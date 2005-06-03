@@ -13,8 +13,8 @@
  */
 package org.mule.routing.inbound;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.util.Map;
+
 import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.MessagingException;
@@ -23,11 +23,13 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 
-import java.util.Map;
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
- * <code>AbstractEventAggregator</code> will aggregate a set of messages into a single message
- *
+ * <code>AbstractEventAggregator</code> will aggregate a set of messages into
+ * a single message
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -43,24 +45,22 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
     {
         SynchronizedBoolean doAggregate = new SynchronizedBoolean(false);
         EventGroup eg = null;
-        //synchronized (lock)
-        //{
-            if (isMatch(event))
-            {
-                eg = addEvent(event);
-                doAggregate.commit(false, shouldAggregate(eg));
-            }
-       // }
-        if (doAggregate.get())
-        {
-            synchronized(lock) {
+        // synchronized (lock)
+        // {
+        if (isMatch(event)) {
+            eg = addEvent(event);
+            doAggregate.commit(false, shouldAggregate(eg));
+        }
+        // }
+        if (doAggregate.get()) {
+            synchronized (lock) {
                 UMOMessage returnMessage = aggregateEvents(eg);
                 removeGroup(eg.getGroupId());
-				UMOEndpoint endpoint = new MuleEndpoint(event.getEndpoint());
-				endpoint.setTransformer(null);
-				endpoint.setName(getClass().getName());
-				UMOEvent returnEvent = new MuleEvent(returnMessage, endpoint, event.getComponent(), event);
-                return new UMOEvent[]{returnEvent};
+                UMOEndpoint endpoint = new MuleEndpoint(event.getEndpoint());
+                endpoint.setTransformer(null);
+                endpoint.setName(getClass().getName());
+                UMOEvent returnEvent = new MuleEvent(returnMessage, endpoint, event.getComponent(), event);
+                return new UMOEvent[] { returnEvent };
             }
         }
         return null;
@@ -68,26 +68,25 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
 
     /**
      * Adds the event to an event group. Groups are defined by the correlationId
-     * on the message.  If no correlationId is set a default group is created for
-     * all events without a correlationId.
-     * If there is no group for the current correlationId one will be created and added
-     * to the router.
-     *
+     * on the message. If no correlationId is set a default group is created for
+     * all events without a correlationId. If there is no group for the current
+     * correlationId one will be created and added to the router.
+     * 
      * @param event
      * @return
      */
     protected EventGroup addEvent(UMOEvent event)
     {
         String cId = event.getMessage().getCorrelationId();
-        if (cId == null) cId = NO_CORRELATION_ID;
+        if (cId == null) {
+            cId = NO_CORRELATION_ID;
+        }
         EventGroup eg = (EventGroup) eventGroups.get(cId);
-        if (eg == null)
-        {
+        if (eg == null) {
             eg = new EventGroup(cId);
             eg.addEvent(event);
             eventGroups.put(eg.getGroupId(), eg);
-        } else
-        {
+        } else {
             eg.addEvent(event);
         }
         return eg;
@@ -95,33 +94,33 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
 
     protected void removeGroup(String id)
     {
-//        synchronized (eventGroups)
-//        {
-            eventGroups.remove(id);
-        //}
+        // synchronized (eventGroups)
+        // {
+        eventGroups.remove(id);
+        // }
     }
 
     /**
-     * Determines if the event group is ready to be aggregated.
-     * if the group is ready to be aggregated (this is entirely up
-     * to the application. it could be determined by volume, last modified time
-     * or some oher criteria based on the last event received)
-     *
+     * Determines if the event group is ready to be aggregated. if the group is
+     * ready to be aggregated (this is entirely up to the application. it could
+     * be determined by volume, last modified time or some oher criteria based
+     * on the last event received)
+     * 
      * @param events
      * @return
      */
     protected abstract boolean shouldAggregate(EventGroup events);
 
     /**
-     * This method is invoked if the shouldAggregate method is called and returns
-     * true.  Once this method returns an aggregated message the event group is removed
-     * from the router
-     *
+     * This method is invoked if the shouldAggregate method is called and
+     * returns true. Once this method returns an aggregated message the event
+     * group is removed from the router
+     * 
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws RoutingException if the aggregation fails.  in this scenario the whole
-     *                          event group is removed and passed to the exception handler for this
-     *                          componenet
+     * @throws RoutingException if the aggregation fails. in this scenario the
+     *             whole event group is removed and passed to the exception
+     *             handler for this componenet
      */
     protected abstract UMOMessage aggregateEvents(EventGroup events) throws RoutingException;
 }

@@ -20,9 +20,9 @@ import java.util.TimerTask;
 
 /**
  * <code>EventTimerTask</code> is a task that causes TimeEvent to be fired to
- * listening objects when a specific number of milliseconds have passed.
- * This implementation is based on the java.util.TimerTask.
- *
+ * listening objects when a specific number of milliseconds have passed. This
+ * implementation is based on the java.util.TimerTask.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -45,7 +45,7 @@ public class EventTimerTask extends TimerTask
 
     /**
      * Constructs a EventTimeTask and registers a listener with it
-     *
+     * 
      * @param listener the listener to register
      */
     public EventTimerTask(TimeEventListener listener)
@@ -57,9 +57,9 @@ public class EventTimerTask extends TimerTask
 
     /**
      * Constructs a EventTimeTask and registers a listener with it
-     *
+     * 
      * @param listener the listener to register
-     * @param name     the name for the task
+     * @param name the name for the task
      */
     public EventTimerTask(TimeEventListener listener, String name)
     {
@@ -69,7 +69,8 @@ public class EventTimerTask extends TimerTask
     }
 
     /**
-     * The action to be performed by this timer task. The fireTime event method is called.
+     * The action to be performed by this timer task. The fireTime event method
+     * is called.
      */
     public void run()
     {
@@ -80,7 +81,7 @@ public class EventTimerTask extends TimerTask
 
     /**
      * Gets the task name (this is also the timer thread name)
-     *
+     * 
      * @return the task name
      */
     public String getName()
@@ -90,8 +91,7 @@ public class EventTimerTask extends TimerTask
 
     public void removeListener(TimeEventListener listener)
     {
-        if (listeners != null && listeners.contains(listener))
-        {
+        if (listeners != null && listeners.contains(listener)) {
             listeners.remove(listener);
         }
     }
@@ -103,24 +103,19 @@ public class EventTimerTask extends TimerTask
 
     public void addListener(TimeEventListener listener)
     {
-        if (listeners == null)
-        {
+        if (listeners == null) {
             listeners = new ArrayList();
             listeners.add(listener);
-        }
-        else if (!listeners.contains(listener))
-        {
+        } else if (!listeners.contains(listener)) {
             listeners.add(listener);
         }
     }
 
     protected void fireTimerEvent(TimeEvent event)
     {
-        if (listeners != null && started)
-        {
+        if (listeners != null && started) {
             int count = listeners.size();
-            for (int i = 0; i < count; i++)
-            {
+            for (int i = 0; i < count; i++) {
                 ((TimeEventListener) listeners.get(i)).timeExpired(event);
             }
         }

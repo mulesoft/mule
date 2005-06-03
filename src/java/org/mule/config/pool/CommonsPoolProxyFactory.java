@@ -23,17 +23,18 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ObjectPool;
 
 /**
- * <code>CommonsPoolProxyFactory</code> is used to create MuleProxies for use in a proxy pool.
- * This is a jakarta commons-pool implementation.
- *
+ * <code>CommonsPoolProxyFactory</code> is used to create MuleProxies for use
+ * in a proxy pool. This is a jakarta commons-pool implementation.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class CommonsPoolProxyFactory extends AbstractProxyFactory implements PoolableObjectFactory
 {
     /**
-     * Creates a pool factory using the descriptor as the basis for creating its objects
-     *
+     * Creates a pool factory using the descriptor as the basis for creating its
+     * objects
+     * 
      * @param descriptor the descriptor to use to construct a MuleProxy
      * @see UMODescriptor
      */
@@ -43,30 +44,30 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.commons.pool.PoolableObjectFactory#activateObject(java.lang.Object)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.apache.commons.pool.PoolableObjectFactory#activateObject(java.lang.Object)
+     */
     public void activateObject(Object arg0) throws Exception
     {
 
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.commons.pool.PoolableObjectFactory#destroyObject(java.lang.Object)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.apache.commons.pool.PoolableObjectFactory#destroyObject(java.lang.Object)
+     */
     public void destroyObject(Object object) throws Exception
     {
         pool.onRemove(object);
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.commons.pool.PoolableObjectFactory#makeObject()
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.apache.commons.pool.PoolableObjectFactory#makeObject()
+     */
     public Object makeObject() throws Exception
     {
         Object object = create();
@@ -75,20 +76,19 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.commons.pool.PoolableObjectFactory#passivateObject(java.lang.Object)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.apache.commons.pool.PoolableObjectFactory#passivateObject(java.lang.Object)
+     */
     public void passivateObject(Object arg0) throws Exception
     {
-
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.commons.pool.PoolableObjectFactory#validateObject(java.lang.Object)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.apache.commons.pool.PoolableObjectFactory#validateObject(java.lang.Object)
+     */
     public boolean validateObject(Object arg0)
     {
         return true;
@@ -96,15 +96,12 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
 
     protected void afterComponentCreate(Object component) throws InitialisationException
     {
-        try
-        {
+        try {
             BeanUtils.populate(component, descriptor.getProperties());
-        }
-        catch (Exception e)
-        {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Component '" + descriptor.getName() + "'"), e, descriptor);
+        } catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Component '"
+                    + descriptor.getName() + "'"), e, descriptor);
         }
     }
-
 
 }

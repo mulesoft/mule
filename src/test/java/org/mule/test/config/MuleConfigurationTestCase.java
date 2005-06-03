@@ -28,16 +28,17 @@ public class MuleConfigurationTestCase extends NamedTestCase
     public void testconfigurationDefaults()
     {
         MuleConfiguration mc = new MuleConfiguration();
-        assertEquals(MuleConfiguration.DEFAULT_MAX_OUTSTANDING_MESSAGES, mc.getQueueProfile().getMaxOutstandingMessages());
+        assertEquals(MuleConfiguration.DEFAULT_MAX_OUTSTANDING_MESSAGES, mc.getQueueProfile()
+                                                                           .getMaxOutstandingMessages());
         assertEquals(PoolingProfile.DEFAULT_MAX_POOL_WAIT, mc.getPoolingProfile().getMaxWait());
         assertEquals(PoolingProfile.DEFAULT_MAX_POOL_ACTIVE, mc.getPoolingProfile().getMaxActive());
         assertEquals(PoolingProfile.DEFAULT_MAX_POOL_IDLE, mc.getPoolingProfile().getMaxIdle());
         assertEquals(PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION, mc.getPoolingProfile().getExhaustedAction());
-        assertEquals(PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY, mc.getPoolingProfile().getInitialisationPolicy());
+        assertEquals(PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY, mc.getPoolingProfile()
+                                                                          .getInitialisationPolicy());
         assertEquals(MuleConfiguration.DEFAULT_SYNCHRONOUS, mc.isSynchronous());
         assertNull(mc.getModel());
     }
-
 
     public void testConfiguration()
     {
@@ -47,8 +48,8 @@ public class MuleConfigurationTestCase extends NamedTestCase
         mc.getPoolingProfile().setMaxWait(0);
         mc.getPoolingProfile().setMaxActive(1);
         mc.getPoolingProfile().setMaxIdle(1);
-        mc.getPoolingProfile().setExhaustedAction((byte)1);
-        mc.getPoolingProfile().setInitialisationPolicy((byte)0);
+        mc.getPoolingProfile().setExhaustedAction((byte) 1);
+        mc.getPoolingProfile().setInitialisationPolicy((byte) 0);
         mc.setSynchronous(false);
         mc.setModel("Test");
 

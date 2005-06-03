@@ -18,9 +18,9 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.queue.QueueConfiguration;
 
 /**
- * <code>QueueProfile</code> determines how an internal queue for a component will
- * behave
- *
+ * <code>QueueProfile</code> determines how an internal queue for a component
+ * will behave
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
@@ -50,7 +50,7 @@ public class QueueProfile
     /**
      * This specifies the number of messages that can be queued before it starts
      * blocking.
-     *
+     * 
      * @return the max number of messages that will be queued
      */
     public int getMaxOutstandingMessages()
@@ -61,8 +61,9 @@ public class QueueProfile
     /**
      * This specifies the number of messages that can be queued before it starts
      * blocking.
-     *
-     * @param maxOutstandingMessages the max number of messages that will be queued
+     * 
+     * @param maxOutstandingMessages the max number of messages that will be
+     *            queued
      */
     public void setMaxOutstandingMessages(int maxOutstandingMessages)
     {
@@ -81,8 +82,8 @@ public class QueueProfile
 
     public void configureQueue(String component) throws InitialisationException
     {
-		QueueConfiguration qc = new QueueConfiguration(maxOutstandingMessages, persistent);
-		MuleManager.getInstance().getQueueManager().setQueueConfiguration(component, qc);
+        QueueConfiguration qc = new QueueConfiguration(maxOutstandingMessages, persistent);
+        MuleManager.getInstance().getQueueManager().setQueueConfiguration(component, qc);
     }
 
 }

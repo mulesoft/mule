@@ -22,34 +22,35 @@ import EDU.oswego.cs.dl.util.concurrent.Executor;
 /**
  * Defines the operations that a pool in charge of the execution of Work
  * instances must expose.
- *
+ * 
  * @version $Rev$ $Date$
  */
-public interface WorkExecutorPool extends Executor {
+public interface WorkExecutorPool extends Executor
+{
 
     /**
      * Gets the current number of active threads in the pool.
-     *
+     * 
      * @return Number of active threads in the pool.
      */
-    public int getPoolSize();
+    int getPoolSize();
 
     /**
      * Gets the maximum number of threads to simultaneously execute.
-     *
+     * 
      * @return Maximum size.
      */
-    public int getMaximumPoolSize();
+    int getMaximumPoolSize();
 
     /**
      * Sets the maximum number of threads to simultaneously execute.
-     *
+     * 
      * @param aSize Maximum size.
      */
-    public void setMaximumPoolSize(int aSize);
+    void setMaximumPoolSize(int aSize);
 
-    public WorkExecutorPool start();
+    WorkExecutorPool start();
 
-    public WorkExecutorPool stop();
+    WorkExecutorPool stop();
 
 }

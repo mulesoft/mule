@@ -17,9 +17,10 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOFilter;
 
 /**
- * <code>UMOEventFilter</code> is a filter for determining if the object is a UMOEvent.
- * This filter will allways be used in conjunction with at least one other filter.
- *
+ * <code>UMOEventFilter</code> is a filter for determining if the object is a
+ * UMOEvent. This filter will allways be used in conjunction with at least one
+ * other filter.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

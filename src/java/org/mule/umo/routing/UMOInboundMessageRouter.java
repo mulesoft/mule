@@ -13,40 +13,41 @@
  */
 package org.mule.umo.routing;
 
+import java.util.List;
+
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-import java.util.List;
-
 /**
- * <code>InboundRouterCollection</code> manages a collection of inbound routers
- *
+ * <code>InboundRouterCollection</code> manages a collection of inbound
+ * routers
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public interface UMOInboundMessageRouter  extends UMORouterCollection
+public interface UMOInboundMessageRouter extends UMORouterCollection
 {
-    public UMOMessage route(UMOEvent event) throws MessagingException;
+    UMOMessage route(UMOEvent event) throws MessagingException;
 
-    public void addRouter(UMOInboundRouter router);
+    void addRouter(UMOInboundRouter router);
 
-    public UMOInboundRouter removeRouter(UMOInboundRouter router);
+    UMOInboundRouter removeRouter(UMOInboundRouter router);
 
-    public void addEndpoint(UMOEndpoint endpoint);
+    void addEndpoint(UMOEndpoint endpoint);
 
-    public boolean removeEndpoint(UMOEndpoint endpoint);
+    boolean removeEndpoint(UMOEndpoint endpoint);
 
-    public List getEndpoints();
+    List getEndpoints();
 
     /**
      * @param name the Endpoint identifier
      * @return the Endpoint or null if the endpointUri is not registered
      * @see UMOInboundMessageRouter
      */
-    public UMOEndpoint getEndpoint(String name);
+    UMOEndpoint getEndpoint(String name);
 
-    public void setEndpoints(List endpoints);
+    void setEndpoints(List endpoints);
 }

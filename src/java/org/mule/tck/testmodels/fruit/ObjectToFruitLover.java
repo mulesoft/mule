@@ -18,7 +18,6 @@ package org.mule.tck.testmodels.fruit;
 import org.mule.transformers.DefaultTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-
 public class ObjectToFruitLover extends DefaultTransformer
 {
     public ObjectToFruitLover()
@@ -30,12 +29,9 @@ public class ObjectToFruitLover extends DefaultTransformer
 
     public Object doTransform(Object src) throws TransformerException
     {
-        if (src instanceof FruitLover)
-        {
+        if (src instanceof FruitLover) {
             return src;
-        }
-        else
-        {
+        } else {
             return new FruitLover((String) src);
         }
     }

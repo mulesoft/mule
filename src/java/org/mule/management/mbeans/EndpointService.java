@@ -22,9 +22,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
- * The EndpointServiceMBean allows you to check the confiugration of an endpoint and conect/disconnect
- * endpoints manually.
- *
+ * The EndpointServiceMBean allows you to check the confiugration of an endpoint
+ * and conect/disconnect endpoints manually.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,65 +38,76 @@ public class EndpointService implements EndpointServiceMBean
     private UMOEndpoint endpoint;
     private UMOMessageReceiver receiver;
 
-    public EndpointService(UMOEndpoint endpoint) {
+    public EndpointService(UMOEndpoint endpoint)
+    {
         this.endpoint = endpoint;
         init();
     }
 
-    public EndpointService(UMOMessageReceiver receiver) {
-       if(receiver==null) {
+    public EndpointService(UMOMessageReceiver receiver)
+    {
+        if (receiver == null) {
             throw new NullPointerException(new Message(Messages.X_IS_NULL, "Receiver").getMessage());
-       }
+        }
         this.endpoint = receiver.getEndpoint();
         this.receiver = receiver;
         init();
     }
 
-    private void init() {
-        if(endpoint==null) {
+    private void init()
+    {
+        if (endpoint == null) {
             throw new NullPointerException(new Message(Messages.X_IS_NULL, "Endpoint").getMessage());
         }
-        if(receiver == null && !UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType())) {
+        if (receiver == null && !UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType())) {
             throw new IllegalArgumentException("Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
         }
     }
-    public String getAddress() {
+
+    public String getAddress()
+    {
         return endpoint.getEndpointURI().getAddress();
     }
 
-    public String getName() {
+    public String getName()
+    {
         return endpoint.getName().replaceAll(":", "#");
     }
 
-    public boolean isConnected() {
-        if(receiver==null) {
+    public boolean isConnected()
+    {
+        if (receiver == null) {
             return true;
         } else {
             return receiver.isConnected();
         }
     }
 
-    public void connect() throws Exception {
-        if(receiver!=null && !receiver.isConnected()) {
+    public void connect() throws Exception
+    {
+        if (receiver != null && !receiver.isConnected()) {
             receiver.connect();
         } else {
             logger.debug("Endpoint is already connected");
         }
     }
 
-    public void disconnect() throws Exception {
-        if(receiver!=null && receiver.isConnected()) {
+    public void disconnect() throws Exception
+    {
+        if (receiver != null && receiver.isConnected()) {
             receiver.disconnect();
         } else {
             logger.debug("Endpoint is already disconnected");
         }
     }
 
-    public boolean isSynchronous() {
+    public boolean isSynchronous()
+    {
         return endpoint.isSynchronous();
     }
 
-    public String getType() {
+    public String getType()
+    {
         return endpoint.getType();
     }
 

@@ -18,28 +18,29 @@ import java.io.IOException;
 
 /**
  * <code>CompressionStrategy</code> TODO -document class
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface CompressionStrategy
 {
     /**
-     * The fully qualified class name of the fallback <code>CompressionStrategy</code>
-     * implementation class to use, if no other can be found. the default is
+     * The fully qualified class name of the fallback
+     * <code>CompressionStrategy</code> implementation class to use, if no
+     * other can be found. the default is
      * <code>org.mule.util.compression.GZipCompression</code>
      */
-    public static final String COMPRESSION_DEFAULT = "org.mule.util.compression.GZipCompression";
+    String COMPRESSION_DEFAULT = "org.mule.util.compression.GZipCompression";
 
     /**
-     * JDK1.3+ 'Service Provider' specification
-     * ( http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html )
+     * JDK1.3+ 'Service Provider' specification (
+     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html )
      */
-    public static final String SERVICE_ID = "META-INF/services/org.mule.util.compression.CompressionStrategy";
+    String SERVICE_ID = "META-INF/services/org.mule.util.compression.CompressionStrategy";
 
-    public byte[] compressByteArray(byte[] bytes) throws IOException;
+    byte[] compressByteArray(byte[] bytes) throws IOException;
 
-    public byte[] uncompressByteArray(byte[] bytes) throws IOException;
+    byte[] uncompressByteArray(byte[] bytes) throws IOException;
 
-    public boolean isCompressed(byte[] bytes) throws IOException;
+    boolean isCompressed(byte[] bytes) throws IOException;
 }

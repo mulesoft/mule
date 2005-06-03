@@ -23,53 +23,62 @@ import java.util.List;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public interface QueuePersistenceStrategy {
+public interface QueuePersistenceStrategy
+{
 
-	public interface Holder {
-		public Object getId();
-		public String getQueue();
-	}
-	
-	/**
-	 * Stores an object and returns its generated id.
-	 * @param obj the object to be stored
-	 * @return the id of the stored object
-	 * @throws IOException
-	 */
-    public Object store(String queue, Object obj) throws IOException;
-    
+    public interface Holder
+    {
+        Object getId();
+
+        String getQueue();
+    }
+
+    /**
+     * Stores an object and returns its generated id.
+     * 
+     * @param obj the object to be stored
+     * @return the id of the stored object
+     * @throws IOException
+     */
+    Object store(String queue, Object obj) throws IOException;
+
     /**
      * Loads an object specified by the given id.
+     * 
      * @param id the id of the stored object
      * @return the object
      * @throws IOException
      */
-    public Object load(String queue, Object id) throws IOException;
+    Object load(String queue, Object id) throws IOException;
 
     /**
      * Removes the object specified by the given id from the store.
+     * 
      * @param id the id of the stored object
      * @throws IOException
      */
-    public void remove(String queue, Object id) throws IOException;
+    void remove(String queue, Object id) throws IOException;
 
     /**
      * Retrieves the ids of the stored objects.
+     * 
      * @return the list of ids
      * @throws IOException
      */
-    public List restore() throws IOException;
+    List restore() throws IOException;
 
-	/**
-	 * Open the store.
-	 * @throws IOException
-	 */
-	public void open() throws IOException;
-	
     /**
-     * Closes the store.
+     * Open the store.
+     * 
      * @throws IOException
      */
-    public void close() throws IOException;
+    void open() throws IOException;
+
+    /**
+     * Closes the store.
+     * 
+     * @throws IOException
+     */
+    void close() throws IOException;
 
 }

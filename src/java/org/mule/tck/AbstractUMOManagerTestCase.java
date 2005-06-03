@@ -13,6 +13,9 @@
  */
 package org.mule.tck;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mule.MuleManager;
 import org.mule.impl.MuleModel;
 import org.mule.interceptors.InterceptorStack;
@@ -22,9 +25,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -37,9 +37,9 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
 
     protected void setUp() throws Exception
     {
-        if(!initialised) {
+        if (!initialised) {
             getUMOManager();
-            initialised=true;
+            initialised = true;
         }
     }
 
@@ -98,7 +98,7 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
 
     public void testManagerProperties()
     {
-        String value = (String)MuleManager.getInstance().getProperty("envProperty1");
+        String value = (String) MuleManager.getInstance().getProperty("envProperty1");
         assertEquals("value1", value);
         assertEquals(1, MuleManager.getInstance().getProperties().size());
     }
@@ -106,14 +106,14 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
     public void testInterceptorStacks()
     {
         UMOInterceptorStack stack1 = MuleManager.getInstance().lookupInterceptorStack("testInterceptorStack");
-		assertNotNull(stack1);
-		List interceptors = stack1.getInterceptors(); 
+        assertNotNull(stack1);
+        List interceptors = stack1.getInterceptors();
         assertEquals(2, interceptors.size());
 
-		InterceptorStack stack2 = new InterceptorStack();
+        InterceptorStack stack2 = new InterceptorStack();
         List interceptors2 = new ArrayList();
         interceptors2.add(new LoggingInterceptor());
-		stack2.setInterceptors(interceptors2);
+        stack2.setInterceptors(interceptors2);
 
         MuleManager.getInstance().registerInterceptorStack("testInterceptors2", stack2);
 
@@ -126,30 +126,30 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
     public void testTrasactionSetting() throws Exception
     {
         assertNotNull(MuleManager.getInstance().getTransactionManager());
-        try
-        {
+        try {
             MuleManager.getInstance().setTransactionManager(null);
             fail("cannot set tx manager once it has been set");
-        } catch (Exception e)
-        {
-            //expected
+        } catch (Exception e) {
+            // expected
         }
     }
 
-//    public void testManagerLifecycle() throws Exception
-//    {
-//        MuleManager.getInstance().start();
-//        UMOConnector connector = MuleManager.getInstance().lookupConnector("testConnector");
-//        assertTrue(connector.isStarted());
-//
-//        MuleManager.getInstance().stop();
-//        assertTrue(!connector.isStarted());
-//
-//        MuleManager.getInstance().dispose();
-//        assertTrue(connector.isDisposed());
-//    }
+    // public void testManagerLifecycle() throws Exception
+    // {
+    // MuleManager.getInstance().start();
+    // UMOConnector connector =
+    // MuleManager.getInstance().lookupConnector("testConnector");
+    // assertTrue(connector.isStarted());
+    //
+    // MuleManager.getInstance().stop();
+    // assertTrue(!connector.isStarted());
+    //
+    // MuleManager.getInstance().dispose();
+    // assertTrue(connector.isDisposed());
+    // }
 
-    public void testModelSetting() {
+    public void testModelSetting()
+    {
         assertNotNull(MuleManager.getInstance().getModel());
         MuleManager.getInstance().setModel(new MuleModel());
         assertEquals("mule", MuleManager.getInstance().getModel().getName());

@@ -21,10 +21,10 @@ import org.mule.umo.model.ModelException;
 import org.mule.util.StringMessageHelper;
 
 /**
- * <code>TooManySatisfiableMethodsException</code> is thrown by EntryPointResolvers when
- * the component passed has more than one methods that meet the criteria of the configured
- * EntryPointResolver.
- *
+ * <code>TooManySatisfiableMethodsException</code> is thrown by
+ * EntryPointResolvers when the component passed has more than one methods that
+ * meet the criteria of the configured EntryPointResolver.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  * @see org.mule.umo.model.UMOEntryPointResolver
@@ -32,7 +32,7 @@ import org.mule.util.StringMessageHelper;
 public class TooManySatisfiableMethodsException extends ModelException
 {
     /**
-     * @param component 
+     * @param component
      */
     public TooManySatisfiableMethodsException(Object component)
     {

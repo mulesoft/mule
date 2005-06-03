@@ -17,18 +17,20 @@
 
 package org.mule.impl.work;
 
+import org.mule.config.ThreadingProfile;
+
 import EDU.oswego.cs.dl.util.concurrent.Channel;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
-import org.mule.config.ThreadingProfile;
 
 /**
  * Based class for WorkExecutorPool. Sub-classes define the synchronization
- * policy (should the call block until the end of the work; or when it starts
- * et cetera).
- *
+ * policy (should the call block until the end of the work; or when it starts et
+ * cetera).
+ * 
  * @version $Rev$ $Date$
  */
-public class WorkExecutorPoolImpl implements WorkExecutorPool {
+public class WorkExecutorPoolImpl implements WorkExecutorPool
+{
 
     /**
      * A timed out pooled executor.
@@ -38,19 +40,20 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool {
     private ThreadingProfile profile;
 
     private String name;
-	
-	private static final long SHUTDOWN_TIMEOUT = 5000L;
+
+    private static final long SHUTDOWN_TIMEOUT = 5000L;
 
     /**
      * Creates a pool with the specified minimum and maximum sizes. The Channel
      * used to enqueue the submitted Work instances is queueless synchronous
      * one.
-     *
-     * @param profile The threading profile to use when creating a pool for
-     * this work manager
+     * 
+     * @param profile The threading profile to use when creating a pool for this
+     *            work manager
      * @param name The name to associate with the threads created in this pool
      */
-    public WorkExecutorPoolImpl(ThreadingProfile profile, String name) {
+    public WorkExecutorPoolImpl(ThreadingProfile profile, String name)
+    {
         this.profile = profile;
         this.name = name;
         pooledExecutor = profile.createPool(name);
@@ -59,13 +62,12 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool {
     /**
      * Creates a pool with the specified minimum and maximum sizes and using the
      * specified Channel to enqueue the submitted Work instances.
-     *
+     * 
      * @param channel Queue to be used as the queueing facility of this pool.
      * @param maxSize Maximum size of the work executor pool.
      */
-    public WorkExecutorPoolImpl(
-            Channel channel,
-            int maxSize) {
+    public WorkExecutorPoolImpl(Channel channel, int maxSize)
+    {
         pooledExecutor = new PooledExecutor(channel, maxSize);
         pooledExecutor.setMinimumPoolSize(maxSize);
         pooledExecutor.waitWhenBlocked();
@@ -73,56 +75,63 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool {
 
     /**
      * Execute the specified Work.
-     *
+     * 
      * @param work Work to be executed.
-     *
-     * @exception InterruptedException Indicates that the Work execution has been
-     * unsuccessful.
+     * 
+     * @exception InterruptedException Indicates that the Work execution has
+     *                been unsuccessful.
      */
-    public void execute(Runnable work) throws InterruptedException {
+    public void execute(Runnable work) throws InterruptedException
+    {
         pooledExecutor.execute(work);
     }
 
     /**
      * Gets the size of this pool.
      */
-    public int getPoolSize() {
+    public int getPoolSize()
+    {
         return pooledExecutor.getPoolSize();
     }
 
     /**
      * Gets the maximum size of this pool.
      */
-    public int getMaximumPoolSize() {
+    public int getMaximumPoolSize()
+    {
         return pooledExecutor.getMaximumPoolSize();
     }
 
     /**
      * Sets the maximum size of this pool.
+     * 
      * @param maxSize New maximum size of this pool.
      */
-    public void setMaximumPoolSize(int maxSize) {
+    public void setMaximumPoolSize(int maxSize)
+    {
         pooledExecutor.setMaximumPoolSize(maxSize);
     }
 
-    public WorkExecutorPool start() {
+    public WorkExecutorPool start()
+    {
         throw new IllegalStateException("This pooled executor is already started");
     }
 
     /**
      * Stops this pool. Prior to stop this pool, all the enqueued Work instances
-     * are processed, if possible, in the allowed timeout.  After what, all
-     * threads are interrupted and waited for.  
-     * This is an mix orderly / abrupt shutdown.
+     * are processed, if possible, in the allowed timeout. After what, all
+     * threads are interrupted and waited for. This is an mix orderly / abrupt
+     * shutdown.
      */
-    public WorkExecutorPool stop() {
+    public WorkExecutorPool stop()
+    {
         int maxSize = getMaximumPoolSize();
-		pooledExecutor.shutdownNow();
-		try {
-			pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT);
-		} catch (InterruptedException e) {
-			// Continue
-		}
+        pooledExecutor.shutdownNow();
+        try {
+            pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT);
+        } catch (InterruptedException e) {
+            // Continue
+        }
         return new NullWorkExecutorPool(profile, name);
     }
 

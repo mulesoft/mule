@@ -23,9 +23,9 @@ import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>TimerInterceptor</code> simply times and displays the time taken to process
- * an event.
- *
+ * <code>TimerInterceptor</code> simply times and displays the time taken to
+ * process an event.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -36,7 +36,9 @@ public class TimerInterceptor implements UMOInterceptor
      */
     private static transient Log logger = LogFactory.getLog(TimerInterceptor.class);
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMOInterceptor#intercept(org.mule.umo.UMOEvent)
      */
     public UMOMessage intercept(Invocation invocation) throws UMOException
@@ -44,7 +46,8 @@ public class TimerInterceptor implements UMOInterceptor
         long startTime = System.currentTimeMillis();
         UMOMessage result = invocation.execute();
         long executionTime = System.currentTimeMillis() - startTime;
-        logger.info(invocation.getDescriptor().getName() + " took " + executionTime + "ms to process event [" + invocation.getEvent().getId() + "]");
+        logger.info(invocation.getDescriptor().getName() + " took " + executionTime + "ms to process event ["
+                + invocation.getEvent().getId() + "]");
         return result;
     }
 }

@@ -13,17 +13,18 @@
  */
 package org.mule.tck;
 
+import java.io.File;
+
 import junit.framework.TestCase;
+
+import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.util.StringMessageHelper;
 import org.mule.util.Utility;
-import org.mule.MuleManager;
-
-import java.io.File;
 
 /**
  * <code>NamedTestCase</code> provides readable testcase names.
- *
+ * 
  * @author Joe Walnes
  * @version $Revision$
  */
@@ -32,8 +33,8 @@ public abstract class NamedTestCase extends TestCase
 {
     protected NamedTestCase()
     {
-        //when testing, do not set up server connections
-       System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
+        // when testing, do not set up server connections
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
     }
 
     public String getName()
@@ -46,18 +47,20 @@ public abstract class NamedTestCase extends TestCase
      */
     protected void setUp() throws Exception
     {
-        System.out.println(StringMessageHelper.getBoilerPlate("Testing: " + toString(), '=', 80));;
-        MuleManager.getConfiguration().getDefaultThreadingProfile().setDoThreading(false);        
+        System.out.println(StringMessageHelper.getBoilerPlate("Testing: " + toString(), '=', 80));
+        ;
+        MuleManager.getConfiguration().getDefaultThreadingProfile().setDoThreading(false);
     }
 
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception
+    {
         File f = new File(".mule");
         try {
-            if(f.exists()) {
+            if (f.exists()) {
                 Utility.deleteTree(f);
             }
         } catch (Exception e) {
-            //ignore
+            // ignore
         }
     }
 }

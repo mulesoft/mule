@@ -13,15 +13,15 @@
  */
 package org.mule.management.stats;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.management.stats.printers.AbstractTablePrinter;
-import org.mule.management.stats.printers.SimplePrinter;
-
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.management.stats.printers.AbstractTablePrinter;
+import org.mule.management.stats.printers.SimplePrinter;
 
 /**
  * <code>AllStatistics</code> todo
@@ -29,7 +29,8 @@ import java.util.Iterator;
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane </a>
  * @version $Revision$
  */
-public class AllStatistics {
+public class AllStatistics
+{
 
     private static final Log log = LogFactory.getLog(AllStatistics.class);
     private boolean isStatisticsEnabled;
@@ -38,19 +39,22 @@ public class AllStatistics {
     private HashMap componentStat = new HashMap();
 
     /**
-     *  
+     * 
      */
-    public AllStatistics() {
+    public AllStatistics()
+    {
         clear();
     }
 
-    public void logSummary() {
+    public void logSummary()
+    {
         logSummary(new SimplePrinter(System.out));
     }
 
-    public void logSummary(PrintWriter printer) {
+    public void logSummary(PrintWriter printer)
+    {
 
-        if(printer instanceof AbstractTablePrinter) {
+        if (printer instanceof AbstractTablePrinter) {
             printer.print(componentStat.values());
         } else {
             Iterator it = componentStat.values().iterator();
@@ -59,32 +63,35 @@ public class AllStatistics {
                 printer.print(it.next());
             }
         }
-//        printer.println("-----------------------------");
-//        printer.println("duration (ms): " + (System.currentTimeMillis() - startTime));
+        // printer.println("-----------------------------");
+        // printer.println("duration (ms): " + (System.currentTimeMillis() -
+        // startTime));
     }
 
-    public synchronized void clear() {
+    public synchronized void clear()
+    {
 
         Iterator it = getComponentStatistics().iterator();
-        
-         while(it.hasNext())
-         {
-             ((Statistics) it.next()).clear();
-         }
+
+        while (it.hasNext()) {
+            ((Statistics) it.next()).clear();
+        }
         startTime = System.currentTimeMillis();
     }
 
     /**
      * Are statistics logged
      */
-    public boolean isEnabled() {
+    public boolean isEnabled()
+    {
         return isStatisticsEnabled;
     }
 
     /**
      * Enable statistics logs (this is a dynamic parameter)
      */
-    public void setEnabled(boolean b) {
+    public void setEnabled(boolean b)
+    {
         isStatisticsEnabled = b;
 
         Iterator it = componentStat.values().iterator();
@@ -94,28 +101,33 @@ public class AllStatistics {
         }
     }
 
-    public long getStartTime() {
+    public long getStartTime()
+    {
         return startTime;
     }
 
-    public synchronized void setStartTime(long startTime) {
+    public synchronized void setStartTime(long startTime)
+    {
         this.startTime = startTime;
     }
 
-    public synchronized void add(ComponentStatistics stat) {
-        if (stat != null)
+    public synchronized void add(ComponentStatistics stat)
+    {
+        if (stat != null) {
             componentStat.put(stat.getName(), stat);
-
+        }
     }
 
-    public synchronized void remove(ComponentStatistics stat) {
+    public synchronized void remove(ComponentStatistics stat)
+    {
         if (stat != null) {
             componentStat.remove(stat.getName());
         }
     }
-    public synchronized Collection getComponentStatistics() {
+
+    public synchronized Collection getComponentStatistics()
+    {
         return componentStat.values();
     }
-    
 
 }

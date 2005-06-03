@@ -13,15 +13,15 @@
  */
 package org.mule.management.agents;
 
+import javax.management.ObjectName;
+
 import org.mule.config.i18n.Message;
 import org.mule.management.ManagementException;
 
-import javax.management.ObjectName;
-
 /**
- * <code>JmxManagementException</code> is thrown by the Jmx agents if an
- * error occurs while executing an operation
- *
+ * <code>JmxManagementException</code> is thrown by the Jmx agents if an error
+ * occurs while executing an operation
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,7 +39,7 @@ public class JmxManagementException extends ManagementException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public JmxManagementException(Message message, Throwable cause)
     {
@@ -57,9 +57,9 @@ public class JmxManagementException extends ManagementException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
-    public JmxManagementException(Message message, ObjectName objectName,  Throwable cause)
+    public JmxManagementException(Message message, ObjectName objectName, Throwable cause)
     {
         super(message, cause);
         this.objectName = objectName;

@@ -13,8 +13,9 @@
  */
 package org.mule.test.routing.outbound;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -26,8 +27,8 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -75,14 +76,14 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         UMOMessage message = new MuleMessage("test event", null);
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
-        messageRouter.route(message, (UMOSession)session.proxy(), false);
+        messageRouter.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
         message = new MuleMessage(new IllegalArgumentException(), null);
 
         session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
-        messageRouter.route(message, (UMOSession)session.proxy(), false);
+        messageRouter.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
         FilteringOutboundRouter router3 = new FilteringOutboundRouter();
@@ -92,7 +93,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         router3.setEndpoints(endpoints);
         messageRouter.addRouter(router3);
 
-        //now the message should be routed twice to different endpoints
+        // now the message should be routed twice to different endpoints
         message = new MuleMessage("testing multiple routing", null);
         session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
         session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
@@ -100,7 +101,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.eq(message, endpoint1));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
         messageRouter.setMatchAll(true);
-        messageRouter.route(message, (UMOSession)session.proxy(), false);
+        messageRouter.route(message, (UMOSession) session.proxy(), false);
         session.verify();
     }
 
@@ -113,7 +114,8 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();
 
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter() {
-            public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+            public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+                    throws RoutingException
             {
                 count1[0]++;
                 return message;
@@ -121,7 +123,8 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         };
 
         FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter() {
-            public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+            public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+                    throws RoutingException
             {
                 count2[0]++;
                 return message;
@@ -134,7 +137,8 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(filterRouter2);
 
         LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy() {
-            public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+            public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
+                    throws RoutingException
             {
                 catchAllCount[0]++;
                 return null;

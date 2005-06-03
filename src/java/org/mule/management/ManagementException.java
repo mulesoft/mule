@@ -17,9 +17,9 @@ import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
 /**
- * <code>ManagementException</code> is a general exception thrown by management
- * extensions
- *
+ * <code>ManagementException</code> is a general exception thrown by
+ * management extensions
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,7 +35,7 @@ public abstract class ManagementException extends UMOException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     protected ManagementException(Message message, Throwable cause)
     {

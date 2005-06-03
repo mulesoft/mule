@@ -36,20 +36,20 @@ public class XaTransactionFactory implements UMOTransactionFactory
 
     public UMOTransaction beginTransaction() throws TransactionException
     {
-    	try {
-        	XaTransaction xat = new XaTransaction();
-        	xat.begin();
-        	return xat;
-    	} catch (Exception e) {
-    		throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "XA"), e);
-    	}
+        try {
+            XaTransaction xat = new XaTransaction();
+            xat.begin();
+            return xat;
+        } catch (Exception e) {
+            throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "XA"), e);
+        }
     }
 
     /**
-     * Determines whether this transaction factory creates transactions that are really
-     * transacted or if they are being used to
-     * simulate batch actions, such as using Jms Client Acknowledge.
-     *
+     * Determines whether this transaction factory creates transactions that are
+     * really transacted or if they are being used to simulate batch actions,
+     * such as using Jms Client Acknowledge.
+     * 
      * @return
      */
     public boolean isTransacted()

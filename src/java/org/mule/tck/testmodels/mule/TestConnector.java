@@ -28,8 +28,9 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
- * <p><code>TestConnector</code> us a mock connector
- *
+ * <p>
+ * <code>TestConnector</code> us a mock connector
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,8 +45,9 @@ public class TestConnector extends AbstractConnector
         super();
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.AbstractConnector#doDispose()
      */
     protected void doDispose()
@@ -53,7 +55,9 @@ public class TestConnector extends AbstractConnector
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.AbstractConnector#doInitialise()
      */
     public void doInitialise() throws InitialisationException
@@ -61,7 +65,9 @@ public class TestConnector extends AbstractConnector
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnector#getProtocol()
      */
     public String getProtocol()
@@ -69,7 +75,9 @@ public class TestConnector extends AbstractConnector
         return "test";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.AbstractConnector#doStart()
      */
     protected void doStart() throws UMOException
@@ -77,7 +85,9 @@ public class TestConnector extends AbstractConnector
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.AbstractConnector#doStop()
      */
     protected void doStop() throws UMOException
@@ -85,7 +95,9 @@ public class TestConnector extends AbstractConnector
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnector#getMessageAdapter(java.lang.Object)
      */
     public UMOMessageAdapter getMessageAdapter(Object message) throws MessagingException
@@ -100,11 +112,17 @@ public class TestConnector extends AbstractConnector
             {
                 return true;
             }
-            public void doConnect() throws Exception {}
 
-            public void doDisconnect() throws Exception {}
+            public void doConnect() throws Exception
+            {
+            }
 
-            public boolean isConnected() {
+            public void doDisconnect() throws Exception
+            {
+            }
+
+            public boolean isConnected()
+            {
                 return false;
             }
         };
@@ -125,7 +143,9 @@ public class TestConnector extends AbstractConnector
             this.message = message;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see org.mule.umo.provider.UMOMessageAdapter#getPayload()
          */
         public Object getPayload()
@@ -133,7 +153,9 @@ public class TestConnector extends AbstractConnector
             return message;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsBytes()
          */
         public byte[] getPayloadAsBytes() throws Exception
@@ -142,7 +164,9 @@ public class TestConnector extends AbstractConnector
             return message.toString().getBytes();
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsString()
          */
         public String getPayloadAsString() throws Exception
@@ -150,6 +174,5 @@ public class TestConnector extends AbstractConnector
             return message.toString();
         }
     }
-
 
 }

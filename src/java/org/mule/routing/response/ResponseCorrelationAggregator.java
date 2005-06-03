@@ -20,21 +20,21 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * <code>ResponseCorrelationAggregator</code> Correlates one or more events on a response
- * flow using the Correlation Id to group events
- *
+ * <code>ResponseCorrelationAggregator</code> Correlates one or more events on
+ * a response flow using the Correlation Id to group events
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public abstract class ResponseCorrelationAggregator extends AbstractResponseAggregator
 {
-   /**
-     * Determines if the event group is ready to be aggregated.
-     * if the group is ready to be aggregated (this is entirely up
-     * to the application. it could be determined by volume, last modified time
-     * or some oher criteria based on the last event received)
-     *
+    /**
+     * Determines if the event group is ready to be aggregated. if the group is
+     * ready to be aggregated (this is entirely up to the application. it could
+     * be determined by volume, last modified time or some oher criteria based
+     * on the last event received)
+     * 
      * @param events
      * @return
      */
@@ -47,17 +47,17 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
         }
 
         logger.info("Aggregator: Current Event groups = " + eventGroups.size());
-        logger.info("correlation size is " + size + ". current event group size is " + events.getSize() + " for correlation " + events.getGroupId());
+        logger.info("correlation size is " + size + ". current event group size is " + events.getSize()
+                + " for correlation " + events.getGroupId());
         return size == events.getSize();
     }
 
     /**
      * Adds the event to an event group. Groups are defined by the correlationId
-     * on the message.  If no correlationId is set a default group is created for
-     * all events without a correlationId.
-     * If there is no group for the current correlationId one will be created and added
-     * to the router.
-     *
+     * on the message. If no correlationId is set a default group is created for
+     * all events without a correlationId. If there is no group for the current
+     * correlationId one will be created and added to the router.
+     * 
      * @param event
      * @return
      */
@@ -69,13 +69,11 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
             throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event.getEndpoint());
         }
         EventGroup eg = (EventGroup) eventGroups.get(cId);
-        if (eg == null)
-        {
+        if (eg == null) {
             eg = new EventGroup(cId, groupSize);
             eg.addEvent(event);
             eventGroups.put(eg.getGroupId(), eg);
-        } else
-        {
+        } else {
             eg.addEvent(event);
         }
         return eg;

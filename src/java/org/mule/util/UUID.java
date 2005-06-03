@@ -14,13 +14,13 @@
  */
 package org.mule.util;
 
-import org.doomdark.uuid.UUIDGenerator;
-
 import java.io.Serializable;
+
+import org.doomdark.uuid.UUIDGenerator;
 
 /**
  * <code>UUID</code> Generates a UUID using the doom dark JUG library
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

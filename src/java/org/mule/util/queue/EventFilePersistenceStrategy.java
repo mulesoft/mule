@@ -19,15 +19,18 @@ import org.mule.umo.UMOEvent;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class EventFilePersistenceStrategy extends FilePersistenceStrategy {
+public class EventFilePersistenceStrategy extends FilePersistenceStrategy
+{
 
-	public EventFilePersistenceStrategy() {
-		super();
-	}
-	
-	protected String getId(Object obj) {
-		UMOEvent event = (UMOEvent) obj;
-		return event.getId();
-	}
+    public EventFilePersistenceStrategy()
+    {
+        super();
+    }
+
+    protected String getId(Object obj)
+    {
+        UMOEvent event = (UMOEvent) obj;
+        return event.getId();
+    }
 
 }

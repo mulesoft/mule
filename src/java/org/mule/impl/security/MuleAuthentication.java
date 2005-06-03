@@ -18,7 +18,7 @@ import org.mule.umo.security.UMOCredentials;
 
 /**
  * <code>MuleAuthentication</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -55,7 +55,8 @@ public class MuleAuthentication implements UMOAuthentication
         return details;
     }
 
-    public void setDetails(Object details) {
+    public void setDetails(Object details)
+    {
         this.details = details;
     }
 

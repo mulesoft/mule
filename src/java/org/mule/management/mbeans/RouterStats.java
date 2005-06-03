@@ -13,57 +13,74 @@
  */
 package org.mule.management.mbeans;
 
-import org.mule.management.stats.RouterStatistics;
-
 import java.util.Map;
+
+import org.mule.management.stats.RouterStatistics;
 
 /**
  * <code>RouterStats</code> TODO
- *
+ * 
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class RouterStats implements RouterStatsMBean {
+public class RouterStats implements RouterStatsMBean
+{
 
-	private RouterStatistics statistics;
-	
-	public RouterStats(RouterStatistics statistics) {
-		this.statistics = statistics;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.mule.management.mbeans.RouterStatsMBean#getCaughtMessages()
-	 */
-	public int getCaughtMessages() {
-		return statistics.getCaughtMessages();
-	}
+    private RouterStatistics statistics;
 
-	/* (non-Javadoc)
-	 * @see org.mule.management.mbeans.RouterStatsMBean#getNotRouted()
-	 */
-	public int getNotRouted() {
-		return statistics.getNotRouted();
-	}
+    public RouterStats(RouterStatistics statistics)
+    {
+        this.statistics = statistics;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.management.mbeans.RouterStatsMBean#getTotalReceived()
-	 */
-	public int getTotalReceived() {
-		return statistics.getTotalReceived();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.management.mbeans.RouterStatsMBean#getCaughtMessages()
+     */
+    public int getCaughtMessages()
+    {
+        return statistics.getCaughtMessages();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.management.mbeans.RouterStatsMBean#getTotalRouted()
-	 */
-	public int getTotalRouted() {
-		return statistics.getTotalRouted();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.management.mbeans.RouterStatsMBean#getNotRouted()
+     */
+    public int getNotRouted()
+    {
+        return statistics.getNotRouted();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.management.mbeans.RouterStatsMBean#getRouted()
-	 */
-	public Map getRouted() {
-		return statistics.getRouted();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.management.mbeans.RouterStatsMBean#getTotalReceived()
+     */
+    public int getTotalReceived()
+    {
+        return statistics.getTotalReceived();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.management.mbeans.RouterStatsMBean#getTotalRouted()
+     */
+    public int getTotalRouted()
+    {
+        return statistics.getTotalRouted();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.management.mbeans.RouterStatsMBean#getRouted()
+     */
+    public Map getRouted()
+    {
+        return statistics.getRouted();
+    }
 
 }

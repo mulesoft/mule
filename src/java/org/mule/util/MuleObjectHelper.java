@@ -13,6 +13,10 @@
  */
 package org.mule.util;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -28,14 +32,10 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 /**
- * <code>MuleObjectHelper</code> is a helper class to assist in finding mule server
- * objects, such as endpoint and transformers
- *
+ * <code>MuleObjectHelper</code> is a helper class to assist in finding mule
+ * server objects, such as endpoint and transformers
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -56,20 +56,16 @@ public class MuleObjectHelper
         UMOTransformer returnTrans = null;
         UMOManager manager = MuleManager.getInstance();
         String key;
-        while (st.hasMoreTokens())
-        {
+        while (st.hasMoreTokens()) {
             key = st.nextToken().trim();
             tempTrans = manager.lookupTransformer(key);
-            if (tempTrans == null)
-            {
+            if (tempTrans == null) {
                 throw new MuleException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Transformer: " + key));
             }
-            if (currentTrans == null)
-            {
+            if (currentTrans == null) {
                 currentTrans = tempTrans;
                 returnTrans = tempTrans;
-            } else
-            {
+            } else {
                 currentTrans.setTransformer(tempTrans);
                 currentTrans = tempTrans;
             }
@@ -82,11 +78,9 @@ public class MuleObjectHelper
     {
         UMOImmutableEndpoint iprovider;
         Map endpoints = MuleManager.getInstance().getEndpoints();
-        for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();) {
             iprovider = (UMOImmutableEndpoint) iterator.next();
-            if (iprovider.getProtocol().equals(protocol))
-            {
+            if (iprovider.getProtocol().equals(protocol)) {
                 return new MuleEndpoint(iprovider);
             }
         }
@@ -96,18 +90,16 @@ public class MuleObjectHelper
     public static UMOEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch)
     {
         UMOFilter filter;
-        if(wildcardMatch) {
+        if (wildcardMatch) {
             filter = new WildcardFilter(endpointUri);
         } else {
             filter = new EqualsFilter(endpointUri);
         }
         UMOImmutableEndpoint iprovider;
         Map endpoints = MuleManager.getInstance().getEndpoints();
-        for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = endpoints.values().iterator(); iterator.hasNext();) {
             iprovider = (UMOImmutableEndpoint) iterator.next();
-            if (filter.accept(iprovider.getEndpointURI()))
-            {
+            if (filter.accept(iprovider.getEndpointURI())) {
                 return new MuleEndpoint(iprovider);
             }
         }

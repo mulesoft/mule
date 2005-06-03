@@ -13,28 +13,28 @@
  */
 package org.mule.impl.container;
 
+import java.io.Reader;
+import java.util.Iterator;
+import java.util.TreeMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
-import java.io.Reader;
-import java.util.Iterator;
-import java.util.TreeMap;
-
 /**
- * <code>MultiContainerContext</code> is a container that hosts other containers
- * from which components are queried.
- *
+ * <code>MultiContainerContext</code> is a container that hosts other
+ * containers from which components are queried.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MultiContainerContext implements UMOContainerContext {
+public class MultiContainerContext implements UMOContainerContext
+{
     /**
      * logger used by this class
      */
@@ -44,42 +44,47 @@ public class MultiContainerContext implements UMOContainerContext {
     private UMOContainerContext defaultContainer = new MuleContainerContext();
     private TreeMap containers = new TreeMap();
 
-    public void setName(String name) {
-        //noop
+    public void setName(String name)
+    {
+        // noop
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void addContainer(UMOContainerContext container) {
+    public void addContainer(UMOContainerContext container)
+    {
         if (!(container instanceof MuleContainerContext)) {
             if (containers.containsKey(container.getName())) {
-                throw new IllegalArgumentException(new Message(Messages.CONTAINER_X_ALREADY_REGISTERED, container.getName()).toString());
+                throw new IllegalArgumentException(new Message(Messages.CONTAINER_X_ALREADY_REGISTERED,
+                                                               container.getName()).toString());
             }
             containers.put(container.getName(), container);
         }
     }
 
-    public UMOContainerContext removeContainer(String name) {
+    public UMOContainerContext removeContainer(String name)
+    {
         return (UMOContainerContext) containers.remove(name);
     }
 
-    public Object getComponent(Object key) throws ObjectNotFoundException {
-
-        //first see if a particular container has been requested
+    public Object getComponent(Object key) throws ObjectNotFoundException
+    {
+        // first see if a particular container has been requested
         String containerName = null;
         Object realKey = key;
-        if(key instanceof ContainerKeyPair) {
-            containerName = ((ContainerKeyPair)key).getContaimerName();
-            realKey = ((ContainerKeyPair)key).getKey();
+        if (key instanceof ContainerKeyPair) {
+            containerName = ((ContainerKeyPair) key).getContaimerName();
+            realKey = ((ContainerKeyPair) key).getKey();
         }
 
         Object component = null;
         UMOContainerContext container;
-        if(containerName!=null) {
+        if (containerName != null) {
             container = (UMOContainerContext) containers.get(containerName);
-            if(container!=null) {
+            if (container != null) {
                 return container.getComponent(realKey);
             } else {
                 throw new ObjectNotFoundException("Container: " + containerName);
@@ -110,7 +115,7 @@ public class MultiContainerContext implements UMOContainerContext {
 
     public void configure(Reader configuration, String doctype, String encoding) throws ContainerException
     {
-        //noop
+        // noop
     }
 
     public void dispose()
@@ -121,11 +126,12 @@ public class MultiContainerContext implements UMOContainerContext {
             container.dispose();
         }
         defaultContainer.dispose();
-        defaultContainer =null;
+        defaultContainer = null;
         containers.clear();
         containers = null;
     }
 
-    public void initialise() throws InitialisationException, RecoverableException {
+    public void initialise() throws InitialisationException
+    {
     }
 }

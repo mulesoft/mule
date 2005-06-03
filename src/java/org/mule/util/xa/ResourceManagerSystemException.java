@@ -20,36 +20,40 @@ import org.mule.config.i18n.Message;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class ResourceManagerSystemException extends
-		ResourceManagerException {
+public class ResourceManagerSystemException extends ResourceManagerException
+{
 
-	/**
-	 * 
-	 */
-	public ResourceManagerSystemException() {
-		super();
-	}
+    /**
+     * 
+     */
+    public ResourceManagerSystemException()
+    {
+        super();
+    }
 
-	/**
-	 * @param message
-	 */
-	public ResourceManagerSystemException(Message message) {
-		super(message);
-	}
+    /**
+     * @param message
+     */
+    public ResourceManagerSystemException(Message message)
+    {
+        super(message);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public ResourceManagerSystemException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public ResourceManagerSystemException(Throwable cause)
+    {
+        super(cause);
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public ResourceManagerSystemException(Message message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public ResourceManagerSystemException(Message message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
 }

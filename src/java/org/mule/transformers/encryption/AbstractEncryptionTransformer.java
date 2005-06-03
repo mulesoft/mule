@@ -23,10 +23,10 @@ import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>EncryptionTransformer</code> will transform an array of bytes or string
- * into an encrypted array of bytes
+ * <code>EncryptionTransformer</code> will transform an array of bytes or
+ * string into an encrypted array of bytes
  * 
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,32 +34,30 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
 {
     private UMOEncryptionStrategy strategy = null;
     private String strategyName = null;
-    
+
     public AbstractEncryptionTransformer()
     {
-        registerSourceType(byte[].class);   
-        registerSourceType(String.class);   
+        registerSourceType(byte[].class);
+        registerSourceType(String.class);
         setReturnClass(byte[].class);
     }
 
     public Object doTransform(Object src) throws TransformerException
     {
         byte[] buf;
-        if(src instanceof String) {
+        if (src instanceof String) {
             buf = src.toString().getBytes();
         } else {
-            buf = (byte[])src;
+            buf = (byte[]) src;
         }
-        try
-        {
+        try {
             byte[] result = getTransformedBytes(buf);
-            if(getReturnClass().equals(String.class)) {
+            if (getReturnClass().equals(String.class)) {
                 return new String(result);
             } else {
                 return result;
             }
-        } catch (CryptoFailureException e)
-        {
+        } catch (CryptoFailureException e) {
             throw new TransformerException(this, e);
         }
     }
@@ -67,26 +65,25 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
     protected abstract byte[] getTransformedBytes(byte[] buffer) throws CryptoFailureException;
 
     /**
-     * Template method were deriving classes can do any initialisation
-     * after the properties have been set on this transformer
-     *
+     * Template method were deriving classes can do any initialisation after the
+     * properties have been set on this transformer
+     * 
      * @throws org.mule.umo.lifecycle.InitialisationException
-     *
+     * 
      */
     public void initialise() throws InitialisationException
     {
-        if(strategyName!=null) {
-            if(MuleManager.getInstance().getSecurityManager()==null)
-            { 
-                if(strategy==null) {
+        if (strategyName != null) {
+            if (MuleManager.getInstance().getSecurityManager() == null) {
+                if (strategy == null) {
                     throw new InitialisationException(new Message(Messages.AUTH_SECURITY_MANAGER_NOT_SET), this);
-              
-                } 
-            }else {
-                strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);         
+
+                }
+            } else {
+                strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);
             }
         }
-        if(strategy==null) {
+        if (strategy == null) {
             throw new InitialisationException(new Message(Messages.ENCRYPT_STRATEGY_NOT_SET), this);
         }
     }

@@ -13,26 +13,35 @@
  */
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.Callable;
+import java.io.OutputStream;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.*;
+import org.mule.umo.FutureMessageResult;
+import org.mule.umo.TransactionException;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
 
-import java.io.OutputStream;
-import java.util.Map;
+import EDU.oswego.cs.dl.util.concurrent.Callable;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current
- * request.  Using the context, developers can send/dispatch/receive events programmatically
- * as well as manage transactions.
- *
+ * request. Using the context, developers can send/dispatch/receive events
+ * programmatically as well as manage transactions.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -54,7 +63,7 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Returns the message payload for this event
-     *
+     * 
      * @return the message payload for this event
      */
     public UMOMessage getMessage()
@@ -63,10 +72,11 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Reterns the conents of the message  as a byte array.
-     *
+     * Reterns the conents of the message as a byte array.
+     * 
      * @return the conents of the message as a byte array
-     * @throws org.mule.umo.UMOException if the message cannot be converted into an array of bytes
+     * @throws org.mule.umo.UMOException if the message cannot be converted into
+     *             an array of bytes
      */
     public byte[] getMessageAsBytes() throws UMOException
     {
@@ -74,14 +84,13 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Returns the message transformed into it's recognised or expected
-     * format. The transformer used is the one configured on the endpoint through
-     * which this event was received.
-     *
-     * @return the message transformed into it's recognised or expected
-     *         format.
-     * @throws org.mule.umo.transformer.TransformerException
-     *          if a failure occurs in the transformer
+     * Returns the message transformed into it's recognised or expected format.
+     * The transformer used is the one configured on the endpoint through which
+     * this event was received.
+     * 
+     * @return the message transformed into it's recognised or expected format.
+     * @throws org.mule.umo.transformer.TransformerException if a failure occurs
+     *             in the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
     public Object getTransformedMessage() throws TransformerException
@@ -90,14 +99,14 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Returns the message transformed into it's recognised or expected
-     * format and then into an array of bytes. The transformer used is the one configured on the endpoint through
-     * which this event was received.
-     *
-     * @return the message transformed into it's recognised or expected
-     *         format as an array of bytes.
-     * @throws org.mule.umo.transformer.TransformerException
-     *          if a failure occurs in the transformer
+     * Returns the message transformed into it's recognised or expected format
+     * and then into an array of bytes. The transformer used is the one
+     * configured on the endpoint through which this event was received.
+     * 
+     * @return the message transformed into it's recognised or expected format
+     *         as an array of bytes.
+     * @throws org.mule.umo.transformer.TransformerException if a failure occurs
+     *             in the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
     public byte[] getTransformedMessageAsBytes() throws TransformerException
@@ -106,14 +115,14 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Returns the message transformed into it's recognised or expected
-     * format and then into a String. The transformer used is the one configured on the endpoint through
-     * which this event was received.
-     *
-     * @return the message transformed into it's recognised or expected
-     *         format as a Strings.
-     * @throws org.mule.umo.transformer.TransformerException
-     *          if a failure occurs in the transformer
+     * Returns the message transformed into it's recognised or expected format
+     * and then into a String. The transformer used is the one configured on the
+     * endpoint through which this event was received.
+     * 
+     * @return the message transformed into it's recognised or expected format
+     *         as a Strings.
+     * @throws org.mule.umo.transformer.TransformerException if a failure occurs
+     *             in the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
     public String getTransformedMessageAsString() throws TransformerException
@@ -123,9 +132,10 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Returns the message contents as a string
-     *
+     * 
      * @return the message contents as a string
-     * @throws org.mule.umo.UMOException if the message cannot be converted into a string
+     * @throws org.mule.umo.UMOException if the message cannot be converted into
+     *             a string
      */
     public String getMessageAsString() throws UMOException
     {
@@ -134,7 +144,7 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Returns the current transaction (if any) for the session
-     *
+     * 
      * @return the current transaction for the session or null if there is no
      *         transaction in progress
      */
@@ -153,11 +163,12 @@ public class MuleEventContext implements UMOEventContext
     /**
      * This will send an event via the configured outbound router on the
      * component
-     *
+     * 
      * @param message the message to send
      * @return the result of the send if any
-     * @throws org.mule.umo.UMOException if there is no outbound endpoint configured on the
-     *                                   component or the events fails during dispatch
+     * @throws org.mule.umo.UMOException if there is no outbound endpoint
+     *             configured on the component or the events fails during
+     *             dispatch
      */
     public UMOMessage sendEvent(Object message) throws UMOException
     {
@@ -166,20 +177,21 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
-     * configured for the event
-     *
-     * @param message  the event message payload to send
-     * @param endpoint The endpoint  to disptch the event through.
+     * synchronously to the next available Mule UMO in the pool or via the
+     * endpoint configured for the event
+     * 
+     * @param message the event message payload to send
+     * @param endpoint The endpoint to disptch the event through.
      * @return the return Message from the call or null if there was no result
-     * @throws org.mule.umo.UMOException if the event fails to be processed by the component or
-     *                                   the transport for the endpoint
+     * @throws org.mule.umo.UMOException if the event fails to be processed by
+     *             the component or the transport for the endpoint
      */
     public UMOMessage sendEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
-        //If synchronous receive has not been explicitly set, default it to true
+        // If synchronous receive has not been explicitly set, default it to
+        // true
         Object temp = message.getProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY);
-        if(temp==null && getTransaction()==null) {
+        if (temp == null && getTransaction() == null) {
             message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
         }
         return session.sendEvent(message, endpoint);
@@ -187,19 +199,20 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
-     * configured for the event
-     *
+     * synchronously to the next available Mule UMO in the pool or via the
+     * endpoint configured for the event
+     * 
      * @param message the message payload to send
      * @return the return Message from the call or null if there was no result
-     * @throws org.mule.umo.UMOException if the event fails to be processed by the component or
-     *                                   the transport for the endpoint
+     * @throws org.mule.umo.UMOException if the event fails to be processed by
+     *             the component or the transport for the endpoint
      */
     public UMOMessage sendEvent(UMOMessage message) throws UMOException
     {
-        //If synchronous receive has not been explicitly set, default it to true
+        // If synchronous receive has not been explicitly set, default it to
+        // true
         Object temp = message.getProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY);
-        if(temp==null) {
+        if (temp == null) {
             message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
         }
         return session.sendEvent(message);
@@ -207,41 +220,42 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpointUri
-     * configured for the event
-     *
-     * @param message  the event message payload to send
+     * synchronously to the next available Mule UMO in the pool or via the
+     * endpointUri configured for the event
+     * 
+     * @param message the event message payload to send
      * @param endpointUri The endpointUri to disptch the event through
      * @return the return Message from the call or null if there was no result
-     * @throws org.mule.umo.UMOException if the event fails to be processed by the component or
-     *                                   the transport for the endpointUri
+     * @throws org.mule.umo.UMOException if the event fails to be processed by
+     *             the component or the transport for the endpointUri
      */
     public UMOMessage sendEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        
-        //If synchronous receive has not been explicitly set, default it to true
+
+        // If synchronous receive has not been explicitly set, default it to
+        // true
         Object temp = message.getProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY);
-        if(temp==null) {
+        if (temp == null) {
             message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
         }
         return session.sendEvent(message, endpoint);
     }
 
     /**
-     * sends an event request via the configured outbound router for this component.
-     * This method return immediately, but the result of the event invocation available
-     * from the returned a Future result that can be accessed later by the
-     * the returned FutureMessageResult.
-     * the Future messageResult can be queried at any time to check that the invocation
-     * has completed.  A timeout is associated with the invocation, which is the maximum time in
-     * milli-seconds that the invocation should take to complete
-     *
+     * sends an event request via the configured outbound router for this
+     * component. This method return immediately, but the result of the event
+     * invocation available from the returned a Future result that can be
+     * accessed later by the the returned FutureMessageResult. the Future
+     * messageResult can be queried at any time to check that the invocation has
+     * completed. A timeout is associated with the invocation, which is the
+     * maximum time in milli-seconds that the invocation should take to complete
+     * 
      * @param message the object that is the payload of the event
      * @param timeout how long to block in milliseconds waiting for a result
      * @return the result message if any of the invocation
      * @throws org.mule.umo.UMOException if the dispatch fails or the components
-     *                                   or transfromers cannot be found
+     *             or transfromers cannot be found
      * @see org.mule.umo.FutureMessageResult
      */
     public FutureMessageResult sendEventAsync(final Object message, final int timeout) throws UMOException
@@ -263,19 +277,19 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * sends an event request via the configured outbound router for this component.
-     * This method return immediately, but the result of the event invocation available
-     * from the returned a Future result that can be accessed later by the
-     * the returned FutureMessageResult.
-     * the Future messageResult can be queried at any time to check that the invocation
-     * has completed.  A timeout is associated with the invocation, which is the maximum time in
-     * milli-seconds that the invocation should take to complete
-     *
+     * sends an event request via the configured outbound router for this
+     * component. This method return immediately, but the result of the event
+     * invocation available from the returned a Future result that can be
+     * accessed later by the the returned FutureMessageResult. the Future
+     * messageResult can be queried at any time to check that the invocation has
+     * completed. A timeout is associated with the invocation, which is the
+     * maximum time in milli-seconds that the invocation should take to complete
+     * 
      * @param message the UMOMessage of the event
      * @param timeout how long to block in milliseconds waiting for a result
      * @return the result message if any of the invocation
      * @throws org.mule.umo.UMOException if the dispatch fails or the components
-     *                                   or transfromers cannot be found
+     *             or transfromers cannot be found
      * @see org.mule.umo.FutureMessageResult
      */
     public FutureMessageResult sendEventAsync(final UMOMessage message, final int timeout) throws UMOException
@@ -296,23 +310,25 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * sends an event request via the configured outbound router for this component.
-     * This method return immediately, but the result of the event invocation available
-     * from the returned a Future result that can be accessed later by the
-     * the returned FutureMessageResult.
-     * the Future messageResult can be queried at any time to check that the invocation
-     * has completed.  A timeout is associated with the invocation, which is the maximum time in
-     * milli-seconds that the invocation should take to complete
-     *
-     * @param message  the UMOMessage of the event
+     * sends an event request via the configured outbound router for this
+     * component. This method return immediately, but the result of the event
+     * invocation available from the returned a Future result that can be
+     * accessed later by the the returned FutureMessageResult. the Future
+     * messageResult can be queried at any time to check that the invocation has
+     * completed. A timeout is associated with the invocation, which is the
+     * maximum time in milli-seconds that the invocation should take to complete
+     * 
+     * @param message the UMOMessage of the event
      * @param endpointUri the endpointUri to dispatch to
-     * @param timeout  how long to block in milliseconds waiting for a result
+     * @param timeout how long to block in milliseconds waiting for a result
      * @return the result message if any of the invocation
      * @throws org.mule.umo.UMOException if the dispatch fails or the components
-     *                                   or transfromers cannot be found
+     *             or transfromers cannot be found
      * @see org.mule.umo.FutureMessageResult
      */
-    public FutureMessageResult sendEventAsync(final UMOMessage message, final UMOEndpointURI endpointUri, final int timeout) throws UMOException
+    public FutureMessageResult sendEventAsync(final UMOMessage message,
+                                              final UMOEndpointURI endpointUri,
+                                              final int timeout) throws UMOException
     {
         FutureMessageResult result = new FutureMessageResult();
 
@@ -330,25 +346,26 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * sends an event request via the configured outbound router for this component.
-     * This method return immediately, but the result of the event invocation available
-     * from the returned a Future result that can be accessed later by the
-     * the returned FutureMessageResult.
-     * the Future messageResult can be queried at any time to check that the invocation
-     * has completed.  A timeout is associated with the invocation, which is the maximum time in
-     * milli-seconds that the invocation should take to complete
-     *
-     * @param message      the UMOMessage of the event
-     * @param endpointName The endpoint name to disptch the event through.
-     *                     This will be looked up first on the component configuration and then
-     *                     on the mule manager configuration
-     * @param timeout      how long to block in milliseconds waiting for a result
+     * sends an event request via the configured outbound router for this
+     * component. This method return immediately, but the result of the event
+     * invocation available from the returned a Future result that can be
+     * accessed later by the the returned FutureMessageResult. the Future
+     * messageResult can be queried at any time to check that the invocation has
+     * completed. A timeout is associated with the invocation, which is the
+     * maximum time in milli-seconds that the invocation should take to complete
+     * 
+     * @param message the UMOMessage of the event
+     * @param endpointName The endpoint name to disptch the event through. This
+     *            will be looked up first on the component configuration and
+     *            then on the mule manager configuration
+     * @param timeout how long to block in milliseconds waiting for a result
      * @return the result message if any of the invocation
      * @throws org.mule.umo.UMOException if the dispatch fails or the components
-     *                                   or transfromers cannot be found
+     *             or transfromers cannot be found
      * @see org.mule.umo.FutureMessageResult
      */
-    public FutureMessageResult sendEventAsync(final UMOMessage message, final String endpointName, final int timeout) throws UMOException
+    public FutureMessageResult sendEventAsync(final UMOMessage message, final String endpointName, final int timeout)
+            throws UMOException
     {
         FutureMessageResult result = new FutureMessageResult();
 
@@ -367,15 +384,16 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * synchronously to the next available Mule UMO in the pool or via the endpoint
-     * configured for the event
-     *
-     * @param message      the event message payload to send
-     * @param endpointName The endpoint name to disptch the event through.  This will be looked up
-     *                     first on the component configuration and then on the mule manager configuration
+     * synchronously to the next available Mule UMO in the pool or via the
+     * endpoint configured for the event
+     * 
+     * @param message the event message payload to send
+     * @param endpointName The endpoint name to disptch the event through. This
+     *            will be looked up first on the component configuration and
+     *            then on the mule manager configuration
      * @return the return Message from the call or null if there was no result
-     * @throws org.mule.umo.UMOException if the event fails to be processed by the component or
-     *                                   the transport for the endpoint
+     * @throws org.mule.umo.UMOException if the event fails to be processed by
+     *             the component or the transport for the endpoint
      */
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
@@ -383,26 +401,28 @@ public class MuleEventContext implements UMOEventContext
         return session.sendEvent(message, endpoint);
     }
 
-
     /**
      * This will dispatch an event asynchronously via the configured outbound
      * endpoint on the component for this session
-     *
+     * 
      * @param message payload to dispatch
-     * @throws org.mule.umo.UMOException if there is no outbound endpoint configured on the
-     *                                   component or the events fails during dispatch
+     * @throws org.mule.umo.UMOException if there is no outbound endpoint
+     *             configured on the component or the events fails during
+     *             dispatch
      */
     public void dispatchEvent(Object message) throws UMOException
     {
         session.dispatchEvent(new MuleMessage(message, event.getProperties()));
     }
+
     /**
      * This will dispatch an event asynchronously via the configured outbound
      * endpoint on the component for this session
-     *
+     * 
      * @param message the message to send
-     * @throws org.mule.umo.UMOException if there is no outbound endpoint configured on the
-     *                                   component or the events fails during dispatch
+     * @throws org.mule.umo.UMOException if there is no outbound endpoint
+     *             configured on the component or the events fails during
+     *             dispatch
      */
     public void dispatchEvent(UMOMessage message) throws UMOException
     {
@@ -411,31 +431,33 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpointUri
-     * configured for the event
-     *
-     * @param message  the event message payload to send
-     * @param endpointUri the endpointUri to dispatc the event to
-     *                 first on the component configuration and then on the mule manager configuration
-     * @throws org.mule.umo.UMOException if the event fails to be processed by the component or
-     *                                   the transport for the endpointUri
+     * asynchronously to the next available Mule UMO in the pool or via the
+     * endpointUri configured for the event
+     * 
+     * @param message the event message payload to send
+     * @param endpointUri the endpointUri to dispatc the event to first on the
+     *            component configuration and then on the mule manager
+     *            configuration
+     * @throws org.mule.umo.UMOException if the event fails to be processed by
+     *             the component or the transport for the endpointUri
      */
     public void dispatchEvent(UMOMessage message, UMOEndpointURI endpointUri) throws UMOException
     {
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri( endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         session.dispatchEvent(message, endpoint);
     }
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
-     * configured for the event
-     *
-     * @param message      the event message payload to send
-     * @param endpointName The endpoint name to disptch the event through.  This will be looked up
-     *                     first on the component configuration and then on the mule manager configuration
-     * @throws org.mule.umo.UMOException if the event fails to be processed by the component or
-     *                                   the transport for the endpoint
+     * asynchronously to the next available Mule UMO in the pool or via the
+     * endpoint configured for the event
+     * 
+     * @param message the event message payload to send
+     * @param endpointName The endpoint name to disptch the event through. This
+     *            will be looked up first on the component configuration and
+     *            then on the mule manager configuration
+     * @throws org.mule.umo.UMOException if the event fails to be processed by
+     *             the component or the transport for the endpoint
      */
     public void dispatchEvent(UMOMessage message, String endpointName) throws UMOException
     {
@@ -444,13 +466,13 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Depending on the session state this methods either Passes an event
-     * asynchronously to the next available Mule UMO in the pool or via the endpoint
-     * configured for the event
-     *
-     * @param message  the event message payload to send
+     * asynchronously to the next available Mule UMO in the pool or via the
+     * endpoint configured for the event
+     * 
+     * @param message the event message payload to send
      * @param endpoint The endpoint name to disptch the event through.
-     * @throws org.mule.umo.UMOException if the event fails to be processed by the component or
-     *                                   the transport for the endpoint
+     * @throws org.mule.umo.UMOException if the event fails to be processed by
+     *             the component or the transport for the endpoint
      */
     public void dispatchEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
@@ -459,9 +481,10 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Requests a synchronous receive of an event on the component
-     *
-     * @param endpoint the endpoint identifing the endpointUri on ewhich the event will be received
-     * @param timeout  time in milliseconds before the request timesout
+     * 
+     * @param endpoint the endpoint identifing the endpointUri on ewhich the
+     *            event will be received
+     * @param timeout time in milliseconds before the request timesout
      * @return The requested event or null if the request times out
      * @throws org.mule.umo.UMOException if the request operation fails
      */
@@ -472,9 +495,10 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Requests a synchronous receive of an event on the component
-     *
-     * @param endpointName the endpoint identifing the endpointUri on ewhich the event will be received
-     * @param timeout      time in milliseconds before the request timesout
+     * 
+     * @param endpointName the endpoint identifing the endpointUri on ewhich the
+     *            event will be received
+     * @param timeout time in milliseconds before the request timesout
      * @return The requested event or null if the request times out
      * @throws org.mule.umo.UMOException if the request operation fails
      */
@@ -485,20 +509,20 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Requests a synchronous receive of an event on the component
-     *
+     * 
      * @param endpointUri the endpointUri on which the event will be received
-     * @param timeout  time in milliseconds before the request timesout
+     * @param timeout time in milliseconds before the request timesout
      * @return The requested event or null if the request times out
      * @throws org.mule.umo.UMOException if the request operation fails
      */
     public UMOMessage receiveEvent(UMOEndpointURI endpointUri, long timeout) throws UMOException
     {
-        UMOEndpoint endpoint =MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         return session.receiveEvent(endpoint, timeout);
     }
 
     /**
-     *
+     * 
      * @return
      */
     public UMODescriptor getComponentDescriptor()
@@ -509,7 +533,7 @@ public class MuleEventContext implements UMOEventContext
     /**
      * Gets a property associated with the current event. Calling this method is
      * equivilent to calling <code>event.getMessage().getProperty(...)</code>
-     *
+     * 
      * @param name the property name
      * @return the property value or null if the property does not exist
      */
@@ -520,10 +544,12 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Gets a property associated with the current event. Calling this method is
-     * equivilent to calling <code>event.getMessage().getProperty(..., ...)</code>
-     *
-     * @param name         the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
+     * equivilent to calling
+     * <code>event.getMessage().getProperty(..., ...)</code>
+     * 
+     * @param name the property name
+     * @param defaultValue a default value if the property doesn't exist in the
+     *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -533,11 +559,13 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Gets an Integer property associated with the current event. Calling
-     * this method is equivilent to calling <code>event.getMessage().getIntProperty(..., ...)</code>
-     *
-     * @param name         the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
+     * Gets an Integer property associated with the current event. Calling this
+     * method is equivilent to calling
+     * <code>event.getMessage().getIntProperty(..., ...)</code>
+     * 
+     * @param name the property name
+     * @param defaultValue a default value if the property doesn't exist in the
+     *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -547,11 +575,13 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Gets a Long property associated with the current event. Calling
-     * this method is equivilent to calling <code>event.getMessage().getLongProperty(..., ...)</code>
-     *
-     * @param name         the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
+     * Gets a Long property associated with the current event. Calling this
+     * method is equivilent to calling
+     * <code>event.getMessage().getLongProperty(..., ...)</code>
+     * 
+     * @param name the property name
+     * @param defaultValue a default value if the property doesn't exist in the
+     *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -561,11 +591,13 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Gets a Double property associated with the current event. Calling
-     * this method is equivilent to calling <code>event.getMessage().getDoubleProperty(..., ...)</code>
-     *
-     * @param name         the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
+     * Gets a Double property associated with the current event. Calling this
+     * method is equivilent to calling
+     * <code>event.getMessage().getDoubleProperty(..., ...)</code>
+     * 
+     * @param name the property name
+     * @param defaultValue a default value if the property doesn't exist in the
+     *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -575,11 +607,13 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Gets a Boolean property associated with the current event. Calling
-     * this method is equivilent to calling <code>event.getMessage().getbooleanProperty(..., ...)</code>
-     *
-     * @param name         the property name
-     * @param defaultValue a default value if the property doesn't exist in the event
+     * Gets a Boolean property associated with the current event. Calling this
+     * method is equivilent to calling
+     * <code>event.getMessage().getbooleanProperty(..., ...)</code>
+     * 
+     * @param name the property name
+     * @param defaultValue a default value if the property doesn't exist in the
+     *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -589,11 +623,11 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Sets a property associated with the current event. Calling
-     * this method is equivilent to calling
+     * Sets a property associated with the current event. Calling this method is
+     * equivilent to calling
      * <code>event.getMessage().setProperty(..., ...)</code>
-     *
-     * @param name  the property name or key
+     * 
+     * @param name the property name or key
      * @param value the property value
      */
     public void setProperty(String name, Object value)
@@ -602,11 +636,11 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Sets a Boolean property associated with the current event. Calling
-     * this method is equivilent to calling
+     * Sets a Boolean property associated with the current event. Calling this
+     * method is equivilent to calling
      * <code>event.getMessage().setBooleanProperty(..., ...)</code>
-     *
-     * @param name  the property name or key
+     * 
+     * @param name the property name or key
      * @param value the property value
      */
     public void setBooleanProperty(String name, boolean value)
@@ -615,11 +649,11 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Sets an Integer property associated with the current event. Calling
-     * this method is equivilent to calling
+     * Sets an Integer property associated with the current event. Calling this
+     * method is equivilent to calling
      * <code>event.getMessage().setIntProperty(..., ...)</code>
-     *
-     * @param name  the property name or key
+     * 
+     * @param name the property name or key
      * @param value the property value
      */
     public void setIntProperty(String name, int value)
@@ -628,11 +662,11 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Sets a Long property associated with the current event. Calling
-     * this method is equivilent to calling
+     * Sets a Long property associated with the current event. Calling this
+     * method is equivilent to calling
      * <code>event.getMessage().setLongProperty(..., ...)</code>
-     *
-     * @param name  the property name or key
+     * 
+     * @param name the property name or key
      * @param value the property value
      */
     public void setLongProperty(String name, long value)
@@ -641,11 +675,11 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Sets a Double property associated with the current event. Calling
-     * this method is equivilent to calling
+     * Sets a Double property associated with the current event. Calling this
+     * method is equivilent to calling
      * <code>event.getMessage().setDoubleProperty(..., ...)</code>
-     *
-     * @param name  the property name or key
+     * 
+     * @param name the property name or key
      * @param value the property value
      */
     public void setDoubleProperty(String name, double value)
@@ -655,7 +689,7 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Returns a map of properties associated with the event
-     *
+     * 
      * @return a map of properties on the event
      */
     public Map getProperties()
@@ -665,13 +699,14 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Determines whether the default processing for this event will be
-     * executed.  By default, the Mule server will route events according
-     * to a components configuration.  The user can override this behaviour by
+     * executed. By default, the Mule server will route events according to a
+     * components configuration. The user can override this behaviour by
      * obtaining a reference to the Event context, either by implementing
-     * <code>org.mule.umo.lifecycle.Callable</code> or calling <code>UMOManager.getEventContext</code>
-     * to obtain the UMOEventContext for the current thread. The user can programmatically control
-     * how events are dispached.
-     *
+     * <code>org.mule.umo.lifecycle.Callable</code> or calling
+     * <code>UMOManager.getEventContext</code> to obtain the UMOEventContext
+     * for the current thread. The user can programmatically control how events
+     * are dispached.
+     * 
      * @return Returns true is the user has set stopFurtherProcessing.
      * @see org.mule.umo.manager.UMOManager
      * @see org.mule.umo.UMOEventContext
@@ -684,13 +719,14 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Determines whether the default processing for this event will be
-     * executed.  By default, the Mule server will route events according
-     * to a components configuration.  The user can override this behaviour by
+     * executed. By default, the Mule server will route events according to a
+     * components configuration. The user can override this behaviour by
      * obtaining a reference to the Event context, either by implementing
-     * <code>org.mule.umo.lifecycle.Callable</code> or calling <code>UMOManager.getEventContext</code>
-     * to obtain the UMOEventContext for the current thread. The user can programmatically control
-     * how events are dispached.
-     *
+     * <code>org.mule.umo.lifecycle.Callable</code> or calling
+     * <code>UMOManager.getEventContext</code> to obtain the UMOEventContext
+     * for the current thread. The user can programmatically control how events
+     * are dispached.
+     * 
      * @param stopFurtherProcessing the value to set.
      */
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
@@ -701,7 +737,7 @@ public class MuleEventContext implements UMOEventContext
     /**
      * An outputstream the can optionally be used write response data to an
      * incoming message.
-     *
+     * 
      * @return an output strem if one has been made available by the message
      *         receiver that received the message
      */
@@ -712,7 +748,7 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Determines whether the was sent synchrounously or not
-     *
+     * 
      * @return true if the event is synchronous
      */
     public boolean isSynchronous()
@@ -728,11 +764,12 @@ public class MuleEventContext implements UMOEventContext
     /**
      * Returns the transaction for the current event or null if there is no
      * transaction in progresss
-     *
+     * 
      * @return the transaction for the current event or null if there is no
      *         transaction in progresss
      */
-    public UMOTransaction getTransaction() {
+    public UMOTransaction getTransaction()
+    {
         return TransactionCoordination.getInstance().getTransaction();
     }
 }

@@ -17,14 +17,13 @@ package org.mule.umo.lifecycle;
 
 import org.mule.umo.UMOException;
 
-
 /**
  * <code>Startable</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface Startable
 {
-    public void start() throws UMOException;
+    void start() throws UMOException;
 }

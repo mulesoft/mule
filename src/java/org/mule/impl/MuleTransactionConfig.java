@@ -20,10 +20,9 @@ import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
 
 /**
- * <p/>
- * <code>MuleTransactionConfig</code> defines transaction configuration for
- * a transactional endpoint.
- *
+ * <p/> <code>MuleTransactionConfig</code> defines transaction configuration
+ * for a transactional endpoint.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -51,48 +50,46 @@ public class MuleTransactionConfig implements UMOTransactionConfig
     public MuleTransactionConfig()
     {
         timeout = MuleManager.getConfiguration().getTransactionTimeout();
-
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.umo.UMOTransactionConfig#getFactory()
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.UMOTransactionConfig#getFactory()
+     */
     public UMOTransactionFactory getFactory()
     {
         return factory;
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.umo.UMOTransactionConfig#setFactory(org.mule.umo.UMOTransactionFactory)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.UMOTransactionConfig#setFactory(org.mule.umo.UMOTransactionFactory)
+     */
     public void setFactory(UMOTransactionFactory factory)
     {
-        if (factory == null)
-        {
+        if (factory == null) {
             throw new IllegalArgumentException("Transaction Factory cannot be null");
         }
         this.factory = factory;
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.umo.UMOTransactionConfig#getAction()
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.UMOTransactionConfig#getAction()
+     */
     public byte getAction()
     {
         return action;
     }
 
     /*
-	 * (non-Javadoc)
-	 *
-	 * @see org.mule.umo.UMOTransactionConfig#setAction(byte)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.UMOTransactionConfig#setAction(byte)
+     */
     public void setAction(byte action)
     {
         this.action = action;
@@ -101,28 +98,17 @@ public class MuleTransactionConfig implements UMOTransactionConfig
 
     public void setActionAsString(String action)
     {
-        if (ACTION_ALWAYS_BEGIN_STRING.equals(action))
-        {
+        if (ACTION_ALWAYS_BEGIN_STRING.equals(action)) {
             this.action = ACTION_ALWAYS_BEGIN;
-        }
-        else if (ACTION_BEGIN_OR_JOIN_STRING.equals(action))
-        {
+        } else if (ACTION_BEGIN_OR_JOIN_STRING.equals(action)) {
             this.action = ACTION_BEGIN_OR_JOIN;
-        }
-        else if (ACTION_ALWAYS_JOIN_STRING.equals(action))
-        {
+        } else if (ACTION_ALWAYS_JOIN_STRING.equals(action)) {
             this.action = ACTION_ALWAYS_JOIN;
-        }
-        else if (ACTION_JOIN_IF_POSSIBLE_STRING.equals(action))
-        {
+        } else if (ACTION_JOIN_IF_POSSIBLE_STRING.equals(action)) {
             this.action = ACTION_JOIN_IF_POSSIBLE;
-        }
-        else if (ACTION_NONE_STRING.equals(action))
-        {
+        } else if (ACTION_NONE_STRING.equals(action)) {
             this.action = ACTION_NONE;
-        }
-        else
-        {
+        } else {
             throw new IllegalArgumentException("Action " + action + " is not recognised as a begin action.");
         }
     }
@@ -131,7 +117,7 @@ public class MuleTransactionConfig implements UMOTransactionConfig
     {
         if (factory != null) {
             if (!factory.isTransacted()) {
-            	return false;
+                return false;
             }
             return action != ACTION_NONE;
         }
@@ -140,12 +126,12 @@ public class MuleTransactionConfig implements UMOTransactionConfig
 
     public ConstraintFilter getConstraint()
     {
-        if(constraint==null) return null;
-        try
-        {
-            return (ConstraintFilter)constraint.clone();
-        } catch (CloneNotSupportedException e)
-        {
+        if (constraint == null) {
+            return null;
+        }
+        try {
+            return (ConstraintFilter) constraint.clone();
+        } catch (CloneNotSupportedException e) {
             logger.fatal("Failed to clone ContraintFilter: " + e.getMessage(), e);
             return constraint;
         }

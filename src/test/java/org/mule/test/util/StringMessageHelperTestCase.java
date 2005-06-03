@@ -15,15 +15,17 @@
 
 package org.mule.test.util;
 
-import junit.framework.TestCase;
-import org.mule.util.StringMessageHelper;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
+import org.mule.util.StringMessageHelper;
+
 /**
- * <code>StringMessageHelperTest</code> test the methods of the StringMessageHelper formatting class
- *
+ * <code>StringMessageHelperTest</code> test the methods of the
+ * StringMessageHelper formatting class
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -66,11 +68,11 @@ public class StringMessageHelperTestCase extends TestCase
         result = StringMessageHelper.getFormattedMessage(msg1, null);
         assertEquals(msg1, result);
 
-        result = StringMessageHelper.getFormattedMessage(msg1, new Object[]{});
+        result = StringMessageHelper.getFormattedMessage(msg1, new Object[] {});
         assertEquals(msg1, result);
 
         String msg2 = "There should be a variable {0}, {1} and {2}";
-        result = StringMessageHelper.getFormattedMessage(msg2, new Object[]{"here", "there", "everywhere"});
+        result = StringMessageHelper.getFormattedMessage(msg2, new Object[] { "here", "there", "everywhere" });
         assertEquals("There should be a variable here, there and everywhere", result);
     }
 
@@ -93,10 +95,12 @@ public class StringMessageHelperTestCase extends TestCase
         msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
 
         String plate = StringMessageHelper.getBoilerPlate(msgs, '*', 12);
-        assertEquals("\n************\n* This     *\n* is a     *\n* Boiler P *\n* late Mes *\n* sage tha *\n* t should *\n*  get wra *\n* pped to  *\n* the next *\n*  line if *\n*  it is w *\n* orking p *\n* roperly  *\n************", plate);
+        assertEquals("\n************\n* This     *\n* is a     *\n* Boiler P *\n* late Mes *\n* sage tha *\n* t should *\n*  get wra *\n* pped to  *\n* the next *\n*  line if *\n*  it is w *\n* orking p *\n* roperly  *\n************",
+                     plate);
     }
 
-    public void testTruncate() {
+    public void testTruncate()
+    {
         String msg = "this is a test message for truncating";
         String result = StringMessageHelper.truncate(msg, 100, true);
         assertEquals(msg, result);

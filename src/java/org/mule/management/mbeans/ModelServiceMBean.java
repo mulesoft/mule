@@ -18,30 +18,30 @@ import org.mule.umo.UMOException;
 
 /**
  * <code>ModelServiceMBean</code> JMX Service interface for the UMOModel
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface ModelServiceMBean
 {
 
-    public void start() throws UMOException;
+    void start() throws UMOException;
 
-    public void stop() throws UMOException;
+    void stop() throws UMOException;
 
-    public boolean isComponentRegistered(String name);
+    boolean isComponentRegistered(String name);
 
-    public UMODescriptor getComponentDescriptor(String name);
+    UMODescriptor getComponentDescriptor(String name);
 
-    public void startComponent(String name) throws UMOException;
+    void startComponent(String name) throws UMOException;
 
-    public void stopComponent(String name) throws UMOException;
+    void stopComponent(String name) throws UMOException;
 
-    public void pauseComponent(String name) throws UMOException;
+    void pauseComponent(String name) throws UMOException;
 
-    public void resumeComponent(String name) throws UMOException;
+    void resumeComponent(String name) throws UMOException;
 
-    public void unregisterComponent(String name) throws UMOException;
+    void unregisterComponent(String name) throws UMOException;
 
-    public String getName();
+    String getName();
 }

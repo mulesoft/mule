@@ -16,12 +16,18 @@
 package org.mule.test.util;
 
 import junit.framework.TestCase;
-import org.mule.tck.testmodels.fruit.*;
+
+import org.mule.tck.testmodels.fruit.AbstractFruit;
+import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Fruit;
+import org.mule.tck.testmodels.fruit.FruitBowl;
+import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.util.ClassHelper;
 
 /**
  * <code>ReflectionHelperTestCase</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,13 +48,10 @@ public class ClassHelperTestCase extends TestCase
         assertTrue(!ClassHelper.isConcrete(Fruit.class));
         assertTrue(!ClassHelper.isConcrete(AbstractFruit.class));
 
-        try
-        {
+        try {
             ClassHelper.isConcrete(null);
             fail("Class cannot be null, exception should be thrown");
-        }
-        catch (RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             // expected
         }
     }
@@ -60,13 +63,10 @@ public class ClassHelperTestCase extends TestCase
 
         assertEquals(clazz.getName(), "java.lang.String");
 
-        try
-        {
+        try {
             clazz = ClassHelper.loadClass("java.lang.Bing", getClass());
             fail("Class not found exception should be found");
-        }
-        catch (ClassNotFoundException e)
-        {
+        } catch (ClassNotFoundException e) {
             // expected
         }
 
@@ -74,11 +74,12 @@ public class ClassHelperTestCase extends TestCase
 
     public void testInstanciateClass() throws Exception
     {
-        Object object = ClassHelper.instanciateClass("org.mule.tck.testmodels.fruit.Orange", new Object[]{});
+        Object object = ClassHelper.instanciateClass("org.mule.tck.testmodels.fruit.Orange", new Object[] {});
         assertNotNull(object);
         assertTrue(object instanceof Orange);
 
-        object = ClassHelper.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Object[]{new Apple(), new Banana()});
+        object = ClassHelper.instanciateClass("org.mule.tck.testmodels.fruit.FruitBowl", new Object[] { new Apple(),
+                new Banana() });
         assertNotNull(object);
         assertTrue(object instanceof FruitBowl);
 
@@ -87,13 +88,10 @@ public class ClassHelperTestCase extends TestCase
         assertTrue(bowl.hasApple());
         assertTrue(bowl.hasBanana());
 
-        try
-        {
-            object = ClassHelper.instanciateClass("java.lang.Bing", new Object[]{});
+        try {
+            object = ClassHelper.instanciateClass("java.lang.Bing", new Object[] {});
             fail("Class does not exist, exception should have been thrown");
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             // expected
         }
 

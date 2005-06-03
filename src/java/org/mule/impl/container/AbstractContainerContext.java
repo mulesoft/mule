@@ -13,21 +13,20 @@
  */
 package org.mule.impl.container;
 
+import java.io.Reader;
+import java.io.StringReader;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.ChainedReader;
 
-import java.io.Reader;
-import java.io.StringReader;
-
 /**
  * <code>AbstractContainerContext</code> provides base container configuration
  * functions for handling embedded configuration
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -41,11 +40,13 @@ public abstract class AbstractContainerContext implements UMOContainerContext
     public static final String DEFAULT_ENCODING = "UTF-8";
     private String name;
 
-    protected AbstractContainerContext(String name) {
+    protected AbstractContainerContext(String name)
+    {
         this.name = name;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
@@ -54,28 +55,30 @@ public abstract class AbstractContainerContext implements UMOContainerContext
         this.name = name;
     }
 
-    public void initialise() throws InitialisationException, RecoverableException
+    public void initialise() throws InitialisationException
     {
-        //noop
+        // noop
     }
 
-    public void dispose() {
-        //noop
+    public void dispose()
+    {
+        // noop
     }
 
     public final void configure(Reader configuration, String doctype, String encoding) throws ContainerException
     {
         String decl = getXmlDeclaration(encoding);
         logger.debug("Using Xml declaration: " + decl);
-        if(doctype==null) doctype = getDefaultDocType();
-
-        if(doctype!=null) {
-            if(!doctype.startsWith("<!DOCTYPE")) {
+        if (doctype == null) {
+            doctype = getDefaultDocType();
+        }
+        if (doctype != null) {
+            if (!doctype.startsWith("<!DOCTYPE")) {
                 doctype = "<!DOCTYPE " + doctype + ">";
             }
             logger.info("Using doctype: " + doctype);
         } else {
-            doctype="";
+            doctype = "";
         }
         StringReader declaration = new StringReader(decl + "\n" + doctype);
         ChainedReader reader = new ChainedReader(declaration, configuration);
@@ -83,16 +86,21 @@ public abstract class AbstractContainerContext implements UMOContainerContext
 
     }
 
-    protected String getXmlDeclaration(String encoding) {
-        if(encoding==null) encoding = getDefaultEncoding();
-        return "<?xml version=\"1.0\" encoding=\"" + encoding.toUpperCase() +"\"?>";
+    protected String getXmlDeclaration(String encoding)
+    {
+        if (encoding == null) {
+            encoding = getDefaultEncoding();
+        }
+        return "<?xml version=\"1.0\" encoding=\"" + encoding.toUpperCase() + "\"?>";
     }
 
-    protected String getDefaultDocType() {
+    protected String getDefaultDocType()
+    {
         return null;
     }
 
-    protected String getDefaultEncoding() {
+    protected String getDefaultEncoding()
+    {
         return DEFAULT_ENCODING;
     }
 

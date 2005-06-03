@@ -26,7 +26,9 @@ import org.mule.umo.transformer.UMOTransformer;
  */
 public class UCEncodingTransformersTestCase extends AbstractTransformerTestCase
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
      */
     public Object getResultData()
@@ -34,7 +36,9 @@ public class UCEncodingTransformersTestCase extends AbstractTransformerTestCase
         return new sun.misc.UCEncoder().encode(getTestData().toString().getBytes());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
      */
     public Object getTestData()
@@ -42,7 +46,9 @@ public class UCEncodingTransformersTestCase extends AbstractTransformerTestCase
         return "the quick brown fox jumped over the lazy dog";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getTransformers()
      */
     public UMOTransformer getTransformer()
@@ -50,7 +56,9 @@ public class UCEncodingTransformersTestCase extends AbstractTransformerTestCase
         return new UCEncoder();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
      */
     public UMOTransformer getRoundTripTransformer()

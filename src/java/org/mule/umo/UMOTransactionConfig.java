@@ -18,35 +18,36 @@ package org.mule.umo;
 import org.mule.transaction.constraints.ConstraintFilter;
 
 /**
- * <p><code>UMOTransactionConfig</code> defines transaction configuration for
- * a transactional endpoint.
- *
+ * <p>
+ * <code>UMOTransactionConfig</code> defines transaction configuration for a
+ * transactional endpoint.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface UMOTransactionConfig
 {
-    public static final byte ACTION_NONE = 0;
-    public static final byte ACTION_ALWAYS_BEGIN = 1;
-    public static final byte ACTION_BEGIN_OR_JOIN = 2;
-    public static final byte ACTION_ALWAYS_JOIN = 3;
-    public static final byte ACTION_JOIN_IF_POSSIBLE = 4;
+    byte ACTION_NONE = 0;
+    byte ACTION_ALWAYS_BEGIN = 1;
+    byte ACTION_BEGIN_OR_JOIN = 2;
+    byte ACTION_ALWAYS_JOIN = 3;
+    byte ACTION_JOIN_IF_POSSIBLE = 4;
 
-    public UMOTransactionFactory getFactory();
+    UMOTransactionFactory getFactory();
 
-    public void setFactory(UMOTransactionFactory factory);
+    void setFactory(UMOTransactionFactory factory);
 
-    public byte getAction();
+    byte getAction();
 
-    public void setAction(byte action);
+    void setAction(byte action);
 
-    public boolean isTransacted();
+    boolean isTransacted();
 
-    public ConstraintFilter getConstraint();
+    ConstraintFilter getConstraint();
 
-    public void setConstraint(ConstraintFilter constraint);
+    void setConstraint(ConstraintFilter constraint);
 
-    public void setTimeout(int timeout);
+    void setTimeout(int timeout);
 
-    public int getTimeout();
+    int getTimeout();
 }

@@ -23,8 +23,8 @@ import org.mule.tck.NamedTestCase;
 
 public class RegExFilterTestCase extends NamedTestCase
 {
-    public void testWildcardFilter() {
-
+    public void testWildcardFilter()
+    {
 
         RegExFilter filter = new RegExFilter("The quick (.*)");
         assertNotNull(filter.getPattern());

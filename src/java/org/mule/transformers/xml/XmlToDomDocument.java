@@ -19,8 +19,9 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>XmlToDomDocument</code> Transform a XML String to  org.w3c.dom.Document.
- *
+ * <code>XmlToDomDocument</code> Transform a XML String to
+ * org.w3c.dom.Document.
+ * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$
  */
@@ -35,14 +36,12 @@ public class XmlToDomDocument extends AbstractTransformer
     public Object doTransform(Object src) throws TransformerException
     {
 
-        try
-        {
+        try {
             String xml = (String) src;
             org.dom4j.Document dom4jDoc = DocumentHelper.parseText(xml);
             org.w3c.dom.Document x3cDoc = new DOMWriter().write(dom4jDoc);
             return x3cDoc;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new TransformerException(this, e);
         }
     }

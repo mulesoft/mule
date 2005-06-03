@@ -21,44 +21,51 @@ import org.mule.util.counters.CounterFactory.Type;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public abstract class AggregateCounter extends AbstractCounter {
+public abstract class AggregateCounter extends AbstractCounter
+{
 
-	private Counter base;
-	
-	public AggregateCounter(String name, Type type, AbstractCounter base) {
-		super(name, type);
-		this.base = base;
-		base.addAggregate(this);
-	}
-	
-	public double increment() {
-		throw new UnsupportedOperationException();
-	}
-		
-	public double incrementBy(double value) {
-		throw new UnsupportedOperationException();
-	}
-	
-	public double decrement() {
-		throw new UnsupportedOperationException();
-	}
-	
-	public void setRawValue(double value) {
-		throw new UnsupportedOperationException();
-	}
-	
-	public void compute() {
-		doCompute();
-		propagate();
-	}
-	
-	public Counter getBase() {
-		return this.base;
-	}
-	
-	public abstract double nextValue();
-	
-	public abstract void doCompute();
-	
-	
+    private Counter base;
+
+    public AggregateCounter(String name, Type type, AbstractCounter base)
+    {
+        super(name, type);
+        this.base = base;
+        base.addAggregate(this);
+    }
+
+    public double increment()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public double incrementBy(double value)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public double decrement()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setRawValue(double value)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    public void compute()
+    {
+        doCompute();
+        propagate();
+    }
+
+    public Counter getBase()
+    {
+        return this.base;
+    }
+
+    public abstract double nextValue();
+
+    public abstract void doCompute();
+
 }

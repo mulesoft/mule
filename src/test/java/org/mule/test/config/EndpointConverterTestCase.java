@@ -31,11 +31,9 @@ public class EndpointConverterTestCase extends AbstractConverterTestCase
 
     public Object getValidConvertedType()
     {
-        try
-        {
+        try {
             return getTestEndpoint("test://Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
             return null;
@@ -47,40 +45,50 @@ public class EndpointConverterTestCase extends AbstractConverterTestCase
         return "lookupEndpointIdentifier";
     }
 
-
-public void testValidConversion()
+    public void testValidConversion()
     {
 
-//        MuleManager.setInstance((UMOManager)mockManager.proxy());
-//        mockManager.expectAndReturn("lookupEndpointIdentifier", C.args(C.isA(String.class), C.isA(String.class)), "test://test");
-//        mockManager.expectAndReturn("lookupEndpointIdentifier", C.args(C.isA(String.class), C.isA(String.class)), "test://test");
-//        mockManager.expectAndReturn("lookupEndpointIdentifier", C.args(C.isA(String.class), C.isA(String.class)), "test://test");
-//        mockManager.expectAndReturn("lookupEndpoint", "test://test", null);
-//        mockManager.expectAndReturn("lookupEndpoint", "test://test", null);
-//
-//        Object obj = getValidConvertedType();
-//        mockManager.expectAndReturn("lookupEndpointIdentifier", C.args(C.isA(String.class), C.isA(String.class)), "test://test");
-//
-//        Object result = getConverter().convert(obj.getClass(), "test://Test");
-//
-//        assertNotNull(result);
-//        mockManager.verify();
+        // MuleManager.setInstance((UMOManager)mockManager.proxy());
+        // mockManager.expectAndReturn("lookupEndpointIdentifier",
+        // C.args(C.isA(String.class), C.isA(String.class)),
+        // "test://test");
+        // mockManager.expectAndReturn("lookupEndpointIdentifier",
+        // C.args(C.isA(String.class), C.isA(String.class)),
+        // "test://test");
+        // mockManager.expectAndReturn("lookupEndpointIdentifier",
+        // C.args(C.isA(String.class), C.isA(String.class)),
+        // "test://test");
+        // mockManager.expectAndReturn("lookupEndpoint", "test://test", null);
+        // mockManager.expectAndReturn("lookupEndpoint", "test://test", null);
+        //
+        // Object obj = getValidConvertedType();
+        // mockManager.expectAndReturn("lookupEndpointIdentifier",
+        // C.args(C.isA(String.class), C.isA(String.class)),
+        // "test://test");
+        //
+        // Object result = getConverter().convert(obj.getClass(),
+        // "test://Test");
+        //
+        // assertNotNull(result);
+        // mockManager.verify();
     }
 
     public void testInvalidConversion()
     {
-//        MuleManager.setInstance((UMOManager)mockManager.proxy());
-//        Object obj = getValidConvertedType();
-//        mockManager.expectAndReturn("lookupEndpointIdentifier", C.args(C.isA(String.class), C.isA(String.class)), null);
-//
-//        try
-//        {
-//            getConverter().convert(obj.getClass(), "TestBad");
-//            fail("should throw an exception if not valid");
-//        } catch (Exception e)
-//        {
-//            //exprected
-//            mockManager.verify();
-//        }
+        // MuleManager.setInstance((UMOManager)mockManager.proxy());
+        // Object obj = getValidConvertedType();
+        // mockManager.expectAndReturn("lookupEndpointIdentifier",
+        // C.args(C.isA(String.class), C.isA(String.class)),
+        // null);
+        //
+        // try
+        // {
+        // getConverter().convert(obj.getClass(), "TestBad");
+        // fail("should throw an exception if not valid");
+        // } catch (Exception e)
+        // {
+        // //exprected
+        // mockManager.verify();
+        // }
     }
 }

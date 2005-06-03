@@ -23,29 +23,36 @@ import org.mule.util.queue.TransactionalQueueManager;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class NoPersistenceTestCase extends
-		AbstractTransactionQueueManagerTestCase {
+public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCase
+{
 
-	private static final Log logger = LogFactory.getLog(FilePersistenceTestCase.class);
-	
-	protected Log getLogger() {
-		return logger;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.mule.transaction.xa.queue.AbstractTransactionQueueManagerTestCase#createQueueManager()
-	 */
-	protected TransactionalQueueManager createQueueManager() throws Exception {
-		TransactionalQueueManager mgr = new TransactionalQueueManager();
-		mgr.setPersistenceStrategy(new MemoryPersistenceStrategy());
-		return mgr;
-	}
+    private static final Log logger = LogFactory.getLog(FilePersistenceTestCase.class);
 
-	/* (non-Javadoc)
-	 * @see org.mule.transaction.xa.queue.AbstractTransactionQueueManagerTestCase#isPersistent()
-	 */
-	protected boolean isPersistent() {
-		return false;
-	}
+    protected Log getLogger()
+    {
+        return logger;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.transaction.xa.queue.AbstractTransactionQueueManagerTestCase#createQueueManager()
+     */
+    protected TransactionalQueueManager createQueueManager() throws Exception
+    {
+        TransactionalQueueManager mgr = new TransactionalQueueManager();
+        mgr.setPersistenceStrategy(new MemoryPersistenceStrategy());
+        return mgr;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.transaction.xa.queue.AbstractTransactionQueueManagerTestCase#isPersistent()
+     */
+    protected boolean isPersistent()
+    {
+        return false;
+    }
 
 }

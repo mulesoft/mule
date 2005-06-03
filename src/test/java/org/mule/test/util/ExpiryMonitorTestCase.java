@@ -33,10 +33,10 @@ public class ExpiryMonitorTestCase extends NamedTestCase
     public void testExiry() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
-        Expirable e = new Expirable(){
+        Expirable e = new Expirable() {
             public void expired()
             {
-                expired=true;
+                expired = true;
             }
         };
         monitor.addExpirable(300, e);
@@ -48,10 +48,10 @@ public class ExpiryMonitorTestCase extends NamedTestCase
     public void testNotExiry() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
-        Expirable e = new Expirable(){
+        Expirable e = new Expirable() {
             public void expired()
             {
-                expired=true;
+                expired = true;
             }
         };
         monitor.addExpirable(800, e);
@@ -65,10 +65,10 @@ public class ExpiryMonitorTestCase extends NamedTestCase
     public void testExiryWithReset() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
-        Expirable e = new Expirable(){
+        Expirable e = new Expirable() {
             public void expired()
             {
-                expired=true;
+                expired = true;
             }
         };
         monitor.addExpirable(600, e);
@@ -86,10 +86,10 @@ public class ExpiryMonitorTestCase extends NamedTestCase
     public void testNotExiryWithRemove() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
-        Expirable e = new Expirable(){
+        Expirable e = new Expirable() {
             public void expired()
             {
-                expired=true;
+                expired = true;
             }
         };
         monitor.addExpirable(1000, e);

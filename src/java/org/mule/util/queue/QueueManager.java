@@ -20,18 +20,19 @@ import org.mule.util.xa.ResourceManagerSystemException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public interface QueueManager {
+public interface QueueManager
+{
 
-	void start() throws ResourceManagerSystemException;
-	
-	void stop() throws ResourceManagerSystemException;
-	
-	QueueSession getQueueSession();
-	
-	void close();
-	
-	void setDefaultQueueConfiguration(QueueConfiguration config);
-	
-	void setQueueConfiguration(String queueName, QueueConfiguration config);
-	
+    void start() throws ResourceManagerSystemException;
+
+    void stop() throws ResourceManagerSystemException;
+
+    QueueSession getQueueSession();
+
+    void close();
+
+    void setDefaultQueueConfiguration(QueueConfiguration config);
+
+    void setQueueConfiguration(String queueName, QueueConfiguration config);
+
 }

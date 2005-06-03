@@ -16,9 +16,9 @@ package org.mule.transformers.encryption;
 import org.mule.umo.security.CryptoFailureException;
 
 /**
- * <code>EncryptionTransformer</code> will transform an encrypted array of bytes or
- * string into an decrypted array of bytes
- *
+ * <code>EncryptionTransformer</code> will transform an encrypted array of
+ * bytes or string into an decrypted array of bytes
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

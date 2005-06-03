@@ -13,16 +13,17 @@
  */
 package org.mule.impl.message;
 
+import java.util.Date;
+
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-import java.util.Date;
-
 /**
- * <code>ExceptionMessage</code> is used by the DefaultComponentExceptionStrategy
- * for wrapping an exception with a message to send via an endpointUri.
- *
+ * <code>ExceptionMessage</code> is used by the
+ * DefaultComponentExceptionStrategy for wrapping an exception with a message to
+ * send via an endpointUri.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,7 +40,7 @@ public class ExceptionMessage extends BaseMessage
         this.exception = exception;
         timeStamp = new Date();
         componentName = ctx.getComponentDescriptor().getName();
-        if(endpoint!=null) {
+        if (endpoint != null) {
             endpointUri = endpoint.getEndpointURI();
         } else {
             endpointUri = ctx.getEndpointURI();

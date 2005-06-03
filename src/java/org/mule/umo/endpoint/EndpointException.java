@@ -17,9 +17,9 @@ import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 
 /**
- * <code>EndpointException</code> is an abstract exception extended by endpoint specific
- * exceptions.
- *
+ * <code>EndpointException</code> is an abstract exception extended by
+ * endpoint specific exceptions.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -36,7 +36,7 @@ public class EndpointException extends UMOException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public EndpointException(Message message, Throwable cause)
     {

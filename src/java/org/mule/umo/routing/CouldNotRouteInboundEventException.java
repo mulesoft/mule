@@ -18,9 +18,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
- * <code>CouldNotRouteInboundEventException</code> thrown if the current component cannot
- * accept the inbound event
- *
+ * <code>CouldNotRouteInboundEventException</code> thrown if the current
+ * component cannot accept the inbound event
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,7 +42,10 @@ public class CouldNotRouteInboundEventException extends RoutingException
         super(message, umoMessage, endpoint);
     }
 
-    public CouldNotRouteInboundEventException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    public CouldNotRouteInboundEventException(Message message,
+                                              UMOMessage umoMessage,
+                                              UMOEndpoint endpoint,
+                                              Throwable cause)
     {
         super(message, umoMessage, endpoint, cause);
     }

@@ -21,35 +21,40 @@ import org.mule.umo.UMOException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class ResourceManagerException extends UMOException {
+public class ResourceManagerException extends UMOException
+{
 
-	/**
-	 * 
-	 */
-	public ResourceManagerException() {
-		super();
-	}
+    /**
+     * 
+     */
+    public ResourceManagerException()
+    {
+        super();
+    }
 
-	/**
-	 * @param message
-	 */
-	public ResourceManagerException(Message message) {
-		super(message);
-	}
+    /**
+     * @param message
+     */
+    public ResourceManagerException(Message message)
+    {
+        super(message);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public ResourceManagerException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public ResourceManagerException(Throwable cause)
+    {
+        super(cause);
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public ResourceManagerException(Message message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public ResourceManagerException(Message message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
 }

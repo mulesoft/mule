@@ -28,9 +28,9 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
 /**
- * <code>MuleAdminAgent</code> manages the server endpoint that receives
- * Admin and remote client requests
- *
+ * <code>MuleAdminAgent</code> manages the server endpoint that receives Admin
+ * and remote client requests
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -47,7 +47,7 @@ public class MuleAdminAgent implements UMOAgent
 
     /**
      * Gets the name of this agent
-     *
+     * 
      * @return the agent name
      */
     public String getName()
@@ -57,7 +57,7 @@ public class MuleAdminAgent implements UMOAgent
 
     /**
      * Sets the name of this agent
-     *
+     * 
      * @param name the name of the agent
      */
     public void setName(String name)
@@ -66,7 +66,7 @@ public class MuleAdminAgent implements UMOAgent
 
     /**
      * Should be a 1 line description of the agent
-     *
+     * 
      * @return
      */
     public String getDescription()
@@ -98,23 +98,19 @@ public class MuleAdminAgent implements UMOAgent
     {
         serverEndpoint = MuleManager.getConfiguration().getServerUrl();
         UMOManager manager = MuleManager.getInstance();
-        try
-        {
-            //Check for override
-            if (manager.getModel().isComponentRegistered(MuleManagerComponent.MANAGER_COMPONENT_NAME))
-            {
+        try {
+            // Check for override
+            if (manager.getModel().isComponentRegistered(MuleManagerComponent.MANAGER_COMPONENT_NAME)) {
                 logger.info("Mule manager component has been already initialsied, ignoring server url");
-            } else
-            {
-                if (manager.lookupConnector(DEFAULT_MANAGER_PROVIDER) != null)
-                {
+            } else {
+                if (manager.lookupConnector(DEFAULT_MANAGER_PROVIDER) != null) {
                     throw new AlreadyInitialisedException("Server Components", this);
                 }
 
                 UMOEndpointURI endpointUri = new MuleEndpointURI(serverEndpoint);
                 UMOConnector connector = ConnectorFactory.getOrCreateConnectorByProtocol(endpointUri);
-                //If this connector has already been initialised i.e. it's a
-                //pre-existing connector not not reinit
+                // If this connector has already been initialised i.e. it's a
+                // pre-existing connector not not reinit
                 if (manager.lookupConnector(connector.getName()) == null) {
                     connector.setName(DEFAULT_MANAGER_PROVIDER);
                     connector.initialise();
@@ -125,17 +121,13 @@ public class MuleAdminAgent implements UMOAgent
                 UMODescriptor descriptor = MuleManagerComponent.getDescriptor(connector, endpointUri);
                 manager.getModel().registerComponent(descriptor);
             }
-        } catch (UMOException e)
-        {
+        } catch (UMOException e) {
             throw new InitialisationException(e, this);
         }
     }
 
-
     public String toString()
     {
-        return "MuleAdminAgent{" +
-                "serverEndpoint='" + serverEndpoint + "'" +
-                "}";
+        return "MuleAdminAgent{" + "serverEndpoint='" + serverEndpoint + "'" + "}";
     }
 }

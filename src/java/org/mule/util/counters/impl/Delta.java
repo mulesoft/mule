@@ -20,26 +20,30 @@ import org.mule.util.counters.CounterFactory.Type;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class Delta extends AggregateCounter {
+public class Delta extends AggregateCounter
+{
 
-	private double first = 0.0;
-	private double second = 0.0;
-	
-	public Delta(String name, AbstractCounter base) {
-		super(name, Type.DELTA, base);
-	}
+    private double first = 0.0;
+    private double second = 0.0;
 
-	public double nextValue() {
-		if (first == Double.NaN || second == Double.NaN) {
-			return Double.NaN;
-		} else {
-			return second - first > 0.0 ? second - first : 0.0;
-		}
-	}
+    public Delta(String name, AbstractCounter base)
+    {
+        super(name, Type.DELTA, base);
+    }
 
-	public void doCompute() {
-		first = second;
-		second = getBase().nextValue();
-	}
+    public double nextValue()
+    {
+        if (first == Double.NaN || second == Double.NaN) {
+            return Double.NaN;
+        } else {
+            return second - first > 0.0 ? second - first : 0.0;
+        }
+    }
+
+    public void doCompute()
+    {
+        first = second;
+        second = getBase().nextValue();
+    }
 
 }

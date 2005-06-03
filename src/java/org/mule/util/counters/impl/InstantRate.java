@@ -20,28 +20,32 @@ import org.mule.util.counters.CounterFactory.Type;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class InstantRate extends AggregateCounter {
+public class InstantRate extends AggregateCounter
+{
 
-	private double firstTime;
-	private double lastTime;
-	private double value;
-	
-	public InstantRate(String name, AbstractCounter base) {
-		super(name, Type.INSTANT_RATE, base);
-	}
+    private double firstTime;
+    private double lastTime;
+    private double value;
 
-	public double nextValue() {
-		if (firstTime == 0 || firstTime == lastTime) {
-			return Double.NaN;
-		} else {
-			return value  / (lastTime - firstTime) * 1000.0;
-		}
-	}
+    public InstantRate(String name, AbstractCounter base)
+    {
+        super(name, Type.INSTANT_RATE, base);
+    }
 
-	public void doCompute() {
-		firstTime = lastTime;
-		lastTime = System.currentTimeMillis();
-		value = getBase().nextValue();
-	}
+    public double nextValue()
+    {
+        if (firstTime == 0 || firstTime == lastTime) {
+            return Double.NaN;
+        } else {
+            return value / (lastTime - firstTime) * 1000.0;
+        }
+    }
+
+    public void doCompute()
+    {
+        firstTime = lastTime;
+        lastTime = System.currentTimeMillis();
+        value = getBase().nextValue();
+    }
 
 }

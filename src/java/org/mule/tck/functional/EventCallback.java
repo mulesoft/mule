@@ -18,7 +18,7 @@ import org.mule.umo.UMOEventContext;
 
 /**
  * <code>EventCallback</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

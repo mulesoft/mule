@@ -17,13 +17,14 @@ package org.mule.umo;
 import java.util.List;
 
 /**
- * TODO: document this class 
- *
+ * TODO: document this class
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public interface UMOInterceptorStack extends UMOInterceptor {
+public interface UMOInterceptorStack extends UMOInterceptor
+{
 
-	List getInterceptors();
-	
+    List getInterceptors();
+
 }

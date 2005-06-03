@@ -13,7 +13,9 @@
  */
 package org.mule.routing.inbound;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.RouterStatistics;
@@ -28,21 +30,19 @@ import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.util.StringMessageHelper;
 
-import java.util.Iterator;
-import java.util.List;
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * <code>InboundMessageRouter</code> is a collection of routers that will be invoked
- * when an event is received It is responsible for manageing a collection of routers and
- * also executing the routing logic. Each router must match against the current event for
- * the event to be routed.
- *
+ * <code>InboundMessageRouter</code> is a collection of routers that will be
+ * invoked when an event is received It is responsible for manageing a
+ * collection of routers and also executing the routing logic. Each router must
+ * match against the current event for the event to be routed.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
  * @version $Revision$
  */
 
-public class InboundMessageRouter extends AbstractRouterCollection implements
-        UMOInboundMessageRouter
+public class InboundMessageRouter extends AbstractRouterCollection implements UMOInboundMessageRouter
 {
     /**
      * logger used by this class
@@ -58,8 +58,7 @@ public class InboundMessageRouter extends AbstractRouterCollection implements
 
     public UMOMessage route(UMOEvent event) throws MessagingException
     {
-        if (endpoints.size() > 0 && routers.size() == 0)
-        {
+        if (endpoints.size() > 0 && routers.size() == 0) {
             addRouter(new InboundPassThroughRouter());
         }
 
@@ -70,90 +69,75 @@ public class InboundMessageRouter extends AbstractRouterCollection implements
         boolean match = false;
         UMOInboundRouter umoInboundRouter = null;
 
-        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
             umoInboundRouter = (UMOInboundRouter) iterator.next();
 
-            if (umoInboundRouter.isMatch(event))
-            {
+            if (umoInboundRouter.isMatch(event)) {
                 match = true;
                 eventsToRoute = umoInboundRouter.process(event);
                 noRoute = (eventsToRoute == null);
                 if (!matchAll) {
-					break;
+                    break;
                 }
             }
         }
 
-		// If the stopFurtherProcessing flag has been set
-		// do not route events to the component.
-		// This is the case when using a ForwardingConsumer
-		// inbound router for example.
-		if (!event.isStopFurtherProcessing()) {
-	        if (noRoute)
-	        {
-	            //Update stats
-	            if (getStatistics().isEnabled())
-	            {
-	                getStatistics().incrementNoRoutedMessage();
-	            }
-	            if (!match)
-	            {
-	                if (getCatchAllStrategy() != null)
-	                {
-	                    if (logger.isDebugEnabled()) {
-		                    logger.debug("Message did not match any routers on: "
-		                    		+ componentName
-		                    		+ " - invoking catch all strategy");
-	                    }
-	                    getStatistics().incrementCaughtMessage();
-	                    return getCatchAllStrategy().catchMessage(event.getMessage(), event.getSession(), event.isSynchronous());
-	
-	                } else
-	                {
-	                    logger.warn("Message did not match any routers on: "
-	                            + componentName
-	                            + " and there is no catch all strategy configured on this router.  Disposing message.");
-	                    if (logger.isDebugEnabled())
-	                    {
-	                        try
-	                        {
-	                            logger.warn("Message fragment is: " + StringMessageHelper.truncate(event.getMessageAsString(), 100, true));
-	                        } catch (UMOException e)
-	                        {
-	
-	                        }
-	                    }
-	                }
-	            }
-	        } else
-	        {
-	            try
-	            {
+        // If the stopFurtherProcessing flag has been set
+        // do not route events to the component.
+        // This is the case when using a ForwardingConsumer
+        // inbound router for example.
+        if (!event.isStopFurtherProcessing()) {
+            if (noRoute) {
+                // Update stats
+                if (getStatistics().isEnabled()) {
+                    getStatistics().incrementNoRoutedMessage();
+                }
+                if (!match) {
+                    if (getCatchAllStrategy() != null) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Message did not match any routers on: " + componentName
+                                    + " - invoking catch all strategy");
+                        }
+                        getStatistics().incrementCaughtMessage();
+                        return getCatchAllStrategy().catchMessage(event.getMessage(),
+                                                                  event.getSession(),
+                                                                  event.isSynchronous());
+
+                    } else {
+                        logger.warn("Message did not match any routers on: " + componentName
+                                + " and there is no catch all strategy configured on this router.  Disposing message.");
+                        if (logger.isDebugEnabled()) {
+                            try {
+                                logger.warn("Message fragment is: "
+                                        + StringMessageHelper.truncate(event.getMessageAsString(), 100, true));
+                            } catch (UMOException e) {
+
+                            }
+                        }
+                    }
+                }
+            } else {
+                try {
                     UMOMessage messageResult = null;
-                    for (int i = 0; i < eventsToRoute.length; i++)
-                    {
-		                if (event.isSynchronous())
-		                {
-	                        messageResult = send(eventsToRoute[i]);
-		                } else
-		                {
+                    for (int i = 0; i < eventsToRoute.length; i++) {
+                        if (event.isSynchronous()) {
+                            messageResult = send(eventsToRoute[i]);
+                        } else {
                             dispatch(eventsToRoute[i]);
-		                }
-                        //Update stats
-                        if (getStatistics().isEnabled())
-                        {
+                        }
+                        // Update stats
+                        if (getStatistics().isEnabled()) {
                             getStatistics().incrementRoutedMessage(eventsToRoute[i].getEndpoint());
                         }
                     }
                     return messageResult;
-	            } catch (UMOException e)
-	            {
-	                throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
-	            }
-	        }
-		}
-        return (eventsToRoute != null && eventsToRoute.length > 0 ? eventsToRoute[eventsToRoute.length - 1].getMessage() : null);
+                } catch (UMOException e) {
+                    throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
+                }
+            }
+        }
+        return (eventsToRoute != null && eventsToRoute.length > 0
+                ? eventsToRoute[eventsToRoute.length - 1].getMessage() : null);
 
     }
 
@@ -175,23 +159,19 @@ public class InboundMessageRouter extends AbstractRouterCollection implements
 
     public UMOInboundRouter removeRouter(UMOInboundRouter router)
     {
-        if (routers.remove(router))
-        {
+        if (routers.remove(router)) {
             return router;
-        } else
-        {
+        } else {
             return null;
         }
     }
 
     public void addEndpoint(UMOEndpoint endpoint)
     {
-        if (endpoint != null)
-        {
+        if (endpoint != null) {
             endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
             endpoints.add(endpoint);
-        } else
-        {
+        } else {
             throw new NullPointerException("Endpoint cannot be null");
         }
     }
@@ -209,12 +189,12 @@ public class InboundMessageRouter extends AbstractRouterCollection implements
     public void setEndpoints(List endpoints)
     {
         this.endpoints = endpoints;
-		if (endpoints != null) {
-			for (Iterator it = endpoints.iterator(); it.hasNext();) {
-				UMOEndpoint endpoint = (UMOEndpoint) it.next();
-	            endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
-			}
-		}
+        if (endpoints != null) {
+            for (Iterator it = endpoints.iterator(); it.hasNext();) {
+                UMOEndpoint endpoint = (UMOEndpoint) it.next();
+                endpoint.setType(UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+            }
+        }
     }
 
     /**
@@ -225,11 +205,9 @@ public class InboundMessageRouter extends AbstractRouterCollection implements
     public UMOEndpoint getEndpoint(String name)
     {
         UMOEndpoint endpointDescriptor;
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
             endpointDescriptor = (UMOEndpoint) iterator.next();
-            if (endpointDescriptor.getName().equals(name))
-            {
+            if (endpointDescriptor.getName().equals(name)) {
                 return endpointDescriptor;
             }
         }

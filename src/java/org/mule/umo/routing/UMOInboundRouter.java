@@ -18,17 +18,19 @@ import org.mule.umo.UMOEvent;
 
 /**
  * <code>UMOInboundRouter</code> defines an interface for an inbound Message
- * router. An imbound router is used to control how events are received by a component.
- * One or more of these routers can be associated with a UMOInboundMessageRouter implementation.
- * @see UMOInboundMessageRouter 
- *
+ * router. An imbound router is used to control how events are received by a
+ * component. One or more of these routers can be associated with a
+ * UMOInboundMessageRouter implementation.
+ * 
+ * @see UMOInboundMessageRouter
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public interface UMOInboundRouter extends UMORouter
 {
-    public UMOEvent[] process(UMOEvent event) throws MessagingException;
+    UMOEvent[] process(UMOEvent event) throws MessagingException;
 
-    public boolean isMatch(UMOEvent event) throws MessagingException;
+    boolean isMatch(UMOEvent event) throws MessagingException;
 }

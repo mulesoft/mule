@@ -13,13 +13,17 @@
  */
 package org.mule.impl;
 
-import org.mule.umo.*;
-
 import java.util.List;
+
+import org.mule.umo.Invocation;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOImmutableDescriptor;
+import org.mule.umo.UMOInterceptor;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>InterceptorsInvoker</code> is used trigger an interceptor chain.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -43,8 +47,7 @@ public class InterceptorsInvoker extends Invocation
     public UMOMessage execute() throws UMOException
     {
         UMOMessage message = null;
-        if (cursor < interceptors.size())
-        {
+        if (cursor < interceptors.size()) {
             UMOInterceptor interceptor = (UMOInterceptor) interceptors.get(cursor);
             incCursor();
             message = interceptor.intercept(this);
@@ -53,7 +56,8 @@ public class InterceptorsInvoker extends Invocation
         return getMessage();
     }
 
-    private synchronized void incCursor() {
+    private synchronized void incCursor()
+    {
         cursor++;
     }
 

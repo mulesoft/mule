@@ -21,10 +21,10 @@ import org.mule.umo.model.ModelException;
 import org.mule.util.StringMessageHelper;
 
 /**
- * <code>NoSatisfiableMethodsException</code> is thrown by EntryPointResolvers when
- * the component passed has no methods that meet the criteria of the configured
- * EntryPointResolver.
- *
+ * <code>NoSatisfiableMethodsException</code> is thrown by EntryPointResolvers
+ * when the component passed has no methods that meet the criteria of the
+ * configured EntryPointResolver.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  * @see org.mule.umo.model.UMOEntryPointResolver
@@ -34,7 +34,7 @@ public class NoSatisfiableMethodsException extends ModelException
     private static final String msg = "Could not find entry point on: ";
 
     /**
-     * @param component 
+     * @param component
      */
     public NoSatisfiableMethodsException(Object component)
     {

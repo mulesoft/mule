@@ -14,6 +14,10 @@
  */
 package org.mule.transformers;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,14 +30,10 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * <code>AbstractTransformer</code> Is a base class for all transformers.
  * Transformations transform one object into another.
- *
+ * 
  * @author Ross Mason
  * @version $Revision$
  */
@@ -71,11 +71,11 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     protected Object checkReturnClass(Object object) throws TransformerException
     {
-        if (returnClass != null)
-        {
-            if (!returnClass.isInstance(object))
-            {
-                throw new TransformerException(new Message(Messages.TRANSFORM_X_UNEXPECTED_TYPE_X, object.getClass().getName(), returnClass.getName()), this);
+        if (returnClass != null) {
+            if (!returnClass.isInstance(object)) {
+                throw new TransformerException(new Message(Messages.TRANSFORM_X_UNEXPECTED_TYPE_X,
+                                                           object.getClass().getName(),
+                                                           returnClass.getName()), this);
             }
         }
         logger.debug("The transformed object is of expected type. Type is: " + object.getClass().getName());
@@ -84,8 +84,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     protected void registerSourceType(Class aClass)
     {
-        if (aClass.equals(Object.class))
-        {
+        if (aClass.equals(Object.class)) {
             logger.warn("java.lang.Object has been added as an exceptable sourcetype to this transformer, there will no source type checking on this transformer");
         }
         sourceTypes.add(aClass);
@@ -106,8 +105,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public String getName()
     {
-        if (name == null)
-        {
+        if (name == null) {
             name = getClass().getName();
             name = name.substring(name.lastIndexOf(".") + 1);
         }
@@ -123,7 +121,9 @@ public abstract class AbstractTransformer implements UMOTransformer
         name = string;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.transformers.Transformer#getReturnClass()
      */
     public Class getReturnClass()
@@ -131,7 +131,9 @@ public abstract class AbstractTransformer implements UMOTransformer
         return returnClass;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.transformers.Transformer#setReturnClass(java.lang.String)
      */
     public void setReturnClass(Class newClass)
@@ -141,16 +143,13 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     public boolean isSourceTypeSupported(Class aClass)
     {
-        if (sourceTypes.isEmpty())
-        {
+        if (sourceTypes.isEmpty()) {
             return true;
         }
         Class anotherClass = null;
-        for (Iterator i = getSourceTypeClassesIterator(); i.hasNext();)
-        {
+        for (Iterator i = getSourceTypeClassesIterator(); i.hasNext();) {
             anotherClass = (Class) i.next();
-            if (anotherClass.isAssignableFrom(aClass))
-            {
+            if (anotherClass.isAssignableFrom(aClass)) {
                 return true;
             }
         }
@@ -159,26 +158,26 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     /**
      * Transforms the object.
-     *
+     * 
      * @param src The source object to transform.
      * @return The transformed object
      */
     public final Object transform(Object src) throws TransformerException
     {
         Object result = null;
-        if(src instanceof UMOMessage) {
-            src = ((UMOMessage)src).getPayload();
+        if (src instanceof UMOMessage) {
+            src = ((UMOMessage) src).getPayload();
         }
-        
-        if (!isSourceTypeSupported(src.getClass()))
-        {
+
+        if (!isSourceTypeSupported(src.getClass())) {
             throw new TransformerException(new Message(Messages.TRANSFORM_X_UNSUPORTED_TYPE_X_ENDPOINT_X,
-                            getName(), src.getClass().getName(), endpoint.getEndpointURI()), this);
+                                                       getName(),
+                                                       src.getClass().getName(),
+                                                       endpoint.getEndpointURI()), this);
         } else {
             result = doTransform(src);
             result = checkReturnClass(result);
-            if (transformer != null)
-            {
+            if (transformer != null) {
                 result = transformer.transform(result);
             }
         }
@@ -190,15 +189,16 @@ public abstract class AbstractTransformer implements UMOTransformer
         return endpoint;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.transformer.UMOTransformer#setConnector(org.mule.umo.provider.UMOConnector)
      */
     public void setEndpoint(UMOImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
         UMOTransformer trans = transformer;
-        while (trans != null && endpoint != null)
-        {
+        while (trans != null && endpoint != null) {
             trans.setEndpoint(endpoint);
             trans = trans.getTransformer();
         }
@@ -207,7 +207,9 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     public abstract Object doTransform(Object src) throws TransformerException;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.transformer.UMOTransformer#getTransformer()
      */
     public UMOTransformer getTransformer()
@@ -215,7 +217,9 @@ public abstract class AbstractTransformer implements UMOTransformer
         return transformer;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.transformer.UMOTransformer#setTransformer(org.mule.umo.transformer.UMOTransformer)
      */
     public void setTransformer(UMOTransformer transformer)
@@ -223,33 +227,31 @@ public abstract class AbstractTransformer implements UMOTransformer
         this.transformer = transformer;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#clone()
      */
     public Object clone() throws CloneNotSupportedException
     {
-        try
-        {
+        try {
             Object c = BeanUtils.cloneBean(this);
             return (UMOTransformer) c;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new CloneNotSupportedException("Failed to clone transformer: " + e.getMessage());
         }
     }
 
     /**
      * Will return the return type for the last transformer in the chain
-     *
+     * 
      * @return the last transformers return type
      */
     public Class getFinalReturnClass()
     {
         UMOTransformer tempTrans = this;
         UMOTransformer returnTrans = this;
-        while (tempTrans != null)
-        {
+        while (tempTrans != null) {
             returnTrans = tempTrans;
             tempTrans = tempTrans.getTransformer();
         }
@@ -257,8 +259,9 @@ public abstract class AbstractTransformer implements UMOTransformer
     }
 
     /**
-     * Template method were deriving classes can do any initialisation
-     * after the properties have been set on this transformer
+     * Template method were deriving classes can do any initialisation after the
+     * properties have been set on this transformer
+     * 
      * @throws InitialisationException
      */
     public void initialise() throws InitialisationException
@@ -266,21 +269,24 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     }
 
-    protected String generateTransformerName() {
+    protected String generateTransformerName()
+    {
         String name = getClass().getName();
         int i = name.lastIndexOf(".");
-        if(i > -1) {
+        if (i > -1) {
             name = name.substring(i + 1);
         }
         return name;
-        //String temp = name.substring(0,3).toLowerCase();
-        //return temp + name.substring(3);
+        // String temp = name.substring(0,3).toLowerCase();
+        // return temp + name.substring(3);
     }
 
     /**
      * Convenience method to register source types using a bean property setter
+     * 
      * @param type the fully qualified class name
-     * @throws ClassNotFoundException is thrown if the class is not on theclasspath
+     * @throws ClassNotFoundException is thrown if the class is not on
+     *             theclasspath
      */
     public void setSourceType(String type) throws ClassNotFoundException
     {
@@ -288,12 +294,9 @@ public abstract class AbstractTransformer implements UMOTransformer
         registerSourceType(clazz);
     }
 
-
-    public String toString() {
-        return "AbstractTransformer{" +
-                "name='" + name + "'" +
-                ", returnClass=" + returnClass +
-                ", sourceTypes=" + sourceTypes +
-                "}";
+    public String toString()
+    {
+        return "AbstractTransformer{" + "name='" + name + "'" + ", returnClass=" + returnClass + ", sourceTypes="
+                + sourceTypes + "}";
     }
 }

@@ -26,41 +26,42 @@ import org.mule.util.xa.ResourceManagerException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public interface FileSession {
+public interface FileSession
+{
 
-	void begin() throws ResourceManagerException;
-	
-	void commit() throws ResourceManagerException;
-	
-	void rollback() throws ResourceManagerException;
-	
-	FileInputStream openInputStream(File f) throws IOException;
+    void begin() throws ResourceManagerException;
 
-	FileOutputStream openOutputStream(File f, boolean append) throws IOException;
+    void commit() throws ResourceManagerException;
 
-	FileOutputStream openOutputStream(File f) throws IOException;
+    void rollback() throws ResourceManagerException;
 
-	boolean mkdir(File f) throws IOException;
+    FileInputStream openInputStream(File f) throws IOException;
 
-	RandomAccessFile openRandomAccess(File f, String mode) throws IOException;
+    FileOutputStream openOutputStream(File f, boolean append) throws IOException;
 
-	/** 
-	 * Delete the given file.  
-	 * 
-	 * @throw IllegalStateException 		if this transaction has already been
-	 *										committed or rolled back
-	 * @throw FileNotFoundException 		if the file does not exist
-	 * @throw DeleteException 				if the deletion fails
-	 * @throw TransactionException 			if there is a problem maintaining 
-	 *										transaction information
-	 * @throw InconsistentStateException 	if this transaction cannot be restored
-	 *										to a consistent state (either no effect or 
-	 *										all effects); failure of atomicity
-	 */
-	void delete(File f) throws IOException;
-	
-	void copy(File source, File dest) throws IOException;
-	
-	void rename(File source, File dest) throws IOException;
+    FileOutputStream openOutputStream(File f) throws IOException;
+
+    boolean mkdir(File f) throws IOException;
+
+    RandomAccessFile openRandomAccess(File f, String mode) throws IOException;
+
+    /**
+     * Delete the given file.
+     * 
+     * @throw IllegalStateException if this transaction has already been
+     *        committed or rolled back
+     * @throw FileNotFoundException if the file does not exist
+     * @throw DeleteException if the deletion fails
+     * @throw TransactionException if there is a problem maintaining transaction
+     *        information
+     * @throw InconsistentStateException if this transaction cannot be restored
+     *        to a consistent state (either no effect or all effects); failure
+     *        of atomicity
+     */
+    void delete(File f) throws IOException;
+
+    void copy(File source, File dest) throws IOException;
+
+    void rename(File source, File dest) throws IOException;
 
 }

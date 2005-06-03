@@ -15,6 +15,8 @@
 
 package org.mule.test.transformers.encryption;
 
+import java.util.Arrays;
+
 import org.mule.impl.security.PasswordBasedEncryptionStrategy;
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.encryption.DecryptionTransformer;
@@ -22,8 +24,6 @@ import org.mule.transformers.encryption.EncryptionTransformer;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.transformer.UMOTransformer;
-
-import java.util.Arrays;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -41,23 +41,24 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         strat.initialise();
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
      */
     public Object getResultData()
     {
-        try
-        {
+        try {
             return strat.encrypt(getTestData().toString().getBytes(), null);
-        } catch (CryptoFailureException e)
-        {
+        } catch (CryptoFailureException e) {
             fail(e.getMessage());
             return null;
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
      */
     public Object getTestData()
@@ -65,29 +66,32 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         return "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getTransformers()
      */
     public UMOTransformer getTransformer()
     {
         EncryptionTransformer transformer = new EncryptionTransformer();
         transformer.setStrategy(strat);
-        try
-        {
+        try {
             transformer.initialise();
-        } catch (InitialisationException e)
-        {
+        } catch (InitialisationException e) {
             fail(e.getMessage());
         }
         return transformer;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see junit.framework.TestCase#setUp()
      */
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
      */
     public UMOTransformer getRoundTripTransformer()
@@ -95,21 +99,22 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         DecryptionTransformer transformer = new DecryptionTransformer();
         transformer.setStrategy(strat);
         transformer.setReturnClass(String.class);
-        try
-        {
+        try {
             transformer.initialise();
-        } catch (InitialisationException e)
-        {
+        } catch (InitialisationException e) {
             fail(e.getMessage());
         }
         return transformer;
     }
 
-    public boolean compareResults(Object src, Object result) {
-        if(src instanceof byte[]) {
-            if(src==null && result ==null) return true;
-            if(src==null || result ==null) return false;
-            return Arrays.equals((byte[])src, (byte[])result);
+    public boolean compareResults(Object src, Object result)
+    {
+        if (src instanceof byte[]) {
+            if (src == null && result == null)
+                return true;
+            if (src == null || result == null)
+                return false;
+            return Arrays.equals((byte[]) src, (byte[]) result);
         } else {
             return super.compareResults(src, result);
         }

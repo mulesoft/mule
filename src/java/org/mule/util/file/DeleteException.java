@@ -21,12 +21,15 @@ import java.io.IOException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class DeleteException extends IOException {
-	
-	public DeleteException() {
-	}
+public class DeleteException extends IOException
+{
 
-	public DeleteException(File f) {
-		super(f.toString());
-	}
+    public DeleteException()
+    {
+    }
+
+    public DeleteException(File f)
+    {
+        super(f.toString());
+    }
 }

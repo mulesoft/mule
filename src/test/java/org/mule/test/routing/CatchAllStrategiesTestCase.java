@@ -13,8 +13,8 @@
  */
 package org.mule.test.routing;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.util.HashMap;
+
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.ForwardingCatchAllStrategy;
@@ -31,11 +31,12 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.routing.RoutingException;
 
-import java.util.HashMap;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * <code>CatchAllStrategiesTestCase</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -46,13 +47,11 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
     {
         UMOEvent event = getTestEvent("UncaughtEvent");
         LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy();
-        try
-        {
+        try {
             strategy.setEndpoint(getTestEndpoint("testProvider", UMOEndpoint.ENDPOINT_TYPE_SENDER));
             fail("Illegal operation exception shold have been thrown");
-        } catch (Exception e)
-        {
-            //expected
+        } catch (Exception e) {
+            // expected
         }
 
         assertNull(strategy.getEndpoint());
@@ -66,13 +65,13 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         Mock dispatcher = new Mock(UMOMessageDispatcher.class);
         Mock connector = getMockConnector();
         UMOEvent event = getTestEvent("UncaughtEvent");
-        strategy.setEndpoint((UMOEndpoint)endpoint.proxy());
+        strategy.setEndpoint((UMOEndpoint) endpoint.proxy());
 
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
-        endpoint.expectAndReturn("getConnector", (UMOConnector)connector.proxy());
+        endpoint.expectAndReturn("getConnector", (UMOConnector) connector.proxy());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        connector.expectAndReturn("getDispatcher", "dummy", (UMOMessageDispatcher)dispatcher.proxy());
+        connector.expectAndReturn("getDispatcher", "dummy", (UMOMessageDispatcher) dispatcher.proxy());
         dispatcher.expect("dispatch", C.isA(UMOEvent.class));
         strategy.catchMessage(event.getMessage(), null, false);
 
@@ -92,7 +91,8 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();
 
         FilteringOutboundRouter filterRouter1 = new FilteringOutboundRouter() {
-            public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+            public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+                    throws RoutingException
             {
                 count1[0]++;
                 return message;
@@ -100,7 +100,8 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         };
 
         FilteringOutboundRouter filterRouter2 = new FilteringOutboundRouter() {
-            public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+            public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous)
+                    throws RoutingException
             {
                 count2[0]++;
                 return message;
@@ -113,7 +114,8 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(filterRouter2);
 
         LoggingCatchAllStrategy strategy = new LoggingCatchAllStrategy() {
-            public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+            public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
+                    throws RoutingException
             {
                 catchAllCount[0]++;
                 return null;

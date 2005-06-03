@@ -26,11 +26,12 @@ import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>SelectiveConsumer</code> is an inbound router used to filter out unwanted events.
- * The filtering is performed by a <code>UMOFilter</code> that can be set on the router. If the event
- * does not match the filter a <code>UMOROutnerCatchAllStrategy</code> can be set on this router
- * to route unwanted events.  If a catch strategy is not set the router just returns null.
- *
+ * <code>SelectiveConsumer</code> is an inbound router used to filter out
+ * unwanted events. The filtering is performed by a <code>UMOFilter</code>
+ * that can be set on the router. If the event does not match the filter a
+ * <code>UMOROutnerCatchAllStrategy</code> can be set on this router to route
+ * unwanted events. If a catch strategy is not set the router just returns null.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -49,15 +50,18 @@ public class SelectiveConsumer implements UMOInboundRouter
 
     public boolean isMatch(UMOEvent event) throws MessagingException
     {
-        if(filter==null) return true;
+        if (filter == null) {
+            return true;
+        }
         Object payload = null;
-        if(transformFirst) {
-            try
-            {
+        if (transformFirst) {
+            try {
                 payload = event.getTransformedMessage();
-            } catch (TransformerException e)
-            {
-                throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER), event.getMessage(), event.getEndpoint(), e);
+            } catch (TransformerException e) {
+                throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER),
+                                           event.getMessage(),
+                                           event.getEndpoint(),
+                                           e);
             }
         } else {
             payload = event.getMessage().getPayload();
@@ -67,8 +71,8 @@ public class SelectiveConsumer implements UMOInboundRouter
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
-        if(isMatch(event)) {
-            return new UMOEvent[]{event};
+        if (isMatch(event)) {
+            return new UMOEvent[] { event };
         } else {
             return null;
         }

@@ -18,9 +18,9 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.security.UMOCredentialsAccessor;
 
 /**
- * <code>MuleHeaderCredentialsAccessor</code> obtains and sets the user credentials
- * as Mule property headers
- *
+ * <code>MuleHeaderCredentialsAccessor</code> obtains and sets the user
+ * credentials as Mule property headers
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

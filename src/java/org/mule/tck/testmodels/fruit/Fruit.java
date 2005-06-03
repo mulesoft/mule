@@ -17,7 +17,6 @@ package org.mule.tck.testmodels.fruit;
 
 import java.io.Serializable;
 
-
 public interface Fruit extends Serializable
 {
     public void bite();

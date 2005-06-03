@@ -13,6 +13,9 @@
  */
 package org.mule.config;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.util.ClassHelper;
@@ -20,23 +23,18 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * <code>MuleDtdResolver</code> attempts to locate the mule-configuration.dtd
- * on the classpath, regardless of the DOCTYPE declaration.  If the dtd is not
- * found, it defaults to trying to download it using the systemId.
- * <p/>
- * This resolve is responsible for associating an Xsl document if any with the Dtd.
- * It also allows for a delegate Entity resolver and delegate Xsl.  This allows
- * Configuration builders to mix Mule Xml configuration with other document based
- * configuration and apply transformers to each of the configuration types (if necessary)
- * before constucting a Mule instance.
- * <p/>
- * Note that its up to the Configuration builder implementation to do the actual transformations
+ * on the classpath, regardless of the DOCTYPE declaration. If the dtd is not
+ * found, it defaults to trying to download it using the systemId. <p/> This
+ * resolve is responsible for associating an Xsl document if any with the Dtd.
+ * It also allows for a delegate Entity resolver and delegate Xsl. This allows
+ * Configuration builders to mix Mule Xml configuration with other document
+ * based configuration and apply transformers to each of the configuration types
+ * (if necessary) before constucting a Mule instance. <p/> Note that its up to
+ * the Configuration builder implementation to do the actual transformations
  * this Resolver simple associates Xsl reosurces with dtds
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -50,13 +48,12 @@ public class MuleDtdResolver implements EntityResolver
     public static final String DEFAULT_MULE_DTD = "mule-configuration.dtd";
     private String dtdName = null;
 
-    //Maybe the dtd should go in the META-INF??
+    // Maybe the dtd should go in the META-INF??
     private static final String SEARCH_PATH = "";
 
     private EntityResolver delegate;
     private String xsl;
     private static String currentXsl;
-
 
     public MuleDtdResolver()
     {
@@ -73,7 +70,7 @@ public class MuleDtdResolver implements EntityResolver
         this(dtdName, xsl, null);
     }
 
-    public MuleDtdResolver(String dtdName, EntityResolver delegate )
+    public MuleDtdResolver(String dtdName, EntityResolver delegate)
     {
         this(dtdName, null, delegate);
     }
@@ -83,8 +80,7 @@ public class MuleDtdResolver implements EntityResolver
         this.dtdName = dtdName;
         this.delegate = delegate;
         this.xsl = xsl;
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             StringBuffer buffer = new StringBuffer();
             buffer.append("Created Mule Dtd Resolver: ");
             buffer.append("dtd=").append(dtdName).append(", ");
@@ -96,30 +92,25 @@ public class MuleDtdResolver implements EntityResolver
 
     public InputSource resolveEntity(String publicId, String systemId) throws IOException, SAXException
     {
-        logger.debug("Trying to resolve XML entity with public ID: " + publicId +
-                " and system ID: " + systemId);
+        logger.debug("Trying to resolve XML entity with public ID: " + publicId + " and system ID: " + systemId);
 
         InputSource source = null;
-        currentXsl=null;
-        if (delegate != null)
-        {
+        currentXsl = null;
+        if (delegate != null) {
             source = delegate.resolveEntity(publicId, systemId);
         }
-        if (source == null)
-        {
-            if (systemId != null && systemId.indexOf(dtdName) > systemId.lastIndexOf("/"))
-            {
+        if (source == null) {
+            if (systemId != null && systemId.indexOf(dtdName) > systemId.lastIndexOf("/")) {
                 String dtdFile = systemId.substring(systemId.indexOf(dtdName));
                 logger.debug("Looking on classpath for " + SEARCH_PATH + dtdFile);
 
                 InputStream is = ClassHelper.getResourceAsStream(SEARCH_PATH + dtdFile, getClass());
-                if (is != null)
-                {
+                if (is != null) {
                     source = new InputSource(is);
                     source.setPublicId(publicId);
                     source.setSystemId(systemId);
                     logger.debug("Found on classpath mule DTD: " + systemId);
-                    currentXsl=xsl;
+                    currentXsl = xsl;
                     return source;
                 }
                 logger.debug("Could not find dtd resource on classpath: " + SEARCH_PATH + dtdFile);

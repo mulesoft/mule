@@ -19,7 +19,7 @@ import org.mule.umo.UMOMessage;
 
 /**
  * <code>SecurityException</code> is a generic security exception
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

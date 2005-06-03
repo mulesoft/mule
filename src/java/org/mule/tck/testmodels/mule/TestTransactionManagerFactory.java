@@ -14,16 +14,17 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.umo.manager.UMOTransactionManagerFactory;
-
-import javax.transaction.TransactionManager;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import javax.transaction.TransactionManager;
+
+import org.mule.umo.manager.UMOTransactionManagerFactory;
+
 /**
  * <code>TestTransactionManagerFactory</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -32,12 +33,16 @@ public class TestTransactionManagerFactory implements UMOTransactionManagerFacto
 {
     public TransactionManager create() throws Exception
     {
-        return (TransactionManager) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{TransactionManager.class}, new InvocationHandler(){
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-            {
-                return null;
-            }
+        return (TransactionManager) Proxy.newProxyInstance(getClass().getClassLoader(),
+                                                           new Class[] { TransactionManager.class },
+                                                           new InvocationHandler() {
+                                                               public Object invoke(Object proxy,
+                                                                                    Method method,
+                                                                                    Object[] args) throws Throwable
+                                                               {
+                                                                   return null;
+                                                               }
 
-        });
+                                                           });
     }
 }

@@ -19,5 +19,5 @@ package org.mule.components.simple;
  */
 public interface EchoService
 {
-    public String echo(String echo);
+    String echo(String echo);
 }

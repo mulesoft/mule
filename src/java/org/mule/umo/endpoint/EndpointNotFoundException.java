@@ -16,11 +16,11 @@ package org.mule.umo.endpoint;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
-
 /**
- * <code>EndpointNotFoundException</code> is thrown when an endpoint name or protocol is
- * specified but a matching endpoint is not registered with the Mule server
- *
+ * <code>EndpointNotFoundException</code> is thrown when an endpoint name or
+ * protocol is specified but a matching endpoint is not registered with the Mule
+ * server
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,9 +39,10 @@ public class EndpointNotFoundException extends EndpointException
     {
         super(message);
     }
+
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public EndpointNotFoundException(Message message, Throwable cause)
     {

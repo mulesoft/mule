@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * <code>StringMessageHelper</code> contains some useful methods for
  * formatting message strings for logging or exceptions.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -31,10 +31,8 @@ public class StringMessageHelper
 
     public static String getFormattedMessage(String msg, Object[] arguments)
     {
-        if (arguments != null)
-        {
-            for (int i = 0; i < arguments.length; i++)
-            {
+        if (arguments != null) {
+            for (int i = 0; i < arguments.length; i++) {
                 arguments[i] = getObjectValue(arguments[i]);
             }
         }
@@ -43,21 +41,13 @@ public class StringMessageHelper
 
     public static String getObjectValue(Object object)
     {
-        if (object instanceof String)
-        {
+        if (object instanceof String) {
             return (String) object;
-
-        }
-        else if (object instanceof Class)
-        {
+        } else if (object instanceof Class) {
             return ((Class) object).getName();
-        }
-        else if (object.toString().indexOf(String.valueOf(object.hashCode())) == -1)
-        {
+        } else if (object.toString().indexOf(String.valueOf(object.hashCode())) == -1) {
             return object.toString();
-        }
-        else
-        {
+        } else {
             return object.getClass().getName();
         }
     }
@@ -80,16 +70,13 @@ public class StringMessageHelper
         StringBuffer buf = new StringBuffer(messages.size() * maxlength);
         int trimLength = maxlength - 4;
 
-        for (int i = 0; i < messages.size(); i++)
-        {
+        for (int i = 0; i < messages.size(); i++) {
             size = messages.get(i).toString().length();
-            if (size > trimLength)
-            {
+            if (size > trimLength) {
                 String temp = messages.get(i).toString();
                 int k = i;
                 messages.remove(i);
-                while (temp.length() > trimLength)
-                {
+                while (temp.length() > trimLength) {
                     String msg = temp.substring(0, trimLength);
                     temp = temp.substring(trimLength);
                     messages.add(k, msg);
@@ -101,15 +88,13 @@ public class StringMessageHelper
         buf.append("\n");
         buf.append(charString(c, maxlength));
 
-        for (int i = 0; i < messages.size(); i++)
-        {
+        for (int i = 0; i < messages.size(); i++) {
             buf.append("\n");
             buf.append(c);
             buf.append(" ");
             buf.append(messages.get(i));
             int padding = trimLength - messages.get(i).toString().length();
-            if (padding > 0)
-            {
+            if (padding > 0) {
                 buf.append(charString(' ', padding));
             }
             buf.append(" ");
@@ -123,8 +108,7 @@ public class StringMessageHelper
     public static String charString(char c, int len)
     {
         StringBuffer buf = new StringBuffer(len);
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             buf.append(c);
         }
         return buf.toString();
@@ -132,11 +116,16 @@ public class StringMessageHelper
 
     public static String truncate(String message, int length, boolean includeCount)
     {
-        if(message==null) return null;
-        if(message.length() <= length) return message;
+        if (message == null) {
+            return null;
+        }
+        if (message.length() <= length) {
+            return message;
+        }
         String result = message.substring(0, length) + "...";
-        if(includeCount) result += "[" + length + " of " + message.length() + "]";
+        if (includeCount) {
+            result += "[" + length + " of " + message.length() + "]";
+        }
         return result;
     }
 }
-

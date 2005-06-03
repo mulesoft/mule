@@ -13,12 +13,13 @@
  */
 package org.mule.routing.filters;
 
-import org.mule.umo.UMOFilter;
-
 import java.util.regex.Pattern;
 
+import org.mule.umo.UMOFilter;
+
 /**
- * <code>RegExFilter</code> is used to match a rgular expression against a string argument.
+ * <code>RegExFilter</code> is used to match a rgular expression against a
+ * string argument.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -32,26 +33,27 @@ public class RegExFilter implements UMOFilter
     {
     }
 
-
-    public RegExFilter(String pattern) {
+    public RegExFilter(String pattern)
+    {
         this.pattern = Pattern.compile(pattern);
     }
 
     public boolean accept(Object object)
     {
-        if(object==null) return false;
+        if (object == null) {
+            return false;
+        }
         return pattern.matcher(object.toString()).find();
     }
 
     public String getPattern()
     {
-        return (pattern==null ? null : pattern.pattern());
+        return (pattern == null ? null : pattern.pattern());
     }
 
     public void setPattern(String pattern)
     {
         this.pattern = Pattern.compile(pattern);
     }
-
 
 }

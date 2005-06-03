@@ -1,5 +1,5 @@
 /*
-s * $Header$
+ s * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
@@ -25,76 +25,86 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
 
 /**
- * TODO: document this class 
- *
+ * TODO: document this class
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class InterceptorStack implements UMOInterceptorStack, Initialisable, Disposable {
+public class InterceptorStack implements UMOInterceptorStack, Initialisable, Disposable
+{
 
-	private List interceptors; 
-	
-	public InterceptorStack() {
-	}
+    private List interceptors;
 
-	public InterceptorStack(List interceptors) {
-		this.interceptors = interceptors;
-	}
+    public InterceptorStack()
+    {
+    }
 
-	public UMOMessage intercept(Invocation invocation) throws UMOException {
-		return new Invoc(invocation).execute();
-	}
-	
-	private class Invoc extends Invocation {
-		private int cursor = 0;
-		private Invocation invocation;
-		public Invoc(Invocation invocation) {
-			super(invocation.getDescriptor(), invocation.getMessage(), invocation);
-			this.invocation = invocation;
-		}
-	    public UMOMessage execute() throws UMOException
-	    {
-	        if (interceptors != null && cursor < interceptors.size())
-	        {
-	            UMOInterceptor interceptor = (UMOInterceptor) interceptors.get(cursor);
-	            cursor++;
-				setMessage(interceptor.intercept(this));
-	        } else {
-				invocation.setMessage(getMessage());
-            	setMessage(invocation.execute());
-	        }
-			return getMessage();
-	    }
+    public InterceptorStack(List interceptors)
+    {
+        this.interceptors = interceptors;
+    }
 
-	}
+    public UMOMessage intercept(Invocation invocation) throws UMOException
+    {
+        return new Invoc(invocation).execute();
+    }
 
-	public List getInterceptors() {
-		return interceptors;
-	}
+    private class Invoc extends Invocation
+    {
+        private int cursor = 0;
+        private Invocation invocation;
 
-	public void setInterceptors(List interceptors) {
-		this.interceptors = interceptors;
-	}
+        public Invoc(Invocation invocation)
+        {
+            super(invocation.getDescriptor(), invocation.getMessage(), invocation);
+            this.invocation = invocation;
+        }
 
-	public void initialise() throws InitialisationException, RecoverableException {
-		for (Iterator it = interceptors.iterator(); it.hasNext();) {
+        public UMOMessage execute() throws UMOException
+        {
+            if (interceptors != null && cursor < interceptors.size()) {
+                UMOInterceptor interceptor = (UMOInterceptor) interceptors.get(cursor);
+                cursor++;
+                setMessage(interceptor.intercept(this));
+            } else {
+                invocation.setMessage(getMessage());
+                setMessage(invocation.execute());
+            }
+            return getMessage();
+        }
+
+    }
+
+    public List getInterceptors()
+    {
+        return interceptors;
+    }
+
+    public void setInterceptors(List interceptors)
+    {
+        this.interceptors = interceptors;
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        for (Iterator it = interceptors.iterator(); it.hasNext();) {
             UMOInterceptor interceptor = (UMOInterceptor) it.next();
-			if (interceptor instanceof Initialisable) {
-				((Initialisable) interceptor).initialise();
-			}
-		}
-	}
+            if (interceptor instanceof Initialisable) {
+                ((Initialisable) interceptor).initialise();
+            }
+        }
+    }
 
-	public void dispose() {
-		for (Iterator it = interceptors.iterator(); it.hasNext();) {
+    public void dispose()
+    {
+        for (Iterator it = interceptors.iterator(); it.hasNext();) {
             UMOInterceptor interceptor = (UMOInterceptor) it.next();
-			if (interceptor instanceof Disposable) {
-				((Disposable) interceptor).dispose();
-			}
-		}
-	}
-	
+            if (interceptor instanceof Disposable) {
+                ((Disposable) interceptor).dispose();
+            }
+        }
+    }
+
 }

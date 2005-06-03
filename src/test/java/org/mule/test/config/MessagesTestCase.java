@@ -13,11 +13,11 @@
  */
 package org.mule.test.config;
 
+import java.util.MissingResourceException;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.tck.NamedTestCase;
-
-import java.util.MissingResourceException;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -35,12 +35,10 @@ public class MessagesTestCase extends NamedTestCase
 
     public void testBadBundle()
     {
-        try
-        {
+        try {
             Message message = new Message("blah", 1);
             fail("should throw resource bundle not found exception");
-        } catch (MissingResourceException e)
-        {
+        } catch (MissingResourceException e) {
             assertTrue(e.getMessage().startsWith("Can't find bundle"));
         }
     }

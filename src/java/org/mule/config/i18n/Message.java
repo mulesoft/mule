@@ -17,7 +17,7 @@ import java.io.Serializable;
 
 /**
  * <code>Message</code> constructs a
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -25,7 +25,7 @@ public class Message implements Serializable
 {
     public static final int STATIC_ERROR_CODE = -1;
 
-    private static transient final Object[] emptyArgs = new Object[]{};
+    private static final transient Object[] EMPTY_ARGS = new Object[] {};
 
     private int code = 0;
     private Object[] args;
@@ -36,14 +36,14 @@ public class Message implements Serializable
     private Message(String message)
     {
         this.code = STATIC_ERROR_CODE;
-        args = emptyArgs;
+        args = EMPTY_ARGS;
         this.message = message;
     }
 
     public Message(int code)
     {
         this.code = code;
-        args = emptyArgs;
+        args = EMPTY_ARGS;
         message = Messages.get(code, args);
     }
 
@@ -57,34 +57,46 @@ public class Message implements Serializable
     public Message(int code, Object arg1)
     {
         this.code = code;
-        if (arg1 == null) arg1 = "null";
-        args = new Object[]{arg1};
+        if (arg1 == null) {
+            arg1 = "null";
+        }
+        args = new Object[] { arg1 };
         message = Messages.get(code, args);
     }
 
     public Message(int code, Object arg1, Object arg2)
     {
         this.code = code;
-        if (arg1 == null) arg1 = "null";
-        if (arg2 == null) arg2 = "null";
-        args = new Object[]{arg1, arg2};
+        if (arg1 == null) {
+            arg1 = "null";
+        }
+        if (arg2 == null) {
+            arg2 = "null";
+        }
+        args = new Object[] { arg1, arg2 };
         message = Messages.get(code, args);
     }
 
     public Message(int code, Object arg1, Object arg2, Object arg3)
     {
         this.code = code;
-        if (arg1 == null) arg1 = "null";
-        if (arg2 == null) arg2 = "null";
-        if (arg3 == null) arg3 = "null";
-        args = new Object[]{arg1, arg2, arg3};
+        if (arg1 == null) {
+            arg1 = "null";
+        }
+        if (arg2 == null) {
+            arg2 = "null";
+        }
+        if (arg3 == null) {
+            arg3 = "null";
+        }
+        args = new Object[] { arg1, arg2, arg3 };
         message = Messages.get(code, args);
     }
 
     public Message(String bundle, int code)
     {
         this.code = code;
-        args = emptyArgs;
+        args = EMPTY_ARGS;
         message = Messages.get(bundle, code, args);
         this.bundle = bundle;
     }
@@ -100,8 +112,10 @@ public class Message implements Serializable
     public Message(String bundle, int code, Object arg1)
     {
         this.code = code;
-        if (arg1 == null) arg1 = "null";
-        args = new Object[]{arg1};
+        if (arg1 == null) {
+            arg1 = "null";
+        }
+        args = new Object[] { arg1 };
         message = Messages.get(bundle, code, args);
         this.bundle = bundle;
     }
@@ -109,9 +123,13 @@ public class Message implements Serializable
     public Message(String bundle, int code, Object arg1, Object arg2)
     {
         this.code = code;
-        if (arg1 == null) arg1 = "null";
-        if (arg2 == null) arg2 = "null";
-        args = new Object[]{arg1, arg2};
+        if (arg1 == null) {
+            arg1 = "null";
+        }
+        if (arg2 == null) {
+            arg2 = "null";
+        }
+        args = new Object[] { arg1, arg2 };
         message = Messages.get(bundle, code, args);
         this.bundle = bundle;
     }
@@ -119,10 +137,16 @@ public class Message implements Serializable
     public Message(String bundle, int code, Object arg1, Object arg2, Object arg3)
     {
         this.code = code;
-        if (arg1 == null) arg1 = "null";
-        if (arg2 == null) arg2 = "null";
-        if (arg3 == null) arg3 = "null";
-        args = new Object[]{arg1, arg2, arg3};
+        if (arg1 == null) {
+            arg1 = "null";
+        }
+        if (arg2 == null) {
+            arg2 = "null";
+        }
+        if (arg3 == null) {
+            arg3 = "null";
+        }
+        args = new Object[] { arg1, arg2, arg3 };
         message = Messages.get(bundle, code, args);
         this.bundle = bundle;
     }
@@ -139,7 +163,7 @@ public class Message implements Serializable
 
     public String getMessage()
     {
-        return message + (nextMessage !=null ? ". " + nextMessage.getMessage() : "");
+        return message + (nextMessage != null ? ". " + nextMessage.getMessage() : "");
     }
 
     public void setNextMessage(Message nextMessage)
@@ -147,7 +171,8 @@ public class Message implements Serializable
         this.nextMessage = nextMessage;
     }
 
-    public Message getNextMessage() {
+    public Message getNextMessage()
+    {
         return nextMessage;
     }
 
@@ -156,11 +181,13 @@ public class Message implements Serializable
         return bundle;
     }
 
-    public static Message createStaticMessage(String message) {
+    public static Message createStaticMessage(String message)
+    {
         return new Message(message);
     }
 
-    public String toString() {
+    public String toString()
+    {
         return getMessage();
     }
 }

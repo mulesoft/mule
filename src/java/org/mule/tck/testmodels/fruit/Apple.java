@@ -21,7 +21,6 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
 
-
 public class Apple implements Fruit, Callable
 {
     /**

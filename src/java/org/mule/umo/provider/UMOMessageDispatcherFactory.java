@@ -17,11 +17,9 @@ package org.mule.umo.provider;
 import org.mule.umo.UMOException;
 
 /**
- * @author Ross Mason
- *         <p/>
- *         //TODO document
+ * @author Ross Mason <p/> //TODO document
  */
 public interface UMOMessageDispatcherFactory
 {
-    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException;
+    UMOMessageDispatcher create(UMOConnector connector) throws UMOException;
 }

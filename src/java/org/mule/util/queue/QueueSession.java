@@ -20,14 +20,15 @@ import org.mule.util.xa.ResourceManagerException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public interface QueueSession {
+public interface QueueSession
+{
 
-	public Queue getQueue(String name);
-	
-	public void begin() throws ResourceManagerException;
-	
-	public void commit() throws ResourceManagerException;
-	
-	public void rollback() throws ResourceManagerException;
-	
+    Queue getQueue(String name);
+
+    void begin() throws ResourceManagerException;
+
+    void commit() throws ResourceManagerException;
+
+    void rollback() throws ResourceManagerException;
+
 }

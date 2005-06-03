@@ -18,18 +18,20 @@ package org.mule.umo.manager;
 import javax.transaction.TransactionManager;
 
 /**
- * <code>TranactionManagerFactory</code> is a factory class for creating a transaction
- * manager for the MuleServer.
- *
+ * <code>TranactionManagerFactory</code> is a factory class for creating a
+ * transaction manager for the MuleServer.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface UMOTransactionManagerFactory
 {
     /**
-     * Creates of obtains the jta transaction manager to use for mule transactions
+     * Creates of obtains the jta transaction manager to use for mule
+     * transactions
+     * 
      * @return the transaction manager to use
      * @throws Exception if the transaction manager cannot be located or created
      */
-    public TransactionManager create() throws Exception;
+    TransactionManager create() throws Exception;
 }

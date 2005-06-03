@@ -13,14 +13,14 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.MuleManager;
-import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOServerEvent;
 
 /**
- * <code>ManagerEvent</code> is fired when an event such as the manager starting
- * occurs.  The payload of this event will always be a reference to the manager.
- *
+ * <code>ManagerEvent</code> is fired when an event such as the manager
+ * starting occurs. The payload of this event will always be a reference to the
+ * manager.
+ * 
  * @see org.mule.MuleManager
  * @see org.mule.umo.manager.UMOManager
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -39,9 +39,8 @@ public class ManagerEvent extends UMOServerEvent implements BlockingServerEvent
     public static final int MANAGER_DISPOSING_CONNECTORS = MANAGER_EVENT_ACTION_START_RANGE + 9;
     public static final int MANAGER_DISPOSED_CONNECTORS = MANAGER_EVENT_ACTION_START_RANGE + 10;
 
-    private String[] actions = new String[]{
-        "initialising","initialised","starting","started","stopping","stopped",
-        "disposing","disposed","disposing connectors", "disposed connectors"};
+    private static final transient String[] ACTIONS = new String[] { "initialising", "initialised", "starting",
+            "started", "stopping", "stopped", "disposing", "disposed", "disposing connectors", "disposed connectors" };
 
     public ManagerEvent(UMOManager message, int action)
     {
@@ -51,13 +50,15 @@ public class ManagerEvent extends UMOServerEvent implements BlockingServerEvent
 
     protected String getPayloadToString()
     {
-        return ((UMOManager)source).getId();
+        return ((UMOManager) source).getId();
     }
 
     protected String getActionName(int action)
     {
         int i = action - MANAGER_EVENT_ACTION_START_RANGE;
-        if(i-1 > actions.length) return String.valueOf(action);
-        return actions[i-1];
+        if (i - 1 > ACTIONS.length) {
+            return String.valueOf(action);
+        }
+        return ACTIONS[i - 1];
     }
 }

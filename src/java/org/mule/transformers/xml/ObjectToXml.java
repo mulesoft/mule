@@ -16,11 +16,11 @@ package org.mule.transformers.xml;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>ObjectToXml</code> converts any object to xml using Xstream.
- * Xstream uses some cleaver tricks so objects that get marshalled to xml do not
- * need to implement any interfaces including Serializable and you don't even
- * need to specify a default constructor.
- *
+ * <code>ObjectToXml</code> converts any object to xml using Xstream. Xstream
+ * uses some cleaver tricks so objects that get marshalled to xml do not need to
+ * implement any interfaces including Serializable and you don't even need to
+ * specify a default constructor.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

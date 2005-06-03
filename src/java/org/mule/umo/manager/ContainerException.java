@@ -17,9 +17,9 @@ package org.mule.umo.manager;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>ContainerException</code> is an Exception thrown by the
- * component resolver when it fials to find a component
- *
+ * <code>ContainerException</code> is an Exception thrown by the component
+ * resolver when it fials to find a component
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -36,7 +36,7 @@ public class ContainerException extends ManagerException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public ContainerException(Message message, Throwable cause)
     {

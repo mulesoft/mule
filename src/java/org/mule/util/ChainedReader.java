@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
- * <code>ChainedReader</code> allows Reader objects to be chained together.  Useful
- * for concatenating data from multiple Reader objects.
- *
+ * <code>ChainedReader</code> allows Reader objects to be chained together.
+ * Useful for concatenating data from multiple Reader objects.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,24 +29,26 @@ public class ChainedReader extends Reader
     private Reader second;
     private boolean firstRead = false;
 
-    public ChainedReader(Reader first, Reader second) {
+    public ChainedReader(Reader first, Reader second)
+    {
         this.first = first;
         this.second = second;
     }
 
-    public void close() throws IOException {
+    public void close() throws IOException
+    {
         first.close();
         second.close();
     }
 
-    public int read(char cbuf[], int off, int len) throws IOException
+    public int read(char[] cbuf, int off, int len) throws IOException
     {
-        if(!firstRead) {
+        if (!firstRead) {
             int i = first.read(cbuf, off, len);
-            if(i < len) {
+            if (i < len) {
                 firstRead = true;
                 int x = second.read(cbuf, i, len - i);
-                return x+i;
+                return x + i;
             } else {
                 return i;
             }
@@ -55,10 +57,11 @@ public class ChainedReader extends Reader
         }
     }
 
-    public int read() throws IOException {
-        if(!firstRead) {
+    public int read() throws IOException
+    {
+        if (!firstRead) {
             int i = first.read();
-            if(i ==-1) {
+            if (i == -1) {
                 firstRead = true;
                 return second.read();
             } else {
@@ -69,13 +72,14 @@ public class ChainedReader extends Reader
         }
     }
 
-    public int read(char cbuf[]) throws IOException {
-        if(!firstRead) {
+    public int read(char[] cbuf) throws IOException
+    {
+        if (!firstRead) {
             int i = first.read(cbuf);
-            if(i < cbuf.length) {
+            if (i < cbuf.length) {
                 firstRead = true;
                 int x = second.read(cbuf, i, cbuf.length - i);
-                return x+i;
+                return x + i;
             } else {
                 return i;
             }

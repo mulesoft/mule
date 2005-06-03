@@ -20,7 +20,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 /**
  * <code>CouldNotRouteOutboundMessageException</code> thrown if Mule fails to
  * route the current outbound event
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,7 +42,10 @@ public class CouldNotRouteOutboundMessageException extends RoutingException
         super(message, umoMessage, endpoint);
     }
 
-    public CouldNotRouteOutboundMessageException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, Throwable cause)
+    public CouldNotRouteOutboundMessageException(Message message,
+                                                 UMOMessage umoMessage,
+                                                 UMOEndpoint endpoint,
+                                                 Throwable cause)
     {
         super(message, umoMessage, endpoint, cause);
     }

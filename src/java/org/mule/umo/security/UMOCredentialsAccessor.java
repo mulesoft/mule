@@ -16,15 +16,16 @@ package org.mule.umo.security;
 import org.mule.umo.UMOEvent;
 
 /**
- * <code>UMOCredentialsAccessor</code> is a template for obtaining user credentials from
- * the current message and writing the user credentials to an outbound message
- *
+ * <code>UMOCredentialsAccessor</code> is a template for obtaining user
+ * credentials from the current message and writing the user credentials to an
+ * outbound message
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface UMOCredentialsAccessor
 {
-    public Object getCredentials(UMOEvent event);
+    Object getCredentials(UMOEvent event);
 
-    public void setCredentials(UMOEvent event, Object credentials);
+    void setCredentials(UMOEvent event, Object credentials);
 }

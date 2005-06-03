@@ -14,24 +14,22 @@
  */
 package org.mule.providers;
 
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.FatalException;
-import org.mule.config.i18n.Messages;
-import org.mule.config.i18n.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 /**
- * A simple connection retry strategy where the a connection will be attempted X number
- * of retryCount every Y milliseconds. The <i>retryCount</i> and <i>frequency</i> properties can be set to
- * customise the behaviour.
- *
+ * A simple connection retry strategy where the a connection will be attempted X
+ * number of retryCount every Y milliseconds. The <i>retryCount</i> and
+ * <i>frequency</i> properties can be set to customise the behaviour.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class SimpleRetryConnectionStrategy implements ConnectionStrategy {
+public class SimpleRetryConnectionStrategy implements ConnectionStrategy
+{
 
     /**
      * logger used by this class
@@ -42,18 +40,21 @@ public class SimpleRetryConnectionStrategy implements ConnectionStrategy {
     private long frequency = 2000;
     private int count = 0;
 
-    public void connect(AbstractMessageReceiver receiver) throws FatalConnectException {
-        while(true) {
+    public void connect(AbstractMessageReceiver receiver) throws FatalConnectException
+    {
+        while (true) {
             try {
                 count++;
                 receiver.connect();
-                //reset counter
-                count=0;
+                // reset counter
+                count = 0;
                 logger.debug("Successfully connected to " + receiver.getEndpoint().getEndpointURI());
                 break;
             } catch (Exception e) {
-                if(count==retryCount) {
-                    throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X, getClass().getName(), receiver.getEndpoint().getEndpointURI()), e, receiver);
+                if (count == retryCount) {
+                    throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
+                                                                getClass().getName(),
+                                                                receiver.getEndpoint().getEndpointURI()), e, receiver);
                 }
                 logger.warn("Failed to connect/reconnect on endpoint: " + receiver.getEndpoint().getEndpointURI());
                 logger.debug("Waiting for " + frequency + "ms before reconnecting");
@@ -66,19 +67,23 @@ public class SimpleRetryConnectionStrategy implements ConnectionStrategy {
         }
     }
 
-    public int getRetryCount() {
+    public int getRetryCount()
+    {
         return retryCount;
     }
 
-    public void setRetryCount(int retryCount) {
+    public void setRetryCount(int retryCount)
+    {
         this.retryCount = retryCount;
     }
 
-    public long getFrequency() {
+    public long getFrequency()
+    {
         return frequency;
     }
 
-    public void setFrequency(long frequency) {
+    public void setFrequency(long frequency)
+    {
         this.frequency = frequency;
     }
 }

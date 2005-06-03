@@ -19,22 +19,27 @@ import javax.resource.spi.work.WorkException;
 
 /**
  * todo document
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractConnectionStrategy implements ConnectionStrategy {
+public abstract class AbstractConnectionStrategy implements ConnectionStrategy
+{
 
     private boolean doThreading = false;
 
-    public final void connect(final AbstractMessageReceiver receiver) throws FatalConnectException {
+    public final void connect(final AbstractMessageReceiver receiver) throws FatalConnectException
+    {
 
-        if(doThreading) {
+        if (doThreading) {
             try {
                 receiver.getWorkManager().scheduleWork(new Work() {
-                    public void release() { }
+                    public void release()
+                    {
+                    }
 
-                    public void run() {
+                    public void run()
+                    {
                         try {
                             doConnect(receiver);
                         } catch (FatalConnectException e) {
@@ -50,11 +55,13 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy {
         }
     }
 
-    public boolean isDoThreading() {
+    public boolean isDoThreading()
+    {
         return doThreading;
     }
 
-    public void setDoThreading(boolean doThreading) {
+    public void setDoThreading(boolean doThreading)
+    {
         this.doThreading = doThreading;
     }
 

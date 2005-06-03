@@ -19,8 +19,8 @@ import java.util.Map;
 
 /**
  * <code>BaseMessage</code> A default message implementation used for messages
- * sent over the wire.  client messages should NOT implement UMOMessage.
- *
+ * sent over the wire. client messages should NOT implement UMOMessage.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,7 +38,7 @@ public class BaseMessage implements Serializable
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
@@ -49,7 +49,7 @@ public class BaseMessage implements Serializable
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
@@ -68,7 +68,7 @@ public class BaseMessage implements Serializable
 
     /**
      * Adds a map of properties to associated with this message
-     *
+     * 
      * @param properties the properties add to this message
      */
     public void addProperties(Map properties)
@@ -86,7 +86,7 @@ public class BaseMessage implements Serializable
 
     /**
      * Returns a map of all properties on this message
-     *
+     * 
      * @return a map of all properties on this message
      */
     public Map getProperties()
@@ -94,11 +94,13 @@ public class BaseMessage implements Serializable
         return context;
     }
 
-    public void setProperty(Object key, Object value) {
+    public void setProperty(Object key, Object value)
+    {
         context.put(key, value);
     }
 
-    public Object getProperty(Object key) {
+    public Object getProperty(Object key)
+    {
         return context.get(key);
     }
 }

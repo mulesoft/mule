@@ -17,48 +17,50 @@ import javax.management.ObjectName;
 
 /**
  * <code>ComponentStatsMBean</code> TODO
- *
+ * 
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public interface ComponentStatsMBean {
+public interface ComponentStatsMBean
+{
 
-	public void clear();
-	
-	public ObjectName getRouterInbound();
-	public ObjectName getRouterOutbound();
-	
-    public long getAverageExecutionTime();
+    void clear();
 
-    public long getAverageQueueSize();
+    ObjectName getRouterInbound();
 
-    public long getMaxQueueSize();
+    ObjectName getRouterOutbound();
 
-    public long getMaxExecutionTime();
+    long getAverageExecutionTime();
 
-    public long getFatalErrors();
+    long getAverageQueueSize();
 
-    public long getMinExecutionTime();
+    long getMaxQueueSize();
 
-    public long getTotalExecutionTime();
+    long getMaxExecutionTime();
 
-    public long getQueuedEvents();
+    long getFatalErrors();
 
-    public long getAsyncEventsReceived();
+    long getMinExecutionTime();
 
-    public long getSyncEventsReceived();
+    long getTotalExecutionTime();
 
-    public long getReplyToEventsSent();
+    long getQueuedEvents();
 
-    public long getSyncEventsSent();
+    long getAsyncEventsReceived();
 
-    public long getAsyncEventsSent();
+    long getSyncEventsReceived();
 
-    public long getTotalEventsSent();
+    long getReplyToEventsSent();
 
-    public long getTotalEventsReceived();
+    long getSyncEventsSent();
 
-    public long getExecutedEvents();
+    long getAsyncEventsSent();
 
-    public long getExecutionErrors();
+    long getTotalEventsSent();
+
+    long getTotalEventsReceived();
+
+    long getExecutedEvents();
+
+    long getExecutionErrors();
 }

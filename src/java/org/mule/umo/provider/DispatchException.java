@@ -19,9 +19,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * <code>DispatchException</code> is thrown when an endpoint dispatcher fails to
- * send, dispatch or receive a message.
- *
+ * <code>DispatchException</code> is thrown when an endpoint dispatcher fails
+ * to send, dispatch or receive a message.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

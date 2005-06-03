@@ -19,10 +19,12 @@ import org.mule.umo.UMOEvent;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class EventMemoryPersistenceStrategy extends MemoryPersistenceStrategy {
+public class EventMemoryPersistenceStrategy extends MemoryPersistenceStrategy
+{
 
-	protected Object getId(Object obj) {
-		return ((UMOEvent) obj).getId();
-	}
-	
+    protected Object getId(Object obj)
+    {
+        return ((UMOEvent) obj).getId();
+    }
+
 }

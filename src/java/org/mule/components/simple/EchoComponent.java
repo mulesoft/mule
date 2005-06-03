@@ -18,7 +18,7 @@ import org.mule.umo.UMOEventContext;
 /**
  * <code>EchoComponent</code> will log the message and return the payload back
  * as the result
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

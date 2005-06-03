@@ -19,7 +19,7 @@ import org.mule.umo.UMOFilter;
 
 /**
  * <code>ConstraintFilter</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,8 +35,8 @@ public class ConstraintFilter implements UMOFilter, Cloneable
 
     public final boolean accept(Object object)
     {
-        if(eventFilter.accept(object)) {
-            return accept((UMOEvent)object);
+        if (eventFilter.accept(object)) {
+            return accept((UMOEvent) object);
         } else {
             return false;
         }
@@ -51,6 +51,5 @@ public class ConstraintFilter implements UMOFilter, Cloneable
     {
         return new ConstraintFilter();
     }
-
 
 }

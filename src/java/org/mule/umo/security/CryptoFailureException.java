@@ -19,13 +19,13 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEncryptionStrategy;
 
 /**
- * <code>CryptoFailureException</code> is a generic exception thrown by
- * an CryptoStrategy if encryption or decryption fails. The constuctors
- * of this exception accept a UMOEncryptionStrategy that will be included in
- * the exception message.  Implementors of UMOEncryptionStrategy should provide
- * a toString method that exposes *only* information that maybe useful for
+ * <code>CryptoFailureException</code> is a generic exception thrown by an
+ * CryptoStrategy if encryption or decryption fails. The constuctors of this
+ * exception accept a UMOEncryptionStrategy that will be included in the
+ * exception message. Implementors of UMOEncryptionStrategy should provide a
+ * toString method that exposes *only* information that maybe useful for
  * debugging not passwords, secret keys, etc.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -36,7 +36,7 @@ public class CryptoFailureException extends MuleException
     public CryptoFailureException(Message message, UMOEncryptionStrategy strategy)
     {
         super(message);
-        String s = (strategy==null ? "null" : strategy.toString());
+        String s = (strategy == null ? "null" : strategy.toString());
         addInfo("Encryption", s);
         this.encryptionStrategy = strategy;
     }
@@ -44,7 +44,7 @@ public class CryptoFailureException extends MuleException
     public CryptoFailureException(Message message, UMOEncryptionStrategy strategy, Throwable cause)
     {
         super(message, cause);
-        String s = (strategy==null ? "null" : strategy.toString());
+        String s = (strategy == null ? "null" : strategy.toString());
         addInfo("Encryption", s);
         this.encryptionStrategy = strategy;
     }
@@ -52,7 +52,7 @@ public class CryptoFailureException extends MuleException
     public CryptoFailureException(UMOEncryptionStrategy strategy, Throwable cause)
     {
         super(new Message(Messages.CRYPTO_FAILURE), cause);
-        String s = (strategy==null ? "null" : strategy.toString());
+        String s = (strategy == null ? "null" : strategy.toString());
         addInfo("Encryption", s);
         this.encryptionStrategy = strategy;
 

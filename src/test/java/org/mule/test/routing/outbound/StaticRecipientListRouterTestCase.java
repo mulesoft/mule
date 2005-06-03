@@ -13,8 +13,9 @@
  */
 package org.mule.test.routing.outbound;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mule.impl.MuleMessage;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.outbound.StaticRecipientList;
@@ -24,8 +25,8 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -54,10 +55,11 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         UMOMessage message = new MuleMessage("test event", null);
         assertTrue(router.isMatch(message));
-        //note this router clones endpoints so that the endpointUri can be changed
+        // note this router clones endpoints so that the endpointUri can be
+        // changed
         session.expect("dispatchEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)));
         session.expect("dispatchEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)));
-        router.route(message, (UMOSession)session.proxy(), false);
+        router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
         message = new MuleMessage("test event", null);
@@ -65,10 +67,10 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("sendEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)), message);
         session.expectAndReturn("sendEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)), message);
         session.expectAndReturn("sendEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)), message);
-        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
+        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof List);
-        assertEquals(3, ((List)result.getPayload()).size());
+        assertEquals(3, ((List) result.getPayload()).size());
         session.verify();
 
     }
@@ -92,13 +94,11 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         UMOMessage message = new MuleMessage("test event", null);
         assertTrue(router.isMatch(message));
-        try
-        {
-            router.route(message, (UMOSession)session.proxy(), false);
+        try {
+            router.route(message, (UMOSession) session.proxy(), false);
             fail("Sohlud not allow malformed endpointUri");
-        } catch (RoutingException e)
-        {
-            //ignore
+        } catch (RoutingException e) {
+            // ignore
         }
         session.verify();
     }

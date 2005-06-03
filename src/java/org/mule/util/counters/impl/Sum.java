@@ -20,19 +20,23 @@ import org.mule.util.counters.CounterFactory.Type;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class Sum extends AggregateCounter {
-	
-	private double value;
-	
-	public Sum(String name, AbstractCounter base) {
-		super(name, Type.SUM, base);
-	}
-	
-	public double nextValue() {
-		return this.value;
-	}
-	
-	public void doCompute() {
-		this.value += getBase().nextValue();
-	}
+public class Sum extends AggregateCounter
+{
+
+    private double value;
+
+    public Sum(String name, AbstractCounter base)
+    {
+        super(name, Type.SUM, base);
+    }
+
+    public double nextValue()
+    {
+        return this.value;
+    }
+
+    public void doCompute()
+    {
+        this.value += getBase().nextValue();
+    }
 }

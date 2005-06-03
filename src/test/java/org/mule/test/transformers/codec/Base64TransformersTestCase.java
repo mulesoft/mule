@@ -21,13 +21,15 @@ import org.mule.transformers.codec.Base64Encoder;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class Base64TransformersTestCase extends AbstractTransformerTestCase
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
      */
     public Object getResultData()
@@ -35,7 +37,9 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
         return new sun.misc.BASE64Encoder().encode(getTestData().toString().getBytes());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
      */
     public Object getTestData()
@@ -43,7 +47,9 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
         return "the quick brown fox jumped over the lazy dog";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getTransformers()
      */
     public UMOTransformer getTransformer()
@@ -51,7 +57,9 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
         return new Base64Encoder();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
      */
     public UMOTransformer getRoundTripTransformer()

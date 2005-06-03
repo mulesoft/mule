@@ -13,11 +13,12 @@
  */
 package org.mule.test.util;
 
-import junit.framework.TestCase;
-import org.mule.util.TemplateParser;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.TestCase;
+
+import org.mule.util.TemplateParser;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -25,7 +26,8 @@ import java.util.Map;
  */
 public class TemplateParserTestCase extends TestCase
 {
-    public void testStringParser() {
+    public void testStringParser()
+    {
         Map props = new HashMap();
         props.put("fromAddress", "ross.mason@symphonysoft.com");
         String string = "smtp://[fromAddress]";

@@ -18,10 +18,10 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 
 /**
- * <code>SecurityProviderNotFoundException</code> is thrown by the UMOSecurityManager
- * when an authentication request is made but no suitable security provider can be
- * found to process the authentication
- *
+ * <code>SecurityProviderNotFoundException</code> is thrown by the
+ * UMOSecurityManager when an authentication request is made but no suitable
+ * security provider can be found to process the authentication
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

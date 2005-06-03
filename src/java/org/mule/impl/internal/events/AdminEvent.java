@@ -13,15 +13,15 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.umo.UMOMessage;
-import org.mule.umo.manager.UMOServerEvent;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mule.umo.UMOMessage;
+import org.mule.umo.manager.UMOServerEvent;
+
 /**
  * <code>AdminEvent</code> is used to invoke actions on a remote mule server
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -33,8 +33,8 @@ public class AdminEvent extends UMOServerEvent
     public static final int ACTION_SEND = ADMIN_EVENT_ACTION_START_RANGE + 3;
     public static final int ACTION_INVOKE = ADMIN_EVENT_ACTION_START_RANGE + 4;
 
-    private static final String[] actions = new String[]{
-            "receive event", "dispatch event", "send event", "invoke component"};
+    private static final transient String[] ACTIONS = new String[] { "receive event", "dispatch event", "send event",
+            "invoke component" };
 
     private Map properties = new HashMap();
     private UMOMessage message;
@@ -45,16 +45,18 @@ public class AdminEvent extends UMOServerEvent
         this.message = message;
     }
 
-
-    public UMOMessage getMessage() {
+    public UMOMessage getMessage()
+    {
         return message;
     }
 
-    public void setProperty(Object key, Object value) {
+    public void setProperty(Object key, Object value)
+    {
         properties.put(key, value);
     }
 
-    public Object getProperty(Object key) {
+    public Object getProperty(Object key)
+    {
         return properties.get(key);
     }
 
@@ -63,10 +65,12 @@ public class AdminEvent extends UMOServerEvent
         return properties;
     }
 
-   protected String getActionName(int action)
+    protected String getActionName(int action)
     {
         int i = action - ADMIN_EVENT_ACTION_START_RANGE;
-        if(i-1 > actions.length) return String.valueOf(action);
-        return actions[i];
+        if (i - 1 > ACTIONS.length) {
+            return String.valueOf(action);
+        }
+        return ACTIONS[i];
     }
 }

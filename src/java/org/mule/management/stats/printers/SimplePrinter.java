@@ -19,7 +19,7 @@ import java.util.Collection;
 
 /**
  * <code>SimplePrinter</code> Default stats printer
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,16 +35,13 @@ public class SimplePrinter extends AbstractTablePrinter
         super(out);
     }
 
-
     public void print(Collection stats)
     {
-        String[][] table  = getTable(stats);
-        for (int i = 1; i < table.length; i++)
-        {
+        String[][] table = getTable(stats);
+        for (int i = 1; i < table.length; i++) {
             println();
             println("---- Component Statistics ----");
-            for (int j = 0; j < table[0].length; j++)
-            {
+            for (int j = 0; j < table[0].length; j++) {
                 println(table[0][j] + ": " + table[i][j]);
             }
             println("---- End Component Statistics ----");

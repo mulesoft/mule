@@ -16,8 +16,9 @@ package org.mule.routing.filters;
 import org.mule.umo.UMOFilter;
 
 /**
- * <code>EqualsFilter</code> is a filer for comparing two objects using the equals() method.
- *
+ * <code>EqualsFilter</code> is a filer for comparing two objects using the
+ * equals() method.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -30,15 +31,19 @@ public class EqualsFilter implements UMOFilter
     {
     }
 
-
-    public EqualsFilter(Object compareTo) {
+    public EqualsFilter(Object compareTo)
+    {
         this.pattern = compareTo;
     }
 
     public boolean accept(Object object)
     {
-        if(object==null && pattern ==null) return true;
-        if(object==null || pattern ==null) return false;
+        if (object == null && pattern == null) {
+            return true;
+        }
+        if (object == null || pattern == null) {
+            return false;
+        }
         return pattern.equals(object);
     }
 
@@ -51,6 +56,5 @@ public class EqualsFilter implements UMOFilter
     {
         this.pattern = pattern;
     }
-
 
 }

@@ -29,7 +29,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        //setup a dummy context for transformers that are event aware
+        // setup a dummy context for transformers that are event aware
         RequestContext.setEvent(getTestEvent("test"));
     }
 
@@ -49,8 +49,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public void testRoundtripTransform() throws Exception
     {
-        if (getRoundTripTransformer() != null)
-        {
+        if (getRoundTripTransformer() != null) {
             Object result = getRoundTripTransformer().transform(getResultData());
             assertNotNull(result);
             boolean b = compareRoundtripResults(getTestData(), result);
@@ -65,16 +64,14 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public void testRoundtripBadReturnType() throws Exception
     {
-        if (getRoundTripTransformer() != null)
-        {
+        if (getRoundTripTransformer() != null) {
             doTestBadReturnType(getRoundTripTransformer(), getResultData());
         }
     }
 
     public void testRoundTrip() throws Exception
     {
-        if (getRoundTripTransformer() != null)
-        {
+        if (getRoundTripTransformer() != null) {
             UMOTransformer trans = getTransformer();
             trans.setTransformer(getRoundTripTransformer());
             Object result = trans.transform(getTestData());
@@ -85,13 +82,10 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
     public void doTestBadReturnType(UMOTransformer tran, Object src) throws Exception
     {
         tran.setReturnClass(InvalidSatsuma.class);
-        try
-        {
+        try {
             tran.transform(src);
             fail("Should throw exception for bad return type");
-        }
-        catch (TransformerException e)
-        {
+        } catch (TransformerException e) {
             // expected
         }
     }
@@ -104,13 +98,17 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 
     public abstract Object getResultData();
 
-    public boolean compareResults(Object src, Object result) {
-        if(src==null && result ==null) return true;
-        if(src==null || result ==null) return false;
+    public boolean compareResults(Object src, Object result)
+    {
+        if (src == null && result == null)
+            return true;
+        if (src == null || result == null)
+            return false;
         return src.equals(result);
     }
 
-    public boolean compareRoundtripResults(Object src, Object result) {
+    public boolean compareRoundtripResults(Object src, Object result)
+    {
         return compareResults(src, result);
     }
 }

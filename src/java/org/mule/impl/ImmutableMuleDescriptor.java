@@ -15,7 +15,13 @@
 
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
@@ -30,23 +36,18 @@ import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * <code>MuleDescriptor</code>  describes all the properties for a Mule UMO.  New Mule UMOs
- * can be initialised as needed from their descriptor.
- *
+ * <code>MuleDescriptor</code> describes all the properties for a Mule UMO.
+ * New Mule UMOs can be initialised as needed from their descriptor.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -55,11 +56,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 {
 
     /**
-     * Implementation type can be prepended to the implementation string to control
-     * how the implementation is loaded.
-     * Local mean that the implementation is loaded from the object references i.e.
-     * local:myRef would get the implementation from the ObjectReference called myRef.
-     * Other implementations may include jndi:myRef
+     * Implementation type can be prepended to the implementation string to
+     * control how the implementation is loaded. Local mean that the
+     * implementation is loaded from the object references i.e. local:myRef
+     * would get the implementation from the ObjectReference called myRef. Other
+     * implementations may include jndi:myRef
      */
     public static final String IMPLEMENTATION_TYPE_LOCAL = "local:";
     /**
@@ -74,9 +75,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected ExceptionListener exceptionListener = null;
 
     /**
-     * The implementationReference used to create the Object UMO instance
-     * Can either be a string such as a container reference or classname
-     * or can be an instance of the implementation
+     * The implementationReference used to create the Object UMO instance Can
+     * either be a string such as a container reference or classname or can be
+     * an instance of the implementation
      */
     protected Object implementationReference = null;
 
@@ -96,9 +97,8 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected UMOTransformer outboundTransformer = null;
 
     /**
-     * The properties for the Mule UMO.
-     * Note HashMap is used instead of Map due to a Spring quirk where
-     * the property is not found if specified as a map
+     * The properties for the Mule UMO. Note HashMap is used instead of Map due
+     * to a Spring quirk where the property is not found if specified as a map
      */
     protected HashMap properties = new HashMap();
 
@@ -113,7 +113,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected String version = "1.0";
 
     /**
-     * A list of UMOinteceptors  that will be executed when the Mule UMO executed
+     * A list of UMOinteceptors that will be executed when the Mule UMO executed
      */
     protected List intecerptorList = new CopyOnWriteArrayList();
 
@@ -127,14 +127,14 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected UMOEndpoint outboundEndpoint;
 
     /**
-     * The threading profile to use for this component. If this is not set
-     * a default will be provided by the server
+     * The threading profile to use for this component. If this is not set a
+     * default will be provided by the server
      */
     protected ThreadingProfile threadingProfile;
 
     /**
-     * the pooling configuration used when initialising the component
-     * described by this descriptor.
+     * the pooling configuration used when initialising the component described
+     * by this descriptor.
      */
     protected PoolingProfile poolingProfile;
 
@@ -144,17 +144,18 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected QueueProfile queueProfile;
 
     /**
-     * Determines whether the component described by this descriptor is
-     * hosted in a container. if the value is false the component will not be
-     * pooled by Mule
+     * Determines whether the component described by this descriptor is hosted
+     * in a container. if the value is false the component will not be pooled by
+     * Mule
      */
     protected boolean containerManaged = true;
 
     protected List initialisationCallbacks = new ArrayList();
 
     /**
-     * Default constructor. Initalises common properties for the MuleConfiguration object
-     *
+     * Default constructor. Initalises common properties for the
+     * MuleConfiguration object
+     * 
      * @see org.mule.config.MuleConfiguration
      */
     public ImmutableMuleDescriptor(ImmutableMuleDescriptor descriptor)
@@ -163,7 +164,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         outboundRouter = descriptor.getOutboundRouter();
         inboundTransformer = descriptor.getInboundTransformer();
         outboundTransformer = descriptor.getOutboundTransformer();
-		responseTransformer = descriptor.getResponseTransformer();
+        responseTransformer = descriptor.getResponseTransformer();
         implementationReference = descriptor.getImplementation();
         version = descriptor.getVersion();
         intecerptorList = descriptor.getInterceptors();
@@ -177,8 +178,8 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     }
 
     /**
-     * Default constructor used by mutable versions of this class to provide defaults
-     * for certain properties
+     * Default constructor used by mutable versions of this class to provide
+     * defaults for certain properties
      */
     protected ImmutableMuleDescriptor()
     {
@@ -186,7 +187,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         inboundRouter.addRouter(new InboundPassThroughRouter());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMODescriptor#getExceptionListener()
      */
     public ExceptionListener getExceptionListener()
@@ -194,7 +197,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return exceptionListener;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.transformers.HasTransformer#getInboundTransformer()
      */
     public UMOTransformer getInboundTransformer()
@@ -202,7 +207,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return inboundTransformer;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMODescriptor#getName()
      */
     public String getName()
@@ -210,7 +217,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return name;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.impl.MuleDescriptor#getOutboundTransformer()
      */
     public UMOTransformer getOutboundTransformer()
@@ -218,7 +227,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return outboundTransformer;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.impl.MuleDescriptor#getResponseTransformer()
      */
     public UMOTransformer getResponseTransformer()
@@ -226,18 +237,21 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return responseTransformer;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.umo.UMODescriptor#getParams()
-     * Not HashMap is used instead of Map due to a Spring quirk where
-     * the property is not found if specified as a map
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.UMODescriptor#getParams() Not HashMap is used instead
+     *      of Map due to a Spring quirk where the property is not found if
+     *      specified as a map
      */
-    public HashMap getProperties()
+    public Map getProperties()
     {
         return properties;
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMODescriptor#getVersion()
      */
     public String getVersion()
@@ -245,7 +259,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return version;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMODescriptor#getinteceptorList()
      */
     public List getInterceptors()
@@ -253,7 +269,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return intecerptorList;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString()
@@ -267,7 +285,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         return buffer.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMODescriptor#getImplementation()
      */
     public Object getImplementation()
@@ -286,9 +306,8 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     }
 
     /**
-     * The threading profile used but the UMO when managing a component.
-     * can be used to allocate more or less resources to this particular umo
-     * component
+     * The threading profile used but the UMO when managing a component. can be
+     * used to allocate more or less resources to this particular umo component
      */
     public ThreadingProfile getThreadingProfile()
     {
@@ -312,33 +331,28 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     public Class getImplementationClass() throws UMOException
     {
-        //check for other types of references
+        // check for other types of references
         String impl = null;
         Class implClass = null;
-        if (implementationReference instanceof String)
-        {
+        if (implementationReference instanceof String) {
             impl = implementationReference.toString();
-            if (impl.startsWith(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL))
-            {
+            if (impl.startsWith(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL)) {
                 impl = impl.substring(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL.length());
                 Object obj = properties.get(impl);
-                if (obj != null)
-                {
+                if (obj != null) {
                     implClass = obj.getClass();
-                    //If its a string it must be a container reference or a classname
-                    if (implClass.equals(String.class))
-                    {
+                    // If its a string it must be a container reference or a
+                    // classname
+                    if (implClass.equals(String.class)) {
                         implClass = getImplementationForReference(impl);
                     }
-                } else
-                {
+                } else {
                     throw new MuleException(new Message(Messages.NO_COMPONENT_FOR_LOCAL_REFERENCE, impl));
                 }
             } else {
                 implClass = getImplementationForReference(impl);
             }
-        } else
-        {
+        } else {
             implClass = implementationReference.getClass();
         }
 
@@ -346,20 +360,20 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     }
 
     /**
-     * A helper method that will resolved a component for a given reference id.  For example, for a component declared in
-     * a Spring Application context the id would be the bean id, in Pico the id would be a fully qualified class name.
-     *
+     * A helper method that will resolved a component for a given reference id.
+     * For example, for a component declared in a Spring Application context the
+     * id would be the bean id, in Pico the id would be a fully qualified class
+     * name.
+     * 
      * @param reference the reference to use when resolving the component
      * @return the Implementation of the component
      */
-    protected Class getImplementationForReference(String reference) throws ObjectNotFoundException, ContainerException
+    protected Class getImplementationForReference(String reference) throws ContainerException
     {
         Class clazz = null;
-        try
-        {
+        try {
             clazz = ClassHelper.loadClass(reference, getClass());
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             Object object = MuleManager.getInstance().getContainerContext().getComponent(reference);
             clazz = object.getClass();
         }
@@ -369,18 +383,17 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public void fireInitialisationCallbacks(Object component) throws InitialisationException
     {
         InitialisationCallback callback;
-        for (Iterator iterator = initialisationCallbacks.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = initialisationCallbacks.iterator(); iterator.hasNext();) {
             callback = (InitialisationCallback) iterator.next();
             callback.initialise(component);
         }
     }
 
     /**
-     * The inbound Provider to use when receiveing an event. This
-     * may get overidden by the configured behaviour of the inbound router
-     * on this component
-     *
+     * The inbound Provider to use when receiveing an event. This may get
+     * overidden by the configured behaviour of the inbound router on this
+     * component
+     * 
      * @return the inbound endpoint or null if one is not set
      * @see org.mule.umo.endpoint.UMOEndpoint
      */
@@ -390,10 +403,10 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     }
 
     /**
-     * The outbound Provider to use when sending an event. This
-     * may get overidden by the configured behaviour of the outbound router
-     * on this component
-     *
+     * The outbound Provider to use when sending an event. This may get
+     * overidden by the configured behaviour of the outbound router on this
+     * component
+     * 
      * @return the outbound endpoint or null if one is not set
      * @see org.mule.umo.endpoint.UMOEndpoint
      */

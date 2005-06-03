@@ -18,106 +18,103 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.mule.umo.UMOFilter;
+
 /**
- * <code>JXPathFilter</code> evaluates an XPath expression against an Xml document or
- * bean and returns true if the result is expected.
- *
+ * <code>JXPathFilter</code> evaluates an XPath expression against an Xml
+ * document or bean and returns true if the result is expected.
+ * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$
  */
-public class JXPathFilter implements UMOFilter {
+public class JXPathFilter implements UMOFilter
+{
 
-	private static final Logger logger = Logger.getLogger(JXPathFilter.class);
+    private static final Logger logger = Logger.getLogger(JXPathFilter.class);
 
-	private String expression;
+    private String expression;
 
-	private String value;
+    private String value;
 
-	public boolean accept(Object obj) {
-		if (obj == null)
-			return false;
+    public boolean accept(Object obj)
+    {
+        if (obj == null) {
+            return false;
+        }
+        if (expression == null) {
+            logger.warn("Expression for JXPathFilter is not set");
+            return false;
+        }
 
-		if (expression == null) {
-			logger.warn("Expression for JXPathFilter is not set");
-			return false;
-		}
+        if (value == null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Value for JXPathFilter is not set : true by default");
+            }
+            value = Boolean.TRUE.toString();
+        }
 
-		if (value == null) {
-	        if (logger.isDebugEnabled()) {
-				logger.debug("Value for JXPathFilter is not set : true by default");
-	        }
-			value = Boolean.TRUE.toString();
-		}
+        boolean res = false;
 
-		boolean res = false;
+        try {
+            Object o = null;
 
-		try {
-		    Object o = null;
+            if (obj instanceof String) {
+                Document doc = DocumentHelper.parseText((String) obj);
+                o = doc.valueOf(expression);
+            } else {
+                JXPathContext context = JXPathContext.newContext(obj);
+                o = context.getValue(expression);
+            }
 
-		    if(obj instanceof String)
-		     {
-		         Document doc=DocumentHelper.parseText((String)obj);
-		         o =doc.valueOf(expression);
-		     }
-		     else
-		     {
-			     JXPathContext context = JXPathContext.newContext(obj);
-			     o =context.getValue(expression);
-		     }
+            if (logger.isDebugEnabled()) {
+                logger.debug("JXPathFilter Expression result='" + o + "' -  Expected value='" + value + "'");
+            }
 
-	        if (logger.isDebugEnabled()) {
-				logger.debug("JXPathFilter Expression result='" + o
-						+ "' -  Expected value='" + value + "'");
-	        }
-
-	        if (o!=null) {
-				res = value.equals(o.toString());
-	        }
-           else
-           {
-           	res=false;
-    		logger.warn("JXPathFilter Expression result is null (" + expression + ")");
-           }
-		} catch (Exception e) {
-			logger.warn("JXPathFilter cannot evaluate expression (" + expression
-					+ ") :" + e.getMessage(), e);
-		}
+            if (o != null) {
+                res = value.equals(o.toString());
+            } else {
+                res = false;
+                logger.warn("JXPathFilter Expression result is null (" + expression + ")");
+            }
+        } catch (Exception e) {
+            logger.warn("JXPathFilter cannot evaluate expression (" + expression + ") :" + e.getMessage(), e);
+        }
 
         if (logger.isDebugEnabled()) {
-			logger.debug("JXPathFilter accept object  : " + res);
+            logger.debug("JXPathFilter accept object  : " + res);
         }
-		return res;
+        return res;
 
-	}
+    }
 
-	/**
-	 * @return XPath expression
-	 */
-	public String getExpression() {
-		return expression;
-	}
+    /**
+     * @return XPath expression
+     */
+    public String getExpression()
+    {
+        return expression;
+    }
 
-	/**
-	 * @param expression
-	 *            The XPath expression
-	 */
-	public void setExpression(String expression) {
-		this.expression = expression;
-	}
+    /**
+     * @param expression The XPath expression
+     */
+    public void setExpression(String expression)
+    {
+        this.expression = expression;
+    }
 
-	/**
-	 * @return The expected result value of the XPath expression
-	 */
-	public String getValue() {
-		return value;
-	}
+    /**
+     * @return The expected result value of the XPath expression
+     */
+    public String getValue()
+    {
+        return value;
+    }
 
-	/**
-	 * @param value
-	 *            The expected result value of the XPath expression
-	 */
-	public void setValue(String value) {
-		this.value = value;
-	}
+    /**
+     * @param value The expected result value of the XPath expression
+     */
+    public void setValue(String value)
+    {
+        this.value = value;
+    }
 }
-

@@ -13,6 +13,11 @@
  */
 package org.mule.impl;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
@@ -20,15 +25,10 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.PropertiesHelper;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 /**
- * <code>MuleMessage</code> is a wrapper that contains a payload payload and properties
- * associated with the payload.
- *
+ * <code>MuleMessage</code> is a wrapper that contains a payload payload and
+ * properties associated with the payload.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,7 +39,6 @@ public class MuleMessage implements UMOMessage
 
     protected UMOExceptionPayload exceptionPayload;
 
-
     public MuleMessage(UMOMessageAdapter message)
     {
         adapter = message;
@@ -47,22 +46,22 @@ public class MuleMessage implements UMOMessage
 
     public MuleMessage(Object message, Map props)
     {
-        if(message instanceof UMOMessageAdapter) {
-            adapter = (UMOMessageAdapter)message;
+        if (message instanceof UMOMessageAdapter) {
+            adapter = (UMOMessageAdapter) message;
         } else {
             adapter = new DefaultMessageAdapter(message);
         }
         addProperties(props);
     }
 
-    public UMOMessageAdapter getAdapter() {
+    public UMOMessageAdapter getAdapter()
+    {
         return adapter;
     }
 
-
     /**
      * Gets a property of the payload implementation
-     *
+     * 
      * @param key the key on which to lookup the property value
      * @return the property value or null if the property does not exist
      */
@@ -76,11 +75,10 @@ public class MuleMessage implements UMOMessage
         return adapter.removeProperty(key);
     }
 
-
     /**
      * Gets a property of the payload implementation
-     *
-     * @param key   the key on which to associate the value
+     * 
+     * @param key the key on which to associate the value
      * @param value the property value
      */
     public void setProperty(Object key, Object value)
@@ -90,7 +88,7 @@ public class MuleMessage implements UMOMessage
 
     /**
      * Converts the payload implementation into a String representation
-     *
+     * 
      * @return String representation of the payload
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
@@ -109,7 +107,7 @@ public class MuleMessage implements UMOMessage
 
     /**
      * Converts the payload implementation into a String representation
-     *
+     * 
      * @return String representation of the payload
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
@@ -128,10 +126,9 @@ public class MuleMessage implements UMOMessage
 
     public void addProperties(Map properties)
     {
-        if(properties != null)  {
-            Map.Entry entry;
-            for(Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
-                entry = (Map.Entry)iter.next();
+        if (properties != null) {
+            for (Iterator iter = properties.entrySet().iterator(); iter.hasNext();) {
+                Map.Entry entry = (Map.Entry) iter.next();
                 adapter.setProperty(entry.getKey(), entry.getValue());
             }
         }
@@ -141,7 +138,7 @@ public class MuleMessage implements UMOMessage
     {
         Map props = new HashMap();
         Object key;
-        for(Iterator iter = getPropertyNames(); iter.hasNext();) {
+        for (Iterator iter = getPropertyNames(); iter.hasNext();) {
             key = iter.next();
             props.put(key, getProperty(key));
         }
@@ -150,18 +147,18 @@ public class MuleMessage implements UMOMessage
 
     public void clearProperties()
     {
-        for(Iterator iter = adapter.getPropertyNames(); iter.hasNext();) {
+        for (Iterator iter = adapter.getPropertyNames(); iter.hasNext();) {
             Object key = iter.next();
             adapter.removeProperty(key);
-            }
+        }
     }
-
 
     /**
      * Gets a double property from the event
-     *
-     * @param name         the name or key of the property
-     * @param defaultValue a default value if the property doesn't exist in the event
+     * 
+     * @param name the name or key of the property
+     * @param defaultValue a default value if the property doesn't exist in the
+     *            event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -172,8 +169,8 @@ public class MuleMessage implements UMOMessage
 
     /**
      * Sets a double property on the event
-     *
-     * @param name  the property name or key
+     * 
+     * @param name the property name or key
      * @param value the property value
      */
     public void setDoubleProperty(String name, double value)
@@ -222,15 +219,14 @@ public class MuleMessage implements UMOMessage
     }
 
     /**
-     * Sets a correlationId for this message.  The correlation Id can
-     * be used by components in the system to manage message relations
-     * <p/>
-     * transport protocol.  As such not all messages will support the notion
-     * of a correlationId i.e. tcp or file.  In this situation the correlation Id
-     * is set as a property of the message where it's up to developer to keep
-     * the association with the message. For example if the message is serialised to
+     * Sets a correlationId for this message. The correlation Id can be used by
+     * components in the system to manage message relations <p/> transport
+     * protocol. As such not all messages will support the notion of a
+     * correlationId i.e. tcp or file. In this situation the correlation Id is
+     * set as a property of the message where it's up to developer to keep the
+     * association with the message. For example if the message is serialised to
      * xml the correlationId will be available in the message.
-     *
+     * 
      * @param id the Id reference for this relationship
      */
     public void setCorrelationId(String id)
@@ -239,16 +235,15 @@ public class MuleMessage implements UMOMessage
     }
 
     /**
-     * Sets a correlationId for this message.  The correlation Id can
-     * be used by components in the system to manage message relations.
-     * <p/>
-     * The correlationId is associated with the message using the underlying
-     * transport protocol.  As such not all messages will support the notion
-     * of a correlationId i.e. tcp or file.  In this situation the correlation Id
-     * is set as a property of the message where it's up to developer to keep
-     * the association with the message. For example if the message is serialised to
+     * Sets a correlationId for this message. The correlation Id can be used by
+     * components in the system to manage message relations. <p/> The
+     * correlationId is associated with the message using the underlying
+     * transport protocol. As such not all messages will support the notion of a
+     * correlationId i.e. tcp or file. In this situation the correlation Id is
+     * set as a property of the message where it's up to developer to keep the
+     * association with the message. For example if the message is serialised to
      * xml the correlationId will be available in the message.
-     *
+     * 
      * @return the correlationId for this message or null if one hasn't been set
      */
     public String getCorrelationId()
@@ -257,11 +252,11 @@ public class MuleMessage implements UMOMessage
     }
 
     /**
-     * Sets a replyTo address for this message.  This is useful in an asynchronous
-     * environment where the caller doesn't wait for a response and the response needs
-     * to be routed somewhere for further processing.
-     * The value of this field can be any valid endpointUri url.
-     *
+     * Sets a replyTo address for this message. This is useful in an
+     * asynchronous environment where the caller doesn't wait for a response and
+     * the response needs to be routed somewhere for further processing. The
+     * value of this field can be any valid endpointUri url.
+     * 
      * @param replyTo the endpointUri url to reply to
      */
     public void setReplyTo(Object replyTo)
@@ -270,11 +265,11 @@ public class MuleMessage implements UMOMessage
     }
 
     /**
-     * Sets a replyTo address for this message.  This is useful in an asynchronous
-     * environment where the caller doesn't wait for a response and the response needs
-     * to be routed somewhere for further processing.
-     * The value of this field can be any valid endpointUri url.
-     *
+     * Sets a replyTo address for this message. This is useful in an
+     * asynchronous environment where the caller doesn't wait for a response and
+     * the response needs to be routed somewhere for further processing. The
+     * value of this field can be any valid endpointUri url.
+     * 
      * @return the endpointUri url to reply to or null if one has not been set
      */
     public Object getReplyTo()
@@ -283,10 +278,10 @@ public class MuleMessage implements UMOMessage
     }
 
     /**
-     * Gets the sequence or ordering number for this message in the
-     * the correlation group (as defined by the correlationId)
-     *
-     * @return the sequence number  or -1 if the sequence is not important
+     * Gets the sequence or ordering number for this message in the the
+     * correlation group (as defined by the correlationId)
+     * 
+     * @return the sequence number or -1 if the sequence is not important
      */
     public int getCorrelationSequence()
     {
@@ -294,10 +289,11 @@ public class MuleMessage implements UMOMessage
     }
 
     /**
-     * Gets the sequence or ordering number for this message in the
-     * the correlation group (as defined by the correlationId)
-     *
-     * @param sequence the sequence number  or -1 if the sequence is not important
+     * Gets the sequence or ordering number for this message in the the
+     * correlation group (as defined by the correlationId)
+     * 
+     * @param sequence the sequence number or -1 if the sequence is not
+     *            important
      */
     public void setCorrelationSequence(int sequence)
     {
@@ -306,7 +302,7 @@ public class MuleMessage implements UMOMessage
 
     /**
      * Determines how many messages are in the correlation group
-     *
+     * 
      * @return total messages in this group or -1 if the size is not known
      */
     public int getCorrelationGroupSize()
@@ -316,25 +312,27 @@ public class MuleMessage implements UMOMessage
 
     /**
      * Determines how many messages are in the correlation group
-     *
-     * @param size the total messages in this group or -1 if the size is not known
+     * 
+     * @param size the total messages in this group or -1 if the size is not
+     *            known
      */
     public void setCorrelationGroupSize(int size)
     {
         adapter.setCorrelationGroupSize(size);
     }
 
-    public UMOExceptionPayload getExceptionPayload() {
+    public UMOExceptionPayload getExceptionPayload()
+    {
         return exceptionPayload;
     }
 
-    public void setExceptionPayload(UMOExceptionPayload exceptionPayload) {
+    public void setExceptionPayload(UMOExceptionPayload exceptionPayload)
+    {
         this.exceptionPayload = exceptionPayload;
     }
 
-
-    public String toString() {
-
+    public String toString()
+    {
         String id = null;
         try {
             id = getUniqueId();

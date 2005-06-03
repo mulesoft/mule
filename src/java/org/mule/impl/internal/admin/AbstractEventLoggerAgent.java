@@ -13,6 +13,10 @@
  */
 package org.mule.impl.internal.admin;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -31,14 +35,10 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.manager.UMOServerEventListener;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 /**
- * <code>AbstractEventLoggerAgent</code> Receives Mule server events and logs them and can
- * optionally route them to an endpoint
- *
+ * <code>AbstractEventLoggerAgent</code> Receives Mule server events and logs
+ * them and can optionally route them to an endpoint
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -47,7 +47,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
     /**
      * logger used by this class
      */
-     protected static transient Log logger = LogFactory.getLog(AbstractEventLoggerAgent.class);
+    protected static transient Log logger = LogFactory.getLog(AbstractEventLoggerAgent.class);
 
     protected static transient Log eventLogger;
     private String name;
@@ -65,111 +65,136 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
 
     /**
      * Gets the name of this agent
-     *
+     * 
      * @return the agent name
      */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
     /**
      * Sets the name of this agent
-     *
+     * 
      * @param name the name of the agent
      */
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public void start() throws UMOException {
+    public void start() throws UMOException
+    {
     }
 
-    public void stop() throws UMOException {
+    public void stop() throws UMOException
+    {
     }
 
-    public void dispose() {
+    public void dispose()
+    {
     }
 
-    public void registered() {
+    public void registered()
+    {
     }
 
-    public void unregistered() {
+    public void unregistered()
+    {
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
             UMOServerEventListener listener = (UMOServerEventListener) iterator.next();
             MuleManager.getInstance().unregisterListener(listener);
         }
     }
 
-    public boolean isIgnoreManagerEvents() {
+    public boolean isIgnoreManagerEvents()
+    {
         return ignoreManagerEvents;
     }
 
-    public void setIgnoreManagerEvents(boolean ignoreManagerEvents) {
+    public void setIgnoreManagerEvents(boolean ignoreManagerEvents)
+    {
         this.ignoreManagerEvents = ignoreManagerEvents;
     }
 
-    public boolean isIgnoreModelEvents() {
+    public boolean isIgnoreModelEvents()
+    {
         return ignoreModelEvents;
     }
 
-    public void setIgnoreModelEvents(boolean ignoreModelEvents) {
+    public void setIgnoreModelEvents(boolean ignoreModelEvents)
+    {
         this.ignoreModelEvents = ignoreModelEvents;
     }
 
-    public boolean isIgnoreComponentEvents() {
+    public boolean isIgnoreComponentEvents()
+    {
         return ignoreComponentEvents;
     }
 
-    public void setIgnoreComponentEvents(boolean ignoreComponentEvents) {
+    public void setIgnoreComponentEvents(boolean ignoreComponentEvents)
+    {
         this.ignoreComponentEvents = ignoreComponentEvents;
     }
 
-    public boolean isIgnoreSecurityEvents() {
+    public boolean isIgnoreSecurityEvents()
+    {
         return ignoreSecurityEvents;
     }
 
-    public void setIgnoreSecurityEvents(boolean ignoreSecurityEvents) {
+    public void setIgnoreSecurityEvents(boolean ignoreSecurityEvents)
+    {
         this.ignoreSecurityEvents = ignoreSecurityEvents;
     }
 
-    public boolean isIgnoreManagementEvents() {
+    public boolean isIgnoreManagementEvents()
+    {
         return ignoreManagementEvents;
     }
 
-    public void setIgnoreManagementEvents(boolean ignoreManagementEvents) {
+    public void setIgnoreManagementEvents(boolean ignoreManagementEvents)
+    {
         this.ignoreManagementEvents = ignoreManagementEvents;
     }
 
-    public boolean isIgnoreCustomEvents() {
+    public boolean isIgnoreCustomEvents()
+    {
         return ignoreCustomEvents;
     }
 
-    public void setIgnoreCustomEvents(boolean ignoreCustomEvents) {
+    public void setIgnoreCustomEvents(boolean ignoreCustomEvents)
+    {
         this.ignoreCustomEvents = ignoreCustomEvents;
     }
 
-    public boolean isIgnoreAdminEvents() {
+    public boolean isIgnoreAdminEvents()
+    {
         return ignoreAdminEvents;
     }
 
-    public void setIgnoreAdminEvents(boolean ignoreAdminEvents) {
+    public void setIgnoreAdminEvents(boolean ignoreAdminEvents)
+    {
         this.ignoreAdminEvents = ignoreAdminEvents;
     }
 
-    public boolean isIgnoreConnectionEvents() {
+    public boolean isIgnoreConnectionEvents()
+    {
         return ignoreConnectionEvents;
     }
 
-    public void setIgnoreConnectionEvents(boolean ignoreConnectionEvents) {
+    public void setIgnoreConnectionEvents(boolean ignoreConnectionEvents)
+    {
         this.ignoreConnectionEvents = ignoreConnectionEvents;
     }
 
-    public final void initialise() throws InitialisationException {
+    public final void initialise() throws InitialisationException
+    {
         doInitialise();
         UMOManager manager = MuleManager.getInstance();
         if (!ignoreManagerEvents) {
             UMOServerEventListener l = new ManagerEventListener() {
-                public void onEvent(UMOServerEvent event) {
+                public void onEvent(UMOServerEvent event)
+                {
                     logEvent(event);
                 }
             };
@@ -178,7 +203,8 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
         }
         if (!ignoreModelEvents) {
             UMOServerEventListener l = new ModelEventListener() {
-                public void onEvent(UMOServerEvent event) {
+                public void onEvent(UMOServerEvent event)
+                {
                     logEvent(event);
                 }
             };
@@ -187,7 +213,8 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
         }
         if (!ignoreComponentEvents) {
             UMOServerEventListener l = new ComponentEventListener() {
-                public void onEvent(UMOServerEvent event) {
+                public void onEvent(UMOServerEvent event)
+                {
                     logEvent(event);
                 }
             };
@@ -196,7 +223,8 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
         }
         if (!ignoreSecurityEvents) {
             UMOServerEventListener l = new SecurityEventListener() {
-                public void onEvent(UMOServerEvent event) {
+                public void onEvent(UMOServerEvent event)
+                {
                     logEvent(event);
                 }
             };
@@ -206,7 +234,8 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
 
         if (!ignoreManagementEvents) {
             UMOServerEventListener l = new ManagementEventListener() {
-                public void onEvent(UMOServerEvent event) {
+                public void onEvent(UMOServerEvent event)
+                {
                     logEvent(event);
                 }
             };
@@ -216,7 +245,8 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
 
         if (!ignoreCustomEvents) {
             UMOServerEventListener l = new CustomEventListener() {
-                public void onEvent(UMOServerEvent event) {
+                public void onEvent(UMOServerEvent event)
+                {
                     logEvent(event);
                 }
             };
@@ -226,7 +256,8 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
 
         if (!ignoreConnectionEvents) {
             UMOServerEventListener l = new ConnectionEventListener() {
-                public void onEvent(UMOServerEvent event) {
+                public void onEvent(UMOServerEvent event)
+                {
                     logEvent(event);
                 }
             };
@@ -236,7 +267,8 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
 
         if (!ignoreAdminEvents) {
             UMOServerEventListener l = new AdminEventListener() {
-                public void onEvent(UMOServerEvent event) {
+                public void onEvent(UMOServerEvent event)
+                {
                     logEvent(event);
                 }
             };

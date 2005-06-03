@@ -18,14 +18,14 @@ import org.mule.umo.UMOMessage;
 
 /**
  * <code>UMOResponseRouter</code> is a router that handles response flow
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public interface UMOResponseRouter extends UMORouter
 {
-    public void process(UMOEvent event) throws RoutingException;
+    void process(UMOEvent event) throws RoutingException;
 
-    public UMOMessage getResponse(UMOMessage message)  throws RoutingException;
+    UMOMessage getResponse(UMOMessage message) throws RoutingException;
 }
