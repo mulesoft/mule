@@ -24,10 +24,10 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.util.EncodingUtils;
 
 /**
- * <code>TransformerConverter</code>will obtain an endpoint name and
- * convert it to a <code>UMOEndpoint</code> instance by looking up the
- * proivder from the <code>MuleManager</code>.
- *
+ * <code>TransformerConverter</code>will obtain an endpoint name and convert
+ * it to a <code>UMOEndpoint</code> instance by looking up the proivder from
+ * the <code>MuleManager</code>.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -37,35 +37,28 @@ public class EndpointURIConverter implements Converter
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Convert the specified input object into an output object of the
-     * specified type.
-     *
-     * @param type  Data type to which this value should be converted
+     * Convert the specified input object into an output object of the specified
+     * type.
+     * 
+     * @param type Data type to which this value should be converted
      * @param value The input value to be converted
-     * @throws org.apache.commons.beanutils.ConversionException if conversion cannot be performed
-     *                             successfully
+     * @throws org.apache.commons.beanutils.ConversionException if conversion
+     *             cannot be performed successfully
      */
     public Object convert(Class type, Object value)
     {
         UMOManager manager = MuleManager.getInstance();
-        if (value == null)
-        {
+        if (value == null) {
             throw new ConversionException("No value specified");
         }
-
-        if (value instanceof UMOEndpointURI)
-        {
-            return (value);
+        if (value instanceof UMOEndpointURI) {
+            return value;
         }
-
-        try
-        {
+        try {
             String endpoint = manager.lookupEndpointIdentifier(value.toString(), value.toString());
             endpoint = EncodingUtils.decode(endpoint);
             return new MuleEndpointURI(endpoint);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new ConversionException(e);
         }
     }

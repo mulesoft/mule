@@ -16,22 +16,23 @@ package org.mule.umo.security;
 import org.mule.umo.lifecycle.Initialisable;
 
 /**
- * <code>UMOSecurityProvider</code> is a target security provider thsat actually does
- * the work of authenticating credentials and populating the UMOAuthentication object.
- *
+ * <code>UMOSecurityProvider</code> is a target security provider thsat
+ * actually does the work of authenticating credentials and populating the
+ * UMOAuthentication object.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public interface UMOSecurityProvider extends Initialisable
 {
-    public void setName(String name);
+    void setName(String name);
 
-    public String getName();
+    String getName();
 
-    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException;
+    UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException;
 
-    public boolean supports(Class aClass);
+    boolean supports(Class aClass);
 
-    public UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException;
+    UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException;
 }

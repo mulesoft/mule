@@ -13,24 +13,24 @@
  */
 package org.mule.transformers.codec;
 
+import java.io.IOException;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transformers.DefaultTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-import java.io.IOException;
-
 /**
- * <code>Base64Encoder</code> transforms strings or byte arrays into Base64 encoded
- * string
- *
+ * <code>Base64Encoder</code> transforms strings or byte arrays into Base64
+ * encoded string
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class UCDecoder extends DefaultTransformer
 {
     private sun.misc.UCDecoder decoder;
-    
+
     public UCDecoder()
     {
         registerSourceType(String.class);
@@ -39,26 +39,26 @@ public class UCDecoder extends DefaultTransformer
         decoder = new sun.misc.UCDecoder();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.transformer.UMOTransformer#transform(java.lang.Object)
      */
     public Object doTransform(Object src) throws TransformerException
     {
         String data;
-        if(src instanceof byte[]) {
-            data = new String((byte[])src);
+        if (src instanceof byte[]) {
+            data = new String((byte[]) src);
         } else {
-            data = (String)src;
+            data = (String) src;
         }
-        try
-        {
+        try {
             byte[] result = decoder.decodeBuffer(data);
-            if(getReturnClass().equals(String.class)) {
+            if (getReturnClass().equals(String.class)) {
                 return new String(result);
             }
             return result;
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X, "UU Encoding"), this, e);
         }
     }

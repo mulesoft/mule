@@ -17,15 +17,16 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
 /**
- * <code>ComponentException</code> should be thrown when some action on a component
- * fails such as starting or stopping
- *
+ * <code>ComponentException</code> should be thrown when some action on a
+ * component fails such as starting or stopping
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class ComponentException extends MessagingException
 {
     private transient UMOComponent component;
+
     /**
      * @param message the exception message
      */
@@ -37,7 +38,7 @@ public class ComponentException extends MessagingException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public ComponentException(Message message, UMOMessage umoMessage, UMOComponent component, Throwable cause)
     {
@@ -51,18 +52,20 @@ public class ComponentException extends MessagingException
         this.component = component;
     }
 
-    public UMOComponent getComponent() {
+    public UMOComponent getComponent()
+    {
         return component;
     }
 
-    private static Message generateMessage(Message message, UMOComponent component) {
-         Message m = new Message(Messages.COMPONENT_CAUSED_ERROR_IS_X, component);
-         if(message!=null) {
-             message.setNextMessage(m);
-             return message;
-         } else {
-             message = new Message(0);
-             return m;
-         }
+    private static Message generateMessage(Message message, UMOComponent component)
+    {
+        Message m = new Message(Messages.COMPONENT_CAUSED_ERROR_IS_X, component);
+        if (message != null) {
+            message.setNextMessage(m);
+            return message;
+        } else {
+            message = new Message(0);
+            return m;
+        }
     }
 }

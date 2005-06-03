@@ -13,11 +13,11 @@
  *
  */
 
-
 package org.mule.providers.jms;
 
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 
-import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -26,9 +26,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -45,11 +43,13 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         assertNotNull(receiver.getComponent());
         assertNotNull(receiver.getConnector());
         assertNotNull(receiver.getEndpoint());
-        //hmm how do we unit test a message receive
-        //receiver.onMessage((Message) getValidMessage());
+        // hmm how do we unit test a message receive
+        // receiver.onMessage((Message) getValidMessage());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.providers.AbstractMessageReceiverTestCase#getMessageReceiver()
      */
     public UMOMessageReceiver getMessageReceiver() throws Exception
@@ -61,15 +61,14 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public UMOConnector getConnector() throws Exception
     {
-        if (connector == null)
-        {
+        if (connector == null) {
             connector = new JmsConnector();
             connector.setName("TestConnector");
             connector.setSpecification("1.1");
 
             Mock connectionFactory = new Mock(ConnectionFactory.class);
             Mock connection = new Mock(Connection.class);
-            connectionFactory.expectAndReturn("createConnection", (Connection)connection.proxy());
+            connectionFactory.expectAndReturn("createConnection", (Connection) connection.proxy());
             connection.expect("close");
             connection.expect("start");
             connection.expect("stop");

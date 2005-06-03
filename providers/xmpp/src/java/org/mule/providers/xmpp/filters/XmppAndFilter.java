@@ -18,42 +18,47 @@ import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
  * <code>XmppAndFilter</code> an Xmpp AND filter
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XmppAndFilter extends AbstractXmppFilter {
+public class XmppAndFilter extends AbstractXmppFilter
+{
     private PacketFilter leftFilter;
     private PacketFilter rightFilter;
 
-    public XmppAndFilter() {
+    public XmppAndFilter()
+    {
     }
 
-
-    public XmppAndFilter(PacketFilter left, PacketFilter right) {
+    public XmppAndFilter(PacketFilter left, PacketFilter right)
+    {
         this.leftFilter = left;
         this.rightFilter = right;
     }
 
-
-    public void setLeftFilter(PacketFilter left) {
+    public void setLeftFilter(PacketFilter left)
+    {
         this.leftFilter = left;
     }
 
-    public void setRightFilter(PacketFilter right) {
+    public void setRightFilter(PacketFilter right)
+    {
         this.leftFilter = right;
     }
 
-
-    public PacketFilter getLeftFilter() {
+    public PacketFilter getLeftFilter()
+    {
         return leftFilter;
     }
 
-    public PacketFilter getRightFilter() {
+    public PacketFilter getRightFilter()
+    {
         return rightFilter;
     }
 
-    protected PacketFilter createFilter() {
+    protected PacketFilter createFilter()
+    {
         return new AndFilter(leftFilter, rightFilter);
     }
 }

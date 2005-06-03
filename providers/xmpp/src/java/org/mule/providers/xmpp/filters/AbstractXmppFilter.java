@@ -20,7 +20,7 @@ import org.mule.umo.UMOFilter;
 /**
  * <code>AbstractXmppFilter</code> is a filter adapter so that Smack Filters
  * can be configured as Mule filters
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -28,18 +28,20 @@ public abstract class AbstractXmppFilter implements UMOFilter, PacketFilter
 {
     protected PacketFilter delegate;
 
-    public boolean accept(Packet packet) {
-        if(delegate==null) {
+    public boolean accept(Packet packet)
+    {
+        if (delegate == null) {
             delegate = createFilter();
         }
         return delegate.accept(packet);
     }
 
-    public boolean accept(Object object) {
-        if(object instanceof Packet) {
+    public boolean accept(Object object)
+    {
+        if (object instanceof Packet) {
             return accept((Packet) object);
         }
-        //If we have received a UMOMessage the filter has already been applied
+        // If we have received a UMOMessage the filter has already been applied
         return true;
     }
 

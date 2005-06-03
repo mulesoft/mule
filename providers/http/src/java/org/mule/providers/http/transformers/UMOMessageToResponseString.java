@@ -13,6 +13,15 @@
  */
 package org.mule.providers.http.transformers;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -25,13 +34,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 /**
  * <code>UMOMessageToResponseString</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -49,27 +54,28 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
 
         headers = new ArrayList(Arrays.asList(HttpConstants.RESPONSE_HEADER_NAMES));
         format = new SimpleDateFormat(HttpConstants.DATE_FORMAT);
-        server = MuleManager.getConfiguration().getProductName() + "/" + MuleManager.getConfiguration().getProductVersion();
+        server = MuleManager.getConfiguration().getProductName() + "/"
+                + MuleManager.getConfiguration().getProductVersion();
     }
 
     public Object transform(Object src, UMOEventContext context) throws TransformerException
     {
         int status = context.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
-        String version = (String)context.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
+        String version = (String) context.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
         String date = format.format(new Date());
         byte[] response = null;
-        String contentType = (String)context.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
-        if(src instanceof byte[]) {
-            response = (byte[])src;
-        } else if(contentType != null && contentType.startsWith("text/")) {
+        String contentType = (String) context.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        if (src instanceof byte[]) {
+            response = (byte[]) src;
+        } else if (contentType != null && contentType.startsWith("text/")) {
             response = src.toString().getBytes();
         } else {
-            try
-            {
+            try {
                 response = Utility.objectToByteArray(src);
-            } catch (IOException e)
-            {
-                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "Object", "byte[]"), this, e);
+            } catch (IOException e) {
+                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "Object", "byte[]"),
+                                               this,
+                                               e);
             }
         }
 
@@ -81,13 +87,13 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
         httpMessage.append(": ").append(date).append(HttpConstants.CRLF);
         httpMessage.append(HttpConstants.HEADER_SERVER);
         httpMessage.append(": ").append(server).append(HttpConstants.CRLF);
-        if(context.getProperty(HttpConstants.HEADER_EXPIRES)==null) {
+        if (context.getProperty(HttpConstants.HEADER_EXPIRES) == null) {
             httpMessage.append(HttpConstants.HEADER_EXPIRES);
             httpMessage.append(": ").append(date).append(HttpConstants.CRLF);
         }
 
         httpMessage.append(HttpConstants.HEADER_CONTENT_TYPE);
-        if(contentType==null) {
+        if (contentType == null) {
             httpMessage.append(": ").append("text/xml").append(HttpConstants.CRLF);
         } else {
             httpMessage.append(": ").append(contentType).append(HttpConstants.CRLF);
@@ -98,48 +104,53 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
 
         String headerName;
         String value;
-        for (Iterator iterator = headers.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = headers.iterator(); iterator.hasNext();) {
             headerName = (String) iterator.next();
-            value = (String)context.getProperty(headerName);
-            if(value!=null) {
+            value = (String) context.getProperty(headerName);
+            if (value != null) {
                 httpMessage.append(headerName).append(": ").append(value);
                 httpMessage.append(HttpConstants.CRLF);
             }
         }
-        //Custom headers
-        Map customHeaders = (Map)context.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
-        if(customHeaders!=null) {
+        // Custom headers
+        Map customHeaders = (Map) context.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+        if (customHeaders != null) {
             Map.Entry entry;
-            for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
-            {
-                entry =  (Map.Entry)iterator.next();
+            for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();) {
+                entry = (Map.Entry) iterator.next();
                 httpMessage.append(entry.getKey()).append(": ").append(entry.getValue());
                 httpMessage.append(HttpConstants.CRLF);
             }
         }
 
-        //Mule properties
+        // Mule properties
         UMOMessage m = context.getMessage();
-        String user = (String)m.getProperty(MuleProperties.MULE_USER_PROPERTY);
-        if(user!=null) {
+        String user = (String) m.getProperty(MuleProperties.MULE_USER_PROPERTY);
+        if (user != null) {
             httpMessage.append("X-" + MuleProperties.MULE_USER_PROPERTY).append(": ").append(user);
             httpMessage.append(HttpConstants.CRLF);
         }
-        if(m.getCorrelationId()!=null) {
-            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_ID_PROPERTY).append(": ").append(m.getCorrelationId());
+        if (m.getCorrelationId() != null) {
+            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_ID_PROPERTY)
+                       .append(": ")
+                       .append(m.getCorrelationId());
             httpMessage.append(HttpConstants.CRLF);
-            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY).append(": ").append(m.getCorrelationGroupSize());
+            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY)
+                       .append(": ")
+                       .append(m.getCorrelationGroupSize());
             httpMessage.append(HttpConstants.CRLF);
-            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY).append(": ").append(m.getCorrelationSequence());
+            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY)
+                       .append(": ")
+                       .append(m.getCorrelationSequence());
             httpMessage.append(HttpConstants.CRLF);
         }
-        if(m.getReplyTo()!=null) {
-            httpMessage.append("X-" + MuleProperties.MULE_REPLY_TO_PROPERTY).append(": ").append(m.getReplyTo().toString());
+        if (m.getReplyTo() != null) {
+            httpMessage.append("X-" + MuleProperties.MULE_REPLY_TO_PROPERTY).append(": ").append(m.getReplyTo()
+                                                                                                  .toString());
             httpMessage.append(HttpConstants.CRLF);
         }
 
-        //End header
+        // End header
         httpMessage.append(HttpConstants.CRLF);
         byte[] resultPayload = new byte[httpMessage.length() + response.length];
         System.arraycopy(httpMessage.toString().getBytes(), 0, resultPayload, 0, httpMessage.length());

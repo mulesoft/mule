@@ -16,8 +16,9 @@ package org.mule.routing.filters.logic;
 import org.mule.umo.UMOFilter;
 
 /**
- * <code>AndFilter</code> accepts only if the leftFilter and rightFilter filter accept
- *
+ * <code>AndFilter</code> accepts only if the leftFilter and rightFilter
+ * filter accept
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -31,13 +32,11 @@ public class AndFilter implements UMOFilter
     {
     }
 
-
     public AndFilter(UMOFilter left, UMOFilter right)
     {
         this.leftFilter = left;
         this.rightFilter = right;
     }
-
 
     public void setLeftFilter(UMOFilter leftFilter)
     {
@@ -48,7 +47,6 @@ public class AndFilter implements UMOFilter
     {
         this.rightFilter = rightFilter;
     }
-
 
     public UMOFilter getLeftFilter()
     {

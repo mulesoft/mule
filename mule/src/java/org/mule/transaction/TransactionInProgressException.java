@@ -18,9 +18,10 @@ package org.mule.transaction;
 import org.mule.config.i18n.Message;
 
 /**
- * <p><code>TransactionInProgressException</code> is thrown if a new transaction is started
- * when there is one already in progress
- *
+ * <p>
+ * <code>TransactionInProgressException</code> is thrown if a new transaction
+ * is started when there is one already in progress
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -37,7 +38,7 @@ public class TransactionInProgressException extends TransactionStatusException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public TransactionInProgressException(Message message, Throwable cause)
     {

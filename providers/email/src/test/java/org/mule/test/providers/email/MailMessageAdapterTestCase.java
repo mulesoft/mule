@@ -15,14 +15,15 @@
 
 package org.mule.test.providers.email;
 
-import org.mule.providers.email.MailMessageAdapter;
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
-import org.mule.umo.provider.UMOMessageAdapter;
+import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-import java.util.Properties;
+
+import org.mule.providers.email.MailMessageAdapter;
+import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -32,21 +33,24 @@ public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
     private Message message;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
      */
     public UMOMessageAdapter createAdapter(Object payload) throws Exception
     {
-        return new MailMessageAdapter((Message)payload);
+        return new MailMessageAdapter((Message) payload);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getValidMessage()
      */
     public Object getValidMessage() throws Exception
     {
-        if (message == null)
-        {
+        if (message == null) {
             message = new MimeMessage(Session.getDefaultInstance(new Properties()));
             message.setContent("Test Email Message", "text/plain");
         }

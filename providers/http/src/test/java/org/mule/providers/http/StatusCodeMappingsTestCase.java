@@ -27,7 +27,8 @@ import org.mule.umo.security.UnauthorisedException;
 
 public class StatusCodeMappingsTestCase extends NamedTestCase
 {
-    public void testErrorMappings() {
+    public void testErrorMappings()
+    {
         String code = ExceptionHelper.getErrorMapping("http", RoutingException.class);
         assertEquals("500", code);
 
@@ -42,7 +43,8 @@ public class StatusCodeMappingsTestCase extends NamedTestCase
 
     }
 
-    public void testHttpsErrorMappings() {
+    public void testHttpsErrorMappings()
+    {
         String code = ExceptionHelper.getErrorMapping("httpS", RoutingException.class);
         assertEquals("500", code);
 

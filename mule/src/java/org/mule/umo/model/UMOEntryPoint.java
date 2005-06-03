@@ -13,15 +13,15 @@
  */
 package org.mule.umo.model;
 
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.transformer.TransformerException;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.transformer.TransformerException;
+
 /**
  * <code>UMOEntryPoint</code> defines the current entry method on a component
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,7 +29,8 @@ public interface UMOEntryPoint
 {
     Class getParameterType();
 
-    Object invoke(Object component, UMOEventContext context, Method method) throws InvocationTargetException, IllegalAccessException, TransformerException;
+    Object invoke(Object component, UMOEventContext context, Method method) throws InvocationTargetException,
+            IllegalAccessException, TransformerException;
 
     boolean isVoid();
 

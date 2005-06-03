@@ -17,13 +17,15 @@ package org.mule.providers.quartz;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 
-public class TestComponent implements Callable {
+public class TestComponent implements Callable
+{
 
-	public Object onCall(UMOEventContext eventContext) throws Exception {
-		if (QuartzFunctionalTestCase.countDown != null) {
-			QuartzFunctionalTestCase.countDown.release();
-		}
-		return null;
-	}
-	
+    public Object onCall(UMOEventContext eventContext) throws Exception
+    {
+        if (QuartzFunctionalTestCase.countDown != null) {
+            QuartzFunctionalTestCase.countDown.release();
+        }
+        return null;
+    }
+
 }

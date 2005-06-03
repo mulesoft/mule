@@ -13,13 +13,14 @@
  */
 package org.mule.providers.ssl;
 
-import com.mockobjects.dynamic.Mock;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -30,8 +31,10 @@ public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     /**
      * Store created using
-     * C:\dev\projects\mule\src\providers\ssl\src\test\conf>keytool -genkey -keystore serverKeystore -keyalg rsa -alias muleserver -storepass mulepassword -keypass mulepassword
-     *
+     * C:\dev\projects\mule\src\providers\ssl\src\test\conf>keytool -genkey
+     * -keystore serverKeystore -keyalg rsa -alias muleserver -storepass
+     * mulepassword -keypass mulepassword
+     * 
      */
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
@@ -39,10 +42,12 @@ public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         SslConnector cnn = SslConnectorTestCase.createConnector(true);
         endpoint.setConnector(cnn);
         Mock mockComponent = new Mock(UMOComponent.class);
-		Mock mockDescriptor = new Mock(UMODescriptor.class);
-		mockComponent.expectAndReturn("getDescriptor" , mockDescriptor.proxy());
-		mockDescriptor.expectAndReturn("getResponseTransformer", null);
+        Mock mockDescriptor = new Mock(UMODescriptor.class);
+        mockComponent.expectAndReturn("getDescriptor", mockDescriptor.proxy());
+        mockDescriptor.expectAndReturn("getResponseTransformer", null);
 
-        return new SslMessageReceiver((AbstractConnector) endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint);
+        return new SslMessageReceiver((AbstractConnector) endpoint.getConnector(),
+                                      (UMOComponent) mockComponent.proxy(),
+                                      endpoint);
     }
 }

@@ -13,25 +13,25 @@
  */
 package org.mule.impl.container;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.ObjectNotFoundException;
-
-import javax.naming.InitialContext;
-import javax.naming.Name;
-import javax.naming.NamingException;
 import java.io.Reader;
 import java.util.Hashtable;
 import java.util.Map;
 
+import javax.naming.InitialContext;
+import javax.naming.Name;
+import javax.naming.NamingException;
+
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.ContainerException;
+import org.mule.umo.manager.ObjectNotFoundException;
+
 /**
- * <code>JndiContainerContext</code> is a container implementaiton that exposes
- * a jndi context.  What ever properties are set on the container in configuration
- * will be passed to the initial context.
- *
+ * <code>JndiContainerContext</code> is a container implementaiton that
+ * exposes a jndi context. What ever properties are set on the container in
+ * configuration will be passed to the initial context.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -40,23 +40,26 @@ public class JndiContainerContext extends AbstractContainerContext
     private InitialContext initialContext;
     private Map environment;
 
-    public JndiContainerContext() {
+    public JndiContainerContext()
+    {
         super("jndi");
     }
 
-    public Map getEnvironment() {
+    public Map getEnvironment()
+    {
         return environment;
     }
 
-    public void setEnvironment(Map environment) {
+    public void setEnvironment(Map environment)
+    {
         this.environment = environment;
     }
 
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
         try {
-            if(key instanceof Name) {
-                return initialContext.lookup((Name)key);
+            if (key instanceof Name) {
+                return initialContext.lookup((Name) key);
             } else {
                 return initialContext.lookup(key.toString());
             }
@@ -70,7 +73,7 @@ public class JndiContainerContext extends AbstractContainerContext
         throw new UnsupportedOperationException("configure(Reader)");
     }
 
-    public void initialise() throws InitialisationException, RecoverableException
+    public void initialise() throws InitialisationException
     {
         try {
             initialContext = new InitialContext(new Hashtable(environment));

@@ -21,10 +21,10 @@ import org.mule.MuleManager;
 import org.mule.umo.provider.UMOConnector;
 
 /**
- * <code>TransformerConverter</code> will obtain an endpoint name and
- * convert it to a <code>UMOConnector</code> instance by looking up the endpoint in the
- * <code>MuleManager</code>.
- *
+ * <code>TransformerConverter</code> will obtain an endpoint name and convert
+ * it to a <code>UMOConnector</code> instance by looking up the endpoint in
+ * the <code>MuleManager</code>.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,37 +34,30 @@ public class ConnectorConverter implements Converter
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Convert the specified input object into an output object of the
-     * specified type.
-     *
-     * @param type  Data type to which this value should be converted
+     * Convert the specified input object into an output object of the specified
+     * type.
+     * 
+     * @param type Data type to which this value should be converted
      * @param value The input value to be converted
      * @throws ConversionException if conversion cannot be performed
-     *                             successfully
+     *             successfully
      */
     public Object convert(Class type, Object value)
     {
-        if (value == null)
-        {
+        if (value == null) {
             throw new ConversionException("No value specified");
         }
-
-        if (value instanceof UMOConnector)
-        {
+        if (value instanceof UMOConnector) {
             return (value);
         }
-
-        try
-        {
+        try {
             UMOConnector c = MuleManager.getInstance().lookupConnector(value.toString());
-            if (c == null)
-            {
-                throw new ConversionException("UMOConnector: " + value.toString() + " has not been registered with Mule");
+            if (c == null) {
+                throw new ConversionException("UMOConnector: " + value.toString()
+                        + " has not been registered with Mule");
             }
             return c;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new ConversionException(e);
         }
     }

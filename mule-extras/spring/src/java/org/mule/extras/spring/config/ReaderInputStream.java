@@ -8,21 +8,24 @@
  */
 package org.mule.extras.spring.config;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.IOException;
 
-public class ReaderInputStream extends InputStream {
+public class ReaderInputStream extends InputStream
+{
     private Reader reader = null;
 
-    public ReaderInputStream(Reader reader) {
+    public ReaderInputStream(Reader reader)
+    {
         this.reader = reader;
     }
 
     /**
      * @see java.io.InputStream#read()
      */
-    public int read() throws IOException {
+    public int read() throws IOException
+    {
         return reader.read();
     }
 }

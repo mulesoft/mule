@@ -15,6 +15,8 @@
 
 package org.mule.providers.file;
 
+import java.io.File;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
@@ -24,14 +26,12 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.transformer.TransformerException;
 
-import java.io.File;
-
 /**
- * <code>FileMessageAdapter</code> provides a wrapper for a message.  Users can
- * obtain the contents of the message through the payload property and can get the
- * filename and directory in the properties using PROPERTY_FILENAME and
+ * <code>FileMessageAdapter</code> provides a wrapper for a message. Users can
+ * obtain the contents of the message through the payload property and can get
+ * the filename and directory in the properties using PROPERTY_FILENAME and
  * PROPERTY_DIRECTORY
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,14 +44,16 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
 
     public FileContentsMessageAdapter(Object message) throws MessagingException
     {
-        if(message instanceof File) {
-            setMessage((File)message);
+        if (message instanceof File) {
+            setMessage((File) message);
         } else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#getPayload()
      */
     public Object getPayload()
@@ -59,7 +61,9 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#getPayloadAsBytes()
      */
     public byte[] getPayloadAsBytes() throws Exception
@@ -67,7 +71,9 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#getPayloadAsString()
      */
     public String getPayloadAsString() throws Exception
@@ -75,19 +81,19 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
         return new String(getPayloadAsBytes());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#setMessage(java.lang.Object)
      */
     private void setMessage(File message) throws MessagingException
     {
-        try
-        {
+        try {
             this.file = message;
-            this.message = (byte[])transformer.transform(message);
+            this.message = (byte[]) transformer.transform(message);
             properties.put(FileConnector.PROPERTY_ORIGINAL_FILENAME, this.file.getName());
             properties.put(FileConnector.PROPERTY_DIRECTORY, this.file.getAbsolutePath());
-        } catch (TransformerException e)
-        {
+        } catch (TransformerException e) {
             throw new MessagingException(new Message(Messages.FILE_X_DOES_NOT_EXIST, file.getAbsolutePath()), e);
         }
     }

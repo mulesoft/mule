@@ -13,7 +13,13 @@
  */
 package org.mule.providers.udp;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.mule.MuleManager;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -23,12 +29,11 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import java.io.IOException;
-import java.net.*;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
  * <code>UdpMessageDispatcher</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -54,8 +59,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
 
     protected void initialise(String endpoint) throws IOException, URISyntaxException
     {
-        if (!initialised.get())
-        {
+        if (!initialised.get()) {
             URI uri = new URI(endpoint);
             port = uri.getPort();
             inetAddress = InetAddress.getByName(uri.getHost());
@@ -77,8 +81,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     protected void write(DatagramSocket socket, byte[] data) throws IOException
     {
         DatagramPacket packet = new DatagramPacket(data, data.length);
-        if (port >= 0)
-        {
+        if (port >= 0) {
             packet.setPort(port);
         }
         packet.setAddress(inetAddress);
@@ -88,15 +91,14 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
         doDispatch(event);
-        //If we're doing sync receive try and read return info from socket
-        if (MuleManager.getConfiguration().isSynchronousReceive())
-        {
+        // If we're doing sync receive try and read return info from socket
+        if (MuleManager.getConfiguration().isSynchronousReceive()) {
             DatagramPacket result = receive(socket, connector.getTimeout());
-            if (result == null) return null;
+            if (result == null)
+                return null;
             UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
             return message;
-        } else
-        {
+        } else {
             return event.getMessage();
         }
     }
@@ -104,14 +106,12 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     private DatagramPacket receive(DatagramSocket socket, int timeout) throws IOException
     {
         int origTimeout = socket.getSoTimeout();
-        try
-        {
+        try {
             DatagramPacket packet = new DatagramPacket(new byte[connector.getBufferSize()], connector.getBufferSize());
             socket.setSoTimeout(timeout);
             socket.receive(packet);
             return packet;
-        } finally
-        {
+        } finally {
             socket.setSoTimeout(origTimeout);
         }
     }
@@ -120,7 +120,8 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     {
         initialise(endpointUri.getAddress());
         DatagramPacket result = receive(socket, Integer.parseInt(String.valueOf(timeout)));
-        if (result == null) return null;
+        if (result == null)
+            return null;
         UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
         return message;
     }
@@ -138,6 +139,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     public void doDispose()
     {
         initialised.set(false);
-        if(socket!=null) socket.close();
+        if (socket != null)
+            socket.close();
     }
 }

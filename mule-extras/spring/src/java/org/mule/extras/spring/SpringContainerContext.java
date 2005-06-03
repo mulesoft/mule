@@ -14,6 +14,8 @@
  */
 package org.mule.extras.spring;
 
+import java.io.Reader;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
@@ -35,12 +37,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.io.InputStreamResource;
 
-import java.io.Reader;
-
 /**
- * <code>SpringContainerContext</code> is a Spring Context that can expose spring-managed
- * components for use in the Mule framework.
- *
+ * <code>SpringContainerContext</code> is a Spring Context that can expose
+ * spring-managed components for use in the Mule framework.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -61,13 +61,14 @@ public class SpringContainerContext extends AbstractContainerContext implements 
 
     protected String configFile;
 
-    public SpringContainerContext() {
+    public SpringContainerContext()
+    {
         super("spring");
     }
 
     /**
      * Sets the spring application context used to build components
-     *
+     * 
      * @param beanFactory the context to use
      */
     public void setBeanFactory(BeanFactory beanFactory)
@@ -82,50 +83,48 @@ public class SpringContainerContext extends AbstractContainerContext implements 
 
     /**
      * The spring application context used to build components
-     *
+     * 
      * @return spring application context
      */
     public BeanFactory getBeanFactory()
     {
-        if(externalBeanFactory !=null) return externalBeanFactory;
+        if (externalBeanFactory != null)
+            return externalBeanFactory;
         return beanFactory;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.model.UMOContainerContext#getComponent(java.lang.Object)
      */
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
-        if (getBeanFactory() == null)
-        {
+        if (getBeanFactory() == null) {
             throw new IllegalStateException("Spring Application context has not been set");
         }
-        if (key == null)
-        {
+        if (key == null) {
             throw new ObjectNotFoundException("Component not found for null key");
         }
 
-        if (key instanceof Class)
-        {
-            //We will assume that there should only be one object of
-            //this class in the container for now
-//            String[] names = getBeanFactory().getBeanDefinitionNames((Class) key);
-//            if (names == null || names.length == 0 || names.length > 1)
-//            {
-                throw new ObjectNotFoundException("The container is unable to build single instance of " +
-                        ((Class) key).getName() + " number of instances found was: 0");
-//            }
-//            else
-//            {
-//                key = names[0];
-//            }
+        if (key instanceof Class) {
+            // We will assume that there should only be one object of
+            // this class in the container for now
+            // String[] names = getBeanFactory().getBeanDefinitionNames((Class)
+            // key);
+            // if (names == null || names.length == 0 || names.length > 1)
+            // {
+            throw new ObjectNotFoundException("The container is unable to build single instance of "
+                    + ((Class) key).getName() + " number of instances found was: 0");
+            // }
+            // else
+            // {
+            // key = names[0];
+            // }
         }
-        try
-        {
+        try {
             return getBeanFactory().getBean(key.toString());
-        }
-        catch (BeansException e)
-        {
+        } catch (BeansException e) {
             throw new ObjectNotFoundException("Component not found for key: " + key.toString(), e);
         }
     }
@@ -149,33 +148,35 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         setExternalBeanFactory(bf);
     }
 
-    protected String getDefaultDocType() {
+    protected String getDefaultDocType()
+    {
         return "beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\"";
     }
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-        if(configFile==null) return;
-        try
-        {
-            if(ClassHelper.getResource(configFile, getClass())==null) {
-                logger.warn("Spring config resource: " + configFile + " not found on class path, attempting to load it from local file");
+        if (configFile == null)
+            return;
+        try {
+            if (ClassHelper.getResource(configFile, getClass()) == null) {
+                logger.warn("Spring config resource: " + configFile
+                        + " not found on class path, attempting to load it from local file");
                 setExternalBeanFactory(new FileSystemXmlApplicationContext(configFile));
             } else {
                 logger.info("Loading Spring config from classpath, resource is: " + configFile);
                 setExternalBeanFactory(new ClassPathXmlApplicationContext(configFile));
             }
-        } catch (BeansException e)
-        {
-            throw new InitialisationException(
-                    new ConfigurationException(
-                            new Message(Messages.FAILED_LOAD_X, "Application Context: " + configFile), e), this);
+        } catch (BeansException e) {
+            throw new InitialisationException(new ConfigurationException(new Message(Messages.FAILED_LOAD_X,
+                                                                                     "Application Context: "
+                                                                                             + configFile), e), this);
         }
     }
 
-    public void dispose() {
-    	if (externalBeanFactory instanceof ConfigurableApplicationContext) {
-        	((ConfigurableApplicationContext) externalBeanFactory).close();
+    public void dispose()
+    {
+        if (externalBeanFactory instanceof ConfigurableApplicationContext) {
+            ((ConfigurableApplicationContext) externalBeanFactory).close();
         }
         super.dispose();
 

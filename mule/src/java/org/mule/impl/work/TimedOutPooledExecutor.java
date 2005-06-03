@@ -23,38 +23,42 @@ import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 /**
  * PooledExecutor enforcing a timed out "blocked execution policy". The works
  * submitted to this pooled executor MUST be a WorkWrapper.
- *
+ * 
  * @version $Rev$ $Date$
  */
-public class TimedOutPooledExecutor extends PooledExecutor {
+public class TimedOutPooledExecutor extends PooledExecutor
+{
 
     /**
-     * Creates a pooled executor. The Channel used to enqueue the submitted
-     * Work instance is a queueless synchronous one.
+     * Creates a pooled executor. The Channel used to enqueue the submitted Work
+     * instance is a queueless synchronous one.
      */
-    public TimedOutPooledExecutor() {
+    public TimedOutPooledExecutor()
+    {
         setBlockedExecutionHandler(new TimedOutSpinHandler());
     }
 
     /**
      * Creates a pooled executor, which uses the provided Channel as its
      * queueing mechanism.
-     *
+     * 
      * @param aChannel Channel to be used to enqueue the submitted Work
-     * intances.
+     *            intances.
      */
-    public TimedOutPooledExecutor(Channel aChannel) {
+    public TimedOutPooledExecutor(Channel aChannel)
+    {
         super(aChannel);
         setBlockedExecutionHandler(new TimedOutSpinHandler());
     }
 
     /**
      * Executes the provided task, which MUST be an instance of WorkWrapper.
-     *
+     * 
      * @throws IllegalArgumentException Indicates that the provided task is not
-     * a WorkWrapper instance.
+     *             a WorkWrapper instance.
      */
-    public void execute(Runnable aTask) throws InterruptedException {
+    public void execute(Runnable aTask) throws InterruptedException
+    {
         if (!(aTask instanceof WorkerContext)) {
             throw new IllegalArgumentException("Please submit a WorkWrapper.");
         }
@@ -64,16 +68,19 @@ public class TimedOutPooledExecutor extends PooledExecutor {
     /**
      * This class implements a time out policy when a work is blocked: it offers
      * the task to the pool until the work has timed out.
-     *
+     * 
      * @version $Rev$ $Date$
      */
-    private class TimedOutSpinHandler
-            implements PooledExecutor.BlockedExecutionHandler {
+    private class TimedOutSpinHandler implements PooledExecutor.BlockedExecutionHandler
+    {
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see EDU.oswego.cs.dl.util.concurrent.PooledExecutor.BlockedExecutionHandler#blockedAction(java.lang.Runnable)
          */
-        public boolean blockedAction(Runnable arg0) throws InterruptedException {
+        public boolean blockedAction(Runnable arg0) throws InterruptedException
+        {
             WorkerContext work = (WorkerContext) arg0;
             if (!handOff_.offer(arg0, work.getStartTimeout())) {
                 // double check.

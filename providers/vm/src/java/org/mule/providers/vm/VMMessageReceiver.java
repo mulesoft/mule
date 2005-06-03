@@ -31,10 +31,10 @@ import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
 /**
- * <code>VMMessageReceiver</code> is a listener of events from a mule component which then simply
- * <p/>
- * passes the events on to the target component.
- *
+ * <code>VMMessageReceiver</code> is a listener of events from a mule
+ * component which then simply <p/> passes the events on to the target
+ * component.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
@@ -43,66 +43,77 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 {
     private VMConnector connector;
 
-    public VMMessageReceiver(UMOConnector connector, 
-							 UMOComponent component, 
-							 UMOEndpoint endpoint) throws InitialisationException
+    public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+            throws InitialisationException
     {
         super(connector, component, endpoint, new Long(10));
-		this.connector = (VMConnector) connector;
+        this.connector = (VMConnector) connector;
         receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
     }
 
-    public void doConnect() throws Exception {
-        if(connector.isQueueEvents()) {
-            //Ensure we can create a vm queue
+    public void doConnect() throws Exception
+    {
+        if (connector.isQueueEvents()) {
+            // Ensure we can create a vm queue
             QueueSession queueSession = connector.getQueueSession();
             Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
         }
-   }
-
-    public void doDisconnect() throws Exception {
     }
 
-    /* (non-Javadoc)
+    public void doDisconnect() throws Exception
+    {
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMOEventListener#onEvent(org.mule.umo.UMOEvent)
      */
     public void onEvent(UMOEvent event) throws UMOException
     {
         if (connector.isQueueEvents()) {
-			QueueSession queueSession = connector.getQueueSession();
-			Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
+            QueueSession queueSession = connector.getQueueSession();
+            Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
             try {
-				queue.put(event);
+                queue.put(event);
             } catch (InterruptedException e) {
-                throw new MuleException(new Message(Messages.INTERRUPTED_QUEUING_EVENT_FOR_X, this.endpoint.getEndpointURI()), e);
+                throw new MuleException(new Message(Messages.INTERRUPTED_QUEUING_EVENT_FOR_X,
+                                                    this.endpoint.getEndpointURI()), e);
             }
         } else {
-			routeMessage(new MuleMessage(event.getTransformedMessage(), event.getProperties()));
+            routeMessage(new MuleMessage(event.getTransformedMessage(), event.getProperties()));
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMOSyncChainSupport#onCall(org.mule.umo.UMOEvent)
      */
     public Object onCall(UMOEvent event) throws UMOException
     {
-        return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getProperties()), event.isSynchronous());
+        return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getProperties()),
+                            event.isSynchronous());
     }
 
-	protected List getMessages() throws Exception {
-		QueueSession qs = connector.getQueueSession();
-		Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
+    protected List getMessages() throws Exception
+    {
+        QueueSession qs = connector.getQueueSession();
+        Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
         UMOEvent event = (UMOEvent) queue.take();
         routeMessage(new MuleMessage(event.getTransformedMessage(), event.getProperties()));
-		return null;
-	}
+        return null;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.providers.TransactionEnabledPollingMessageReceiver#processMessage(java.lang.Object)
-	 */
-	protected void processMessage(Object msg) throws Exception {
-		// This method is never called as the 
-		// message is processed when received
-	}
-	
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.providers.TransactionEnabledPollingMessageReceiver#processMessage(java.lang.Object)
+     */
+    protected void processMessage(Object msg) throws Exception
+    {
+        // This method is never called as the
+        // message is processed when received
+    }
+
 }

@@ -13,6 +13,9 @@
  */
 package org.mule.extras.spring.config;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -20,15 +23,13 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
- * <code>MuleApplicationContext</code> is A Simple extension Application context
- * that allows rosurces to be loaded from the Classpath of file system using
- * the MuleBeanDefinitionReader.
+ * <code>MuleApplicationContext</code> is A Simple extension Application
+ * context that allows rosurces to be loaded from the Classpath of file system
+ * using the MuleBeanDefinitionReader.
+ * 
  * @see MuleBeanDefinitionReader
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -36,32 +37,37 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
 {
     private String[] configLocations;
 
-    public MuleApplicationContext(String configLocation) {
-        this(new String[]{configLocation});
+    public MuleApplicationContext(String configLocation)
+    {
+        this(new String[] { configLocation });
     }
-    public MuleApplicationContext(String[] configLocations) {
+
+    public MuleApplicationContext(String[] configLocations)
+    {
         this(configLocations, true);
     }
 
-    public MuleApplicationContext(String[] configLocations, boolean refresh) throws BeansException {
-		this.configLocations = configLocations;
-		if (refresh) {
-			refresh();
-		}
-	}
+    public MuleApplicationContext(String[] configLocations, boolean refresh) throws BeansException
+    {
+        this.configLocations = configLocations;
+        if (refresh) {
+            refresh();
+        }
+    }
 
     protected String[] getConfigLocations()
     {
         return configLocations;
     }
 
-    protected Resource getResourceByPath(String path) {
+    protected Resource getResourceByPath(String path)
+    {
         String filePath = path;
-            if (filePath != null&& filePath.startsWith("/")) {
-                filePath = filePath.substring(1);
-            }
+        if (filePath != null && filePath.startsWith("/")) {
+            filePath = filePath.substring(1);
+        }
         File file = new File(filePath);
-        if(file.exists()) {
+        if (file.exists()) {
             return new FileSystemResource(filePath);
         } else {
             return super.getResourceByPath(path);
@@ -74,11 +80,10 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
         super.initBeanDefinitionReader(xmlBeanDefinitionReader);
     }
 
-
-
-    protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException {
-		XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory, configLocations.length);
-		initBeanDefinitionReader(beanDefinitionReader);
-		loadBeanDefinitions(beanDefinitionReader);
-	}
+    protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws IOException
+    {
+        XmlBeanDefinitionReader beanDefinitionReader = new MuleBeanDefinitionReader(beanFactory, configLocations.length);
+        initBeanDefinitionReader(beanDefinitionReader);
+        loadBeanDefinitions(beanDefinitionReader);
+    }
 }

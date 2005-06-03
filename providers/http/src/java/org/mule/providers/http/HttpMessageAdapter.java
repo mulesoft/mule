@@ -15,16 +15,16 @@
 
 package org.mule.providers.http;
 
+import java.util.Map;
+
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
-import java.util.Map;
-
 /**
- * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making
- * the payload and heads available a standard message adapter
- *
+ * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
+ * payload and heads available a standard message adapter
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,20 +34,21 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
 
     public HttpMessageAdapter(Object message) throws MessagingException
     {
-        if (message instanceof Object[])
-        {
-            this.message = (byte[])((Object[])message)[0];
-            if(((Object[])message).length > 1) {
-                properties = (Map)((Object[])message)[1];
+        if (message instanceof Object[]) {
+            this.message = (byte[]) ((Object[]) message)[0];
+            if (((Object[]) message).length > 1) {
+                properties = (Map) ((Object[]) message)[1];
             }
-        } else if(message instanceof byte[]){
-            this.message = (byte[])message;
-        }  else {
+        } else if (message instanceof byte[]) {
+            this.message = (byte[]) message;
+        } else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayload()
      */
     public Object getPayload()
@@ -60,7 +61,9 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         return message instanceof byte[];
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsBytes()
      */
     public byte[] getPayloadAsBytes() throws Exception
@@ -68,7 +71,9 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsString()
      */
     public String getPayloadAsString() throws Exception

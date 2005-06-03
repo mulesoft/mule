@@ -15,31 +15,29 @@
 
 package org.mule.providers.file;
 
+import java.io.File;
+import java.io.FilenameFilter;
+
 import org.mule.MuleException;
-import org.mule.util.Utility;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.PollingMessageReceiver;
 import org.mule.providers.ConnectException;
+import org.mule.providers.PollingMessageReceiver;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import org.mule.util.Utility;
 
 /**
- * <code>FileMessageReceiver</code> is a polling listener that reads files from
- * a directory.
- *
+ * <code>FileMessageReceiver</code> is a polling listener that reads files
+ * from a directory.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -70,8 +68,8 @@ public class FileMessageReceiver extends PollingMessageReceiver
         this.readDir = readDir;
         this.moveDir = moveDir;
         this.moveToPattern = moveToPattern;
-        if(endpoint.getFilter()!=null) {
-            filenameFilter = (FilenameFilter)endpoint.getFilter();
+        if (endpoint.getFilter() != null) {
+            filenameFilter = (FilenameFilter) endpoint.getFilter();
         } else {
             filenameFilter = new FilenameWildcardFilter("*");
         }
@@ -79,115 +77,96 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
     public void doConnect() throws Exception
     {
-        if (readDir != null)
-        {
+        if (readDir != null) {
             readDirectory = Utility.openDirectory(readDir);
-            if (!(readDirectory.canRead()))
-            {
-                throw new ConnectException(new Message(Messages.FILE_X_DOES_NOT_EXIST, readDirectory.getAbsolutePath()), this);
-            }
-            else
-            {
+            if (!(readDirectory.canRead())) {
+                throw new ConnectException(new Message(Messages.FILE_X_DOES_NOT_EXIST, readDirectory.getAbsolutePath()),
+                                           this);
+            } else {
                 logger.debug("Listening on endpointUri: " + readDirectory.getAbsolutePath());
             }
         }
-        if (moveDir != null)
-        {
+        if (moveDir != null) {
             moveDirectory = Utility.openDirectory((moveDir));
-            if (!(moveDirectory.canRead()) || !moveDirectory.canWrite())
-            {
+            if (!(moveDirectory.canRead()) || !moveDirectory.canWrite()) {
                 throw new ConnectException(new Message("file", 5), this);
             }
         }
     }
 
-    public void doDisconnect() throws Exception {
+    public void doDisconnect() throws Exception
+    {
     }
 
     public void poll()
     {
-        try
-        {
+        try {
             File[] files = listFiles();
-            if (files == null)
-            {
+            if (files == null) {
                 return;
             }
-            for (int i = 0; i < files.length; i++)
-            {
+            for (int i = 0; i < files.length; i++) {
                 processFile(files[i]);
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             handleException(e);
         }
     }
-
 
     public synchronized void processFile(File file) throws MuleException
     {
         File destinationFile = null;
         String orginalFilename = file.getName();
-        if (moveDir != null)
-        {
+        if (moveDir != null) {
             String fileName = file.getName();
-            if(moveToPattern!=null) {
-                fileName = ((FileConnector)connector).getFilenameParser().getFilename(null, moveToPattern);
+            if (moveToPattern != null) {
+                fileName = ((FileConnector) connector).getFilenameParser().getFilename(null, moveToPattern);
             }
             destinationFile = new File(moveDir, fileName);
         }
         boolean resultOfFileMoveOperation = false;
-        try
-        {
-            //Perform some quick checks to make sure file can be processed
-            if (!(file.canRead() && file.exists() && file.isFile()))
-            {
+        try {
+            // Perform some quick checks to make sure file can be processed
+            if (!(file.canRead() && file.exists() && file.isFile())) {
                 throw new MuleException(new Message(Messages.FILE_X_DOES_NOT_EXIST, file.getName()));
-            }
-            else
-            {
-                if (destinationFile != null)
-                {
+            } else {
+                if (destinationFile != null) {
                     resultOfFileMoveOperation = file.renameTo(destinationFile);
-                    if (!resultOfFileMoveOperation)
-                    {
-                        throw new MuleException(new Message("file", 4, file.getAbsolutePath(), destinationFile.getAbsolutePath()));
+                    if (!resultOfFileMoveOperation) {
+                        throw new MuleException(new Message("file",
+                                                            4,
+                                                            file.getAbsolutePath(),
+                                                            destinationFile.getAbsolutePath()));
                     }
                     file = destinationFile;
                 }
                 UMOMessageAdapter msgAdapter = connector.getMessageAdapter(file);
                 msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, orginalFilename);
-                if(((FileConnector)connector).isAutoDelete()) {
+                if (((FileConnector) connector).isAutoDelete()) {
                     msgAdapter.getPayloadAsBytes();
 
-                    //no moveTo directory
-                    if (destinationFile == null)
-                    {
+                    // no moveTo directory
+                    if (destinationFile == null) {
                         resultOfFileMoveOperation = file.delete();
-                        if (!resultOfFileMoveOperation)
-                        {
+                        if (!resultOfFileMoveOperation) {
                             throw new MuleException(new Message("file", 3, file.getAbsolutePath()));
                         }
                     }
                 }
-              
+
                 UMOMessage message = new MuleMessage(msgAdapter);
                 routeMessage(message, endpoint.isSynchronous());
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             boolean resultOfRollbackFileMove = false;
-            if (resultOfFileMoveOperation)
-            {
+            if (resultOfFileMoveOperation) {
                 resultOfRollbackFileMove = rollbackFileMove(destinationFile, file.getAbsolutePath());
             }
-            Exception ex = new MuleException(new Message("file", 2, file.getName(), (resultOfRollbackFileMove ? "successful" : "unsuccessful")), e);
+            Exception ex = new MuleException(new Message("file", 2, file.getName(), (resultOfRollbackFileMove
+                    ? "successful" : "unsuccessful")), e);
             handleException(ex);
         }
     }
-
 
     /**
      * Exception tolerant roll back method
@@ -195,33 +174,27 @@ public class FileMessageReceiver extends PollingMessageReceiver
     private boolean rollbackFileMove(File sourceFile, String destinationFilePath)
     {
         boolean result = false;
-        try
-        {
+        try {
             result = sourceFile.renameTo(new File(destinationFilePath));
-        }
-        catch (Throwable t)
-        {
+        } catch (Throwable t) {
             logger.debug("rollback of file move failed: " + t.getMessage());
         }
         return result;
     }
 
-
     /**
      * Get a list of files to be processed.
-     *
+     * 
      * @return a list of files to be processed.
-     * @throws org.mule.MuleException which will wrap any other exceptions or errors.
+     * @throws org.mule.MuleException which will wrap any other exceptions or
+     *             errors.
      */
     File[] listFiles() throws MuleException
     {
         File[] todoFiles = new File[0];
-        try
-        {
+        try {
             todoFiles = readDirectory.listFiles(filenameFilter);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new MuleException(new Message("file", 1), e);
         }
         return todoFiles;

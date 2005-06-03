@@ -13,18 +13,6 @@
  */
 package org.mule.providers.soap.glue;
 
-import electric.server.http.HTTP;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOException;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.lifecycle.LifecycleException;
-import org.mule.umo.provider.UMOMessageReceiver;
-
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -32,10 +20,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOMessageReceiver;
+
 /**
- * <code>GlueConnector</code> instanciates a Glue soap server and allows beans to be
- * dynamically exposed a swebservices simply by registering with the connector
- *
+ * <code>GlueConnector</code> instanciates a Glue soap server and allows beans
+ * to be dynamically exposed a swebservices simply by registering with the
+ * connector
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -50,12 +44,16 @@ public class GlueConnector extends AbstractServiceEnabledConnector
         return "glue";
     }
 
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception {
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    {
         boolean createServer = shouldCreateServer(endpoint.getEndpointURI().getAddress());
 
-        UMOMessageReceiver receiver = serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{new Boolean(createServer)});
+        UMOMessageReceiver receiver = serviceDescriptor.createMessageReceiver(this,
+                                                                              component,
+                                                                              endpoint,
+                                                                              new Object[] { new Boolean(createServer) });
 
-        if(createServer) {
+        if (createServer) {
             serverEndpoints.add(endpoint.getEndpointURI().getAddress());
         }
         return receiver;
@@ -65,12 +63,12 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     {
         URI uri = new URI(endpoint);
         String ep = uri.getScheme() + "://" + uri.getHost();
-        if(uri.getPort()!= -1) ep += ":" + uri.getPort();
+        if (uri.getPort() != -1)
+            ep += ":" + uri.getPort();
 
-        for (Iterator iterator = serverEndpoints.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = serverEndpoints.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
-            if(s.startsWith(ep)) {
+            if (s.startsWith(ep)) {
                 return false;
             }
         }

@@ -20,7 +20,7 @@ import org.mule.umo.endpoint.EndpointException;
 /**
  * <code>TransformerException</code> is a simple exception that is thrown by
  * transformers.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -28,6 +28,7 @@ import org.mule.umo.endpoint.EndpointException;
 public class TransformerException extends EndpointException
 {
     private transient UMOTransformer transformer;
+
     /**
      * @param message the exception message
      */
@@ -40,7 +41,7 @@ public class TransformerException extends EndpointException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public TransformerException(Message message, UMOTransformer transformer, Throwable cause)
     {
@@ -53,7 +54,7 @@ public class TransformerException extends EndpointException
     {
         super(cause);
         this.transformer = transformer;
-        addInfo("Transformer", transformer.toString());        
+        addInfo("Transformer", transformer.toString());
     }
 
     public UMOTransformer getTransformer()

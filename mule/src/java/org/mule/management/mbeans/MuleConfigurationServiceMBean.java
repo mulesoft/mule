@@ -16,26 +16,26 @@ package org.mule.management.mbeans;
 import org.mule.config.QueueProfile;
 
 /**
- * <code>MuleConfigurationServiceMBean</code> is a JMx service interface
- * for the Mule server configuration
- *
+ * <code>MuleConfigurationServiceMBean</code> is a JMx service interface for
+ * the Mule server configuration
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface MuleConfigurationServiceMBean
 {
 
-    //ThreadingProfile getMessageDispatcherThreadingProfile();
+    // ThreadingProfile getMessageDispatcherThreadingProfile();
 
-    //ThreadingProfile getMessageReceiverThreadingProfile();
+    // ThreadingProfile getMessageReceiverThreadingProfile();
 
-    //ThreadingProfile getComponentThreadingProfile();
+    // ThreadingProfile getComponentThreadingProfile();
 
-    //ThreadingProfile getDefaultThreadingProfile();
+    // ThreadingProfile getDefaultThreadingProfile();
 
-    //PoolingProfile getPoolingProfile();
+    // PoolingProfile getPoolingProfile();
 
-    //QueueProfile getQueueProfile();
+    // QueueProfile getQueueProfile();
 
     boolean isSynchronous();
 

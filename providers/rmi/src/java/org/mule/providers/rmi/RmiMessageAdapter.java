@@ -19,7 +19,7 @@ import org.mule.util.Utility;
 
 /**
  * <code>RmiMessageAdapter</code> TODO
- *
+ * 
  * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
  * @version $Revision$
  */
@@ -28,10 +28,11 @@ public class RmiMessageAdapter extends AbstractMessageAdapter
 {
     private Object message;
 
-    public RmiMessageAdapter(Object message) throws MessageTypeNotSupportedException {
-		if (message == null) {
+    public RmiMessageAdapter(Object message) throws MessageTypeNotSupportedException
+    {
+        if (message == null) {
             throw new MessageTypeNotSupportedException(null, getClass());
-		}
+        }
         this.message = message;
     }
 

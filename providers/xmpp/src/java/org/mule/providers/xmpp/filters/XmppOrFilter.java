@@ -18,19 +18,23 @@ import org.jivesoftware.smack.filter.PacketFilter;
 
 /**
  * <code>XmppAndFilter</code> an Xmpp OR filter
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XmppOrFilter extends XmppAndFilter {
-    public XmppOrFilter() {
+public class XmppOrFilter extends XmppAndFilter
+{
+    public XmppOrFilter()
+    {
     }
 
-    public XmppOrFilter(PacketFilter left, PacketFilter right) {
+    public XmppOrFilter(PacketFilter left, PacketFilter right)
+    {
         super(left, right);
     }
 
-    protected PacketFilter createFilter() {
+    protected PacketFilter createFilter()
+    {
         return new OrFilter(getLeftFilter(), getRightFilter());
     }
 }

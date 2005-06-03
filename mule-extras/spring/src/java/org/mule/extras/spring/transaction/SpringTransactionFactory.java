@@ -24,97 +24,109 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
- * TODO: document this class 
- *
+ * TODO: document this class
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class SpringTransactionFactory implements UMOTransactionFactory {
+public class SpringTransactionFactory implements UMOTransactionFactory
+{
 
-	/**
-	 * TODO: document this class 
-	 *
-	 * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
-	 */
-	public class SpringTransaction extends AbstractSingleResourceTransaction {
-		
-		protected TransactionStatus status;
-	    protected SynchronizedBoolean started = new SynchronizedBoolean(false);
-	    protected SynchronizedBoolean committed = new SynchronizedBoolean(false);
-	    protected SynchronizedBoolean rolledBack = new SynchronizedBoolean(false);
-	    protected SynchronizedBoolean rollbackOnly = new SynchronizedBoolean(false);
-	    
-		
-		public SpringTransaction() {
-			status = manager.getTransaction(null);
-		}
+    /**
+     * TODO: document this class
+     * 
+     * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+     */
+    public class SpringTransaction extends AbstractSingleResourceTransaction
+    {
 
-		protected void doBegin() throws TransactionException {
-		}
+        protected TransactionStatus status;
+        protected SynchronizedBoolean started = new SynchronizedBoolean(false);
+        protected SynchronizedBoolean committed = new SynchronizedBoolean(false);
+        protected SynchronizedBoolean rolledBack = new SynchronizedBoolean(false);
+        protected SynchronizedBoolean rollbackOnly = new SynchronizedBoolean(false);
 
-		protected void doCommit() throws TransactionException {
-			manager.commit(status);
-		}
+        public SpringTransaction()
+        {
+            status = manager.getTransaction(null);
+        }
 
-		protected void doRollback() throws TransactionException {
-			manager.rollback(status);
-		}
+        protected void doBegin() throws TransactionException
+        {
+        }
 
-		public Object getResource(Object key) {
-			Object res = TransactionSynchronizationManager.getResource(key);
-			if (res != null) {
-				if (res instanceof org.springframework.jdbc.datasource.ConnectionHolder) {
-					return ((org.springframework.jdbc.datasource.ConnectionHolder) res).getConnection();
-				}
-				if (res instanceof org.springframework.jms.connection.ConnectionHolder) {
-					return ((org.springframework.jms.connection.ConnectionHolder) res).getConnection();
-				}
-			}
-			return res;
-		}
+        protected void doCommit() throws TransactionException
+        {
+            manager.commit(status);
+        }
 
-		public boolean hasResource(Object key) {
-			return getResource(key) != null;
-		}
+        protected void doRollback() throws TransactionException
+        {
+            manager.rollback(status);
+        }
 
-		public void bindResource(Object key, Object resource) throws TransactionException {
-			throw new UnsupportedOperationException();
-		}
+        public Object getResource(Object key)
+        {
+            Object res = TransactionSynchronizationManager.getResource(key);
+            if (res != null) {
+                if (res instanceof org.springframework.jdbc.datasource.ConnectionHolder) {
+                    return ((org.springframework.jdbc.datasource.ConnectionHolder) res).getConnection();
+                }
+                if (res instanceof org.springframework.jms.connection.ConnectionHolder) {
+                    return ((org.springframework.jms.connection.ConnectionHolder) res).getConnection();
+                }
+            }
+            return res;
+        }
 
-		public void setRollbackOnly() {
-			super.setRollbackOnly();
-			status.setRollbackOnly();
-		}
+        public boolean hasResource(Object key)
+        {
+            return getResource(key) != null;
+        }
 
-	}
-	
-	private PlatformTransactionManager manager;
-	
-	public SpringTransactionFactory() {
-	}
+        public void bindResource(Object key, Object resource) throws TransactionException
+        {
+            throw new UnsupportedOperationException();
+        }
 
-	public UMOTransaction beginTransaction() throws TransactionException {
-		return new SpringTransaction();
-	}
+        public void setRollbackOnly()
+        {
+            super.setRollbackOnly();
+            status.setRollbackOnly();
+        }
 
-	public boolean isTransacted() {
-		return true;
-	}
+    }
 
-	/**
-	 * @return Returns the manager.
-	 */
-	public PlatformTransactionManager getManager() {
-		return manager;
-	}
-	
+    private PlatformTransactionManager manager;
 
-	/**
-	 * @param manager The manager to set.
-	 */
-	public void setManager(PlatformTransactionManager manager) {
-		this.manager = manager;
-	}
-	
+    public SpringTransactionFactory()
+    {
+    }
+
+    public UMOTransaction beginTransaction() throws TransactionException
+    {
+        return new SpringTransaction();
+    }
+
+    public boolean isTransacted()
+    {
+        return true;
+    }
+
+    /**
+     * @return Returns the manager.
+     */
+    public PlatformTransactionManager getManager()
+    {
+        return manager;
+    }
+
+    /**
+     * @param manager The manager to set.
+     */
+    public void setManager(PlatformTransactionManager manager)
+    {
+        this.manager = manager;
+    }
 
 }

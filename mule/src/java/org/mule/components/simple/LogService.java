@@ -19,5 +19,5 @@ package org.mule.components.simple;
  */
 public interface LogService
 {
-    public void log(String message);
+    void log(String message);
 }

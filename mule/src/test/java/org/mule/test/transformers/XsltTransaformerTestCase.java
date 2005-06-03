@@ -22,7 +22,8 @@ import org.mule.util.Utility;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XsltTransaformerTestCase extends AbstractTransformerTestCase {
+public class XsltTransaformerTestCase extends AbstractTransformerTestCase
+{
 
     private String srcData;
     private String resultData;
@@ -38,8 +39,8 @@ public class XsltTransaformerTestCase extends AbstractTransformerTestCase {
     public UMOTransformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-		transformer.setXslFile("cdcatalog.xsl");
-		transformer.initialise();
+        transformer.setXslFile("cdcatalog.xsl");
+        transformer.initialise();
         return transformer;
     }
 
@@ -48,7 +49,8 @@ public class XsltTransaformerTestCase extends AbstractTransformerTestCase {
         return null;
     }
 
-    public void testRoundtripTransform() throws Exception {
+    public void testRoundtripTransform() throws Exception
+    {
         // disable this test
     }
 
@@ -62,9 +64,10 @@ public class XsltTransaformerTestCase extends AbstractTransformerTestCase {
         return resultData;
     }
 
-    public boolean compareResults(Object src, Object result) {
-        if(src!=null) {
-            src = ((String)src).replaceAll("\r", "");
+    public boolean compareResults(Object src, Object result)
+    {
+        if (src != null) {
+            src = ((String) src).replaceAll("\r", "");
         }
         return super.compareResults(src, result);
     }

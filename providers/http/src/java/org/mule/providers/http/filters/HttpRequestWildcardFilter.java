@@ -18,11 +18,11 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>HttpRequestWildcardFilter</code> filters out wildcard Url expressions.
- * you can use a comma separated list of url patterns such as-
- *
+ * <code>HttpRequestWildcardFilter</code> filters out wildcard Url
+ * expressions. you can use a comma separated list of url patterns such as-
+ * 
  * *.gif, *blah*
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,7 +39,7 @@ public class HttpRequestWildcardFilter extends WildcardFilter
 
     public boolean accept(Object object)
     {
-        String request = (String)((UMOMessage)object).getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        String request = (String) ((UMOMessage) object).getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         return super.accept(request);
     }
 }

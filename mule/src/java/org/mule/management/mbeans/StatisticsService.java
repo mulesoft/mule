@@ -13,6 +13,9 @@
  */
 package org.mule.management.mbeans;
 
+import java.io.StringWriter;
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -21,12 +24,9 @@ import org.mule.management.stats.printers.CSVPrinter;
 import org.mule.management.stats.printers.HtmlTablePrinter;
 import org.mule.umo.manager.UMOManager;
 
-import java.io.StringWriter;
-import java.util.Collection;
-
 /**
  * <code>StatisicsService</code> exposes Mule processing statistics
- *
+ * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane </a>
  * @version $Revision$
  */
@@ -40,15 +40,12 @@ public class StatisticsService implements StatisticsServiceMBean
     private AllStatistics stats = new AllStatistics();
     private MuleManager manager = null;
 
-
     public void setManager(UMOManager manager)
     {
         this.manager = (MuleManager) manager;
-        if (manager == null)
-        {
+        if (manager == null) {
             stats = new AllStatistics();
-        } else
-        {
+        } else {
             stats = this.manager.getStatistics();
         }
 

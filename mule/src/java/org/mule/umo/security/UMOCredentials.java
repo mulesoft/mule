@@ -15,15 +15,15 @@ package org.mule.umo.security;
 
 /**
  * <code>UMOCredentials</code> holds credentials information for a user.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface UMOCredentials
 {
-    public String getUsername();
+    String getUsername();
 
-    public char[] getPassword();
+    char[] getPassword();
 
-    public Object getRoles();
+    Object getRoles();
 }

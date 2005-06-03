@@ -13,14 +13,6 @@
  */
 package org.mule.providers.http;
 
-import org.mule.providers.AbstractConnector;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
-
-import javax.net.ServerSocketFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -28,10 +20,19 @@ import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+
+import org.mule.providers.AbstractConnector;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
+
 /**
- * <code>HttpsMessageReceiver</code> is a Https server implementation used to recieve
- * incoming requests over https
- *
+ * <code>HttpsMessageReceiver</code> is a Https server implementation used to
+ * recieve incoming requests over https
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,7 +45,7 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
         super(connector, component, endpoint);
     }
 
-     protected ServerSocket createSocket(URI uri) throws IOException, NoSuchAlgorithmException, KeyManagementException
+    protected ServerSocket createSocket(URI uri) throws IOException, NoSuchAlgorithmException, KeyManagementException
     {
         HttpsConnector cnn = null;
         ServerSocketFactory ssf = null;
@@ -61,19 +62,16 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
         String host = uri.getHost();
         InetAddress inetAddress = null;
         int backlog = cnn.getBacklog();
-        if (host == null || host.length() == 0)
-        {
+        if (host == null || host.length() == 0) {
             host = "localhost";
         }
 
         SSLServerSocket serverSocket = null;
         inetAddress = InetAddress.getByName(host);
-        if (inetAddress.equals(InetAddress.getLocalHost()) || inetAddress.isLoopbackAddress() ||
-                host.trim().equals("localhost"))
-        {
+        if (inetAddress.equals(InetAddress.getLocalHost()) || inetAddress.isLoopbackAddress()
+                || host.trim().equals("localhost")) {
             serverSocket = (SSLServerSocket) ssf.createServerSocket(uri.getPort(), backlog);
-        } else
-        {
+        } else {
             serverSocket = (SSLServerSocket) ssf.createServerSocket(uri.getPort(), backlog, inetAddress);
         }
         // Authenticate the client?

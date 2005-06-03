@@ -13,6 +13,8 @@
  */
 package org.mule.tck.functional;
 
+import java.util.HashMap;
+
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -28,8 +30,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
-
-import java.util.HashMap;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -47,15 +47,18 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     protected void setUp() throws Exception
     {
         super.setUp();
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         manager = MuleManager.getInstance();
-        //Make sure we are running synchronously
+        // Make sure we are running synchronously
         MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+        MuleManager.getConfiguration()
+                   .getPoolingProfile()
+                   .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
         manager.setModel(new MuleModel());
         callbackCalled = false;
-        callbackCount=0;
+        callbackCount = 0;
         connector = createConnector();
     }
 
@@ -68,8 +71,11 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     {
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
-        initialiseComponent(descriptor, UMOTransactionConfig.ACTION_NONE, UMOTransactionConfig.ACTION_NONE, this.createEventCallback());
-        //Start the server
+        initialiseComponent(descriptor,
+                            UMOTransactionConfig.ACTION_NONE,
+                            UMOTransactionConfig.ACTION_NONE,
+                            this.createEventCallback());
+        // Start the server
         MuleManager.getInstance().start();
 
         sendTestData(100);
@@ -81,25 +87,33 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         assertTrue(callbackCalled);
     }
 
-    public UMOComponent initialiseComponent(UMODescriptor descriptor, byte txBeginAction, byte txCommitAction,
+    public UMOComponent initialiseComponent(UMODescriptor descriptor,
+                                            byte txBeginAction,
+                                            byte txCommitAction,
                                             EventCallback callback) throws Exception
     {
 
-        UMOEndpoint endpoint = new MuleEndpoint("testIn", getInDest(), connector, null,
-                UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null);
+        UMOEndpoint endpoint = new MuleEndpoint("testIn",
+                                                getInDest(),
+                                                connector,
+                                                null,
+                                                UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
+                                                0,
+                                                null);
 
-//        UMOEndpoint outProvider = new MuleEndpoint("testOut", getOutDest(), connector, null,
-//                UMOEndpoint.PROVIDER_TYPE_SENDER, true, null);
-//
-//
-//        descriptor.setOutboundEndpoint(outProvider);
+        // UMOEndpoint outProvider = new MuleEndpoint("testOut", getOutDest(),
+        // connector, null,
+        // UMOEndpoint.PROVIDER_TYPE_SENDER, true, null);
+        //
+        //
+        // descriptor.setOutboundEndpoint(outProvider);
         descriptor.setInboundEndpoint(endpoint);
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
         MuleManager.getInstance().registerConnector(connector);
         UMOComponent component = MuleManager.getInstance().getModel().registerComponent(descriptor);
-        ((MuleDescriptor)descriptor).initialise();
+        ((MuleDescriptor) descriptor).initialise();
         return component;
     }
 
@@ -117,9 +131,9 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     }
 
-    public EventCallback createEventCallback() {
-        EventCallback callback = new EventCallback()
-        {
+    public EventCallback createEventCallback()
+    {
+        EventCallback callback = new EventCallback() {
             public void eventReceived(UMOEventContext context, Object Component)
             {
                 callbackCalled = true;

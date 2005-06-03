@@ -13,25 +13,27 @@
  */
 package org.mule.extras.pgp;
 
-import org.mule.tck.NamedTestCase;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
 
+import org.mule.tck.NamedTestCase;
+
 /**
  * @author ariva
- *  
+ * 
  */
-public class KeyBasedEncryptionStrategyTestCase extends NamedTestCase {
+public class KeyBasedEncryptionStrategyTestCase extends NamedTestCase
+{
     private KeyBasedEncryptionStrategy kbStrategy;
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see org.mule.tck.NamedTestCase#setUp()
      */
-    protected void setUp() throws Exception {
+    protected void setUp() throws Exception
+    {
         // TODO Auto-generated method stub
         super.setUp();
 
@@ -48,49 +50,53 @@ public class KeyBasedEncryptionStrategyTestCase extends NamedTestCase {
         keyM.setSecretPassphrase("TestingPassphrase");
         keyM.initialise();
 
-        kbStrategy=new KeyBasedEncryptionStrategy();
+        kbStrategy = new KeyBasedEncryptionStrategy();
         kbStrategy.setKeyManager(keyM);
         kbStrategy.initialise();
-        
+
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.NamedTestCase#tearDown()
      */
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception
+    {
         // TODO Auto-generated method stub
         super.tearDown();
-        
-        kbStrategy=null;
+
+        kbStrategy = null;
     }
-    
-    public void testDecrypt() throws Exception {
+
+    public void testDecrypt() throws Exception
+    {
         URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
 
-        int length=(int)new File(url.getFile()).length();
-        byte[] msg=new byte[length];
-        
+        int length = (int) new File(url.getFile()).length();
+        byte[] msg = new byte[length];
+
         FileInputStream in = new FileInputStream(url.getFile());
         in.read(msg);
         in.close();
 
-        String result=new String(kbStrategy.decrypt(msg,null));
-        
-        System.out.println(result);
-        
-        assertNotNull(result);
-    }
-    
-    public void testEncrypt() throws Exception {
-        String msg="Test Message";
-        PGPCryptInfo cryptInfo=new PGPCryptInfo(
-                kbStrategy.getKeyManager().getKeyBundle("Mule client <mule_client@mule.com>")
-                ,true);
-        
-        String result=new String(kbStrategy.encrypt(msg.getBytes(),cryptInfo));
+        String result = new String(kbStrategy.decrypt(msg, null));
 
         System.out.println(result);
-        
+
+        assertNotNull(result);
+    }
+
+    public void testEncrypt() throws Exception
+    {
+        String msg = "Test Message";
+        PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager()
+                                                            .getKeyBundle("Mule client <mule_client@mule.com>"), true);
+
+        String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));
+
+        System.out.println(result);
+
         assertNotNull(result);
     }
 }

@@ -19,7 +19,7 @@ import java.util.Collection;
 
 /**
  * <code>CSVPrinter</code> prints component stats in CSV format
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -40,21 +40,19 @@ public class CSVPrinter extends AbstractTablePrinter
 
     public void print(Collection stats)
     {
-        try
-        {
+        try {
             String[][] table = getTable(stats);
             int i = (printHeaders ? 0 : 1);
-            for (; i < table.length; i++)
-            {
-                for (int j = 0; j < table[0].length; j++)
-                {
+            for (; i < table.length; i++) {
+                for (int j = 0; j < table[0].length; j++) {
                     print(table[i][j]);
-                    if (j+1 != table[i].length) print(delim);
+                    if (j + 1 != table[i].length) {
+                        print(delim);
+                    }
                 }
                 println();
             }
-        } catch (Throwable e)
-        {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

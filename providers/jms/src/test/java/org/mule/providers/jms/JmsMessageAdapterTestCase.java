@@ -13,15 +13,12 @@
  *
  */
 
-
 package org.mule.providers.jms;
-
-
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
-import org.mule.umo.provider.UMOMessageAdapter;
 
 import javax.jms.Message;
 
+import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -30,12 +27,14 @@ import javax.jms.Message;
 
 public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
      */
     public UMOMessageAdapter createAdapter(Object payload) throws Exception
     {
-        return new JmsMessageAdapter((Message)payload);
+        return new JmsMessageAdapter((Message) payload);
     }
 
     public Object getValidMessage() throws Exception

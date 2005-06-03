@@ -20,7 +20,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>MulticastMessageDispatcherFactory</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,7 +29,6 @@ public class MulticastMessageDispatcherFactory implements UMOMessageDispatcherFa
 {
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-        return new MulticastMessageDispatcher((MulticastConnector)connector);
+        return new MulticastMessageDispatcher((MulticastConnector) connector);
     }
 }
-

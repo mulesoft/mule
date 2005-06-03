@@ -15,16 +15,15 @@
 
 package org.mule.tck.testmodels.fruit;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 
 public class Orange implements Fruit, Callable
 {
@@ -37,7 +36,6 @@ public class Orange implements Fruit, Callable
     private Integer segments = new Integer(10);
     private Double radius = new Double(4.34);
     private String brand;
-    
 
     private Map mapProperties;
 
@@ -56,12 +54,12 @@ public class Orange implements Fruit, Callable
         setSegments((Integer) props.get("segments"));
     }
 
-    //        public Orange(String brand, Double radius, Integer segments)
-    //        {
-    //            this.brand = brand;
-    //            this.radius = radius;
-    //            this.segments = segments;
-    //        }
+    // public Orange(String brand, Double radius, Integer segments)
+    // {
+    // this.brand = brand;
+    // this.radius = radius;
+    // this.segments = segments;
+    // }
 
     public void bite()
     {

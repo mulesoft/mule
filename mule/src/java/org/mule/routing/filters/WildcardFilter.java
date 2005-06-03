@@ -17,20 +17,18 @@ import org.mule.umo.UMOFilter;
 import org.mule.util.Utility;
 
 /**
- * <code>WildcardFilter</code> is used to match wildcard string.  It performs
+ * <code>WildcardFilter</code> is used to match wildcard string. It performs
  * matches with * i.e.
- *
- * jms.events.* would catch
- * jms.events.customer
- * jms.events.receipts
- *
+ * 
+ * jms.events.* would catch jms.events.customer jms.events.receipts
+ * 
  * This filter accepts a comma separented list of patterns so more than one
  * filter pattenr can be matched for a given argument i.e.-
- *
+ * 
  * jms.events.*, jms.actions.*
- *
+ * 
  * will match jms.events.system and jms.actions but not jms.queue
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,39 +42,42 @@ public class WildcardFilter implements UMOFilter
     {
     }
 
-
-    public WildcardFilter(String pattern) {
+    public WildcardFilter(String pattern)
+    {
         setPattern(pattern);
     }
 
     public boolean accept(Object object)
     {
-        if(object==null) return false;
+        if (object == null) {
+            return false;
+        }
         String pattern = null;
         boolean match = false;
-        for (int x = 0; x < patterns.length; x++)
-        {
+        for (int x = 0; x < patterns.length; x++) {
             pattern = patterns[x];
 
             String string = object.toString();
-            if("*".equals(pattern) || "**".equals(pattern)) {
+            if ("*".equals(pattern) || "**".equals(pattern)) {
                 return true;
             }
             int i = pattern.indexOf("*");
 
-            if(i == -1) {
+            if (i == -1) {
                 match = pattern.equals(string);
             } else {
                 int i2 = pattern.indexOf("*", i + 1);
-                if(i2 > 1) {
+                if (i2 > 1) {
                     match = string.indexOf(pattern.substring(1, i2)) > -1;
-                }else if (i == 0) {
+                } else if (i == 0) {
                     match = string.endsWith(pattern.substring(1));
                 } else {
                     match = string.startsWith(pattern.substring(0, i));
                 }
             }
-            if(match) return true;
+            if (match) {
+                return true;
+            }
         }
         return false;
     }

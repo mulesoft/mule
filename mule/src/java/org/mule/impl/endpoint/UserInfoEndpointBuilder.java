@@ -13,17 +13,18 @@
  */
 package org.mule.impl.endpoint;
 
-import org.mule.umo.endpoint.MalformedEndpointException;
-
 import java.net.URI;
 import java.util.Properties;
 
+import org.mule.umo.endpoint.MalformedEndpointException;
+
 /**
  * <code>UserInfoEndpointBuilder</code> builds an endpoint with the userinfo
- * and host details.  This endpoint builder is used where endpoints as of the form :
- *
+ * and host details. This endpoint builder is used where endpoints as of the
+ * form :
+ * 
  * xxx://ross:secret@host:1000
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -32,41 +33,32 @@ public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
         address = uri.getHost();
-        if (address.startsWith("mail."))
-        {
+        if (address.startsWith("mail.")) {
             address = address.substring(5);
-        } else if (address.startsWith("pop3."))
-        {
+        } else if (address.startsWith("pop3.")) {
             address = address.substring(5);
-        } else if (address.startsWith("pop."))
-        {
+        } else if (address.startsWith("pop.")) {
             address = address.substring(4);
-        } else if (address.startsWith("smtp."))
-        {
+        } else if (address.startsWith("smtp.")) {
             address = address.substring(5);
         }
-        if (uri.getPort() != -1)
-        {
-            //set the endpointUri to be a proper url if host and port are set
+        if (uri.getPort() != -1) {
+            // set the endpointUri to be a proper url if host and port are set
             this.address += ":" + uri.getPort();
         }
 
-        if (uri.getUserInfo() != null)
-        {
+        if (uri.getUserInfo() != null) {
             int x = uri.getUserInfo().indexOf(":");
-            if (x > -1)
-            {
+            if (x > -1) {
                 String user = uri.getUserInfo().substring(0, x);
                 address = user + "@" + address;
-            } else
-            {
+            } else {
                 address = uri.getUserInfo() + "@" + address;
-           }
-        } else
-        {
+            }
+        } else {
             throw new MalformedEndpointException("User info is not set");
         }
-        if(uri.getPath()!=null && !"".equals(uri.getPath())) {
+        if (uri.getPath() != null && !"".equals(uri.getPath())) {
             props.put("folder", uri.getPath().substring(1));
         }
     }

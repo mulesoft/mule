@@ -14,37 +14,40 @@
  */
 package org.mule.util.queue;
 
-
 /**
  * <code>Queue</code> TODO
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public interface Queue {
+public interface Queue
+{
 
-	/**
-	 * Returns the number of elements in this queue.
-	 * @return
-	 */
-	int size();
+    /**
+     * Returns the number of elements in this queue.
+     * 
+     * @return
+     */
+    int size();
 
-	/**
-	 * Puts a new object in this queue and wait if necessary.
-	 * @param o the object to put
-	 */
+    /**
+     * Puts a new object in this queue and wait if necessary.
+     * 
+     * @param o the object to put
+     */
     void put(Object o) throws InterruptedException;
 
     /**
      * Blocks and retrieves an object from this queue.
+     * 
      * @return an object.
      */
     Object take() throws InterruptedException;
-	
-	Object peek() throws InterruptedException;
-	
-	Object poll(long timeout) throws InterruptedException;
-	
-	boolean offer(Object o, long timeout) throws InterruptedException;
+
+    Object peek() throws InterruptedException;
+
+    Object poll(long timeout) throws InterruptedException;
+
+    boolean offer(Object o, long timeout) throws InterruptedException;
 
 }

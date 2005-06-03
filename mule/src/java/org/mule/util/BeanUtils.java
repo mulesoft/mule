@@ -13,15 +13,16 @@
  */
 package org.mule.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * <code>BeanUtils</code> provides functions for altering the way commons BeanUtils works
- *
+ * <code>BeanUtils</code> provides functions for altering the way commons
+ * BeanUtils works
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,21 +36,21 @@ public class BeanUtils
 
     /**
      * Exception safe version of BeanUtils.populateWithoutFail
+     * 
      * @param object
      * @param props
      */
-    public static void populateWithoutFail(Object object, Map props, boolean logWarnings) {
+    public static void populateWithoutFail(Object object, Map props, boolean logWarnings)
+    {
         Map.Entry entry;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
-            try
-            {
+            try {
                 org.apache.commons.beanutils.BeanUtils.setProperty(object, entry.getKey().toString(), entry.getValue());
-            } catch (Exception e)
-            {
-                if(logWarnings) {
-                    logger.warn("Property: " + entry.getKey() + "=" + entry.getValue() + " not found on object: " + object.getClass().getName());
+            } catch (Exception e) {
+                if (logWarnings) {
+                    logger.warn("Property: " + entry.getKey() + "=" + entry.getValue() + " not found on object: "
+                            + object.getClass().getName());
                 }
             }
         }

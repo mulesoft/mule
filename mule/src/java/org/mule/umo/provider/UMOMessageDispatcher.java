@@ -21,36 +21,35 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Disposable;
 
 /**
- * @author Ross Mason
- *         <p/>
- *         //TODO document
+ * @author Ross Mason <p/> //TODO document
  */
 public interface UMOMessageDispatcher extends Disposable
 {
-    public static final long RECEIVE_WAIT_INDEFINITELY = 0;
-    public static final long RECEIVE_NO_WAIT = -1;
+    long RECEIVE_WAIT_INDEFINITELY = 0;
+    long RECEIVE_NO_WAIT = -1;
+
     /**
      * Dispatches an event from the endpoint to the external system
-     *
+     * 
      * @param event The event to dispatch
      * @throws java.lang.Exception if the event fails to be dispatched
      */
-    public void dispatch(UMOEvent event) throws Exception;
+    void dispatch(UMOEvent event) throws Exception;
 
     /**
      * Sends an event from the endpoint to the external system
-     *
+     * 
      * @param event The event to send
      * @return event the response form the external system wrapped in a UMOEvent
      * @throws java.lang.Exception if the event fails to be dispatched
      */
-    public UMOMessage send(UMOEvent event) throws Exception;
+    UMOMessage send(UMOEvent event) throws Exception;
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception;
+    UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception;
 
-    public Object getDelegateSession() throws UMOException;
+    Object getDelegateSession() throws UMOException;
 
-    public UMOConnector getConnector();
+    UMOConnector getConnector();
 
-    public boolean isDisposed();
+    boolean isDisposed();
 }

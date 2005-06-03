@@ -27,47 +27,55 @@ import org.mule.util.queue.TransactionalQueueManager;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTestCase {
+public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTestCase
+{
 
-	private static final Log logger = LogFactory.getLog(FilePersistenceTestCase.class);
-	
-	protected static final String STORE_DIR = "./target/file";
-	
-	protected void deleteWholeDir(File f) {
-		if (f.exists()) {
-			File[] files = f.listFiles();
-			for (int i = 0; i < files.length; i++) {
-				if (files[i].isDirectory()) {
-					deleteWholeDir(files[i]);
-				} else {
-					logger.info("Deleting " + files[i]);
-					files[i].delete();
-				}
-			}
-			f.delete();
-		}
-	}
-	
-	protected void setUp() throws Exception {
-		deleteWholeDir(new File(MuleManager.getConfiguration().getWorkingDirectory()));
-	}
-	
-	protected Log getLogger() {
-		return logger;
-	}
-	
-	protected TransactionalQueueManager createQueueManager() throws Exception {
-		TransactionalQueueManager mgr = new TransactionalQueueManager();
-		mgr.setPersistenceStrategy(new FilePersistenceStrategy());
-		mgr.setDefaultQueueConfiguration(new QueueConfiguration(true));
-		return mgr;
-	}
+    private static final Log logger = LogFactory.getLog(FilePersistenceTestCase.class);
 
-	/* (non-Javadoc)
-	 * @see org.mule.transaction.xa.queue.AbstractTransactionQueueManagerTestCase#isPersistent()
-	 */
-	protected boolean isPersistent() {
-		return true;
-	}
-	
+    protected static final String STORE_DIR = "./target/file";
+
+    protected void deleteWholeDir(File f)
+    {
+        if (f.exists()) {
+            File[] files = f.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    deleteWholeDir(files[i]);
+                } else {
+                    logger.info("Deleting " + files[i]);
+                    files[i].delete();
+                }
+            }
+            f.delete();
+        }
+    }
+
+    protected void setUp() throws Exception
+    {
+        deleteWholeDir(new File(MuleManager.getConfiguration().getWorkingDirectory()));
+    }
+
+    protected Log getLogger()
+    {
+        return logger;
+    }
+
+    protected TransactionalQueueManager createQueueManager() throws Exception
+    {
+        TransactionalQueueManager mgr = new TransactionalQueueManager();
+        mgr.setPersistenceStrategy(new FilePersistenceStrategy());
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(true));
+        return mgr;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.transaction.xa.queue.AbstractTransactionQueueManagerTestCase#isPersistent()
+     */
+    protected boolean isPersistent()
+    {
+        return true;
+    }
+
 }

@@ -21,9 +21,9 @@ import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>EnvelopeInterceptor</code> is an intercepter that will fire before and after
- * an event is received.
- *
+ * <code>EnvelopeInterceptor</code> is an intercepter that will fire before
+ * and after an event is received.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -31,18 +31,17 @@ public abstract class EnvelopeInterceptor implements UMOInterceptor
 {
     /**
      * This method is invoked before the event is processed
-     *
+     * 
      * @param invocation the message invocation being processed
      */
     public abstract void before(Invocation invocation) throws UMOException;
 
     /**
      * This method is invoked after the event has been processed
-     *
+     * 
      * @param invocation the message invocation being processed
      */
     public abstract void after(Invocation invocation) throws UMOException;
-
 
     public final UMOMessage intercept(Invocation invocation) throws UMOException
     {

@@ -19,29 +19,30 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * The TcpProtocol interface enables to plug
- * different application level protocols on a TcpConnector.
- *
+ * The TcpProtocol interface enables to plug different application level
+ * protocols on a TcpConnector.
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public interface TcpProtocol {
+public interface TcpProtocol
+{
 
-	/**
-	 * Reads the input stream and returns a whole message.
-	 * 
-	 * @param is the input stream
-	 * @return an array of byte containing a full message
-	 * @throws IOException if an exception occurs
-	 */
-	byte[] read(InputStream is) throws IOException;
-	
-	/**
-	 * Write the specified message to the output stream.
-	 * 
-	 * @param os the output stream to write to 
-	 * @param data the data to write
-	 * @throws IOException if an exception occurs
-	 */
-	void write(OutputStream os, byte[] data) throws IOException;
+    /**
+     * Reads the input stream and returns a whole message.
+     * 
+     * @param is the input stream
+     * @return an array of byte containing a full message
+     * @throws IOException if an exception occurs
+     */
+    byte[] read(InputStream is) throws IOException;
+
+    /**
+     * Write the specified message to the output stream.
+     * 
+     * @param os the output stream to write to
+     * @param data the data to write
+     * @throws IOException if an exception occurs
+     */
+    void write(OutputStream os, byte[] data) throws IOException;
 }

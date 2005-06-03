@@ -14,8 +14,19 @@
 
 package org.mule.providers.jms;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Hashtable;
+import java.util.Map;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.jms.XAConnectionFactory;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
@@ -33,25 +44,18 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.util.ClassHelper;
 
-import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Hashtable;
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 
 /**
- * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be used by a Mule
- * endpoint.  The connector supports all Jms functionality including, topics and queues, durable
- * subscribers, acknowledgement modes, loacal transactions
- *
+ * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be
+ * used by a Mule endpoint. The connector supports all Jms functionality
+ * including, topics and queues, durable subscribers, acknowledgement modes,
+ * loacal transactions
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
  */
-
 
 public class JmsConnector extends AbstractServiceEnabledConnector
 {
@@ -105,96 +109,96 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         receivers = new ConcurrentHashMap();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOConnector#create(java.util.HashMap)
      */
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        try
-        {
-            //If we have a connection factory, there is no need to initialise
-            //the JndiContext
-            if(connectionFactory==null || (connectionFactory!=null && jndiInitialFactory!=null)) {
+        try {
+            // If we have a connection factory, there is no need to initialise
+            // the JndiContext
+            if (connectionFactory == null || (connectionFactory != null && jndiInitialFactory != null)) {
                 initJndiContext();
             } else {
-                //Set these to false so that the jndiContext
-                //will not be used by the JmsSupport classes
+                // Set these to false so that the jndiContext
+                // will not be used by the JmsSupport classes
                 jndiDestinations = false;
                 forceJndiDestinations = false;
             }
 
-            if(JMS_SPECIFICATION_102B.equals(specification)) {
+            if (JMS_SPECIFICATION_102B.equals(specification)) {
                 jmsSupport = new Jms102bSupport(this, jndiContext, jndiDestinations, forceJndiDestinations);
             } else {
                 jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);
             }
             connection = createConnection();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jms Connector"), e, this);
         }
     }
 
     protected void initJndiContext() throws NamingException, InitialisationException
     {
-        if(jndiContext==null) {
+        if (jndiContext == null) {
             Hashtable props = new Hashtable();
 
             if (jndiInitialFactory != null) {
                 props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
-            } else if(providerProperties==null || !providerProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY)) {
+            } else if (providerProperties == null || !providerProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY)) {
                 throw new InitialisationException(new Message(Messages.X_IS_NULL, "jndiInitialFactory"), this);
             }
 
             if (jndiProviderUrl != null)
                 props.put(Context.PROVIDER_URL, jndiProviderUrl);
 
-            if (providerProperties != null)
-            {
+            if (providerProperties != null) {
                 props.putAll(providerProperties);
             }
             jndiContext = new InitialContext(props);
         }
     }
 
-    protected void setConnection(Connection connection) {
+    protected void setConnection(Connection connection)
+    {
         this.connection = connection;
     }
 
     protected ConnectionFactory createConnectionFactory() throws InitialisationException, NamingException
     {
 
-        Object temp =  jndiContext.lookup(connectionFactoryJndiName);
+        Object temp = jndiContext.lookup(connectionFactoryJndiName);
 
-        if(temp instanceof ConnectionFactory)
-        {
-            return (ConnectionFactory)temp;
+        if (temp instanceof ConnectionFactory) {
+            return (ConnectionFactory) temp;
         } else {
-            throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND, connectionFactoryJndiName), this);
+            throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND, connectionFactoryJndiName),
+                                              this);
         }
     }
 
     protected Connection createConnection() throws NamingException, JMSException, InitialisationException
     {
         Connection connection = null;
-        if(connectionFactory==null)
-        {
+        if (connectionFactory == null) {
             connectionFactory = createConnectionFactory();
         }
         if (connectionFactory != null && connectionFactory instanceof XAConnectionFactory) {
-        	if (MuleManager.getInstance().getTransactionManager() != null) {
-        		connectionFactory = new ConnectionFactoryWrapper((XAConnectionFactory) connectionFactory, MuleManager.getInstance().getTransactionManager());
-        	}
+            if (MuleManager.getInstance().getTransactionManager() != null) {
+                connectionFactory = new ConnectionFactoryWrapper((XAConnectionFactory) connectionFactory,
+                                                                 MuleManager.getInstance().getTransactionManager());
+            }
         }
 
-        if(username!=null) {
+        if (username != null) {
             connection = jmsSupport.createConnection(connectionFactory, username, password);
         } else {
             connection = jmsSupport.createConnection(connectionFactory);
         }
 
-        if (clientId!=null) {
+        if (clientId != null) {
             connection.setClientID(getClientId());
         }
         return connection;
@@ -205,77 +209,76 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         return component.getDescriptor().getName() + "~" + endpoint.getEndpointURI().getAddress();
     }
 
-	/* (non-Javadoc)
-	 * @see org.mule.providers.TransactionEnabledConnector#getSessionFactory(org.mule.umo.endpoint.UMOEndpoint)
-	 */
-    public Object getSessionFactory(UMOEndpoint endpoint) {
-    	if (endpoint.getTransactionConfig() != null &&
-    		endpoint.getTransactionConfig().getFactory() instanceof JmsClientAcknowledgeTransactionFactory) {
-    		throw new MuleRuntimeException(new org.mule.config.i18n.Message("jms", 9));
-    	} else {
-    		return connection;
-    	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.providers.TransactionEnabledConnector#getSessionFactory(org.mule.umo.endpoint.UMOEndpoint)
+     */
+    public Object getSessionFactory(UMOEndpoint endpoint)
+    {
+        if (endpoint.getTransactionConfig() != null
+                && endpoint.getTransactionConfig().getFactory() instanceof JmsClientAcknowledgeTransactionFactory) {
+            throw new MuleRuntimeException(new org.mule.config.i18n.Message("jms", 9));
+        } else {
+            return connection;
+        }
     }
-    
-	public Session getCurrentSession() {
-		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-		if (tx != null) {
-			if (tx.hasResource(connection)) {
-				return (Session) tx.getResource(connection);
-			}
-		}
-		return null;
-	}
-	
+
+    public Session getCurrentSession()
+    {
+        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx != null) {
+            if (tx.hasResource(connection)) {
+                return (Session) tx.getResource(connection);
+            }
+        }
+        return null;
+    }
+
     public Session getSession(boolean transacted) throws JMSException
     {
-		Session session = getCurrentSession();
-		if (session != null) {
-			logger.debug("Retrieving jms session from current transaction");
-			return session;
-		}
-		logger.debug("Retrieving new jms session from connection");
-    	session = jmsSupport.createSession(connection, transacted, acknowledgementMode, noLocal);
-		UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
-		if (tx != null) {
-			logger.debug("Binding session to current transaction");
-			try {
-				tx.bindResource(connection, session);
-			} catch (TransactionException e) {
-				throw new RuntimeException("Could not bind session to current transaction", e);
-			}
-		}
-		return session;
+        Session session = getCurrentSession();
+        if (session != null) {
+            logger.debug("Retrieving jms session from current transaction");
+            return session;
+        }
+        logger.debug("Retrieving new jms session from connection");
+        session = jmsSupport.createSession(connection, transacted, acknowledgementMode, noLocal);
+        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx != null) {
+            logger.debug("Binding session to current transaction");
+            try {
+                tx.bindResource(connection, session);
+            } catch (TransactionException e) {
+                throw new RuntimeException("Could not bind session to current transaction", e);
+            }
+        }
+        return session;
     }
 
     public void doStop() throws UMOException
     {
-		if (connection != null) {
-	        try
-	        {
-				connection.stop();
-			}
-	        catch (JMSException e)
-	        {
-	            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jms Connection"), e);
-	        }
+        if (connection != null) {
+            try {
+                connection.stop();
+            } catch (JMSException e) {
+                throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jms Connection"), e);
+            }
         }
     }
 
-
     public void doStart() throws UMOException
     {
-        try
-        {
+        try {
             connection.start();
-        }
-        catch (JMSException e)
-        {
+        } catch (JMSException e) {
             throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jms Connection"), e);
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOConnector#getProtocol()
      */
     public String getProtocol()
@@ -283,21 +286,22 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         return "jms";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.AbstractConnector#doDispose()
      */
     protected void doDispose()
     {
-		super.doDispose();
-		if (jndiContext != null) {
-			try {
-				jndiContext.close();
-			} catch (NamingException e) {
-				logger.error("Jms connector failed to close properly: " + e);
-			}
-		}
+        super.doDispose();
+        if (jndiContext != null) {
+            try {
+                jndiContext.close();
+            } catch (NamingException e) {
+                logger.error("Jms connector failed to close properly: " + e);
+            }
+        }
     }
-
 
     /**
      * @return Returns the acknowledgeMode.
@@ -306,7 +310,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     {
         return acknowledgementMode;
     }
-
 
     /**
      * @param acknowledgementMode The acknowledgementMode to set.
@@ -323,7 +326,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     {
         return connectionFactoryJndiName;
     }
-
 
     /**
      * @param connectionFactoryJndiName The connectionFactoryJndiName to set.
@@ -357,7 +359,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         return noLocal;
     }
 
-
     /**
      * @param noLocal The noLocal to set.
      */
@@ -366,7 +367,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         this.noLocal = noLocal;
     }
 
-
     /**
      * @return Returns the persistentDelivery.
      */
@@ -374,7 +374,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     {
         return persistentDelivery;
     }
-
 
     /**
      * @param persistentDelivery The persistentDelivery to set.
@@ -391,7 +390,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     {
         return providerProperties;
     }
-
 
     /**
      * @param endpointProperties The endpointProperties to set.
@@ -486,9 +484,11 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         this.jndiContext = jndiContext;
     }
 
-    protected RedeliveryHandler createRedeliveryHandler() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException, ClassNotFoundException {
-        if(redeliveryHandler!=null) {
-            return (RedeliveryHandler)ClassHelper.instanciateClass(redeliveryHandler, ClassHelper.NO_ARGS);
+    protected RedeliveryHandler createRedeliveryHandler() throws IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException, InstantiationException, ClassNotFoundException
+    {
+        if (redeliveryHandler != null) {
+            return (RedeliveryHandler) ClassHelper.instanciateClass(redeliveryHandler, ClassHelper.NO_ARGS);
         } else {
             return new DefaultRedeliveryHandler();
         }
@@ -519,12 +519,13 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         this.password = password;
     }
 
-	/**
-	 * @return Returns the connection.
-	 */
-	public Connection getConnection() {
-		return connection;
-	}
+    /**
+     * @return Returns the connection.
+     */
+    public Connection getConnection()
+    {
+        return connection;
+    }
 
     public String getClientId()
     {
@@ -536,19 +537,23 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         this.clientId = clientId;
     }
 
-    public int getMaxRedelivery() {
+    public int getMaxRedelivery()
+    {
         return maxRedelivery;
     }
 
-    public void setMaxRedelivery(int maxRedelivery) {
+    public void setMaxRedelivery(int maxRedelivery)
+    {
         this.maxRedelivery = maxRedelivery;
     }
 
-    public String getRedeliveryHandler() {
+    public String getRedeliveryHandler()
+    {
         return redeliveryHandler;
     }
 
-    public void setRedeliveryHandler(String redeliveryHandler) {
+    public void setRedeliveryHandler(String redeliveryHandler)
+    {
         this.redeliveryHandler = redeliveryHandler;
     }
 }

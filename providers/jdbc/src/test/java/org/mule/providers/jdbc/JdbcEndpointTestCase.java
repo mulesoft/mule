@@ -21,7 +21,8 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class JdbcEndpointTestCase extends NamedTestCase {
+public class JdbcEndpointTestCase extends NamedTestCase
+{
 
     public void testWithoutEndpointName() throws Exception
     {
@@ -33,7 +34,7 @@ public class JdbcEndpointTestCase extends NamedTestCase {
         assertEquals("SELECT * FROM TABLE", url.getParams().get("sql"));
         assertEquals("jdbc:/?sql=SELECT%20*%20FROM%20TABLE", url.toString());
     }
-    
+
     public void testWithoutEndpointName2() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("jdbc://?sql=SELECT * FROM TABLE");
@@ -44,8 +45,9 @@ public class JdbcEndpointTestCase extends NamedTestCase {
         assertEquals("SELECT * FROM TABLE", url.getParams().get("sql"));
         assertEquals("jdbc://?sql=SELECT%20*%20FROM%20TABLE", url.toString());
     }
-    
-    public void testWithEndpointName() throws Exception {
+
+    public void testWithEndpointName() throws Exception
+    {
         UMOEndpointURI url = new MuleEndpointURI("jdbc://history/writeTests?type=2");
         assertEquals("jdbc", url.getScheme());
         assertEquals("writeTests", url.getAddress());
@@ -54,5 +56,5 @@ public class JdbcEndpointTestCase extends NamedTestCase {
         assertEquals("2", url.getParams().get("type"));
         assertEquals("jdbc://history/writeTests?type=2", url.toString());
     }
-    
+
 }

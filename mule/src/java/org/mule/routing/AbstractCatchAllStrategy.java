@@ -20,10 +20,11 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
 
 /**
- * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router for any events
- * not caught by the router this strategy is associated with.  Users can assign an endpoint to this strategy to
- * forward all events to.  This is similar to a dead letter queue in messaging.
- *
+ * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router
+ * for any events not caught by the router this strategy is associated with.
+ * Users can assign an endpoint to this strategy to forward all events to. This
+ * is similar to a dead letter queue in messaging.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -33,8 +34,8 @@ public abstract class AbstractCatchAllStrategy implements UMORouterCatchAllStrat
     /**
      * logger used by this class
      */
-    protected  transient Log logger = LogFactory.getLog(getClass());
-    
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     protected UMOEndpoint endpoint;
 
     protected RouterStatistics statistics;

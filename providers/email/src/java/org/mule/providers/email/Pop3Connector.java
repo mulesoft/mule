@@ -13,15 +13,12 @@
  */
 package org.mule.providers.email;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.providers.AbstractServiceEnabledConnector;
 
-
 /**
- * <code>Pop3Connector</code> is used to connect and receive mail from a
- * pop3  mailbox
- *
+ * <code>Pop3Connector</code> is used to connect and receive mail from a pop3
+ * mailbox
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -33,7 +30,8 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
     public static final int DEFAULT_CHECK_FREQUENCY = 60000;
 
     /**
-     * Holds the time in milliseconds that the endpoint should wait before checking a mailbox
+     * Holds the time in milliseconds that the endpoint should wait before
+     * checking a mailbox
      */
     private long checkFrequency = DEFAULT_CHECK_FREQUENCY;
 
@@ -50,7 +48,9 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
         return checkFrequency;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOConnector#getProtocol()
      */
     public String getProtocol()
@@ -63,7 +63,8 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
      */
     public void setCheckFrequency(long l)
     {
-        if(l < 1) l = DEFAULT_CHECK_FREQUENCY;
+        if (l < 1)
+            l = DEFAULT_CHECK_FREQUENCY;
         checkFrequency = l;
     }
 

@@ -17,12 +17,14 @@ package org.mule.impl.internal.events;
 import org.mule.umo.manager.UMOServerEventListener;
 
 /**
- * <code>ConnectionEventListener</code> is an observer interface that objects can implement and then
- * register themselves with the Mule manager to be notified when a Connection event occurs.
- *
- *
+ * <code>ConnectionEventListener</code> is an observer interface that objects
+ * can implement and then register themselves with the Mule manager to be
+ * notified when a Connection event occurs.
+ * 
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface ConnectionEventListener extends UMOServerEventListener {
+public interface ConnectionEventListener extends UMOServerEventListener
+{
 }

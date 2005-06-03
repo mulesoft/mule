@@ -13,33 +13,37 @@
  */
 package org.mule.ra;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.resource.NotSupportedException;
+import javax.resource.ResourceException;
+import javax.resource.spi.ConnectionEvent;
+import javax.resource.spi.ConnectionEventListener;
+import javax.resource.spi.ConnectionRequestInfo;
+import javax.resource.spi.ManagedConnection;
+import javax.resource.spi.ManagedConnectionMetaData;
+import javax.resource.spi.security.PasswordCredential;
+import javax.security.auth.Subject;
+import javax.transaction.xa.XAResource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.security.MuleCredentials;
 
-import javax.resource.NotSupportedException;
-import javax.resource.ResourceException;
-import javax.resource.spi.*;
-import javax.resource.spi.security.PasswordCredential;
-import javax.security.auth.Subject;
-import javax.transaction.xa.XAResource;
-import java.io.PrintWriter;
-import java.lang.IllegalStateException;
-import java.lang.SecurityException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 /**
  * <code>MuleManagedConnection</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleManagedConnection implements ManagedConnection {
+public class MuleManagedConnection implements ManagedConnection
+{
     /**
      * logger used by this class
      */
@@ -53,19 +57,17 @@ public class MuleManagedConnection implements ManagedConnection {
 
     private PasswordCredential passCred = null;
 
-
     /**
      * Constructor.
-     *
-     * @param mcf           the ManagedConnectionFactory that created this instance
-     * @param subject       security context as JAAS subject
+     * 
+     * @param mcf the ManagedConnectionFactory that created this instance
+     * @param subject security context as JAAS subject
      * @param cxRequestInfo ConnectionRequestInfo instance
      */
 
-    MuleManagedConnection(MuleManagedConnectionFactory mcf,
-                          Subject subject,
-                          ConnectionRequestInfo cxRequestInfo)
-            throws ResourceException {
+    MuleManagedConnection(MuleManagedConnectionFactory mcf, Subject subject, ConnectionRequestInfo cxRequestInfo)
+            throws ResourceException
+    {
         this.mcf = mcf;
 
         // Note: this will select the credential that matches this MC's MCF.
@@ -79,15 +81,15 @@ public class MuleManagedConnection implements ManagedConnection {
      * Creates a new connection handle to the Mail Server represented by the
      * ManagedConnection instance. This connection handle is used by the
      * application code to refer to the underlying physical connection.
-     *
-     * @param subject       security context as JAAS subject
+     * 
+     * @param subject security context as JAAS subject
      * @param connectionRequestInfo ConnectionRequestInfo instance
      * @return Connection instance representing the connection handle
      * @throws ResourceException if the method fails to get a connection
      */
 
-    public Object getConnection(Subject subject, ConnectionRequestInfo connectionRequestInfo)
-            throws ResourceException {
+    public Object getConnection(Subject subject, ConnectionRequestInfo connectionRequestInfo) throws ResourceException
+    {
 
         checkIfDestroyed();
 
@@ -100,18 +102,19 @@ public class MuleManagedConnection implements ManagedConnection {
         // We only need the Folder name as all the connections share the store
         String user;
         String password;
-        MuleConnectionRequestInfo info = (MuleConnectionRequestInfo)connectionRequestInfo;
+        MuleConnectionRequestInfo info = (MuleConnectionRequestInfo) connectionRequestInfo;
 
         user = info.getUserName();
         password = info.getPassword();
-        if(user==null) {
+        if (user == null) {
             // Use default values
             user = mcf.getUsername();
             password = mcf.getPassword();
         }
         MuleCredentials creds = null;
-        if(user!=null) {
-            if(password==null) password = "";
+        if (user != null) {
+            if (password == null)
+                password = "";
             creds = new MuleCredentials(user, password.toCharArray());
         }
 
@@ -122,16 +125,15 @@ public class MuleManagedConnection implements ManagedConnection {
 
     /**
      * Destroys the physical connection.
-     *
-     * @throws ResourceException if the method fails to destroy the
-     *                           connection
+     * 
+     * @throws ResourceException if the method fails to destroy the connection
      */
 
-    public void destroy() throws ResourceException {
+    public void destroy() throws ResourceException
+    {
         if (destroyed)
             return;
         destroyed = true;
-
 
         invalidateConnections();
     }
@@ -140,23 +142,22 @@ public class MuleManagedConnection implements ManagedConnection {
      * Initiates a cleanup of the client-specific state maintained by a
      * ManagedConnection instance. The cleanup should invalidate all connection
      * handles created using this ManagedConnection instance.
-     *
+     * 
      * @throws ResourceException if the cleanup fails
      */
 
-    public void cleanup()
-            throws ResourceException {
+    public void cleanup() throws ResourceException
+    {
         checkIfDestroyed();
 
         invalidateConnections();
     }
 
-
-    private void invalidateConnections() {
+    private void invalidateConnections()
+    {
         Iterator it = connectionSet.iterator();
         while (it.hasNext()) {
-            DefaultMuleConnection connection =
-                    (DefaultMuleConnection) it.next();
+            DefaultMuleConnection connection = (DefaultMuleConnection) it.next();
             connection.invalidate();
         }
         connectionSet.clear();
@@ -164,219 +165,219 @@ public class MuleManagedConnection implements ManagedConnection {
 
     /**
      * Used by the container to change the association of an application-level
-     * connection handle with a ManagedConnection instance. The container
-     * should find the right ManagedConnection instance and call the
+     * connection handle with a ManagedConnection instance. The container should
+     * find the right ManagedConnection instance and call the
      * associateConnection method.
-     *
+     * 
      * @param connection application-level connection handle
-     * @throws ResourceException if the attempt to change the association
-     *                           fails
+     * @throws ResourceException if the attempt to change the association fails
      */
 
-    public void associateConnection(Object connection) throws ResourceException {
+    public void associateConnection(Object connection) throws ResourceException
+    {
         checkIfDestroyed();
 
         if (connection instanceof MuleConnection) {
-            MuleConnection cnn =
-                    (MuleConnection) connection;
+            MuleConnection cnn = (MuleConnection) connection;
             cnn.associateConnection(this);
         } else {
-            throw new IllegalStateException(new Message(Messages.X_IS_INVALID, DefaultMuleConnection.class.getName() + ": " +
-                    (connection ==null ? "null" : connection.getClass().getName())).toString());
+            throw new IllegalStateException(new Message(Messages.X_IS_INVALID, DefaultMuleConnection.class.getName()
+                    + ": " + (connection == null ? "null" : connection.getClass().getName())).toString());
         }
     }
 
-
     /**
-     * Adds a connection event listener to the ManagedConnection instance.
-     * The registered ConnectionEventListener instances are notified of
-     * connection close and error events as well as local-transaction-related
-     * events on the Managed Connection.
-     *
+     * Adds a connection event listener to the ManagedConnection instance. The
+     * registered ConnectionEventListener instances are notified of connection
+     * close and error events as well as local-transaction-related events on the
+     * Managed Connection.
+     * 
      * @param listener a new ConnectionEventListener to be registered
      */
 
-    public void addConnectionEventListener(ConnectionEventListener listener) {
+    public void addConnectionEventListener(ConnectionEventListener listener)
+    {
         listeners.add(listener);
     }
 
     /**
      * Removes an already registered connection event listener from the
      * ManagedConnection instance.
-     *
+     * 
      * @param listener already registered connection event listener to be
-     *                 removed
+     *            removed
      */
 
-    public void removeConnectionEventListener(ConnectionEventListener listener) {
+    public void removeConnectionEventListener(ConnectionEventListener listener)
+    {
         listeners.remove(listener);
     }
 
     /**
-     * Returns a javax.transaction.xa.XAresource instance. An application
-     * server enlists this XAResource instance with the Transaction Manager
-     * if the ManagedConnection instance is being used in a JTA transaction
-     * that is being coordinated by the Transaction Manager.
-     * <p/>
-     * Because this implementation does not support transactions, the method
-     * throws an exception.
-     *
+     * Returns a javax.transaction.xa.XAresource instance. An application server
+     * enlists this XAResource instance with the Transaction Manager if the
+     * ManagedConnection instance is being used in a JTA transaction that is
+     * being coordinated by the Transaction Manager. <p/> Because this
+     * implementation does not support transactions, the method throws an
+     * exception.
+     * 
      * @return the XAResource instance
      * @throws ResourceException if transactions are not supported
      */
-//todo
-    public XAResource getXAResource() throws ResourceException {
+    // todo
+    public XAResource getXAResource() throws ResourceException
+    {
         throw new NotSupportedException("getXAResource");
     }
 
     /**
      * Returns a javax.resource.spi.LocalTransaction instance. The
      * LocalTransaction interface is used by the container to manage local
-     * transactions for a RM instance.
-     * <p/>
-     * Because this implementation does not support transactions, the method
-     * throws an exception.
-     *
+     * transactions for a RM instance. <p/> Because this implementation does not
+     * support transactions, the method throws an exception.
+     * 
      * @return javax.resource.spi.LocalTransaction instance
      * @throws ResourceException if transactions are not supported
      */
 
-    public javax.resource.spi.LocalTransaction getLocalTransaction()  throws ResourceException {
+    public javax.resource.spi.LocalTransaction getLocalTransaction() throws ResourceException
+    {
         throw new NotSupportedException("getLocalTransaction");
     }
-
 
     /**
      * Gets the metadata information for this connection's underlying EIS
      * resource manager instance. The ManagedConnectionMetaData interface
      * provides information about the underlying EIS instance associated with
      * the ManagedConnection instance.
-     *
-     * @return ManagedConnectionMetaData  ManagedConnectionMetaData instance
+     * 
+     * @return ManagedConnectionMetaData ManagedConnectionMetaData instance
      * @throws ResourceException if the metadata cannot be retrieved
      */
 
-    public ManagedConnectionMetaData getMetaData() throws ResourceException {
+    public ManagedConnectionMetaData getMetaData() throws ResourceException
+    {
         checkIfDestroyed();
         return new MuleManagedConnectionMetaData(this);
     }
 
     /**
-     * Sets the log writer for this ManagedConnection instance.
-     * The log writer is a character output stream to which all logging and
-     * tracing messages for this ManagedConnection instance will be printed.
-     *
+     * Sets the log writer for this ManagedConnection instance. The log writer
+     * is a character output stream to which all logging and tracing messages
+     * for this ManagedConnection instance will be printed.
+     * 
      * @param out character output stream to be associated
      * @throws ResourceException if the method fails
      */
 
-    public void setLogWriter(PrintWriter out)
-            throws ResourceException {
+    public void setLogWriter(PrintWriter out) throws ResourceException
+    {
         this.logWriter = out;
     }
 
-
     /**
      * Gets the log writer for this ManagedConnection instance.
-     *
+     * 
      * @return the character output stream associated with this
      *         ManagedConnection instance
      * @throws ResourceException if the method fails
      */
 
-    public PrintWriter getLogWriter()
-            throws ResourceException {
+    public PrintWriter getLogWriter() throws ResourceException
+    {
         return logWriter;
     }
-
 
     /**
      * Gets the user name of the user associated with the ManagedConnection
      * instance.
-     *
+     * 
      * @return the username for this connection
      */
 
-    public String getUsername() {
+    public String getUsername()
+    {
         if (passCred != null)
             return passCred.getUserName();
         else
             return null;
     }
 
-
     /**
      * Gets the password for the user associated with the ManagedConnection
      * instance.
-     *
+     * 
      * @return the password for this connection
      */
 
-    public PasswordCredential getPasswordCredential() {
+    public PasswordCredential getPasswordCredential()
+    {
         return passCred;
     }
 
-
     /**
      * Associate connection handle with the physical connection.
-     *
+     * 
      * @param connection connection handle
      */
 
-    public void addConnection(MuleConnection connection) {
+    public void addConnection(MuleConnection connection)
+    {
         connectionSet.add(connection);
     }
 
-
     /**
      * Check validation of the physical connection.
-     *
+     * 
      * @throws ResourceException if the connection has been destroyed
      */
 
-    private void checkIfDestroyed() throws ResourceException {
+    private void checkIfDestroyed() throws ResourceException
+    {
         if (destroyed) {
             throw new ResourceException(new Message(Messages.X_IS_DISPOSED, "MuleManagedConnection").toString());
         }
     }
 
-
     /**
      * Removes the associated connection handle from the connections set to the
      * physical connection.
-     *
+     * 
      * @param connection the connection handle
      */
 
-    public void removeConnection(MuleConnection connection) {
+    public void removeConnection(MuleConnection connection)
+    {
         connectionSet.remove(connection);
     }
 
-
     /**
      * Checks validation of the physical connection.
-     *
+     * 
      * @return true if the connection has been destroyed; false otherwise
      */
 
-    boolean isDestroyed() {
+    boolean isDestroyed()
+    {
         return destroyed;
     }
 
     /**
      * Returns the ManagedConnectionFactory that created this instance of
      * ManagedConnection.
-     *
+     * 
      * @return the ManagedConnectionFactory for this connection
      */
 
-    public MuleManagedConnectionFactory getManagedConnectionFactory() {
+    public MuleManagedConnectionFactory getManagedConnectionFactory()
+    {
         return this.mcf;
     }
 
-    void fireBeginEvent() {
+    void fireBeginEvent()
+    {
         ConnectionEvent event = new ConnectionEvent(MuleManagedConnection.this,
-                ConnectionEvent.LOCAL_TRANSACTION_STARTED);
+                                                    ConnectionEvent.LOCAL_TRANSACTION_STARTED);
         Iterator iterator = listeners.iterator();
         while (iterator.hasNext()) {
             ConnectionEventListener l = (ConnectionEventListener) iterator.next();
@@ -384,9 +385,10 @@ public class MuleManagedConnection implements ManagedConnection {
         }
     }
 
-    void fireCommitEvent() {
+    void fireCommitEvent()
+    {
         ConnectionEvent event = new ConnectionEvent(MuleManagedConnection.this,
-                ConnectionEvent.LOCAL_TRANSACTION_COMMITTED);
+                                                    ConnectionEvent.LOCAL_TRANSACTION_COMMITTED);
         Iterator iterator = listeners.iterator();
         while (iterator.hasNext()) {
             ConnectionEventListener l = (ConnectionEventListener) iterator.next();
@@ -394,9 +396,10 @@ public class MuleManagedConnection implements ManagedConnection {
         }
     }
 
-    void fireRollbackEvent() {
+    void fireRollbackEvent()
+    {
         ConnectionEvent event = new ConnectionEvent(MuleManagedConnection.this,
-                ConnectionEvent.LOCAL_TRANSACTION_ROLLEDBACK);
+                                                    ConnectionEvent.LOCAL_TRANSACTION_ROLLEDBACK);
         Iterator iterator = listeners.iterator();
         while (iterator.hasNext()) {
             ConnectionEventListener l = (ConnectionEventListener) iterator.next();
@@ -404,9 +407,9 @@ public class MuleManagedConnection implements ManagedConnection {
         }
     }
 
-    void fireCloseEvent(MuleConnection connection) {
-        ConnectionEvent event = new ConnectionEvent(MuleManagedConnection.this,
-                ConnectionEvent.CONNECTION_CLOSED);
+    void fireCloseEvent(MuleConnection connection)
+    {
+        ConnectionEvent event = new ConnectionEvent(MuleManagedConnection.this, ConnectionEvent.CONNECTION_CLOSED);
         event.setConnectionHandle(connection);
 
         Iterator iterator = listeners.iterator();
@@ -416,9 +419,11 @@ public class MuleManagedConnection implements ManagedConnection {
         }
     }
 
-    void fireErrorOccurredEvent(Exception error) {
+    void fireErrorOccurredEvent(Exception error)
+    {
         ConnectionEvent event = new ConnectionEvent(MuleManagedConnection.this,
-                ConnectionEvent.CONNECTION_ERROR_OCCURRED, error);
+                                                    ConnectionEvent.CONNECTION_ERROR_OCCURRED,
+                                                    error);
         Iterator iterator = listeners.iterator();
         while (iterator.hasNext()) {
             ConnectionEventListener l = (ConnectionEventListener) iterator.next();

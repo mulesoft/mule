@@ -13,13 +13,13 @@
  */
 package org.mule.umo.routing;
 
-import org.mule.management.stats.RouterStatistics;
-
 import java.util.List;
+
+import org.mule.management.stats.RouterStatistics;
 
 /**
  * <code>UMORouterCollection</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -30,19 +30,19 @@ public interface UMORouterCollection
 
     List getRouters();
 
-    public void addRouter(UMORouter router);
-    
-    public UMORouter removeRouter(UMORouter router);
+    void addRouter(UMORouter router);
+
+    UMORouter removeRouter(UMORouter router);
 
     UMORouterCatchAllStrategy getCatchAllStrategy();
 
     void setCatchAllStrategy(UMORouterCatchAllStrategy catchAllStrategy);
 
     boolean isMatchAll();
-    
+
     RouterStatistics getStatistics();
-    
+
     void setStatistics(RouterStatistics stat);
-    
+
     void setMatchAll(boolean matchAll);
 }

@@ -15,7 +15,7 @@ package org.mule.extras.spring.events;
 
 /**
  * <code>ApplicationEventException</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

@@ -12,16 +12,17 @@
 
 package org.mule.test.util.timer;
 
+import java.util.Timer;
+
 import junit.framework.TestCase;
+
 import org.mule.util.timer.EventTimerTask;
 import org.mule.util.timer.TimeEvent;
 import org.mule.util.timer.TimeEventListener;
 
-import java.util.Timer;
-
 /**
  * <code>TimerTestCase</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -116,10 +117,10 @@ public class TimerTestCase extends TestCase implements TimeEventListener
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
+     */
     public void timeExpired(TimeEvent e)
     {
         assertTrue(e.getTimeExpired() > 0);
@@ -134,10 +135,10 @@ public class TimerTestCase extends TestCase implements TimeEventListener
         private boolean wasFired;
 
         /*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
-		 */
+         * (non-Javadoc)
+         * 
+         * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
+         */
         public void timeExpired(TimeEvent e)
         {
             wasFired = true;

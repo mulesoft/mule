@@ -22,9 +22,10 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
  */
 public class AuthenticationConfigurationTestCase extends HttpBasicEndpointFilterTestCase
 {
-     public void setUp() throws Exception
+    public void setUp() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("test-acegi-http-config.xml");
     }

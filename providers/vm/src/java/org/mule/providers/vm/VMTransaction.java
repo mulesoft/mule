@@ -28,46 +28,56 @@ import org.mule.util.xa.ResourceManagerException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class VMTransaction extends AbstractSingleResourceTransaction {
+public class VMTransaction extends AbstractSingleResourceTransaction
+{
 
-	public VMTransaction() throws TransactionException {
-		QueueManager qm = MuleManager.getInstance().getQueueManager();
-		QueueSession qs = qm.getQueueSession();
-		bindResource(qm, qs);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.mule.umo.UMOTransaction#bindResource(java.lang.Object, java.lang.Object)
-	 */
-	public void bindResource(Object key, Object resource) throws TransactionException {
-		if (!(key instanceof QueueManager) || !(resource instanceof QueueSession)) {
-			throw new IllegalTransactionStateException(new Message(Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES, "QueueManager/QueueSession"));
-		}
-		super.bindResource(key, resource);
-	}
-	
-	protected void doBegin() throws TransactionException {
-		try {
-			((QueueSession) resource).begin();
-		} catch (ResourceManagerException e) {
-			throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "VMTransaction"), e);
-		}
-	}
+    public VMTransaction() throws TransactionException
+    {
+        QueueManager qm = MuleManager.getInstance().getQueueManager();
+        QueueSession qs = qm.getQueueSession();
+        bindResource(qm, qs);
+    }
 
-	protected void doCommit() throws TransactionException {
-		try {
-			((QueueSession) resource).commit();
-		} catch (ResourceManagerException e) {
-			throw new TransactionException(new Message(Messages.TX_COMMIT_FAILED), e);
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.UMOTransaction#bindResource(java.lang.Object,
+     *      java.lang.Object)
+     */
+    public void bindResource(Object key, Object resource) throws TransactionException
+    {
+        if (!(key instanceof QueueManager) || !(resource instanceof QueueSession)) {
+            throw new IllegalTransactionStateException(new Message(Messages.TX_CAN_ONLY_BIND_TO_X_TYPE_RESOURCES,
+                                                                   "QueueManager/QueueSession"));
+        }
+        super.bindResource(key, resource);
+    }
 
-	protected void doRollback() throws TransactionException {
-		try {
-			((QueueSession) resource).rollback();
-		} catch (ResourceManagerException e) {
-			throw new TransactionException(new Message(Messages.TX_ROLLBACK_FAILED), e);
-		}
-	}
+    protected void doBegin() throws TransactionException
+    {
+        try {
+            ((QueueSession) resource).begin();
+        } catch (ResourceManagerException e) {
+            throw new TransactionException(new Message(Messages.TX_CANT_START_X_TRANSACTION, "VMTransaction"), e);
+        }
+    }
+
+    protected void doCommit() throws TransactionException
+    {
+        try {
+            ((QueueSession) resource).commit();
+        } catch (ResourceManagerException e) {
+            throw new TransactionException(new Message(Messages.TX_COMMIT_FAILED), e);
+        }
+    }
+
+    protected void doRollback() throws TransactionException
+    {
+        try {
+            ((QueueSession) resource).rollback();
+        } catch (ResourceManagerException e) {
+            throw new TransactionException(new Message(Messages.TX_ROLLBACK_FAILED), e);
+        }
+    }
 
 }

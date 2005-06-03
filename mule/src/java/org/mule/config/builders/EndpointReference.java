@@ -13,6 +13,9 @@
  */
 package org.mule.config.builders;
 
+import java.lang.reflect.Method;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -27,17 +30,14 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-
 /**
- * <code>EndpointReference</code> maintains a endpoint reference.
- * Endpoints are cloned when they are looked up for the manager, if there
- * are container properties or transformers set on the Endpoint
- * the clone will have an inconsistent state if the transformers or
- * container properties have not been resolved.  This class holds the refernece
- * and is invoked after the container properties/transformers are resolved
- *
+ * <code>EndpointReference</code> maintains a endpoint reference. Endpoints
+ * are cloned when they are looked up for the manager, if there are container
+ * properties or transformers set on the Endpoint the clone will have an
+ * inconsistent state if the transformers or container properties have not been
+ * resolved. This class holds the refernece and is invoked after the container
+ * properties/transformers are resolved
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -58,7 +58,12 @@ public class EndpointReference
     private UMOFilter filter;
     private UMOTransactionConfig transactionConfig;
 
-    public EndpointReference(String propertyName, String endpointName, String address, String transformer, String createConnector, Object object)
+    public EndpointReference(String propertyName,
+                             String endpointName,
+                             String address,
+                             String transformer,
+                             String createConnector,
+                             Object object)
     {
         this.propertyName = propertyName;
         this.endpointName = endpointName;
@@ -113,73 +118,80 @@ public class EndpointReference
         this.properties = properties;
     }
 
-    public String getCreateConnector() {
+    public String getCreateConnector()
+    {
         return createConnector;
     }
 
-    public void setCreateConnector(String createConnector) {
+    public void setCreateConnector(String createConnector)
+    {
         this.createConnector = createConnector;
     }
 
     public void resolveEndpoint() throws InitialisationException
     {
-        try
-        {
-            MuleEndpoint ep = (MuleEndpoint)MuleManager.getInstance().lookupEndpoint(endpointName);
-            if(ep == null) {
-                throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Endpoint '" + endpointName + "'"), this);
+        try {
+            MuleEndpoint ep = (MuleEndpoint) MuleManager.getInstance().lookupEndpoint(endpointName);
+            if (ep == null) {
+                throw new InitialisationException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Endpoint '"
+                        + endpointName + "'"), this);
             }
-            if(address!=null) {
-                if(logger.isDebugEnabled()) {
-                    logger.debug("Overloading endpoint uri for: " + endpointName + " from " + ep.getEndpointURI().toString() + " to " + address);
+            if (address != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Overloading endpoint uri for: " + endpointName + " from "
+                            + ep.getEndpointURI().toString() + " to " + address);
                 }
                 ep.setEndpointURI(new MuleEndpointURI(address));
             }
-            if(createConnector!=null) {
-                if(logger.isDebugEnabled()) {
-                    logger.debug("Overloading createConnector property for endpoint: " + endpointName + " from " + ep.getCreateConnector() + " to " + createConnector);
+            if (createConnector != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Overloading createConnector property for endpoint: " + endpointName + " from "
+                            + ep.getCreateConnector() + " to " + createConnector);
                 }
                 ep.setCreateConnectorAsString(createConnector);
             }
-            if(transformer!=null) {
-                if(logger.isDebugEnabled()) {
-                    logger.debug("Overloading Transformer for: " + endpointName + " from " + ep.getTransformer() + " to " + transformer);
+            if (transformer != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Overloading Transformer for: " + endpointName + " from " + ep.getTransformer()
+                            + " to " + transformer);
                 }
                 UMOTransformer trans = MuleObjectHelper.getTransformer(transformer, " ");
                 ep.setTransformer(trans);
             }
-            if(filter!=null) ep.setFilter(filter);
-            if(properties!=null) ep.getProperties().putAll(properties);
-            if(transactionConfig!=null) ep.setTransactionConfig(transactionConfig);
-
-            ep.initialise();
-            Method m = object.getClass().getMethod(propertyName, new Class[]{UMOEndpoint.class});
-            if(m==null) {
-                throw new InitialisationException(new Message(Messages.METHOD_X_NOT_FOUND_ON_X, propertyName, object.getClass().getName()), this);
+            if (filter != null) {
+                ep.setFilter(filter);
+            }
+            if (properties != null) {
+                ep.getProperties().putAll(properties);
+            }
+            if (transactionConfig != null) {
+                ep.setTransactionConfig(transactionConfig);
             }
 
-            m.invoke(object, new Object[]{ep});
-        } catch (InitialisationException e)
-        {
-           throw e;
-        } catch (Exception e)
-        {
-            throw new InitialisationException(new Message(Messages.CANT_SET_PROP_X_ON_X_OF_TYPE_X, propertyName, object.getClass().getName(), UMOEndpoint.class.getName()), e, this);
+            ep.initialise();
+            Method m = object.getClass().getMethod(propertyName, new Class[] { UMOEndpoint.class });
+            if (m == null) {
+                throw new InitialisationException(new Message(Messages.METHOD_X_NOT_FOUND_ON_X,
+                                                              propertyName,
+                                                              object.getClass().getName()), this);
+            }
+
+            m.invoke(object, new Object[] { ep });
+        } catch (InitialisationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.CANT_SET_PROP_X_ON_X_OF_TYPE_X,
+                                                          propertyName,
+                                                          object.getClass().getName(),
+                                                          UMOEndpoint.class.getName()), e, this);
         }
     }
 
-
     public String toString()
     {
-        return "EndpointReference{" +
-                "propertyName='" + propertyName + "'" +
-                ", endpointName='" + endpointName + "'" +
-                ", address='" + address + "'" +
-                ", transformer='" + transformer + "'" +
-                ", object=" + object +
-                ", properties=" + properties +
-                ", filter=" + filter +
-                ", transactionConfig=" + transactionConfig +
-                "}";
+        return "EndpointReference{" + "propertyName='" + propertyName + "'" + ", endpointName='" + endpointName + "'"
+                + ", address='" + address + "'" + ", transformer='" + transformer + "'" + ", object=" + object
+                + ", properties=" + properties + ", filter=" + filter + ", transactionConfig=" + transactionConfig
+                + "}";
     }
 }

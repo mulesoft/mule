@@ -28,6 +28,9 @@
 
 package org.mule.providers.stream;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -36,13 +39,9 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-
 /**
  * <code>SystemStreamConnector</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -71,36 +70,40 @@ public class SystemStreamConnector extends StreamConnector
     }
 
     /*
-	 * (non-Javadoc)
-	 *
-	 * @see org.mule.providers.stream.StreamConnector#getInputStream()
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.providers.stream.StreamConnector#getInputStream()
+     */
     public InputStream getInputStream()
     {
         return inputStream;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.AbstractConnector#doStart()
      */
     public synchronized void doStart()
     {
-        if(receivers.size() > 0) {
+        if (receivers.size() > 0) {
             reinitialise();
         }
     }
 
     /*
-	 * (non-Javadoc)
-	 *
-	 * @see org.mule.providers.stream.StreamConnector#getOutputStream()
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.providers.stream.StreamConnector#getOutputStream()
+     */
     public OutputStream getOutputStream()
     {
         return outputStream;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.stream.StreamConnector#reinitialise()
      */
     public void reinitialise()
@@ -125,7 +128,9 @@ public class SystemStreamConnector extends StreamConnector
         this.promptMessage = promptMessage;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOMessageDispatcher#getConnector()
      */
     public UMOConnector getConnector()
@@ -133,7 +138,9 @@ public class SystemStreamConnector extends StreamConnector
         return this;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
      */
     public Object getDelegateSession() throws UMOException
@@ -143,7 +150,7 @@ public class SystemStreamConnector extends StreamConnector
 
     public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        if(receivers.size() > 0) {
+        if (receivers.size() > 0) {
             throw new UnsupportedOperationException("You can only register one listener per system stream connector");
         }
         UMOMessageReceiver receiver = super.registerListener(component, endpoint);
@@ -162,15 +169,11 @@ public class SystemStreamConnector extends StreamConnector
 
         public void run()
         {
-            if (delay > 0)
-            {
-                try
-                {
-                    //Allow all other console message to be printed out first
+            if (delay > 0) {
+                try {
+                    // Allow all other console message to be printed out first
                     sleep(delay);
-                }
-                catch (InterruptedException e1)
-                {
+                } catch (InterruptedException e1) {
                 }
             }
             outputStream.println("\n" + promptMessage);
@@ -184,7 +187,6 @@ public class SystemStreamConnector extends StreamConnector
     {
         return messageDelayTime;
     }
-
 
     /**
      * @param messageDelayTime The messageDelayTime to set.

@@ -13,11 +13,6 @@
  */
 package org.mule.extras.pgp;
 
-import cryptix.message.*;
-import cryptix.openpgp.PGPArmouredMessage;
-import cryptix.pki.ExtendedKeyStore;
-import cryptix.pki.KeyBundle;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,25 +24,37 @@ import java.security.cert.CertificateException;
 import java.util.Enumeration;
 import java.util.Iterator;
 
+import cryptix.message.EncryptedMessageBuilder;
+import cryptix.message.LiteralMessageBuilder;
+import cryptix.message.Message;
+import cryptix.message.MessageException;
+import cryptix.message.SignedMessageBuilder;
+import cryptix.openpgp.PGPArmouredMessage;
+import cryptix.pki.ExtendedKeyStore;
+import cryptix.pki.KeyBundle;
+
 /**
  * @author ariva
- *  
+ * 
  */
-public class GenerateTestMessage {
+public class GenerateTestMessage
+{
     private static ExtendedKeyStore clientPublicRing, clientPrivateRing;
     private static ExtendedKeyStore serverPublicRing, serverPrivateRing;
-    
+
     private static KeyBundle serverPublicKey;
     private static KeyBundle clientPrivateKey;
 
-    public static void readKeyrings() {
+    public static void readKeyrings()
+    {
         clientPublicRing = readKeyRing("clientPublic.gpg");
         clientPrivateRing = readKeyRing("clientPrivate.gpg");
         serverPublicRing = readKeyRing("serverPublic.gpg");
         serverPrivateRing = readKeyRing("serverPrivate.gpg");
     }
 
-    public static ExtendedKeyStore readKeyRing(String filename) {
+    public static ExtendedKeyStore readKeyRing(String filename)
+    {
 
         ExtendedKeyStore ring = null;
 
@@ -61,7 +68,8 @@ public class GenerateTestMessage {
             in.close();
 
         } catch (IOException ioe) {
-            System.err.println("IOException... You did remember to run the " + "GenerateAndWriteKey example first, right?");
+            System.err.println("IOException... You did remember to run the "
+                    + "GenerateAndWriteKey example first, right?");
             ioe.printStackTrace();
             System.exit(-1);
         } catch (NoSuchAlgorithmException nsae) {
@@ -82,7 +90,8 @@ public class GenerateTestMessage {
         return ring;
     }
 
-    public static KeyBundle findKeyBundle(ExtendedKeyStore ring, String principal) throws Exception {
+    public static KeyBundle findKeyBundle(ExtendedKeyStore ring, String principal) throws Exception
+    {
 
         for (Enumeration e = ring.aliases(); e.hasMoreElements();) {
             String aliasId = (String) e.nextElement();
@@ -90,38 +99,37 @@ public class GenerateTestMessage {
             if (bundle != null) {
                 for (Iterator users = bundle.getPrincipals(); users.hasNext();) {
                     Principal princ = (Principal) users.next();
-                    System.out.println("aliasId:"+aliasId+", user:"+princ.toString());
+                    System.out.println("aliasId:" + aliasId + ", user:" + princ.toString());
                     if (princ.toString().equals(principal)) {
                         return bundle;
-                    }                        
+                    }
                 }
             }
         }
-        
-        throw new Exception("KeyBundle not found for "+principal);
-    }
-    
-    public static void decodeKeyRings() throws Exception {
-        serverPublicKey=findKeyBundle(clientPublicRing,"Mule server <mule_server@mule.com>");
-        clientPrivateKey=findKeyBundle(clientPrivateRing,"Mule client <mule_client@mule.com>");
-        System.out.println("Server private keyring:");
-        findKeyBundle(serverPrivateRing,"Mule server <mule_server@mule.com>");
+
+        throw new Exception("KeyBundle not found for " + principal);
     }
 
-    public static void writeMsg() {
+    public static void decodeKeyRings() throws Exception
+    {
+        serverPublicKey = findKeyBundle(clientPublicRing, "Mule server <mule_server@mule.com>");
+        clientPrivateKey = findKeyBundle(clientPrivateRing, "Mule client <mule_client@mule.com>");
+        System.out.println("Server private keyring:");
+        findKeyBundle(serverPrivateRing, "Mule server <mule_server@mule.com>");
+    }
+
+    public static void writeMsg()
+    {
         Message msg = null;
-        
+
         try {
-            String data = "This is a test message.\n" +
-                          "This is another line.\n";
-            LiteralMessageBuilder lmb = 
-                LiteralMessageBuilder.getInstance("OpenPGP");
+            String data = "This is a test message.\n" + "This is another line.\n";
+            LiteralMessageBuilder lmb = LiteralMessageBuilder.getInstance("OpenPGP");
             lmb.init(data);
             msg = lmb.build();
         } catch (NoSuchAlgorithmException nsae) {
-            System.err.println("Cannot find the OpenPGP LiteralMessageBuilder."+
-                " This usually means that the Cryptix OpenPGP provider is not "+
-                "installed correctly.");
+            System.err.println("Cannot find the OpenPGP LiteralMessageBuilder."
+                    + " This usually means that the Cryptix OpenPGP provider is not " + "installed correctly.");
             nsae.printStackTrace();
             System.exit(-1);
         } catch (MessageException me) {
@@ -129,33 +137,30 @@ public class GenerateTestMessage {
             me.printStackTrace();
             System.exit(-1);
         }
-        
 
-        //**********************************************************************
+        // **********************************************************************
         // Sign the message.
         //
         // Note that signing usually comes before encryption, such that
         // unauthorized parties cannot see who signed the message.
-        //**********************************************************************
+        // **********************************************************************
         try {
-        
-            SignedMessageBuilder smb = 
-                SignedMessageBuilder.getInstance("OpenPGP");
-            
+
+            SignedMessageBuilder smb = SignedMessageBuilder.getInstance("OpenPGP");
+
             // use the following line for compatibility with older PGP versions
 
-            // SignedMessageBuilder smb = 
-            //     SignedMessageBuilder.getInstance("OpenPGP/V3");
-            
+            // SignedMessageBuilder smb =
+            // SignedMessageBuilder.getInstance("OpenPGP/V3");
+
             smb.init(msg);
             smb.addSigner(clientPrivateKey, "TestingPassphrase".toCharArray());
 
             msg = smb.build();
-        
+
         } catch (NoSuchAlgorithmException nsae) {
-            System.err.println("Cannot find the OpenPGP SignedMessageBuilder. "+
-                "This usually means that the Cryptix OpenPGP provider is not "+
-                "installed correctly.");
+            System.err.println("Cannot find the OpenPGP SignedMessageBuilder. "
+                    + "This usually means that the Cryptix OpenPGP provider is not " + "installed correctly.");
             nsae.printStackTrace();
             System.exit(-1);
         } catch (UnrecoverableKeyException uke) {
@@ -168,18 +173,18 @@ public class GenerateTestMessage {
             System.exit(-1);
         }
 
-        //**********************************************************************
+        // **********************************************************************
         // Armour the message and write it to disk
-        //**********************************************************************
+        // **********************************************************************
         try {
-            
+
             PGPArmouredMessage armoured;
-        
+
             armoured = new PGPArmouredMessage(msg);
             FileOutputStream out = new FileOutputStream("signed.asc");
             out.write(armoured.getEncoded());
             out.close();
-        
+
         } catch (MessageException me) {
             System.err.println("Writing the encrypted message failed.");
             me.printStackTrace();
@@ -190,23 +195,19 @@ public class GenerateTestMessage {
             System.exit(-1);
         }
 
-        
-        //**********************************************************************
+        // **********************************************************************
         // Encrypt the message.
-        //**********************************************************************
+        // **********************************************************************
         try {
-            
-            EncryptedMessageBuilder emb = 
-                EncryptedMessageBuilder.getInstance("OpenPGP");
+
+            EncryptedMessageBuilder emb = EncryptedMessageBuilder.getInstance("OpenPGP");
             emb.init(msg);
             emb.addRecipient(serverPublicKey);
             msg = emb.build();
-        
+
         } catch (NoSuchAlgorithmException nsae) {
-            System.err.println("Cannot find the OpenPGP "+
-                "EncryptedMessageBuilder. "+
-                "This usually means that the Cryptix OpenPGP provider is not "+
-                "installed correctly.");
+            System.err.println("Cannot find the OpenPGP " + "EncryptedMessageBuilder. "
+                    + "This usually means that the Cryptix OpenPGP provider is not " + "installed correctly.");
             nsae.printStackTrace();
             System.exit(-1);
         } catch (MessageException me) {
@@ -214,20 +215,19 @@ public class GenerateTestMessage {
             me.printStackTrace();
             System.exit(-1);
         }
-        
 
-        //**********************************************************************
+        // **********************************************************************
         // Armour the message and write it to disk
-        //**********************************************************************
+        // **********************************************************************
         try {
-            
+
             PGPArmouredMessage armoured;
-        
+
             armoured = new PGPArmouredMessage(msg);
             FileOutputStream out = new FileOutputStream("encrypted-signed.asc");
             out.write(armoured.getEncoded());
             out.close();
-        
+
         } catch (MessageException me) {
             System.err.println("Writing the encrypted message failed.");
             me.printStackTrace();
@@ -237,17 +237,17 @@ public class GenerateTestMessage {
             ioe.printStackTrace();
             System.exit(-1);
         }
-        
 
     }
-    
-    public static void main(String[] args) throws Exception {
+
+    public static void main(String[] args) throws Exception
+    {
         java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto());
         java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP());
 
         readKeyrings();
         decodeKeyRings();
-        
+
         writeMsg();
     }
 }

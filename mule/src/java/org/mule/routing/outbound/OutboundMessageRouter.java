@@ -13,6 +13,10 @@
  */
 package org.mule.routing.outbound;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.RouterStatistics;
@@ -27,29 +31,23 @@ import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * <code>OutboundMessageRouter</code> is a container of routers. An
- * OutboundMessageRouter must have atleast one router. By default the first matching
- * router is used to route an event though it is possible to match on all routers meaning
- * that the message will get sent over all matching routers.
- *
+ * OutboundMessageRouter must have atleast one router. By default the first
+ * matching router is used to route an event though it is possible to match on
+ * all routers meaning that the message will get sent over all matching routers.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
  * @version $Revision$
  */
 
-public class OutboundMessageRouter extends AbstractRouterCollection implements
-        UMOOutboundMessageRouter
+public class OutboundMessageRouter extends AbstractRouterCollection implements UMOOutboundMessageRouter
 {
 
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory
-            .getLog(OutboundMessageRouter.class);
+    protected static transient Log logger = LogFactory.getLog(OutboundMessageRouter.class);
 
     public OutboundMessageRouter()
     {
@@ -63,60 +61,52 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
         UMOMessage result = null;
         boolean matchfound = false;
 
-        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
             UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter) iterator.next();
-            if (umoOutboundRouter.isMatch(message))
-            {
+            if (umoOutboundRouter.isMatch(message)) {
                 matchfound = true;
-                //Manage outbound only transactions here
+                // Manage outbound only transactions here
                 final UMOOutboundRouter router = umoOutboundRouter;
                 TransactionTemplate tt = new TransactionTemplate(umoOutboundRouter.getTransactionConfig(),
-                        session.getComponent().getDescriptor().getExceptionListener());
+                                                                 session.getComponent()
+                                                                        .getDescriptor()
+                                                                        .getExceptionListener());
 
-                TransactionCallback cb = new TransactionCallback()
-                {
+                TransactionCallback cb = new TransactionCallback() {
                     public Object doInTransaction() throws Exception
                     {
                         return router.route(message, session, synchronous);
                     }
                 };
-                try
-                {
+                try {
                     result = (UMOMessage) tt.execute(cb);
-                } catch (Exception e)
-                {
+                } catch (Exception e) {
                     throw new RoutingException(message, null, e);
                 }
 
-                if (!isMatchAll())
-                {
+                if (!isMatchAll()) {
                     return result;
                 }
             }
         }
 
-        if (!matchfound && getCatchAllStrategy() != null)
-        {
+        if (!matchfound && getCatchAllStrategy() != null) {
             if (logger.isDebugEnabled()) {
-	            logger.debug("Message did not match any routers on: "
-	                    + session.getComponent().getDescriptor().getName()
-	                    + " invoking catch all strategy");
+                logger.debug("Message did not match any routers on: "
+                        + session.getComponent().getDescriptor().getName() + " invoking catch all strategy");
             }
             return catchAll(message, session, synchronous);
-        } else if (!matchfound)
-        {
-            logger.warn("Message did not match any routers on: "
-                    + session.getComponent().getDescriptor().getName()
+        } else if (!matchfound) {
+            logger.warn("Message did not match any routers on: " + session.getComponent().getDescriptor().getName()
                     + " and there is no catch all strategy configured on this router.  Disposing message.");
         }
         return message;
     }
 
     /**
-     * A helper method for finding out which endpoints a message would be routed to
-     * without actually routing the the message
-     *
+     * A helper method for finding out which endpoints a message would be routed
+     * to without actually routing the the message
+     * 
      * @param message the message to retrieve endpoints for
      * @return an array of UMOEndpoint objects or an empty array
      * @throws RoutingException
@@ -124,15 +114,12 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
     public UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws MessagingException
     {
         List endpoints = new ArrayList();
-        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
 
             UMOOutboundRouter umoOutboundRouter = (UMOOutboundRouter) iterator.next();
-            if (umoOutboundRouter.isMatch(message))
-            {
+            if (umoOutboundRouter.isMatch(message)) {
                 endpoints.addAll(umoOutboundRouter.getEndpoints());
-                if (!isMatchAll())
-                {
+                if (!isMatchAll()) {
                     break;
                 }
             }
@@ -141,12 +128,10 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements
         return (UMOEndpoint[]) endpoints.toArray(result);
     }
 
-    protected UMOMessage catchAll(UMOMessage message, UMOSession session, boolean synchronous)
-            throws RoutingException
+    protected UMOMessage catchAll(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
 
-        if (getStatistics().isEnabled())
-        {
+        if (getStatistics().isEnabled()) {
             getStatistics().incrementCaughtMessage();
         }
 

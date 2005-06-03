@@ -46,11 +46,13 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
         assertEquals("Event data should equal " + data, data, event.getMessageAsString());
         assertEquals("Event data should equal " + data, data, event.getTransformedMessage());
-        assertEquals("Event data should be a byte array 9 bytes in length", 9, event.getTransformedMessageAsBytes().length);
+        assertEquals("Event data should be a byte array 9 bytes in length",
+                     9,
+                     event.getTransformedMessageAsBytes().length);
 
         assertEquals("Event data should be a byte array 9 bytes in length", 9, event.getMessageAsBytes().length);
         assertEquals("Event data should equal " + data, data, event.getSource());
-        
+
         assertEquals("MuleBeanPropertiesRule", event.getProperty("MuleBeanPropertiesRule", "MuleBeanPropertiesRule"));
         event.setProperty("Test", "Test1");
 
@@ -71,8 +73,12 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
         assertEquals("Event data should equal " + data, data, event.getMessageAsString());
-        assertEquals("Event data should equal 'Transformed Test Data'", "Transformed Test Data", event.getTransformedMessage());
-        assertEquals("Event data should be a byte array 28 bytes in length", 21, event.getTransformedMessageAsBytes().length);
+        assertEquals("Event data should equal 'Transformed Test Data'",
+                     "Transformed Test Data",
+                     event.getTransformedMessage());
+        assertEquals("Event data should be a byte array 28 bytes in length",
+                     21,
+                     event.getTransformedMessageAsBytes().length);
     }
 
     public void testEventRewrite() throws Exception
@@ -81,9 +87,11 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint.setTransformer(new TestEventTransformer());
         MuleEvent event = new MuleEvent(new MuleMessage(data, null),
-                endpoint,
-                getTestSession(getTestComponent(getTestDescriptor("apple", Apple.class.getName()))),
-                true, new ResponseOutputStream(System.out));
+                                        endpoint,
+                                        getTestSession(getTestComponent(getTestDescriptor("apple",
+                                                                                          Apple.class.getName()))),
+                                        true,
+                                        new ResponseOutputStream(System.out));
 
         assertNotNull(event.getId());
         assertNotNull(event.getSession());
@@ -102,58 +110,61 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals("New Data", event2.getMessageAsString());
 
     }
-    
-    public void testProperties() throws Exception {
-    	UMOEvent prevEvent;
-    	Properties props;
-    	UMOMessage msg;
-    	UMOEndpoint endpoint;
-    	UMOEvent event;
-    	
-    	// nowhere
-    	prevEvent = getTestEvent("payload");
-    	props = new Properties();
-    	msg = new MuleMessage("payload", props);
-    	endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-    	props = new Properties();
-    	endpoint.setProperties(props);
-    	event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-    	assertNull(event.getProperty("prop"));
 
-    	// in previous event => previous event
-    	prevEvent.setProperty("prop", "value0");
-    	event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-    	assertEquals("value0", event.getProperty("prop"));
+    public void testProperties() throws Exception
+    {
+        UMOEvent prevEvent;
+        Properties props;
+        UMOMessage msg;
+        UMOEndpoint endpoint;
+        UMOEvent event;
 
-    	// in previous event + endpoint => endpoint
-    	props = new Properties();
-    	props.put("prop", "value2");
-    	endpoint.setProperties(props);
-    	event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-    	assertEquals("value2", event.getProperty("prop"));
-    	
-    	// in previous event + message => message
-    	props = new Properties();
-    	props.put("prop", "value1");
-    	msg = new MuleMessage("payload", props);
-    	endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-    	event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-    	assertEquals("value1", event.getProperty("prop"));
+        // nowhere
+        prevEvent = getTestEvent("payload");
+        props = new Properties();
+        msg = new MuleMessage("payload", props);
+        endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        props = new Properties();
+        endpoint.setProperties(props);
+        event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+        assertNull(event.getProperty("prop"));
 
-    	// in previous event + endpoint + message => message
-    	props = new Properties();
-    	props.put("prop", "value2");
-    	endpoint.setProperties(props);
-    	event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
-    	assertEquals("value1", event.getProperty("prop"));
+        // in previous event => previous event
+        prevEvent.setProperty("prop", "value0");
+        event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+        assertEquals("value0", event.getProperty("prop"));
+
+        // in previous event + endpoint => endpoint
+        props = new Properties();
+        props.put("prop", "value2");
+        endpoint.setProperties(props);
+        event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+        assertEquals("value2", event.getProperty("prop"));
+
+        // in previous event + message => message
+        props = new Properties();
+        props.put("prop", "value1");
+        msg = new MuleMessage("payload", props);
+        endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+        assertEquals("value1", event.getProperty("prop"));
+
+        // in previous event + endpoint + message => message
+        props = new Properties();
+        props.put("prop", "value2");
+        endpoint.setProperties(props);
+        event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
+        assertEquals("value1", event.getProperty("prop"));
 
     }
 
     private class TestEventTransformer extends DefaultTransformer
     {
-        /* (non-Javadoc)
-        * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
-        */
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
+         */
         public Object doTransform(Object src) throws TransformerException
         {
             return "Transformed Test Data";

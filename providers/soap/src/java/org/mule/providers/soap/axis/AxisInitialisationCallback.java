@@ -20,9 +20,9 @@ import org.mule.impl.InitialisationCallback;
 import org.mule.umo.lifecycle.InitialisationException;
 
 /**
- * <code>AxisInitialisationCallback</code> is invoked when an Axis component is
- * created from its descriptor.
- *
+ * <code>AxisInitialisationCallback</code> is invoked when an Axis component
+ * is created from its descriptor.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -32,7 +32,6 @@ public class AxisInitialisationCallback implements InitialisationCallback
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(AxisInitialisationCallback.class);
-
 
     private SOAPService service;
     private boolean invoked = false;
@@ -44,13 +43,14 @@ public class AxisInitialisationCallback implements InitialisationCallback
 
     public void initialise(Object component) throws InitialisationException
     {
-        //only call this once
-        if(invoked) return;
-        if(component instanceof AxisInitialisable) {
+        // only call this once
+        if (invoked)
+            return;
+        if (component instanceof AxisInitialisable) {
             if (logger.isDebugEnabled()) {
-            	logger.debug("Calling axis initialisation for component: " + component.getClass().getName());
+                logger.debug("Calling axis initialisation for component: " + component.getClass().getName());
             }
-            ((AxisInitialisable)component).initialise(service);
+            ((AxisInitialisable) component).initialise(service);
         }
         invoked = true;
     }

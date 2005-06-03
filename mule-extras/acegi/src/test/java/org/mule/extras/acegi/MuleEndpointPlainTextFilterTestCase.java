@@ -29,7 +29,8 @@ public class MuleEndpointPlainTextFilterTestCase extends NamedTestCase
 {
     public void setUp() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("test-acegi-encrypt-config.xml");
     }

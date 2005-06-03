@@ -14,23 +14,26 @@
 package org.mule.providers.xmpp.filters;
 
 import org.jivesoftware.smack.filter.PacketFilter;
+
 /**
- * <code>XmppToContainsFilter</code> is an Xmpp ToContainsfilter
- * adapter.
- *
+ * <code>XmppToContainsFilter</code> is an Xmpp ToContainsfilter adapter.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class XmppToContainsFilter extends XmppFromContainsFilter
 {
-    public XmppToContainsFilter() {
+    public XmppToContainsFilter()
+    {
     }
 
-    public XmppToContainsFilter(String expression) {
+    public XmppToContainsFilter(String expression)
+    {
         super(expression);
     }
 
-    protected PacketFilter createFilter() {
+    protected PacketFilter createFilter()
+    {
         return new org.jivesoftware.smack.filter.ToContainsFilter(pattern);
     }
 }

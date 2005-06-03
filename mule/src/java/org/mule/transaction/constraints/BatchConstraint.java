@@ -16,9 +16,9 @@ package org.mule.transaction.constraints;
 import org.mule.umo.UMOEvent;
 
 /**
- * <code>BatchConstraint</code> is a filter that counts on every execution and returns
- * true when the batch size value equals the execution count.
- *
+ * <code>BatchConstraint</code> is a filter that counts on every execution and
+ * returns true when the batch size value equals the execution count.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -49,11 +49,10 @@ public class BatchConstraint extends ConstraintFilter
     {
         BatchConstraint clone = new BatchConstraint();
         clone.setBatchSize(batchSize);
-        for(int i = 0; i < batchCount;i++) {
+        for (int i = 0; i < batchCount; i++) {
             clone.accept(null);
         }
         return clone;
     }
-
 
 }

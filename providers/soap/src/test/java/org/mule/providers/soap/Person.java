@@ -15,7 +15,7 @@ package org.mule.providers.soap;
 
 /**
  * <code>Person</code> part of the test PeopleService
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -24,7 +24,7 @@ public class Person
 {
     private String firstName;
     private String lastName;
-    private Address address =new Address();
+    private Address address = new Address();
 
     public Person()
     {
@@ -56,7 +56,8 @@ public class Person
         this.lastName = lastName;
     }
 
-    public String toString() {
+    public String toString()
+    {
         return firstName + " " + lastName;
     }
 

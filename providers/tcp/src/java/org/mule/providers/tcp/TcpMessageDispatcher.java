@@ -13,6 +13,16 @@
  */
 package org.mule.providers.tcp;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -26,12 +36,10 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.Utility;
 
-import java.io.*;
-import java.net.*;
-
 /**
- * <code>TcpMessageDispatcher</code> will send transformed mule events over tcp.
- *
+ * <code>TcpMessageDispatcher</code> will send transformed mule events over
+ * tcp.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -61,21 +69,21 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         socket.setReceiveBufferSize(connector.getBufferSize());
         socket.setSendBufferSize(connector.getBufferSize());
         socket.setSoTimeout(connector.getTimeout());
-		return socket;
+        return socket;
     }
 
     public void doDispatch(UMOEvent event) throws Exception
     {
         Socket socket = null;
-		try {
-	        Object payload = event.getTransformedMessage();
-			socket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
-	        write(socket, payload);
-		} finally {
-			if (socket != null && !socket.isClosed()) {
-				socket.close();
-			}
-		}
+        try {
+            Object payload = event.getTransformedMessage();
+            socket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
+            write(socket, payload);
+        } finally {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        }
     }
 
     protected Socket createSocket(int port, InetAddress inetAddress) throws IOException
@@ -86,58 +94,53 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     protected void write(Socket socket, Object data) throws IOException
     {
         TcpProtocol protocol = connector.getTcpProtocol();
-		byte[] binaryData;
-        if (data instanceof String)
-        {
-			binaryData = data.toString().getBytes();
-        } else if (data instanceof byte[])
-        {
-			binaryData = (byte[]) data;
+        byte[] binaryData;
+        if (data instanceof String) {
+            binaryData = data.toString().getBytes();
+        } else if (data instanceof byte[]) {
+            binaryData = (byte[]) data;
         } else {
-			binaryData = Utility.objectToByteArray(data); 
+            binaryData = Utility.objectToByteArray(data);
         }
         BufferedOutputStream bos = new BufferedOutputStream(socket.getOutputStream());
-		protocol.write(bos, binaryData);
+        protocol.write(bos, binaryData);
         bos.flush();
     }
 
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
-		Socket socket = null;
-		try {
-			Object payload = event.getTransformedMessage();
-	        socket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
+        Socket socket = null;
+        try {
+            Object payload = event.getTransformedMessage();
+            socket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
 
-	        boolean syncReceive = event.getBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY,
-	                MuleManager.getConfiguration().isSynchronousReceive());
-	        
-	        write(socket, payload);
-	        //If we're doing sync receive try and read return info from socket
-	        if (syncReceive)
-	        {
-	            try
-	            {
-	                byte[] result = receive(socket, event.getTimeout());
-	                if (result == null) {
-						return null;
-	                }
-	                UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
-	                return message;
-	            } catch (SocketTimeoutException e)
-	            {
-	                //we dont necesarily expect to receive a resonse here
-	                logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: " + event.getEndpoint().getEndpointURI());
-	                return null;
-	            }
-	        } else
-	        {
-	            return event.getMessage();
-	        }
-		} finally {
-			if (socket != null && !socket.isClosed()) {
-				socket.close();
-			}
-		}
+            boolean syncReceive = event.getBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY,
+                                                           MuleManager.getConfiguration().isSynchronousReceive());
+
+            write(socket, payload);
+            // If we're doing sync receive try and read return info from socket
+            if (syncReceive) {
+                try {
+                    byte[] result = receive(socket, event.getTimeout());
+                    if (result == null) {
+                        return null;
+                    }
+                    UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
+                    return message;
+                } catch (SocketTimeoutException e) {
+                    // we dont necesarily expect to receive a resonse here
+                    logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
+                            + event.getEndpoint().getEndpointURI());
+                    return null;
+                }
+            } else {
+                return event.getMessage();
+            }
+        } finally {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        }
     }
 
     protected byte[] receive(Socket socket, int timeout) throws IOException
@@ -151,28 +154,27 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
-		Socket socket = null;
-		try {
-	        socket = initSocket(endpointUri.getAddress());
-            try
-            {
+        Socket socket = null;
+        try {
+            socket = initSocket(endpointUri.getAddress());
+            try {
                 byte[] result = receive(socket, (int) timeout);
                 if (result == null) {
-					return null;
+                    return null;
                 }
                 UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
                 return message;
-            } catch (SocketTimeoutException e)
-            {
-                //we dont necesarily expect to receive a resonse here
-                logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: " + endpointUri);
+            } catch (SocketTimeoutException e) {
+                // we dont necesarily expect to receive a resonse here
+                logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
+                        + endpointUri);
                 return null;
             }
-		} finally {
-			if (socket != null && !socket.isClosed()) {
-				socket.close();
-			}
-		}
+        } finally {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+        }
     }
 
     public Object getDelegateSession() throws UMOException

@@ -15,14 +15,14 @@
 
 package org.mule.test.transformers.compression;
 
+import java.util.Arrays;
+
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.compression.GZipCompressTransformer;
 import org.mule.transformers.compression.GZipUncompressTransformer;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.compression.GZipCompression;
-
-import java.util.Arrays;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -38,23 +38,24 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         strat = new GZipCompression();
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getResultData()
      */
     public Object getResultData()
     {
-        try
-        {
+        try {
             return strat.compressByteArray(getTestData().toString().getBytes());
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             fail(e.getMessage());
             return null;
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getTestData()
      */
     public Object getTestData()
@@ -62,7 +63,9 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         return "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getTransformers()
      */
     public UMOTransformer getTransformer()
@@ -71,33 +74,37 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         return transformer;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see junit.framework.TestCase#setUp()
      */
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.AbstractTransformerTestCase#getRoundTripTransformer()
      */
     public UMOTransformer getRoundTripTransformer()
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
         transformer.setReturnClass(String.class);
-        try
-        {
+        try {
             transformer.initialise();
-        } catch (InitialisationException e)
-        {
+        } catch (InitialisationException e) {
             fail(e.getMessage());
         }
         return transformer;
     }
 
-    public boolean compareResults(Object src, Object result) {
-        if(src instanceof byte[]) {
-            if(src==null && result ==null) return true;
-            if(src==null || result ==null) return false;
-            return Arrays.equals((byte[])src, (byte[])result);
+    public boolean compareResults(Object src, Object result)
+    {
+        if (src instanceof byte[]) {
+            if (src == null && result == null)
+                return true;
+            if (src == null || result == null)
+                return false;
+            return Arrays.equals((byte[]) src, (byte[]) result);
         } else {
             return super.compareResults(src, result);
         }

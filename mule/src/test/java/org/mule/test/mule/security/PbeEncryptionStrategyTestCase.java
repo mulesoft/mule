@@ -22,7 +22,7 @@ import org.mule.tck.NamedTestCase;
  */
 public class PbeEncryptionStrategyTestCase extends NamedTestCase
 {
-    public void testRoundTripEncryption()throws Exception
+    public void testRoundTripEncryption() throws Exception
     {
         PasswordBasedEncryptionStrategy pbe = new PasswordBasedEncryptionStrategy();
         pbe.setPassword("test");
@@ -30,30 +30,29 @@ public class PbeEncryptionStrategyTestCase extends NamedTestCase
 
         byte[] b = pbe.encrypt("hello".getBytes(), null);
 
-        String s= new String(pbe.decrypt(b, null), "UTF-8");
+        String s = new String(pbe.decrypt(b, null), "UTF-8");
         assertEquals("hello", s);
     }
 
-
-
-    public void testRoundTripEncryptionWithCharsetConversion()throws Exception
+    public void testRoundTripEncryptionWithCharsetConversion() throws Exception
     {
-//        PasswordBasedEncryptionStrategy pbe = new PasswordBasedEncryptionStrategy();
-//        pbe.setPassword("test");
-//        pbe.initialise();
-//
-//        CharsetEncoder ce = new UnicodeEncoder(Charset)
-//        {
-//            protected CoderResult encodeLoop(CharBuffer in, ByteBuffer out)
-//            {
-//                return null;
-//            }
-//        };
-//        byte[] b = pbe.encrypt("hello".getBytes());
-//
-//        String s1 = new String(b);
-//
-//        String s= new String(pbe.decrypt(s1.getBytes()));
-//        assertEquals("hello", s);
-     }
+        // PasswordBasedEncryptionStrategy pbe = new
+        // PasswordBasedEncryptionStrategy();
+        // pbe.setPassword("test");
+        // pbe.initialise();
+        //
+        // CharsetEncoder ce = new UnicodeEncoder(Charset)
+        // {
+        // protected CoderResult encodeLoop(CharBuffer in, ByteBuffer out)
+        // {
+        // return null;
+        // }
+        // };
+        // byte[] b = pbe.encrypt("hello".getBytes());
+        //
+        // String s1 = new String(b);
+        //
+        // String s= new String(pbe.decrypt(s1.getBytes()));
+        // assertEquals("hello", s);
+    }
 }

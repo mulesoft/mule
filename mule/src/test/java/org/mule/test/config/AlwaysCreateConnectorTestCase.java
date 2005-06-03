@@ -25,7 +25,8 @@ public class AlwaysCreateConnectorTestCase extends NamedTestCase
 {
     public void setUp() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
 
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("always-create-connector-config.xml");

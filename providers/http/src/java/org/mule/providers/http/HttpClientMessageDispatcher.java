@@ -15,7 +15,18 @@
 
 package org.mule.providers.http;
 
-import org.apache.commons.httpclient.*;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Properties;
+
+import org.apache.commons.httpclient.ConnectMethod;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpConnection;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -34,16 +45,12 @@ import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Properties;
-
 import sun.misc.BASE64Encoder;
 
 /**
- * <p><code>HttpClientMessageDispatcher</code> dispatches Mule events over http.
- *
+ * <p>
+ * <code>HttpClientMessageDispatcher</code> dispatches Mule events over http.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -59,15 +66,16 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         this.connector = connector;
         receiveTransformer = new HttpClientMethodResponseToObject();
 
-
         state = new HttpState();
-        if (connector.getProxyUsername() != null)
-        {
-            state.setProxyCredentials(null, null, new UsernamePasswordCredentials(connector.getProxyUsername(), connector.getProxyPassword()));
+        if (connector.getProxyUsername() != null) {
+            state.setProxyCredentials(null, null, new UsernamePasswordCredentials(connector.getProxyUsername(),
+                                                                                  connector.getProxyPassword()));
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.AbstractConnectorSession#doDispatch(org.mule.umo.UMOEvent)
      */
     public void doDispatch(UMOEvent event) throws Exception
@@ -75,7 +83,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         send(event);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
     public UMOConnector getConnector()
@@ -83,7 +93,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#getDelegateSession()
      */
     public Object getDelegateSession() throws UMOException
@@ -91,26 +103,28 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.umo.provider.UMOConnectorSession#receive(java.lang.String, org.mule.umo.UMOEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.provider.UMOConnectorSession#receive(java.lang.String,
+     *      org.mule.umo.UMOEvent)
      */
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
-        if (endpointUri == null) return null;
+        if (endpointUri == null)
+            return null;
 
-        HttpMethod  httpMethod = new GetMethod(endpointUri.getAddress());
+        HttpMethod httpMethod = new GetMethod(endpointUri.getAddress());
 
         HttpConnection connection = null;
-        try
-        {
+        try {
             connection = getConnection(endpointUri.getUri());
-            if (connection.isProxied() && connection.isSecure())
-            {
+            if (connection.isProxied() && connection.isSecure()) {
                 httpMethod = new ConnectMethod(httpMethod);
             }
             httpMethod.setDoAuthentication(true);
-            if(endpointUri.getUserInfo()!=null) {
-                //Add User Creds
+            if (endpointUri.getUserInfo() != null) {
+                // Add User Creds
                 StringBuffer header = new StringBuffer();
                 header.append("Basic ");
                 header.append(new BASE64Encoder().encode(endpointUri.getUserInfo().getBytes()));
@@ -119,26 +133,26 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
             httpMethod.execute(state, connection);
 
-            if (httpMethod.getStatusCode() == HttpStatus.SC_OK)
-            {
-                return (UMOMessage)receiveTransformer.transform(httpMethod);
-            } else
-            {
-                throw new ReceiveException(new Message("http", 3, httpMethod.getStatusLine().toString()), endpointUri, timeout);
+            if (httpMethod.getStatusCode() == HttpStatus.SC_OK) {
+                return (UMOMessage) receiveTransformer.transform(httpMethod);
+            } else {
+                throw new ReceiveException(new Message("http", 3, httpMethod.getStatusLine().toString()),
+                                           endpointUri,
+                                           timeout);
             }
-        } catch (ReceiveException e)
-        {
+        } catch (ReceiveException e) {
             throw e;
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new ReceiveException(endpointUri, timeout, e);
-        } finally
-        {
-            if (httpMethod != null) httpMethod.releaseConnection();
+        } finally {
+            if (httpMethod != null)
+                httpMethod.releaseConnection();
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
     public UMOMessage doSend(UMOEvent event) throws Exception
@@ -147,23 +161,21 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         URI uri = event.getEndpoint().getEndpointURI().getUri();
         HttpMethod httpMethod = null;
         Object body = event.getTransformedMessage();
-        if(body instanceof HttpMethod) {
-            httpMethod = (HttpMethod)body;
-        } else if ("GET".equals(method) || body instanceof NullPayload)
-        {
+        if (body instanceof HttpMethod) {
+            httpMethod = (HttpMethod) body;
+        } else if ("GET".equals(method) || body instanceof NullPayload) {
             httpMethod = new GetMethod(uri.toString());
-        } else
-        {
+        } else {
             PostMethod postMethod = new PostMethod(uri.toString());
 
-            if(body instanceof String) {
+            if (body instanceof String) {
                 ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
-                httpMethod = (HttpMethod)trans.transform(body.toString());
-//                postMethod.setRequestBody(body.toString());
-//                postMethod.setRequestContentLength(body.toString().length());
-//                httpMethod = postMethod;
+                httpMethod = (HttpMethod) trans.transform(body.toString());
+                // postMethod.setRequestBody(body.toString());
+                // postMethod.setRequestContentLength(body.toString().length());
+                // httpMethod = postMethod;
             } else if (body instanceof HttpMethod) {
-                httpMethod= (HttpMethod)body;
+                httpMethod = (HttpMethod) body;
             } else {
                 byte[] buffer = event.getTransformedMessageAsBytes();
                 postMethod.setRequestBody(new ByteArrayInputStream(buffer));
@@ -173,18 +185,16 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         }
         HttpConnection connection = null;
-        try
-        {
+        try {
             connection = getConnection(uri);
 
-            if (connection.isProxied() && connection.isSecure())
-            {
+            if (connection.isProxied() && connection.isSecure()) {
                 httpMethod = new ConnectMethod(httpMethod);
             }
             httpMethod.setDoAuthentication(true);
 
-            if(event.getEndpoint().getEndpointURI().getUserInfo()!=null) {
-                //Add User Creds
+            if (event.getEndpoint().getEndpointURI().getUserInfo() != null) {
+                // Add User Creds
                 StringBuffer header = new StringBuffer();
                 header.append("Basic ");
                 header.append(new BASE64Encoder().encode(event.getEndpoint().getEndpointURI().getUserInfo().getBytes()));
@@ -195,23 +205,20 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
             Properties h = new Properties();
             Header[] headers = httpMethod.getRequestHeaders();
-            for (int i = 0; i < headers.length; i++)
-            {
+            for (int i = 0; i < headers.length; i++) {
                 h.setProperty(headers[i].getName(), headers[i].getValue());
             }
             String status = String.valueOf(httpMethod.getStatusCode());
             h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
             logger.debug("Http response is: " + status);
             return new MuleMessage(httpMethod.getResponseBody(), h);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-        } finally
-        {
-            if (httpMethod != null) httpMethod.releaseConnection();
+        } finally {
+            if (httpMethod != null)
+                httpMethod.releaseConnection();
         }
     }
-
 
     protected HttpConnection getConnection(URI uri) throws URISyntaxException
     {
@@ -221,7 +228,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         String host = uri.getHost();
         int port = uri.getPort();
-        
+
         connection = new HttpConnection(host, port, protocol);
         connection.setProxyHost(connector.getProxyHostname());
         connection.setProxyPort(connector.getProxyPort());

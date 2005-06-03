@@ -13,6 +13,10 @@
  */
 package org.mule.extras.spring.config;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -23,10 +27,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -36,7 +36,7 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     public String getConfigResource()
     {
-        //A Mule Xml config file and a Spring context file
+        // A Mule Xml config file and a Spring context file
         return "test-xml-mule-config-split-with-beans.xml,test-xml-mule-config.xml,test-application-context.xml,test-xml-mule-config-split.xml";
     }
 
@@ -47,8 +47,9 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
     // Test spring bean configs
 
-    public void testConnectorBean(){
-        VMConnector c = (VMConnector)MuleManager.getInstance().lookupConnector("beanConnector");
+    public void testConnectorBean()
+    {
+        VMConnector c = (VMConnector) MuleManager.getInstance().lookupConnector("beanConnector");
         assertNotNull(c);
         assertTrue(c.isQueueEvents());
     }
@@ -58,15 +59,17 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("appleComponent3");
         assertNotNull(d);
         assertNotNull(d.getInboundRouter());
-        UMOEndpoint e = (UMOEndpoint)d.getInboundRouter().getEndpoints().get(0);
+        UMOEndpoint e = (UMOEndpoint) d.getInboundRouter().getEndpoints().get(0);
         assertNotNull(e);
         assertEquals("Prop2", e.getProperties().get("testEndpointBeanProperty"));
-		
-		d = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
-		assertNotNull(d);
-		e = d.getInboundEndpoint();
-		assertNotNull(e);
-		assertEquals(e.getEndpointURI().toString(), MuleManager.getInstance().getEndpointIdentifiers().get("Test Queue"));
+
+        d = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        assertNotNull(d);
+        e = d.getInboundEndpoint();
+        assertNotNull(e);
+        assertEquals(e.getEndpointURI().toString(), MuleManager.getInstance()
+                                                               .getEndpointIdentifiers()
+                                                               .get("Test Queue"));
     }
 
     public void testPropertyBeansOnDescriptors()
@@ -76,36 +79,36 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
 
         assertTrue(d.getExceptionListener() instanceof DefaultExceptionStrategy);
 
-        //assertEquals("1.1", d.getVersion());
+        // assertEquals("1.1", d.getVersion());
     }
-	
-	public void testTransformers() 
-	{
+
+    public void testTransformers()
+    {
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
-		assertNotNull(d);
-		UMOResponseMessageRouter r = d.getResponseRouter();
-		assertNotNull(r);
-		UMOTransformer t = r.getTransformer();
-		assertNotNull(t);
-		assertEquals("TestCompressionTransformer", t.getName());
-		t = t.getTransformer();
-		assertNotNull(t);
-		assertEquals("Default", t.getName());
-		t = t.getTransformer();
-		assertNull(t);
-	}
+        assertNotNull(d);
+        UMOResponseMessageRouter r = d.getResponseRouter();
+        assertNotNull(r);
+        UMOTransformer t = r.getTransformer();
+        assertNotNull(t);
+        assertEquals("TestCompressionTransformer", t.getName());
+        t = t.getTransformer();
+        assertNotNull(t);
+        assertEquals("Default", t.getName());
+        t = t.getTransformer();
+        assertNull(t);
+    }
 
     public void testPropertyBeansInMaps()
     {
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("appleComponent3");
         assertNotNull(d);
-        Map map = (Map)d.getProperties().get("springMap");
+        Map map = (Map) d.getProperties().get("springMap");
         assertNotNull(map);
         assertEquals(2, map.size());
-        List list = (List)d.getProperties().get("springList");
+        List list = (List) d.getProperties().get("springList");
         assertNotNull(list);
         assertEquals(2, list.size());
-        Set set = (Set)d.getProperties().get("springSet");
+        Set set = (Set) d.getProperties().get("springSet");
         assertNotNull(set);
         assertEquals(2, set.size());
         assertNotNull(d.getProperties().get("springBean"));

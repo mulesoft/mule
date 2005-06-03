@@ -13,6 +13,12 @@
  */
 package org.mule.providers.ssl;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.net.URI;
+
+import javax.net.ssl.SSLSocketFactory;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -20,17 +26,12 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.net.ssl.SSLSocketFactory;
-import java.io.IOException;
-import java.net.Socket;
-import java.net.URI;
-
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class TlsConnectorFunctionalTestCase  extends SslConnectorFunctionalTestCase
+public class TlsConnectorFunctionalTestCase extends SslConnectorFunctionalTestCase
 {
     /**
      * logger used by this class
@@ -41,11 +42,9 @@ public class TlsConnectorFunctionalTestCase  extends SslConnectorFunctionalTestC
 
     protected UMOEndpointURI getInDest()
     {
-        try
-        {
+        try {
             return new MuleEndpointURI("tls://localhost:" + port);
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }

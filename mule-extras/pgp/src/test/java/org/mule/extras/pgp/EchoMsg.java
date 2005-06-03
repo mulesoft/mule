@@ -11,14 +11,18 @@ import org.mule.umo.lifecycle.Callable;
 
 /**
  * @author ariva
- *
+ * 
  */
-public class EchoMsg implements Callable {
+public class EchoMsg implements Callable
+{
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.lifecycle.Callable#onCall(org.mule.umo.UMOEventContext)
      */
-    public Object onCall(UMOEventContext eventContext) throws Exception {
+    public Object onCall(UMOEventContext eventContext) throws Exception
+    {
         return eventContext.getMessageAsString();
     }
 

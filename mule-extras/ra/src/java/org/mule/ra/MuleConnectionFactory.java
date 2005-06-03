@@ -13,20 +13,21 @@
  */
 package org.mule.ra;
 
+import java.io.Serializable;
+
 import javax.naming.Referenceable;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
-import java.io.Serializable;
 
 /**
- * <code>MuleConnectionFactory</code> defines the connection factory interface that
- * the RA clients will obtain a reference to.
- *
+ * <code>MuleConnectionFactory</code> defines the connection factory interface
+ * that the RA clients will obtain a reference to.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface MuleConnectionFactory extends Serializable, Referenceable
- {
+{
     MuleConnection createConnection() throws ResourceException;
 
     MuleConnection createConnection(MuleConnectionRequestInfo info) throws ResourceException;

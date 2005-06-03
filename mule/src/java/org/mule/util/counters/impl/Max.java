@@ -20,25 +20,29 @@ import org.mule.util.counters.CounterFactory.Type;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class Max extends AggregateCounter {
+public class Max extends AggregateCounter
+{
 
-	private double max = Double.MIN_VALUE;
-	
-	public Max(String name, AbstractCounter base) {
-		super(name, Type.MAX, base);
-	}
+    private double max = Double.MIN_VALUE;
 
-	public double nextValue() {
-		return max;
-	}
+    public Max(String name, AbstractCounter base)
+    {
+        super(name, Type.MAX, base);
+    }
 
-	public void doCompute() {
-		double next = getBase().nextValue(); 
-		if (max == Double.NaN) {
-			max = next;
-		} else if (next > max) {
-			max = next;
-		}
-	}
+    public double nextValue()
+    {
+        return max;
+    }
+
+    public void doCompute()
+    {
+        double next = getBase().nextValue();
+        if (max == Double.NaN) {
+            max = next;
+        } else if (next > max) {
+            max = next;
+        }
+    }
 
 }

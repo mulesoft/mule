@@ -13,6 +13,9 @@
  */
 package org.mule.extras.plexus;
 
+import java.io.Reader;
+import java.net.URL;
+
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.embed.Embedder;
 import org.mule.config.ConfigurationException;
@@ -25,12 +28,10 @@ import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.util.Utility;
 
-import java.io.Reader;
-import java.net.URL;
 /**
- * <code>PlexusContainerContext</code> integrate the plexus container with Mule so that Mule
- * objects can be constructed using Plexus-managed objects
- *
+ * <code>PlexusContainerContext</code> integrate the plexus container with
+ * Mule so that Mule objects can be constructed using Plexus-managed objects
+ * 
  * @author Brian Topping
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -53,28 +54,23 @@ public class PlexusContainerContext extends AbstractContainerContext
 
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
-        if (key == null)
-        {
+        if (key == null) {
             throw new ObjectNotFoundException("Component not found for null key");
         }
-        try
-        {
-            String compKey = (key instanceof Class ? ((Class)key).getName() : key.toString());
+        try {
+            String compKey = (key instanceof Class ? ((Class) key).getName() : key.toString());
             return container.lookup(compKey);
-        } catch (ComponentLookupException e)
-        {
+        } catch (ComponentLookupException e) {
             throw new ObjectNotFoundException("could not load component", e);
         }
     }
 
     public void configure(Reader configuration) throws ContainerException
     {
-        try
-        {
+        try {
             container.setConfiguration(configuration);
             container.start();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new ContainerException(new Message(Messages.FAILED_TO_CONFIGURE_CONTAINER), e);
         }
     }
@@ -83,7 +79,6 @@ public class PlexusContainerContext extends AbstractContainerContext
     {
         return configFile;
     }
-
 
     /**
      * @param configFile The configFile to set.
@@ -95,29 +90,30 @@ public class PlexusContainerContext extends AbstractContainerContext
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-        if(configFile==null) return;
-        try
-        {
+        if (configFile == null)
+            return;
+        try {
             URL url = Utility.getResource(configFile, getClass());
-            if (url == null)
-            {
+            if (url == null) {
                 throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, configFile));
             }
             container.setConfiguration(url);
             container.start();
-        } catch (Exception e)
-        {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Plexus container", this.configFile), this);
+        } catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                                                          "Plexus container",
+                                                          this.configFile), this);
         }
     }
-	
-	public void dispose() {
-		if (container != null) {
-			try {
-				container.stop();
-			} catch (Exception e) {
-				logger.info("Plexus container", e);
-			}
-		}
-	}
+
+    public void dispose()
+    {
+        if (container != null) {
+            try {
+                container.stop();
+            } catch (Exception e) {
+                logger.info("Plexus container", e);
+            }
+        }
+    }
 }

@@ -13,14 +13,15 @@
  */
 package org.mule.test.mule.commonspool;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
 import org.mule.config.pool.CommonsPoolProxyFactory;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.model.AbstractProxyPoolFactoryTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
+
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -41,7 +42,8 @@ public class CommonsPoolProxyFactoryTestCase extends AbstractProxyPoolFactoryTes
         mockPool.expect("onAdd", C.IS_NOT_NULL);
         mockPool.expect("onRemove", C.IS_NOT_NULL);
         MuleDescriptor descriptor = getTestDescriptor("apple", Apple.class.getName());
-        CommonsPoolProxyFactory factory = (CommonsPoolProxyFactory)getProxyFactory(descriptor, (ObjectPool)mockPool.proxy());
+        CommonsPoolProxyFactory factory = (CommonsPoolProxyFactory) getProxyFactory(descriptor,
+                                                                                    (ObjectPool) mockPool.proxy());
 
         assertNotNull(factory);
 

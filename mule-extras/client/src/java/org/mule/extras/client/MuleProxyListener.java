@@ -13,20 +13,20 @@
  */
 package org.mule.extras.client;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-
 /**
  * <code>MuleProxyListener</code> is a generic listent proxy that can be used
  * to foward calls as Mule events from any Observer/Observerable implementation.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -48,7 +48,8 @@ public class MuleProxyListener implements InvocationHandler
         createProxy();
     }
 
-    public MuleProxyListener(Class listenerClass, AbstractEventTransformer eventTransformer, String componentName) throws UMOException
+    public MuleProxyListener(Class listenerClass, AbstractEventTransformer eventTransformer, String componentName)
+            throws UMOException
     {
         setListenerClass(listenerClass);
         setEventTransformer(eventTransformer);
@@ -57,7 +58,10 @@ public class MuleProxyListener implements InvocationHandler
         createProxy();
     }
 
-    public MuleProxyListener(Class listenerClass, AbstractEventTransformer eventTransformer, String componentName, MuleClient client)
+    public MuleProxyListener(Class listenerClass,
+                             AbstractEventTransformer eventTransformer,
+                             String componentName,
+                             MuleClient client)
     {
         setListenerClass(listenerClass);
         setEventTransformer(eventTransformer);
@@ -66,8 +70,9 @@ public class MuleProxyListener implements InvocationHandler
         createProxy();
     }
 
-    protected void createProxy() {
-        proxy = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class[]{listenerClass}, this);
+    protected void createProxy()
+    {
+        proxy = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class[] { listenerClass }, this);
     }
 
     public Class getListenerClass()
@@ -112,17 +117,16 @@ public class MuleProxyListener implements InvocationHandler
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
-        if(args.length==0) {
+        if (args.length == 0) {
             throw new MuleException(new Message("client", 2));
         }
         UMOMessage message = eventTransformer.transform(args[0], method);
-        if(!"void".equals(method.getReturnType().getName()))
-        {
+        if (!"void".equals(method.getReturnType().getName())) {
             UMOMessage result = client.sendDirect(componentName, null, message.getPayload(), message.getProperties());
-            if(UMOMessage.class.equals(method.getReturnType())) {
+            if (UMOMessage.class.equals(method.getReturnType())) {
                 return result;
-            }else {
-                return (result==null ? null : result.getPayload());
+            } else {
+                return (result == null ? null : result.getPayload());
             }
         } else {
             client.dispatchDirect(componentName, message.getPayload(), message.getProperties());
@@ -130,7 +134,8 @@ public class MuleProxyListener implements InvocationHandler
         }
     }
 
-    public Object getProxy() {
+    public Object getProxy()
+    {
         return proxy;
     }
 }

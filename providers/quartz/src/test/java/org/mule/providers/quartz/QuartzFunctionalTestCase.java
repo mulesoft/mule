@@ -22,31 +22,35 @@ import org.mule.tck.NamedTestCase;
 import EDU.oswego.cs.dl.util.concurrent.CountDown;
 
 /**
- * TODO: document this class 
- *
+ * TODO: document this class
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class QuartzFunctionalTestCase extends NamedTestCase {
+public class QuartzFunctionalTestCase extends NamedTestCase
+{
 
-	protected static CountDown countDown;
-	
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-	
-	protected void tearDown() throws Exception {
-		if (MuleManager.isInstanciated()) {
-			MuleManager.getInstance().dispose();
-		}
-		super.tearDown();
-	}
-	
-	public void test() throws Exception {
-		countDown = new CountDown(3);
+    protected static CountDown countDown;
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+    }
+
+    protected void tearDown() throws Exception
+    {
+        if (MuleManager.isInstanciated()) {
+            MuleManager.getInstance().dispose();
+        }
+        super.tearDown();
+    }
+
+    public void test() throws Exception
+    {
+        countDown = new CountDown(3);
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("quartz.xml");
-		assertTrue(countDown.attempt(5000));
-	}
-	
+        assertTrue(countDown.attempt(5000));
+    }
+
 }

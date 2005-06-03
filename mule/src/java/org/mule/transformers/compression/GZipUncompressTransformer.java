@@ -19,7 +19,7 @@ import org.mule.util.compression.GZipCompression;
 
 /**
  * <code>GZipCompressTransformer</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,7 +38,7 @@ public class GZipUncompressTransformer extends GZipCompressTransformer
     public Object doTransform(Object src) throws TransformerException
     {
         byte[] buf = uncompressMessage(src);
-        if(getReturnClass().equals(String.class)) {
+        if (getReturnClass().equals(String.class)) {
             return new String(buf);
         }
         return buf;

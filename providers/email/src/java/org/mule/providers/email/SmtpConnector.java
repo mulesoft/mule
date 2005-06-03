@@ -26,9 +26,21 @@
 
  */
 
-
 package org.mule.providers.email;
 
+import java.util.Calendar;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.URLName;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.mule.MuleException;
 import org.mule.config.i18n.Messages;
@@ -38,34 +50,24 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import java.util.Calendar;
-import java.util.Properties;
-
-
 /**
- * <code>SmtpConnector</code> is used to connect to and send data to
- * an SMTP mail server
- *
+ * <code>SmtpConnector</code> is used to connect to and send data to an SMTP
+ * mail server
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class SmtpConnector extends AbstractServiceEnabledConnector
 {
-	/**
-	 * Event properties
-	 */
-	public static final String TO_ADDRESSES_PROPERTY = "toAddresses";
-	public static final String CC_ADDRESSES_PROPERTY = "ccAddresses";
-	public static final String BCC_ADDRESSES_PROPERTY = "bccAddresses";
-	public static final String FROM_ADDRESS_PROPERTY = "fromAddress";
-	public static final String SUBJECT_PROPERTY = "subject";
-	
-	
+    /**
+     * Event properties
+     */
+    public static final String TO_ADDRESSES_PROPERTY = "toAddresses";
+    public static final String CC_ADDRESSES_PROPERTY = "ccAddresses";
+    public static final String BCC_ADDRESSES_PROPERTY = "bccAddresses";
+    public static final String FROM_ADDRESS_PROPERTY = "fromAddress";
+    public static final String SUBJECT_PROPERTY = "subject";
+
     public static final int DEFAULT_SMTP_PORT = 25;
 
     /**
@@ -74,7 +76,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
     private String bcc;
 
     /**
-     * Holds value of  cc addresses.
+     * Holds value of cc addresses.
      */
     private String cc;
 
@@ -108,7 +110,6 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
      */
     private int port = DEFAULT_SMTP_PORT;
 
-
     /**
      * Holds value of property SMTPusername.
      */
@@ -119,72 +120,68 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
         super.doInitialise();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOConnector#createMessage(java.lang.Object)
      */
     public Object createMessage(Object message, Session session) throws Exception
     {
-        if (message instanceof Message)
-        {
+        if (message instanceof Message) {
             return message;
         }
         String body = null;
-        if (message instanceof String)
-        {
+        if (message instanceof String) {
             body = (String) message;
         }
         Message msg = createMessage(getFromAddress(), null, cc, bcc, defaultSubject, body, session);
         return msg;
     }
 
-    protected Message createMessage(String from, String to, String cc, String bcc, String subject, String body, Session session)
-            throws MuleException
+    protected Message createMessage(String from,
+                                    String to,
+                                    String cc,
+                                    String bcc,
+                                    String subject,
+                                    String body,
+                                    Session session) throws MuleException
     {
         Message msg = new MimeMessage(session);
-        try
-        {
-            //to
+        try {
+            // to
 
             InternetAddress[] toAddrs = null;
-            if ((to != null) && !to.equals(""))
-            {
+            if ((to != null) && !to.equals("")) {
                 toAddrs = InternetAddress.parse(to, false);
                 msg.setRecipients(Message.RecipientType.TO, toAddrs);
-            }
-            else
-            {
+            } else {
                 throw new MuleException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "toAddress"));
             }
-            //sent date
+            // sent date
             msg.setSentDate(Calendar.getInstance().getTime());
-            //from
-            if(from==null) {
+            // from
+            if (from == null) {
                 throw new IllegalArgumentException("From address must be set");
             }
             msg.setFrom(new InternetAddress(from));
-            //cc
+            // cc
             InternetAddress[] ccAddrs = null;
-            if ((cc != null) && !cc.equals(""))
-            {
+            if ((cc != null) && !cc.equals("")) {
                 ccAddrs = InternetAddress.parse(cc, false);
                 msg.setRecipients(Message.RecipientType.CC, ccAddrs);
             }
             InternetAddress[] bccAddrs = null;
-            if ((bcc != null) && !bcc.equals(""))
-            {
+            if ((bcc != null) && !bcc.equals("")) {
                 bccAddrs = InternetAddress.parse(bcc, false);
                 msg.setRecipients(Message.RecipientType.BCC, bccAddrs);
             }
-            //subject
-            if ((subject != null) && !subject.equals(""))
-            {
+            // subject
+            if ((subject != null) && !subject.equals("")) {
                 msg.setSubject(subject);
-            }
-            else
-            {
+            } else {
                 msg.setSubject("(no subject)");
             }
-            //todo attachments
+            // todo attachments
 
             // create the Multipart and its parts to it
             Multipart mp = new MimeMultipart();
@@ -195,14 +192,11 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
             // add the Multipart to the message
             msg.setContent(mp);
             return msg;
-        }
-        catch (MuleException e)
-        {
+        } catch (MuleException e) {
             throw e;
-        }
-        catch (MessagingException e)
-        {
-            throw new MuleException(new org.mule.config.i18n.Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Email message"), e);
+        } catch (MessagingException e) {
+            throw new MuleException(new org.mule.config.i18n.Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X,
+                                                                     "Email message"), e);
         }
     }
 
@@ -214,7 +208,9 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
         return from;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOConnector#getProtocol()
      */
     public String getProtocol()
@@ -227,8 +223,11 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
         return this.connected;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.providers.UMOConnector#registerListener(javax.jms.MessageListener, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.providers.UMOConnector#registerListener(javax.jms.MessageListener,
+     *      java.lang.String)
      */
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
@@ -240,11 +239,13 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
      */
     public void doStart() throws UMOException
     {
-        //force connection to server
+        // force connection to server
         dispatcherFactory.create(this);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOConnector#stop()
      */
     public void doStop() throws UMOException
@@ -252,7 +253,9 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
         connected = false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.AbstractConnector#doDispose()
      */
     protected void doDispose()
@@ -378,11 +381,9 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
         this.port = port;
     }
 
-
     protected Session createMailSession(URLName url)
     {
-        if (url == null)
-        {
+        if (url == null) {
             throw new IllegalArgumentException("Url argument cannot be null when creating a session");
         }
         Properties props = System.getProperties();

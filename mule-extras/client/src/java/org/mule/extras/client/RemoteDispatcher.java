@@ -13,9 +13,8 @@
  */
 package org.mule.extras.client;
 
-import EDU.oswego.cs.dl.util.concurrent.Callable;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.XppDriver;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -39,13 +38,16 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
-import java.util.Map;
+import EDU.oswego.cs.dl.util.concurrent.Callable;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
- * <code>RemoteDispatcher</code> is used to make and recieve requests to a remote
- * Mule instance.  It is used to proxy requests to Mule using the Server Url as the
- * the transport channel.
- *
+ * <code>RemoteDispatcher</code> is used to make and recieve requests to a
+ * remote Mule instance. It is used to proxy requests to Mule using the Server
+ * Url as the the transport channel.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -64,10 +66,11 @@ public class RemoteDispatcher implements Disposable
     /** Calls made to a remote server are serialised using xstream */
     private XStream xstream = null;
 
-    RemoteDispatcher(MuleClient client, String endpoint, String user, String password) throws MalformedEndpointException
+    RemoteDispatcher(MuleClient client, String endpoint, String user, String password)
+            throws MalformedEndpointException
     {
         this(client, endpoint);
-        //todo authenticate
+        // todo authenticate
     }
 
     RemoteDispatcher(MuleClient client, String endpoint) throws MalformedEndpointException
@@ -78,74 +81,84 @@ public class RemoteDispatcher implements Disposable
     }
 
     /**
-         * Dispatcher an event asynchronously to a components on a remote Mule instance.
-         * Users can endpoint a url to a remote Mule server in the constructor of a Mule client,  by
-         * default the default Mule server url tcp://localhost:60504 is used.
-         *
-         * @param component         the name of the Mule components to dispatch to
-         * @param payload           the object that is the payload of the event
-         * @param messageProperties any properties to be associated with the payload.
-         *                          as null
-         * @throws org.mule.umo.UMOException if the dispatch fails or the components or transfromers cannot be found
-         */
-        public void dispatchToRemoteComponent(String component, Object payload, Map messageProperties) throws UMOException
-        {
-            doToRemoteComponent(component, payload, messageProperties, true);
+     * Dispatcher an event asynchronously to a components on a remote Mule
+     * instance. Users can endpoint a url to a remote Mule server in the
+     * constructor of a Mule client, by default the default Mule server url
+     * tcp://localhost:60504 is used.
+     * 
+     * @param component the name of the Mule components to dispatch to
+     * @param payload the object that is the payload of the event
+     * @param messageProperties any properties to be associated with the
+     *            payload. as null
+     * @throws org.mule.umo.UMOException if the dispatch fails or the components
+     *             or transfromers cannot be found
+     */
+    public void dispatchToRemoteComponent(String component, Object payload, Map messageProperties) throws UMOException
+    {
+        doToRemoteComponent(component, payload, messageProperties, true);
+    }
+
+    /**
+     * sends an event synchronously to a components on a remote Mule instance.
+     * Users can endpoint a url to a remote Mule server in the constructor of a
+     * Mule client, by default the default Mule server url tcp://localhost:60504
+     * is used.
+     * 
+     * @param component the name of the Mule components to send to
+     * @param payload the object that is the payload of the event
+     * @param messageProperties any properties to be associated with the
+     *            payload. as null
+     * @return the result message if any of the invocation
+     * @throws org.mule.umo.UMOException if the dispatch fails or the components
+     *             or transfromers cannot be found
+     */
+    public UMOMessage sendToRemoteComponent(String component, Object payload, Map messageProperties)
+            throws UMOException
+    {
+        return doToRemoteComponent(component, payload, messageProperties, true);
+    }
+
+    /**
+     * sends an event to a components on a remote Mule instance, while making
+     * the result of the event trigger available as a Future result that can be
+     * accessed later by client code. Users can endpoint a url to a remote Mule
+     * server in the constructor of a Mule client, by default the default Mule
+     * server url tcp://localhost:60504 is used.
+     * 
+     * @param component the name of the Mule components to send to
+     * @param transformers a comma separated list of transformers to apply to
+     *            the result message
+     * @param payload the object that is the payload of the event
+     * @param messageProperties any properties to be associated with the
+     *            payload. as null
+     * @return the result message if any of the invocation
+     * @throws org.mule.umo.UMOException if the dispatch fails or the components
+     *             or transfromers cannot be found
+     */
+    public FutureMessageResult sendAsyncToRemoteComponent(final String component,
+                                                          String transformers,
+                                                          final Object payload,
+                                                          final Map messageProperties) throws UMOException
+    {
+        UMOTransformer trans = null;
+        FutureMessageResult result = null;
+        if (transformers != null) {
+            trans = MuleObjectHelper.getTransformer(transformers, ",");
+            result = new FutureMessageResult(trans);
+        } else {
+            result = new FutureMessageResult();
         }
 
-        /**
-         * sends an event synchronously to a components on a remote Mule instance.
-         * Users can endpoint a url to a remote Mule server in the constructor of a Mule client,  by
-         * default the default Mule server url tcp://localhost:60504 is used.
-         *
-         * @param component         the name of the Mule components to send to
-         * @param payload           the object that is the payload of the event
-         * @param messageProperties any properties to be associated with the payload.
-         *                          as null
-         * @return the result message if any of the invocation
-         * @throws org.mule.umo.UMOException if the dispatch fails or the components or transfromers cannot be found
-         */
-        public UMOMessage sendToRemoteComponent(String component, Object payload, Map messageProperties) throws UMOException
-        {
-            return doToRemoteComponent(component, payload, messageProperties, true);
-        }
-
-        /**
-         * sends an event to a components on a remote Mule instance, while making the result of
-         * the event trigger available as a Future result that can be accessed later by client code.
-         * Users can endpoint a url to a remote Mule server in the constructor of a Mule client,  by
-         * default the default Mule server url tcp://localhost:60504 is used.
-         *
-         * @param component         the name of the Mule components to send to
-         * @param transformers      a comma separated list of transformers to apply to the result message
-         * @param payload           the object that is the payload of the event
-         * @param messageProperties any properties to be associated with the payload.
-         *                          as null
-         * @return the result message if any of the invocation
-         * @throws org.mule.umo.UMOException if the dispatch fails or the components or transfromers cannot be found
-         */
-        public FutureMessageResult sendAsyncToRemoteComponent(final String component, String transformers, final Object payload, final Map messageProperties) throws UMOException
-        {
-            UMOTransformer trans = null;
-            FutureMessageResult result = null;
-            if (transformers != null)
+        Callable callable = new Callable() {
+            public Object call() throws Exception
             {
-                trans = MuleObjectHelper.getTransformer(transformers, ",");
-                result = new FutureMessageResult(trans);
-            } else {
-                result = new FutureMessageResult();
+                return doToRemoteComponent(component, payload, messageProperties, true);
             }
+        };
 
-            Callable callable = new Callable() {
-                public Object call() throws Exception
-                {
-                    return doToRemoteComponent(component, payload, messageProperties, true);
-                }
-            };
-
-            result.execute(callable);
-            return result;
-        }
+        result.execute(callable);
+        return result;
+    }
 
     public UMOMessage sendRemote(String endpoint, Object payload, Map messageProperties) throws UMOException
     {
@@ -157,7 +170,8 @@ public class RemoteDispatcher implements Disposable
         doToRemote(endpoint, payload, messageProperties, false);
     }
 
-    public FutureMessageResult sendAsyncRemote(final String endpoint, final Object payload, final Map messageProperties) throws UMOException
+    public FutureMessageResult sendAsyncRemote(final String endpoint, final Object payload, final Map messageProperties)
+            throws UMOException
     {
         FutureMessageResult result = null;
         result = new FutureMessageResult();
@@ -177,7 +191,7 @@ public class RemoteDispatcher implements Disposable
     {
         AdminEvent action = new AdminEvent(null, AdminEvent.ACTION_RECEIVE, endpoint);
         action.setProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "true");
-		action.setProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, new Long(timeout));
+        action.setProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, new Long(timeout));
         UMOMessage result = dispatchAction(action, true, timeout);
         return result;
     }
@@ -198,21 +212,28 @@ public class RemoteDispatcher implements Disposable
         return result;
     }
 
-    protected UMOMessage doToRemoteComponent(String component, Object payload, Map messageProperties, boolean synchronous) throws UMOException
+    protected UMOMessage doToRemoteComponent(String component,
+                                             Object payload,
+                                             Map messageProperties,
+                                             boolean synchronous) throws UMOException
     {
         UMOMessage message = new MuleMessage(payload, messageProperties);
         message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, synchronous);
 
         AdminEvent action = new AdminEvent(message, AdminEvent.ACTION_INVOKE, "mule://" + component);
-        UMOMessage result = dispatchAction(action, synchronous, MuleManager.getConfiguration().getSynchronousEventTimeout());
+        UMOMessage result = dispatchAction(action, synchronous, MuleManager.getConfiguration()
+                                                                           .getSynchronousEventTimeout());
         return result;
     }
 
-    protected UMOMessage doToRemote(String endpoint, Object payload, Map messageProperties, boolean synchronous) throws UMOException
+    protected UMOMessage doToRemote(String endpoint, Object payload, Map messageProperties, boolean synchronous)
+            throws UMOException
     {
         UMOMessage message = new MuleMessage(payload, messageProperties);
         message.setProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, String.valueOf(synchronous));
-        AdminEvent action = new AdminEvent(message, (synchronous ? AdminEvent.ACTION_SEND : AdminEvent.ACTION_DISPATCH), endpoint);
+        AdminEvent action = new AdminEvent(message,
+                                           (synchronous ? AdminEvent.ACTION_SEND : AdminEvent.ACTION_DISPATCH),
+                                           endpoint);
 
         UMOMessage result = dispatchAction(action, synchronous, -1);
         return result;
@@ -222,7 +243,8 @@ public class RemoteDispatcher implements Disposable
     {
         String xml = xstream.toXML(action);
 
-        UMOMessage message = new MuleMessage(xml, (action.getMessage()==null ? null :action.getMessage().getProperties()));
+        UMOMessage message = new MuleMessage(xml, (action.getMessage() == null ? null : action.getMessage()
+                                                                                              .getProperties()));
 
         message.addProperties(action.getProperties());
         UMOEndpoint endpoint = ConnectorFactory.createEndpoint(serverEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
@@ -230,16 +252,16 @@ public class RemoteDispatcher implements Disposable
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(timeout);
         if (logger.isDebugEnabled()) {
-            logger.debug("MuleClient sending remote call to: " + action.getResourceIdentifier() + ". At " + serverEndpoint.toString() + " .Event is: " + event);
+            logger.debug("MuleClient sending remote call to: " + action.getResourceIdentifier() + ". At "
+                    + serverEndpoint.toString() + " .Event is: " + event);
         }
 
         UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(serverEndpoint.getAddress());
 
         UMOMessage result = null;
 
-        try
-        {
-            if(synchronous) {
+        try {
+            if (synchronous) {
                 result = dispatcher.send(event);
             } else {
                 dispatcher.dispatch(event);
@@ -247,24 +269,25 @@ public class RemoteDispatcher implements Disposable
             }
             if (result != null) {
                 String resultXml = result.getPayloadAsString();
-                if(resultXml!=null && resultXml.length() > 0) {
-                    //System.out.println("Remote dispatcher received result:\n" + resultXml);
-                    result = (UMOMessage)xstream.fromXML(resultXml);
+                if (resultXml != null && resultXml.length() > 0) {
+                    // System.out.println("Remote dispatcher received result:\n"
+                    // + resultXml);
+                    result = (UMOMessage) xstream.fromXML(resultXml);
                 } else {
                     return null;
                 }
             }
 
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
 
-        logger.debug("Result of MuleClient remote call is: " + (result==null ? "null" : result.getPayload()));
+        logger.debug("Result of MuleClient remote call is: " + (result == null ? "null" : result.getPayload()));
         return result;
     }
 
-    public void dispose() {
+    public void dispose()
+    {
 
     }
 }

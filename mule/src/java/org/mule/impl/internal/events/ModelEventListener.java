@@ -16,10 +16,11 @@ package org.mule.impl.internal.events;
 import org.mule.umo.manager.UMOServerEventListener;
 
 /**
- * <code>ModelEventListener</code> is an observer interface that objects can implement and then
- * register themselves with the Mule manager to be notified when a Model event occurs.
+ * <code>ModelEventListener</code> is an observer interface that objects can
+ * implement and then register themselves with the Mule manager to be notified
+ * when a Model event occurs.
  * 
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

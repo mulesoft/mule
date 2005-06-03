@@ -31,7 +31,6 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
         return cnn;
     }
 
-
     public Object getValidMessage() throws Exception
     {
         return new Message("Hello");

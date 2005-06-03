@@ -20,13 +20,14 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * @author Ross Mason
- *         //TODO document
+ * @author Ross Mason //TODO document
  */
 
 public class VMMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOMessageDispatcherFactory#create(org.mule.umo.provider.UMOConnector)
      */
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException

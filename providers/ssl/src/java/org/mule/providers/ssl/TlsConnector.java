@@ -14,8 +14,8 @@
 package org.mule.providers.ssl;
 
 /**
- * <code>TlsConnector</code> Provides TLS connections 
- *
+ * <code>TlsConnector</code> Provides TLS connections
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

@@ -17,14 +17,15 @@ package org.mule.extras.groovy;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mule.extras.groovy.transformers.GroovyTransformer;
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class GroovyTransformerTestCase extends AbstractTransformerTestCase {
+public class GroovyTransformerTestCase extends AbstractTransformerTestCase
+{
     public UMOTransformer getTransformer() throws Exception
     {
         GroovyTransformer transformer = new GroovyTransformer();

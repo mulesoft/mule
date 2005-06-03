@@ -13,8 +13,6 @@
  */
 package org.mule.test.providers.file;
 
-import java.net.URI;
-
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;

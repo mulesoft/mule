@@ -21,15 +21,18 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * Creates a HttpClientMessageAdapter to make client requests
+ * 
  * @author Ross Mason
  */
 public class HttpClientMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnectorSessionFactory#create(org.mule.umo.provider.UMOConnector)
      */
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-         return new HttpClientMessageDispatcher((HttpConnector) connector);
+        return new HttpClientMessageDispatcher((HttpConnector) connector);
     }
 }

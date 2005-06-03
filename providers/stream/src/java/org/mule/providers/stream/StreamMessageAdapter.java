@@ -19,7 +19,7 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 /**
  * <code>StreamMessageAdapter</code>
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,7 +34,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
@@ -45,7 +45,7 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
@@ -68,8 +68,8 @@ public class StreamMessageAdapter extends AbstractMessageAdapter
      */
     private void setMessage(Object message) throws MessageTypeNotSupportedException
     {
-        if(message instanceof String) {
-            this.message  = (String)message;
+        if (message instanceof String) {
+            this.message = (String) message;
         } else {
             throw new MessageTypeNotSupportedException(message, StreamMessageAdapter.class);
         }

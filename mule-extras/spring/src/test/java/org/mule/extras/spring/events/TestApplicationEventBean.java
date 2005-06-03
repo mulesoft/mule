@@ -21,7 +21,7 @@ import org.springframework.context.ApplicationListener;
 /**
  * <code>TestApplicationEventBean</code> is a bean for testing Spring
  * ApplicationListeners with the MuleEventMulticaster
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,12 +34,10 @@ public class TestApplicationEventBean implements ApplicationListener
     {
         System.out.println(StringMessageHelper.getBoilerPlate("Recieved Spring event " + event.getClass().getName()));
 
-        if(eventCallback!= null) {
-            try
-            {
+        if (eventCallback != null) {
+            try {
                 eventCallback.eventReceived(null, event);
-            } catch (Exception e1)
-            {
+            } catch (Exception e1) {
                 throw new RuntimeException("Callback failed: " + e1.getMessage(), e1);
             }
         }

@@ -13,19 +13,25 @@
  */
 package org.mule.providers.soap.axis;
 
+import java.util.Iterator;
+
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPHeaderElement;
+
 import org.apache.axis.MessageContext;
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.utils.XMLUtils;
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOEvent;
 
-import javax.xml.soap.*;
-import java.util.Iterator;
-
 /**
  * <code>MuleSoapHeaders</code> is a helper class for extracting and writing
  * Mule header properties to s Soap message
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -43,6 +49,7 @@ public class MuleSoapHeaders
 
     /**
      * Extracts header properties from a Mule event
+     * 
      * @param event
      */
     public MuleSoapHeaders(UMOEvent event)
@@ -50,45 +57,51 @@ public class MuleSoapHeaders
         setCorrelationId(event.getMessage().getCorrelationId());
         setCorrelationGroup(String.valueOf(event.getMessage().getCorrelationGroupSize()));
         setCorrelationSequence(String.valueOf(event.getMessage().getCorrelationSequence()));
-        setReplyTo((String)event.getMessage().getReplyTo());
+        setReplyTo((String) event.getMessage().getReplyTo());
     }
 
     /**
      * Extracts Mule header properties from a Soap message
+     * 
      * @param soapHeader
      * @throws SOAPException
      */
-    public MuleSoapHeaders(SOAPHeader soapHeader) throws SOAPException {
+    public MuleSoapHeaders(SOAPHeader soapHeader) throws SOAPException
+    {
         Iterator iter = soapHeader.examineHeaderElements(MULE_10_ACTOR);
         SOAPHeaderElement header;
         SOAPElement element;
-        while(iter.hasNext()) {
-            header = (SOAPHeaderElement)iter.next();
+        while (iter.hasNext()) {
+            header = (SOAPHeaderElement) iter.next();
             Iterator iter2 = header.getChildElements();
 
-            while(iter2.hasNext()) {
-                element = (SOAPElement)iter2.next();
-                if(MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(element.getElementName().getLocalName())) {
+            while (iter2.hasNext()) {
+                element = (SOAPElement) iter2.next();
+                if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(element.getElementName().getLocalName())) {
                     correlationId = getStringValue(element);
-                } else if(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(element.getElementName().getLocalName())) {
+                } else if (MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(element.getElementName()
+                                                                                             .getLocalName())) {
                     correlationGroup = getStringValue(element);
-                } else if(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(element.getElementName().getLocalName())) {
+                } else if (MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(element.getElementName()
+                                                                                           .getLocalName())) {
                     correlationSequence = getStringValue(element);
-                } else if(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(element.getElementName().getLocalName())) {
+                } else if (MuleProperties.MULE_REPLY_TO_PROPERTY.equals(element.getElementName().getLocalName())) {
                     replyTo = getStringValue(element);
                 } else {
-                    throw new SOAPException("Unrecognised Mule Soap header: " + element.getElementName().getQualifiedName());
+                    throw new SOAPException("Unrecognised Mule Soap header: "
+                            + element.getElementName().getQualifiedName());
                 }
             }
         }
     }
 
-    private String getStringValue(SOAPElement e) {
+    private String getStringValue(SOAPElement e)
+    {
         String value = e.getValue();
-        if(value==null && e.hasChildNodes()) {
-            //see if the value is base64 ecoded
+        if (value == null && e.hasChildNodes()) {
+            // see if the value is base64 ecoded
             value = e.getChildNodes().item(0).getChildNodes().item(0).getNodeValue();
-            if(value!=null) {
+            if (value != null) {
                 value = new String(org.apache.axis.encoding.Base64.decode(value));
             }
         }
@@ -97,19 +110,25 @@ public class MuleSoapHeaders
 
     /**
      * Sets the header properties as properties directly on the message context
+     * 
      * @param context
      */
     public void setAsClientProperties(MessageContext context)
     {
-        if(correlationId!=null) context.setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, correlationId);
-        if(correlationGroup!=null) context.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, correlationGroup);
-        if(correlationSequence!=null) context.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, correlationSequence);
+        if (correlationId != null)
+            context.setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, correlationId);
+        if (correlationGroup != null)
+            context.setProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, correlationGroup);
+        if (correlationSequence != null)
+            context.setProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, correlationSequence);
 
-        if(replyTo!=null) context.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
+        if (replyTo != null)
+            context.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
     }
 
     /**
      * Writes the header properties to a Soap header
+     * 
      * @param env
      * @throws SOAPException
      */
@@ -117,8 +136,8 @@ public class MuleSoapHeaders
     {
         SOAPHeader header = env.getHeader();
         SOAPHeaderElement muleHeader;
-        if(correlationId!=null || replyTo != null) {
-            if(header==null) {
+        if (correlationId != null || replyTo != null) {
+            if (header == null) {
                 header = env.addHeader();
             }
             Name muleHeaderName = env.createName(MULE_HEADER, MULE_NAMESPACE, MULE_10_ACTOR);
@@ -128,16 +147,20 @@ public class MuleSoapHeaders
             return;
         }
 
-        if(correlationId!=null) {
-            MessageElement e = (MessageElement)muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_ID_PROPERTY, MULE_NAMESPACE);
+        if (correlationId != null) {
+            MessageElement e = (MessageElement) muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
+                                                                           MULE_NAMESPACE);
             e.setObjectValue(correlationId);
-            e = (MessageElement)muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, MULE_NAMESPACE);
+            e = (MessageElement) muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+                                                            MULE_NAMESPACE);
             e.setObjectValue(correlationGroup);
-            e = (MessageElement)muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, MULE_NAMESPACE);
+            e = (MessageElement) muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
+                                                            MULE_NAMESPACE);
             e.setObjectValue(correlationSequence);
         }
-        if(replyTo!=null) {
-            MessageElement e = (MessageElement)muleHeader.addChildElement(MuleProperties.MULE_REPLY_TO_PROPERTY, MULE_NAMESPACE);
+        if (replyTo != null) {
+            MessageElement e = (MessageElement) muleHeader.addChildElement(MuleProperties.MULE_REPLY_TO_PROPERTY,
+                                                                           MULE_NAMESPACE);
             String enc = XMLUtils.xmlEncodeString(replyTo);
             e.setObjectValue(enc);
         }

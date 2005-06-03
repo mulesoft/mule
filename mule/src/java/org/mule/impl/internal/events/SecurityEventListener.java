@@ -16,10 +16,10 @@ package org.mule.impl.internal.events;
 import org.mule.umo.manager.UMOServerEventListener;
 
 /**
- * <code>ManagerEventListener</code> is an observer interface that objects can implement
- * to receive notifications about secure access requests.
- *
- *
+ * <code>ManagerEventListener</code> is an observer interface that objects can
+ * implement to receive notifications about secure access requests.
+ * 
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

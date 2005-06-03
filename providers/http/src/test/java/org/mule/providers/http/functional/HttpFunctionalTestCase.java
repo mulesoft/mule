@@ -14,6 +14,8 @@
 
 package org.mule.providers.http.functional;
 
+import java.net.URI;
+
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -23,8 +25,6 @@ import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
-
-import java.net.URI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -38,11 +38,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected UMOEndpointURI getInDest()
     {
-        try
-        {
+        try {
             return new MuleEndpointURI("http://localhost:60198");
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -50,11 +48,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected UMOEndpointURI getOutDest()
     {
-        try
-        {
+        try {
             return new MuleEndpointURI("http://localhost:60199");
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -82,7 +78,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     {
         byte[] buf = new byte[1024 * 4];
         int len = cnn.getResponseInputStream().read(buf);
-        if(len < 1) {
+        if (len < 1) {
             fail("Nothing was sent back in the response");
         }
         String msg = new String(buf, 0, len);

@@ -13,6 +13,8 @@
  */
 package org.mule.providers.multicast;
 
+import java.net.DatagramPacket;
+
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -20,8 +22,6 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
-
-import java.net.DatagramPacket;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -58,33 +58,24 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         endpoint.setEndpointURI(null);
         endpoint.setConnector(connector);
 
-        try
-        {
+        try {
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
-        }
-        catch (Exception e)
-        { /* expected */
+        } catch (Exception e) { /* expected */
         }
         endpoint.setEndpointURI(null);
-        try
-        {
+        try {
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
-        }
-        catch (Exception e)
-        { /* expected */
+        } catch (Exception e) { /* expected */
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI("multicast://228.2.3.4:10100"));
         connector.registerListener(component, endpoint);
-        try
-        {
+        try {
             connector.registerListener(component, endpoint);
             fail("cannot register on the same endpointUri");
-        }
-        catch (Exception e)
-        { /* expected */
+        } catch (Exception e) { /* expected */
         }
         connector.dispose();
     }

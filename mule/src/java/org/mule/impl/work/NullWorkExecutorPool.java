@@ -19,44 +19,51 @@ package org.mule.impl.work;
 
 import org.mule.config.ThreadingProfile;
 
-
 /**
- *
- *
+ * 
+ * 
  * @version $Rev$ $Date$
- *
- * */
-public class NullWorkExecutorPool implements WorkExecutorPool {
+ * 
+ */
+public class NullWorkExecutorPool implements WorkExecutorPool
+{
 
     private ThreadingProfile profile;
     private String name;
 
-    public NullWorkExecutorPool(ThreadingProfile profile, String name) {
+    public NullWorkExecutorPool(ThreadingProfile profile, String name)
+    {
         this.profile = profile;
         this.name = name;
     }
 
-    public int getPoolSize() {
+    public int getPoolSize()
+    {
         return 0;
     }
 
-    public int getMaximumPoolSize() {
+    public int getMaximumPoolSize()
+    {
         return profile.getMaxThreadsActive();
     }
 
-    public void setMaximumPoolSize(int maxSize) {
+    public void setMaximumPoolSize(int maxSize)
+    {
         profile.setMaxThreadsActive(maxSize);
     }
 
-    public WorkExecutorPool start() {
+    public WorkExecutorPool start()
+    {
         return new WorkExecutorPoolImpl(profile, name);
     }
 
-    public WorkExecutorPool stop() {
+    public WorkExecutorPool stop()
+    {
         return this;
     }
 
-    public void execute(Runnable command) throws InterruptedException {
+    public void execute(Runnable command) throws InterruptedException
+    {
         throw new IllegalStateException("Stopped");
     }
 }

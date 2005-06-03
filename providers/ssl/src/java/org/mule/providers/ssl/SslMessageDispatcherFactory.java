@@ -19,8 +19,9 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>SslMessageDispatcherFactory</code> creates SslMessageDispatcher instances
- *
+ * <code>SslMessageDispatcherFactory</code> creates SslMessageDispatcher
+ * instances
+ * 
  * @see SslMessageDispatcher
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -30,7 +31,6 @@ public class SslMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-        return new SslMessageDispatcher((SslConnector)connector);
+        return new SslMessageDispatcher((SslConnector) connector);
     }
 }
-

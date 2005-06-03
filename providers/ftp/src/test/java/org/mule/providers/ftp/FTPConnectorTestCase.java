@@ -26,13 +26,16 @@ import org.mule.umo.provider.UMOMessageReceiver;
 /**
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  */
-public class FTPConnectorTestCase extends AbstractConnectorTestCase {
+public class FTPConnectorTestCase extends AbstractConnectorTestCase
+{
     static final long POLLING_FREQUENCY = 1234;
     static final long POLLING_FREQUENCY_OVERRIDE = 4321;
     static final String TEST_ENDPOINT_URI = "ftp://foo:bar@example.com";
     static final String VALID_MESSAGE = "This is a valid FTP message";
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.providers.AbstractConnectorTestCase#createConnector()
      */
     public UMOConnector getConnector() throws Exception
@@ -65,10 +68,9 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase {
         UMOEndpoint endpoint = getTestEndpoint("mock", UMOImmutableEndpoint.ENDPOINT_TYPE_RECEIVER);
         UMOComponent component = getTestComponent(descriptor);
         UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
-        assertEquals(
-                "Connector's polling frequency must not be ignored.",
-                POLLING_FREQUENCY,
-                ((FtpMessageReceiver) receiver).getFrequency());
+        assertEquals("Connector's polling frequency must not be ignored.",
+                     POLLING_FREQUENCY,
+                     ((FtpMessageReceiver) receiver).getFrequency());
     }
 
     /**
@@ -82,15 +84,13 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase {
 
         Properties props = new Properties();
         // Endpoint wants String-typed properties
-        props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY,
-                  "" + POLLING_FREQUENCY_OVERRIDE);
+        props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY, "" + POLLING_FREQUENCY_OVERRIDE);
         endpoint.setProperties(props);
 
         UMOComponent component = getTestComponent(descriptor);
         UMOMessageReceiver receiver = connector.createReceiver(component, endpoint);
-        assertEquals(
-                "Polling frequency endpoint override must not be ignored.",
-                POLLING_FREQUENCY_OVERRIDE,
-                ((FtpMessageReceiver) receiver).getFrequency());
+        assertEquals("Polling frequency endpoint override must not be ignored.",
+                     POLLING_FREQUENCY_OVERRIDE,
+                     ((FtpMessageReceiver) receiver).getFrequency());
     }
 }

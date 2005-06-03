@@ -13,12 +13,13 @@
  */
 package org.mule.test.config;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
 import org.apache.commons.beanutils.Converter;
 import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.manager.UMOManager;
+
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -31,13 +32,11 @@ public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
 
     public void testnullConverter()
     {
-        try
-        {
+        try {
             getConverter().convert(getValidConvertedType().getClass(), null);
             fail("Should thow exception on null");
-        } catch (Exception e)
-        {
-            //expected
+        } catch (Exception e) {
+            // expected
         }
     }
 
@@ -53,7 +52,7 @@ public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
     public void testValidConversion()
     {
 
-        MuleManager.setInstance((UMOManager)mockManager.proxy());
+        MuleManager.setInstance((UMOManager) mockManager.proxy());
         Object obj = getValidConvertedType();
         mockManager.expectAndReturn(getLookupMethod(), C.eq("test://Test"), obj);
 
@@ -65,16 +64,14 @@ public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
 
     public void testInvalidConversion()
     {
-        MuleManager.setInstance((UMOManager)mockManager.proxy());
+        MuleManager.setInstance((UMOManager) mockManager.proxy());
         Object obj = getValidConvertedType();
         mockManager.expectAndReturn(getLookupMethod(), C.eq("TestBad"), null);
-        try
-        {
+        try {
             getConverter().convert(obj.getClass(), "TestBad");
             fail("should throw an exception if not found");
-        } catch (Exception e)
-        {
-            //exprected
+        } catch (Exception e) {
+            // exprected
             mockManager.verify();
         }
 

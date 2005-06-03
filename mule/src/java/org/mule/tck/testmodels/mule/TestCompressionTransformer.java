@@ -65,14 +65,15 @@ public class TestCompressionTransformer extends AbstractCompressionTransformer
         this.containerProperty = containerProperty;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     * ensures that isn't not cloned before all properties have
-     * been set on it
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#clone() ensures that isn't not cloned before all
+     *      properties have been set on it
      */
     public Object clone() throws CloneNotSupportedException
     {
-        if(containerProperty==null) {
+        if (containerProperty == null) {
             throw new IllegalStateException("Transformer cannot be cloned until all properties have been set on it");
         }
         return super.clone();

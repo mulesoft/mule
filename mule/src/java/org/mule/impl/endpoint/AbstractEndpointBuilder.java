@@ -13,18 +13,18 @@
  */
 package org.mule.impl.endpoint;
 
+import java.net.URI;
+import java.util.Properties;
+
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesHelper;
 
-import java.net.URI;
-import java.util.Properties;
-
 /**
- * <code>UrlEndpointBuilder</code> is the default endpointUri strategy suitable for most
- * connectors
- *
+ * <code>UrlEndpointBuilder</code> is the default endpointUri strategy
+ * suitable for most connectors
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -47,11 +47,18 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     public UMOEndpointURI build(URI uri) throws MalformedEndpointException
     {
         Properties props = getPropertiesForURI(uri);
-        if(address== null) {
+        if (address == null) {
             setEndpoint(uri, props);
         }
 
-        UMOEndpointURI ep = new MuleEndpointURI(address, endpointName,  connectorName, transformers, createConnector, props, uri, userInfo);
+        UMOEndpointURI ep = new MuleEndpointURI(address,
+                                                endpointName,
+                                                connectorName,
+                                                transformers,
+                                                createConnector,
+                                                props,
+                                                uri,
+                                                userInfo);
         address = null;
         endpointName = null;
         connectorName = null;
@@ -66,44 +73,46 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         Properties properties = PropertiesHelper.getPropertiesFromQueryString(uri.getQuery());
 
-        String tempEndpointName = (String)properties.remove(PROPERTY_ENDPOINT_NAME);
-        if(tempEndpointName!=null) {
+        String tempEndpointName = (String) properties.remove(PROPERTY_ENDPOINT_NAME);
+        if (tempEndpointName != null) {
             this.endpointName = tempEndpointName;
         }
-        //override the endpointUri if set
-        String endpoint = (String)properties.remove(PROPERTY_ENDPOINT_URI);
-        if(endpoint!=null) {
+        // override the endpointUri if set
+        String endpoint = (String) properties.remove(PROPERTY_ENDPOINT_URI);
+        if (endpoint != null) {
             this.address = endpoint;
         }
 
-        String cnnName = (String)properties.remove(PROPERTY_CONNECTOR_NAME);
-        if(cnnName!=null) {
+        String cnnName = (String) properties.remove(PROPERTY_CONNECTOR_NAME);
+        if (cnnName != null) {
             this.connectorName = cnnName;
         }
 
-        String create = (String)properties.remove(PROPERTY_CREATE_CONNECTOR);
-        if(create!=null) {
-            if("0".equals(create)) {
+        String create = (String) properties.remove(PROPERTY_CREATE_CONNECTOR);
+        if (create != null) {
+            if ("0".equals(create)) {
                 this.createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
-            } else if("1".equals(create)) {
+            } else if ("1".equals(create)) {
                 this.createConnector = ConnectorFactory.ALWAYS_CREATE_CONNECTOR;
-            } else if("2".equals(create)) {
+            } else if ("2".equals(create)) {
                 this.createConnector = ConnectorFactory.NEVER_CREATE_CONNECTOR;
-            } else if("IF_NEEDED".equals(create)) {
+            } else if ("IF_NEEDED".equals(create)) {
                 this.createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
-            } else if("ALWAYS".equals(create)) {
+            } else if ("ALWAYS".equals(create)) {
                 this.createConnector = ConnectorFactory.ALWAYS_CREATE_CONNECTOR;
-            } else if("NEVER".equals(create)) {
+            } else if ("NEVER".equals(create)) {
                 this.createConnector = ConnectorFactory.NEVER_CREATE_CONNECTOR;
-            } else if(connectorName==null) {
+            } else if (connectorName == null) {
                 this.createConnector = ConnectorFactory.USE_CONNECTOR;
                 connectorName = create;
             }
 
         }
 
-        transformers = (String)properties.remove(PROPERTY_TRANSFORMERS);
-        if(transformers!=null) transformers = transformers.replaceAll(" ", ",");
+        transformers = (String) properties.remove(PROPERTY_TRANSFORMERS);
+        if (transformers != null) {
+            transformers = transformers.replaceAll(" ", ",");
+        }
         return properties;
     }
 }

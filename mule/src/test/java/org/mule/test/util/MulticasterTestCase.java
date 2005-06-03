@@ -14,15 +14,16 @@
 
 package org.mule.test.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
+
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.Multicaster;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <code>MulticasterTestCase</code> TODO (document class)
@@ -36,13 +37,13 @@ public class MulticasterTestCase extends TestCase
     {
         List fruit = new ArrayList();
         Apple apple = new Apple();
-        Banana banana  = new Banana();
+        Banana banana = new Banana();
         WaterMelon melon = new WaterMelon();
         fruit.add(apple);
         fruit.add(banana);
         fruit.add(melon);
 
-        Fruit caster = (Fruit)Multicaster.create(Fruit.class, fruit);
+        Fruit caster = (Fruit) Multicaster.create(Fruit.class, fruit);
         caster.bite();
 
         assertTrue(apple.isBitten());

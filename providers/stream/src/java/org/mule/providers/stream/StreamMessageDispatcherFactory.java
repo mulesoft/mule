@@ -35,17 +35,19 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>StreamMessageDispatcherFactory</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class StreamMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOMessageDispatcherFactory#create(org.mule.umo.provider.UMOConnector)
      */
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-        return new StreamMessageDispatcher((StreamConnector)connector);
+        return new StreamMessageDispatcher((StreamConnector) connector);
     }
 }

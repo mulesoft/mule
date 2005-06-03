@@ -15,6 +15,7 @@ package org.mule.extras.acegi.filters.http;
 
 import net.sf.acegisecurity.AuthenticationException;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,11 +29,16 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.SecurityException;
-import org.mule.umo.security.*;
+import org.mule.umo.security.SecurityProviderNotFoundException;
+import org.mule.umo.security.UMOAuthentication;
+import org.mule.umo.security.UMOSecurityContext;
+import org.mule.umo.security.UnauthorisedException;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
+import org.mule.umo.security.UnsupportedAuthenticationSchemeException;
 
 /**
  * <code>HttpBasicAuthenticationFilter</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -59,8 +65,8 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
     public void doInitialise() throws InitialisationException
     {
-        if(realm==null) {
-            if(isRealmRequired()) {
+        if (realm == null) {
+            if (isRealmRequired()) {
                 throw new InitialisationException(new Message(Messages.AUTH_REALM_MUST_SET_ON_FILTER), this);
             } else {
                 logger.warn("There is no security realm set, using default: null");
@@ -68,6 +74,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         }
 
     }
+
     public String getRealm()
     {
         return realm;
@@ -89,16 +96,16 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
     }
 
     /**
-     * Authenticates the current message if authenticate is set to true.  This method will
-     * always populate the secure context in the session
-     *
+     * Authenticates the current message if authenticate is set to true. This
+     * method will always populate the secure context in the session
+     * 
      * @param event the current message recieved
-     * @throws org.mule.umo.security.SecurityException
-     *          if authentication fails
+     * @throws org.mule.umo.security.SecurityException if authentication fails
      */
-    public void authenticateInbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
+    public void authenticateInbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException,
+            UnknownAuthenticationTypeException
     {
-        String header = (String)event.getProperty(HttpConstants.HEADER_AUTHORIZATION);
+        String header = (String) event.getProperty(HttpConstants.HEADER_AUTHORIZATION);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Authorization header: " + header);
@@ -118,7 +125,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
             }
 
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username,
-                    password);
+                                                                                                      password);
             authRequest.setDetails(event.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY));
 
             UMOAuthentication authResult;
@@ -130,11 +137,10 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
             } catch (AuthenticationException e) {
                 // Authentication failed
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Authentication request for user: " + username
-                        + " failed: " + e.toString());
+                    logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
                 }
                 setUnauthenticated(event);
-                throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, username),e);
+                throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, username), e);
             }
 
             // Authentication success
@@ -144,43 +150,49 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
             UMOSecurityContext context = getSecurityManager().createSecurityContext(authResult);
             event.getSession().setSecurityContext(context);
-        } else if(header==null) {
+        } else if (header == null) {
             setUnauthenticated(event);
-            throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(), getEndpoint(), this);
+            throw new UnauthorisedException(event.getMessage(),
+                                            event.getSession().getSecurityContext(),
+                                            getEndpoint(),
+                                            this);
         } else {
             setUnauthenticated(event);
             throw new UnsupportedAuthenticationSchemeException(new Message("acegi", 1, header), event.getMessage());
         }
     }
 
-    protected void setUnauthenticated(UMOEvent event) {
+    protected void setUnauthenticated(UMOEvent event)
+    {
         String realmHeader = "Basic realm=";
-        if(realm!=null) {
-            realmHeader+="\"" + realm + "\"";
+        if (realm != null) {
+            realmHeader += "\"" + realm + "\"";
         }
         event.setProperty(HttpConstants.HEADER_WWW_AUTHENTICATE, realmHeader);
         event.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_UNAUTHORIZED);
     }
 
     /**
-     * Authenticates the current message if authenticate is set to true.  This method will
-     * always populate the secure context in the session
-     *
+     * Authenticates the current message if authenticate is set to true. This
+     * method will always populate the secure context in the session
+     * 
      * @param event the current event being dispatched
-     * @throws org.mule.umo.security.SecurityException
-     *          if authentication fails
+     * @throws org.mule.umo.security.SecurityException if authentication fails
      */
     public void authenticateOutbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException
     {
-        if(event.getSession().getSecurityContext()==null) {
-            if(isAuthenticate()) {
-                throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(), event.getEndpoint(), this);
+        if (event.getSession().getSecurityContext() == null) {
+            if (isAuthenticate()) {
+                throw new UnauthorisedException(event.getMessage(),
+                                                event.getSession().getSecurityContext(),
+                                                event.getEndpoint(),
+                                                this);
             } else {
                 return;
             }
         }
         UMOAuthentication auth = event.getSession().getSecurityContext().getAuthentication();
-        if(isAuthenticate()) {
+        if (isAuthenticate()) {
             auth = getSecurityManager().authenticate(auth);
             if (logger.isDebugEnabled()) {
                 logger.debug("Authentication success: " + auth.toString());
@@ -196,4 +208,3 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         event.setProperty(HttpConstants.HEADER_AUTHORIZATION, header.toString());
     }
 }
-

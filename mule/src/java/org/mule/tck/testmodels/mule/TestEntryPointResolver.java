@@ -22,7 +22,7 @@ import org.mule.umo.model.UMOEntryPoint;
 
 /**
  * <code>TestEntryPointResolver</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -37,7 +37,9 @@ public class TestEntryPointResolver extends DynamicEntryPointResolver
         super();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.spi.UMOEntryPointResolver#resolveEntryPoint(org.mule.umo.UMODescriptor)
      */
     public UMOEntryPoint resolveEntryPoint(UMODescriptor componentDescriptor) throws ModelException

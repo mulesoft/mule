@@ -23,12 +23,20 @@ import org.mule.impl.security.MuleHeaderCredentialsAccessor;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.*;
+import org.mule.umo.security.CredentialsNotSetException;
+import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.security.SecurityException;
+import org.mule.umo.security.SecurityProviderNotFoundException;
+import org.mule.umo.security.UMOAuthentication;
+import org.mule.umo.security.UMOCredentials;
+import org.mule.umo.security.UMOSecurityContext;
+import org.mule.umo.security.UnauthorisedException;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
- * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based encription
- *
+ * <code>MuleEncryptionEndpointSecurityFilter</code> provides password-based
+ * encription
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,15 +50,18 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         setCredentialsAccessor(new MuleHeaderCredentialsAccessor());
     }
 
-    protected final void authenticateInbound(UMOEvent event) throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
+    protected final void authenticateInbound(UMOEvent event) throws SecurityException, CryptoFailureException,
+            SecurityProviderNotFoundException, UnknownAuthenticationTypeException
     {
-        String userHeader = (String)getCredentialsAccessor().getCredentials(event);
-        if (userHeader == null)
-        {
-            throw new CredentialsNotSetException(event.getMessage(), event.getSession().getSecurityContext(), event.getEndpoint(), this);
+        String userHeader = (String) getCredentialsAccessor().getCredentials(event);
+        if (userHeader == null) {
+            throw new CredentialsNotSetException(event.getMessage(),
+                                                 event.getSession().getSecurityContext(),
+                                                 event.getEndpoint(),
+                                                 this);
         }
         byte[] creds = null;
-        if(userHeader.startsWith("Plain ")) {
+        if (userHeader.startsWith("Plain ")) {
             creds = userHeader.substring(6).getBytes();
         } else {
             creds = strategy.decrypt(userHeader.getBytes(), null);
@@ -59,23 +70,20 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
 
         UMOAuthentication authResult;
         UMOAuthentication umoAuthentication = new MuleAuthentication(user);
-        try
-        {
+        try {
             authResult = getSecurityManager().authenticate(umoAuthentication);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             // Authentication failed
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Authentication request for user: " + user.getUsername()
-                        + " failed: " + e.toString());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Authentication request for user: " + user.getUsername() + " failed: " + e.toString());
             }
-            throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, user.getUsername()), event.getMessage(), e);
+            throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, user.getUsername()),
+                                            event.getMessage(),
+                                            e);
         }
 
         // Authentication success
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             logger.debug("Authentication success: " + authResult.toString());
         }
 
@@ -83,24 +91,23 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         event.getSession().setSecurityContext(context);
     }
 
-    protected void authenticateOutbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
+    protected void authenticateOutbound(UMOEvent event) throws SecurityException, SecurityProviderNotFoundException,
+            CryptoFailureException
     {
-        if (event.getSession().getSecurityContext() == null)
-        {
-            if (isAuthenticate())
-            {
-                throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(), event.getEndpoint(), this);
-            } else
-            {
+        if (event.getSession().getSecurityContext() == null) {
+            if (isAuthenticate()) {
+                throw new UnauthorisedException(event.getMessage(),
+                                                event.getSession().getSecurityContext(),
+                                                event.getEndpoint(),
+                                                this);
+            } else {
                 return;
             }
         }
         UMOAuthentication auth = event.getSession().getSecurityContext().getAuthentication();
-        if (isAuthenticate())
-        {
+        if (isAuthenticate()) {
             auth = getSecurityManager().authenticate(auth);
-            if (logger.isDebugEnabled())
-            {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Authentication success: " + auth.toString());
             }
         }
@@ -113,12 +120,11 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
 
     protected void doInitialise() throws InitialisationException
     {
-        if(strategyName!=null) {
+        if (strategyName != null) {
             strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);
         }
 
-        if (strategy == null)
-        {
+        if (strategy == null) {
             throw new InitialisationException(new Message(Messages.ENCRYPT_STRATEGY_NOT_SET), this);
         }
     }

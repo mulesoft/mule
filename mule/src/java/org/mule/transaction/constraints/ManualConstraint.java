@@ -16,9 +16,9 @@ package org.mule.transaction.constraints;
 import org.mule.umo.UMOEvent;
 
 /**
- * <code>ManualConstraint</code> always returns false meaning that the transaction
- * should be commited manually.
- *
+ * <code>ManualConstraint</code> always returns false meaning that the
+ * transaction should be commited manually.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

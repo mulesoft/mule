@@ -17,10 +17,10 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * <code>InboundPassThroughRouter</code> allows intbound routing over all registered
- * endpoints without any filtering.  This class is used by Mule when a specific
- * inbound router has not been configured on a UMODescriptor.
- *
+ * <code>InboundPassThroughRouter</code> allows intbound routing over all
+ * registered endpoints without any filtering. This class is used by Mule when a
+ * specific inbound router has not been configured on a UMODescriptor.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -28,14 +28,14 @@ import org.mule.umo.routing.RoutingException;
 public class InboundPassThroughRouter extends SelectiveConsumer
 {
     public UMOEvent[] process(UMOEvent event) throws RoutingException
-        {
-            synchronized(event) {
-                return new UMOEvent[]{event};
-            }
+    {
+        synchronized (event) {
+            return new UMOEvent[] { event };
         }
+    }
 
-        public boolean isMatch(UMOEvent event) throws RoutingException
-        {
-            return true;
-        }
+    public boolean isMatch(UMOEvent event) throws RoutingException
+    {
+        return true;
+    }
 }

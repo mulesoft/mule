@@ -20,9 +20,9 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.umo.Invocation;
 
 /**
- * <code>LoggingInterceptor</code> is a simple interceptor that logs a message before and after the event
- * processing.
- *
+ * <code>LoggingInterceptor</code> is a simple interceptor that logs a message
+ * before and after the event processing.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -33,7 +33,9 @@ public class LoggingInterceptor extends EnvelopeInterceptor
      */
     private static transient Log logger = LogFactory.getLog(LoggingInterceptor.class);
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.interceptors.EnvelopeInterceptor#before(org.mule.umo.Invocation)
      */
     public void before(Invocation event)
@@ -42,7 +44,9 @@ public class LoggingInterceptor extends EnvelopeInterceptor
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.interceptors.EnvelopeInterceptor#after(org.mule.umo.Invocation)
      */
     public void after(Invocation event)

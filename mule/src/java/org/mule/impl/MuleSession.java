@@ -22,7 +22,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.DispatchException;
@@ -33,8 +38,9 @@ import org.mule.umo.security.UMOSecurityContext;
 import org.mule.util.UUID;
 
 /**
- * <code>MuleSession</code>  manages the interaction and distribution of events for Mule UMOs.
- *
+ * <code>MuleSession</code> manages the interaction and distribution of events
+ * for Mule UMOs.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -68,8 +74,7 @@ public final class MuleSession implements UMOSession
     public MuleSession(UMOComponent component, UMOTransaction transaction)
     {
         this();
-        if (component == null)
-        {
+        if (component == null) {
             throw new IllegalArgumentException("Component cannot be null");
         }
         this.component = component;
@@ -78,8 +83,9 @@ public final class MuleSession implements UMOSession
     public void dispatchEvent(UMOMessage message) throws UMOException
     {
         UMOOutboundMessageRouter router = component.getDescriptor().getOutboundRouter();
-        if(router==null) {
-            throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X, component.getDescriptor().getName()));            
+        if (router == null) {
+            throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X,
+                                                            component.getDescriptor().getName()));
         }
         router.route(message, this, false);
     }
@@ -92,10 +98,9 @@ public final class MuleSession implements UMOSession
     public void dispatchEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
         logger.debug("Session has received asynchronous event on: " + endpoint);
-        if (component == null)
-        {
+        if (component == null) {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
-        } else if (endpoint==null) {
+        } else if (endpoint == null) {
             endpoint = component.getDescriptor().getOutboundEndpoint();
         }
         UMOEvent event = createOutboundEvent(message, endpoint, RequestContext.getEvent());
@@ -110,8 +115,9 @@ public final class MuleSession implements UMOSession
     public UMOMessage sendEvent(UMOMessage message) throws UMOException
     {
         UMOOutboundMessageRouter router = component.getDescriptor().getOutboundRouter();
-        if(router==null) {
-            throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X, component.getDescriptor().getName()));
+        if (router == null) {
+            throw new EndpointNotFoundException(new Message(Messages.NO_OUTBOUND_ROUTER_SET_ON_X,
+                                                            component.getDescriptor().getName()));
         }
         return router.route(message, this, true);
     }
@@ -119,8 +125,7 @@ public final class MuleSession implements UMOSession
     public UMOMessage sendEvent(UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
         logger.debug("Session has received synchronous event on: " + endpoint);
-        if (component == null)
-        {
+        if (component == null) {
             throw new IllegalStateException(new Message(Messages.X_IS_NULL, "Component").getMessage());
         } else if (endpoint == null) {
             endpoint = component.getDescriptor().getOutboundEndpoint();
@@ -131,29 +136,31 @@ public final class MuleSession implements UMOSession
         return sendEvent(event);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMOSession#dispatchEvent(org.mule.umo.UMOEvent)
      */
     public synchronized void dispatchEvent(UMOEvent event) throws UMOException
     {
-        if(event.getEndpoint().canSend()) {
-            try
-            {
+        if (event.getEndpoint().canSend()) {
+            try {
                 logger.debug("dispatching event: " + event);
-                UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+                UMOMessageDispatcher dispatcher = event.getEndpoint()
+                                                       .getConnector()
+                                                       .getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
                 dispatcher.dispatch(event);
-
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
-
-        } else if(component!=null){
-            logger.debug("dispatching event to component: " + component.getDescriptor().getName() + " event is: " + event);
+        } else if (component != null) {
+            logger.debug("dispatching event to component: " + component.getDescriptor().getName() + " event is: "
+                    + event);
             component.dispatchEvent(event);
-
         } else {
-            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT), event.getMessage(),  event.getEndpoint());
+            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT),
+                                        event.getMessage(),
+                                        event.getEndpoint());
         }
     }
 
@@ -162,41 +169,46 @@ public final class MuleSession implements UMOSession
         return id;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMOSession#sendEvent(org.mule.umo.UMOEvent)
      */
     public UMOMessage sendEvent(UMOEvent event) throws UMOException
     {
-        String timeout = (String)event.removeProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY);
-        if(timeout!=null) {
+        String timeout = (String) event.removeProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY);
+        if (timeout != null) {
             event.setTimeout(Integer.parseInt(timeout));
         }
 
-        if(event.getEndpoint().canSend()) {
-            try
-            {
+        if (event.getEndpoint().canSend()) {
+            try {
                 logger.debug("sending event: " + event);
-                UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+                UMOMessageDispatcher dispatcher = event.getEndpoint()
+                                                       .getConnector()
+                                                       .getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
                 return dispatcher.send(event);
-
             } catch (UMOException e) {
                 throw e;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
 
-        } else if(component!=null){
-            logger.debug("dispatching event to component: " + component.getDescriptor().getName() + " event is: " + event);
+        } else if (component != null) {
+            logger.debug("dispatching event to component: " + component.getDescriptor().getName() + " event is: "
+                    + event);
             return component.sendEvent(event);
 
         } else {
-            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT), event.getMessage(),  event.getEndpoint());
+            throw new DispatchException(new Message(Messages.NO_COMPONENT_FOR_ENDPOINT),
+                                        event.getMessage(),
+                                        event.getEndpoint());
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMOSession#isValid()
      */
     public boolean isValid()
@@ -204,7 +216,9 @@ public final class MuleSession implements UMOSession
         return valid;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMOSession#setValid(boolean)
      */
     public void setValid(boolean value)
@@ -212,8 +226,11 @@ public final class MuleSession implements UMOSession
         valid = value;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint, long, org.mule.umo.UMOEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint,
+     *      long, org.mule.umo.UMOEvent)
      */
     public UMOMessage receiveEvent(String endpointName, long timeout) throws UMOException
     {
@@ -221,49 +238,48 @@ public final class MuleSession implements UMOSession
         return receiveEvent(endpoint, timeout);
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint, long, org.mule.umo.UMOEvent)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.UMOSession#receiveEvent(org.mule.umo.endpoint.UMOEndpoint,
+     *      long, org.mule.umo.UMOEvent)
      */
     public UMOMessage receiveEvent(UMOEndpoint endpoint, long timeout) throws UMOException
     {
-        try
-        {
-            UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint.getEndpointURI().getAddress());
+        try {
+            UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint.getEndpointURI()
+                                                                                            .getAddress());
             return dispatcher.receive(endpoint.getEndpointURI(), timeout);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new ReceiveException(endpoint.getEndpointURI(), timeout, e);
         }
     }
 
-    public UMOEvent createOutboundEvent(UMOMessage message, UMOEndpoint endpoint, UMOEvent previousEvent) throws UMOException
+    public UMOEvent createOutboundEvent(UMOMessage message, UMOEndpoint endpoint, UMOEvent previousEvent)
+            throws UMOException
     {
-        logger.debug("Creating event with data: " + message.getPayload().getClass().getName() + ", for endpoint: " + endpoint.toString());
+        logger.debug("Creating event with data: " + message.getPayload().getClass().getName() + ", for endpoint: "
+                + endpoint.toString());
 
-        if (endpoint == null)
-        {
+        if (endpoint == null) {
             throw new DispatchException(new Message(Messages.X_IS_NULL, "Outbound Endpoint"), message, endpoint);
         }
-        //Use default transformer if none is set
-        if(endpoint.getTransformer() == null)
-        {
-            if(endpoint.getConnector() instanceof AbstractConnector) {
-                endpoint.setTransformer(((AbstractConnector)endpoint.getConnector()).getDefaultOutboundTransformer());
+        // Use default transformer if none is set
+        if (endpoint.getTransformer() == null) {
+            if (endpoint.getConnector() instanceof AbstractConnector) {
+                endpoint.setTransformer(((AbstractConnector) endpoint.getConnector()).getDefaultOutboundTransformer());
                 logger.debug("Using default connector outbound transformer: " + endpoint.getTransformer());
-             }
+            }
         }
-        try
-        {
+        try {
             UMOEvent event;
-            if(previousEvent!=null) {
+            if (previousEvent != null) {
                 event = new MuleEvent(message, endpoint, component, previousEvent);
             } else {
                 event = new MuleEvent(message, endpoint, this, false, null);
             }
             return event;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new DispatchException(new Message(Messages.FAILED_TO_CREATE_X, "Event"), message, endpoint, e);
         }
     }
@@ -276,16 +292,17 @@ public final class MuleSession implements UMOSession
         return component;
     }
 
-    void setComponent(UMOComponent component) {
+    void setComponent(UMOComponent component)
+    {
         this.component = component;
     }
 
     /**
-     * The security context for this session.  If not null outbound, inbound
+     * The security context for this session. If not null outbound, inbound
      * and/or method invocations will be authenticated using this context
-     *
+     * 
      * @param context the context for this session or null if the request is not
-     *                secure.
+     *            secure.
      */
     public void setSecurityContext(UMOSecurityContext context)
     {
@@ -293,9 +310,9 @@ public final class MuleSession implements UMOSession
     }
 
     /**
-     * The security context for this session.  If not null outbound, inbound
+     * The security context for this session. If not null outbound, inbound
      * and/or method invocations will be authenticated using this context
-     *
+     * 
      * @return the context for this session or null if the request is not
      *         secure.
      */

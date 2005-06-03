@@ -17,14 +17,19 @@ import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.AuthenticationException;
 import net.sf.acegisecurity.providers.AuthenticationProvider;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
+
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.SecurityException;
-import org.mule.umo.security.*;
+import org.mule.umo.security.UMOAuthentication;
+import org.mule.umo.security.UMOSecurityContext;
+import org.mule.umo.security.UMOSecurityContextFactory;
+import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
 
 /**
- * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security provider to
- * use with the UMOSecurityManager
- *
+ * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security
+ * provider to use with the UMOSecurityManager
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,7 +39,8 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
     private String name;
     private UMOSecurityContextFactory factory;
 
-    public AcegiProviderAdapter() {
+    public AcegiProviderAdapter()
+    {
     }
 
     public AcegiProviderAdapter(AuthenticationProvider delegate)
@@ -50,10 +56,10 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
 
     public void initialise() throws InitialisationException
     {
-//      //all initialisation should be handled in the spring
-        //intitialisation hook afterPropertiesSet()
+        // //all initialisation should be handled in the spring
+        // intitialisation hook afterPropertiesSet()
 
-        //register context factory
+        // register context factory
         factory = new AcegiSecurityContextFactory();
     }
 
@@ -69,19 +75,21 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
 
     public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException
     {
-        Authentication  auth = null;
-        if(authentication instanceof AcegiAuthenticationAdapter) {
-            auth = ((AcegiAuthenticationAdapter)authentication).getDelegate();
+        Authentication auth = null;
+        if (authentication instanceof AcegiAuthenticationAdapter) {
+            auth = ((AcegiAuthenticationAdapter) authentication).getDelegate();
         } else {
-            auth = new UsernamePasswordAuthenticationToken(
-                            authentication.getPrincipal(), authentication.getCredentials());
+            auth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(),
+                                                           authentication.getCredentials());
         }
 
-       // try {
-            auth = delegate.authenticate(auth);
-//        } catch (AcegiSecurityException e) {
-//            throw new UnauthorisedException(new Message(Messages.AUTH_FAILED_FOR_USER_X, authentication.getPrincipal()), e);
-//        }
+        // try {
+        auth = delegate.authenticate(auth);
+        // } catch (AcegiSecurityException e) {
+        // throw new UnauthorisedException(new
+        // Message(Messages.AUTH_FAILED_FOR_USER_X,
+        // authentication.getPrincipal()), e);
+        // }
         return new AcegiAuthenticationAdapter(auth);
     }
 
@@ -92,7 +100,7 @@ public class AcegiProviderAdapter implements UMOSecurityProvider, Authentication
 
     public boolean supports(Class aClass)
     {
-        return  UMOAuthentication.class.isAssignableFrom(aClass);
+        return UMOAuthentication.class.isAssignableFrom(aClass);
     }
 
     public AuthenticationProvider getDelegate()

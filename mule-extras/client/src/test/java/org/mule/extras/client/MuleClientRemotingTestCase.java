@@ -27,8 +27,9 @@ public class MuleClientRemotingTestCase extends AbstractMuleTestCase
 {
     public void setUp() throws Exception
     {
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");        
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("test-client-mule-config-remoting-tcp.xml");
         System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
@@ -46,7 +47,7 @@ public class MuleClientRemotingTestCase extends AbstractMuleTestCase
 
     public void testClientSendToRemoteComponent() throws Exception
     {
-        //Will connect to the server using tcp://localhost:60504
+        // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
         MuleManager.getConfiguration().setSynchronous(true);
 
@@ -59,18 +60,18 @@ public class MuleClientRemotingTestCase extends AbstractMuleTestCase
     public void testClientSendAndReceiveRemote() throws Exception
     {
         String remoteEndpoint = "vm://vmRemoteProvider/remote.queue";
-        //Will connect to the server using tcp://localhost:60504
+        // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
         MuleManager.getConfiguration().setSynchronous(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
         UMOMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);
         assertNull(message);
-		
-		// Dispatch a message
+
+        // Dispatch a message
         dispatcher.dispatchRemote(remoteEndpoint, "Test Remote Message 2", null);
 
-		// Receive the message
+        // Receive the message
         message = dispatcher.receiveRemote(remoteEndpoint, 2000);
         assertNotNull(message);
         assertEquals("Test Remote Message 2", message.getPayload());

@@ -17,19 +17,20 @@ import java.util.Map;
 
 /**
  * <code>RouterStatsMBean</code> TODO
- *
+ * 
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public interface RouterStatsMBean {
+public interface RouterStatsMBean
+{
 
     int getCaughtMessages();
-    
+
     int getNotRouted();
 
     int getTotalReceived();
 
     int getTotalRouted();
-    
+
     Map getRouted();
 }

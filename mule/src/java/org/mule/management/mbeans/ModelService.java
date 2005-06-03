@@ -21,7 +21,7 @@ import org.mule.umo.UMOException;
 /**
  * <code>ModelService</code> exposes service information and actions on the
  * Mule Model
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -31,7 +31,7 @@ public class ModelService implements ModelServiceMBean
 
     public ModelService()
     {
-        model = (MuleModel)MuleManager.getInstance().getModel();
+        model = (MuleModel) MuleManager.getInstance().getModel();
 
     }
 
@@ -70,15 +70,18 @@ public class ModelService implements ModelServiceMBean
         model.unregisterComponent(model.getDescriptor(name));
     }
 
-    public boolean isComponentRegistered(String name) {
+    public boolean isComponentRegistered(String name)
+    {
         return model.isComponentRegistered(name);
     }
 
-    public UMODescriptor getComponentDescriptor(String name) {
-       return model.getDescriptor(name);
+    public UMODescriptor getComponentDescriptor(String name)
+    {
+        return model.getDescriptor(name);
     }
 
-    public String getName() {
+    public String getName()
+    {
         return model.getName();
     }
 }

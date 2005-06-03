@@ -15,13 +15,12 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class FruitBowl
 {
@@ -38,8 +37,7 @@ public class FruitBowl
 
     public FruitBowl(Fruit fruit[])
     {
-        for (int i = 0; i < fruit.length; i++)
-        {
+        for (int i = 0; i < fruit.length; i++) {
             bowl.put(fruit[i].getClass(), fruit[i]);
         }
     }
@@ -63,8 +61,7 @@ public class FruitBowl
     public Object consumeFruit(FruitLover fruitlover)
     {
         logger.debug("Got a fruit lover who says: " + fruitlover.speak());
-        for (Iterator iter = bowl.values().iterator(); iter.hasNext();)
-        {
+        for (Iterator iter = bowl.values().iterator(); iter.hasNext();) {
             ((Fruit) iter.next()).bite();
         }
         return fruitlover;
@@ -72,8 +69,7 @@ public class FruitBowl
 
     public void setFruit(Fruit[] fruit)
     {
-        for (int i = 0; i < fruit.length; i++)
-        {
+        for (int i = 0; i < fruit.length; i++) {
             bowl.put(fruit[i].getClass(), fruit[i]);
         }
     }

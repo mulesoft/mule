@@ -15,7 +15,7 @@ package org.mule.providers;
 
 /**
  * <code>NullPayload</code> represents a null event payload
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

@@ -18,21 +18,29 @@ import org.mule.umo.security.UMOCredentialsAccessor;
 
 /**
  * @author ariva
- *
+ * 
  */
-public class FakeCredentialAccessor implements UMOCredentialsAccessor {
+public class FakeCredentialAccessor implements UMOCredentialsAccessor
+{
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.security.UMOCredentialsAccessor#getCredentials(org.mule.umo.UMOEvent)
      */
-    public Object getCredentials(UMOEvent event) {
+    public Object getCredentials(UMOEvent event)
+    {
         return "Mule client <mule_client@mule.com>";
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.umo.security.UMOCredentialsAccessor#setCredentials(org.mule.umo.UMOEvent, java.lang.Object)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.security.UMOCredentialsAccessor#setCredentials(org.mule.umo.UMOEvent,
+     *      java.lang.Object)
      */
-    public void setCredentials(UMOEvent event, Object credentials) {
+    public void setCredentials(UMOEvent event, Object credentials)
+    {
     }
 
 }

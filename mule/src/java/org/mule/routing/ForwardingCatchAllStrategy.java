@@ -24,10 +24,11 @@ import org.mule.umo.routing.ComponentRoutingException;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router for any events
- * not caught by the router this strategy is associated with.  Users can assign an endpoint to this strategy to
- * forward all events to.  This can be used as a dead letter/error queue.
- *
+ * <code>ForwardingCatchAllStrategy</code> acts as a catch and forward router
+ * for any events not caught by the router this strategy is associated with.
+ * Users can assign an endpoint to this strategy to forward all events to. This
+ * can be used as a dead letter/error queue.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,25 +39,31 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
 
     public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
-        if(getEndpoint()==null) {
-            throw new ComponentRoutingException(new Message(Messages.NO_CATCH_ALL_ENDPOINT_SET), message, getEndpoint(), session.getComponent());
+        if (getEndpoint() == null) {
+            throw new ComponentRoutingException(new Message(Messages.NO_CATCH_ALL_ENDPOINT_SET),
+                                                message,
+                                                getEndpoint(),
+                                                session.getComponent());
         }
-        try
-        {
-            UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint().getEndpointURI().getAddress());
+        try {
+            UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint().getEndpointURI()
+                                                                                                      .getAddress());
             UMOEvent newEvent = new MuleEvent(message, getEndpoint(), session, synchronous);
 
-            if(synchronous) {
+            if (synchronous) {
                 UMOMessage result = dispatcher.send(newEvent);
-                if(statistics!=null) statistics.incrementRoutedMessage(getEndpoint());
+                if (statistics != null) {
+                    statistics.incrementRoutedMessage(getEndpoint());
+                }
                 return result;
             } else {
                 dispatcher.dispatch(newEvent);
-                if(statistics!=null) statistics.incrementRoutedMessage(getEndpoint());
+                if (statistics != null) {
+                    statistics.incrementRoutedMessage(getEndpoint());
+                }
                 return null;
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new RoutingException(message, getEndpoint(), e);
 
         }

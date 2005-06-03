@@ -18,58 +18,63 @@ package org.mule.util.queue;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class QueueConfiguration {
+public class QueueConfiguration
+{
 
-	protected int capacity;
-	protected boolean persistent;
-	
-	public QueueConfiguration(int capacity, boolean persistent) {
-		this.capacity = capacity;
-		this.persistent = persistent;
-	}
-	
-	public QueueConfiguration(int capacity) {
-		this(capacity, false);
-	}
-	
-	public QueueConfiguration(boolean persistent) {
-		this(0, persistent);
-	}
-	
-	public QueueConfiguration() {
-		this(0, false);
-	}
+    protected int capacity;
+    protected boolean persistent;
 
-	/**
-	 * @return Returns the capacity.
-	 */
-	public int getCapacity() {
-		return capacity;
-	}
-	
+    public QueueConfiguration(int capacity, boolean persistent)
+    {
+        this.capacity = capacity;
+        this.persistent = persistent;
+    }
 
-	/**
-	 * @param capacity The capacity to set.
-	 */
-	public void setCapacity(int capacity) {
-		this.capacity = capacity;
-	}
-	
+    public QueueConfiguration(int capacity)
+    {
+        this(capacity, false);
+    }
 
-	/**
-	 * @return Returns the persistent.
-	 */
-	public boolean isPersistent() {
-		return persistent;
-	}
-	
+    public QueueConfiguration(boolean persistent)
+    {
+        this(0, persistent);
+    }
 
-	/**
-	 * @param persistent The persistent to set.
-	 */
-	public void setPersistent(boolean persistent) {
-		this.persistent = persistent;
-	}
-	
-	
+    public QueueConfiguration()
+    {
+        this(0, false);
+    }
+
+    /**
+     * @return Returns the capacity.
+     */
+    public int getCapacity()
+    {
+        return capacity;
+    }
+
+    /**
+     * @param capacity The capacity to set.
+     */
+    public void setCapacity(int capacity)
+    {
+        this.capacity = capacity;
+    }
+
+    /**
+     * @return Returns the persistent.
+     */
+    public boolean isPersistent()
+    {
+        return persistent;
+    }
+
+    /**
+     * @param persistent The persistent to set.
+     */
+    public void setPersistent(boolean persistent)
+    {
+        this.persistent = persistent;
+    }
+
 }

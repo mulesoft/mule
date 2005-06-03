@@ -13,13 +13,14 @@
  */
 package org.mule.providers.servlet;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
-
 import java.util.Map;
 
+import org.mule.providers.AbstractServiceEnabledConnector;
+
 /**
- * <code>ServletConnector</code> is a channel adapter between Mule and a servlet engine.
- *
+ * <code>ServletConnector</code> is a channel adapter between Mule and a
+ * servlet engine.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

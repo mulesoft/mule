@@ -37,17 +37,17 @@ public class SpringAutowireConfigBuilderTestCase extends AbstractConfigBuilderTe
     }
 
     public void testComponentResolverConfig() throws Exception
-        {
-            //test container init
-            UMOManager manager = MuleManager.getInstance();
-            assertNotNull(manager.getContainerContext());
+    {
+        // test container init
+        UMOManager manager = MuleManager.getInstance();
+        assertNotNull(manager.getContainerContext());
 
-            Object object = manager.getContainerContext().getComponent("org.mule.tck.testmodels.fruit.FruitBowl");
-            assertNotNull(object);
-            assertTrue(object instanceof FruitBowl);
-            FruitBowl bowl = (FruitBowl) object;
-            assertTrue(bowl.hasBanana());
-            assertTrue(bowl.hasApple());
-        }
+        Object object = manager.getContainerContext().getComponent("org.mule.tck.testmodels.fruit.FruitBowl");
+        assertNotNull(object);
+        assertTrue(object instanceof FruitBowl);
+        FruitBowl bowl = (FruitBowl) object;
+        assertTrue(bowl.hasBanana());
+        assertTrue(bowl.hasApple());
+    }
 
 }

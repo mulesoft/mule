@@ -72,20 +72,25 @@ import org.mule.util.ObjectPool;
  * @version $Revision$
  */
 
-public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
+public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
+{
     protected static boolean initialised = false;
 
-    protected AbstractConfigBuilderTestCase() {
-        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+    protected AbstractConfigBuilderTestCase()
+    {
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         initialised = false;
     }
 
-    protected void setUp() throws Exception {
+    protected void setUp() throws Exception
+    {
         super.setUp();
         if (!initialised) {
             System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
 
-            if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+            if (MuleManager.isInstanciated())
+                MuleManager.getInstance().dispose();
             ConfigurationBuilder configBuilder = getConfigBuilder();
             configBuilder.configure(getConfigResource());
             initialised = true;
@@ -94,32 +99,36 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         }
     }
 
-    public void testManagerConfig() throws Exception {
+    public void testManagerConfig() throws Exception
+    {
         assertEquals("true", MuleManager.getInstance().getProperty("doCompression"));
         assertNotNull(MuleManager.getInstance().getTransactionManager());
     }
 
-    public void testConnectorConfig() throws Exception {
+    public void testConnectorConfig() throws Exception
+    {
         TestConnector c = (TestConnector) MuleManager.getInstance().lookupConnector("dummyConnector");
         assertNotNull(c);
         assertNotNull(c.getExceptionListener());
         assertTrue(c.getExceptionListener() instanceof TestExceptionStrategy);
         assertNotNull(c.getConnectionStrategy());
         assertTrue(c.getConnectionStrategy() instanceof SimpleRetryConnectionStrategy);
-        assertEquals(4, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getRetryCount());
-        assertEquals(3000, ((SimpleRetryConnectionStrategy)c.getConnectionStrategy()).getFrequency());
+        assertEquals(4, ((SimpleRetryConnectionStrategy) c.getConnectionStrategy()).getRetryCount());
+        assertEquals(3000, ((SimpleRetryConnectionStrategy) c.getConnectionStrategy()).getFrequency());
     }
 
-    public void testGlobalEndpointConfig() {
+    public void testGlobalEndpointConfig()
+    {
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint("fruitBowlEndpoint");
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
     }
 
-    public void testEndpointConfig() {
+    public void testEndpointConfig()
+    {
         String endpointString = MuleManager.getInstance().lookupEndpointIdentifier("Test Queue", null);
         assertEquals(endpointString, "test://test.queue");
-        //test that endpoints have been resolved on endpoints
+        // test that endpoints have been resolved on endpoints
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
@@ -128,20 +137,23 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertNotNull(descriptor);
     }
 
-    public void testInterceptorStacks() {
-		UMOInterceptorStack stack = MuleManager.getInstance().lookupInterceptorStack("default");
+    public void testInterceptorStacks()
+    {
+        UMOInterceptorStack stack = MuleManager.getInstance().lookupInterceptorStack("default");
         assertEquals(2, stack.getInterceptors().size());
         assertTrue(stack.getInterceptors().get(0) instanceof LoggingInterceptor);
         assertTrue(stack.getInterceptors().get(1) instanceof TimerInterceptor);
     }
 
-    public void testExceptionStrategy() {
+    public void testExceptionStrategy()
+    {
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
         assertNotNull(MuleManager.getInstance().getModel().getExceptionListener());
         assertNotNull(descriptor.getExceptionListener());
 
         assertTrue(((AbstractExceptionListener) descriptor.getExceptionListener()).getEndpoints().size() > 0);
-        UMOEndpoint ep = (UMOEndpoint)((AbstractExceptionListener)descriptor.getExceptionListener()).getEndpoints().get(0);
+        UMOEndpoint ep = (UMOEndpoint) ((AbstractExceptionListener) descriptor.getExceptionListener()).getEndpoints()
+                                                                                                      .get(0);
 
         assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
 
@@ -149,10 +161,10 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertNotNull(descriptor.getExceptionListener());
         assertEquals(DefaultExceptionStrategy.class, descriptor.getExceptionListener().getClass());
 
-
     }
 
-    public void testTransformerConfig() {
+    public void testTransformerConfig()
+    {
         UMOTransformer t = MuleManager.getInstance().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
@@ -160,7 +172,8 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
     }
 
-    public void testModelConfig() throws Exception {
+    public void testModelConfig() throws Exception
+    {
         UMOModel model = MuleManager.getInstance().getModel();
         assertNotNull(model);
         assertEquals("test-model", model.getName());
@@ -168,7 +181,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertTrue(model.getExceptionListener() instanceof TestExceptionStrategy);
 
         assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().size() > 0);
-        UMOEndpoint ep = (UMOEndpoint)((AbstractExceptionListener)model.getExceptionListener()).getEndpoints().get(0);
+        UMOEndpoint ep = (UMOEndpoint) ((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().get(0);
 
         assertEquals("test://component.exceptions", ep.getEndpointURI().toString());
 
@@ -179,7 +192,8 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertTrue(model.isComponentRegistered("appleComponent2"));
     }
 
-    public void testPropertiesConfig() throws Exception {
+    public void testPropertiesConfig() throws Exception
+    {
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
 
         Map props = descriptor.getProperties();
@@ -210,18 +224,19 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
         assertEquals(7, descriptor.getProperties().size());
         assertEquals(2, descriptor.getInboundRouter().getEndpoints().size());
-//        assertNotNull(descriptor.getInboundEndpoint());
-//        assertNotNull(descriptor.getOutboundEndpoint());
+        // assertNotNull(descriptor.getInboundEndpoint());
+        // assertNotNull(descriptor.getOutboundEndpoint());
     }
 
-    public void testOutboundRouterConfig() {
-        //test outbound message router
+    public void testOutboundRouterConfig()
+    {
+        // test outbound message router
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent");
         assertNotNull(descriptor.getOutboundRouter());
         UMOOutboundMessageRouter router = descriptor.getOutboundRouter();
         assertNotNull(router.getCatchAllStrategy());
         assertEquals(2, router.getRouters().size());
-        //check first Router
+        // check first Router
         UMOOutboundRouter route1 = (UMOOutboundRouter) router.getRouters().get(0);
         assertTrue(route1 instanceof FilteringOutboundRouter);
         assertNotNull(((FilteringOutboundRouter) route1).getTransformer());
@@ -231,7 +246,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertTrue(filter instanceof PayloadTypeFilter);
         assertEquals(String.class, ((PayloadTypeFilter) filter).getExpectedType());
 
-        //check second Router
+        // check second Router
         UMOOutboundRouter route2 = (UMOOutboundRouter) router.getRouters().get(1);
         assertTrue(route2 instanceof FilteringOutboundRouter);
 
@@ -250,7 +265,8 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertTrue(router.getCatchAllStrategy() instanceof TestCatchAllStrategy);
     }
 
-    public void testDescriptorEndpoints() {
+    public void testDescriptorEndpoints()
+    {
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
         assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
         UMOOutboundRouter router = (UMOOutboundRouter) descriptor.getOutboundRouter().getRouters().get(0);
@@ -261,7 +277,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertNotNull(endpoint.getTransformer());
         assertTrue(endpoint.getTransformer() instanceof TestCompressionTransformer);
 
-        //check the global endpoint
+        // check the global endpoint
         endpoint = MuleManager.getInstance().lookupEndpoint("appleInEndpoint");
         assertNotNull(endpoint);
         assertNull(endpoint.getTransformer());
@@ -271,22 +287,27 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy());
         assertTrue(descriptor.getInboundRouter().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
         assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy().getEndpoint());
-        assertEquals("test://catch.all", descriptor.getInboundRouter().getCatchAllStrategy().getEndpoint().getEndpointURI().toString());
+        assertEquals("test://catch.all", descriptor.getInboundRouter()
+                                                   .getCatchAllStrategy()
+                                                   .getEndpoint()
+                                                   .getEndpointURI()
+                                                   .toString());
         endpoint = (UMOEndpoint) descriptor.getInboundRouter().getEndpoint("orangeEndpoint");
         assertNotNull(endpoint);
         assertEquals("orangeEndpoint", endpoint.getName());
         assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());
-        //assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
+        // assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
         assertNotNull(endpoint.getTransformer());
         assertTrue(endpoint.getTransformer() instanceof TestCompressionTransformer);
 
-        //check the global endpoint
+        // check the global endpoint
         endpoint = MuleManager.getInstance().lookupEndpoint("orangeEndpoint");
         assertNotNull(endpoint);
         assertNull(endpoint.getTransformer());
     }
 
-    public void testInboundRouterConfig() {
+    public void testInboundRouterConfig()
+    {
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent");
         assertNotNull(descriptor.getInboundRouter());
         UMOInboundMessageRouter messageRouter = descriptor.getInboundRouter();
@@ -298,7 +319,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
 
         assertNotNull(sc.getFilter());
         UMOFilter filter = sc.getFilter();
-        //check first Router
+        // check first Router
         assertTrue(filter instanceof PayloadTypeFilter);
         assertEquals(String.class, ((PayloadTypeFilter) filter).getExpectedType());
 
@@ -306,7 +327,8 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertTrue(router2 instanceof IdempotentReceiver);
     }
 
-    public void testResponseRouterConfig() {
+    public void testResponseRouterConfig()
+    {
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
         assertNotNull(descriptor.getResponseRouter());
         UMOResponseMessageRouter messageRouter = descriptor.getResponseRouter();
@@ -326,8 +348,9 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
     }
 
-    public void testThreadingConfig() throws MuleException {
-        //test config
+    public void testThreadingConfig() throws MuleException
+    {
+        // test config
         ThreadingProfile tp = MuleManager.getConfiguration().getDefaultThreadingProfile();
         assertEquals(0, tp.getMaxBufferSize());
         assertEquals(8, tp.getMaxThreadsActive());
@@ -335,7 +358,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertEquals(0, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 
-        //test defaults
+        // test defaults
         tp = MuleManager.getConfiguration().getComponentThreadingProfile();
         assertEquals(0, tp.getMaxBufferSize());
         assertEquals(8, tp.getMaxThreadsActive());
@@ -343,7 +366,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertEquals(0, tp.getPoolExhaustedAction());
         assertEquals(60001, tp.getThreadTTL());
 
-        //test thatvalues not set retain a default value
+        // test thatvalues not set retain a default value
         AbstractConnector c = (AbstractConnector) MuleManager.getInstance().lookupConnector("dummyConnector");
         tp = c.getDispatcherThreadingProfile();
         assertEquals(2, tp.getMaxBufferSize());
@@ -352,7 +375,9 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertEquals(4, tp.getPoolExhaustedAction());
         assertEquals(60000, tp.getThreadTTL());
 
-        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance().getModel().getDescriptor("appleComponent2");
+        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
+                                                                .getModel()
+                                                                .getDescriptor("appleComponent2");
         tp = descriptor.getThreadingProfile();
         assertEquals(6, tp.getMaxBufferSize());
         assertEquals(12, tp.getMaxThreadsActive());
@@ -361,8 +386,9 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertEquals(60000, tp.getThreadTTL());
     }
 
-    public void testPoolingConfig() {
-        //test config
+    public void testPoolingConfig()
+    {
+        // test config
         PoolingProfile pp = MuleManager.getConfiguration().getPoolingProfile();
         assertEquals(8, pp.getMaxActive());
         assertEquals(4, pp.getMaxIdle());
@@ -371,8 +397,10 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertEquals(1, pp.getInitialisationPolicy());
         assertTrue(pp.getPoolFactory() instanceof CommonsPoolFactory);
 
-        //test override
-        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance().getModel().getDescriptor("appleComponent2");
+        // test override
+        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
+                                                                .getModel()
+                                                                .getDescriptor("appleComponent2");
         pp = descriptor.getPoolingProfile();
 
         assertEquals(5, pp.getMaxActive());
@@ -382,44 +410,50 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertEquals(2, pp.getInitialisationPolicy());
     }
 
-    public void testQueueProfileConfig() {
-        //test config
+    public void testQueueProfileConfig()
+    {
+        // test config
         QueueProfile qp = MuleManager.getConfiguration().getQueueProfile();
         assertEquals(100, qp.getMaxOutstandingMessages());
         assertTrue(qp.isPersistent());
 
-        //test inherit
-        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        // test inherit
+        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
+                                                                .getModel()
+                                                                .getDescriptor("orangeComponent");
         qp = descriptor.getQueueProfile();
         assertEquals(100, qp.getMaxOutstandingMessages());
         assertTrue(qp.isPersistent());
 
-        //test override
+        // test override
         descriptor = (MuleDescriptor) MuleManager.getInstance().getModel().getDescriptor("appleComponent2");
         qp = descriptor.getQueueProfile();
         assertEquals(102, qp.getMaxOutstandingMessages());
         assertFalse(qp.isPersistent());
     }
 
-    public void testEndpointProperties() throws Exception {
-        //test transaction config
+    public void testEndpointProperties() throws Exception
+    {
+        // test transaction config
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent2");
-        MuleEndpoint inEndpoint = (MuleEndpoint)descriptor.getInboundRouter().getEndpoint("transactedInboundEndpoint");
+        MuleEndpoint inEndpoint = (MuleEndpoint) descriptor.getInboundRouter().getEndpoint("transactedInboundEndpoint");
         assertNotNull(inEndpoint);
         assertEquals(ConnectorFactory.ALWAYS_CREATE_CONNECTOR, inEndpoint.getCreateConnector());
         assertNotNull(inEndpoint.getProperties());
         assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
     }
 
-    public void testTranactionConfig() throws Exception {
-        //test transaction config
+    public void testTranactionConfig() throws Exception
+    {
+        // test transaction config
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent2");
         UMOEndpoint inEndpoint = descriptor.getInboundRouter().getEndpoint("transactedInboundEndpoint");
         assertNotNull(inEndpoint);
         assertNull(descriptor.getOutboundEndpoint());
         assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
 
-        UMOEndpoint outEndpoint = (UMOEndpoint) ((UMOOutboundRouter) descriptor.getOutboundRouter().getRouters().get(0)).getEndpoints().get(0);
+        UMOEndpoint outEndpoint = (UMOEndpoint) ((UMOOutboundRouter) descriptor.getOutboundRouter().getRouters().get(0)).getEndpoints()
+                                                                                                                        .get(0);
 
         assertNotNull(outEndpoint);
         assertNotNull(inEndpoint.getTransactionConfig());
@@ -428,19 +462,24 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertNull(inEndpoint.getTransactionConfig().getConstraint());
     }
 
-    public void testObjectReferences() throws UMOException {
-        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+    public void testObjectReferences() throws UMOException
+    {
+        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
+                                                                .getModel()
+                                                                .getDescriptor("orangeComponent");
         assertEquals("local:orange", descriptor.getImplementation());
         assertNotNull(descriptor.getProperties().get("orange"));
         assertEquals(Orange.class, descriptor.getImplementationClass());
     }
 
-    public void testAgentConfiguration() throws UMOException {
+    public void testAgentConfiguration() throws UMOException
+    {
         UMOAgent agent = MuleManager.getInstance().removeAgent("jmxAgent");
         assertNotNull(agent);
     }
 
-    public void testEnvironmentProperties() {
+    public void testEnvironmentProperties()
+    {
         Map props = MuleManager.getInstance().getProperties();
         assertNotNull(props);
         assertNotNull(props.get("doCompression"));
@@ -450,9 +489,11 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase {
         assertNotNull(props.get("OS Version"));
     }
 
-    //leave this last
-    public void testTearDown() throws Exception {
-        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+    // leave this last
+    public void testTearDown() throws Exception
+    {
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         initialised = false;
     }
 

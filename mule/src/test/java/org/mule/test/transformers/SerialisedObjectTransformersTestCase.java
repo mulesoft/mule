@@ -13,15 +13,15 @@
  */
 package org.mule.test.transformers;
 
-import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.transformers.simple.ByteArrayToSerializable;
-import org.mule.transformers.simple.SerializableToByteArray;
-import org.mule.umo.transformer.UMOTransformer;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+
+import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.transformers.simple.ByteArrayToSerializable;
+import org.mule.transformers.simple.SerializableToByteArray;
+import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -48,8 +48,7 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
 
     public Object getResultData()
     {
-        try
-        {
+        try {
             ByteArrayOutputStream bs = null;
             ObjectOutputStream os = null;
 
@@ -59,23 +58,28 @@ public class SerialisedObjectTransformersTestCase extends AbstractTransformerTes
             os.flush();
             os.close();
             return bs.toByteArray();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new IllegalStateException(e.getMessage());
         }
     }
 
-    public boolean compareResults(Object src, Object result) {
-        if (src == null && result == null) return true;
-        if (src == null || result == null) return false;
+    public boolean compareResults(Object src, Object result)
+    {
+        if (src == null && result == null)
+            return true;
+        if (src == null || result == null)
+            return false;
         return Arrays.equals((byte[]) src, (byte[]) result);
     }
 
-    public boolean compareRoundtripResults(Object src, Object result) {
-        if (src == null && result == null) return true;
-        if (src == null || result == null) return false;
+    public boolean compareRoundtripResults(Object src, Object result)
+    {
+        if (src == null && result == null)
+            return true;
+        if (src == null || result == null)
+            return false;
         if (src instanceof Exception && result instanceof Exception) {
-            return ((Exception)src).getMessage().equals(((Exception) result).getMessage());
+            return ((Exception) src).getMessage().equals(((Exception) result).getMessage());
         } else {
             throw new IllegalStateException("arguments are not Exceptions");
         }

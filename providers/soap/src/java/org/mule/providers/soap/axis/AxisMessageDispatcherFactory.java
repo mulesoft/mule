@@ -19,9 +19,9 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>AxisMessageDispatcherFactory</code> creates an AxisMessageDispatcher, used
- * for making soap calls using the Axis stack.
- *
+ * <code>AxisMessageDispatcherFactory</code> creates an AxisMessageDispatcher,
+ * used for making soap calls using the Axis stack.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,6 +29,6 @@ public class AxisMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-        return new AxisMessageDispatcher((AxisConnector)connector);
+        return new AxisMessageDispatcher((AxisConnector) connector);
     }
 }

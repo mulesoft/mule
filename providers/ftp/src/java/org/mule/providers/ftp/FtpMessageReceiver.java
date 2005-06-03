@@ -40,94 +40,100 @@ import org.mule.umo.provider.UMOConnector;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class FtpMessageReceiver extends PollingMessageReceiver {
+public class FtpMessageReceiver extends PollingMessageReceiver
+{
 
-	protected Set currentFiles = Collections.synchronizedSet(new HashSet());
+    protected Set currentFiles = Collections.synchronizedSet(new HashSet());
 
-	protected FtpConnector connector;
-	
-    public FtpMessageReceiver(UMOConnector connector,
-            				  UMOComponent component,
-            				  UMOEndpoint endpoint,
-            				  Long frequency) throws InitialisationException {
-		super(connector, component, endpoint, frequency);
-		this.connector = (FtpConnector) connector;
+    protected FtpConnector connector;
+
+    public FtpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint, Long frequency)
+            throws InitialisationException
+    {
+        super(connector, component, endpoint, frequency);
+        this.connector = (FtpConnector) connector;
     }
-	
-	public void poll() throws Exception {
-		FTPFile[] files = listFiles();
-		for (int i = 0; i < files.length; i++) {
-			final FTPFile file = files[i];
-			if (!currentFiles.contains(file.getName())) {
-				getWorkManager().scheduleWork(new Work() {
-					public void run() {
-						try {
-							processFile(file);
-						} catch (Exception e) {
-							connector.handleException(e);
-						} finally {
-							currentFiles.remove(file.getName());
-						}
-					}
-					public void release() {
-					}
-				});
-			}
-		}
-	}
-	
-	protected FTPFile[] listFiles() throws Exception {
-		FTPClient client = null;
-		UMOEndpointURI uri = endpoint.getEndpointURI();
-		try {
-			client = (FTPClient) connector.getFtp(uri);
-			if (!client.changeWorkingDirectory(uri.getPath())) {
-				throw new IOException("Ftp error: " + client.getReplyCode());
-			}
-			FTPFile[] files = client.listFiles();
-			if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
-				throw new IOException("Ftp error: " + client.getReplyCode());
-			}
-			UMOFilter filter = endpoint.getFilter();
-			if (files == null || files.length > 0) {
-				return files;
-			}
-			ArrayList v = new ArrayList();
-			for (int i = 0; i < files.length; i++) {
-				if (files[i].isFile()) {
-					if (filter == null || filter.accept(files[i].getName())) {
-						v.add(files);
-					}
-				}
-			}
-			return (FTPFile[]) v.toArray(new FTPFile[v.size()]);
-		} finally {
-			connector.releaseFtp(uri, client);
-		}
-	}
 
-	protected void processFile(FTPFile file) throws Exception {
-		FTPClient client = null;
-		UMOEndpointURI uri = endpoint.getEndpointURI();
-		try {
-			client = (FTPClient) connector.getFtp(uri);
-			if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath())) {
-				throw new IOException("Ftp error: " + client.getReplyCode());
-			}
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			if (!client.retrieveFile(file.getName(), baos)) {
-				throw new IOException("Ftp error: " + client.getReplyCode());
-			}
-			UMOMessage message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()), null);
-			message.setProperty(FtpConnector.PROPERTY_FILENAME, file.getName());
-			routeMessage(message);
-			if (!client.deleteFile(file.getName())) {
-				throw new IOException("Ftp error: " + client.getReplyCode());
-			}
-		} finally {
-			connector.releaseFtp(uri, client);
-		}
-	}
+    public void poll() throws Exception
+    {
+        FTPFile[] files = listFiles();
+        for (int i = 0; i < files.length; i++) {
+            final FTPFile file = files[i];
+            if (!currentFiles.contains(file.getName())) {
+                getWorkManager().scheduleWork(new Work() {
+                    public void run()
+                    {
+                        try {
+                            processFile(file);
+                        } catch (Exception e) {
+                            connector.handleException(e);
+                        } finally {
+                            currentFiles.remove(file.getName());
+                        }
+                    }
+
+                    public void release()
+                    {
+                    }
+                });
+            }
+        }
+    }
+
+    protected FTPFile[] listFiles() throws Exception
+    {
+        FTPClient client = null;
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+        try {
+            client = (FTPClient) connector.getFtp(uri);
+            if (!client.changeWorkingDirectory(uri.getPath())) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+            FTPFile[] files = client.listFiles();
+            if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+            UMOFilter filter = endpoint.getFilter();
+            if (files == null || files.length > 0) {
+                return files;
+            }
+            ArrayList v = new ArrayList();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isFile()) {
+                    if (filter == null || filter.accept(files[i].getName())) {
+                        v.add(files);
+                    }
+                }
+            }
+            return (FTPFile[]) v.toArray(new FTPFile[v.size()]);
+        } finally {
+            connector.releaseFtp(uri, client);
+        }
+    }
+
+    protected void processFile(FTPFile file) throws Exception
+    {
+        FTPClient client = null;
+        UMOEndpointURI uri = endpoint.getEndpointURI();
+        try {
+            client = (FTPClient) connector.getFtp(uri);
+            if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath())) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            if (!client.retrieveFile(file.getName(), baos)) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+            UMOMessage message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()), null);
+            message.setProperty(FtpConnector.PROPERTY_FILENAME, file.getName());
+            routeMessage(message);
+            if (!client.deleteFile(file.getName())) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+        } finally {
+            connector.releaseFtp(uri, client);
+        }
+    }
 
     public void doConnect() throws Exception
     {
@@ -135,7 +141,8 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
         connector.releaseFtp(getEndpointURI(), client);
     }
 
-    public void doDisconnect() throws Exception {
+    public void doDisconnect() throws Exception
+    {
 
     }
 

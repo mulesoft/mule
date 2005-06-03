@@ -13,19 +13,20 @@
  */
 package org.mule.util;
 
-import EDU.oswego.cs.dl.util.concurrent.Channel;
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
-import org.mule.config.ThreadingProfile;
-import org.mule.umo.lifecycle.Disposable;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mule.config.ThreadingProfile;
+import org.mule.umo.lifecycle.Disposable;
+
+import EDU.oswego.cs.dl.util.concurrent.Channel;
+import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+
 /**
- * <code>DisposableThreadPool</code> explicitly disposes all threads in
- * the pool that implement Disposable
- * Calling shutdownNow() will invoke the dispose method on this pool
- *
+ * <code>DisposableThreadPool</code> explicitly disposes all threads in the
+ * pool that implement Disposable Calling shutdownNow() will invoke the dispose
+ * method on this pool
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -51,19 +52,20 @@ public class DisposableThreadPool extends PooledExecutor implements Disposable
         super(channel, i);
     }
 
-    public DisposableThreadPool (String name) {
+    public DisposableThreadPool(String name)
+    {
         super();
         setThreadFactory(new ThreadingProfile.NamedThreadFactory(name, Thread.NORM_PRIORITY));
     }
+
     public void dispose()
     {
         List list = new ArrayList(threads_.values());
         Thread thread;
-        for (int i = 0; i < list.size(); i++)
-        {
-              thread = (Thread)list.get(i);
-              if(thread instanceof Disposable) {
-                ((Disposable)thread).dispose();
+        for (int i = 0; i < list.size(); i++) {
+            thread = (Thread) list.get(i);
+            if (thread instanceof Disposable) {
+                ((Disposable) thread).dispose();
             } else {
                 thread.interrupt();
             }

@@ -22,9 +22,9 @@ import org.mule.umo.MessagingException;
  */
 public class MessageRedeliveredException extends MessagingException
 {
-    public MessageRedeliveredException(JmsMessageAdapter jmsMessage) {
-        super(new org.mule.config.i18n.Message("jms", 7,
-                (jmsMessage==null ? "[null message]" : jmsMessage.getUniqueId()))
-                , jmsMessage);
+    public MessageRedeliveredException(JmsMessageAdapter jmsMessage)
+    {
+        super(new org.mule.config.i18n.Message("jms", 7, (jmsMessage == null ? "[null message]"
+                : jmsMessage.getUniqueId())), jmsMessage);
     }
 }

@@ -22,16 +22,19 @@ import org.mule.umo.UMOTransactionFactory;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class VMTransactionFactory implements UMOTransactionFactory {
+public class VMTransactionFactory implements UMOTransactionFactory
+{
 
-	public UMOTransaction beginTransaction() throws TransactionException {
-		VMTransaction tx = new VMTransaction();
-		tx.begin();
-		return tx;
-	}
+    public UMOTransaction beginTransaction() throws TransactionException
+    {
+        VMTransaction tx = new VMTransaction();
+        tx.begin();
+        return tx;
+    }
 
-	public boolean isTransacted() {
-		return true;
-	}
+    public boolean isTransacted()
+    {
+        return true;
+    }
 
 }

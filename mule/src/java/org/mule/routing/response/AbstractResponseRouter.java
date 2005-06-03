@@ -19,8 +19,9 @@ import org.mule.routing.DefaultPropertiesExtractor;
 import org.mule.umo.routing.UMOResponseRouter;
 
 /**
- * <code>AbstractResponseRouter</code> is a base class for all Response Routers
- *
+ * <code>AbstractResponseRouter</code> is a base class for all Response
+ * Routers
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

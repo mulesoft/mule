@@ -13,8 +13,10 @@
  */
 package org.mule.test.routing.outbound;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.outbound.AbstractMessageSplitter;
@@ -24,9 +26,8 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.util.Utility;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -46,9 +47,10 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         UMOEndpoint endpoint3 = getTestEndpoint("Test3Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
 
-        //Dummy message splitter
+        // Dummy message splitter
         AbstractMessageSplitter router = new AbstractMessageSplitter() {
             private List parts;
+
             protected void initialise(UMOMessage message)
             {
                 multimatch = false;
@@ -57,11 +59,11 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
 
             protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
             {
-                if(endpoint.getEndpointURI().getAddress().equals("endpointUri.1")) {
+                if (endpoint.getEndpointURI().getAddress().equals("endpointUri.1")) {
                     return new MuleMessage(parts.get(0), null);
-                } else if(endpoint.getEndpointURI().getAddress().equals("endpointUri.2")) {
+                } else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.2")) {
                     return new MuleMessage(parts.get(1), null);
-                } else if(endpoint.getEndpointURI().getAddress().equals("endpointUri.3")) {
+                } else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.3")) {
                     return new MuleMessage(parts.get(2), null);
                 } else {
                     return null;
@@ -81,7 +83,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint2)));
         session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint3)));
-        router.route(message, (UMOSession)session.proxy(), false);
+        router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
         message = new MuleMessage("test,mule,message", null);
@@ -89,7 +91,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint1)), message);
         session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint2)), message);
         session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint3)), message);
-        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
+        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();

@@ -13,62 +13,81 @@
  */
 package org.mule.extras.pgp;
 
+import org.mule.umo.security.UMOAuthentication;
+
 import cryptix.message.Message;
 import cryptix.pki.KeyBundle;
-import org.mule.umo.security.UMOAuthentication;
 
 /**
  * @author ariva
- *
+ * 
  */
-public class PGPAuthentication implements UMOAuthentication {
+public class PGPAuthentication implements UMOAuthentication
+{
 
-    boolean authenticated=false;
+    boolean authenticated = false;
     private String userName;
     private Message message;
-    private KeyBundle userKeyBundle=null;
-    
-    public PGPAuthentication(String userName, Message message) {
-        this.userName=userName;
-        this.message=message;
-    }
-    
-    /* (non-Javadoc)
-     * @see org.mule.umo.security.UMOAuthentication#setAuthenticated(boolean)
-     */
-    public void setAuthenticated(boolean b) {
-        authenticated=b;
+    private KeyBundle userKeyBundle = null;
+
+    public PGPAuthentication(String userName, Message message)
+    {
+        this.userName = userName;
+        this.message = message;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.security.UMOAuthentication#setAuthenticated(boolean)
+     */
+    public void setAuthenticated(boolean b)
+    {
+        authenticated = b;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.security.UMOAuthentication#isAuthenticated()
      */
-    public boolean isAuthenticated() {        
+    public boolean isAuthenticated()
+    {
         return authenticated;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.security.UMOAuthentication#getCredentials()
      */
-    public Object getCredentials() {
+    public Object getCredentials()
+    {
         return message;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.security.UMOAuthentication#getDetails()
      */
-    public Object getDetails() {
+    public Object getDetails()
+    {
         return userKeyBundle;
     }
 
-    protected void setDetails(KeyBundle kb) {
-        userKeyBundle=kb;
+    protected void setDetails(KeyBundle kb)
+    {
+        userKeyBundle = kb;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.security.UMOAuthentication#getPrincipal()
      */
-    public Object getPrincipal() {        
+    public Object getPrincipal()
+    {
         return userName;
     }
 

@@ -23,13 +23,17 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class FtpMessageDispatcherFactory implements UMOMessageDispatcherFactory {
+public class FtpMessageDispatcherFactory implements UMOMessageDispatcherFactory
+{
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnectorSessionFactory#create(org.mule.umo.provider.UMOConnector)
      */
-	public UMOMessageDispatcher create(UMOConnector connector) throws UMOException {
+    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    {
         return new FtpMessageDispatcher((FtpConnector) connector);
-	}
+    }
 
 }

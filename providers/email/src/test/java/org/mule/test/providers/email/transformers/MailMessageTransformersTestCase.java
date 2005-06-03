@@ -13,7 +13,13 @@
  */
 package org.mule.test.providers.email.transformers;
 
-import com.mockobjects.dynamic.Mock;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.email.SmtpConnector;
 import org.mule.providers.email.transformers.EmailMessageToString;
@@ -24,11 +30,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-import java.util.Properties;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -55,7 +57,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         endpoint.setConnector(new SmtpConnector() {
             public UMOMessageDispatcher getDispatcher() throws UMOException
             {
-                return (UMOMessageDispatcher)mockDispatcher.proxy();
+                return (UMOMessageDispatcher) mockDispatcher.proxy();
             }
         });
         trans.setEndpoint(endpoint);
@@ -65,14 +67,11 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 
     public Object getTestData()
     {
-        if (message == null)
-        {
+        if (message == null) {
             message = new MimeMessage(Session.getDefaultInstance(new Properties()));
-            try
-            {
+            try {
                 message.setContent(getResultData(), "text/plain");
-            } catch (MessagingException e)
-            {
+            } catch (MessagingException e) {
                 throw new RuntimeException("Failed to create Mime Message: " + e.getMessage(), e);
             }
         }
@@ -86,18 +85,17 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 
     public boolean compareResults(Object src, Object result)
     {
-        if(src instanceof Message) {
+        if (src instanceof Message) {
             Object objSrc = null;
             Object objRes = null;
-            try
-            {
-                objSrc = ((Message)src).getContent();
-                objRes = ((Message)result).getContent();
-            } catch (Exception e)
-            {
+            try {
+                objSrc = ((Message) src).getContent();
+                objRes = ((Message) result).getContent();
+            } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
-            if(objSrc==null || objRes==null) return false;
+            if (objSrc == null || objRes == null)
+                return false;
             return objRes.equals(objSrc);
         }
         return super.compareResults(src, result);

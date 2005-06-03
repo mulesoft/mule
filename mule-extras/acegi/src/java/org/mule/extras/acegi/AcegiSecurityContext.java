@@ -15,13 +15,14 @@ package org.mule.extras.acegi;
 
 import net.sf.acegisecurity.context.ContextInvalidException;
 import net.sf.acegisecurity.context.SecureContext;
+
 import org.mule.umo.security.UMOAuthentication;
 import org.mule.umo.security.UMOSecurityContext;
 
 /**
- * <code>AcegiSecurityContext</code> is a UMOSecurityContext wrapper used to interface
- * with an acegi Secure context
- *
+ * <code>AcegiSecurityContext</code> is a UMOSecurityContext wrapper used to
+ * interface with an acegi Secure context
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,7 +39,7 @@ public class AcegiSecurityContext implements UMOSecurityContext
 
     public void setAuthentication(UMOAuthentication authentication)
     {
-        this.authentication = ((AcegiAuthenticationAdapter)authentication);
+        this.authentication = ((AcegiAuthenticationAdapter) authentication);
         delegate.setAuthentication(this.authentication.getDelegate());
     }
 

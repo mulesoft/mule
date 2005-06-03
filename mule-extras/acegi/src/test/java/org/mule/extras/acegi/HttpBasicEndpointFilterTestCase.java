@@ -20,6 +20,7 @@ import net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider;
 import net.sf.acegisecurity.providers.dao.User;
 import net.sf.acegisecurity.providers.dao.memory.InMemoryDaoImpl;
 import net.sf.acegisecurity.providers.dao.memory.UserMap;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -45,8 +46,18 @@ public class HttpBasicEndpointFilterTestCase extends NamedTestCase
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         InMemoryDaoImpl dao = new InMemoryDaoImpl();
         UserMap map = new UserMap();
-        map.addUser(new User("ross", "ross", true, true, true, new GrantedAuthority[]{new GrantedAuthorityImpl("ROLE_ADMIN")}));
-        map.addUser(new User("anon", "anon", true, true, true, new GrantedAuthority[]{new GrantedAuthorityImpl("ROLE_ANONYOMUS")}));
+        map.addUser(new User("ross",
+                             "ross",
+                             true,
+                             true,
+                             true,
+                             new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_ADMIN") }));
+        map.addUser(new User("anon",
+                             "anon",
+                             true,
+                             true,
+                             true,
+                             new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_ANONYOMUS") }));
         dao.setUserMap(map);
         dao.afterPropertiesSet();
         provider.setAuthenticationDao(dao);
@@ -61,8 +72,11 @@ public class HttpBasicEndpointFilterTestCase extends NamedTestCase
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         UMOManager manager = builder.createStartedManager(true, "");
         manager.setSecurityManager(sm);
-        UMODescriptor d = builder.createDescriptor(
-                EchoComponent.class.getName(), "echo", "http://localhost:4567", null ,null);
+        UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(),
+                                                   "echo",
+                                                   "http://localhost:4567",
+                                                   null,
+                                                   null);
         d.getInboundEndpoint().setSecurityFilter(new HttpBasicAuthenticationFilter("mule-realm"));
         builder.registerComponent(d);
     }
@@ -73,10 +87,10 @@ public class HttpBasicEndpointFilterTestCase extends NamedTestCase
         client.getState().setAuthenticationPreemptive(true);
         GetMethod get = new GetMethod("http://localhost:4567/index.html");
 
-        get.setDoAuthentication( false );
+        get.setDoAuthentication(false);
 
         try {
-            int status = client.executeMethod( get );
+            int status = client.executeMethod(get);
 
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
             System.out.println(status + "\n" + get.getResponseBodyAsString());
@@ -88,50 +102,50 @@ public class HttpBasicEndpointFilterTestCase extends NamedTestCase
 
     public void testAuthenticationFailureBadCredentials() throws Exception
     {
-        doRequest(null, "localhost", "anonX", "anonX",
-                "http://localhost:4567/index.html", true, false, 401);
+        doRequest(null, "localhost", "anonX", "anonX", "http://localhost:4567/index.html", true, false, 401);
     }
 
     public void testAuthenticationAuthorised() throws Exception
     {
-        doRequest(null, "localhost", "anon", "anon",
-                "http://localhost:4567/index.html", false, true, 200);
+        doRequest(null, "localhost", "anon", "anon", "http://localhost:4567/index.html", false, true, 200);
     }
 
     public void testAuthenticationAuthorisedWithHandshake() throws Exception
     {
-        doRequest(null, "localhost", "anon", "anon",
-                "http://localhost:4567/index.html", true, false, 200);
+        doRequest(null, "localhost", "anon", "anon", "http://localhost:4567/index.html", true, false, 200);
     }
 
     public void testAuthenticationAuthorisedWithHandshakeAndBadRealm() throws Exception
     {
-        doRequest("blah", "localhost", "anon", "anon",
-                "http://localhost:4567/index.html", true, false, 401);
+        doRequest("blah", "localhost", "anon", "anon", "http://localhost:4567/index.html", true, false, 401);
     }
 
     public void testAuthenticationAuthorisedWithHandshakeAndRealm() throws Exception
     {
-        doRequest("mule-realm", "localhost", "ross", "ross",
-                "http://localhost:4567/index.html", true, false, 200);
+        doRequest("mule-realm", "localhost", "ross", "ross", "http://localhost:4567/index.html", true, false, 200);
     }
 
-
-    private void doRequest(String realm, String host, String user, String pass, String url, boolean handshake, boolean preemtive, int result) throws Exception
+    private void doRequest(String realm,
+                           String host,
+                           String user,
+                           String pass,
+                           String url,
+                           boolean handshake,
+                           boolean preemtive,
+                           int result) throws Exception
     {
         HttpClient client = new HttpClient();
 
         client.getState().setAuthenticationPreemptive(preemtive);
 
-        client.getState().setCredentials( realm, host,
-            new UsernamePasswordCredentials(user, pass));
+        client.getState().setCredentials(realm, host, new UsernamePasswordCredentials(user, pass));
 
         GetMethod get = new GetMethod(url);
 
-        get.setDoAuthentication( handshake );
+        get.setDoAuthentication(handshake);
 
         try {
-            int status = client.executeMethod( get );
+            int status = client.executeMethod(get);
 
             assertEquals(result, status);
             System.out.println(status + "\n" + get.getResponseBodyAsString());

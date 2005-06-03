@@ -18,9 +18,9 @@ import org.mule.util.StringMessageHelper;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * <code>TestMuleEventBean</code> is a MuleEventBean for testing with
- * the MuleEventMulticaster.
- *
+ * <code>TestMuleEventBean</code> is a MuleEventBean for testing with the
+ * MuleEventMulticaster.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -31,16 +31,14 @@ public class TestMuleEventBean implements MuleEventListener
 
     public void onApplicationEvent(ApplicationEvent event)
     {
-        MuleApplicationEvent e = (MuleApplicationEvent)event;
+        MuleApplicationEvent e = (MuleApplicationEvent) event;
 
         System.out.println(StringMessageHelper.getBoilerPlate("Received message on " + e.getEndpoint()));
 
-        if(eventCallback!= null) {
-            try
-            {
+        if (eventCallback != null) {
+            try {
                 eventCallback.eventReceived(e.getMuleEventContext(), event);
-            } catch (Exception e1)
-            {
+            } catch (Exception e1) {
                 throw new RuntimeException("Callback failed: " + e1.getMessage(), e1);
             }
         }

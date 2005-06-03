@@ -27,7 +27,8 @@ public class MuleManagerTestCase extends AbstractUMOManagerTestCase
 {
     public UMOManager getUMOManager() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         UMOManager manager = builder.configure("test-config-for-manager.xml");
         return manager;

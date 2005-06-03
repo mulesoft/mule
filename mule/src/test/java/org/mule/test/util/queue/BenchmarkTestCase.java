@@ -31,96 +31,106 @@ import org.mule.util.xa.AbstractResourceManager;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class BenchmarkTestCase extends TestCase {
+public class BenchmarkTestCase extends TestCase
+{
 
-	private static final Log logger = LogFactory.getLog(BenchmarkTestCase.class); 
-	
-	//private static final int WORKERS = 10;
-	//private static final int OUTERLOOP = 100;
-	//private static final int INNERLOOP = 500;
-	private static final int WORKERS = 1;
-	private static final int OUTERLOOP = 1;
-	private static final int INNERLOOP = 1;
-	private static final int OBJSIZE = 256;
-	
-	protected TransactionalQueueManager createFileQueueManager() throws Exception {
-		TransactionalQueueManager mgr = new TransactionalQueueManager();
-		mgr.setPersistenceStrategy(new FilePersistenceStrategy());
-		return mgr;
-	}
+    private static final Log logger = LogFactory.getLog(BenchmarkTestCase.class);
 
-	protected TransactionalQueueManager createJournalQueueManager() throws Exception {
-		TransactionalQueueManager mgr = new TransactionalQueueManager();
-		mgr.setPersistenceStrategy(new JournalPersistenceStrategy());
-		return mgr;
-	}
+    // private static final int WORKERS = 10;
+    // private static final int OUTERLOOP = 100;
+    // private static final int INNERLOOP = 500;
+    private static final int WORKERS = 1;
+    private static final int OUTERLOOP = 1;
+    private static final int INNERLOOP = 1;
+    private static final int OBJSIZE = 256;
 
-	
-	public void testBench() throws Exception {
-		benchmark(createJournalQueueManager());
-		benchmark(createFileQueueManager());
-	}
-	
-	public static void main(String[] args) throws Exception {
-		new BenchmarkTestCase().testBench();
-	}
+    protected TransactionalQueueManager createFileQueueManager() throws Exception
+    {
+        TransactionalQueueManager mgr = new TransactionalQueueManager();
+        mgr.setPersistenceStrategy(new FilePersistenceStrategy());
+        return mgr;
+    }
 
-	protected static class Worker extends Thread {
-		private TransactionalQueueManager mgr;
-		private String queue;
-		public Worker(TransactionalQueueManager mgr, String queue) {
-			this.mgr = mgr;
-			this.queue = queue;
-		}
-		public void run() {
-			Random rnd = new Random(); 
-			try {
-				QueueSession s = mgr.getQueueSession();
-				Queue q = s.getQueue(queue);
-				
-				long t0 = System.currentTimeMillis();
-				for (int i = 0; i < OUTERLOOP; i++) {
-					for (int j = 0; j < INNERLOOP; j++) {
-						byte[] o = new byte[(rnd.nextInt(16) + 1) * OBJSIZE];
-						q.put(o);
-					}
-					while (q.size() > 0) {
-						q.take();
-					}
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	protected void benchmark(TransactionalQueueManager mgr) throws Exception {
-		logger.info("================================");
-		logger.info("Running test: " + mgr.getPersistenceStrategy().getClass().getName());
-		logger.info("================================");
-		
-		try {
-			mgr.start();
-		
-			long t0 = System.currentTimeMillis();
-			Worker[] w = new Worker[WORKERS];
-			for (int i = 0; i < w.length; i++) {
-				w[i] = new Worker(mgr, "queue" + i);
-				w[i].setDaemon(true);
-				w[i].start();
-			}
-			for (int i = 0; i < w.length; i++) {
-				w[i].join();
-			}
-			long t1 = System.currentTimeMillis();
-	
-			logger.info("Time: " + (t1 - t0) + " ms");
-			
-			mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
-		} catch (Exception e) {	
-			e.printStackTrace();
-			mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_KILL);
-			throw e;
-		}
-	}
+    protected TransactionalQueueManager createJournalQueueManager() throws Exception
+    {
+        TransactionalQueueManager mgr = new TransactionalQueueManager();
+        mgr.setPersistenceStrategy(new JournalPersistenceStrategy());
+        return mgr;
+    }
+
+    public void testBench() throws Exception
+    {
+        benchmark(createJournalQueueManager());
+        benchmark(createFileQueueManager());
+    }
+
+    public static void main(String[] args) throws Exception
+    {
+        new BenchmarkTestCase().testBench();
+    }
+
+    protected static class Worker extends Thread
+    {
+        private TransactionalQueueManager mgr;
+        private String queue;
+
+        public Worker(TransactionalQueueManager mgr, String queue)
+        {
+            this.mgr = mgr;
+            this.queue = queue;
+        }
+
+        public void run()
+        {
+            Random rnd = new Random();
+            try {
+                QueueSession s = mgr.getQueueSession();
+                Queue q = s.getQueue(queue);
+
+                long t0 = System.currentTimeMillis();
+                for (int i = 0; i < OUTERLOOP; i++) {
+                    for (int j = 0; j < INNERLOOP; j++) {
+                        byte[] o = new byte[(rnd.nextInt(16) + 1) * OBJSIZE];
+                        q.put(o);
+                    }
+                    while (q.size() > 0) {
+                        q.take();
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    protected void benchmark(TransactionalQueueManager mgr) throws Exception
+    {
+        logger.info("================================");
+        logger.info("Running test: " + mgr.getPersistenceStrategy().getClass().getName());
+        logger.info("================================");
+
+        try {
+            mgr.start();
+
+            long t0 = System.currentTimeMillis();
+            Worker[] w = new Worker[WORKERS];
+            for (int i = 0; i < w.length; i++) {
+                w[i] = new Worker(mgr, "queue" + i);
+                w[i].setDaemon(true);
+                w[i].start();
+            }
+            for (int i = 0; i < w.length; i++) {
+                w[i].join();
+            }
+            long t1 = System.currentTimeMillis();
+
+            logger.info("Time: " + (t1 - t0) + " ms");
+
+            mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_KILL);
+            throw e;
+        }
+    }
 }

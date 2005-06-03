@@ -14,25 +14,25 @@
  */
 package org.mule.providers.email.transformers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.transformer.TransformerException;
+import java.util.Calendar;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Calendar;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>StringToEmailMessage</code> will convert a string to a java mail Message, using the
- * string as the contents.  This implementation uses properties on the transformer
- * to determine the to and subject fields.
- *
+ * <code>StringToEmailMessage</code> will convert a string to a java mail
+ * Message, using the string as the contents. This implementation uses
+ * properties on the transformer to determine the to and subject fields.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -54,36 +54,35 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         registerSourceType(String.class);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
     public Object transform(Object src, UMOEventContext context) throws TransformerException
     {
-        String contentType = (String)context.getProperty("contentType");
-        if(contentType==null) contentType = "text/plain";
+        String contentType = (String) context.getProperty("contentType");
+        if (contentType == null)
+            contentType = "text/plain";
 
-        try
-        {
+        try {
             Message msg = new MimeMessage((Session) endpoint.getConnector().getDispatcher("ANY").getDelegateSession());
 
             msg.setRecipients(Message.RecipientType.TO, inetToAddresses);
 
-            //sent date
+            // sent date
             msg.setSentDate(Calendar.getInstance().getTime());
 
-            if (inetFromAddress != null)
-            {
+            if (inetFromAddress != null) {
                 msg.setFrom(inetFromAddress);
             }
 
             msg.setSubject(getSubject());
 
-            //attachments TODO
+            // attachments TODO
             msg.setContent(src, contentType);
             return msg;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new TransformerException(this, e);
         }
     }
@@ -101,14 +100,10 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
      */
     public void setFromAddress(String fromAddress) throws TransformerException
     {
-        if (!(fromAddress == null || "".equals(fromAddress)))
-        {
-            try
-            {
+        if (!(fromAddress == null || "".equals(fromAddress))) {
+            try {
                 inetFromAddress = new InternetAddress(fromAddress);
-            }
-            catch (AddressException e)
-            {
+            } catch (AddressException e) {
                 throw new TransformerException(new org.mule.config.i18n.Message("email", 1, fromAddress), this, e);
             }
         }
@@ -120,7 +115,8 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
      */
     public String getSubject()
     {
-        if (subject == null) subject = "";
+        if (subject == null)
+            subject = "";
         return subject;
     }
 
@@ -130,8 +126,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
     public void setSubject(String subject)
     {
         this.subject = subject;
-        if (subject == null)
-        {
+        if (subject == null) {
             subject = "[No Subject]";
             logger.warn("Emails addressed to: " + toAddresses + " will be sent with a subject [no subject]");
         }
@@ -150,15 +145,11 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
      */
     public void setToAddress(String toAddress) throws TransformerException
     {
-        if (!(toAddress == null || "".equals(toAddress)))
-        {
-            try
-            {
+        if (!(toAddress == null || "".equals(toAddress))) {
+            try {
                 inetToAddresses = InternetAddress.parse(toAddress, false);
-            }
-            catch (AddressException e)
-            {
-                throw new TransformerException(new org.mule.config.i18n.Message("email", 2, toAddress), this, e);                
+            } catch (AddressException e) {
+                throw new TransformerException(new org.mule.config.i18n.Message("email", 2, toAddress), this, e);
             }
         }
         this.toAddresses = toAddress;

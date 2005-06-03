@@ -16,12 +16,11 @@ package org.mule.providers;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.UUID;
 
-
 /**
- * <code>DefaultMessageAdapter</code> can be used to wrap an arbitary object where
- * no special 'apapting' is needed. The adpapter allows for a set of properties to be associated
- * with an object.
- *
+ * <code>DefaultMessageAdapter</code> can be used to wrap an arbitary object
+ * where no special 'apapting' is needed. The adpapter allows for a set of
+ * properties to be associated with an object.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,8 +33,8 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
     public DefaultMessageAdapter(Object message)
     {
         id = new UUID().getUUID();
-        if(message==null) {
-            this.message = new  NullPayload();
+        if (message == null) {
+            this.message = new NullPayload();
         } else {
             this.message = message;
         }
@@ -43,14 +42,14 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString() throws Exception
     {
-        if(message instanceof byte[]) {
-            return new String((byte[])message);
+        if (message instanceof byte[]) {
+            return new String((byte[]) message);
         } else {
             return message.toString();
         }
@@ -58,7 +57,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */

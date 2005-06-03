@@ -20,7 +20,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>RmiMessageDispatcherFactory</code> TODO
- *
+ * 
  * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
  * @version $Revision$
  */
@@ -29,7 +29,6 @@ public class RmiMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-        return new RmiMessageDispatcher((RmiConnector)connector);
+        return new RmiMessageDispatcher((RmiConnector) connector);
     }
 }
-

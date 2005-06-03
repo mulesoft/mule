@@ -40,10 +40,10 @@ import org.xml.sax.EntityResolver;
 
 /**
  * <code>MuleBeanDefinitionReader</code> Is a custom Spring Bean reader that
- * will apply a transformation to Mule Xml configuration files before
- * loading bean definitions allowing Mule Xml config to be parsed as Spring
- * configuration.  
- *
+ * will apply a transformation to Mule Xml configuration files before loading
+ * bean definitions allowing Mule Xml config to be parsed as Spring
+ * configuration.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -52,25 +52,24 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     private int contextCount = 0;
     private int configCount = 0;
     private MuleDtdResolver dtdResolver = null;
+
     public MuleBeanDefinitionReader(BeanDefinitionRegistry beanDefinitionRegistry, int configCount)
     {
         super(beanDefinitionRegistry);
         setEntityResolver(createEntityResolver());
         this.configCount = configCount;
-        ((DefaultListableBeanFactory)beanDefinitionRegistry).registerCustomEditor(UMOTransformer.class, new TransformerEditor());
+        ((DefaultListableBeanFactory) beanDefinitionRegistry).registerCustomEditor(UMOTransformer.class,
+                                                                                   new TransformerEditor());
     }
 
     public int registerBeanDefinitions(Document document, Resource resource) throws BeansException
     {
-        try
-        {
+        try {
             Document newDocument = transformDocument(document);
             return super.registerBeanDefinitions(newDocument, resource);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new FatalBeanException("Failed to read config resource: " + resource, e);
-        } finally
-        {
+        } finally {
             incConfigCount();
         }
     }
@@ -84,25 +83,23 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
 
     protected Document transformDocument(Document document) throws IOException, TransformerException
     {
-        if (getXslResource() != null)
-        {
+        if (getXslResource() != null) {
             Transformer transformer = createTransformer(createXslSource());
             DOMResult result = new DOMResult();
-			transformer.setParameter("firstContext", new Boolean(isFirstContext()));
+            transformer.setParameter("firstContext", new Boolean(isFirstContext()));
             transformer.transform(new DOMSource(document), result);
-            if(logger.isDebugEnabled()) {
-				try {
-					String xml = new DOMReader().read((Document) result.getNode()).asXML();
-					if (logger.isDebugEnabled()) {
-						logger.debug("Transformed document is:\n" + xml);
-					}
-				} catch (Exception e) { 
-					e.printStackTrace();
-				}
+            if (logger.isDebugEnabled()) {
+                try {
+                    String xml = new DOMReader().read((Document) result.getNode()).asXML();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Transformed document is:\n" + xml);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             return (Document) result.getNode();
-        } else
-        {
+        } else {
             return document;
         }
 
@@ -116,25 +113,23 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     protected ClassPathResource getXslResource()
     {
         String xsl = dtdResolver.getXslForDtd();
-        if (xsl != null)
-        {
+        if (xsl != null) {
             return new ClassPathResource(xsl);
-        } else
-        {
+        } else {
             return null;
         }
     }
 
     protected EntityResolver createEntityResolver()
     {
-        if(dtdResolver==null) {
-             MuleDtdResolver muleSpringResolver = new MuleDtdResolver("mule-spring-configuration.dtd", "mule-to-spring.xsl",
-                new BeansDtdResolver());
-            dtdResolver =  new MuleDtdResolver("mule-configuration.dtd", "mule-to-spring.xsl", muleSpringResolver);
+        if (dtdResolver == null) {
+            MuleDtdResolver muleSpringResolver = new MuleDtdResolver("mule-spring-configuration.dtd",
+                                                                     "mule-to-spring.xsl",
+                                                                     new BeansDtdResolver());
+            dtdResolver = new MuleDtdResolver("mule-configuration.dtd", "mule-to-spring.xsl", muleSpringResolver);
         }
         return dtdResolver;
     }
-
 
     public boolean isFirstContext()
     {
@@ -144,8 +139,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
     private void incConfigCount()
     {
         contextCount++;
-        if (contextCount >= configCount)
-        {
+        if (contextCount >= configCount) {
             contextCount = 0;
         }
     }

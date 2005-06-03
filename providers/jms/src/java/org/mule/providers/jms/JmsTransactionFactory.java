@@ -20,22 +20,25 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
 
 /**
- * <p><code>JmsTransactionFactory</code> Creates a Jms local transaction
- *
+ * <p>
+ * <code>JmsTransactionFactory</code> Creates a Jms local transaction
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
  */
 public class JmsTransactionFactory implements UMOTransactionFactory
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMOTransactionFactory#beginTransaction(org.mule.umo.provider.UMOMessageDispatcher)
      */
     public UMOTransaction beginTransaction() throws TransactionException
     {
-		JmsTransaction tx = new JmsTransaction();
-		tx.begin();
-		return tx;
+        JmsTransaction tx = new JmsTransaction();
+        tx.begin();
+        return tx;
     }
 
     public boolean isTransacted()

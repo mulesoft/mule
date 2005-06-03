@@ -20,7 +20,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>TcpMessageDispatcherFactory</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,7 +29,6 @@ public class TcpMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-        return new TcpMessageDispatcher((TcpConnector)connector);
+        return new TcpMessageDispatcher((TcpConnector) connector);
     }
 }
-

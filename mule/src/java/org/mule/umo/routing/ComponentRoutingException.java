@@ -20,22 +20,31 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
- * <code>ComponentRoutingException</code> is thrown due to a routing exception between
- * the endpoint the event was received on and the component receiving the event
- *
+ * <code>ComponentRoutingException</code> is thrown due to a routing exception
+ * between the endpoint the event was received on and the component receiving
+ * the event
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class ComponentRoutingException extends RoutingException
 {
     private transient UMOComponent component;
-    public ComponentRoutingException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, UMOComponent component)
+
+    public ComponentRoutingException(Message message,
+                                     UMOMessage umoMessage,
+                                     UMOEndpoint endpoint,
+                                     UMOComponent component)
     {
         super(generateMessage(message, endpoint, component), umoMessage, endpoint);
         this.component = component;
     }
 
-    public ComponentRoutingException(Message message, UMOMessage umoMessage, UMOEndpoint endpoint, UMOComponent component, Throwable cause)
+    public ComponentRoutingException(Message message,
+                                     UMOMessage umoMessage,
+                                     UMOEndpoint endpoint,
+                                     UMOComponent component,
+                                     Throwable cause)
     {
         super(generateMessage(message, endpoint, component), umoMessage, endpoint, cause);
         this.component = component;
@@ -47,17 +56,23 @@ public class ComponentRoutingException extends RoutingException
         this.component = component;
     }
 
-    public ComponentRoutingException(UMOMessage umoMessage, UMOEndpoint endpoint, UMOComponent component, Throwable cause)
+    public ComponentRoutingException(UMOMessage umoMessage,
+                                     UMOEndpoint endpoint,
+                                     UMOComponent component,
+                                     Throwable cause)
     {
         super(generateMessage(null, endpoint, component), umoMessage, endpoint, cause);
         this.component = component;
 
     }
 
-    private static Message generateMessage(Message message, UMOEndpoint endpoint, UMOComponent component) {
+    private static Message generateMessage(Message message, UMOEndpoint endpoint, UMOComponent component)
+    {
 
-        Message m = new Message(Messages.COMPONENT_X_ROUTING_FAILED_ON_ENDPOINT_X, component.getDescriptor().getName(), endpoint.getEndpointURI());
-        if(message!=null) {
+        Message m = new Message(Messages.COMPONENT_X_ROUTING_FAILED_ON_ENDPOINT_X,
+                                component.getDescriptor().getName(),
+                                endpoint.getEndpointURI());
+        if (message != null) {
             message.setNextMessage(m);
             return message;
         } else {

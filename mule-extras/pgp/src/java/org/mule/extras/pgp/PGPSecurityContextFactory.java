@@ -19,15 +19,19 @@ import org.mule.umo.security.UMOSecurityContextFactory;
 
 /**
  * @author ariva
- *
+ * 
  */
-public class PGPSecurityContextFactory implements UMOSecurityContextFactory {
+public class PGPSecurityContextFactory implements UMOSecurityContextFactory
+{
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.security.UMOSecurityContextFactory#create(org.mule.umo.security.UMOAuthentication)
      */
-    public UMOSecurityContext create(UMOAuthentication authentication) {
-        return new PGPSecurityContext((PGPAuthentication)authentication);
+    public UMOSecurityContext create(UMOAuthentication authentication)
+    {
+        return new PGPSecurityContext((PGPAuthentication) authentication);
     }
 
 }

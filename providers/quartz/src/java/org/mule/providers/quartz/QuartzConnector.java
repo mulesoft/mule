@@ -28,98 +28,111 @@ import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
- * TODO: document this class 
- *
+ * TODO: document this class
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class QuartzConnector extends AbstractServiceEnabledConnector {
+public class QuartzConnector extends AbstractServiceEnabledConnector
+{
 
-	public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
-	public static final String PROPERTY_REPEAT_INTERVAL = "repeatInterval";
-	public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
-	public static final String PROPERTY_START_DELAY = "startDelay";
-	public static final String PROPERTY_PAYLOAD = "payload";
-	public static final String PROPERTY_PAYLOAD_CLASS_NAME = "payloadClassName";
-	
-	private String factoryClassName = StdSchedulerFactory.class.getName();
-	
-	private SchedulerFactory factory;
-	
-	private Properties factoryProperties;
-	
-	private Scheduler scheduler;
-	
-	public String getProtocol() {
-		return "QUARTZ";
-	}
+    public static final String PROPERTY_CRON_EXPRESSION = "cronExpression";
+    public static final String PROPERTY_REPEAT_INTERVAL = "repeatInterval";
+    public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
+    public static final String PROPERTY_START_DELAY = "startDelay";
+    public static final String PROPERTY_PAYLOAD = "payload";
+    public static final String PROPERTY_PAYLOAD_CLASS_NAME = "payloadClassName";
 
-	public void doInitialise() throws InitialisationException {
-		super.doInitialise();
-		try {
-			if (scheduler == null) {
-				if (factory == null) {
-					Object[] args = null;
-					if (factoryProperties != null) {
-						args = new Object[] { factoryProperties };
-					}
-					factory = (SchedulerFactory) ClassHelper.instanciateClass(factoryClassName, args);
-				}
-				scheduler = factory.getScheduler();
-			}
-		} catch (Exception e) {
-			throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X, "Quartz provider"), e);
-		}
-	}
+    private String factoryClassName = StdSchedulerFactory.class.getName();
 
-	protected void doStart() throws UMOException {
-		try {
-			scheduler.start();
-		} catch (Exception e) {
-			throw new ConnectorException(new Message(Messages.FAILED_TO_START_X, "Quartz provider"), this, e);
-		}
-	}
+    private SchedulerFactory factory;
 
-	protected void doStop() throws UMOException {
-		try {
-			if (scheduler != null) {
-				scheduler.shutdown();
-			}
-		} catch (Exception e) {
-			throw new ConnectorException(new Message(Messages.FAILED_TO_STOP_X, "Quartz provider"), this, e);
-		}
-	}
+    private Properties factoryProperties;
 
-	public SchedulerFactory getFactory() {
-		return factory;
-	}
+    private Scheduler scheduler;
 
-	public void setFactory(SchedulerFactory factory) {
-		this.factory = factory;
-	}
+    public String getProtocol()
+    {
+        return "QUARTZ";
+    }
 
-	public Scheduler getScheduler() {
-		return scheduler;
-	}
+    public void doInitialise() throws InitialisationException
+    {
+        super.doInitialise();
+        try {
+            if (scheduler == null) {
+                if (factory == null) {
+                    Object[] args = null;
+                    if (factoryProperties != null) {
+                        args = new Object[] { factoryProperties };
+                    }
+                    factory = (SchedulerFactory) ClassHelper.instanciateClass(factoryClassName, args);
+                }
+                scheduler = factory.getScheduler();
+            }
+        } catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.INITIALISATION_FAILURE_X, "Quartz provider"), e);
+        }
+    }
 
-	public void setScheduler(Scheduler scheduler) {
-		this.scheduler = scheduler;
-	}
+    protected void doStart() throws UMOException
+    {
+        try {
+            scheduler.start();
+        } catch (Exception e) {
+            throw new ConnectorException(new Message(Messages.FAILED_TO_START_X, "Quartz provider"), this, e);
+        }
+    }
 
-	public String getFactoryClassName() {
-		return factoryClassName;
-	}
+    protected void doStop() throws UMOException
+    {
+        try {
+            if (scheduler != null) {
+                scheduler.shutdown();
+            }
+        } catch (Exception e) {
+            throw new ConnectorException(new Message(Messages.FAILED_TO_STOP_X, "Quartz provider"), this, e);
+        }
+    }
 
-	public void setFactoryClassName(String factoryClassName) {
-		this.factoryClassName = factoryClassName;
-	}
+    public SchedulerFactory getFactory()
+    {
+        return factory;
+    }
 
-	public Properties getFactoryProperties() {
-		return factoryProperties;
-	}
+    public void setFactory(SchedulerFactory factory)
+    {
+        this.factory = factory;
+    }
 
-	public void setFactoryProperties(Properties factoryProperties) {
-		this.factoryProperties = factoryProperties;
-	}
+    public Scheduler getScheduler()
+    {
+        return scheduler;
+    }
+
+    public void setScheduler(Scheduler scheduler)
+    {
+        this.scheduler = scheduler;
+    }
+
+    public String getFactoryClassName()
+    {
+        return factoryClassName;
+    }
+
+    public void setFactoryClassName(String factoryClassName)
+    {
+        this.factoryClassName = factoryClassName;
+    }
+
+    public Properties getFactoryProperties()
+    {
+        return factoryProperties;
+    }
+
+    public void setFactoryProperties(Properties factoryProperties)
+    {
+        this.factoryProperties = factoryProperties;
+    }
 
 }

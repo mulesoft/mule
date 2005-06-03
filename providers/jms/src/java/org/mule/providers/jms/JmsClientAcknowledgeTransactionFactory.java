@@ -18,9 +18,9 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionFactory;
 
 /**
- * <code>JmsClientAcknowledgeTransactionFactory</code> creates a Jms Client Acknowledge transaction
- * using a Jms message.
- *
+ * <code>JmsClientAcknowledgeTransactionFactory</code> creates a Jms Client
+ * Acknowledge transaction using a Jms message.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
@@ -28,7 +28,9 @@ import org.mule.umo.UMOTransactionFactory;
 
 public class JmsClientAcknowledgeTransactionFactory implements UMOTransactionFactory
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.UMOTransactionFactory#beginTransaction(java.lang.Object)
      */
     public UMOTransaction beginTransaction() throws TransactionException

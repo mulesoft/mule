@@ -28,7 +28,8 @@ public class GroovyComponentTestCase extends NamedTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("groovy-mule-config.xml");
     }

@@ -13,6 +13,14 @@
  */
 package org.mule.providers.tcp;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.URI;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -27,16 +35,12 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import java.io.*;
-import java.net.Socket;
-import java.net.URI;
-
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class TcpConnectorFunctionalTestCase  extends AbstractProviderFunctionalTestCase
+public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
     /**
      * logger used by this class
@@ -46,10 +50,10 @@ public class TcpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
     private Socket s;
     private int port = 61655;
 
-
     protected void tearDown() throws Exception
     {
-        if(s!=null)s.close();
+        if (s != null)
+            s.close();
         super.tearDown();
     }
 
@@ -57,7 +61,7 @@ public class TcpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
     {
         MuleManager.getConfiguration().setSynchronous(false);
         URI uri = getInDest().getUri();
-        for(int i=0;i<iterations;i++) {
+        for (int i = 0; i < iterations; i++) {
             s = createSocket(uri);
             DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(s.getOutputStream()));
             dos.write("Hello".getBytes());
@@ -80,11 +84,9 @@ public class TcpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
 
     protected UMOEndpointURI getInDest()
     {
-        try
-        {
+        try {
             return new MuleEndpointURI("tcp://localhost:" + port);
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -109,22 +111,25 @@ public class TcpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
         MuleManager.getConfiguration().setSynchronous(false);
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
-        initialiseComponent(descriptor, UMOTransactionConfig.ACTION_NONE, UMOTransactionConfig.ACTION_NONE,
-                new EventCallback() {
-                    public void eventReceived(UMOEventContext context, Object Component) throws Exception
-                    {
-                        callbackCount++;
-                        String result = "Received Async event: " + context.getMessageAsString();
-                        assertNotNull(context.getOutputStream());
+        initialiseComponent(descriptor,
+                            UMOTransactionConfig.ACTION_NONE,
+                            UMOTransactionConfig.ACTION_NONE,
+                            new EventCallback() {
+                                public void eventReceived(UMOEventContext context, Object Component) throws Exception
+                                {
+                                    callbackCount++;
+                                    String result = "Received Async event: " + context.getMessageAsString();
+                                    assertNotNull(context.getOutputStream());
 
-                        if(!((ResponseOutputStream)context.getOutputStream()).getSocket().isClosed()) {
-                            context.getOutputStream().write(result.getBytes());
-                            context.getOutputStream().flush();
-                        };
-                        callbackCalled = true;
-                    }
-                });
-        //Start the server
+                                    if (!((ResponseOutputStream) context.getOutputStream()).getSocket().isClosed()) {
+                                        context.getOutputStream().write(result.getBytes());
+                                        context.getOutputStream().flush();
+                                    }
+                                    ;
+                                    callbackCalled = true;
+                                }
+                            });
+        // Start the server
         MuleManager.getInstance().start();
 
         URI uri = getInDest().getUri();

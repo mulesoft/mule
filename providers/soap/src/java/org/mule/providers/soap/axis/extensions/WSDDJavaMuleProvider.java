@@ -20,10 +20,11 @@ import org.apache.axis.deployment.wsdd.WSDDService;
 import org.mule.providers.soap.axis.AxisConnector;
 
 /**
- * <code>WSDDJavaMuleProvider</code> is a factory class for creating
- * the MuleProvider
+ * <code>WSDDJavaMuleProvider</code> is a factory class for creating the
+ * MuleProvider
+ * 
  * @see MuleProvider
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,13 +39,14 @@ public class WSDDJavaMuleProvider extends WSDDProvider
 
     /**
      * Factory method for creating an <code>MuleProvider</code>.
-     *
+     * 
      * @param wsddService a <code>WSDDService</code> value
      * @param engineConfiguration an <code>EngineConfiguration</code> value
      * @return a <code>Handler</code> value
      * @exception Exception if an error occurs
      */
-    public org.apache.axis.Handler newProviderInstance(WSDDService wsddService, EngineConfiguration engineConfiguration) throws Exception
+    public org.apache.axis.Handler newProviderInstance(WSDDService wsddService, EngineConfiguration engineConfiguration)
+            throws Exception
     {
         return new MuleProvider(connector);
     }

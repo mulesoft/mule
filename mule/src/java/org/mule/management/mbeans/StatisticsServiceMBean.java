@@ -15,17 +15,17 @@ package org.mule.management.mbeans;
 
 import org.mule.management.stats.Statistics;
 
-
 /**
  * <code>StatisticsServiceMBean</code> is a JMX interfaces for querying Mule
  * event processing statistics
- *
+ * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$
  */
-public interface StatisticsServiceMBean extends Statistics {
+public interface StatisticsServiceMBean extends Statistics
+{
 
-    public void logCSVSummary();
+    void logCSVSummary();
 
-    public String printHtmlSummary();
+    String printHtmlSummary();
 }

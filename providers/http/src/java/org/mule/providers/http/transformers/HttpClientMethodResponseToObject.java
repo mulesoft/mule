@@ -13,6 +13,9 @@
  */
 package org.mule.providers.http.transformers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 import org.mule.config.MuleProperties;
@@ -22,13 +25,10 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * <code>HttpClientMethodResponseToObject</code> transforms a http client response to a
- * MuleMessage.
- *
+ * <code>HttpClientMethodResponseToObject</code> transforms a http client
+ * response to a MuleMessage.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,26 +44,25 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
     public Object doTransform(Object src) throws TransformerException
     {
         Object msg;
-        HttpMethod httpMethod = (HttpMethod)src;
+        HttpMethod httpMethod = (HttpMethod) src;
         Header contentType = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
-        if(contentType!=null && !contentType.getValue().startsWith("text/")) {
+        if (contentType != null && !contentType.getValue().startsWith("text/")) {
             msg = httpMethod.getResponseBody();
         } else {
             msg = httpMethod.getResponseBodyAsString();
         }
-        //Standard headers
+        // Standard headers
         Map headerProps = new HashMap();
         Header[] headers = httpMethod.getRequestHeaders();
         String name;
-        for (int i=0;i < headers.length; i++)
-        {
+        for (int i = 0; i < headers.length; i++) {
             name = headers[i].getName();
-            if(name.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
+            if (name.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
                 name = name.substring(2);
             }
             headerProps.put(headers[i].getName(), headers[i].getValue());
         }
-        //Set Mule Properties
+        // Set Mule Properties
 
         return new MuleMessage(msg, headerProps);
     }

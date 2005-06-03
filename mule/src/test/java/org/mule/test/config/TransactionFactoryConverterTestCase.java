@@ -49,16 +49,13 @@ public class TransactionFactoryConverterTestCase extends AbstractConverterTestCa
 
     public void testInvalidConversion()
     {
-        try
-        {
+        try {
             getConverter().convert(UMOTransactionFactory.class, "foo.bar.bad.TransactionFactory");
             fail("should throw exception on bad transaction factory class");
-        } catch (Exception e)
-        {
-            //expected
+        } catch (Exception e) {
+            // expected
         }
 
     }
-
 
 }

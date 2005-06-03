@@ -21,8 +21,9 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageHelper;
 
 /**
- * <code>LogComponent</code> Simply logs the content (or content length is it is a large message)
- *
+ * <code>LogComponent</code> Simply logs the content (or content length is it
+ * is a large message)
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,16 +35,17 @@ public class LogComponent implements Callable, LogService
     {
         String contents = context.getMessageAsString();
         String msg = "Message Received in component: " + context.getComponentDescriptor().getName();
-        if(contents.length() > 100) {
+        if (contents.length() > 100) {
             msg = StringMessageHelper.getBoilerPlate(msg + ". Content length is: " + contents.length());
-        }else {
+        } else {
             msg = StringMessageHelper.getBoilerPlate(msg + ". Content is: " + contents);
         }
         log(msg);
         return null;
     }
 
-    public void log(String message) {
+    public void log(String message)
+    {
         logger.info(message);
     }
 }

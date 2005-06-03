@@ -13,18 +13,21 @@
  */
 package org.mule.management.stats.printers;
 
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.management.stats.RouterStatistics;
-
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.RouterStatistics;
 
 /**
- * <code>HtmlTablePrinter</code> prints event processing stats as a HTML
- * table
- *
+ * <code>HtmlTablePrinter</code> prints event processing stats as a HTML table
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -84,90 +87,91 @@ public class AbstractTablePrinter extends PrintWriter
     }
 
     protected void getColumn(ComponentStatistics stats, String[] col)
-        {
-            if(stats==null) return;
-
-            col[0] = stats.getName();
-            col[1] = stats.getComponentPoolMaxSize() + "/" + stats.getComponentPoolAbsoluteMaxSize();
-            col[2] = String.valueOf(stats.getComponentPoolSize());
-            col[3] = String.valueOf(stats.getThreadPoolSize());
-            col[4] = String.valueOf(stats.getQueuedEvents());
-            col[5] = String.valueOf(stats.getMaxQueueSize());
-            col[6] = String.valueOf(stats.getAverageQueueSize());
-            col[7] = String.valueOf(stats.getSyncEventsReceived());
-            col[8] = String.valueOf(stats.getAsyncEventsReceived());
-            col[9] = String.valueOf(stats.getTotalEventsReceived());
-            col[10] = String.valueOf(stats.getSyncEventsSent());
-            col[11] = String.valueOf(stats.getAsyncEventsSent());
-            col[12] = String.valueOf(stats.getReplyToEventsSent());
-            col[13] = String.valueOf(stats.getTotalEventsSent());
-            col[14] = String.valueOf(stats.getExecutedEvents());
-            col[15] = String.valueOf(stats.getExecutionErrors());
-            col[16] = String.valueOf(stats.getFatalErrors());
-            col[17] = String.valueOf(stats.getMinExecutionTime());
-            col[18] = String.valueOf(stats.getMaxExecutionTime());
-            col[19] = String.valueOf(stats.getAverageExecutionTime());
-            col[20] = String.valueOf(stats.getTotalExecutionTime());
-
-
-            int i = getRouterInfo(stats.getInboundRouterStat(), col, 21);
-            i = getRouterInfo(stats.getOutboundRouterStat(), col, i);
-            col[i] = String.valueOf(stats.getSamplePeriod());
-
+    {
+        if (stats == null) {
+            return;
         }
 
-        protected int getRouterInfo(RouterStatistics stats, String[] col, int index) {
-            if (stats.isInbound())
-                col[index++] = "-";
-            else
-                col[index++] = "-";
+        col[0] = stats.getName();
+        col[1] = stats.getComponentPoolMaxSize() + "/" + stats.getComponentPoolAbsoluteMaxSize();
+        col[2] = String.valueOf(stats.getComponentPoolSize());
+        col[3] = String.valueOf(stats.getThreadPoolSize());
+        col[4] = String.valueOf(stats.getQueuedEvents());
+        col[5] = String.valueOf(stats.getMaxQueueSize());
+        col[6] = String.valueOf(stats.getAverageQueueSize());
+        col[7] = String.valueOf(stats.getSyncEventsReceived());
+        col[8] = String.valueOf(stats.getAsyncEventsReceived());
+        col[9] = String.valueOf(stats.getTotalEventsReceived());
+        col[10] = String.valueOf(stats.getSyncEventsSent());
+        col[11] = String.valueOf(stats.getAsyncEventsSent());
+        col[12] = String.valueOf(stats.getReplyToEventsSent());
+        col[13] = String.valueOf(stats.getTotalEventsSent());
+        col[14] = String.valueOf(stats.getExecutedEvents());
+        col[15] = String.valueOf(stats.getExecutionErrors());
+        col[16] = String.valueOf(stats.getFatalErrors());
+        col[17] = String.valueOf(stats.getMinExecutionTime());
+        col[18] = String.valueOf(stats.getMaxExecutionTime());
+        col[19] = String.valueOf(stats.getAverageExecutionTime());
+        col[20] = String.valueOf(stats.getTotalExecutionTime());
 
-            col[index++] = String.valueOf(stats.getTotalReceived());
-            col[index++] = String.valueOf(stats.getTotalRouted());
-            col[index++] = String.valueOf(stats.getNotRouted());
-            col[index++] = String.valueOf(stats.getCaughtMessages());
+        int i = getRouterInfo(stats.getInboundRouterStat(), col, 21);
+        i = getRouterInfo(stats.getOutboundRouterStat(), col, i);
+        col[i] = String.valueOf(stats.getSamplePeriod());
 
-            Map routed = stats.getRouted();
+    }
 
+    protected int getRouterInfo(RouterStatistics stats, String[] col, int index)
+    {
+        if (stats.isInbound()) {
             col[index++] = "-";
-            if (!routed.isEmpty()) {
-                Iterator it = routed.keySet().iterator();
-
-                StringBuffer buf = new StringBuffer();
-                while (it.hasNext()) {
-                    String name = (String) it.next();
-                    buf.append(name).append("=").append(routed.get(name)).append(";");
-                }
-                col[index++] = buf.toString();
-            } else {
-                col[index++] = "";
-            }
-            return index;
+        } else {
+            col[index++] = "-";
         }
+
+        col[index++] = String.valueOf(stats.getTotalReceived());
+        col[index++] = String.valueOf(stats.getTotalRouted());
+        col[index++] = String.valueOf(stats.getNotRouted());
+        col[index++] = String.valueOf(stats.getCaughtMessages());
+
+        Map routed = stats.getRouted();
+
+        col[index++] = "-";
+        if (!routed.isEmpty()) {
+            Iterator it = routed.keySet().iterator();
+
+            StringBuffer buf = new StringBuffer();
+            while (it.hasNext()) {
+                String name = (String) it.next();
+                buf.append(name).append("=").append(routed.get(name)).append(";");
+            }
+            col[index++] = buf.toString();
+        } else {
+            col[index++] = "";
+        }
+        return index;
+    }
 
     protected String[][] getTable(Collection stats)
     {
         String[] cols = getHeaders();
         String[][] table = new String[stats.size() + 1][cols.length];
-        for (int i = 0; i < cols.length; i++)
-        {
+        for (int i = 0; i < cols.length; i++) {
             table[0][i] = cols[i];
 
         }
 
         int i = 1;
-        for (Iterator iterator = stats.iterator(); iterator.hasNext();i++)
-        {
-            getColumn((ComponentStatistics)iterator.next(), table[i]);
+        for (Iterator iterator = stats.iterator(); iterator.hasNext(); i++) {
+            getColumn((ComponentStatistics) iterator.next(), table[i]);
         }
         return table;
     }
 
     public void print(Object obj)
     {
-        if(obj instanceof Collection) {
-            print((Collection)obj);
-        } else if(obj instanceof ComponentStatistics) {
+        if (obj instanceof Collection) {
+            print((Collection) obj);
+        } else if (obj instanceof ComponentStatistics) {
             List l = new ArrayList();
             l.add(obj);
             print(l);
@@ -182,7 +186,8 @@ public class AbstractTablePrinter extends PrintWriter
         println();
     }
 
-    public void print(Collection c) {
-		throw new UnsupportedOperationException();
+    public void print(Collection c)
+    {
+        throw new UnsupportedOperationException();
     }
 }

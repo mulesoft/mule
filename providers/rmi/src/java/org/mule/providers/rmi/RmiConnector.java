@@ -20,10 +20,10 @@ import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
 
-
 /**
- * <code>RmiConnector</code> can bind or sent to a given rmi port on a given host.
- *
+ * <code>RmiConnector</code> can bind or sent to a given rmi port on a given
+ * host.
+ * 
  * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
  * @version $Revision$
  */
@@ -55,7 +55,6 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     private Class[] argumentClasses = null;
 
-
     public String getProtocol()
     {
         return "RMI";
@@ -69,100 +68,103 @@ public class RmiConnector extends AbstractServiceEnabledConnector
         return securityPolicy;
     }
 
-
     /**
      * @param path The securityPolicy to set.
      */
     public void setSecurityPolicy(String path)
     {
-        //verify securityPolicy existence
+        // verify securityPolicy existence
         if (path != null) {
-			URL url = Utility.getResource(path, RmiConnector.class);
+            URL url = Utility.getResource(path, RmiConnector.class);
             if (url == null) {
                 throw new IllegalArgumentException("Error on initialization, RMI security policy does not exist");
             }
-	        this.securityPolicy = url.toString();
+            this.securityPolicy = url.toString();
         }
     }
 
-
     /**
      * Method getServerCodebase
-     *
-     *
+     * 
+     * 
      * @return
-     *
+     * 
      */
-    public String getServerCodebase() {
+    public String getServerCodebase()
+    {
         return (this.serverCodebase);
     }
 
     /**
      * Method setServerCodebase
-     *
-     *
+     * 
+     * 
      * @param serverCodebase
-     *
+     * 
      */
-    public void setServerCodebase(String serverCodebase) {
+    public void setServerCodebase(String serverCodebase)
+    {
         this.serverCodebase = serverCodebase;
     }
 
     /**
      * Method getServerClassName
-     *
-     *
+     * 
+     * 
      * @return
-     *
+     * 
      */
-    public String getServerClassName() {
+    public String getServerClassName()
+    {
         return (this.serverClassName);
     }
 
     /**
      * Method setServerClassName
-     *
-     *
+     * 
+     * 
      * @param serverClassName
-     *
+     * 
      */
-    public void setServerClassName(String serverClassName) {
+    public void setServerClassName(String serverClassName)
+    {
         this.serverClassName = serverClassName;
     }
 
     /**
      * Method getMethodArgumentTypes
-     *
-     *
+     * 
+     * 
      * @return
-     *
+     * 
      */
-    public ArrayList getMethodArgumentTypes() {
+    public ArrayList getMethodArgumentTypes()
+    {
         return (this.methodArgumentTypes);
     }
 
     /**
      * Method setMethodArgumentTypes
-     *
-     *
+     * 
+     * 
      * @param methodArgumentTypes
-     *
+     * 
      */
-    public void setMethodArgumentTypes(ArrayList methodArgumentTypes) throws ClassNotFoundException{
-    	Class argumentClasses[] = null;
-    	
-    	this.methodArgumentTypes = methodArgumentTypes;
-        
-        if (getMethodArgumentTypes() != null)
-        	
-        {        
-        	argumentClasses = new Class[methodArgumentTypes.size()];
+    public void setMethodArgumentTypes(ArrayList methodArgumentTypes) throws ClassNotFoundException
+    {
+        Class argumentClasses[] = null;
 
-	        for (int i = 0; i < methodArgumentTypes.size() ;i++)
-	        {
-	            String className = (String)methodArgumentTypes.get(i);
-	            argumentClasses[i] = ClassHelper.loadClass(className.trim(), this.getClass());
-	        }
+        this.methodArgumentTypes = methodArgumentTypes;
+
+        if (getMethodArgumentTypes() != null)
+
+        {
+            argumentClasses = new Class[methodArgumentTypes.size()];
+
+            for (int i = 0; i < methodArgumentTypes.size(); i++) {
+                String className = (String) methodArgumentTypes.get(i);
+                argumentClasses[i] = ClassHelper.loadClass(className.trim(), this.getClass());
+            }
         }
 
         setArgumentClasses(argumentClasses);
@@ -170,23 +172,25 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     /**
      * Method getArgumentClasses
-     *
-     *
+     * 
+     * 
      * @return
-     *
+     * 
      */
-    public Class[] getArgumentClasses() {
+    public Class[] getArgumentClasses()
+    {
         return (this.argumentClasses);
     }
 
     /**
      * Method setArgumentClasses
-     *
-     *
+     * 
+     * 
      * @param argumentClasses
-     *
+     * 
      */
-    public void setArgumentClasses(Class[] argumentClasses) {
+    public void setArgumentClasses(Class[] argumentClasses)
+    {
         this.argumentClasses = argumentClasses;
     }
 }

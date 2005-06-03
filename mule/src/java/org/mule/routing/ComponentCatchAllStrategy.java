@@ -24,9 +24,9 @@ import org.mule.umo.routing.ComponentRoutingException;
 import org.mule.umo.routing.RoutingException;
 
 /**
- * <code>ComponentCatchAllStrategy</code> is used to catch any events and forward
- * the events to the component as is.
- *
+ * <code>ComponentCatchAllStrategy</code> is used to catch any events and
+ * forward the events to the component as is.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,25 +42,23 @@ public class ComponentCatchAllStrategy extends AbstractCatchAllStrategy
         return null;
     }
 
-    public synchronized UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
+    public synchronized UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous)
+            throws RoutingException
     {
         UMOEvent event = RequestContext.getEvent();
-        try
-        {
+        try {
             event = new MuleEvent(message, event.getEndpoint(), session.getComponent(), event);
-            if (synchronous)
-            {
+            if (synchronous) {
                 statistics.incrementRoutedMessage(event.getEndpoint());
-                logger.info("Event being routed from catch all strategy for endpoint: " + RequestContext.getEvent().getEndpoint());
+                logger.info("Event being routed from catch all strategy for endpoint: "
+                        + RequestContext.getEvent().getEndpoint());
                 return session.getComponent().sendEvent(event);
-            } else
-            {
+            } else {
                 statistics.incrementRoutedMessage(event.getEndpoint());
                 session.getComponent().dispatchEvent(event);
                 return null;
             }
-        } catch (UMOException e)
-        {
+        } catch (UMOException e) {
             throw new ComponentRoutingException(event.getMessage(), event.getEndpoint(), session.getComponent(), e);
         }
     }

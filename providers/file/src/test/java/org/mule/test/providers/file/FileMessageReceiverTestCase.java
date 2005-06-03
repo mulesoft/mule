@@ -15,7 +15,8 @@
 
 package org.mule.test.providers.file;
 
-import com.mockobjects.dynamic.Mock;
+import java.io.File;
+
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.file.FileConnector;
@@ -27,11 +28,11 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import java.io.File;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * <code>FileMessageReceiverTestCase</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -45,11 +46,14 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public void testReceiver() throws Exception
     {
-        //FIX A bit hard testing receive from a unit simple as we need to reg listener etc
-        //file endpoint functiona tests for this
+        // FIX A bit hard testing receive from a unit simple as we need to reg
+        // listener etc
+        // file endpoint functiona tests for this
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.providers.AbstractMessageReceiverTestCase#getMessageReceiver()
      */
     public UMOMessageReceiver getMessageReceiver() throws Exception
@@ -59,8 +63,13 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         read.deleteOnExit();
         move.deleteOnExit();
 
-        return new FileMessageReceiver(endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint,
-                read.getAbsolutePath(), move.getAbsolutePath(), null, new Long(1000));
+        return new FileMessageReceiver(endpoint.getConnector(),
+                                       (UMOComponent) mockComponent.proxy(),
+                                       endpoint,
+                                       read.getAbsolutePath(),
+                                       move.getAbsolutePath(),
+                                       null,
+                                       new Long(1000));
     }
 
     public static UMOEndpoint getTestProvider(String name, String type)
@@ -68,11 +77,9 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         UMOEndpoint endpoint = new MuleEndpoint();
 
         endpoint.setConnector(new FileConnector());
-        try
-        {
+        try {
             endpoint.setEndpointURI(new MuleEndpointURI("file://./simple"));
-        } catch (EndpointException e)
-        {
+        } catch (EndpointException e) {
             fail(e.getMessage());
         }
         endpoint.setName(name);

@@ -13,8 +13,9 @@
  */
 package org.mule.test.routing.outbound;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
@@ -27,8 +28,8 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -60,13 +61,13 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
-        router.route(message, (UMOSession)session.proxy(), false);
+        router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
         message = new MuleMessage("test event", null);
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        UMOMessage result = router.route(message, (UMOSession)session.proxy(), true);
+        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
@@ -78,7 +79,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         router.setTransformer(new DefaultTransformer() {
             public Object doTransform(Object src) throws TransformerException
             {
-                return ((Exception)src).getMessage();
+                return ((Exception) src).getMessage();
             }
         });
 

@@ -22,15 +22,16 @@ import javax.resource.spi.work.WorkException;
 import EDU.oswego.cs.dl.util.concurrent.Executor;
 
 /**
- *
- *
+ * 
+ * 
  * @version $Rev$ $Date$
- *
- * */
-public class ScheduleWorkExecutor implements WorkExecutor {
+ * 
+ */
+public class ScheduleWorkExecutor implements WorkExecutor
+{
 
-    public void doExecute(WorkerContext work, Executor executor)
-            throws WorkException, InterruptedException {
+    public void doExecute(WorkerContext work, Executor executor) throws WorkException, InterruptedException
+    {
         executor.execute(work);
     }
 }

@@ -13,10 +13,10 @@
  */
 package org.mule.providers.udp;
 
+import java.net.DatagramPacket;
+
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
-
-import java.net.DatagramPacket;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -40,7 +40,7 @@ public class UdpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         Object message = getValidMessage();
         UMOMessageAdapter adapter = createAdapter(message);
 
-        assertEquals(new String(((DatagramPacket)message).getData()), adapter.getPayloadAsString());
+        assertEquals(new String(((DatagramPacket) message).getData()), adapter.getPayloadAsString());
         byte[] bytes = adapter.getPayloadAsBytes();
         assertNotNull(bytes);
 
@@ -49,14 +49,11 @@ public class UdpMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 
         assertNotNull(adapter.getPayload());
 
-        try
-        {
+        try {
             adapter = createAdapter(getInvalidMessage());
             fail("Message adapter should throw exception if an invalid messgae is set");
-        }
-        catch (Exception e)
-        {
-// expected
+        } catch (Exception e) {
+            // expected
         }
     }
 }

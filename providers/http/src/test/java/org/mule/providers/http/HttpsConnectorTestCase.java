@@ -13,6 +13,8 @@
  */
 package org.mule.providers.http;
 
+import java.io.IOException;
+
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.tcp.TcpConnector;
@@ -22,8 +24,6 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-
-import java.io.IOException;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -47,7 +47,8 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         cnn.setKeyPassword("mulepassword");
         cnn.setStorePassword("mulepassword");
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
-        if(initialised) cnn.initialise();
+        if (initialised)
+            cnn.initialise();
         return cnn;
     }
 
@@ -63,7 +64,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
 
     public void testValidListener() throws Exception
     {
-        HttpsConnector connector = (HttpsConnector)getConnector();
+        HttpsConnector connector = (HttpsConnector) getConnector();
 
         MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
         UMOComponent component = getTestComponent(d);
@@ -71,40 +72,31 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         endpoint.setEndpointURI(null);
         endpoint.setConnector(connector);
 
-        try
-        {
+        try {
             connector.registerListener(component, endpoint);
             fail("cannot register with null endpointUri");
-        }
-        catch (Exception e)
-        { /* expected */
+        } catch (Exception e) { /* expected */
         }
         endpoint.setEndpointURI(null);
-        try
-        {
+        try {
             connector.registerListener(component, endpoint);
             fail("cannot register with empty endpointUri");
-        }
-        catch (Exception e)
-        { /* expected */
+        } catch (Exception e) { /* expected */
         }
 
         endpoint.setEndpointURI(new MuleEndpointURI("https://localhost:0"));
         connector.registerListener(component, endpoint);
-        try
-        {
+        try {
             connector.registerListener(component, endpoint);
             fail("cannot register on the same endpointUri");
-        }
-        catch (Exception e)
-        { /* expected */
+        } catch (Exception e) { /* expected */
         }
         connector.dispose();
     }
 
     public void testProperties() throws Exception
     {
-        HttpsConnector c = (HttpsConnector)getConnector();
+        HttpsConnector c = (HttpsConnector) getConnector();
 
         c.setBufferSize(1024);
         assertEquals(1024, c.getBufferSize());

@@ -26,7 +26,8 @@ public class MuleClientTestCase extends AbstractMuleTestCase
 {
     public void setUp() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("test-client-mule-config.xml");
     }
@@ -76,12 +77,12 @@ public class MuleClientTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         MuleManager.getConfiguration().setSynchronous(true);
         MuleManager.getConfiguration().setSynchronousReceive(true);
-        
-         for(int i = 0;i < 100;i++) {
+
+        for (int i = 0; i < 100; i++) {
             UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
             assertNotNull(message);
             assertEquals("Received: Test Client Send message " + i, message.getPayload());
-         }
+        }
     }
 
     public void testClientMultidispatch() throws Exception
@@ -90,17 +91,16 @@ public class MuleClientTestCase extends AbstractMuleTestCase
         MuleManager.getConfiguration().setSynchronous(false);
 
         int i = 0;
-        //to init
+        // to init
         client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
         long start = System.currentTimeMillis();
-        for(i = 0; i < 100; i++) {
+        for (i = 0; i < 100; i++) {
             client.dispatch(getDispatchUrl(), "Test Client Send message " + i, null);
         }
         long time = System.currentTimeMillis() - start;
         System.out.println(i + " took " + time + "ms to process");
         Thread.sleep(1000);
     }
-   
 
     public String getDispatchUrl()
     {

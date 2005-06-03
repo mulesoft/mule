@@ -13,21 +13,22 @@
  */
 package org.mule.util.monitor;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.umo.lifecycle.Disposable;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.umo.lifecycle.Disposable;
+
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+
 /**
  * <code>ExpiryMonitor</code> can monitor objects beased on an expiry time and
- * can invoke a callback method once the object time has expired.  If the object
+ * can invoke a callback method once the object time has expired. If the object
  * does expire it is removed from this monitor
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -55,41 +56,46 @@ public class ExpiryMonitor extends TimerTask implements Disposable
         monitors = new ConcurrentHashMap();
     }
 
-
     /**
-     * Adds an expirable object to monitor.  If the Object is
-     * already being monitored it will be reset and the
-     * millisecond timeout will be ignored
+     * Adds an expirable object to monitor. If the Object is already being
+     * monitored it will be reset and the millisecond timeout will be ignored
+     * 
      * @param milliseconds
      * @param expirable
      */
     public void addExpirable(long milliseconds, Expirable expirable)
     {
-        if(isRegistered(expirable)) {
+        if (isRegistered(expirable)) {
             resetExpirable(expirable);
         } else {
-            if(logger.isDebugEnabled()) logger.debug("Adding new expirable: " + expirable);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Adding new expirable: " + expirable);
+            }
             monitors.put(expirable, new ExpirableHolder(milliseconds, expirable));
         }
     }
 
-    public boolean isRegistered( Expirable expirable)
+    public boolean isRegistered(Expirable expirable)
     {
-        return (monitors.get(expirable)!=null);
+        return (monitors.get(expirable) != null);
     }
 
     public void removeExpirable(Expirable expirable)
     {
-        if(logger.isDebugEnabled()) logger.debug("Removing expirable: " + expirable);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Removing expirable: " + expirable);
+        }
         monitors.remove(expirable);
     }
 
     public void resetExpirable(Expirable expirable)
     {
-        ExpirableHolder eh = (ExpirableHolder)monitors.get(expirable);
-        if(eh!=null) {
+        ExpirableHolder eh = (ExpirableHolder) monitors.get(expirable);
+        if (eh != null) {
             eh.reset();
-            if(logger.isDebugEnabled()) logger.debug("Reset expirable: " + expirable);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Reset expirable: " + expirable);
+            }
         }
     }
 
@@ -99,10 +105,9 @@ public class ExpiryMonitor extends TimerTask implements Disposable
     public void run()
     {
         ExpirableHolder holder;
-        for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
-        {
-            holder = (ExpirableHolder)iterator.next();
-            if(holder.isExpired()) {
+        for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();) {
+            holder = (ExpirableHolder) iterator.next();
+            if (holder.isExpired()) {
                 removeExpirable(holder.getExpirable());
                 holder.getExpirable().expired();
             }
@@ -114,21 +119,19 @@ public class ExpiryMonitor extends TimerTask implements Disposable
         logger.info("disposing monitor");
         timer.cancel();
         ExpirableHolder holder;
-        for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();)
-        {
-            holder = (ExpirableHolder)iterator.next();
+        for (Iterator iterator = monitors.values().iterator(); iterator.hasNext();) {
+            holder = (ExpirableHolder) iterator.next();
             removeExpirable(holder.getExpirable());
-            try
-            {
+            try {
                 holder.getExpirable().expired();
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 logger.debug(e.getMessage());
             }
         }
     }
 
-    private class ExpirableHolder {
+    private class ExpirableHolder
+    {
 
         private long milliseconds;
         private Expirable expirable;
@@ -153,10 +156,11 @@ public class ExpiryMonitor extends TimerTask implements Disposable
 
         public boolean isExpired()
         {
-            return  (System.currentTimeMillis() - milliseconds) > created;
+            return (System.currentTimeMillis() - milliseconds) > created;
         }
 
-        public void reset() {
+        public void reset()
+        {
             created = System.currentTimeMillis();
         }
     }

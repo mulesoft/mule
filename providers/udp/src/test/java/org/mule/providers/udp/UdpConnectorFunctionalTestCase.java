@@ -13,6 +13,11 @@
  */
 package org.mule.providers.udp;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.URI;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -21,17 +26,12 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.URI;
-
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class UdpConnectorFunctionalTestCase  extends AbstractProviderFunctionalTestCase
+public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
     /**
      * logger used by this class
@@ -50,11 +50,9 @@ public class UdpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
 
     protected void tearDown() throws Exception
     {
-        try
-        {
+        try {
             s.close();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
         }
         super.tearDown();
     }
@@ -64,7 +62,7 @@ public class UdpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
 
         InetAddress inet = InetAddress.getByName(serverUri.getHost());
         s = new DatagramSocket(0);
-        for(int i=0;i<iterations;i++) {
+        for (int i = 0; i < iterations; i++) {
             String msg = "Hello" + i;
 
             DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), inet, serverUri.getPort());
@@ -80,7 +78,7 @@ public class UdpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
         URI uri = getOutDest().getUri();
         InetAddress inet = InetAddress.getByName(uri.getHost());
         s.setSoTimeout(2000);
-        for(i=0;i<100;i++) {
+        for (i = 0; i < 100; i++) {
 
             DatagramPacket packet = new DatagramPacket(new byte[32], 32, inet, serverUri.getPort());
 
@@ -95,11 +93,9 @@ public class UdpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
 
     protected UMOEndpointURI getInDest()
     {
-        try
-        {
+        try {
             return new MuleEndpointURI("udp://localhost:60131");
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -107,11 +103,9 @@ public class UdpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
 
     protected UMOEndpointURI getOutDest()
     {
-        try
-        {
+        try {
             return new MuleEndpointURI("udp://localhost:60132");
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -122,7 +116,7 @@ public class UdpConnectorFunctionalTestCase  extends AbstractProviderFunctionalT
         UdpConnector connector = new UdpConnector();
         connector.setName("testUdp");
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-        
+
         connector.setBufferSize(1024);
         return connector;
     }

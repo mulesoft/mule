@@ -21,10 +21,11 @@ import org.mule.config.ThreadingProfile;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * <code>MuleConfigurationFactoryBean</code> is used to configure the MuleManager
- * object.  This is not necessary if you use the AutowireUMOManagerFactoryBean as it handles
- * creating the MuleConfiguration correctly for you.
- *
+ * <code>MuleConfigurationFactoryBean</code> is used to configure the
+ * MuleManager object. This is not necessary if you use the
+ * AutowireUMOManagerFactoryBean as it handles creating the MuleConfiguration
+ * correctly for you.
+ * 
  * @deprecated use AutowireUMOManagerFactoryBean instead
  * @see AutowireUMOManagerFactoryBean
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -49,7 +50,6 @@ public class MuleConfigurationFactoryBean implements FactoryBean
     {
         return true;
     }
-
 
     public boolean isSynchronous()
     {

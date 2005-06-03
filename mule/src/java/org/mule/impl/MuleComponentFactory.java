@@ -20,9 +20,9 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.model.UMOComponentFactory;
 
 /**
- * <code>MuleComponentFactory</code> creates an instance of MuleComponent when a Descriptor
- * is registered
- *
+ * <code>MuleComponentFactory</code> creates an instance of MuleComponent when
+ * a Descriptor is registered
+ * 
  * @see MuleComponent
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -31,12 +31,13 @@ public class MuleComponentFactory implements UMOComponentFactory
 {
     public UMOComponent create(UMODescriptor descriptor)
     {
-        if(descriptor instanceof MuleDescriptor) {
-            return new MuleComponent((MuleDescriptor)descriptor);
+        if (descriptor instanceof MuleDescriptor) {
+            return new MuleComponent((MuleDescriptor) descriptor);
         } else {
             throw new IllegalArgumentException(new Message(Messages.CANT_SET_PROP_X_ON_X_OF_TYPE_X,
-                    MuleDescriptor.class.getName(), MuleComponent.class.getName(),
-                    descriptor.getClass().getName()).getMessage());
+                                                           MuleDescriptor.class.getName(),
+                                                           MuleComponent.class.getName(),
+                                                           descriptor.getClass().getName()).getMessage());
         }
     }
 }

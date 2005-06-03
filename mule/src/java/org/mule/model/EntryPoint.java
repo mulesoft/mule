@@ -15,15 +15,16 @@
 
 package org.mule.model;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
- * <code>EntryPoint</code> is a method on a Mule-managed component that is invoked when an event for the component is received.
- *
+ * <code>EntryPoint</code> is a method on a Mule-managed component that is
+ * invoked when an event for the component is received.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -41,7 +42,7 @@ public class EntryPoint
 
     /**
      * Creates a new EntryPoint with the given method
-     *
+     * 
      * @param method the method to invoke on the component
      */
     public EntryPoint(Method method)
@@ -51,9 +52,9 @@ public class EntryPoint
 
     /**
      * Will invoke the entry point method on the given component
-     *
+     * 
      * @param component the component to invoke
-     * @param arg       the argument to pass to the method invocation
+     * @param arg the argument to pass to the method invocation
      * @return An object (if any) returned by the invocation
      * @throws InvocationTargetException
      * @throws IllegalAccessException
@@ -61,13 +62,13 @@ public class EntryPoint
     public Object invoke(Object component, Object arg) throws InvocationTargetException, IllegalAccessException
     {
         String methodCall = null;
-        if(logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             methodCall = component.getClass().getName() + "." + method.getName() + "(" + arg.getClass().getName() + ")";
             logger.debug("Invoking " + methodCall);
         }
 
-        Object result =  method.invoke(component, new Object[]{arg});
-        if(logger.isDebugEnabled()) {
+        Object result = method.invoke(component, new Object[] { arg });
+        if (logger.isDebugEnabled()) {
             logger.debug("Result of call " + methodCall + " is " + result);
         }
         return result;
@@ -75,7 +76,7 @@ public class EntryPoint
 
     /**
      * Determines if the <code>EntryPoint</code> is avoid method or not
-     *
+     * 
      * @return true if the method is void
      */
     public boolean isVoid()
@@ -83,22 +84,23 @@ public class EntryPoint
         return method.getReturnType().getName().equals("void");
     }
 
-
     /**
      * Gets the method name
-     *
+     * 
      * @return the method name
      */
     public String getName()
     {
-        if(method==null) return null;
+        if (method == null) {
+            return null;
+        }
         return method.getName();
     }
 
     /**
      * Gets the argument type for the method
-     *
-     * @return the argument type.  It should never be null
+     * 
+     * @return the argument type. It should never be null
      */
     public Class getParameterType()
     {
@@ -107,17 +109,14 @@ public class EntryPoint
 
     /**
      * Gets the method return type of the method
-     *
+     * 
      * @return the return type or null if the method is void
      */
     public Class getReturnType()
     {
-        if (isVoid())
-        {
+        if (isVoid()) {
             return null;
-        }
-        else
-        {
+        } else {
             return method.getReturnType();
         }
     }
@@ -127,7 +126,8 @@ public class EntryPoint
         this.method = method;
     }
 
-    protected Method getMethod() {
+    protected Method getMethod()
+    {
         return method;
     }
 }

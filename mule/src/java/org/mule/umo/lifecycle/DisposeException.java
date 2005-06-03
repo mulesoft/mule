@@ -17,7 +17,7 @@ import org.mule.config.i18n.Message;
 
 /**
  * <code>DisposeException</code> is an exception thrown
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,7 +35,7 @@ public class DisposeException extends LifecycleException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      * @param component the object that failed during a lifecycle method call
      */
     public DisposeException(Message message, Throwable cause, Object component)
@@ -44,7 +44,7 @@ public class DisposeException extends LifecycleException
     }
 
     /**
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      * @param component the object that failed during a lifecycle method call
      */
     public DisposeException(Throwable cause, Object component)

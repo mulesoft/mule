@@ -42,9 +42,10 @@ import org.mule.util.PropertiesHelper;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
- * <code>RmiMessageDispatcher</code> will send transformed mule events over RMI-JRMP.
- *
- *
+ * <code>RmiMessageDispatcher</code> will send transformed mule events over
+ * RMI-JRMP.
+ * 
+ * 
  * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
  * @version $Revision$
  */
@@ -73,16 +74,17 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
         this.connector = connector;
     }
 
-    protected void initialise(UMOEvent event) throws IOException, DispatchException, NotBoundException, NoSuchMethodException, ClassNotFoundException
+    protected void initialise(UMOEvent event) throws IOException, DispatchException, NotBoundException,
+            NoSuchMethodException, ClassNotFoundException
     {
-        if (!initialised.get())
-        {
+        if (!initialised.get()) {
 
             String rmiPolicyPath = connector.getSecurityPolicy();
             String serverCodebasePath = connector.getServerCodebase();
 
             System.setProperty("java.security.policy", rmiPolicyPath);
-            //System.setProperty("java.rmi.server.codebase", serverCodebasePath);
+            // System.setProperty("java.rmi.server.codebase",
+            // serverCodebasePath);
 
             // Set security manager
             if (System.getSecurityManager() == null) {
@@ -97,62 +99,64 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
     }
 
     private Remote getRemoteObject(UMOEvent event) throws DispatchException, RemoteException, MalformedURLException,
-    NotBoundException, UnknownHostException
+            NotBoundException, UnknownHostException
     {
         Remote remoteObj;
 
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
-        //TODO - add
-        //more error handling on uri
+        // TODO - add
+        // more error handling on uri
         port = endpointUri.getPort();
-        if (port < 1){
+        if (port < 1) {
             port = RmiConnector.DEFAULT_RMI_REGISTRY_PORT;
         }
 
         inetAddress = InetAddress.getByName(endpointUri.getHost());
         serviceName = endpointUri.getPath();
 
-        String name =  "//" + inetAddress.getHostAddress() + ":" + port + serviceName;
+        String name = "//" + inetAddress.getHostAddress() + ":" + port + serviceName;
 
         remoteObj = Naming.lookup(name);
 
         return remoteObj;
     }
 
-    private Method getMethodObject(UMOEvent event, Remote remoteObject) throws DispatchException, NoSuchMethodException, ClassNotFoundException
+    private Method getMethodObject(UMOEvent event, Remote remoteObject) throws DispatchException,
+            NoSuchMethodException, ClassNotFoundException
     {
         Method method;
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
-        String methodName = PropertiesHelper.getStringProperty(endpointUri.getParams(), RmiConnector.PARAM_SERVICE_METHOD, null);
+        String methodName = PropertiesHelper.getStringProperty(endpointUri.getParams(),
+                                                               RmiConnector.PARAM_SERVICE_METHOD,
+                                                               null);
 
-        if (methodName == null)
-        {
+        if (methodName == null) {
             methodName = (String) event.getEndpoint().getProperties().get(RmiConnector.PARAM_SERVICE_METHOD);
-            if (methodName == null)
-            {
-                throw new DispatchException(new org.mule.config.i18n.Message("rmi", RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), event.getMessage(),  event.getEndpoint());
+            if (methodName == null) {
+                throw new DispatchException(new org.mule.config.i18n.Message("rmi",
+                                                                             RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET),
+                                            event.getMessage(),
+                                            event.getEndpoint());
             }
         }
-        
+
         ArrayList methodArgumentTypes = null;
-        
-        try
-		{
-        	methodArgumentTypes = (ArrayList) event.getEndpoint().getProperties().get(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
-		}
-        catch(Exception e)
-		{
-		}
-        
+
+        try {
+            methodArgumentTypes = (ArrayList) event.getEndpoint()
+                                                   .getProperties()
+                                                   .get(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
+        } catch (Exception e) {
+        }
+
         Class[] argTypes;
 
-        if (methodArgumentTypes != null)
-        {            
-            connector.setMethodArgumentTypes(methodArgumentTypes);            
+        if (methodArgumentTypes != null) {
+            connector.setMethodArgumentTypes(methodArgumentTypes);
         }
-        
+
         argTypes = connector.getArgumentClasses();
         method = remoteObject.getClass().getMethod(methodName, argTypes);
 
@@ -163,18 +167,17 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
     {
         Object payload = event.getTransformedMessage();
         Object[] args;
-        if (payload instanceof Object[])
-        {
+        if (payload instanceof Object[]) {
             args = (Object[]) payload;
-        } else
-        {
-            args = new Object[]{payload};
+        } else {
+            args = new Object[] { payload };
         }
         return args;
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#dispatch(org.mule.umo.UMOEvent)
      */
     public void doDispatch(UMOEvent event) throws Exception
@@ -185,7 +188,9 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
         invokedMethod.invoke(remoteObject, arguments);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#send(org.mule.umo.UMOEvent)
      */
     public UMOMessage doSend(UMOEvent event) throws IllegalAccessException, InvocationTargetException, Exception
@@ -198,12 +203,12 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
         Object[] arguments = getArgs(event);
         Object result = invokedMethod.invoke(remoteObject, arguments);
 
-        //TODO - ?? should check whether 1)endpoint , 2)Global synchronous = true then only return result??
+        // TODO - ?? should check whether 1)endpoint , 2)Global synchronous =
+        // true then only return result??
 
-        if (result == null){
+        if (result == null) {
             return null;
-        }
-        else{
+        } else {
             resultMessage = new MuleMessage(connector.getMessageAdapter(result).getPayload(), null);
         }
 
@@ -212,14 +217,16 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
-        /*TODO - pending...
-
-        */
+        /*
+         * TODO - pending...
+         * 
+         */
         return null;
     }
 
     /**
      * There is no associated session for a RMI connector
+     * 
      * @return
      * @throws UMOException
      */
@@ -228,14 +235,15 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
     public UMOConnector getConnector()
     {
         return connector;
     }
-
 
     public void doDispose()
     {

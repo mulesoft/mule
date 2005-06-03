@@ -16,10 +16,10 @@ package org.mule.providers.jms.filters;
 import org.mule.umo.UMOFilter;
 
 /**
- * <code>JmsSelectorFilter</code> is a wrapper for a Jms Selector.
- * This filter should not be called. Instead the JmsConnector sets the selector on
- * the destionation to the expression set on this filer.
- *
+ * <code>JmsSelectorFilter</code> is a wrapper for a Jms Selector. This filter
+ * should not be called. Instead the JmsConnector sets the selector on the
+ * destionation to the expression set on this filer.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,7 +29,7 @@ public class JmsSelectorFilter implements UMOFilter
 
     public boolean accept(Object object)
     {
-        //If we have received the message the selector has been honoured
+        // If we have received the message the selector has been honoured
         return true;
     }
 

@@ -22,27 +22,32 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class FtpMessageAdapter extends AbstractMessageAdapter {
+public class FtpMessageAdapter extends AbstractMessageAdapter
+{
 
-	private byte[] message;
-	
-	public FtpMessageAdapter(Object message) throws MessagingException {
+    private byte[] message;
+
+    public FtpMessageAdapter(Object message) throws MessagingException
+    {
         if (message instanceof byte[])
-            this.message = (byte[])message;
+            this.message = (byte[]) message;
         else
             throw new MessageTypeNotSupportedException(message, getClass());
-	}
-	
-	public String getPayloadAsString() throws Exception {
+    }
+
+    public String getPayloadAsString() throws Exception
+    {
         return new String(message);
-	}
+    }
 
-	public byte[] getPayloadAsBytes() throws Exception {
+    public byte[] getPayloadAsBytes() throws Exception
+    {
         return message;
-	}
+    }
 
-	public Object getPayload() {
+    public Object getPayload()
+    {
         return message;
-	}
+    }
 
 }

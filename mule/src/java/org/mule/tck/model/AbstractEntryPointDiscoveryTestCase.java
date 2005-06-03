@@ -39,27 +39,22 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         UMODescriptor descriptor = getTestDescriptor("badSatsuma", InvalidSatsuma.class.getName());
 
         UMOEntryPoint ep = null;
-        try
-        {
+        try {
             ep = epd.resolveEntryPoint(descriptor);
-        } catch (NoSatisfiableMethodsException e)
-        {
-            //expected
+        } catch (NoSatisfiableMethodsException e) {
+            // expected
             return;
         }
         assertTrue(ep instanceof UMOEntryPoint);
-        try
-        {
+        try {
 
             RequestContext.setEvent(getTestEvent("Hello"));
             ep.invoke(new InvalidSatsuma(), RequestContext.getEventContext(), null);
             fail("Should have failed to find entrypoint on Satsuma");
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             // expected
-        }finally {
+        } finally {
             RequestContext.setEvent(null);
         }
 
@@ -73,14 +68,10 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
     {
         ComponentMethodMapping[] mappings = getComponentMappings();
 
-        for (int i = 0; i < mappings.length; i++)
-        {
-            if (mappings[i].isShouldFail())
-            {
+        for (int i = 0; i < mappings.length; i++) {
+            if (mappings[i].isShouldFail()) {
                 doExpectedFail(mappings[i]);
-            }
-            else
-            {
+            } else {
                 doExpectedPass(mappings[i]);
             }
         }
@@ -91,10 +82,10 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         UMOEntryPointResolver epr = getEntryPointResolver();
         UMODescriptor descriptor = getDescriptorToResolve(mapping.getComponentClass().getName());
         UMOEntryPoint ep = epr.resolveEntryPoint(descriptor);
-//        if(!(ep instanceof DynamicEntryPoint)) {
-//            assertEquals(ep.getName(), mapping.getMethodName());
-//            assertEquals(ep.getParameterType(), mapping.getMethodArgumentType());
-//        }
+        // if(!(ep instanceof DynamicEntryPoint)) {
+        // assertEquals(ep.getName(), mapping.getMethodName());
+        // assertEquals(ep.getParameterType(), mapping.getMethodArgumentType());
+        // }
     }
 
     private void doExpectedFail(ComponentMethodMapping mapping) throws Exception
@@ -102,14 +93,11 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         UMOEntryPointResolver epr = getEntryPointResolver();
         UMODescriptor descriptor = getDescriptorToResolve(mapping.getComponentClass().getName());
 
-        try
-        {
+        try {
             UMOEntryPoint ep = epr.resolveEntryPoint(descriptor);
             fail("Resolving should have failed for: " + mapping.toString());
-        }
-        catch (Exception e)
-        {
-// expected
+        } catch (Exception e) {
+            // expected
         }
 
     }
@@ -122,14 +110,16 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
     public abstract UMOEntryPointResolver getEntryPointResolver();
 
     /**
-     * @return an array of the the different components that can be resolved by the
-     *         resolver and the method name to be resolved on each component
+     * @return an array of the the different components that can be resolved by
+     *         the resolver and the method name to be resolved on each component
      */
     public abstract ComponentMethodMapping[] getComponentMappings();
 
     /**
-     * <p><code>ComponentMethodMapping</code> is used to supply a component class and the correct method to be resovled on the component.
-     *
+     * <p>
+     * <code>ComponentMethodMapping</code> is used to supply a component class
+     * and the correct method to be resovled on the component.
+     * 
      * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
      * @version $Revision$
      */
@@ -145,7 +135,10 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
             this(componentClass, methodName, methodArgumentType, false);
         }
 
-        public ComponentMethodMapping(Class componentClass, String methodName, Class methodArgumentType, boolean shouldFail)
+        public ComponentMethodMapping(Class componentClass,
+                                      String methodName,
+                                      Class methodArgumentType,
+                                      boolean shouldFail)
         {
             this.componentClass = componentClass;
             this.methodName = methodName;
@@ -187,7 +180,8 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
 
         public String toString()
         {
-            return componentClass.getName() + "." + methodName + "(" + methodArgumentType.getName() + "), Expected to fail= " + shouldFail;
+            return componentClass.getName() + "." + methodName + "(" + methodArgumentType.getName()
+                    + "), Expected to fail= " + shouldFail;
         }
 
     }

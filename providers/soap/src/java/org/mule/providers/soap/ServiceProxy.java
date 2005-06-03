@@ -13,7 +13,13 @@
  */
 package org.mule.providers.soap;
 
-import electric.service.IService;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
@@ -25,20 +31,15 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.ClassHelper;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import electric.service.IService;
 
 /**
- * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look like
- * a Web service.
- *
- * Also provides helper methods for building and describing web service interfaces
- * in Mule.
- *
+ * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look
+ * like a Web service.
+ * 
+ * Also provides helper methods for building and describing web service
+ * interfaces in Mule.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -49,15 +50,12 @@ public class ServiceProxy
     {
         Class[] interfaces = new Class[0];
         List ifaces = (List) component.getDescriptor().getProperties().get("serviceInterfaces");
-        if (ifaces == null || ifaces.size() == 0)
-        {
+        if (ifaces == null || ifaces.size() == 0) {
             interfaces = component.getDescriptor().getImplementationClass().getInterfaces();
 
-        } else
-        {
+        } else {
             interfaces = new Class[ifaces.size()];
-            for (int i = 0; i < ifaces.size(); i++)
-            {
+            for (int i = 0; i < ifaces.size(); i++) {
                 String iface = (String) ifaces.get(i);
                 interfaces[i] = ClassHelper.loadClass(iface, ServiceProxy.class);
             }
@@ -67,18 +65,19 @@ public class ServiceProxy
         return interfaces;
     }
 
-    public static Class[] removeInterface(Class[] interfaces, Class iface) {
-        if(interfaces==null) return null;
+    public static Class[] removeInterface(Class[] interfaces, Class iface)
+    {
+        if (interfaces == null)
+            return null;
         List results = new ArrayList();
-        for (int i = 0; i < interfaces.length; i++)
-        {
+        for (int i = 0; i < interfaces.length; i++) {
             Class anInterface = interfaces[i];
-            if(!anInterface.equals(iface)) {
+            if (!anInterface.equals(iface)) {
                 results.add(anInterface);
             }
         }
         Class[] arResults = new Class[results.size()];
-        if(arResults.length==0) {
+        if (arResults.length == 0) {
             return arResults;
         } else {
             results.toArray(arResults);
@@ -89,12 +88,11 @@ public class ServiceProxy
     public static Method[] getMethods(Class[] interfaces)
     {
         List methodNames = new ArrayList();
-        for (int i = 0; i < interfaces.length; i++)
-        {
+        for (int i = 0; i < interfaces.length; i++) {
             methodNames.addAll(Arrays.asList(interfaces[i].getMethods()));
         }
         Method[] results = new Method[methodNames.size()];
-        return (Method[])methodNames.toArray(results);
+        return (Method[]) methodNames.toArray(results);
 
     }
 
@@ -103,8 +101,7 @@ public class ServiceProxy
         Method[] methods = getMethods(interfaces);
 
         String[] results = new String[methods.length];
-        for (int i = 0; i < results.length; i++)
-        {
+        for (int i = 0; i < results.length; i++) {
             results[i] = methods[i].getName();
         }
         return results;
@@ -113,7 +110,8 @@ public class ServiceProxy
     public static Object createGlueProxy(AbstractMessageReceiver receiver, boolean synchronous, Class[] classes)
     {
         return Proxy.newProxyInstance(ServiceProxy.class.getClassLoader(),
-                classes, createGlueServiceHandler(receiver, synchronous));
+                                      classes,
+                                      createGlueServiceHandler(receiver, synchronous));
     }
 
     public static InvocationHandler createGlueServiceHandler(AbstractMessageReceiver receiver, boolean synchronous)
@@ -124,7 +122,8 @@ public class ServiceProxy
     public static Object createAxisProxy(AbstractMessageReceiver receiver, boolean synchronous, Class[] classes)
     {
         return Proxy.newProxyInstance(ServiceProxy.class.getClassLoader(),
-                classes, createAxisServiceHandler(receiver, synchronous));
+                                      classes,
+                                      createAxisServiceHandler(receiver, synchronous));
     }
 
     public static InvocationHandler createAxisServiceHandler(AbstractMessageReceiver receiver, boolean synchronous)
@@ -149,11 +148,9 @@ public class ServiceProxy
             messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
 
             UMOMessage message = receiver.routeMessage(new MuleMessage(messageAdapter), synchronous);
-            if (message != null)
-            {
+            if (message != null) {
                 return message.getPayload();
-            } else
-            {
+            } else {
                 return null;
             }
         }
@@ -173,20 +170,18 @@ public class ServiceProxy
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
             GlueMessageAdapter.GlueMessageHolder holder;
-            if(args.length==1) {
-                holder = new GlueMessageAdapter.GlueMessageHolder(args[0], (IService)proxy);
+            if (args.length == 1) {
+                holder = new GlueMessageAdapter.GlueMessageHolder(args[0], (IService) proxy);
             } else {
-                holder = new GlueMessageAdapter.GlueMessageHolder(args, (IService)proxy);
+                holder = new GlueMessageAdapter.GlueMessageHolder(args, (IService) proxy);
             }
             UMOMessageAdapter messageAdapter = receiver.getConnector().getMessageAdapter(holder);
             messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
 
             UMOMessage message = receiver.routeMessage(new MuleMessage(messageAdapter), synchronous);
-            if (message != null)
-            {
+            if (message != null) {
                 return message.getPayload();
-            } else
-            {
+            } else {
                 return null;
             }
         }

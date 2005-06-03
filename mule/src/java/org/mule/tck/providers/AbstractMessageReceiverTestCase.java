@@ -14,7 +14,6 @@ package org.mule.tck.providers;
 
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
@@ -43,26 +42,20 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
         UMOComponent component = getTestComponent(getTestDescriptor("orange", Orange.class.getName()));
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         UMOMessageReceiver receiver = getMessageReceiver();
-		
+
         assertNotNull(receiver.getEndpoint());
         assertNotNull(receiver.getConnector());
 
-        try
-        {
+        try {
             receiver.setEndpoint(null);
             fail("Provider cannot be set to null");
-        }
-        catch (IllegalArgumentException e)
-        { /* expected */
+        } catch (IllegalArgumentException e) { /* expected */
         }
 
-        try
-        {
+        try {
             receiver.setComponent(null);
             fail("component cannot be set to null");
-        }
-        catch (IllegalArgumentException e)
-        { /* expected */
+        } catch (IllegalArgumentException e) { /* expected */
         }
 
         receiver.setComponent(component);

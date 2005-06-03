@@ -16,11 +16,12 @@ package org.mule.umo.endpoint;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
-
 /**
- * <code>MalformedEndpointException</code> is thrown by the MuleEndpointURI class if it fails to parse a Url
+ * <code>MalformedEndpointException</code> is thrown by the MuleEndpointURI
+ * class if it fails to parse a Url
+ * 
  * @see org.mule.impl.endpoint.MuleEndpointURI
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -37,14 +38,15 @@ public class MalformedEndpointException extends EndpointException
 
     /**
      * @param endpoint the endpoint that could not be parsed
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public MalformedEndpointException(String endpoint, Throwable cause)
     {
         super(new Message(Messages.ENPOINT_X_IS_MALFORMED, endpoint), cause);
     }
 
-    public MalformedEndpointException(Throwable cause) {
+    public MalformedEndpointException(Throwable cause)
+    {
         super(cause);
     }
 }

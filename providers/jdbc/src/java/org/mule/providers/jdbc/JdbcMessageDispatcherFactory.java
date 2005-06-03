@@ -22,15 +22,17 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class JdbcMessageDispatcherFactory implements
-		UMOMessageDispatcherFactory {
+public class JdbcMessageDispatcherFactory implements UMOMessageDispatcherFactory
+{
 
-	/* (non-Javadoc)
-	 * @see org.mule.umo.provider.UMOMessageDispatcherFactory#create(org.mule.umo.provider.UMOConnector)
-	 */
-	public UMOMessageDispatcher create(UMOConnector connector)
-			throws UMOException {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.provider.UMOMessageDispatcherFactory#create(org.mule.umo.provider.UMOConnector)
+     */
+    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    {
         return new JdbcMessageDispatcher((JdbcConnector) connector);
-	}
+    }
 
 }

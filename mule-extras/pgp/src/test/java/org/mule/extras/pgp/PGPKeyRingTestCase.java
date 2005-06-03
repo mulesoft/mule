@@ -13,57 +13,67 @@
  */
 package org.mule.extras.pgp;
 
-import cryptix.pki.KeyBundle;
+import java.net.URL;
+
 import org.mule.tck.NamedTestCase;
 
-import java.net.URL;
+import cryptix.pki.KeyBundle;
 
 /**
  * @author ariva
- *
+ * 
  */
-public class PGPKeyRingTestCase extends NamedTestCase {
+public class PGPKeyRingTestCase extends NamedTestCase
+{
     private PGPKeyRing keyManager;
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.NamedTestCase#setUp()
      */
-    protected void setUp() throws Exception {
+    protected void setUp() throws Exception
+    {
         super.setUp();
-                
-        PGPKeyRingImpl keyM=new PGPKeyRingImpl();
+
+        PGPKeyRingImpl keyM = new PGPKeyRingImpl();
         URL url;
-        
-        url = Thread.currentThread().getContextClassLoader().getResource("./serverPublic.gpg");       
+
+        url = Thread.currentThread().getContextClassLoader().getResource("./serverPublic.gpg");
         keyM.setPublicKeyRingFileName(url.getFile());
 
-        url = Thread.currentThread().getContextClassLoader().getResource("./serverPrivate.gpg");       
+        url = Thread.currentThread().getContextClassLoader().getResource("./serverPrivate.gpg");
         keyM.setSecretKeyRingFileName(url.getFile());
-        
+
         keyM.setSecretAliasId("0x6168F39C");
         keyM.setSecretPassphrase("TestingPassphrase");
         keyM.initialise();
-        
-        keyManager=keyM;
+
+        keyManager = keyM;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.NamedTestCase#tearDown()
      */
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception
+    {
         // TODO Auto-generated method stub
         super.tearDown();
-        
-        keyManager=null;
+
+        keyManager = null;
     }
-    
-    public void testClientKey() {
-        KeyBundle clientKey=keyManager.getKeyBundle("Mule client <mule_client@mule.com>");
+
+    public void testClientKey()
+    {
+        KeyBundle clientKey = keyManager.getKeyBundle("Mule client <mule_client@mule.com>");
         assertNotNull(clientKey);
     }
-    
-    public void testServerKey() {
-        KeyBundle serverKey=keyManager.getSecretKeyBundle();
-        assertNotNull(serverKey);       
+
+    public void testServerKey()
+    {
+        KeyBundle serverKey = keyManager.getSecretKeyBundle();
+        assertNotNull(serverKey);
     }
 }

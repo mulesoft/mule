@@ -16,9 +16,9 @@ package org.mule.providers.file;
 import org.mule.umo.UMOEvent;
 
 /**
- * <code>FilenameParser</code> is a simple expression parser interface for processing
- * filenames
- *
+ * <code>FilenameParser</code> is a simple expression parser interface for
+ * processing filenames
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

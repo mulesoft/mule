@@ -16,14 +16,15 @@ package org.mule.providers.multicast;
 import org.mule.providers.udp.UdpConnector;
 
 /**
- * <code>MulticastConnector</code> can dispatch mule events using ip multicasting
- *
+ * <code>MulticastConnector</code> can dispatch mule events using ip
+ * multicasting
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MulticastConnector extends UdpConnector
 {
-   private boolean loopback = false;
+    private boolean loopback = false;
 
     public String getProtocol()
     {

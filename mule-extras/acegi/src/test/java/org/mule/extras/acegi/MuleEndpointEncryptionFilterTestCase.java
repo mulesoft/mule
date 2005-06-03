@@ -13,6 +13,9 @@
  */
 package org.mule.extras.acegi;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleProperties;
@@ -26,9 +29,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.security.CredentialsNotSetException;
 import org.mule.umo.security.UnauthorisedException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -37,7 +37,8 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 {
     public void setUp() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("test-acegi-encrypt-config.xml");
     }

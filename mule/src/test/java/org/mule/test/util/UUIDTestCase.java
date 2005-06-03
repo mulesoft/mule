@@ -16,11 +16,12 @@
 package org.mule.test.util;
 
 import junit.framework.TestCase;
+
 import org.mule.util.UUID;
 
 /**
  * <code>UUIDTestCase</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

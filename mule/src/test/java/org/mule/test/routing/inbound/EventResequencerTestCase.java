@@ -13,7 +13,8 @@
  */
 package org.mule.test.routing.inbound;
 
-import com.mockobjects.dynamic.Mock;
+import java.util.Comparator;
+
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -22,11 +23,15 @@ import org.mule.routing.inbound.EventGroup;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 
-import java.util.Comparator;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -68,7 +73,7 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
         assertEquals("test event C", results[1].getMessageAsString());
         assertEquals("test event A", results[2].getMessageAsString());
 
-        //set a resequencing comparator
+        // set a resequencing comparator
         router.setComparator(new EventPayloadComparator());
 
         assertNull(router.process(event2));
@@ -96,8 +101,8 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
         protected boolean shouldResequence(EventGroup events)
         {
             eventCount++;
-            if(eventCount == eventthreshold) {
-                eventCount=0;
+            if (eventCount == eventthreshold) {
+                eventCount = 0;
                 return true;
             }
             return false;
@@ -108,11 +113,9 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
     {
         public int compare(Object o1, Object o2)
         {
-            try
-            {
-                return ((UMOEvent)o1).getMessageAsString().compareTo(((UMOEvent)o2).getMessageAsString());
-            } catch (UMOException e)
-            {
+            try {
+                return ((UMOEvent) o1).getMessageAsString().compareTo(((UMOEvent) o2).getMessageAsString());
+            } catch (UMOException e) {
                 throw new IllegalArgumentException(e.getMessage());
             }
 

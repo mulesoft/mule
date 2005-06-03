@@ -28,22 +28,26 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class FtpMessageDispatcher extends AbstractMessageDispatcher {
+public class FtpMessageDispatcher extends AbstractMessageDispatcher
+{
 
-	protected FtpConnector connector;
-	
-	public FtpMessageDispatcher(FtpConnector connector) {
-		super(connector);
-		this.connector = connector;
-	}
+    protected FtpConnector connector;
 
-	public void doDispose() {
-	}
+    public FtpMessageDispatcher(FtpConnector connector)
+    {
+        super(connector);
+        this.connector = connector;
+    }
 
-	public void doDispatch(UMOEvent event) throws Exception {
-		FTPClient client = null;
-		UMOEndpointURI uri = event.getEndpoint().getEndpointURI();
-		try {
+    public void doDispose()
+    {
+    }
+
+    public void doDispatch(UMOEvent event) throws Exception
+    {
+        FTPClient client = null;
+        UMOEndpointURI uri = event.getEndpoint().getEndpointURI();
+        try {
             String filename = (String) event.getProperty(FtpConnector.PROPERTY_FILENAME);
 
             if (filename == null) {
@@ -59,41 +63,42 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher {
 
             byte[] buf;
             Object data = event.getTransformedMessage();
-            if (data instanceof byte[])
-            {
-                buf = (byte[])data;
-            } else
-            {
+            if (data instanceof byte[]) {
+                buf = (byte[]) data;
+            } else {
                 buf = data.toString().getBytes();
             }
 
-			client = (FTPClient) connector.getFtp(uri);
-			if (!client.changeWorkingDirectory(uri.getPath())) {
-				throw new IOException("Ftp error: " + client.getReplyCode());
-			}
-			if (!client.storeFile(filename, new ByteArrayInputStream(buf))) {
-				throw new IOException("Ftp error: " + client.getReplyCode());
-			}
-			
-		} finally {
-			connector.releaseFtp(uri, client);
-		}
-	}
+            client = (FTPClient) connector.getFtp(uri);
+            if (!client.changeWorkingDirectory(uri.getPath())) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+            if (!client.storeFile(filename, new ByteArrayInputStream(buf))) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
 
-	public UMOMessage doSend(UMOEvent event) throws Exception {
-		doDispatch(event);
-		return event.getMessage();
-	}
+        } finally {
+            connector.releaseFtp(uri, client);
+        }
+    }
 
-	public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public UMOMessage doSend(UMOEvent event) throws Exception
+    {
+        doDispatch(event);
+        return event.getMessage();
+    }
 
-	public Object getDelegateSession() throws UMOException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Object getDelegateSession() throws UMOException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     private String generateFilename(UMOEvent event, String pattern)
     {

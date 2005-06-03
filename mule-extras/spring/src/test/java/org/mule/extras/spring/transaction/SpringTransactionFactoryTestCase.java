@@ -22,35 +22,38 @@ import org.springframework.transaction.TransactionStatus;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
-public class SpringTransactionFactoryTestCase extends NamedTestCase {
+public class SpringTransactionFactoryTestCase extends NamedTestCase
+{
 
-	public void testCommit() throws Exception {
-		Mock mockPTM = new Mock(PlatformTransactionManager.class);
-		Mock mockTS  = new Mock(TransactionStatus.class);
-		mockPTM.expectAndReturn("getTransaction", C.same(null), mockTS.proxy());
-		mockPTM.expect("commit", C.same(mockTS.proxy()));
-		
-		SpringTransactionFactory factory = new SpringTransactionFactory();
-		factory.setManager((PlatformTransactionManager) mockPTM.proxy());
+    public void testCommit() throws Exception
+    {
+        Mock mockPTM = new Mock(PlatformTransactionManager.class);
+        Mock mockTS = new Mock(TransactionStatus.class);
+        mockPTM.expectAndReturn("getTransaction", C.same(null), mockTS.proxy());
+        mockPTM.expect("commit", C.same(mockTS.proxy()));
 
-		UMOTransaction tx = factory.beginTransaction();
-		TransactionCoordination.getInstance().bindTransaction(tx);
-		tx.commit();
-	}
-	
-	public void testRollback() throws Exception {
-		Mock mockPTM = new Mock(PlatformTransactionManager.class);
-		Mock mockTS  = new Mock(TransactionStatus.class);
-		mockPTM.expectAndReturn("getTransaction", C.same(null), mockTS.proxy());
-		mockPTM.expect("rollback", C.same(mockTS.proxy()));
-		mockTS.expect("setRollbackOnly");
-		
-		SpringTransactionFactory factory = new SpringTransactionFactory();
-		factory.setManager((PlatformTransactionManager) mockPTM.proxy());
+        SpringTransactionFactory factory = new SpringTransactionFactory();
+        factory.setManager((PlatformTransactionManager) mockPTM.proxy());
 
-		UMOTransaction tx = factory.beginTransaction();
-		TransactionCoordination.getInstance().bindTransaction(tx);
-		tx.rollback();
-	}
-	
+        UMOTransaction tx = factory.beginTransaction();
+        TransactionCoordination.getInstance().bindTransaction(tx);
+        tx.commit();
+    }
+
+    public void testRollback() throws Exception
+    {
+        Mock mockPTM = new Mock(PlatformTransactionManager.class);
+        Mock mockTS = new Mock(TransactionStatus.class);
+        mockPTM.expectAndReturn("getTransaction", C.same(null), mockTS.proxy());
+        mockPTM.expect("rollback", C.same(mockTS.proxy()));
+        mockTS.expect("setRollbackOnly");
+
+        SpringTransactionFactory factory = new SpringTransactionFactory();
+        factory.setManager((PlatformTransactionManager) mockPTM.proxy());
+
+        UMOTransaction tx = factory.beginTransaction();
+        TransactionCoordination.getInstance().bindTransaction(tx);
+        tx.rollback();
+    }
+
 }

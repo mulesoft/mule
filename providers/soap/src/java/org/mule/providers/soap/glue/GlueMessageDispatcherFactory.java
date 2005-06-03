@@ -20,8 +20,9 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
- * <code>GlueMessageDispatcherFactory</code> Creates a Soap Message dispatcher that uses glue
- *
+ * <code>GlueMessageDispatcherFactory</code> Creates a Soap Message dispatcher
+ * that uses glue
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -30,7 +31,7 @@ public class GlueMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-        return new GlueMessageDispatcher((AbstractConnector)connector);
+        return new GlueMessageDispatcher((AbstractConnector) connector);
     }
 
 }

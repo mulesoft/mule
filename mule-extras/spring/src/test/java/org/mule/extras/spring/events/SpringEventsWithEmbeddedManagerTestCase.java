@@ -21,16 +21,18 @@ import org.mule.MuleManager;
  */
 public class SpringEventsWithEmbeddedManagerTestCase extends SpringEventsTestCase
 {
-    protected String getConfigResources() {
+    protected String getConfigResources()
+    {
         return "mule-events-app-with-embedded-manager.xml";
     }
 
-    public void testCorrectManagerLoaded() {
+    public void testCorrectManagerLoaded()
+    {
         assertNotNull(MuleManager.getInstance().getProperty("embeddedManager"));
     }
 
-	public void testRemovingListeners() throws Exception
+    public void testRemovingListeners() throws Exception
     {
-		super.testRemovingListeners();
+        super.testRemovingListeners();
     }
 }

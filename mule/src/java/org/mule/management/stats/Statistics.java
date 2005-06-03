@@ -17,23 +17,23 @@ import java.io.Serializable;
 
 /**
  * <code>Statistics</code> todo
- *
+ * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$
  */
 public interface Statistics extends Serializable
 {
     /**
-	 * Are statistics logged
-	 */
-	public boolean isEnabled() ;
+     * Are statistics logged
+     */
+    boolean isEnabled();
 
-	/**
-	 * Enable statistics logs (this is a dynamic parameter)
-	 */
-	public void setEnabled(boolean b) ;
+    /**
+     * Enable statistics logs (this is a dynamic parameter)
+     */
+    void setEnabled(boolean b);
 
-	public void clear() ;
+    void clear();
 
-	public void logSummary();
+    void logSummary();
 }

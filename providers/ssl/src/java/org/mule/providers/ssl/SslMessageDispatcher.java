@@ -13,20 +13,22 @@
  */
 package org.mule.providers.ssl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.providers.tcp.TcpMessageDispatcher;
-
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.providers.tcp.TcpMessageDispatcher;
+
 /**
- * <code>TcpMessageDispatcher</code> will send transformed mule events over tcp.
- *
+ * <code>TcpMessageDispatcher</code> will send transformed mule events over
+ * tcp.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -46,7 +48,7 @@ public class SslMessageDispatcher extends TcpMessageDispatcher
     protected Socket createSocket(int port, InetAddress inetAddress) throws IOException
     {
         SocketFactory factory = SSLSocketFactory.getDefault();
-        SSLSocket socket = (SSLSocket)factory.createSocket(inetAddress, port);
+        SSLSocket socket = (SSLSocket) factory.createSocket(inetAddress, port);
         return socket;
     }
 }

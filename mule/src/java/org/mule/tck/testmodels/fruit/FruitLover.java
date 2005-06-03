@@ -18,7 +18,6 @@ package org.mule.tck.testmodels.fruit;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class FruitLover
 {
     private List eatList = new ArrayList();

@@ -19,7 +19,7 @@ import org.mule.umo.UMOException;
 
 /**
  * <code>ConnectorException</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -38,7 +38,7 @@ public class ConnectorException extends UMOException
 
     /**
      * @param message the exception message
-     * @param cause   the exception that cause this exception to be thrown
+     * @param cause the exception that cause this exception to be thrown
      */
     public ConnectorException(Message message, UMOConnector connector, Throwable cause)
     {
@@ -46,18 +46,20 @@ public class ConnectorException extends UMOException
         this.connector = connector;
     }
 
-     private static Message generateMessage(Message message, UMOConnector connector) {
-         Message m = new Message(Messages.CONNECTOR_CAUSED_ERROR, connector);
-         if(message!=null) {
-             message.setNextMessage(m);
-             return message;
-         } else {
-             message = new Message(-1);
-             return m;
-         }
+    private static Message generateMessage(Message message, UMOConnector connector)
+    {
+        Message m = new Message(Messages.CONNECTOR_CAUSED_ERROR, connector);
+        if (message != null) {
+            message.setNextMessage(m);
+            return message;
+        } else {
+            message = new Message(-1);
+            return m;
+        }
     }
 
-    public UMOConnector getConnector() {
+    public UMOConnector getConnector()
+    {
         return connector;
     }
 }

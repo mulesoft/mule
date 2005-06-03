@@ -36,7 +36,6 @@ public class SslEndpointTestCase extends NamedTestCase
         assertEquals(0, url.getParams().size());
     }
 
-
     public void testQueryParams1() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("ssl://localhost:7856?param=1");

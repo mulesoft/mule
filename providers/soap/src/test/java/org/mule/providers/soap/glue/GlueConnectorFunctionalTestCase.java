@@ -13,8 +13,9 @@
  */
 package org.mule.providers.soap.glue;
 
-import electric.proxy.IProxy;
-import electric.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
@@ -29,8 +30,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
-import java.util.ArrayList;
-import java.util.List;
+import electric.proxy.IProxy;
+import electric.registry.Registry;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -41,25 +42,27 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("glue-test-mule-config.xml");
     }
 
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception
+    {
         MuleManager.getInstance().dispose();
         super.tearDown();
     }
 
     public void testRequestResponse() throws Throwable
     {
-        IProxy proxy = proxy = Registry.bind( "http://localhost:38004/mycomponent2");
+        IProxy proxy = proxy = Registry.bind("http://localhost:38004/mycomponent2");
         List results = new ArrayList();
-        for(int i = 0;i < 100;i++) {
-            results.add(proxy.invoke("echo", new Object[]{new String("Message " + i)}));
+        for (int i = 0; i < 100; i++) {
+            results.add(proxy.invoke("echo", new Object[] { new String("Message " + i) }));
         }
         assertEquals(100, results.size());
-        for(int i = 0;i < 100;i++) {
+        for (int i = 0; i < 100; i++) {
             assertEquals("Message " + i, results.get(i).toString());
         }
     }
@@ -69,7 +72,8 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
         UMOConnector c = ConnectorFactory.getConnectorByProtocol("glue");
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/services/mycomponent?method=getDate"), 0);
+        UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/services/mycomponent?method=getDate"),
+                                               0);
         assertNotNull(result);
         assertNotNull(result.getPayload());
     }
@@ -79,11 +83,12 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
         UMOConnector c = ConnectorFactory.getConnectorByProtocol("glue");
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=getPerson&param=Fred"), 0);
+        UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=getPerson&param=Fred"),
+                                               0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Fred", ((Person)result.getPayload()).getFirstName());
-        assertEquals("Flintstone", ((Person)result.getPayload()).getLastName());
+        assertEquals("Fred", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
     }
 
     public void testSendComplex() throws Throwable
@@ -92,19 +97,24 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOEndpoint endpoint = new MuleEndpoint("test",
-                new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=addPerson"),
-                c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null);
+                                                new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=addPerson"),
+                                                c,
+                                                null,
+                                                UMOEndpoint.ENDPOINT_TYPE_SENDER,
+                                                0,
+                                                null);
         UMOEvent event = getTestEvent(new Person("Ross", "Mason"), endpoint);
 
         UMOMessage result = dispatcher.send(event);
         assertNull(result);
 
-        //lets get our newly added person
-        result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=getPerson&param=Ross"), 0);
+        // lets get our newly added person
+        result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=getPerson&param=Ross"),
+                                    0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Ross", ((Person)result.getPayload()).getFirstName());
-        assertEquals("Mason", ((Person)result.getPayload()).getLastName());
+        assertEquals("Ross", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Mason", ((Person) result.getPayload()).getLastName());
     }
 
     public void testReceiveComplexCollection() throws Throwable
@@ -112,9 +122,10 @@ public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
         UMOConnector c = ConnectorFactory.getConnectorByProtocol("glue");
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=getPeople"), 0);
+        UMOMessage result = dispatcher.receive(new MuleEndpointURI("http://localhost:38004/mule/mycomponent3?method=getPeople"),
+                                               0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person[]);
-        assertEquals(3, ((Person[])result.getPayload()).length);
+        assertEquals(3, ((Person[]) result.getPayload()).length);
     }
 }

@@ -20,7 +20,7 @@ import org.mule.tck.AbstractMuleTestCase;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EqualsFilterTestCase  extends AbstractMuleTestCase
+public class EqualsFilterTestCase extends AbstractMuleTestCase
 {
     public void testEqualsFilter()
     {

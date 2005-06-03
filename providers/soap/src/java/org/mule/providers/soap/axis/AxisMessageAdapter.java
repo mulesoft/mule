@@ -13,6 +13,8 @@
  */
 package org.mule.providers.soap.axis;
 
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.MessageContext;
 import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageAdapter;
@@ -20,11 +22,9 @@ import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import javax.xml.soap.SOAPException;
-
 /**
  * <code>AxisMessageAdapter</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -36,38 +36,35 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
     public AxisMessageAdapter(Object message) throws MessagingException
     {
         this.message = message;
-        try
-        {
+        try {
             MessageContext ctx = MessageContext.getCurrentContext();
-            if(ctx!=null)
-            {
+            if (ctx != null) {
                 MuleSoapHeaders header = new MuleSoapHeaders(ctx.getMessage().getSOAPPart().getEnvelope().getHeader());
 
-                if(header.getReplyTo()!=null && !"".equals(header.getReplyTo())) {
+                if (header.getReplyTo() != null && !"".equals(header.getReplyTo())) {
                     setReplyTo(header.getReplyTo());
                 }
 
-                if(header.getCorrelationGroup()!=null && !"".equals(header.getCorrelationGroup())
+                if (header.getCorrelationGroup() != null && !"".equals(header.getCorrelationGroup())
                         && !"-1".equals(header.getCorrelationGroup())) {
                     setCorrelationGroupSize(Integer.parseInt(header.getCorrelationGroup()));
                 }
-                if(header.getCorrelationSequence()!=null && !"".equals(header.getCorrelationSequence())
+                if (header.getCorrelationSequence() != null && !"".equals(header.getCorrelationSequence())
                         && !"-1".equals(header.getCorrelationSequence())) {
                     setCorrelationSequence(Integer.parseInt(header.getCorrelationSequence()));
                 }
-                if(header.getCorrelationId()!=null && !"".equals(header.getCorrelationId())) {
+                if (header.getCorrelationId() != null && !"".equals(header.getCorrelationId())) {
                     setCorrelationId(header.getCorrelationId());
                 }
             }
-        } catch (SOAPException e)
-        {
+        } catch (SOAPException e) {
             throw new MessagingException(new Message("soap", 5), message, e);
         }
     }
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
@@ -78,13 +75,13 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return (byte[])trans.transform(message);
+        return (byte[]) trans.transform(message);
     }
 
     /**

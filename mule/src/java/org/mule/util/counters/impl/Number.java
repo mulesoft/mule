@@ -20,39 +20,46 @@ import org.mule.util.counters.CounterFactory.Type;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class Number extends AbstractCounter {
-	
-	private double value = 0.0;
-	
-	public Number(String name) {
-		super(name, Type.NUMBER);
-	}
-	
-	public synchronized double increment() {
-		this.value++;
-		propagate();
-		return this.value;
-	}
-		
-	public synchronized double incrementBy(double value) {
-		this.value += value;
-		propagate();
-		return this.value;
-	}
-	
-	public synchronized double decrement() {
-		this.value--;
-		propagate();
-		return this.value;
-	}
-	
-	public synchronized void setRawValue(double value) {
-		this.value = value;
-		propagate();
-	}
-	
-	public synchronized double nextValue() {
-		return (double) this.value;
-	}
-	
+public class Number extends AbstractCounter
+{
+
+    private double value = 0.0;
+
+    public Number(String name)
+    {
+        super(name, Type.NUMBER);
+    }
+
+    public synchronized double increment()
+    {
+        this.value++;
+        propagate();
+        return this.value;
+    }
+
+    public synchronized double incrementBy(double value)
+    {
+        this.value += value;
+        propagate();
+        return this.value;
+    }
+
+    public synchronized double decrement()
+    {
+        this.value--;
+        propagate();
+        return this.value;
+    }
+
+    public synchronized void setRawValue(double value)
+    {
+        this.value = value;
+        propagate();
+    }
+
+    public synchronized double nextValue()
+    {
+        return (double) this.value;
+    }
+
 }

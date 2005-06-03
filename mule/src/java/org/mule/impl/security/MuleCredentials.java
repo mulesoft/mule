@@ -13,14 +13,14 @@
  */
 package org.mule.impl.security;
 
-import org.mule.umo.security.UMOCredentials;
-
 import java.util.StringTokenizer;
 
+import org.mule.umo.security.UMOCredentials;
+
 /**
- * <code>MuleCredentials</code> can be used to read and
- * set Mule user information that can be stored in a message header
- *
+ * <code>MuleCredentials</code> can be used to read and set Mule user
+ * information that can be stored in a message header
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -51,7 +51,7 @@ public class MuleCredentials implements UMOCredentials
         StringTokenizer st = new StringTokenizer(header, TOKEN_DELIM);
         username = st.nextToken();
         password = st.nextToken().toCharArray();
-        if(st.hasMoreTokens()) {
+        if (st.hasMoreTokens()) {
             roles = st.nextToken();
         }
     }
@@ -62,7 +62,9 @@ public class MuleCredentials implements UMOCredentials
         buf.append(username).append(TOKEN_DELIM);
         buf.append(password).append(TOKEN_DELIM);
 
-        if(roles!=null) buf.append(roles);
+        if (roles != null) {
+            buf.append(roles);
+        }
         return buf.toString();
     }
 

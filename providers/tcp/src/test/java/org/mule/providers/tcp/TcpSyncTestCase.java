@@ -29,59 +29,63 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
- * TODO: document this class 
- *
+ * TODO: document this class
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class TcpSyncTestCase extends NamedTestCase {
+public class TcpSyncTestCase extends NamedTestCase
+{
 
-	private static final String endpointUri = "tcp://localhost:4544";
-	
+    private static final String endpointUri = "tcp://localhost:4544";
+
     protected void setUp() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("tcp-sync.xml");
     }
-	
-	protected UMOMessage send(Object payload) throws Exception {
-	    UMOMessage message = new MuleMessage(payload, null);
-        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(new MuleEndpointURI(endpointUri), UMOEndpoint.ENDPOINT_TYPE_SENDER);
+
+    protected UMOMessage send(Object payload) throws Exception
+    {
+        UMOMessage message = new MuleMessage(payload, null);
+        UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(new MuleEndpointURI(endpointUri),
+                                                                      UMOEndpoint.ENDPOINT_TYPE_SENDER);
         MuleSession session = new MuleSession();
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
-		event.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
-		event.setTimeout(60000);
-		return event.getSession().sendEvent(event);
-	}
-	
-	public void testSendString() throws Exception 
-	{
+        event.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
+        event.setTimeout(60000);
+        return event.getSession().sendEvent(event);
+    }
+
+    public void testSendString() throws Exception
+    {
         UMOMessage message = send("data");
         assertNotNull(message);
-		String response = message.getPayloadAsString();
+        String response = message.getPayloadAsString();
         assertEquals("data", response);
-	}
+    }
 
-	public void testSyncResponseOfBufferSize() throws Exception 
-	{
-		TcpConnector tcp = (TcpConnector) MuleManager.getInstance().lookupConnector("tcpConnector");
-		byte[] data = new byte[tcp.getBufferSize()];
+    public void testSyncResponseOfBufferSize() throws Exception
+    {
+        TcpConnector tcp = (TcpConnector) MuleManager.getInstance().lookupConnector("tcpConnector");
+        byte[] data = new byte[tcp.getBufferSize()];
         UMOMessage message = send(data);
         assertNotNull(message);
-		byte[] response = message.getPayloadAsBytes();
-		assertEquals(data.length, response.length);
+        byte[] response = message.getPayloadAsBytes();
+        assertEquals(data.length, response.length);
         assertTrue(Arrays.equals(data, response));
-	}
+    }
 
-	public void testSyncResponseVeryBig() throws Exception 
-	{
-		byte[] data = new byte[1024 * 1024];
+    public void testSyncResponseVeryBig() throws Exception
+    {
+        byte[] data = new byte[1024 * 1024];
         UMOMessage message = send(data);
         assertNotNull(message);
-		byte[] response = message.getPayloadAsBytes();
-		assertEquals(data.length, response.length);
+        byte[] response = message.getPayloadAsBytes();
+        assertEquals(data.length, response.length);
         assertTrue(Arrays.equals(data, response));
-	}
+    }
 
 }

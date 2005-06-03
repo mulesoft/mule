@@ -18,27 +18,35 @@ import org.mule.umo.security.UMOSecurityContext;
 
 /**
  * @author ariva
- *
+ * 
  */
-public class PGPSecurityContext implements UMOSecurityContext {
+public class PGPSecurityContext implements UMOSecurityContext
+{
 
     PGPAuthentication authentication;
-    
-    public PGPSecurityContext(PGPAuthentication authentication) {
-        this.authentication=authentication;
-    }
-    
-    /* (non-Javadoc)
-     * @see org.mule.umo.security.UMOSecurityContext#setAuthentication(org.mule.umo.security.UMOAuthentication)
-     */
-    public void setAuthentication(UMOAuthentication authentication) {
-       this.authentication=(PGPAuthentication)authentication;
+
+    public PGPSecurityContext(PGPAuthentication authentication)
+    {
+        this.authentication = authentication;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.security.UMOSecurityContext#setAuthentication(org.mule.umo.security.UMOAuthentication)
+     */
+    public void setAuthentication(UMOAuthentication authentication)
+    {
+        this.authentication = (PGPAuthentication) authentication;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.security.UMOSecurityContext#getAuthentication()
      */
-    public UMOAuthentication getAuthentication() {
+    public UMOAuthentication getAuthentication()
+    {
         return authentication;
     }
 

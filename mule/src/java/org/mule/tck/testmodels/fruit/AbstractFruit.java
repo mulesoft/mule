@@ -17,11 +17,11 @@ package org.mule.tck.testmodels.fruit;
 
 /**
  * <code>AbstractFruit</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public abstract class AbstractFruit implements Fruit
 {
-    //test abstract class
+    // test abstract class
 }

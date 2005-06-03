@@ -39,4 +39,3 @@ public class AxisConnectorTestCase extends AbstractConnectorTestCase
         return "Test Message";
     }
 }
-

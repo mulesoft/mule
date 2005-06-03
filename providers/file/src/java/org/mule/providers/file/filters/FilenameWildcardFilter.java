@@ -13,17 +13,17 @@
  */
 package org.mule.providers.file.filters;
 
+import java.io.File;
+import java.io.FilenameFilter;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.routing.filters.WildcardFilter;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
 /**
  * <code>FilenameWildcardFilter</code> Filters the incoming files from the
  * read From directory, based on file patterns
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,33 +34,31 @@ public class FilenameWildcardFilter extends WildcardFilter implements FilenameFi
      */
     private static transient Log logger = LogFactory.getLog(FilenameWildcardFilter.class);
 
-    public FilenameWildcardFilter() {
+    public FilenameWildcardFilter()
+    {
         super();
     }
 
-    public FilenameWildcardFilter(String pattern) {
+    public FilenameWildcardFilter(String pattern)
+    {
         super(pattern);
     }
 
     /**
-     * UMOFilter condition decider method.
-     * <p/>
-     * Returns <code>boolean</code> <code>TRUE</code> if the file conforms
-     * to an acceptable pattern or <code>FALSE</code> otherwise.
-     *
-     * @param dir  The directory to apply the filter to.
+     * UMOFilter condition decider method. <p/> Returns
+     * <code>boolean</code> <code>TRUE</code> if the file conforms to an
+     * acceptable pattern or <code>FALSE</code> otherwise.
+     * 
+     * @param dir The directory to apply the filter to.
      * @param name The name of the file to apply the filter to.
      * @return indication of acceptance as boolean.
      */
     public boolean accept(File dir, String name)
     {
-        if (name == null)
-        {
+        if (name == null) {
             logger.warn("The filename and or directory was null");
             return false;
-        }
-        else
-        {
+        } else {
             return accept(name);
         }
     }

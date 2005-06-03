@@ -15,12 +15,12 @@ package org.mule.umo;
 
 /**
  * <code>UMOFilter</code> well known filter interface
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public interface UMOFilter
 {
-    public boolean accept(Object object);
+    boolean accept(Object object);
 }

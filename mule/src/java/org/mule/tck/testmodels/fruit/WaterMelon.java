@@ -15,6 +15,8 @@
 
 package org.mule.tck.testmodels.fruit;
 
+import java.util.HashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEvent;
@@ -22,9 +24,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
-
-import java.util.HashMap;
-
 
 public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
 {
@@ -52,12 +51,12 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
         state = "initialised";
     }
 
-    //            public WaterMelon(String brand, Double radius, Integer seeds)
-    //            {
-    //                this.brand = brand;
-    //                this.radius = radius;
-    //                this.seeds = seeds;
-    //            }
+    // public WaterMelon(String brand, Double radius, Integer seeds)
+    // {
+    // this.brand = brand;
+    // this.radius = radius;
+    // this.seeds = seeds;
+    // }
 
     public void bite()
     {
@@ -143,19 +142,17 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
         state = "disposed";
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object obj)
     {
-        if (obj instanceof WaterMelon)
-        {
+        if (obj instanceof WaterMelon) {
             WaterMelon melon = (WaterMelon) obj;
-            return (getBrand().equals(melon.getBrand()) &&
-                    getRadius().equals(melon.getRadius()) &&
-                    getSeeds().equals(melon.getSeeds()) &&
-                    getState().equals(getState()));
+            return (getBrand().equals(melon.getBrand()) && getRadius().equals(melon.getRadius())
+                    && getSeeds().equals(melon.getSeeds()) && getState().equals(getState()));
         }
 
         return super.equals(obj);

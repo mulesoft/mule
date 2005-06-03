@@ -13,9 +13,9 @@
  */
 package org.mule.extras.pgp;
 
-import cryptix.message.*;
-import cryptix.openpgp.PGPArmouredMessage;
-import cryptix.pki.KeyBundle;
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Messages;
@@ -23,14 +23,21 @@ import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
 
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
+import cryptix.message.EncryptedMessage;
+import cryptix.message.EncryptedMessageBuilder;
+import cryptix.message.LiteralMessageBuilder;
+import cryptix.message.Message;
+import cryptix.message.MessageFactory;
+import cryptix.message.SignedMessageBuilder;
+import cryptix.openpgp.PGPArmouredMessage;
+import cryptix.pki.KeyBundle;
 
 /**
  * @author ariva
- *  
+ * 
  */
-public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy {
+public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy
+{
     protected static transient Log logger = LogFactory.getLog(KeyBasedEncryptionStrategy.class);
 
     private PGPKeyRing keyManager;
@@ -40,7 +47,8 @@ public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy {
      * 
      * @see org.mule.umo.UMOEncryptionStrategy#encrypt(byte[])
      */
-    public byte[] encrypt(byte[] data, Object cryptInfo) throws CryptoFailureException {
+    public byte[] encrypt(byte[] data, Object cryptInfo) throws CryptoFailureException
+    {
         try {
             PGPCryptInfo pgpCryptInfo = (PGPCryptInfo) cryptInfo;
             KeyBundle publicKey = pgpCryptInfo.getKeyBundle();
@@ -76,7 +84,8 @@ public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy {
      * 
      * @see org.mule.umo.UMOEncryptionStrategy#decrypt(byte[])
      */
-    public byte[] decrypt(byte[] data, Object cryptInfo) throws CryptoFailureException {
+    public byte[] decrypt(byte[] data, Object cryptInfo) throws CryptoFailureException
+    {
         try {
             MessageFactory mf = MessageFactory.getInstance("OpenPGP");
 
@@ -87,8 +96,8 @@ public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy {
             Message msg = (Message) msgs.iterator().next();
 
             if (msg instanceof EncryptedMessage) {
-                msg = ((EncryptedMessage) msg).decrypt(keyManager.getSecretKeyBundle(), keyManager.getSecretPassphrase()
-                        .toCharArray());
+                msg = ((EncryptedMessage) msg).decrypt(keyManager.getSecretKeyBundle(),
+                                                       keyManager.getSecretPassphrase().toCharArray());
 
                 return new PGPArmouredMessage(msg).getEncoded();
             }
@@ -104,21 +113,24 @@ public class KeyBasedEncryptionStrategy implements UMOEncryptionStrategy {
      * 
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
-    public void initialise() throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
         try {
             java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto());
             java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP());
         } catch (Exception e) {
             throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
-                    "KeyBasedEncryptionStrategy"), e, this);
+                                                                               "KeyBasedEncryptionStrategy"), e, this);
         }
     }
 
-    public PGPKeyRing getKeyManager() {
+    public PGPKeyRing getKeyManager()
+    {
         return keyManager;
     }
 
-    public void setKeyManager(PGPKeyRing keyManager) {
+    public void setKeyManager(PGPKeyRing keyManager)
+    {
         this.keyManager = keyManager;
     }
 }

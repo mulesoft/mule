@@ -22,18 +22,18 @@ import org.mule.umo.UMOInterceptor;
 
 /**
  * <code>UMOLifecycleAdapter</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface UMOLifecycleAdapter extends Lifecycle, Initialisable, UMOInterceptor
 {
-    public boolean isStarted();
+    boolean isStarted();
 
-    public boolean isDisposed();
+    boolean isDisposed();
 
-    public UMODescriptor getDescriptor();
+    UMODescriptor getDescriptor();
 
-    public Object onCall(UMOEvent event) throws UMOException;
+    Object onCall(UMOEvent event) throws UMOException;
 
 }

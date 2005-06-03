@@ -26,15 +26,18 @@ import org.mule.umo.manager.UMOContainerContext;
  */
 public class EmbeddedBeansXmlTestCase extends NamedTestCase
 {
-    protected void setUp() throws Exception {
+    protected void setUp() throws Exception
+    {
         super.setUp();
         System.setProperty("org.mule.xml.validate", "false");
-        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("test-embedded-spring-config.xml");
     }
 
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception
+    {
         System.setProperty("org.mule.xml.validate", "true");
         super.tearDown();
     }
@@ -50,7 +53,7 @@ public class EmbeddedBeansXmlTestCase extends NamedTestCase
             context.getComponent("Orange");
             fail("Object should  not found");
         } catch (ObjectNotFoundException e) {
-            //ignore
+            // ignore
         }
     }
 }

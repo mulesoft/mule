@@ -16,10 +16,11 @@ package org.mule.impl.internal.events;
 import org.mule.umo.manager.UMOServerEventListener;
 
 /**
- * <code>ManagementEventListener</code> is an observer interface that objects can use to
- * receive events about the stated of the Mule instance and its respources
- *
- *
+ * <code>ManagementEventListener</code> is an observer interface that objects
+ * can use to receive events about the stated of the Mule instance and its
+ * respources
+ * 
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

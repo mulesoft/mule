@@ -43,8 +43,7 @@ public class ServletConnectorTestCase extends AbstractConnectorTestCase
 
     public void testConnectorMessageDispatcher() throws Exception
     {
-        //there is no dispatcher for the servlet connector
+        // there is no dispatcher for the servlet connector
     }
-
 
 }

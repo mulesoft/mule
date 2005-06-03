@@ -20,11 +20,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * <code>ResponseOutputStream</code> is an output stream associated with
- * the currently recieved event.
- * Note that if the stream is from a socket the socket is also available
- * on this stream so that the socket state can be validated before writing.
- *
+ * <code>ResponseOutputStream</code> is an output stream associated with the
+ * currently recieved event. Note that if the stream is from a socket the socket
+ * is also available on this stream so that the socket state can be validated
+ * before writing.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -61,14 +61,15 @@ public class ResponseOutputStream extends BufferedOutputStream
 
     public byte[] getBytes() throws IOException
     {
-        if(isDefault) {
+        if (isDefault) {
             flush();
             return defaultStream.toByteArray();
         }
         return null;
     }
 
-    public boolean isUsed() {
+    public boolean isUsed()
+    {
         return used;
     }
 

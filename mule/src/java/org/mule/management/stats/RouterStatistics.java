@@ -13,23 +13,25 @@
  */
 package org.mule.management.stats;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import org.mule.management.stats.printers.SimplePrinter;
-import org.mule.umo.endpoint.UMOEndpoint;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.mule.management.stats.printers.SimplePrinter;
+import org.mule.umo.endpoint.UMOEndpoint;
+
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+
 /**
  * <code>RouterStatistics</code> todo
- *
+ * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$
  */
-public class RouterStatistics implements Statistics {
+public class RouterStatistics implements Statistics
+{
 
     public static final int TYPE_INBOUND = 1;
     public static final int TYPE_OUTBOUND = 2;
@@ -46,7 +48,8 @@ public class RouterStatistics implements Statistics {
     /**
      * @see org.mule.management.stats.Statistics#clear()
      */
-    public synchronized void clear() {
+    public synchronized void clear()
+    {
         notRouted = 0;
         totalRouted = 0;
         totalReceived = 0;
@@ -58,23 +61,27 @@ public class RouterStatistics implements Statistics {
     /**
      * @see org.mule.management.stats.Statistics#isEnabled()
      */
-    public boolean isEnabled() {
+    public boolean isEnabled()
+    {
 
         return enabled;
     }
 
-    public void logSummary() {
+    public void logSummary()
+    {
         logSummary(new SimplePrinter(System.out));
     }
 
-    public void logSummary(PrintWriter printer) {
+    public void logSummary(PrintWriter printer)
+    {
         printer.print(this);
     }
 
     /**
      * @see org.mule.management.stats.Statistics#setEnabled(boolean)
      */
-    public synchronized void setEnabled(boolean b) {
+    public synchronized void setEnabled(boolean b)
+    {
         enabled = b;
 
     }
@@ -82,49 +89,48 @@ public class RouterStatistics implements Statistics {
     /**
      * The constructor
      */
-    public RouterStatistics(int type) {
+    public RouterStatistics(int type)
+    {
         super();
-        this.type=type;
+        this.type = type;
         routed = new ConcurrentHashMap();
     }
 
     /**
      * Increment routed message for multiple endpoints
-     *
-     * @param endpoints
-     *            The endpoint collection
+     * 
+     * @param endpoints The endpoint collection
      */
-    public void incrementRoutedMessage(Collection endpoints) {
-        if (endpoints == null || endpoints.isEmpty())
+    public void incrementRoutedMessage(Collection endpoints)
+    {
+        if (endpoints == null || endpoints.isEmpty()) {
             return;
-
+        }
         List list = new ArrayList(endpoints);
-        synchronized(list) {
-            for (int i = 0; i < list.size(); i++)
-            {
-                incrementRoutedMessage((UMOEndpoint)list.get(i));
+        synchronized (list) {
+            for (int i = 0; i < list.size(); i++) {
+                incrementRoutedMessage((UMOEndpoint) list.get(i));
             }
         }
     }
 
     /**
      * Increment routed message for an endpoint
-     *
-     * @param endpoint
-     *            The endpoint
+     * 
+     * @param endpoint The endpoint
      */
-    public synchronized void incrementRoutedMessage(UMOEndpoint endpoint) {
-
-        if (endpoint == null)
+    public synchronized void incrementRoutedMessage(UMOEndpoint endpoint)
+    {
+        if (endpoint == null) {
             return;
-
+        }
         String name = endpoint.getName();
         Integer cpt = (Integer) routed.get(name);
         int count = 0;
 
-        if (cpt != null)
+        if (cpt != null) {
             count = cpt.intValue();
-
+        }
         count++;
 
         routed.put(name, new Integer(count));
@@ -135,7 +141,8 @@ public class RouterStatistics implements Statistics {
     /**
      * Increment no routed message
      */
-    public synchronized void incrementNoRoutedMessage() {
+    public synchronized void incrementNoRoutedMessage()
+    {
         notRouted++;
         totalReceived++;
     }
@@ -143,46 +150,55 @@ public class RouterStatistics implements Statistics {
     /**
      * Increment no routed message
      */
-    public synchronized void incrementCaughtMessage() {
+    public synchronized void incrementCaughtMessage()
+    {
         caughtInCatchAll++;
     }
 
     /**
      * @return Returns the notRouted.
      */
-    public final int getCaughtMessages() {
+    public final int getCaughtMessages()
+    {
         return caughtInCatchAll;
     }
-    
+
     /**
      * @return Returns the notRouted.
      */
-    public final int getNotRouted() {
+    public final int getNotRouted()
+    {
         return notRouted;
     }
+
     /**
      * @return Returns the totalReceived.
      */
-    public final int getTotalReceived() {
+    public final int getTotalReceived()
+    {
         return totalReceived;
     }
+
     /**
      * @return Returns the totalRouted.
      */
-    public final int getTotalRouted() {
+    public final int getTotalRouted()
+    {
         return totalRouted;
     }
+
     /**
      * @return Returns the totalRouted.
      */
-    public final int getRouted(String endpointName) {
+    public final int getRouted(String endpointName)
+    {
         Integer i = (Integer) routed.get(endpointName);
 
-         if(i==null)
-              return 0;
-
-         else
-           return i.intValue();
+        if (i == null) {
+            return 0;
+        } else {
+            return i.intValue();
+        }
     }
 
     public boolean isInbound()
@@ -195,4 +211,3 @@ public class RouterStatistics implements Statistics {
         return routed;
     }
 }
-

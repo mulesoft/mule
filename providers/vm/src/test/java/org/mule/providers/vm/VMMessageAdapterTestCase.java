@@ -13,7 +13,6 @@
  *
  */
 
-
 package org.mule.providers.vm;
 
 import org.mule.impl.MuleMessage;
@@ -25,26 +24,30 @@ import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * <code>VMMessageAdapterTestCase</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#createAdapter()
      */
     public UMOMessageAdapter createAdapter(Object payload) throws MessageTypeNotSupportedException
     {
-        if(payload instanceof UMOMessage) {
-            return new VMMessageAdapter((UMOMessage)payload);
+        if (payload instanceof UMOMessage) {
+            return new VMMessageAdapter((UMOMessage) payload);
         } else {
             throw new MessageTypeNotSupportedException(payload, VMMessageAdapter.class);
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getValidMessage()
      */
     public Object getValidMessage() throws UMOException
@@ -52,7 +55,9 @@ public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
         return new MuleMessage("Valid Message", null);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.providers.AbstractMessageAdapterTestCase#getInvalidMessage()
      */
     public Object getInvalidMessage()

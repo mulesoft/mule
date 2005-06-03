@@ -14,6 +14,9 @@
  */
 package org.mule.config.pool;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
@@ -24,13 +27,10 @@ import org.mule.umo.UMOException;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * <code>CommonsPoolProxyPool</code> is pool used to store MuleProxy objects.  This pool is
- * a jakarta commons-pool implementation.
- *
+ * <code>CommonsPoolProxyPool</code> is pool used to store MuleProxy objects.
+ * This pool is a jakarta commons-pool implementation.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -55,9 +55,9 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /**
      * Creates a new pool and an Object factory with the UMODescriptor
-     *
+     * 
      * @param descriptor the descriptor to use when constructing MuleProxy
-     *                   objects in the pool
+     *            objects in the pool
      */
     public CommonsPoolProxyPool(MuleDescriptor descriptor)
     {
@@ -73,7 +73,7 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /**
      * @param descriptor the UMO descriptor to pool
-     * @param config     the config to use when configuring the pool
+     * @param config the config to use when configuring the pool
      */
     public CommonsPoolProxyPool(MuleDescriptor descriptor, GenericObjectPool.Config config)
     {
@@ -82,7 +82,7 @@ public class CommonsPoolProxyPool implements ObjectPool
 
     /**
      * @param descriptor the UMO descriptor to pool
-     * @param config     the config to use when configuring the pool
+     * @param config the config to use when configuring the pool
      */
     private void init(MuleDescriptor descriptor, GenericObjectPool.Config config)
     {
@@ -92,69 +92,66 @@ public class CommonsPoolProxyPool implements ObjectPool
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.model.pool.ObjectPool#borrowObject()
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.model.pool.ObjectPool#borrowObject()
+     */
     public Object borrowObject() throws Exception
     {
         return pool.borrowObject();
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.model.pool.ObjectPool#returnObject(java.lang.Object)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.model.pool.ObjectPool#returnObject(java.lang.Object)
+     */
     public void returnObject(Object object) throws Exception
     {
         pool.returnObject(object);
-
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.model.pool.ObjectPool#getSize()
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.model.pool.ObjectPool#getSize()
+     */
     public int getSize()
     {
         return pool.getNumActive();
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.model.pool.ObjectPool#getMaxSize()
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.model.pool.ObjectPool#getMaxSize()
+     */
     public int getMaxSize()
     {
         return pool.getMaxActive();
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.model.pool.ObjectPool#setFactory(org.mule.model.pool.ProxyFactory)
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.model.pool.ObjectPool#setFactory(org.mule.model.pool.ProxyFactory)
+     */
     public void setFactory(ObjectFactory factory)
     {
         this.factory = factory;
-
     }
 
     /*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.model.pool.ObjectPool#clearPool()
-	 */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.model.pool.ObjectPool#clearPool()
+     */
     public void clearPool()
     {
-        synchronized(components) {
+        synchronized (components) {
             MuleProxy proxy = null;
-            for (int i = 0; i < components.size(); i++)
-            {
-                proxy = (MuleProxy)components.get(i);
+            for (int i = 0; i < components.size(); i++) {
+                proxy = (MuleProxy) components.get(i);
                 proxy.dispose();
             }
         }
@@ -162,35 +159,34 @@ public class CommonsPoolProxyPool implements ObjectPool
         pool.clear();
     }
 
-    public void onAdd(Object proxy) {
-        synchronized(components) {
+    public void onAdd(Object proxy)
+    {
+        synchronized (components) {
             components.add(proxy);
         }
     }
 
-    public void onRemove(Object proxy){
-        synchronized(components) {
+    public void onRemove(Object proxy)
+    {
+        synchronized (components) {
             components.remove(proxy);
         }
     }
 
     public void start() throws UMOException
     {
-        synchronized(components) {
-            for (int i = 0; i < components.size(); i++)
-            {
-                  ((MuleProxy)components.get(i)).start();
-
+        synchronized (components) {
+            for (int i = 0; i < components.size(); i++) {
+                ((MuleProxy) components.get(i)).start();
             }
         }
     }
 
     public void stop() throws UMOException
     {
-        synchronized(components) {
-            for (int i = 0; i < components.size(); i++)
-            {
-                  ((MuleProxy)components.get(i)).stop();
+        synchronized (components) {
+            for (int i = 0; i < components.size(); i++) {
+                ((MuleProxy) components.get(i)).stop();
             }
         }
     }

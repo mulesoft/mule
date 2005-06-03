@@ -19,9 +19,9 @@ import org.mule.umo.model.UMOPoolFactory;
 import org.mule.util.ObjectPool;
 
 /**
- * <code>CommonsPoolFactory</code> is a commons-pool pool implementation for mule.
- * this is the default implementation used if no other is configured.
- *
+ * <code>CommonsPoolFactory</code> is a commons-pool pool implementation for
+ * mule. this is the default implementation used if no other is configured.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,6 +29,6 @@ public class CommonsPoolFactory implements UMOPoolFactory
 {
     public ObjectPool createPool(UMODescriptor descriptor)
     {
-        return new CommonsPoolProxyPool((MuleDescriptor)descriptor);
+        return new CommonsPoolProxyPool((MuleDescriptor) descriptor);
     }
 }

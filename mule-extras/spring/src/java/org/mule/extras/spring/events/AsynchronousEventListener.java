@@ -21,10 +21,10 @@ import org.springframework.context.ApplicationListener;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
 /**
- * <code>AsynchronousEventListener</code> will spawn a thread for each Event received.
- * The thread pool passed in the constructor will determine hown many threads can
- * be executed at any time.
- *
+ * <code>AsynchronousEventListener</code> will spawn a thread for each Event
+ * received. The thread pool passed in the constructor will determine hown many
+ * threads can be executed at any time.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -54,11 +54,9 @@ public class AsynchronousEventListener implements ApplicationListener
 
     public void onApplicationEvent(ApplicationEvent event)
     {
-        try
-        {
+        try {
             threadPool.execute(new Worker(event));
-        } catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             logger.error("Failed to process event: " + event.toString(), e);
         }
     }
@@ -78,4 +76,3 @@ public class AsynchronousEventListener implements ApplicationListener
         }
     }
 }
-

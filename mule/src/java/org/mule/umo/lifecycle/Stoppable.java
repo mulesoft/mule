@@ -17,14 +17,13 @@ package org.mule.umo.lifecycle;
 
 import org.mule.umo.UMOException;
 
-
 /**
  * <code>Stoppable</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface Stoppable
 {
-    public void stop() throws UMOException;
+    void stop() throws UMOException;
 }

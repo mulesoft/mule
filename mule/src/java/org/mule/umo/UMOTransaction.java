@@ -12,61 +12,63 @@
 
 package org.mule.umo;
 
-
 /**
  * 
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
  */
 public interface UMOTransaction
 {
-	
-    public static final int STATUS_ACTIVE = 0;
-    public static final int STATUS_MARKED_ROLLBACK = 1;
-    public static final int STATUS_PREPARED = 2;
-    public static final int STATUS_COMMITTED = 3;
-    public static final int STATUS_ROLLEDBACK = 4;
-    public static final int STATUS_UNKNOWN = 5;
-    public static final int STATUS_NO_TRANSACTION = 6;
-    public static final int STATUS_PREPARING = 7;
-    public static final int STATUS_COMMITTING = 8;
-    public static final int STATUS_ROLLING_BACK = 9;
+
+    int STATUS_ACTIVE = 0;
+    int STATUS_MARKED_ROLLBACK = 1;
+    int STATUS_PREPARED = 2;
+    int STATUS_COMMITTED = 3;
+    int STATUS_ROLLEDBACK = 4;
+    int STATUS_UNKNOWN = 5;
+    int STATUS_NO_TRANSACTION = 6;
+    int STATUS_PREPARING = 7;
+    int STATUS_COMMITTING = 8;
+    int STATUS_ROLLING_BACK = 9;
 
     /**
      * Begin the transaction.
+     * 
      * @throws TransactionException
      */
-    public void begin() throws TransactionException;
+    void begin() throws TransactionException;
 
     /**
      * Commit the transaction
+     * 
      * @throws TransactionException
      */
-    public void commit() throws TransactionException;
+    void commit() throws TransactionException;
 
     /**
      * Rollback the transaction
+     * 
      * @throws TransactionException
      */
-    public void rollback() throws TransactionException;
+    void rollback() throws TransactionException;
 
-    public int getStatus() throws TransactionException;
+    int getStatus() throws TransactionException;
 
-    public abstract boolean isBegun() throws TransactionException;
+    boolean isBegun() throws TransactionException;
 
-    public abstract boolean isRolledBack() throws TransactionException;
+    boolean isRolledBack() throws TransactionException;
 
-    public abstract boolean isCommitted() throws TransactionException;
+    boolean isCommitted() throws TransactionException;
 
-    public Object getResource(Object key);
-    
-    public boolean hasResource(Object key);
-    
-    public void bindResource(Object key, Object resource) throws TransactionException;
+    Object getResource(Object key);
 
-    public void setRollbackOnly() throws TransactionException;
+    boolean hasResource(Object key);
 
-    public boolean isRollbackOnly() throws TransactionException;
+    void bindResource(Object key, Object resource) throws TransactionException;
+
+    void setRollbackOnly() throws TransactionException;
+
+    boolean isRollbackOnly() throws TransactionException;
 }

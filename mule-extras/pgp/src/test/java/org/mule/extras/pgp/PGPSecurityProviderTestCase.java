@@ -13,24 +13,27 @@
  */
 package org.mule.extras.pgp;
 
-import cryptix.message.Message;
-import cryptix.message.MessageFactory;
-import org.mule.tck.NamedTestCase;
-import org.mule.umo.security.UMOAuthentication;
-
 import java.io.FileInputStream;
 import java.net.URL;
 
+import org.mule.tck.NamedTestCase;
+import org.mule.umo.security.UMOAuthentication;
+
+import cryptix.message.Message;
+import cryptix.message.MessageFactory;
+
 /**
  * @author ariva
- *  
+ * 
  */
-public class PGPSecurityProviderTestCase extends NamedTestCase {
+public class PGPSecurityProviderTestCase extends NamedTestCase
+{
     private PGPSecurityProvider securityProvider;
 
     private Message message;
 
-    protected void setUp() throws Exception {
+    protected void setUp() throws Exception
+    {
         super.setUp();
 
         PGPKeyRingImpl keyM = new PGPKeyRingImpl();
@@ -59,19 +62,23 @@ public class PGPSecurityProviderTestCase extends NamedTestCase {
 
         message = (Message) mf.generateMessages(in).iterator().next();
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.NamedTestCase#tearDown()
      */
-    protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception
+    {
         // TODO Auto-generated method stub
         super.tearDown();
-        
-        securityProvider=null;
-        message=null;
+
+        securityProvider = null;
+        message = null;
     }
 
-    public void testAuthenticate() {
+    public void testAuthenticate()
+    {
         try {
             UMOAuthentication auth = new PGPAuthentication("Mule client <mule_client@mule.com>", message);
 

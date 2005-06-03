@@ -13,41 +13,52 @@
  */
 package org.mule.providers.jdbc;
 
-import org.mule.providers.AbstractMessageAdapter;
-
 import java.util.Map;
+
+import org.mule.providers.AbstractMessageAdapter;
 
 /**
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class JdbcMessageAdapter extends AbstractMessageAdapter {
+public class JdbcMessageAdapter extends AbstractMessageAdapter
+{
 
-	private Map map;
-	
-	public JdbcMessageAdapter(Object obj) {
-		this.map = (Map) obj;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsString()
-	 */
-	public String getPayloadAsString() throws Exception {
-		return map.toString();
-	}
+    private Map map;
 
-	/* (non-Javadoc)
-	 * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsBytes()
-	 */
-	public byte[] getPayloadAsBytes() throws Exception {
-		return map.toString().getBytes();
-	}
+    public JdbcMessageAdapter(Object obj)
+    {
+        this.map = (Map) obj;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mule.umo.provider.UMOMessageAdapter#getPayload()
-	 */
-	public Object getPayload() {
-		return map;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsString()
+     */
+    public String getPayloadAsString() throws Exception
+    {
+        return map.toString();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsBytes()
+     */
+    public byte[] getPayloadAsBytes() throws Exception
+    {
+        return map.toString().getBytes();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.provider.UMOMessageAdapter#getPayload()
+     */
+    public Object getPayload()
+    {
+        return map;
+    }
 
 }

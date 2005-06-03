@@ -13,11 +13,9 @@
  */
 package org.mule.extras.pgp.filters;
 
-import cryptix.message.LiteralMessage;
-import cryptix.message.Message;
-import cryptix.message.MessageFactory;
-import cryptix.message.SignedMessage;
-import cryptix.pki.KeyBundle;
+import java.io.ByteArrayInputStream;
+import java.util.Collection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -37,14 +35,18 @@ import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UnauthorisedException;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
 
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
+import cryptix.message.LiteralMessage;
+import cryptix.message.Message;
+import cryptix.message.MessageFactory;
+import cryptix.message.SignedMessage;
+import cryptix.pki.KeyBundle;
 
 /**
  * @author ariva
- *
+ * 
  */
-public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
+public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
+{
     protected static transient Log logger = LogFactory.getLog(PGPSecurityFilter.class);
 
     private UMOEncryptionStrategy strategy;
@@ -57,11 +59,12 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.impl.security.AbstractEndpointSecurityFilter#authenticateInbound(org.mule.umo.UMOEvent)
      */
     protected void authenticateInbound(UMOEvent event) throws SecurityException, UnauthorisedException,
-            UnknownAuthenticationTypeException {
+            UnknownAuthenticationTypeException
+    {
         UMOMessage message = event.getMessage();
 
         String userId = (String) getCredentialsAccessor().getCredentials(event);
@@ -72,8 +75,9 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
             creds = message.getPayloadAsBytes();
             creds = strategy.decrypt(creds, null);
         } catch (Exception e1) {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD), event
-                    .getMessage(), e1);
+            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD),
+                                            event.getMessage(),
+                                            e1);
         }
 
         UMOAuthentication authResult;
@@ -82,8 +86,9 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
         try {
             umoAuthentication = new PGPAuthentication(userId, decodeMsgRaw(creds));
         } catch (Exception e1) {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD), event
-                    .getMessage(), e1);
+            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD),
+                                            event.getMessage(),
+                                            e1);
         }
 
         try {
@@ -94,8 +99,9 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
                 logger.debug("Authentication request for user: " + userId + " failed: " + e.toString());
             }
 
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.AUTH_FAILED_FOR_USER_X, userId), event
-                    .getMessage(), e);
+            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.AUTH_FAILED_FOR_USER_X, userId),
+                                            event.getMessage(),
+                                            e);
         }
 
         // Authentication success
@@ -108,13 +114,14 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
 
         try {
             RequestContext.rewriteEvent(new MuleMessage(getUnencryptedMessageWithoutSignature((PGPAuthentication) authResult),
-                    null));
+                                                        null));
         } catch (Exception e2) {
             throw new UnauthorisedException(event.getMessage(), context, event.getEndpoint(), this);
         }
     }
 
-    private Message decodeMsgRaw(byte[] raw) throws Exception {
+    private Message decodeMsgRaw(byte[] raw) throws Exception
+    {
         MessageFactory mf = MessageFactory.getInstance("OpenPGP");
 
         ByteArrayInputStream in = new ByteArrayInputStream(raw);
@@ -124,7 +131,8 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
         return (Message) msgs.iterator().next();
     }
 
-    private String getUnencryptedMessageWithoutSignature(PGPAuthentication auth) throws Exception {
+    private String getUnencryptedMessageWithoutSignature(PGPAuthentication auth) throws Exception
+    {
         Message msg = (Message) auth.getCredentials();
 
         if (msg instanceof SignedMessage) {
@@ -140,10 +148,11 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.impl.security.AbstractEndpointSecurityFilter#authenticateOutbound(org.mule.umo.UMOEvent)
      */
-    protected void authenticateOutbound(UMOEvent event) throws SecurityException, UnauthorisedException {
+    protected void authenticateOutbound(UMOEvent event) throws SecurityException, UnauthorisedException
+    {
         logger.debug("authenticateOutbound:" + event.getId());
 
         if (!isAuthenticate()) {
@@ -162,8 +171,9 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
             msg = message.getPayloadAsBytes();
             msg = strategy.encrypt(msg, cryptInfo);
         } catch (Exception e1) {
-            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD), event
-                    .getMessage(), e1);
+            throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.FAILED_TO_READ_PAYLOAD),
+                                            event.getMessage(),
+                                            e1);
         }
 
         try {
@@ -171,17 +181,20 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
             RequestContext.rewriteEvent(new MuleMessage(mesg, null));
             logger.debug("Message:" + mesg);
         } catch (Exception e2) {
-            throw new UnauthorisedException(event.getMessage(), event.getSession().getSecurityContext(), event.getEndpoint(),
-                    this);
+            throw new UnauthorisedException(event.getMessage(),
+                                            event.getSession().getSecurityContext(),
+                                            event.getEndpoint(),
+                                            this);
         }
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.impl.security.AbstractEndpointSecurityFilter#doInitialise()
      */
-    protected void doInitialise() throws InitialisationException {
+    protected void doInitialise() throws InitialisationException
+    {
         if (strategyName != null) {
             strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy(strategyName);
         }
@@ -191,31 +204,38 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter {
         }
     }
 
-    public UMOEncryptionStrategy getStrategy() {
+    public UMOEncryptionStrategy getStrategy()
+    {
         return strategy;
     }
 
-    public void setStrategy(UMOEncryptionStrategy strategy) {
+    public void setStrategy(UMOEncryptionStrategy strategy)
+    {
         this.strategy = strategy;
     }
 
-    public void setStrategyName(String name) {
+    public void setStrategyName(String name)
+    {
         strategyName = name;
     }
 
-    public boolean isSignRequired() {
+    public boolean isSignRequired()
+    {
         return signRequired;
     }
 
-    public void setSignRequired(boolean signRequired) {
+    public void setSignRequired(boolean signRequired)
+    {
         this.signRequired = signRequired;
     }
 
-    public PGPKeyRing getKeyManager() {
+    public PGPKeyRing getKeyManager()
+    {
         return keyManager;
     }
 
-    public void setKeyManager(PGPKeyRing keyManager) {
+    public void setKeyManager(PGPKeyRing keyManager)
+    {
         this.keyManager = keyManager;
     }
 }

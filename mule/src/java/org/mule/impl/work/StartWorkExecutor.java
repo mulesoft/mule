@@ -23,15 +23,16 @@ import EDU.oswego.cs.dl.util.concurrent.Executor;
 import EDU.oswego.cs.dl.util.concurrent.Latch;
 
 /**
- *
- *
+ * 
+ * 
  * @version $Rev$ $Date$
- *
- * */
-public class StartWorkExecutor implements WorkExecutor {
+ * 
+ */
+public class StartWorkExecutor implements WorkExecutor
+{
 
-    public void doExecute(WorkerContext work, Executor executor)
-            throws WorkException, InterruptedException {
+    public void doExecute(WorkerContext work, Executor executor) throws WorkException, InterruptedException
+    {
         Latch latch = work.provideStartLatch();
         executor.execute(work);
         latch.acquire();

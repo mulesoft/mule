@@ -50,40 +50,40 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
 
 /**
- * <code>UMOManagerFactoryBean</code> is a MuleManager factory bean that is used to configure the
- * MuleManager from a spring context.
- * This factory bean is responsible for determining the instance type of UMOManager to create and then delegates
- * configuration calls to that instance depending on what is available in the container.
- * <p/>
- * Apart from removing the need to explicitly wire the MuleManager instance together there another advantage to using
- * the AutowireUMOManagerFactoryBean. There is no need to declare a UMOModel instance in the configuration. If the
- * factory doesn't find a UMOModel implementation it creates a default one of type <i>org.mule.impl.model.MuleModel</i>.
- * The model is automatically initialised with a SpringContainercontext using the current beanFactory and
- * defaults are used for the other Model properties. If you want to override the defaults, such as define your own
- * exception strategy, (which you will most likely want to do) simply declare your exception strategy bean in the
- * container and it will automatically be set on the model.
- * <p/>
- * Most Mule objects have explicit types and can be autowired, however some objects cannot be autowired, such as a
- * <i>java.util.Map</i> of endpoints for example. For these objects Mule defines standard bean names that will be looked
- * for in the container during start up.
- * <p/>
- * muleEnvironmentProperties
- * A map of properties to set on the MuleManager. Accessible from your code using
- * AutowireUMOManagerFactoryBean.MULE_ENVIRONMENT_PROPERTIES_BEAN_NAME.
- * <p/>
- * muleEndpointMappings
- * A Map of logical endpointUri mappings accessible from your code using
- * AutowireUMOManagerFactoryBean.MULE_ENDPOINT_MAPPINGS_BEAN_NAME.
- * <p/>
- * muleInterceptorStacks
- * A map of interceptor stacks, where the name of the stack is the key and a list of interceptors is the value.
- * Accessible using from your code using
+ * <code>UMOManagerFactoryBean</code> is a MuleManager factory bean that is
+ * used to configure the MuleManager from a spring context. This factory bean is
+ * responsible for determining the instance type of UMOManager to create and
+ * then delegates configuration calls to that instance depending on what is
+ * available in the container. <p/> Apart from removing the need to explicitly
+ * wire the MuleManager instance together there another advantage to using the
+ * AutowireUMOManagerFactoryBean. There is no need to declare a UMOModel
+ * instance in the configuration. If the factory doesn't find a UMOModel
+ * implementation it creates a default one of type
+ * <i>org.mule.impl.model.MuleModel</i>. The model is automatically initialised
+ * with a SpringContainercontext using the current beanFactory and defaults are
+ * used for the other Model properties. If you want to override the defaults,
+ * such as define your own exception strategy, (which you will most likely want
+ * to do) simply declare your exception strategy bean in the container and it
+ * will automatically be set on the model. <p/> Most Mule objects have explicit
+ * types and can be autowired, however some objects cannot be autowired, such as
+ * a <i>java.util.Map</i> of endpoints for example. For these objects Mule
+ * defines standard bean names that will be looked for in the container during
+ * start up. <p/> muleEnvironmentProperties A map of properties to set on the
+ * MuleManager. Accessible from your code using
+ * AutowireUMOManagerFactoryBean.MULE_ENVIRONMENT_PROPERTIES_BEAN_NAME. <p/>
+ * muleEndpointMappings A Map of logical endpointUri mappings accessible from
+ * your code using
+ * AutowireUMOManagerFactoryBean.MULE_ENDPOINT_MAPPINGS_BEAN_NAME. <p/>
+ * muleInterceptorStacks A map of interceptor stacks, where the name of the
+ * stack is the key and a list of interceptors is the value. Accessible using
+ * from your code using
  * AutowireUMOManagerFactoryBean.MULE_INTERCEPTOR_STACK_BEAN_NAME.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingBean, DisposableBean, ApplicationContextAware
+public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingBean, DisposableBean,
+        ApplicationContextAware
 {
     /**
      * logger used by this class
@@ -122,92 +122,97 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         context = (AbstractApplicationContext) applicationContext;
-        try
-        {
-            //set mule configuration
+        try {
+            // set mule configuration
             Map temp = context.getBeansOfType(MuleConfiguration.class, true, true);
-            if (temp.size() > 0) MuleManager.setConfiguration((MuleConfiguration) temp.values().iterator().next());
+            if (temp.size() > 0)
+                MuleManager.setConfiguration((MuleConfiguration) temp.values().iterator().next());
 
-            //set environment properties
+            // set environment properties
             setProperties((Map) getBean(MULE_ENVIRONMENT_PROPERTIES_BEAN_NAME, Map.class));
 
-            //set Connectors
+            // set Connectors
             Map connectors = context.getBeansOfType(UMOConnector.class, true, true);
             setConnectors(connectors.values());
 
-            //set endpoint Identifiers
+            // set endpoint Identifiers
             setMessageEndpointIdentifiers((Map) getBean(MULE_ENDPOINT_IDENTIFIERS_BEAN_NAME, Map.class));
 
-            //set mule transaction manager
+            // set mule transaction manager
             temp = context.getBeansOfType(UMOTransactionManagerFactory.class, true, true);
-            if (temp.size() > 0) manager.setTransactionManager(((UMOTransactionManagerFactory) temp.values().iterator().next()).create());
+            if (temp.size() > 0)
+                manager.setTransactionManager(((UMOTransactionManagerFactory) temp.values().iterator().next()).create());
 
-			//set security manager
-			temp = context.getBeansOfType(UMOSecurityManager.class, true, true);
-			if (temp.size() > 0) manager.setSecurityManager((UMOSecurityManager) temp.values().iterator().next());
+            // set security manager
+            temp = context.getBeansOfType(UMOSecurityManager.class, true, true);
+            if (temp.size() > 0)
+                manager.setSecurityManager((UMOSecurityManager) temp.values().iterator().next());
 
-            //set Transformers
+            // set Transformers
             Map transformers = context.getBeansOfType(UMOTransformer.class, true, true);
             setTransformers(transformers.values());
 
-            //set Endpoints
+            // set Endpoints
             Map endpoints = context.getBeansOfType(UMOEndpoint.class, true, true);
             setEndpoints(endpoints.values());
 
-            //set Agents
+            // set Agents
             Map agents = context.getBeansOfType(UMOAgent.class, true, true);
             setAgents(agents.values());
 
-            //Set the container Context
+            // Set the container Context
             Map containers = context.getBeansOfType(UMOContainerContext.class, true, true);
             setContainerContext(containers);
 
-            //interceptors
+            // interceptors
             Map interceptors = (Map) getBean(MULE_INTERCEPTOR_STACK_BEAN_NAME, Map.class);
             setInterceptorStacks(interceptors);
-            //create the model
+            // create the model
             createModel();
 
-            //set Components
+            // set Components
             Map components = context.getBeansOfType(UMODescriptor.class, true, true);
             setComponents(components.values());
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new BeanInitializationException("Failed to wire MuleManager together: " + e.getMessage(), e);
         }
     }
 
     protected void createModel()
     {
-        //set the model
+        // set the model
         Map temp = context.getBeansOfType(UMOModel.class, true, true);
         UMOModel model;
-        if (temp.size() > 0)
-        {
+        if (temp.size() > 0) {
             Map.Entry entry = (Map.Entry) temp.entrySet().iterator().next();
             model = (UMOModel) entry.getValue();
             model.setName(entry.getKey().toString());
-        } else
-        {
-            //create a defaultModel
+        } else {
+            // create a defaultModel
             model = new MuleModel();
         }
 
-        //autowire the model so any ExceptionStrategy or PoolingStrategy beans can be set
-        //context.getBeanFactory().autowireBeanProperties(model, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
-        //RM we cant autowire the model by type as some list properties conflict with each other
+        // autowire the model so any ExceptionStrategy or PoolingStrategy beans
+        // can be set
+        // context.getBeanFactory().autowireBeanProperties(model,
+        // AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+        // RM we cant autowire the model by type as some list properties
+        // conflict with each other
 
-        //Entry point resolver
+        // Entry point resolver
         Map epr = context.getBeansOfType(UMOEntryPointResolver.class, true, true);
-        if (epr.size() > 0) model.setEntryPointResolver((UMOEntryPointResolver) epr.values().iterator().next());
+        if (epr.size() > 0)
+            model.setEntryPointResolver((UMOEntryPointResolver) epr.values().iterator().next());
 
-        //Life cycle adapter factory
+        // Life cycle adapter factory
         Map lcaf = context.getBeansOfType(UMOLifecycleAdapterFactory.class, true, true);
-        if (lcaf.size() > 0) model.setLifecycleAdapterFactory((UMOLifecycleAdapterFactory) lcaf.values().iterator().next());
+        if (lcaf.size() > 0)
+            model.setLifecycleAdapterFactory((UMOLifecycleAdapterFactory) lcaf.values().iterator().next());
 
-        //Model exception strategy
+        // Model exception strategy
         Object listener = getBean(MULE_MODEL_EXCEPTION_STRATEGY_BEAN_NAME, ExceptionListener.class);
-        if (listener != null) model.setExceptionListener((ExceptionListener) listener);
+        if (listener != null)
+            model.setExceptionListener((ExceptionListener) listener);
 
         manager.setModel(model);
 
@@ -215,37 +220,37 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
     private Object getBean(String name, Class clazz)
     {
-        try
-        {
+        try {
             return context.getBean(name, clazz);
-        } catch (BeansException e)
-        {
+        } catch (BeansException e) {
             return null;
         }
 
     }
 
-    protected void setContainerContext(Map containers) throws UMOException {
-        if(containers.size() == 0) {
-            //Use this as the default container
+    protected void setContainerContext(Map containers) throws UMOException
+    {
+        if (containers.size() == 0) {
+            // Use this as the default container
             SpringContainerContext container = new SpringContainerContext();
             container.setBeanFactory(context);
             manager.setContainerContext(container);
         } else if (containers.size() == 1) {
-            manager.setContainerContext((UMOContainerContext)containers.values().iterator().next());
+            manager.setContainerContext((UMOContainerContext) containers.values().iterator().next());
         } else {
-            UMOContainerContext ctx = (UMOContainerContext)containers.values().iterator().next();
-            logger.warn("There are " + containers.size() + " container contexts in the spring context. Using the first one: " + ctx.getClass().getName());
+            UMOContainerContext ctx = (UMOContainerContext) containers.values().iterator().next();
+            logger.warn("There are " + containers.size()
+                    + " container contexts in the spring context. Using the first one: " + ctx.getClass().getName());
             manager.setContainerContext(ctx);
         }
     }
 
     protected void setMessageEndpointIdentifiers(Map endpoints) throws InitialisationException
     {
-        if (endpoints == null) return;
+        if (endpoints == null)
+            return;
         Map.Entry entry;
-        for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
             manager.registerEndpointIdentifier(entry.getKey().toString(), entry.getValue().toString());
 
@@ -254,18 +259,17 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
     protected void setAgents(Collection agents) throws UMOException
     {
-        for (Iterator iterator = agents.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = agents.iterator(); iterator.hasNext();) {
             manager.registerAgent((UMOAgent) iterator.next());
         }
     }
 
     protected void setProperties(Map props)
     {
-        if (props == null) return;
+        if (props == null)
+            return;
         Map.Entry entry;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
             manager.setProperty(entry.getKey(), entry.getValue());
         }
@@ -273,24 +277,21 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
     protected void setConnectors(Collection connectors) throws UMOException
     {
-        for (Iterator iterator = connectors.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = connectors.iterator(); iterator.hasNext();) {
             manager.registerConnector((UMOConnector) iterator.next());
         }
     }
 
     protected void setTransformers(Collection transformers) throws InitialisationException
     {
-        for (Iterator iterator = transformers.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = transformers.iterator(); iterator.hasNext();) {
             manager.registerTransformer((UMOTransformer) iterator.next());
         }
     }
 
     protected void setEndpoints(Collection endpoints) throws InitialisationException
     {
-        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
             manager.registerEndpoint((UMOEndpoint) iterator.next());
         }
     }
@@ -298,11 +299,9 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
     protected void setComponents(Collection components) throws UMOException
     {
         UMODescriptor d;
-        for (Iterator iterator = components.iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = components.iterator(); iterator.hasNext();) {
             d = (UMODescriptor) iterator.next();
-            if (!manager.getModel().isComponentRegistered(d.getName()))
-            {
+            if (!manager.getModel().isComponentRegistered(d.getName())) {
                 manager.getModel().registerComponent(d);
             }
         }
@@ -310,10 +309,10 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
 
     protected void setInterceptorStacks(Map stacks)
     {
-        if (stacks == null) return;
+        if (stacks == null)
+            return;
         Map.Entry entry;
-        for (Iterator iterator = stacks.entrySet().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = stacks.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
             manager.registerInterceptorStack(entry.getKey().toString(), (UMOInterceptorStack) entry.getValue());
         }

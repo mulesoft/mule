@@ -16,12 +16,13 @@ package org.mule.config;
 import java.util.Map;
 
 /**
- * <code>PropertyFactory</code> is used to create objects from the property file,
- *
+ * <code>PropertyFactory</code> is used to create objects from the property
+ * file,
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface PropertyFactory
 {
-    public Object create(Map properties) throws Exception;
+    Object create(Map properties) throws Exception;
 }

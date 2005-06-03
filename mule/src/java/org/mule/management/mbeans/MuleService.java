@@ -13,15 +13,15 @@
  */
 package org.mule.management.mbeans;
 
+import java.util.Date;
+
 import org.mule.MuleManager;
 import org.mule.umo.UMOException;
 
-import java.util.Date;
-
 /**
- * <code>MuleService</code> exposes certain Mule server functions
- * for management
- *
+ * <code>MuleService</code> exposes certain Mule server functions for
+ * management
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -45,12 +45,10 @@ public class MuleService implements MuleServiceMBean
         return isInstanciated() && !MuleManager.getInstance().isStarted();
     }
 
-
-
     public Date getStartTime()
     {
-        if(!isStopped()) {
-        return new Date(MuleManager.getInstance().getStartDate());
+        if (!isStopped()) {
+            return new Date(MuleManager.getInstance().getStartDate());
         } else {
             return null;
         }
@@ -58,9 +56,9 @@ public class MuleService implements MuleServiceMBean
 
     public String getVersion()
     {
-        if(version==null) {
+        if (version == null) {
             version = MuleManager.getConfiguration().getProductVersion();
-            if(version==null) {
+            if (version == null) {
                 version = "Mule Version Info Not Set";
             }
         }
@@ -69,9 +67,9 @@ public class MuleService implements MuleServiceMBean
 
     public String getVendor()
     {
-        if(vendor==null) {
+        if (vendor == null) {
             vendor = MuleManager.getConfiguration().getVendorName();
-            if(vendor==null) {
+            if (vendor == null) {
                 vendor = "Mule Vendor Info Not Set";
             }
         }

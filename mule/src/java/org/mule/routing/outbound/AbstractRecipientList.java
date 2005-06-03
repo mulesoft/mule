@@ -13,8 +13,11 @@
  */
 package org.mule.routing.outbound;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
@@ -28,16 +31,14 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * <code>AbstractRecipientList</code> is used to dispatch a single event to multiple recipients
- * over the same transport.  The recipient endpoints can be configured statically or
- * can be obtained from the message payload.
- *
+ * <code>AbstractRecipientList</code> is used to dispatch a single event to
+ * multiple recipients over the same transport. The recipient endpoints can be
+ * configured statically or can be obtained from the message payload.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -55,65 +56,62 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
     {
         List list = getRecipients(message);
         List results = new ArrayList();
-        if(enableCorrelation != ENABLE_CORREATION_NEVER) {
-            boolean correlationSet = message.getCorrelationGroupSize()!=-1;
-            if(correlationSet && (enableCorrelation == ENABLE_CORREATION_IF_NOT_SET)) {
+        if (enableCorrelation != ENABLE_CORREATION_NEVER) {
+            boolean correlationSet = message.getCorrelationGroupSize() != -1;
+            if (correlationSet && (enableCorrelation == ENABLE_CORREATION_IF_NOT_SET)) {
                 logger.debug("CorrelationId is already set, not setting Correlation group size");
             } else {
-                //the correlationId will be set by the AbstractOutboundRouter
+                // the correlationId will be set by the AbstractOutboundRouter
                 message.setCorrelationGroupSize(list.size());
             }
         }
 
         UMOMessage result = null;
-        //synchronized(list) {
+        // synchronized(list) {
 
         UMOEndpoint endpoint;
         for (Iterator iterator = list.iterator(); iterator.hasNext();)
-        //for (int i =0; i < list.size(); i++)
+        // for (int i =0; i < list.size(); i++)
         {
             String recipient = (String) iterator.next();
             endpoint = getRecipientEndpoint(message, recipient);
 
-            try
-            {
-                if (synchronous)
-                {
+            try {
+                if (synchronous) {
                     result = send(session, message, endpoint);
-                    if(result!=null) {
+                    if (result != null) {
                         results.add(result.getPayload());
                     } else {
                         if (logger.isDebugEnabled()) {
-                        	logger.debug("No result was returned for sync call to: " + endpoint.getEndpointURI());
+                            logger.debug("No result was returned for sync call to: " + endpoint.getEndpointURI());
                         }
                     }
-                } else
-                {
+                } else {
                     dispatch(session, message, endpoint);
                 }
-            } catch (UMOException e)
-            {
+            } catch (UMOException e) {
                 throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
             }
         }
-        
-        if(results != null && results.size()==1) {
-            return new MuleMessage(results.get(0), ((UMOMessage)result).getProperties());
-        } else if(results.size()==0 ) {
+
+        if (results != null && results.size() == 1) {
+            return new MuleMessage(results.get(0), ((UMOMessage) result).getProperties());
+        } else if (results.size() == 0) {
             return null;
-        }else {
-            return new MuleMessage(results, (result==null ? null : result.getProperties()));
+        } else {
+            return new MuleMessage(results, (result == null ? null : result.getProperties()));
         }
-        //}
+        // }
     }
 
     protected UMOEndpoint getRecipientEndpoint(UMOMessage message, String recipient) throws RoutingException
     {
         UMOEndpointURI endpointUri = null;
         UMOEndpoint endpoint = (UMOEndpoint) recipientCache.get(recipient);
-        if(endpoint!=null) return endpoint;
-        try
-        {
+        if (endpoint != null) {
+            return endpoint;
+        }
+        try {
             endpointUri = new MuleEndpointURI(recipient);
             endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         } catch (UMOException e) {
@@ -122,6 +120,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         recipientCache.put(recipient, endpoint);
         return endpoint;
     }
+
     protected abstract CopyOnWriteArrayList getRecipients(UMOMessage message);
 
 }

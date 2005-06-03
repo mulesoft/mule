@@ -27,7 +27,8 @@ public class CircularReferenceSpringEventsTestCase extends AbstractMuleTestCase
 {
     protected void setUp() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
 
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("mule-events-with-manager.xml");
@@ -39,6 +40,7 @@ public class CircularReferenceSpringEventsTestCase extends AbstractMuleTestCase
         assertTrue(m.isInitialised());
         assertTrue(m.isStarted());
         assertNotNull(m.getContainerContext());
-        assertNotNull(m.getContainerContext().getComponent(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME));
+        assertNotNull(m.getContainerContext()
+                       .getComponent(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME));
     }
 }

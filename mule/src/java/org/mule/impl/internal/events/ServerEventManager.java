@@ -13,29 +13,32 @@
  */
 package org.mule.impl.internal.events;
 
-import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.manager.UMOServerEventListener;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkManager;
-import javax.resource.spi.work.WorkException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Comparator;
+import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 
 /**
- * <code>ServerEventManager</code> manages all server listeners for a Mule Instance
- *
+ * <code>ServerEventManager</code> manages all server listeners for a Mule
+ * Instance
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -54,7 +57,8 @@ public class ServerEventManager implements Work, Disposable
     private boolean disposed = false;
 
     private Comparator comparator = new Comparator() {
-        public int compare(Object o1, Object o2) {
+        public int compare(Object o1, Object o2)
+        {
             return (o1.equals(o2) ? 0 : 1);
         }
     };
@@ -76,21 +80,25 @@ public class ServerEventManager implements Work, Disposable
         eventQueue = new BoundedBuffer(1000);
     }
 
-    public void registerEventType(Class eventType, Class listenerType) {
-        if(UMOServerEvent.class.isAssignableFrom(eventType)) {
-            if(!listenersMap.containsKey(eventType)) {
+    public void registerEventType(Class eventType, Class listenerType)
+    {
+        if (UMOServerEvent.class.isAssignableFrom(eventType)) {
+            if (!listenersMap.containsKey(eventType)) {
                 listenersMap.put(eventType, new TreeMap(comparator));
                 eventsMap.put(listenerType, eventType);
-                if(logger.isDebugEnabled()) {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Registered event type: " + eventType);
                     logger.debug("Binding listener type '" + listenerType + "' to event type '" + eventType + "'");
                 }
             }
         } else {
             throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X,
-                    "eventType", UMOServerEvent.class.getName(), eventType.getName()).getMessage());
+                                                           "eventType",
+                                                           UMOServerEvent.class.getName(),
+                                                           eventType.getName()).getMessage());
         }
     }
+
     public void registerListener(UMOServerEventListener listener)
     {
         registerListener(listener, null);
@@ -98,11 +106,11 @@ public class ServerEventManager implements Work, Disposable
 
     public void registerListener(UMOServerEventListener listener, String resourceIdentifier)
     {
-        if(resourceIdentifier==null) resourceIdentifier = NULL_RESOURCE_IDENTIFIER;
-
+        if (resourceIdentifier == null) {
+            resourceIdentifier = NULL_RESOURCE_IDENTIFIER;
+        }
         TreeMap listeners = getListeners(listener.getClass());
-        synchronized (listeners)
-        {
+        synchronized (listeners) {
             listeners.put(listener, resourceIdentifier);
         }
     }
@@ -110,29 +118,27 @@ public class ServerEventManager implements Work, Disposable
     public void unregisterListener(UMOServerEventListener listener)
     {
         TreeMap listeners = getListeners(listener.getClass());
-        synchronized (listeners)
-        {
+        synchronized (listeners) {
             listeners.remove(listener);
         }
     }
 
     public void clearListeners(Class listenerClass)
     {
-        if (listenerClass == null) return;
+        if (listenerClass == null) {
+            return;
+        }
         TreeMap listeners = getListeners(listenerClass);
-        synchronized (listeners)
-        {
+        synchronized (listeners) {
             listeners.clear();
         }
     }
 
     public void clear()
     {
-        for (Iterator iterator = listenersMap.values().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = listenersMap.values().iterator(); iterator.hasNext();) {
             TreeMap set = (TreeMap) iterator.next();
-            synchronized (set)
-            {
+            synchronized (set) {
                 set.clear();
             }
         }
@@ -142,43 +148,40 @@ public class ServerEventManager implements Work, Disposable
 
     protected TreeMap getListeners(Class listenerClass)
     {
-        if (listenerClass == null)
-        {
+        if (listenerClass == null) {
             throw new NullPointerException("Listener class cannot be null");
         }
         Class eventType = null;
         for (Iterator iterator = eventsMap.keySet().iterator(); iterator.hasNext();) {
-            Class clazz =  (Class)iterator.next();
-            if(clazz.isAssignableFrom(listenerClass)) {
-                eventType = (Class)eventsMap.get(clazz);
+            Class clazz = (Class) iterator.next();
+            if (clazz.isAssignableFrom(listenerClass)) {
+                eventType = (Class) eventsMap.get(clazz);
                 break;
             }
         }
 
-        if(eventType!=null) {
+        if (eventType != null) {
             return (TreeMap) listenersMap.get(eventType);
-        } else
-        {
+        } else {
             throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X,
-                    "Listener Type", "Registered Type", listenerClass.getName()).getMessage());
+                                                           "Listener Type",
+                                                           "Registered Type",
+                                                           listenerClass.getName()).getMessage());
         }
     }
 
     public void fireEvent(UMOServerEvent event)
     {
-        if(disposed) {
+        if (disposed) {
             return;
         }
-        if (event instanceof BlockingServerEvent)
-        {
+        if (event instanceof BlockingServerEvent) {
             notifyListeners(event);
             return;
         }
-        try
-        {
+        try {
             eventQueue.put(event);
-        } catch (InterruptedException e)
-        {
+        } catch (InterruptedException e) {
             logger.error("Failed to queue event: " + event, e);
         }
     }
@@ -195,72 +198,72 @@ public class ServerEventManager implements Work, Disposable
         String resourceIdentifier = null;
         Class listenerClass = null;
 
-        //determine the listewner class type for the current event
+        // determine the listewner class type for the current event
         Map.Entry entry = null;
         for (Iterator iterator = eventsMap.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
             Class eventClass = (Class) entry.getValue();
-            if(event.getClass().isAssignableFrom(eventClass)) {
-                listenerClass = (Class)entry.getKey();
+            if (event.getClass().isAssignableFrom(eventClass)) {
+                listenerClass = (Class) entry.getKey();
                 break;
             }
         }
 
-        if(listenerClass==null) {
-            throw new IllegalArgumentException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, event.getClass().getName()).getMessage());            
+        if (listenerClass == null) {
+            throw new IllegalArgumentException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, event.getClass()
+                                                                                                      .getName()).getMessage());
         }
 
         listeners = getListeners(listenerClass);
         UMOServerEventListener l;
-        synchronized(listeners) {
-            for (Iterator iterator = listeners.keySet().iterator(); iterator.hasNext();)
-            {
+        synchronized (listeners) {
+            for (Iterator iterator = listeners.keySet().iterator(); iterator.hasNext();) {
                 l = (UMOServerEventListener) iterator.next();
-                resourceIdentifier = (String)listeners.get(l);
-                if(resourceIdentifier==null) resourceIdentifier = NULL_RESOURCE_IDENTIFIER;
-
-                //If the listener has a resource id associated with it, make sure the event
-                //is only fired if the event resource id and listener resource id match
-                if(NULL_RESOURCE_IDENTIFIER.equals(resourceIdentifier) ||
-                        resourceIdentifier.equals(event.getResourceIdentifier())) {
+                resourceIdentifier = (String) listeners.get(l);
+                if (resourceIdentifier == null) {
+                    resourceIdentifier = NULL_RESOURCE_IDENTIFIER;
+                }
+                // If the listener has a resource id associated with it, make
+                // sure the event
+                // is only fired if the event resource id and listener resource
+                // id match
+                if (NULL_RESOURCE_IDENTIFIER.equals(resourceIdentifier)
+                        || resourceIdentifier.equals(event.getResourceIdentifier())) {
                     l.onEvent(event);
                 } else {
-                    logger.trace("Resource id '" + resourceIdentifier + "' for listener " + l.getClass().getName() + " does not match Resource id '" +
-                            event.getResourceIdentifier() + "' for event, not firing event for this listener");
+                    logger.trace("Resource id '" + resourceIdentifier + "' for listener " + l.getClass().getName()
+                            + " does not match Resource id '" + event.getResourceIdentifier()
+                            + "' for event, not firing event for this listener");
                 }
             }
         }
     }
 
-    public void release() {
+    public void release()
+    {
         dispose();
     }
 
     /**
-     * When an object implementing interface <code>Runnable</code> is used
-     * to create a thread, starting the thread causes the object's
-     * <code>run</code> method to be called in that separately executing
-     * thread.
-     * <p/>
-     * The general contract of the method <code>run</code> is that it may
-     * take any action whatsoever.
-     *
+     * When an object implementing interface <code>Runnable</code> is used to
+     * create a thread, starting the thread causes the object's <code>run</code>
+     * method to be called in that separately executing thread. <p/> The general
+     * contract of the method <code>run</code> is that it may take any action
+     * whatsoever.
+     * 
      * @see Thread#run()
      */
     public void run()
     {
         UMOServerEvent event;
-        while (!disposed)
-        {
-            try
-            {
+        while (!disposed) {
+            try {
                 event = (UMOServerEvent) eventQueue.take();
                 notifyListeners(event);
-            } catch (InterruptedException e)
-            {
-				if (!disposed) {
-					logger.error("Failed to take event from server event queue", e);
-				}
+            } catch (InterruptedException e) {
+                if (!disposed) {
+                    logger.error("Failed to take event from server event queue", e);
+                }
             }
         }
     }

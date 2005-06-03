@@ -27,6 +27,21 @@
  */
 package org.mule.providers.http;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.util.Properties;
+
+import javax.resource.spi.work.Work;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
 import org.mule.config.MuleProperties;
@@ -46,17 +61,10 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
-import javax.resource.spi.work.Work;
-import java.io.*;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.util.Properties;
-
 /**
- * <code>HttpMessageReceiver</code> is a simple http server that can be used to
- * listen for http requests on a particular port
- *
+ * <code>HttpMessageReceiver</code> is a simple http server that can be used
+ * to listen for http requests on a particular port
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -68,20 +76,19 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             throws InitialisationException
     {
         super(connector, component, endpoint);
-        if (((HttpConnector) connector).isKeepAlive())
-        {
+        if (((HttpConnector) connector).isKeepAlive()) {
             keepAliveMonitor = new ExpiryMonitor(1000);
         }
     }
 
-    protected UMOTransformer getResponseTransformer() throws InitialisationException {
-		UMOTransformer transformer = super.getResponseTransformer();
+    protected UMOTransformer getResponseTransformer() throws InitialisationException
+    {
+        UMOTransformer transformer = super.getResponseTransformer();
         if (transformer == null) {
             throw new InitialisationException(new Message("http", 1), this);
         }
-        if(!transformer.getReturnClass().equals(String.class) &&
-           !transformer.getReturnClass().equals(byte[].class) &&
-           !transformer.getReturnClass().equals(Object.class)) {
+        if (!transformer.getReturnClass().equals(String.class) && !transformer.getReturnClass().equals(byte[].class)
+                && !transformer.getReturnClass().equals(Object.class)) {
             throw new InitialisationException(new Message("http", 2, getConnector().getName()), this);
         }
         return transformer;
@@ -99,12 +106,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
     public void doDispose()
     {
-        if(keepAliveMonitor!=null) {
+        if (keepAliveMonitor != null) {
             keepAliveMonitor.dispose();
         }
         super.doDispose();
     }
-
 
     private class HttpWorker extends TcpWorker implements Expirable
     {
@@ -118,14 +124,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         public void run()
         {
-            try
-            {
+            try {
                 int counter = 0;
                 dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-                do
-                {
-                    //useful if keep alive is implemented
+                do {
+                    // useful if keep alive is implemented
                     if (isServerSide() && ++counter > 500) {
                         counter = 0;
                         Thread.yield();
@@ -138,29 +142,23 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     Properties headers = new Properties();
                     byte[] payload = parseRequest(dataIn, headers);
                     if (payload == null) {
-						break;
+                        break;
                     }
 
-                    UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{payload, headers});
+                    UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[] { payload, headers });
 
-                    boolean http11 = ((String) adapter.getProperty(HttpConnector.HTTP_VERSION_PROPERTY))
-                            .equalsIgnoreCase(HttpConstants.HTTP11);
-                    if (!http11)
-                    {
+                    boolean http11 = ((String) adapter.getProperty(HttpConnector.HTTP_VERSION_PROPERTY)).equalsIgnoreCase(HttpConstants.HTTP11);
+                    if (!http11) {
                         keepAlive = adapter.getProperty(HttpConstants.HEADER_KEEP_ALIVE) != null;
-                    } else
-                    {
+                    } else {
                         String connection = (String) adapter.getProperty(HttpConstants.HEADER_CONNECTION);
-                        if (connection != null && connection.equalsIgnoreCase("close"))
-                        {
+                        if (connection != null && connection.equalsIgnoreCase("close")) {
                             keepAlive = false;
-                        } else
-                        {
+                        } else {
                             keepAlive = true;
                         }
                     }
-                    if (keepAlive && !keepAliveRegistered) 
-					{
+                    if (keepAlive && !keepAliveRegistered) {
                         keepAliveRegistered = true;
                         if (keepAliveMonitor != null) {
                             keepAliveMonitor.addExpirable(((HttpConnector) connector).getKeepAliveTimeout(), this);
@@ -170,8 +168,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         }
                     }
 
-                    if (adapter != null)
-                    {
+                    if (adapter != null) {
                         UMOMessage message = new MuleMessage(adapter);
 
                         if (logger.isDebugEnabled()) {
@@ -179,39 +176,40 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         }
                         OutputStream os = new ResponseOutputStream(dataOut, socket);
                         UMOMessage returnMessage = routeMessage(message, endpoint.isSynchronous(), os);
-                        if (returnMessage == null)
-                        {
+                        if (returnMessage == null) {
                             returnMessage = new MuleMessage("", null);
                         }
 
-                        //Do response code mapping
-                        //This is handled generically by handleExcetion method
-//                        if(returnMessage.getExceptionPayload()!=null) {
-//                            String responseCode = ExceptionHelper.getErrorMapping(connector.getProtocol(), returnMessage.getExceptionPayload().getCode());
-//                            returnMessage.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, Integer.parseInt(responseCode));
-//                            //returnMessage = new MuleMessage(returnMessage.getExceptionPayload().getMessage(), returnMessage.getProperties());
-//                        }
+                        // Do response code mapping
+                        // This is handled generically by handleExcetion method
+                        // if(returnMessage.getExceptionPayload()!=null) {
+                        // String responseCode =
+                        // ExceptionHelper.getErrorMapping(connector.getProtocol(),
+                        // returnMessage.getExceptionPayload().getCode());
+                        // returnMessage.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY,
+                        // Integer.parseInt(responseCode));
+                        // //returnMessage = new
+                        // MuleMessage(returnMessage.getExceptionPayload().getMessage(),
+                        // returnMessage.getProperties());
+                        // }
                         RequestContext.rewriteEvent(returnMessage);
 
                         Object response = responseTransformer.transform(returnMessage.getPayload());
-                        if(response instanceof byte[]) {
+                        if (response instanceof byte[]) {
                             dataOut.write((byte[]) response);
                         } else {
                             dataOut.write(response.toString().getBytes());
                         }
                         dataOut.flush();
-                        if (keepAliveMonitor != null)
-                        {
+                        if (keepAliveMonitor != null) {
                             keepAliveMonitor.resetExpirable(this);
                         }
                     }
                 } while (!socket.isClosed() && keepAlive);
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 keepAlive = false;
                 handleException(e);
-            } finally
-            {
+            } finally {
                 if (keepAliveMonitor != null) {
                     keepAliveMonitor.removeExpirable(this);
                 }
@@ -231,25 +229,20 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         byte[] payload;
 
         String line = null;
-        try
-        {
+        try {
             line = HttpParser.readLine(is);
-        } catch (SocketException e)
-        {
+        } catch (SocketException e) {
             return null;
-        } catch (SocketTimeoutException e)
-        {
+        } catch (SocketTimeoutException e) {
             return null;
         }
-        if (line == null)
-        {
+        if (line == null) {
             return null;
         }
 
         int space1 = line.indexOf(" ");
         int space2 = line.indexOf(" ", space1 + 1);
-        if (space1 == -1 || space2 == -1)
-        {
+        if (space1 == -1 || space2 == -1) {
             throw new IOException("Http message header line is malformed: " + line);
         }
         String method = line.substring(0, space1);
@@ -260,42 +253,37 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         p.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request);
         p.setProperty(HttpConnector.HTTP_VERSION_PROPERTY, httpVersion);
 
-        //Read headers from the request as set them as properties on the event
+        // Read headers from the request as set them as properties on the event
         Header[] headers = HttpParser.parseHeaders(is);
         String name;
-        for (int i = 0; i < headers.length; i++)
-        {
+        for (int i = 0; i < headers.length; i++) {
             name = headers[i].getName();
-            if(name.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
+            if (name.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
                 name = name.substring(2);
             }
             p.setProperty(name, headers[i].getValue());
         }
 
-        if (method.equals(HttpConstants.METHOD_GET))
-        {
+        if (method.equals(HttpConstants.METHOD_GET)) {
             payload = request.getBytes();
-        } else
-        {
+        } else {
             boolean contentLengthNotSet = p.getProperty(HttpConstants.HEADER_CONTENT_LENGTH, null) == null;
-            int contentLength = Integer.parseInt(p.getProperty(HttpConstants.HEADER_CONTENT_LENGTH, String.valueOf(1024 * 32)));
+            int contentLength = Integer.parseInt(p.getProperty(HttpConstants.HEADER_CONTENT_LENGTH,
+                                                               String.valueOf(1024 * 32)));
 
             byte[] buffer = new byte[contentLength];
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int len = 0;
             int bytesWritten = 0;
-            //Ensure we read all bytes, http connections may be slow
-            //to send all bytes in  consistent stream.  I've only seen
-            //this when using Axis...
-            while (bytesWritten != contentLength)
-            {
+            // Ensure we read all bytes, http connections may be slow
+            // to send all bytes in consistent stream. I've only seen
+            // this when using Axis...
+            while (bytesWritten != contentLength) {
                 len = is.read(buffer);
-                if (len != -1)
-                {
+                if (len != -1) {
                     baos.write(buffer, 0, len);
                     bytesWritten += len;
-                    if (contentLengthNotSet)
-                    {
+                    if (contentLengthNotSet) {
                         contentLength = bytesWritten;
                     }
                 }

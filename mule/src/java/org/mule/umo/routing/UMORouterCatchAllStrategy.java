@@ -19,16 +19,16 @@ import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * <code>UMORouterCatchAllStrategy</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public interface UMORouterCatchAllStrategy
 {
-    public void setEndpoint(UMOEndpoint endpoint);
+    void setEndpoint(UMOEndpoint endpoint);
 
-    public UMOEndpoint getEndpoint();
+    UMOEndpoint getEndpoint();
 
-    public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException;
+    UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException;
 }

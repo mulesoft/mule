@@ -14,9 +14,9 @@
 package org.mule.umo.security;
 
 /**
- * <code>UMOAuthentication</code> represents an authentication request and contains
- * authenitcation information if the request was successful
- *
+ * <code>UMOAuthentication</code> represents an authentication request and
+ * contains authenitcation information if the request was successful
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

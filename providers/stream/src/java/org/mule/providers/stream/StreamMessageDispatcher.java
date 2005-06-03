@@ -24,7 +24,7 @@ import org.mule.umo.provider.UMOConnector;
 
 /**
  * <code>StreamMessageDispatcher</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,7 +44,9 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
         this.connector = connector;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
      */
     public Object getDelegateSession() throws UMOException
@@ -52,7 +54,9 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnector#dispatch(org.mule.umo.UMOEvent)
      */
     public void doDispatch(UMOEvent event) throws Exception
@@ -60,7 +64,9 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
         connector.getOutputStream().write(event.getTransformedMessageAsBytes());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
     public UMOMessage doSend(UMOEvent event) throws Exception

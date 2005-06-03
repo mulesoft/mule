@@ -20,7 +20,7 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 
 /**
  * <code>XmppMessageDispatcherFactory</code> TODO
- *
+ * 
  * @author Peter Braswell
  * @version $Revision$
  */
@@ -29,7 +29,6 @@ public class XmppMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
     public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
     {
-        return new XmppMessageDispatcher((XmppConnector)connector);
+        return new XmppMessageDispatcher((XmppConnector) connector);
     }
 }
-

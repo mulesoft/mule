@@ -16,28 +16,32 @@ package org.mule.config;
 import java.io.Reader;
 
 /**
- * <code>ReaderResource</code> is a reader with a description associated with it.
- * This is useful for error resolution as the reader description can be included when
- * reporting errors during reading.
- *
+ * <code>ReaderResource</code> is a reader with a description associated with
+ * it. This is useful for error resolution as the reader description can be
+ * included when reporting errors during reading.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ReaderResource {
+public class ReaderResource
+{
 
     private String description;
     private Reader reader;
 
-    public ReaderResource(String description, Reader reader) {
+    public ReaderResource(String description, Reader reader)
+    {
         this.description = description;
         this.reader = reader;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 
-    public Reader getReader() {
+    public Reader getReader()
+    {
         return reader;
     }
 }

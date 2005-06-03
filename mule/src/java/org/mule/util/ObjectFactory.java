@@ -16,11 +16,11 @@ package org.mule.util;
 
 /**
  * <code>ObjectFactory</code> is a generic Factory interface.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public interface ObjectFactory
 {
-    public Object create() throws Exception;
+    Object create() throws Exception;
 }

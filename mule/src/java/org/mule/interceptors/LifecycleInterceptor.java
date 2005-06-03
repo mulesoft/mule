@@ -20,8 +20,9 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 
 /**
- * <code>LifecycleInterceptor</code> is a UMOInterceptor interface with two additional
- * lifecycle methods provided by <code>Initialisable</code> and <code> Disposable
+ * <code>LifecycleInterceptor</code> is a UMOInterceptor interface with two
+ * additional lifecycle methods provided by <code>Initialisable</code> and
+ * <code> Disposable
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

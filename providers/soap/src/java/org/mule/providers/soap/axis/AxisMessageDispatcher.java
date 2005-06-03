@@ -13,7 +13,19 @@
  */
 package org.mule.providers.soap.axis;
 
-import org.apache.axis.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.xml.rpc.ServiceException;
+import javax.xml.soap.SOAPEnvelope;
+
+import org.apache.axis.Handler;
+import org.apache.axis.Message;
+import org.apache.axis.MessageContext;
+import org.apache.axis.SimpleChain;
+import org.apache.axis.SimpleTargetedChain;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
@@ -24,7 +36,6 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
-import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.extensions.MuleHttpSender;
 import org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler;
 import org.mule.umo.UMOEvent;
@@ -35,19 +46,10 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
 
-import javax.xml.rpc.ServiceException;
-import javax.xml.soap.SOAPEnvelope;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-
-import sun.misc.BASE64Encoder;
-
 /**
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the
  * Axis soap client.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -58,12 +60,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     public AxisMessageDispatcher(AxisConnector connector)
     {
         super(connector);
-        try
-        {
+        try {
             service = new Service();
-            //todo for some reason loading the client handlers this way isn't working for me?
-            //Doesn't seem to load the optimised http transport...
-            //SimpleProvider clientConfig = connector.getClientProvider();
+            // todo for some reason loading the client handlers this way isn't
+            // working for me?
+            // Doesn't seem to load the optimised http transport...
+            // SimpleProvider clientConfig = connector.getClientProvider();
 
             SimpleProvider clientConfig = new SimpleProvider();
             Handler muleHandler = (Handler) new MuleSoapHeadersHandler();
@@ -77,8 +79,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
             service.setEngineConfiguration(clientConfig);
             service.setEngine(new AxisClient(clientConfig));
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
     }
@@ -90,8 +91,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     public void doDispatch(UMOEvent event) throws Exception
     {
         Call call = getCall(event);
-        //dont use invokeOneWay here as we are already in a thread pool.
-        //Axis creates a new thread for every invoke one way call. nasty!
+        // dont use invokeOneWay here as we are already in a thread pool.
+        // Axis creates a new thread for every invoke one way call. nasty!
         Object[] args = getArgs(event);
         call.setProperty("axis.one.way", Boolean.TRUE);
         call.invoke(args);
@@ -102,11 +103,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         Call call = getCall(event);
         Object result = call.invoke(getArgs(event));
-        if (result == null)
-        {
+        if (result == null) {
             return null;
-        } else
-        {
+        } else {
             UMOMessage resultMessage = new MuleMessage(result, event.getProperties());
             setMessageContextProperties(resultMessage, call.getMessageContext());
             return resultMessage;
@@ -117,28 +116,28 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         String method = (String) endpointUri.getParams().remove("method");
-        
-        if (method == null)
-        {
+
+        if (method == null) {
             method = (String) event.getEndpoint().getProperties().get("method");
-            if (method == null)
-            {
-                throw new DispatchException(new org.mule.config.i18n.Message("soap", 4), event.getMessage(),  event.getEndpoint());
+            if (method == null) {
+                throw new DispatchException(new org.mule.config.i18n.Message("soap", 4),
+                                            event.getMessage(),
+                                            event.getEndpoint());
             }
         }
 
         Call call = (Call) service.createCall();
-        //set properties on the call from the endpoint properties
+        // set properties on the call from the endpoint properties
         BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
 
         call.setTargetEndpointAddress(endpointUri.getAddress());
         call.setSOAPActionURI(endpointUri.getAddress());
         call.setOperationName(method);
-        //set Mule event here so that hsandlers can extract info
+        // set Mule event here so that hsandlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
 
-        if(endpointUri.getUserInfo()!=null) {
-            //Add User Creds
+        if (endpointUri.getUserInfo() != null) {
+            // Add User Creds
             call.setUsername(endpointUri.getUsername());
             call.setPassword(endpointUri.getPassword());
         }
@@ -149,12 +148,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         Object payload = event.getTransformedMessage();
         Object[] args;
-        if (payload instanceof Object[])
-        {
+        if (payload instanceof Object[]) {
             args = (Object[]) payload;
-        } else
-        {
-            args = new Object[]{payload};
+        } else {
+            args = new Object[] { payload };
         }
         return args;
     }
@@ -162,23 +159,19 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     private void setMessageContextProperties(UMOMessage message, MessageContext ctx)
     {
         Object temp = ctx.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        if (temp != null && !"".equals(temp.toString()))
-        {
+        if (temp != null && !"".equals(temp.toString())) {
             message.setCorrelationId(temp.toString());
         }
         temp = ctx.getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-        if (temp != null && !"".equals(temp.toString()))
-        {
+        if (temp != null && !"".equals(temp.toString())) {
             message.setCorrelationGroupSize(Integer.parseInt(temp.toString()));
         }
         temp = ctx.getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-        if (temp != null && !"".equals(temp.toString()))
-        {
+        if (temp != null && !"".equals(temp.toString())) {
             message.setCorrelationSequence(Integer.parseInt(temp.toString()));
         }
         temp = ctx.getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        if (temp != null && !"".equals(temp.toString()))
-        {
+        if (temp != null && !"".equals(temp.toString())) {
             message.setReplyTo(temp.toString());
         }
     }
@@ -195,8 +188,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         Properties params = endpointUri.getUserParams();
         Object args[] = new Object[params.size()];
         int i = 0;
-        for (Iterator iterator = params.values().iterator(); iterator.hasNext(); i++)
-        {
+        for (Iterator iterator = params.values().iterator(); iterator.hasNext(); i++) {
             args[i] = iterator.next();
         }
 
@@ -211,8 +203,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setSOAPActionURI(endpoint);
         call.setTargetEndpointAddress(endpoint);
 
-        if (!endpoint.startsWith("axis:"))
-        {
+        if (!endpoint.startsWith("axis:")) {
             endpoint = "axis:" + endpoint;
         }
         UMOEndpointURI ep = new MuleEndpointURI(endpoint);
@@ -235,15 +226,13 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected UMOMessage createMessage(Object result, Call call)
     {
-        if (result == null)
-        {
+        if (result == null) {
             result = new NullPayload();
         }
         Map props = new HashMap();
         Iterator iter = call.getMessageContext().getPropertyNames();
         Object key;
-        while (iter.hasNext())
-        {
+        while (iter.hasNext()) {
             key = iter.next();
             props.put(key, call.getMessageContext().getProperty(key.toString()));
         }

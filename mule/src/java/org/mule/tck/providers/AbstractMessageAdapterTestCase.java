@@ -18,9 +18,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
- * @author Ross Mason
- *         <p/>
- *         //TODO document
+ * @author Ross Mason <p/> //TODO document
  */
 public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCase
 {
@@ -38,21 +36,18 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
 
         assertNotNull(adapter.getPayload());
 
-        try
-        {
+        try {
             adapter = createAdapter(getInvalidMessage());
             fail("Message adapter should throw exception if an invalid messgae is set");
-        }
-        catch (Exception e)
-        {
-// expected
+        } catch (Exception e) {
+            // expected
         }
     }
 
     public void testMessageProps() throws Exception
     {
         UMOMessageAdapter adapter = createAdapter(getValidMessage());
-        
+
         adapter.setProperty("TestString", "Test1");
         adapter.setProperty("TestLong", new Long(20000000));
         adapter.setProperty("TestInt", new Integer(200000));
@@ -76,7 +71,6 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
     {
         return new InvalidMessage();
     }
-
 
     public abstract Object getValidMessage() throws Exception;
 

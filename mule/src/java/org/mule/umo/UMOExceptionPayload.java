@@ -16,19 +16,20 @@ package org.mule.umo;
 import java.util.Map;
 
 /**
- * <code>UMOExceptionPayload</code> is a message payload that contains exception information
- * that occurred during message processing
- *
+ * <code>UMOExceptionPayload</code> is a message payload that contains
+ * exception information that occurred during message processing
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOExceptionPayload {
+public interface UMOExceptionPayload
+{
 
-    public int getCode();
+    int getCode();
 
-    public String getMessage();
+    String getMessage();
 
-    public Map getInfo();
+    Map getInfo();
 
-    public Throwable getException();
+    Throwable getException();
 }

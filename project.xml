@@ -214,6 +214,7 @@
         <report>maven-jdepend-plugin</report>
         <report>maven-jxr-plugin</report>
         <report>maven-javadoc-plugin</report>
+        <report>maven-checkstyle-plugin</report>
 <!-- The Clover report MUST be before the JUnit report as the test:test
             target is run only ONCE (due to the test:test postGoal) and clover needs to
             "watch" the tests run, while JUnit report simply analyses the output from

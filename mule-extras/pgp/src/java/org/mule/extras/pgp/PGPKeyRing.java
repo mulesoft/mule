@@ -17,9 +17,10 @@ import cryptix.pki.KeyBundle;
 
 /**
  * @author ariva
- *
+ * 
  */
-public interface PGPKeyRing {
+public interface PGPKeyRing
+{
     public abstract String getSecretPassphrase();
 
     public abstract KeyBundle getSecretKeyBundle();

@@ -21,7 +21,7 @@ import org.mule.impl.RequestContext;
 /**
  * <code>MessagingException</code> is a general message exception thrown when
  * errors specific to Message processing.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -50,7 +50,7 @@ public class MessagingException extends UMOException
     public MessagingException(Message message, Object payload)
     {
         super();
-        if(payload==null) {
+        if (payload == null) {
             this.umoMessage = RequestContext.getEventContext().getMessage();
         } else {
             this.umoMessage = new MuleMessage(payload, null);
@@ -61,7 +61,7 @@ public class MessagingException extends UMOException
     public MessagingException(Message message, Object payload, Throwable cause)
     {
         super(cause);
-        if(payload==null) {
+        if (payload == null) {
             this.umoMessage = RequestContext.getEventContext().getMessage();
         } else {
             this.umoMessage = new MuleMessage(payload, null);
@@ -69,10 +69,11 @@ public class MessagingException extends UMOException
         setMessage(generateMessage(message));
     }
 
-    private String generateMessage(Message message) {
+    private String generateMessage(Message message)
+    {
 
         StringBuffer buf = new StringBuffer();
-        if(message!=null) {
+        if (message != null) {
             buf.append(message.getMessage()).append(". ");
         }
 

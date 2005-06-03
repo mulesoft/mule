@@ -25,13 +25,15 @@ public class TestConnectorWithContainerDependents extends TestConnector
 {
     private Apple containerProp;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.AbstractConnector#doInitialise()
      */
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        if(containerProp==null) {
+        if (containerProp == null) {
             throw new IllegalStateException("Initialise should not be called before all properties have been set");
         }
 

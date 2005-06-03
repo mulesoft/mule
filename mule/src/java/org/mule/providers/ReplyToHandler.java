@@ -19,18 +19,18 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**
- * <code>ReplyToHandler</code> is used to handle routing where a replyTo endpointUri
- * is set on the message
- *
+ * <code>ReplyToHandler</code> is used to handle routing where a replyTo
+ * endpointUri is set on the message
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public interface ReplyToHandler
 {
-    public void processReplyTo(UMOEvent event, UMOMessage returnMessage, Object replyTo) throws UMOException;
+    void processReplyTo(UMOEvent event, UMOMessage returnMessage, Object replyTo) throws UMOException;
 
-    public void setTransformer(UMOTransformer transformer);
+    void setTransformer(UMOTransformer transformer);
 
-    public UMOTransformer getTransformer();
+    UMOTransformer getTransformer();
 }

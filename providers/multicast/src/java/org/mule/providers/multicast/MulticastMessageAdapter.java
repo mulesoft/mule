@@ -15,16 +15,18 @@ package org.mule.providers.multicast;
 
 import org.mule.providers.udp.UdpMessageAdapter;
 import org.mule.umo.MessagingException;
+
 /**
  * <code>MulticastMessageAdapter</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
 public class MulticastMessageAdapter extends UdpMessageAdapter
 {
-    public MulticastMessageAdapter(Object message) throws MessagingException {
+    public MulticastMessageAdapter(Object message) throws MessagingException
+    {
         super(message);
     }
 }

@@ -25,15 +25,15 @@ import org.mule.umo.manager.UMOManager;
 import org.springframework.util.StringUtils;
 
 /**
- * <code>SpringConfigurationBuilder</code> Enables Mule to be loaded from
- * as Spring context.  Multiple configuration files can be loaded from this
- * builder (specified as a comma-separated list) the files can be String Beans
- * documents or Mule Xml Documents or a combination of both.
- *
- * Any Mule Xml documents will be transformed at run-time in to Spring Bean documents
- * before the bean definitions are loaded. Make sure that the DTD definitions for each of the
- * document types are declared in the documents.
- *
+ * <code>SpringConfigurationBuilder</code> Enables Mule to be loaded from as
+ * Spring context. Multiple configuration files can be loaded from this builder
+ * (specified as a comma-separated list) the files can be String Beans documents
+ * or Mule Xml Documents or a combination of both.
+ * 
+ * Any Mule Xml documents will be transformed at run-time in to Spring Bean
+ * documents before the bean definitions are loaded. Make sure that the DTD
+ * definitions for each of the document types are declared in the documents.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -41,12 +41,13 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
 {
     /**
      * 
-     * Will configure a UMOManager based on the configurations made available through Readers
-     *
+     * Will configure a UMOManager based on the configurations made available
+     * through Readers
+     * 
      * @param configResources an array of Readers
      * @return A configured UMOManager
      * @throws org.mule.config.ConfigurationException
-     *
+     * 
      */
     public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
     {
@@ -55,18 +56,16 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
 
     public UMOManager configure(String configResource) throws ConfigurationException
     {
-        if(configResource==null) {
+        if (configResource == null) {
             throw new ConfigurationException(new Message(Messages.X_IS_NULL, "Configuration Resource"));
         }
         String[] resources = StringUtils.tokenizeToStringArray(configResource, ",;", true, true);
 
         MuleManager.getConfiguration().setConfigResources(resources);
         new MuleApplicationContext(resources);
-        try
-        {
+        try {
             MuleManager.getInstance().start();
-        } catch (UMOException e)
-        {
+        } catch (UMOException e) {
             throw new ConfigurationException(new Message(Messages.FAILED_TO_START_X, "Mule server from builder"), e);
         }
         return MuleManager.getInstance();
@@ -74,9 +73,12 @@ public class SpringConfigurationBuilder implements ConfigurationBuilder
 
     /**
      * Indicate whether this ConfigurationBulder has been configured yet
-     * @return <code>true</code> if this ConfigurationBulder has been configured
+     * 
+     * @return <code>true</code> if this ConfigurationBulder has been
+     *         configured
      */
-    public boolean isConfigured() {
+    public boolean isConfigured()
+    {
         return MuleManager.isInstanciated();
     }
 }

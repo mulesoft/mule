@@ -39,116 +39,128 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 
 /**
- * TODO: document this class 
- *
+ * TODO: document this class
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class QuartzMessageReceiver extends AbstractMessageReceiver {
+public class QuartzMessageReceiver extends AbstractMessageReceiver
+{
 
-	private static final String PROP_DISPATCHER = "mule.quartz.dispatcher";
-	
-	public QuartzMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint) throws InitialisationException {
-		super(connector, component, endpoint);
-	}
-	
-	protected void doDispose() {
-	}
+    private static final String PROP_DISPATCHER = "mule.quartz.dispatcher";
 
-	public void doStart() throws UMOException {
-		try {
-			QuartzConnector connector = (QuartzConnector) this.connector;
-			Scheduler s = connector.getScheduler();
-			
-			JobDetail jb = new JobDetail();
-			jb.setName(endpoint.getEndpointURI().toString());
-			jb.setGroup("mule");
-			jb.setJobClass(MuleJob.class);
-			JobDataMap map = new JobDataMap();
-			map.put(PROP_DISPATCHER, this);
-			jb.setJobDataMap(map);
-			
-			Trigger trigger = null;
-			String cron = getStringProperty(QuartzConnector.PROPERTY_CRON_EXPRESSION);
-			String itv  = getStringProperty(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
-			String cnt  = getStringProperty(QuartzConnector.PROPERTY_REPEAT_COUNT);
-			String del  = getStringProperty(QuartzConnector.PROPERTY_START_DELAY);
-			if (cron != null) {
-				CronTrigger ctrigger = new CronTrigger();
-				ctrigger.setCronExpression(cron);
-				trigger = ctrigger;
-			} else if (itv != null) {
-				SimpleTrigger strigger = new SimpleTrigger();
-				strigger.setRepeatInterval(Long.parseLong(itv));
-				if (cnt != null) {
-					strigger.setRepeatCount(Integer.parseInt(cnt));
-				} else {
-					strigger.setRepeatCount(-1);
-				}
-				trigger = strigger;
-			} else {
-				throw new IllegalArgumentException("One of cron or interval property must be set");
-			}
-			long start = System.currentTimeMillis();
-			if (del != null) {
-				start += Long.parseLong(del);
-			}
-			trigger.setStartTime(new Date(start));
-			trigger.setName(endpoint.getEndpointURI().toString());
-			trigger.setGroup("mule");
-			trigger.setJobName(endpoint.getEndpointURI().toString());
-			trigger.setJobGroup("mule");
-			
-			s.scheduleJob(jb, trigger);
-			s.start();
-		} catch (Exception e) {
-			throw new EndpointException(new Message(Messages.FAILED_TO_START_X, "Quartz receiver"), e);
-		}
-	}
-	
-	private String getStringProperty(String name) {
-		Object o = endpoint.getProperties().get(name);
-		if (o != null) {
-			return o.toString();
-		} else {
-			return null;
-		}
-	}
-	
-	private Object getProperty(String name) {
-		return endpoint.getProperties().get(name);
-	}
-	
-	protected void onTrigger() {
-		try {
-			Object payload = getProperty(QuartzConnector.PROPERTY_PAYLOAD);
-			if (payload == null) {
-				String payloadClassName = getStringProperty(QuartzConnector.PROPERTY_PAYLOAD_CLASS_NAME);
-				if (payloadClassName != null) {
-					payload = ClassHelper.instanciateClass(payloadClassName, null);
-				}
-			}
-			routeMessage(new MuleMessage(new DefaultMessageAdapter(payload)));
-		} catch (Exception e) {
-			handleException(e);
-		}
-	}
-
-    public void doConnect() throws Exception {
-        //todo
+    public QuartzMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+            throws InitialisationException
+    {
+        super(connector, component, endpoint);
     }
 
-    public void doDisconnect() throws Exception {
-        //todo
+    protected void doDispose()
+    {
     }
 
-	public static class MuleJob implements Job {
+    public void doStart() throws UMOException
+    {
+        try {
+            QuartzConnector connector = (QuartzConnector) this.connector;
+            Scheduler s = connector.getScheduler();
 
-		public void execute(JobExecutionContext context) throws JobExecutionException {
-			JobDataMap map = context.getJobDetail().getJobDataMap();
-			QuartzMessageReceiver receiver = (QuartzMessageReceiver) map.get(PROP_DISPATCHER);
-			receiver.onTrigger();
-		}
-		
-	}
+            JobDetail jb = new JobDetail();
+            jb.setName(endpoint.getEndpointURI().toString());
+            jb.setGroup("mule");
+            jb.setJobClass(MuleJob.class);
+            JobDataMap map = new JobDataMap();
+            map.put(PROP_DISPATCHER, this);
+            jb.setJobDataMap(map);
+
+            Trigger trigger = null;
+            String cron = getStringProperty(QuartzConnector.PROPERTY_CRON_EXPRESSION);
+            String itv = getStringProperty(QuartzConnector.PROPERTY_REPEAT_INTERVAL);
+            String cnt = getStringProperty(QuartzConnector.PROPERTY_REPEAT_COUNT);
+            String del = getStringProperty(QuartzConnector.PROPERTY_START_DELAY);
+            if (cron != null) {
+                CronTrigger ctrigger = new CronTrigger();
+                ctrigger.setCronExpression(cron);
+                trigger = ctrigger;
+            } else if (itv != null) {
+                SimpleTrigger strigger = new SimpleTrigger();
+                strigger.setRepeatInterval(Long.parseLong(itv));
+                if (cnt != null) {
+                    strigger.setRepeatCount(Integer.parseInt(cnt));
+                } else {
+                    strigger.setRepeatCount(-1);
+                }
+                trigger = strigger;
+            } else {
+                throw new IllegalArgumentException("One of cron or interval property must be set");
+            }
+            long start = System.currentTimeMillis();
+            if (del != null) {
+                start += Long.parseLong(del);
+            }
+            trigger.setStartTime(new Date(start));
+            trigger.setName(endpoint.getEndpointURI().toString());
+            trigger.setGroup("mule");
+            trigger.setJobName(endpoint.getEndpointURI().toString());
+            trigger.setJobGroup("mule");
+
+            s.scheduleJob(jb, trigger);
+            s.start();
+        } catch (Exception e) {
+            throw new EndpointException(new Message(Messages.FAILED_TO_START_X, "Quartz receiver"), e);
+        }
+    }
+
+    private String getStringProperty(String name)
+    {
+        Object o = endpoint.getProperties().get(name);
+        if (o != null) {
+            return o.toString();
+        } else {
+            return null;
+        }
+    }
+
+    private Object getProperty(String name)
+    {
+        return endpoint.getProperties().get(name);
+    }
+
+    protected void onTrigger()
+    {
+        try {
+            Object payload = getProperty(QuartzConnector.PROPERTY_PAYLOAD);
+            if (payload == null) {
+                String payloadClassName = getStringProperty(QuartzConnector.PROPERTY_PAYLOAD_CLASS_NAME);
+                if (payloadClassName != null) {
+                    payload = ClassHelper.instanciateClass(payloadClassName, null);
+                }
+            }
+            routeMessage(new MuleMessage(new DefaultMessageAdapter(payload)));
+        } catch (Exception e) {
+            handleException(e);
+        }
+    }
+
+    public void doConnect() throws Exception
+    {
+        // todo
+    }
+
+    public void doDisconnect() throws Exception
+    {
+        // todo
+    }
+
+    public static class MuleJob implements Job
+    {
+
+        public void execute(JobExecutionContext context) throws JobExecutionException
+        {
+            JobDataMap map = context.getJobDetail().getJobDataMap();
+            QuartzMessageReceiver receiver = (QuartzMessageReceiver) map.get(PROP_DISPATCHER);
+            receiver.onTrigger();
+        }
+
+    }
 }

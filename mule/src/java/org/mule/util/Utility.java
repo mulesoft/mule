@@ -13,7 +13,17 @@
  */
 package org.mule.util;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParsePosition;
@@ -34,12 +44,10 @@ public class Utility
     public static File createFile(String filename) throws IOException
     {
         File file = new File(filename);
-        if (!file.canWrite())
-        {
+        if (!file.canWrite()) {
             String dirName = file.getPath();
             int i = dirName.lastIndexOf(File.separator);
-            if (i > -1)
-            {
+            if (i > -1) {
                 dirName = dirName.substring(0, i);
                 File dir = new File(dirName);
                 dir.mkdirs();
@@ -60,12 +68,10 @@ public class Utility
     public static File openDirectory(String directory) throws IOException
     {
         File dir = new File(directory);
-        if (!dir.exists())
-        {
+        if (!dir.exists()) {
             dir.mkdirs();
         }
-        if (!dir.isDirectory() || !dir.canRead())
-        {
+        if (!dir.isDirectory() || !dir.canRead()) {
             throw new IOException("Directory: " + directory + " exists but isn't a directory");
         }
         return dir;
@@ -80,12 +86,9 @@ public class Utility
     {
         boolean result;
         s = s.trim();
-        if (s.equalsIgnoreCase("true"))
-        {
+        if (s.equalsIgnoreCase("true")) {
             result = true;
-        }
-        else
-        {
+        } else {
             result = false;
         }
         return result;
@@ -117,8 +120,7 @@ public class Utility
 
         FileReader fr = new FileReader(fileName);
         int read = 0;
-        while ((read = fr.read(buf)) >= 0)
-        {
+        while ((read = fr.read(buf)) >= 0) {
             sb.append(buf, 0, read);
         }
 
@@ -127,9 +129,9 @@ public class Utility
 
     /**
      * Reads the incoming String into a file at at the given destination.
-     *
+     * 
      * @param filename name and path of the file to create
-     * @param data     the contents of the file
+     * @param data the contents of the file
      * @return the new file.
      * @throws IOException If the creating or writing to the file stream fails
      */
@@ -142,25 +144,29 @@ public class Utility
     {
         return stringToFile(filename, data, append, false);
     }
-    public static synchronized File stringToFile(String filename, String data, boolean append, boolean newLine) throws IOException
+
+    public static synchronized File stringToFile(String filename, String data, boolean append, boolean newLine)
+            throws IOException
     {
         File f = createFile(filename);
         BufferedWriter writer = null;
-        try
-        {
+        try {
             writer = new BufferedWriter(new FileWriter(f, append));
             writer.write(data);
-            if(newLine) writer.newLine();
-        } finally
-        {
-            if(writer!=null) writer.close();
+            if (newLine) {
+                writer.newLine();
+            }
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
         }
         return f;
     }
 
     public static String getStringFromDate(Date date, String format)
     {
-        //converts from date to strin using the standard TIME_STAMP_FORMAT
+        // converts from date to strin using the standard TIME_STAMP_FORMAT
         // pattern
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(date);
@@ -168,8 +174,8 @@ public class Utility
 
     public static Date getDateFromString(String date, String format)
     {
-        //The date must always be in the format of TIME_STAMP_FORMAT
-        //i.e. JAN 29 2001 22:50:40 GMT
+        // The date must always be in the format of TIME_STAMP_FORMAT
+        // i.e. JAN 29 2001 22:50:40 GMT
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         ParsePosition pos = new ParsePosition(0);
 
@@ -180,38 +186,31 @@ public class Utility
     public static File loadFile(String filename) throws IOException
     {
         File file = new File(filename);
-        if (file.canRead())
-        {
+        if (file.canRead()) {
             return file;
-        }
-        else
-        {
+        } else {
             throw new IOException("File: " + filename + " can not be read");
         }
     }
 
     public static byte[] objectToByteArray(Object src) throws IOException
     {
-        if (src instanceof byte[])
-        {
+        if (src instanceof byte[]) {
             return (byte[]) src;
-        } else if(src instanceof String) {
-            return ((String)src).getBytes();
+        } else if (src instanceof String) {
+            return ((String) src).getBytes();
         }
 
         byte[] dest = null;
         ByteArrayOutputStream bs = null;
         ObjectOutputStream os = null;
-        try
-        {
+        try {
             bs = new ByteArrayOutputStream();
             os = new ObjectOutputStream(bs);
             os.writeObject(src);
             os.flush();
             dest = bs.toByteArray();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             os.close();
             bs.close();
             throw e;
@@ -231,7 +230,7 @@ public class Utility
 
     /**
      * Load a given resource. Trying broader class loaders each time.
-     *
+     * 
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
@@ -241,24 +240,20 @@ public class Utility
 
         url = Thread.currentThread().getContextClassLoader().getResource(resourceName);
 
-        if (url == null)
-        {
+        if (url == null) {
             url = Utility.class.getClassLoader().getResource(resourceName);
         }
 
-        if (url == null)
-        {
+        if (url == null) {
             url = callingClass.getClassLoader().getResource(resourceName);
         }
 
-        if(url == null) {
+        if (url == null) {
             File f = new File(resourceName);
-            if(f.exists()) {
-                try
-                {
+            if (f.exists()) {
+                try {
                     url = f.toURL();
-                } catch (MalformedURLException e)
-                {
+                } catch (MalformedURLException e) {
                     return null;
                 }
             }
@@ -266,17 +261,13 @@ public class Utility
         return url;
     }
 
-
     public static String loadResourceAsString(String resourceName, Class callingClass) throws IOException
     {
         URL url = getResource(resourceName, callingClass);
         String resource = null;
-        if (url == null)
-        {
+        if (url == null) {
             resource = fileToString(resourceName);
-        }
-        else
-        {
+        } else {
             resource = fileToString(url.getFile());
         }
         return resource;
@@ -286,15 +277,12 @@ public class Utility
     {
         URL url = getResource(resourceName, callingClass);
         InputStream resource = null;
-        if (url == null)
-        {
+        if (url == null) {
             File f = new File(resourceName);
-            if(f.exists()){
+            if (f.exists()) {
                 resource = new FileInputStream(f);
             }
-        }
-        else
-        {
+        } else {
             resource = url.openStream();
         }
         return resource;
@@ -302,27 +290,24 @@ public class Utility
 
     public static String getResourcePath(String resourceName, Class callingClass) throws IOException
     {
-        if(resourceName==null) {
+        if (resourceName == null) {
             return null;
         }
         URL url = getResource(resourceName, callingClass);
         String resource = null;
-        if (url == null)
-        {
+        if (url == null) {
             File f = new File(resourceName);
-            if(f.exists()){
+            if (f.exists()) {
                 resource = f.getAbsolutePath();
             }
-        }
-        else
-        {
+        } else {
             resource = url.toExternalForm();
         }
-        if(resource!=null) {
-            if(resource.startsWith("file:/")) {
+        if (resource != null) {
+            if (resource.startsWith("file:/")) {
                 resource = resource.substring(6);
             }
-            if(!resource.startsWith(File.separator)) {
+            if (!resource.startsWith(File.separator)) {
                 resource = File.separator + resource;
             }
         }
@@ -341,10 +326,11 @@ public class Utility
 
         byte[] buffer = new byte[bufferSize];
         int len = 0;
-        while ((len = is.read(buffer, len, buffer.length)) != -1)
-        {
+        while ((len = is.read(buffer, len, buffer.length)) != -1) {
             baos.write(buffer, 0, len);
-            if(len != buffer.length) break;
+            if (len != buffer.length) {
+                break;
+            }
         }
         baos.flush();
         byte[] result = baos.toByteArray();
@@ -352,16 +338,19 @@ public class Utility
         return result;
     }
 
-    public static boolean deleteTree(File dir) {
-        if(dir==null) return true;
+    public static boolean deleteTree(File dir)
+    {
+        if (dir == null) {
+            return true;
+        }
         File[] files = dir.listFiles();
-        for(int i=0;i< files.length;i++) {
-            if(files[i].isDirectory()) {
-                if(!deleteTree(files[i]) ) {
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isDirectory()) {
+                if (!deleteTree(files[i])) {
                     return false;
                 }
             } else {
-                if(!files[i].delete()) {
+                if (!files[i].delete()) {
                     return false;
                 }
             }
@@ -369,17 +358,19 @@ public class Utility
         return dir.delete();
     }
 
-    public static String[] split(String string, String delim) {
-        StringTokenizer st = new StringTokenizer(string,  delim);
+    public static String[] split(String string, String delim)
+    {
+        StringTokenizer st = new StringTokenizer(string, delim);
         String[] results = new String[st.countTokens()];
         int i = 0;
-        while(st.hasMoreTokens()) {
+        while (st.hasMoreTokens()) {
             results[i++] = st.nextToken().trim();
         }
         return results;
     }
 
-    public static String getFormattedDuration(long mills) {
+    public static String getFormattedDuration(long mills)
+    {
         long days = mills / 86400000;
         mills = mills - (days * 86400000);
         long hours = mills / 3600000;

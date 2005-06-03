@@ -23,7 +23,8 @@ import org.mule.umo.manager.UMOContainerContext;
  */
 public class PlexusContainerContextTestCase extends AbstractContainerContextTestCase
 {
-    public UMOContainerContext getContainerContext() throws ConfigurationException {
+    public UMOContainerContext getContainerContext() throws ConfigurationException
+    {
         PlexusContainerContext context = new PlexusContainerContext();
         context.setConfigFile("test-plexus-config.xml");
         return context;

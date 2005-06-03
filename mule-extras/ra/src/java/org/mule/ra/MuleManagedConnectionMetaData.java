@@ -13,16 +13,16 @@
  */
 package org.mule.ra;
 
+import javax.resource.ResourceException;
+import javax.resource.spi.ManagedConnectionMetaData;
+
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
-import javax.resource.ResourceException;
-import javax.resource.spi.ManagedConnectionMetaData;
-
 /**
  * <code>MuleManagedConnectionMetaData</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,22 +35,25 @@ public class MuleManagedConnectionMetaData implements ManagedConnectionMetaData
         this.managedConnection = mc;
     }
 
-    public String getEISProductName() throws ResourceException {
+    public String getEISProductName() throws ResourceException
+    {
         return MuleManager.getConfiguration().getVendorName();
     }
 
-    public String getEISProductVersion() throws ResourceException {
+    public String getEISProductVersion() throws ResourceException
+    {
         return MuleManager.getConfiguration().getProductVersion();
     }
 
-    //todo
-    public int getMaxConnections() throws ResourceException {
+    // todo
+    public int getMaxConnections() throws ResourceException
+    {
         return 0;
     }
 
-    public String getUserName() throws ResourceException {
-        if (managedConnection.isDestroyed())
-	{
+    public String getUserName() throws ResourceException
+    {
+        if (managedConnection.isDestroyed()) {
             throw new IllegalStateException(new Message(Messages.X_IS_DISPOSED, managedConnection).toString());
         }
         return managedConnection.getUsername();

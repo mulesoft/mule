@@ -13,84 +13,97 @@
  */
 package org.mule.ra;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import javax.naming.Reference;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>DefaultMuleConnectionFactory</code> an implementation of the
- * MuleconnectionFactory interface used by clients of this ResourceAdapter
- * to obtain a connection to Mule resources
- *
+ * MuleconnectionFactory interface used by clients of this ResourceAdapter to
+ * obtain a connection to Mule resources
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DefaultMuleConnectionFactory implements MuleConnectionFactory {
+public class DefaultMuleConnectionFactory implements MuleConnectionFactory
+{
 
     /**
      * logger used by this class
      */
     protected static transient Log logger = LogFactory.getLog(DefaultMuleConnectionFactory.class);
 
-
     private transient ConnectionManager manager;
     private transient MuleManagedConnectionFactory factory;
     private Reference reference;
     private MuleConnectionRequestInfo info;
 
-    public DefaultMuleConnectionFactory(MuleManagedConnectionFactory factory, ConnectionManager manager, MuleConnectionRequestInfo info) {
+    public DefaultMuleConnectionFactory(MuleManagedConnectionFactory factory,
+                                        ConnectionManager manager,
+                                        MuleConnectionRequestInfo info)
+    {
         this.factory = factory;
         this.manager = manager;
         this.info = info;
     }
 
-     public MuleConnection createConnection() throws ResourceException {
-         return createConnection(info);
-     }
-
-    public MuleConnection createConnection(MuleConnectionRequestInfo info) throws ResourceException {
-       // todo try {
-            return (MuleConnection) manager.allocateConnection(factory, info);
-//        }
-//        catch (ResourceException e) {
-//            
-//            logger.warn("Connection could not be created: " + e.getMessage(), e);
-//            throw new UMOException(e.getMessage());
-//        }
+    public MuleConnection createConnection() throws ResourceException
+    {
+        return createConnection(info);
     }
 
-    public ConnectionManager getManager() {
+    public MuleConnection createConnection(MuleConnectionRequestInfo info) throws ResourceException
+    {
+        // todo try {
+        return (MuleConnection) manager.allocateConnection(factory, info);
+        // }
+        // catch (ResourceException e) {
+        //            
+        // logger.warn("Connection could not be created: " + e.getMessage(), e);
+        // throw new UMOException(e.getMessage());
+        // }
+    }
+
+    public ConnectionManager getManager()
+    {
         return manager;
     }
 
-    public void setManager(ConnectionManager manager) {
+    public void setManager(ConnectionManager manager)
+    {
         this.manager = manager;
     }
 
-    public MuleManagedConnectionFactory getFactory() {
+    public MuleManagedConnectionFactory getFactory()
+    {
         return factory;
     }
 
-    public void setFactory(MuleManagedConnectionFactory factory) {
+    public void setFactory(MuleManagedConnectionFactory factory)
+    {
         this.factory = factory;
     }
 
-    public Reference getReference() {
+    public Reference getReference()
+    {
         return reference;
     }
 
-    public void setReference(Reference reference) {
+    public void setReference(Reference reference)
+    {
         this.reference = reference;
     }
 
-    public MuleConnectionRequestInfo getInfo() {
+    public MuleConnectionRequestInfo getInfo()
+    {
         return info;
     }
 
-    public void setInfo(MuleConnectionRequestInfo info) {
+    public void setInfo(MuleConnectionRequestInfo info)
+    {
         this.info = info;
     }
 }

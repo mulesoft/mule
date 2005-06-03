@@ -28,7 +28,9 @@ public class SpringContainerContextTestCase extends AbstractContainerContextTest
 {
     SpringContainerContext context;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.model.AbstractComponentResolverTestCase#getConfiguredResolver()
      */
     public UMOContainerContext getContainerContext()
@@ -36,7 +38,9 @@ public class SpringContainerContextTestCase extends AbstractContainerContextTest
         return context;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see junit.framework.TestCase#setUp()
      */
     protected void setUp() throws Exception
@@ -46,39 +50,32 @@ public class SpringContainerContextTestCase extends AbstractContainerContextTest
         context.setConfigFile("test-application-context.xml");
     }
 
-    public void testContainerContext() throws Exception {
+    public void testContainerContext() throws Exception
+    {
         UMOContainerContext container = getContainerContext();
         container.initialise();
         assertNotNull(container);
 
         Object result = null;
 
-        try
-        {
+        try {
             result = container.getComponent(null);
             fail("Should throw ObjectNotFoundException for null key");
-        }
-        catch (ObjectNotFoundException e)
-        {
+        } catch (ObjectNotFoundException e) {
             // expected
         }
 
-        try
-        {
+        try {
             result = container.getComponent("abcdefg123456!£$%^n");
             fail("Should throw ObjectNotFoundException for a key that doesn't exist");
-        }
-        catch (ObjectNotFoundException e)
-        {
+        } catch (ObjectNotFoundException e) {
             // expected
         }
 
-        try
-        {
+        try {
             result = container.getComponent(Apple.class.getName());
             assertNotNull("Component should exist in container", result);
-        } catch (ObjectNotFoundException e)
-        {
+        } catch (ObjectNotFoundException e) {
             fail("Component should exist in the container");
         }
     }

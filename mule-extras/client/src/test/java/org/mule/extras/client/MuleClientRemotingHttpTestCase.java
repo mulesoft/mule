@@ -26,7 +26,8 @@ public class MuleClientRemotingHttpTestCase extends MuleClientRemotingTestCase
     public void setUp() throws Exception
     {
         System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("test-client-mule-config-remote-http.xml");
         System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");

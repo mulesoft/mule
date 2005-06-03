@@ -20,8 +20,10 @@ import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>ObjectToFileMessage</code> converts an object to a FileMessage type
- * using the obect as the payload. The filename for the message is either picked up from the FileConnector config or explicitly set in the transformer properties
- *
+ * using the obect as the payload. The filename for the message is either picked
+ * up from the FileConnector config or explicitly set in the transformer
+ * properties
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  * @deprecated This is no longer needed as there is no longer a FileMessage type
@@ -41,7 +43,9 @@ public class ObjectToFileMessage extends AbstractTransformer
         setReturnClass(Object.class);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
     public Object doTransform(Object src) throws TransformerException

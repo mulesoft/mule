@@ -13,20 +13,27 @@
  */
 package org.mule.extras.pgp;
 
+import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.security.SecurityException;
+import org.mule.umo.security.UMOAuthentication;
+import org.mule.umo.security.UMOSecurityContext;
+import org.mule.umo.security.UMOSecurityContextFactory;
+import org.mule.umo.security.UMOSecurityProvider;
+import org.mule.umo.security.UnauthorisedException;
+import org.mule.umo.security.UnknownAuthenticationTypeException;
+
 import cryptix.message.Message;
 import cryptix.message.MessageException;
 import cryptix.message.SignedMessage;
 import cryptix.pki.KeyBundle;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.security.SecurityException;
-import org.mule.umo.security.*;
 
 /**
  * @author ariva
- *  
+ * 
  */
-public class PGPSecurityProvider implements UMOSecurityProvider {
+public class PGPSecurityProvider implements UMOSecurityProvider
+{
     private String name = "PGPSecurityProvider";
 
     private PGPKeyRing keyManager;
@@ -38,7 +45,8 @@ public class PGPSecurityProvider implements UMOSecurityProvider {
      * 
      * @see org.mule.umo.security.UMOSecurityProvider#setName(java.lang.String)
      */
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
@@ -47,7 +55,8 @@ public class PGPSecurityProvider implements UMOSecurityProvider {
      * 
      * @see org.mule.umo.security.UMOSecurityProvider#getName()
      */
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
@@ -56,7 +65,8 @@ public class PGPSecurityProvider implements UMOSecurityProvider {
      * 
      * @see org.mule.umo.security.UMOSecurityProvider#authenticate(org.mule.umo.security.UMOAuthentication)
      */
-    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException {
+    public UMOAuthentication authenticate(UMOAuthentication authentication) throws SecurityException
+    {
         PGPAuthentication auth = (PGPAuthentication) authentication;
 
         String userId = (String) auth.getPrincipal();
@@ -96,7 +106,8 @@ public class PGPSecurityProvider implements UMOSecurityProvider {
      * 
      * @see org.mule.umo.security.UMOSecurityProvider#supports(java.lang.Class)
      */
-    public boolean supports(Class aClass) {
+    public boolean supports(Class aClass)
+    {
         return PGPAuthentication.class.isAssignableFrom(aClass);
     }
 
@@ -105,7 +116,8 @@ public class PGPSecurityProvider implements UMOSecurityProvider {
      * 
      * @see org.mule.umo.security.UMOSecurityProvider#createSecurityContext(org.mule.umo.security.UMOAuthentication)
      */
-    public UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException {
+    public UMOSecurityContext createSecurityContext(UMOAuthentication auth) throws UnknownAuthenticationTypeException
+    {
         return factory.create(auth);
     }
 
@@ -114,22 +126,26 @@ public class PGPSecurityProvider implements UMOSecurityProvider {
      * 
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
-    public void initialise() throws InitialisationException {
+    public void initialise() throws InitialisationException
+    {
         try {
             java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto());
             java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP());
 
             factory = new PGPSecurityContextFactory();
         } catch (Exception e) {
-            throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X, "PGPProvider"), e);
+            throw new InitialisationException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
+                                                                               "PGPProvider"), e);
         }
     }
 
-    public PGPKeyRing getKeyManager() {
+    public PGPKeyRing getKeyManager()
+    {
         return keyManager;
     }
 
-    public void setKeyManager(PGPKeyRing keyManager) {
+    public void setKeyManager(PGPKeyRing keyManager)
+    {
         this.keyManager = keyManager;
     }
 }

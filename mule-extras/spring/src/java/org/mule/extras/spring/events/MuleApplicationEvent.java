@@ -28,7 +28,7 @@ import org.springframework.context.ApplicationEvent;
 /**
  * <code>MuleApplicationEvent</code> is an Spring ApplicationEvent used to
  * wrap a MuleEvent
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -43,19 +43,20 @@ public class MuleApplicationEvent extends ApplicationEvent
     public MuleApplicationEvent(Object message, String endpoint) throws MalformedEndpointException
     {
         super(message);
-        String temp = PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(), endpoint, endpoint);
+        String temp = PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(),
+                                                         endpoint,
+                                                         endpoint);
         setEndpoint(new MuleEndpointURI(temp));
     }
 
-
-    MuleApplicationEvent(Object message, UMOEventContext context, ApplicationContext appContext) throws MalformedEndpointException
+    MuleApplicationEvent(Object message, UMOEventContext context, ApplicationContext appContext)
+            throws MalformedEndpointException
     {
         super(message);
         this.context = context;
         setEndpoint(context.getEndpointURI());
         applicationContext = appContext;
     }
-
 
     protected void setEndpoint(UMOEndpointURI endpointUri) throws MalformedEndpointException
     {
@@ -67,7 +68,8 @@ public class MuleApplicationEvent extends ApplicationEvent
         return context;
     }
 
-    public UMOEndpointURI getEndpoint() {
+    public UMOEndpointURI getEndpoint()
+    {
         return endpointUri;
     }
 
@@ -81,7 +83,7 @@ public class MuleApplicationEvent extends ApplicationEvent
         return properties;
     }
 
-    public void setProperty(Object key,  Object value)
+    public void setProperty(Object key, Object value)
     {
         this.properties.put(key, value);
     }

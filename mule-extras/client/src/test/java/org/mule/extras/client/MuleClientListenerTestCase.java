@@ -31,14 +31,12 @@ public class MuleClientListenerTestCase extends NamedTestCase
         MuleManager.getConfiguration().setSynchronous(true);
         MuleManager.getConfiguration().setSynchronousReceive(true);
 
-        if(!canSendWithoutReceiver) {
-            try
-            {
+        if (!canSendWithoutReceiver) {
+            try {
                 client.send(urlString, "Test Client Send message", null);
                 fail("There is no receiver for this endpointUri");
-            } catch (NoReceiverForEndpointException e)
-            {
-                //ignore
+            } catch (NoReceiverForEndpointException e) {
+                // ignore
             }
         }
 
@@ -46,23 +44,21 @@ public class MuleClientListenerTestCase extends NamedTestCase
         MuleEndpointURI url = new MuleEndpointURI(urlString);
         String name = "myComponent";
         client.registerComponent(receiver, name, url);
-        assertTrue( MuleManager.getInstance().getModel().isComponentRegistered(name));
+        assertTrue(MuleManager.getInstance().getModel().isComponentRegistered(name));
 
         UMOMessage message = client.send(urlString, "Test Client Send message", null);
         assertNotNull(message);
         assertEquals("Received: Test Client Send message", message.getPayloadAsString());
         client.unregisterComponent(name);
 
-        assertTrue( !MuleManager.getInstance().getModel().isComponentRegistered(name));
+        assertTrue(!MuleManager.getInstance().getModel().isComponentRegistered(name));
 
-        if(!canSendWithoutReceiver) {
-            try
-            {
+        if (!canSendWithoutReceiver) {
+            try {
                 message = client.send(urlString, "Test Client Send message", null);
                 fail("There is no receiver for this endpointUri");
-            } catch (NoReceiverForEndpointException e)
-            {
-                //ignore
+            } catch (NoReceiverForEndpointException e) {
+                // ignore
             }
         }
     }
@@ -79,11 +75,13 @@ public class MuleClientListenerTestCase extends NamedTestCase
 
     protected void tearDown() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
     }
 
     protected void setUp() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
     }
 }

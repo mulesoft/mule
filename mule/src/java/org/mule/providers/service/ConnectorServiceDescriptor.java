@@ -13,6 +13,8 @@
  */
 package org.mule.providers.service;
 
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -33,28 +35,31 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 import org.mule.util.ObjectFactory;
 
-import java.util.Properties;
-
 /**
- * <code>ConnectorServiceDescriptor</code> describes the necessery information for creating a connector
- * from a service descriptor.
- * A service descriptor should be located at META-INF/services/org/mule/providers/<protocol>
- * where protocol is the protocol of the connector to be created
- * The service descriptor is on the form ok key value pairs and supports the following properties
- *
- * <b>connector</b>=org.mule.umo.providers.AbstractServiceEnabledConnector - The connector class
- * <b>conector.factory</b>=org.mule.util.ObjectFactory - A connector factory class to use, this is used instead of the 'connector' property if set
- * <b>dispatcher.factory</b>=org.mule.umo.providers.UMOMessageDispatcherFactory - tHe dispatcher factory class to use
- * <b>message.adapter</b>=org.mule.umo.providers.UMOMessageAdapter - The message adater class to use
- * <b>message.receiver</b>=org.mule.umo.providers.UMOMessageReceiver - The message receiver class to use
- * <b>service.error</b>= This should only be set if the connector described cannot be created directly from this descriptor. In the case
- * of Jms this would be set as the JmsConnector also needs Jndi information.
- * <b>inbound.transformer</b>=org.mule.umo.UMOTransformer - The default inbound transformer to use by endpoints if no other is set
- * <b>outbound.transformer</b>=org.mule.umo.UMOTransformer - The default outbound transformer to use by endpoints if no other is set
- *
- * Any other properties set in the descriptor are made available using the getParams() method on this
- * discriptor.
- *
+ * <code>ConnectorServiceDescriptor</code> describes the necessery information
+ * for creating a connector from a service descriptor. A service descriptor
+ * should be located at META-INF/services/org/mule/providers/<protocol> where
+ * protocol is the protocol of the connector to be created The service
+ * descriptor is on the form ok key value pairs and supports the following
+ * properties
+ * 
+ * <b>connector</b>=org.mule.umo.providers.AbstractServiceEnabledConnector -
+ * The connector class <b>conector.factory</b>=org.mule.util.ObjectFactory - A
+ * connector factory class to use, this is used instead of the 'connector'
+ * property if set <b>dispatcher.factory</b>=org.mule.umo.providers.UMOMessageDispatcherFactory -
+ * tHe dispatcher factory class to use <b>message.adapter</b>=org.mule.umo.providers.UMOMessageAdapter -
+ * The message adater class to use <b>message.receiver</b>=org.mule.umo.providers.UMOMessageReceiver -
+ * The message receiver class to use <b>service.error</b>= This should only be
+ * set if the connector described cannot be created directly from this
+ * descriptor. In the case of Jms this would be set as the JmsConnector also
+ * needs Jndi information. <b>inbound.transformer</b>=org.mule.umo.UMOTransformer -
+ * The default inbound transformer to use by endpoints if no other is set
+ * <b>outbound.transformer</b>=org.mule.umo.UMOTransformer - The default
+ * outbound transformer to use by endpoints if no other is set
+ * 
+ * Any other properties set in the descriptor are made available using the
+ * getParams() method on this discriptor.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -85,10 +90,11 @@ public class ConnectorServiceDescriptor
     private UMOTransformer inboundTransformer;
     private UMOTransformer outboundTransformer;
     private UMOTransformer responseTransformer;
-    //private EndpointBuilder endpointBuilderImpl;
+    // private EndpointBuilder endpointBuilderImpl;
     private ConnectorServiceFinder connectorServiceFinder;
 
-    public ConnectorServiceDescriptor(String protocol, String serviceLocation, Properties props) {
+    public ConnectorServiceDescriptor(String protocol, String serviceLocation, Properties props)
+    {
         this.protocol = protocol;
         this.serviceLocation = serviceLocation;
         this.properties = props;
@@ -100,15 +106,18 @@ public class ConnectorServiceDescriptor
         transactionFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
         messageReceiver = removeProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
         messageAdapter = removeProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
-        defaultInboundTransformer= removeProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
-        defaultOutboundTransformer= removeProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
-        defaultResponseTransformer= removeProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
-        endpointBuilder= removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
+        defaultInboundTransformer = removeProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
+        defaultOutboundTransformer = removeProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
+        defaultResponseTransformer = removeProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
+        endpointBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
         serviceFinder = removeProperty(MuleProperties.CONNECTOR_SERVICE_FINDER);
     }
 
-    void setOverrides(Properties props) {
-        if(props==null || props.size()==0) return;
+    void setOverrides(Properties props)
+    {
+        if (props == null || props.size() == 0) {
+            return;
+        }
         serviceError = props.getProperty(MuleProperties.CONNECTOR_SERVICE_ERROR, serviceError);
         connector = props.getProperty(MuleProperties.CONNECTOR_CLASS, connector);
         connectorFactory = props.getProperty(MuleProperties.CONNECTOR_FACTORY, connectorFactory);
@@ -117,39 +126,40 @@ public class ConnectorServiceDescriptor
         messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, messageAdapter);
 
         String temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
-        if(temp!=null) {
+        if (temp != null) {
             defaultInboundTransformer = temp;
-            inboundTransformer=null;
+            inboundTransformer = null;
         }
-        
+
         temp = props.getProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
-        if(temp!=null) {
+        if (temp != null) {
             defaultOutboundTransformer = temp;
-            outboundTransformer=null;
+            outboundTransformer = null;
         }
 
         temp = props.getProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
-        if(temp!=null) {
+        if (temp != null) {
             defaultResponseTransformer = temp;
-            responseTransformer=null;
+            responseTransformer = null;
         }
 
         temp = props.getProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
-        if(temp!=null) {
+        if (temp != null) {
             endpointBuilder = temp;
-            //endpointBuilderImpl=null;
+            // endpointBuilderImpl=null;
         }
 
         temp = props.getProperty(MuleProperties.CONNECTOR_SERVICE_FINDER);
-        if(temp!=null) {
+        if (temp != null) {
             serviceFinder = temp;
-            connectorServiceFinder=null;
+            connectorServiceFinder = null;
         }
     }
-  
-    private String removeProperty(String name) {
-        String temp = (String)properties.remove(name);
-        if(temp!=null && temp.trim().length()==0) {
+
+    private String removeProperty(String name)
+    {
+        String temp = (String) properties.remove(name);
+        if (temp != null && temp.trim().length() == 0) {
             return null;
         } else {
             return temp;
@@ -221,16 +231,16 @@ public class ConnectorServiceDescriptor
         return serviceFinder;
     }
 
-    public ConnectorServiceFinder createServiceFinder() throws ConnectorServiceException {
-        if(serviceFinder==null) return null;
-
-        if(connectorServiceFinder==null) {
-            try
-            {
-                connectorServiceFinder = (ConnectorServiceFinder)ClassHelper.instanciateClass(
-                        serviceFinder, ClassHelper.NO_ARGS);
-            } catch (Exception e)
-            {
+    public ConnectorServiceFinder createServiceFinder() throws ConnectorServiceException
+    {
+        if (serviceFinder == null) {
+            return null;
+        }
+        if (connectorServiceFinder == null) {
+            try {
+                connectorServiceFinder = (ConnectorServiceFinder) ClassHelper.instanciateClass(serviceFinder,
+                                                                                               ClassHelper.NO_ARGS);
+            } catch (Exception e) {
                 throw new ConnectorServiceException(new Message(Messages.CANT_INSTANCIATE_FINDER_X, serviceFinder), e);
             }
         }
@@ -242,121 +252,135 @@ public class ConnectorServiceDescriptor
         return defaultResponseTransformer;
     }
 
-    public UMOMessageAdapter createMessageAdapter(Object message) throws ConnectorServiceException {
-
-        if(message==null) message = new NullPayload();
-
-        if(messageAdapter!=null) {
-            try
-            {
-                return (UMOMessageAdapter)ClassHelper.instanciateClass(messageAdapter, new Object[]{message});
-            } catch (Exception e)
-            {
-                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Message Adapter", messageAdapter), e);
+    public UMOMessageAdapter createMessageAdapter(Object message) throws ConnectorServiceException
+    {
+        if (message == null) {
+            message = new NullPayload();
+        }
+        if (messageAdapter != null) {
+            try {
+                return (UMOMessageAdapter) ClassHelper.instanciateClass(messageAdapter, new Object[] { message });
+            } catch (Exception e) {
+                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                                                                "Message Adapter",
+                                                                messageAdapter), e);
             }
         } else {
-            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X, "Message Adapter", getProtocol()));
+            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+                                                            "Message Adapter",
+                                                            getProtocol()));
         }
     }
 
-    public UMOMessageReceiver createMessageReceiver(
-                                UMOConnector connector,
-                               UMOComponent component,
-                               UMOEndpoint endpoint) throws UMOException {
+    public UMOMessageReceiver createMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
+            throws UMOException
+    {
 
         return createMessageReceiver(connector, component, endpoint, null);
     }
 
-     public UMOMessageReceiver createMessageReceiver(
-                                UMOConnector connector,
-                               UMOComponent component,
-                               UMOEndpoint endpoint, Object[] args) throws UMOException {
-        if(messageReceiver!=null) {
-                Object[] newArgs = null;
-                if(args!=null && args.length!=0) {
-                    newArgs = new Object[3 + args.length];
-                } else {
-                    newArgs = new Object[3];
-                }
-                newArgs[0] = connector;
-                newArgs[1] = component;
-                newArgs[2] = endpoint;
-                if(args!=null && args.length!=0) {
-                    System.arraycopy(args, 0, newArgs, 3, newArgs.length-3);
-                }
+    public UMOMessageReceiver createMessageReceiver(UMOConnector connector,
+                                                    UMOComponent component,
+                                                    UMOEndpoint endpoint,
+                                                    Object[] args) throws UMOException
+    {
+        if (messageReceiver != null) {
+            Object[] newArgs = null;
+            if (args != null && args.length != 0) {
+                newArgs = new Object[3 + args.length];
+            } else {
+                newArgs = new Object[3];
+            }
+            newArgs[0] = connector;
+            newArgs[1] = component;
+            newArgs[2] = endpoint;
+            if (args != null && args.length != 0) {
+                System.arraycopy(args, 0, newArgs, 3, newArgs.length - 3);
+            }
 
             try {
-                return (UMOMessageReceiver)ClassHelper.instanciateClass(messageReceiver, newArgs);
+                return (UMOMessageReceiver) ClassHelper.instanciateClass(messageReceiver, newArgs);
             } catch (Exception e) {
-                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Message Receiver", getProtocol()), e);
+                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                                                                "Message Receiver",
+                                                                getProtocol()), e);
             }
 
         } else {
-            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X, "Message Receiver", getProtocol()));
-        }
-     }
-
-    public UMOMessageDispatcherFactory createDispatcherFactory() throws ConnectorServiceException {
-        if(dispatcherFactory!=null) {
-            try
-            {
-                return (UMOMessageDispatcherFactory)ClassHelper.instanciateClass(dispatcherFactory, ClassHelper.NO_ARGS);
-            } catch (Exception e)
-            {
-                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Message Dispatcher Factory", dispatcherFactory), e);
-            }
-        } else {
-            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X, "Message Dispatcher Factory", getProtocol()));
+            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+                                                            "Message Receiver",
+                                                            getProtocol()));
         }
     }
 
-    public UMOTransactionFactory createTransactionFactory() throws ConnectorServiceException {
-        if(transactionFactory!=null) {
-            try
-            {
-                return (UMOTransactionFactory)ClassHelper.instanciateClass(transactionFactory, ClassHelper.NO_ARGS);
-            } catch (Exception e)
-            {
-                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Transaction Factory", transactionFactory), e);
+    public UMOMessageDispatcherFactory createDispatcherFactory() throws ConnectorServiceException
+    {
+        if (dispatcherFactory != null) {
+            try {
+                return (UMOMessageDispatcherFactory) ClassHelper.instanciateClass(dispatcherFactory,
+                                                                                  ClassHelper.NO_ARGS);
+            } catch (Exception e) {
+                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                                                                "Message Dispatcher Factory",
+                                                                dispatcherFactory), e);
+            }
+        } else {
+            throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+                                                            "Message Dispatcher Factory",
+                                                            getProtocol()));
+        }
+    }
+
+    public UMOTransactionFactory createTransactionFactory() throws ConnectorServiceException
+    {
+        if (transactionFactory != null) {
+            try {
+                return (UMOTransactionFactory) ClassHelper.instanciateClass(transactionFactory, ClassHelper.NO_ARGS);
+            } catch (Exception e) {
+                throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                                                                "Transaction Factory",
+                                                                transactionFactory), e);
             }
         } else {
             return null;
         }
     }
 
-    public UMOConnector createConnector(String protocol) throws ConnectorServiceException {
+    public UMOConnector createConnector(String protocol) throws ConnectorServiceException
+    {
 
         UMOConnector connector;
-        //Make sure we can create the endpoint/connector using this service method
-        if(getServiceError()!=null) {
+        // Make sure we can create the endpoint/connector using this service
+        // method
+        if (getServiceError() != null) {
             throw new ConnectorServiceException(Message.createStaticMessage(getServiceError()));
         }
-        //if there is a factory, use it
-        try
-        {
-            if (getConnectorFactory() != null)
-            {
-                ObjectFactory factory = (ObjectFactory) ClassHelper.loadClass(getConnectorFactory(), ConnectorFactory.class).newInstance();
+        // if there is a factory, use it
+        try {
+            if (getConnectorFactory() != null) {
+                ObjectFactory factory = (ObjectFactory) ClassHelper.loadClass(getConnectorFactory(),
+                                                                              ConnectorFactory.class).newInstance();
                 connector = (UMOConnector) factory.create();
-            } else
-            {
-                if (getConnector() != null)
-                {
-                    connector = (UMOConnector) ClassHelper.loadClass(getConnector(), ConnectorFactory.class).newInstance();
-                } else
-                {
-                    throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X, "Connector", getProtocol()));
+            } else {
+                if (getConnector() != null) {
+                    connector = (UMOConnector) ClassHelper.loadClass(getConnector(), ConnectorFactory.class)
+                                                          .newInstance();
+                } else {
+                    throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
+                                                                    "Connector",
+                                                                    getProtocol()));
                 }
             }
-        } catch (ConnectorServiceException e)
-        {
+        } catch (ConnectorServiceException e) {
             throw e;
-        } catch(Exception e) {
-            throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "Connector", getConnector()), e);
+        } catch (Exception e) {
+            throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
+                                                            "Connector",
+                                                            getConnector()), e);
 
         }
 
-        if(connector.getName()==null) {
+        if (connector.getName() == null) {
             connector.setName("_" + protocol + "Connector#" + connector.hashCode());
         }
         return connector;
@@ -364,18 +388,19 @@ public class ConnectorServiceDescriptor
 
     public UMOTransformer createInboundTransformer() throws ConnectorFactoryException
     {
-        if(inboundTransformer!=null) return inboundTransformer;
-
-        if (getDefaultInboundTransformer() != null)
-        {
+        if (inboundTransformer != null) {
+            return inboundTransformer;
+        }
+        if (getDefaultInboundTransformer() != null) {
             logger.info("Loading default inbound transformer: " + getDefaultInboundTransformer());
-            try
-            {
-                inboundTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultInboundTransformer(), ClassHelper.NO_ARGS);
+            try {
+                inboundTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultInboundTransformer(),
+                                                                                   ClassHelper.NO_ARGS);
                 return inboundTransformer;
-            } catch (Exception e)
-            {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X, "inbound", getDefaultInboundTransformer()), e);
+            } catch (Exception e) {
+                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
+                                                                "inbound",
+                                                                getDefaultInboundTransformer()), e);
             }
         }
         return null;
@@ -383,17 +408,19 @@ public class ConnectorServiceDescriptor
 
     public UMOTransformer createOutboundTransformer() throws ConnectorFactoryException
     {
-        if(outboundTransformer!=null) return outboundTransformer;
-        if (getDefaultOutboundTransformer() != null)
-        {
+        if (outboundTransformer != null) {
+            return outboundTransformer;
+        }
+        if (getDefaultOutboundTransformer() != null) {
             logger.info("Loading default outbound transformer: " + getDefaultInboundTransformer());
-            try
-            {
-                outboundTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultOutboundTransformer(), ClassHelper.NO_ARGS);
+            try {
+                outboundTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultOutboundTransformer(),
+                                                                                    ClassHelper.NO_ARGS);
                 return outboundTransformer;
-            } catch (Exception e)
-            {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X, "outbound", getDefaultOutboundTransformer()), e);
+            } catch (Exception e) {
+                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
+                                                                "outbound",
+                                                                getDefaultOutboundTransformer()), e);
             }
         }
         return null;
@@ -401,64 +428,116 @@ public class ConnectorServiceDescriptor
 
     public UMOTransformer createResponseTransformer() throws ConnectorFactoryException
     {
-        if(responseTransformer!=null) return responseTransformer;
-
-        if (getDefaultResponseTransformer() != null)
-        {
+        if (responseTransformer != null) {
+            return responseTransformer;
+        }
+        if (getDefaultResponseTransformer() != null) {
             logger.info("Loading default response transformer: " + getDefaultResponseTransformer());
-            try
-            {
-                responseTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultResponseTransformer(), ClassHelper.NO_ARGS);
+            try {
+                responseTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultResponseTransformer(),
+                                                                                    ClassHelper.NO_ARGS);
                 return responseTransformer;
-            } catch (Exception e)
-            {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X, "response", getDefaultResponseTransformer()), e);                            }
+            } catch (Exception e) {
+                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X_TRANSFORMER_X,
+                                                                "response",
+                                                                getDefaultResponseTransformer()), e);
+            }
         }
         return null;
     }
 
     public EndpointBuilder createEndpointBuilder() throws ConnectorFactoryException
     {
-        //if(endpointBuilderImpl!=null) return endpointBuilderImpl;
+        // if(endpointBuilderImpl!=null) return endpointBuilderImpl;
 
-        if(endpointBuilder==null) {
+        if (endpointBuilder == null) {
             logger.debug("Endpoint resolver not set, Loading default resolver: " + UrlEndpointBuilder.class.getName());
             return new UrlEndpointBuilder();
         } else {
             logger.debug("Loading endpointUri resolver: " + getEndpointBuilder());
-            try
-            {
-                //endpointBuilderImpl = (EndpointBuilder) ClassHelper.instanciateClass(getEndpointBuilder(), ClassHelper.NO_ARGS);
-                //return endpointBuilderImpl;
-				return (EndpointBuilder) ClassHelper.instanciateClass(getEndpointBuilder(), ClassHelper.NO_ARGS);
-            } catch (Exception e)
-            {
-                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X, "Endpoint Builder: " + getEndpointBuilder()), e);
+            try {
+                // endpointBuilderImpl = (EndpointBuilder)
+                // ClassHelper.instanciateClass(getEndpointBuilder(),
+                // ClassHelper.NO_ARGS);
+                // return endpointBuilderImpl;
+                return (EndpointBuilder) ClassHelper.instanciateClass(getEndpointBuilder(), ClassHelper.NO_ARGS);
+            } catch (Exception e) {
+                throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X, "Endpoint Builder: "
+                        + getEndpointBuilder()), e);
             }
         }
     }
 
     public boolean equals(Object o)
     {
-        if (this == o) return true;
-        if (!(o instanceof ConnectorServiceDescriptor)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ConnectorServiceDescriptor)) {
+            return false;
+        }
 
         final ConnectorServiceDescriptor connectorServiceDescriptor = (ConnectorServiceDescriptor) o;
 
-        if (connector != null ? !connector.equals(connectorServiceDescriptor.connector) : connectorServiceDescriptor.connector != null) return false;
-        if (connectorFactory != null ? !connectorFactory.equals(connectorServiceDescriptor.connectorFactory) : connectorServiceDescriptor.connectorFactory != null) return false;
-        if (defaultInboundTransformer != null ? !defaultInboundTransformer.equals(connectorServiceDescriptor.defaultInboundTransformer) : connectorServiceDescriptor.defaultInboundTransformer != null) return false;
-        if (defaultOutboundTransformer != null ? !defaultOutboundTransformer.equals(connectorServiceDescriptor.defaultOutboundTransformer) : connectorServiceDescriptor.defaultOutboundTransformer != null) return false;
-        if (defaultResponseTransformer != null ? !defaultResponseTransformer.equals(connectorServiceDescriptor.defaultResponseTransformer) : connectorServiceDescriptor.defaultResponseTransformer != null) return false;
-        if (dispatcherFactory != null ? !dispatcherFactory.equals(connectorServiceDescriptor.dispatcherFactory) : connectorServiceDescriptor.dispatcherFactory != null) return false;
-        if (endpointBuilder != null ? !endpointBuilder.equals(connectorServiceDescriptor.endpointBuilder) : connectorServiceDescriptor.endpointBuilder != null) return false;
-        if (messageAdapter != null ? !messageAdapter.equals(connectorServiceDescriptor.messageAdapter) : connectorServiceDescriptor.messageAdapter != null) return false;
-        if (messageReceiver != null ? !messageReceiver.equals(connectorServiceDescriptor.messageReceiver) : connectorServiceDescriptor.messageReceiver != null) return false;
-        if (protocol != null ? !protocol.equals(connectorServiceDescriptor.protocol) : connectorServiceDescriptor.protocol != null) return false;
-        if (serviceError != null ? !serviceError.equals(connectorServiceDescriptor.serviceError) : connectorServiceDescriptor.serviceError != null) return false;
-        if (serviceFinder != null ? !serviceFinder.equals(connectorServiceDescriptor.serviceFinder) : connectorServiceDescriptor.serviceFinder != null) return false;
-        if (serviceLocation != null ? !serviceLocation.equals(connectorServiceDescriptor.serviceLocation) : connectorServiceDescriptor.serviceLocation != null) return false;
-        if (transactionFactory != null ? !transactionFactory.equals(connectorServiceDescriptor.transactionFactory) : connectorServiceDescriptor.transactionFactory != null) return false;
+        if (connector != null ? !connector.equals(connectorServiceDescriptor.connector)
+                : connectorServiceDescriptor.connector != null) {
+            return false;
+        }
+        if (connectorFactory != null ? !connectorFactory.equals(connectorServiceDescriptor.connectorFactory)
+                : connectorServiceDescriptor.connectorFactory != null) {
+            return false;
+        }
+        if (defaultInboundTransformer != null
+                ? !defaultInboundTransformer.equals(connectorServiceDescriptor.defaultInboundTransformer)
+                : connectorServiceDescriptor.defaultInboundTransformer != null) {
+            return false;
+        }
+        if (defaultOutboundTransformer != null
+                ? !defaultOutboundTransformer.equals(connectorServiceDescriptor.defaultOutboundTransformer)
+                : connectorServiceDescriptor.defaultOutboundTransformer != null) {
+            return false;
+        }
+        if (defaultResponseTransformer != null
+                ? !defaultResponseTransformer.equals(connectorServiceDescriptor.defaultResponseTransformer)
+                : connectorServiceDescriptor.defaultResponseTransformer != null) {
+            return false;
+        }
+        if (dispatcherFactory != null ? !dispatcherFactory.equals(connectorServiceDescriptor.dispatcherFactory)
+                : connectorServiceDescriptor.dispatcherFactory != null) {
+            return false;
+        }
+        if (endpointBuilder != null ? !endpointBuilder.equals(connectorServiceDescriptor.endpointBuilder)
+                : connectorServiceDescriptor.endpointBuilder != null) {
+            return false;
+        }
+        if (messageAdapter != null ? !messageAdapter.equals(connectorServiceDescriptor.messageAdapter)
+                : connectorServiceDescriptor.messageAdapter != null) {
+            return false;
+        }
+        if (messageReceiver != null ? !messageReceiver.equals(connectorServiceDescriptor.messageReceiver)
+                : connectorServiceDescriptor.messageReceiver != null) {
+            return false;
+        }
+        if (protocol != null ? !protocol.equals(connectorServiceDescriptor.protocol)
+                : connectorServiceDescriptor.protocol != null) {
+            return false;
+        }
+        if (serviceError != null ? !serviceError.equals(connectorServiceDescriptor.serviceError)
+                : connectorServiceDescriptor.serviceError != null) {
+            return false;
+        }
+        if (serviceFinder != null ? !serviceFinder.equals(connectorServiceDescriptor.serviceFinder)
+                : connectorServiceDescriptor.serviceFinder != null) {
+            return false;
+        }
+        if (serviceLocation != null ? !serviceLocation.equals(connectorServiceDescriptor.serviceLocation)
+                : connectorServiceDescriptor.serviceLocation != null) {
+            return false;
+        }
+        if (transactionFactory != null ? !transactionFactory.equals(connectorServiceDescriptor.transactionFactory)
+                : connectorServiceDescriptor.transactionFactory != null) {
+            return false;
+        }
 
         return true;
     }

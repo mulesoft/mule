@@ -13,14 +13,14 @@
  */
 package org.mule.umo;
 
-import org.mule.umo.provider.UMOMessageAdapter;
-
 import java.util.Map;
 
+import org.mule.umo.provider.UMOMessageAdapter;
+
 /**
- * <code>UMOMessage</code> represents a message payload.  The Message comprises of the
- * payload itself and properties associated with the payload.
- *
+ * <code>UMOMessage</code> represents a message payload. The Message comprises
+ * of the payload itself and properties associated with the payload.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -29,18 +29,20 @@ public interface UMOMessage extends UMOMessageAdapter
 {
     /**
      * Adds a map of properties to associated with this message
+     * 
      * @param properties the properties add to this message
      */
-    public void addProperties(Map properties);
+    void addProperties(Map properties);
 
     /**
      * Removes all properties on this message
      */
-    public void clearProperties();
+    void clearProperties();
 
     /**
      * Returns a map of all properties on this message
+     * 
      * @return a map of all properties on this message
      */
-    public Map getProperties();
+    Map getProperties();
 }

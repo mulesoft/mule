@@ -36,7 +36,6 @@ public class RmiEndpointTestCase extends NamedTestCase
         assertEquals(0, url.getParams().size());
     }
 
-
     public void testQueryParams1() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod");
@@ -61,7 +60,8 @@ public class RmiEndpointTestCase extends NamedTestCase
         assertEquals("rmiProvider", url.getEndpointName());
         assertEquals(1099, url.getPort());
         assertEquals("localhost", url.getHost());
-        assertEquals("rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod&endpointName=rmiProvider&blankParam=", url.toString());
+        assertEquals("rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod&endpointName=rmiProvider&blankParam=",
+                     url.toString());
         assertEquals("method=testMethod&endpointName=rmiProvider&blankParam=", url.getQuery());
         assertEquals(2, url.getParams().size());
         assertEquals("testMethod", url.getParams().getProperty("method"));

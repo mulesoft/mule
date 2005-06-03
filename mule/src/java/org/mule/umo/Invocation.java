@@ -15,11 +15,10 @@ package org.mule.umo;
 
 import org.mule.impl.RequestContext;
 
-
 /**
- * <code>Invocation</code> represents a link in an interceptor chain. Interceptors can
- * be configured om Mule Managed components.
- *
+ * <code>Invocation</code> represents a link in an interceptor chain.
+ * Interceptors can be configured om Mule Managed components.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -37,6 +36,7 @@ public class Invocation
 
     /**
      * Constructs an initialised invocation
+     * 
      * @param descriptor the components descriptor
      * @param message the current message
      * @param invocation the next invocation in the chain or null.
@@ -50,6 +50,7 @@ public class Invocation
 
     /**
      * Excutes this invocation
+     * 
      * @return the current message that may have been altered by the invocation
      * @throws UMOException if something goes wrong
      */
@@ -60,6 +61,7 @@ public class Invocation
 
     /**
      * Returns the descriptor for the component associated with this invocation
+     * 
      * @return the descriptor for the component associated with this invocation
      */
     public UMOImmutableDescriptor getDescriptor()
@@ -69,6 +71,7 @@ public class Invocation
 
     /**
      * Returns the current message
+     * 
      * @return the current message
      */
     public UMOMessage getMessage()
@@ -76,12 +79,13 @@ public class Invocation
         return message;
     }
 
-    public UMOEvent getEvent() {
+    public UMOEvent getEvent()
+    {
         return RequestContext.getEvent();
     }
 
-
-   public synchronized void setMessage(UMOMessage message) {
-       this.message = message;
-   }
+    public synchronized void setMessage(UMOMessage message)
+    {
+        this.message = message;
+    }
 }

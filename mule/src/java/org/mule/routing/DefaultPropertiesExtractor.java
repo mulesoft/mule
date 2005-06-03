@@ -18,13 +18,13 @@ import org.mule.config.PropertyExtractor;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>DefaultPropertiesExtractor</code> is a default implementation used for
- * getting the Correlation information from a message. This object is only used when
- * getting a specific property to be set on the message.  When reading the property the
- * getProperty(...) or the direct property accessor will be used i.e.
- * message.getCorrelationId() or
+ * <code>DefaultPropertiesExtractor</code> is a default implementation used
+ * for getting the Correlation information from a message. This object is only
+ * used when getting a specific property to be set on the message. When reading
+ * the property the getProperty(...) or the direct property accessor will be
+ * used i.e. message.getCorrelationId() or
  * message.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -33,39 +33,45 @@ public class DefaultPropertiesExtractor implements PropertyExtractor
     public final Object getProperty(String name, UMOMessage message)
     {
         Object result = null;
-        if(MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(name)){
+        if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(name)) {
             result = getCorrelationId(message);
-//        } else if(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(name)){
-//            result = getCorrelationGroupSize(message);
-//        } else if(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(name)){
-//            result = getCorrelationSequence(message);
-        } else if(MuleProperties.MULE_MESSAGE_ID_PROPERTY.equals(name)){
+            // } else
+            // if(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(name)){
+            // result = getCorrelationGroupSize(message);
+            // } else
+            // if(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(name)){
+            // result = getCorrelationSequence(message);
+        } else if (MuleProperties.MULE_MESSAGE_ID_PROPERTY.equals(name)) {
             result = getMessageId(message);
         } else {
-            throw new IllegalArgumentException("Property name: " + name + " not recognised by the Correlation Property Extractor");
+            throw new IllegalArgumentException("Property name: " + name
+                    + " not recognised by the Correlation Property Extractor");
         }
-        if(result==null) {
-            throw new NullPointerException("Property Extractor cannot return a null value. Extractor is: " + getClass().getName());
+        if (result == null) {
+            throw new NullPointerException("Property Extractor cannot return a null value. Extractor is: "
+                    + getClass().getName());
         }
         return result;
     }
 
-    public String getMessageId(UMOMessage message) {
+    public String getMessageId(UMOMessage message)
+    {
         return message.getUniqueId();
     }
 
-    public String getCorrelationId(UMOMessage message) {
+    public String getCorrelationId(UMOMessage message)
+    {
         return getMessageId(message);
     }
 
-//    public String getCorrelationGroupSize(UMOMessage message) {
-//        int x = message.getCorrelationGroupSize();
-//        if(x < 1) x = 1;
-//        return String.valueOf(x);
-//    }
-//
-//    public String getCorrelationSequence(UMOMessage message) {
-//        int x = message.getCorrelationSequence();
-//        return String.valueOf(x);
-//    }
+    // public String getCorrelationGroupSize(UMOMessage message) {
+    // int x = message.getCorrelationGroupSize();
+    // if(x < 1) x = 1;
+    // return String.valueOf(x);
+    // }
+    //
+    // public String getCorrelationSequence(UMOMessage message) {
+    // int x = message.getCorrelationSequence();
+    // return String.valueOf(x);
+    // }
 }

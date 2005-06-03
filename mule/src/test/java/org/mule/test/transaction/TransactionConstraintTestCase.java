@@ -29,7 +29,7 @@ public class TransactionConstraintTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept(new String()));
         assertTrue(filter.accept(getTestEvent("test")));
 
-        ConstraintFilter clone = (ConstraintFilter)filter.clone();
+        ConstraintFilter clone = (ConstraintFilter) filter.clone();
         assertNotNull(clone);
         assertNotSame(filter, clone);
     }

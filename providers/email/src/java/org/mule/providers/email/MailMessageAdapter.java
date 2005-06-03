@@ -15,20 +15,21 @@
 
 package org.mule.providers.email;
 
+import java.util.Enumeration;
+
+import javax.mail.Address;
+import javax.mail.Header;
+import javax.mail.Message;
+
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.Utility;
 
-import javax.mail.Address;
-import javax.mail.Header;
-import javax.mail.Message;
-import java.util.Enumeration;
-
 /**
  * <code>MailMessageAdapter</code> is a wrapper for a javax.mail.Message.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,13 +45,14 @@ public class MailMessageAdapter extends AbstractMessageAdapter
 
     Message message = null;
 
-
     public MailMessageAdapter(Object message) throws MessagingException
     {
         setMessage(message);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#getPayload()
      */
     public Object getPayload()
@@ -58,7 +60,9 @@ public class MailMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#getPayloadAsBytes()
      */
     public byte[] getPayloadAsBytes() throws Exception
@@ -66,8 +70,9 @@ public class MailMessageAdapter extends AbstractMessageAdapter
         return Utility.objectToByteArray(message.getContent());
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#getPayloadAsString()
      */
     public String getPayloadAsString() throws Exception
@@ -75,25 +80,24 @@ public class MailMessageAdapter extends AbstractMessageAdapter
         return message.getContent().toString();
     }
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.providers.UMOMessageAdapter#setMessage(java.lang.Object)
      */
     private void setMessage(Object message) throws MessagingException
     {
-        if(message instanceof Message) {
-            this.message = (Message)message;
+        if (message instanceof Message) {
+            this.message = (Message) message;
         } else {
             throw new MessageTypeNotSupportedException(message, MailMessageAdapter.class);
         }
-        //Set message attrributes as properties
-        try
-        {
+        // Set message attrributes as properties
+        try {
             Address[] addresses = null;
             properties.put(PROPERTY_SUBJECT, this.message.getSubject());
             addresses = this.message.getFrom();
-            if (addresses != null && addresses.length > 0)
-            {
+            if (addresses != null && addresses.length > 0) {
                 properties.put(PROPERTY_FROM_ADDRESS, addresses[0].toString());
                 properties.put(PROPERTY_FROM_ADDRESSES, addresses);
             }
@@ -101,16 +105,14 @@ public class MailMessageAdapter extends AbstractMessageAdapter
             properties.put(PROPERTY_CC_ADDRESSES, this.message.getRecipients(Message.RecipientType.CC));
             properties.put(PROPERTY_BCC_ADDRESSES, this.message.getRecipients(Message.RecipientType.BCC));
 
-            for (Enumeration e = this.message.getAllHeaders(); e.hasMoreElements();)
-            {
-                Header h = (Header)e.nextElement();
+            for (Enumeration e = this.message.getAllHeaders(); e.hasMoreElements();) {
+                Header h = (Header) e.nextElement();
                 properties.put(h.getName(), h.getValue());
             }
 
-        }
-        catch (javax.mail.MessagingException e)
-        {
-            throw new MessagingException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X, "Message Adapter"), e);
+        } catch (javax.mail.MessagingException e) {
+            throw new MessagingException(new org.mule.config.i18n.Message(Messages.FAILED_TO_CREATE_X,
+                                                                          "Message Adapter"), e);
         }
     }
 }

@@ -14,21 +14,20 @@
  */
 package org.mule.providers.stream;
 
+import java.io.InputStream;
+
 import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
-import java.io.InputStream;
-
 /**
  * <code>StreamMessageReceiver</code> is a listener of events from a mule
  * components which then simply passes the events on to the target components.
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -40,10 +39,10 @@ public class StreamMessageReceiver extends PollingMessageReceiver
     private InputStream inputStream;
 
     public StreamMessageReceiver(UMOConnector connector,
-                       UMOComponent component,
-                       UMOEndpoint endpoint,
-                       InputStream stream,
-                       Long checkFrequency) throws InitialisationException
+                                 UMOComponent component,
+                                 UMOEndpoint endpoint,
+                                 InputStream stream,
+                                 Long checkFrequency) throws InitialisationException
     {
 
         super(connector, component, endpoint, checkFrequency);
@@ -51,36 +50,36 @@ public class StreamMessageReceiver extends PollingMessageReceiver
 
     }
 
-    public void doConnect() throws Exception {
-        //noop
+    public void doConnect() throws Exception
+    {
+        // noop
     }
 
-    public void doDisconnect() throws Exception {
-        //noop
+    public void doDisconnect() throws Exception
+    {
+        // noop
     }
 
     /*
-       * (non-Javadoc)
-       *
-       * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
-       */
+     * (non-Javadoc)
+     * 
+     * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
+     */
     public void poll()
     {
-        try
-        {
+        try {
             StringBuffer message = new StringBuffer();
             byte[] buf = new byte[getBufferSize()];
             int len = inputStream.read(buf);
-            if(len==-1) return;
+            if (len == -1)
+                return;
             message.append(new String(buf, 0, len));
 
             UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(message.toString()));
-            routeMessage(umoMessage,  endpoint.isSynchronous());
+            routeMessage(umoMessage, endpoint.isSynchronous());
 
             ((StreamConnector) endpoint.getConnector()).reinitialise();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             handleException(e);
         }
     }

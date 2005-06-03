@@ -13,6 +13,12 @@
  */
 package org.mule.providers.jms;
 
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+
 import org.mule.impl.MuleComponent;
 import org.mule.providers.DefaultReplyToHandler;
 import org.mule.umo.UMOEvent;
@@ -21,12 +27,10 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import javax.jms.*;
-
 /**
- * <code>JmsReplyToHandler</code> will process a Jms replyTo or hand off
- * to the defualt replyTo handler if the replyTo is a url
- *
+ * <code>JmsReplyToHandler</code> will process a Jms replyTo or hand off to
+ * the defualt replyTo handler if the replyTo is a url
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -45,61 +49,59 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         Destination replyToDestination = null;
         MessageProducer replyToProducer = null;
         Session session = null;
-        try
-        {
+        try {
             // now we need to send the response
-            if (replyTo instanceof Destination)
-            {
+            if (replyTo instanceof Destination) {
                 replyToDestination = (Destination) replyTo;
             }
-            if (replyToDestination == null)
-            {
+            if (replyToDestination == null) {
                 super.processReplyTo(event, returnMessage, replyTo);
                 return;
             }
             Object payload = returnMessage.getPayload();
-            if (getTransformer() != null)
-            {
+            if (getTransformer() != null) {
                 payload = getTransformer().transform(payload);
             }
             session = connector.getSession(false);
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);
 
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Sending jms reply to: " + replyToDestination + "(" + replyToDestination.getClass().getName() + ")");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Sending jms reply to: " + replyToDestination + "("
+                        + replyToDestination.getClass().getName() + ")");
             }
             replyToProducer = ((JmsConnector) connector).getJmsSupport().createProducer(session, replyToDestination);
 
-            //QoS support
+            // QoS support
             String ttlString = (String) event.removeProperty("TimeToLive");
             String priorityString = (String) event.removeProperty("Priority");
             String persistentDeliveryString = (String) event.removeProperty("PersistentDelivery");
 
-            if (ttlString == null && priorityString == null && persistentDeliveryString == null)
-            {
+            if (ttlString == null && priorityString == null && persistentDeliveryString == null) {
                 connector.getJmsSupport().send(replyToProducer, replyToMessage);
-            } else
-            {
+            } else {
                 long ttl = Message.DEFAULT_TIME_TO_LIVE;
                 int priority = Message.DEFAULT_PRIORITY;
                 boolean persistent = Message.DEFAULT_DELIVERY_MODE == DeliveryMode.PERSISTENT;
 
-                if (ttlString != null) ttl = Long.parseLong(ttlString);
-                if (priorityString != null) priority = Integer.parseInt(priorityString);
-                if (persistentDeliveryString != null) persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
+                if (ttlString != null)
+                    ttl = Long.parseLong(ttlString);
+                if (priorityString != null)
+                    priority = Integer.parseInt(priorityString);
+                if (persistentDeliveryString != null)
+                    persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
 
                 connector.getJmsSupport().send(replyToProducer, replyToMessage, persistent, priority, ttl);
             }
 
-            //connector.getJmsSupport().send(replyToProducer, replyToMessage, replyToDestination);
+            // connector.getJmsSupport().send(replyToProducer, replyToMessage,
+            // replyToDestination);
             logger.info("Reply Message sent to: " + replyToDestination);
             ((MuleComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
-        } catch (Exception e)
-        {
-            throw new DispatchException(new org.mule.config.i18n.Message("jms", 8, replyToDestination), returnMessage, null);
-        } finally
-        {
+        } catch (Exception e) {
+            throw new DispatchException(new org.mule.config.i18n.Message("jms", 8, replyToDestination),
+                                        returnMessage,
+                                        null);
+        } finally {
             JmsUtils.closeQuietly(replyToProducer);
             JmsUtils.closeQuietly(session);
         }

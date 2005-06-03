@@ -26,63 +26,57 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.providers.tcp.TcpProtocol;
 
 /**
- * The DefaultProtocol class is an application level tcp protocol
- * that does nothing.  Reading is performed in reading the socket
- * until no more bytes are available.  Writing simply writes the data
- * to the socket.
- *
+ * The DefaultProtocol class is an application level tcp protocol that does
+ * nothing. Reading is performed in reading the socket until no more bytes are
+ * available. Writing simply writes the data to the socket.
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class DefaultProtocol implements TcpProtocol {
+public class DefaultProtocol implements TcpProtocol
+{
 
-	private static final int BUFFER_SIZE = 8192;
-	
-	private static final Log logger = LogFactory.getLog(DefaultProtocol.class);
-	
-	public byte[] read(InputStream is) throws IOException {
+    private static final int BUFFER_SIZE = 8192;
+
+    private static final Log logger = LogFactory.getLog(DefaultProtocol.class);
+
+    public byte[] read(InputStream is) throws IOException
+    {
         ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
 
         byte[] buffer = new byte[BUFFER_SIZE];
         int len = 0;
-        try
-        {
-            while ((len = is.read(buffer)) == 0)
-            {
+        try {
+            while ((len = is.read(buffer)) == 0) {
             }
-        } catch (SocketException e)
-        {
-	        return null;
-        } catch (SocketTimeoutException e)
-        {
+        } catch (SocketException e) {
+            return null;
+        } catch (SocketTimeoutException e) {
             return null;
         }
-        if (len == -1)
-        {
+        if (len == -1) {
             return null;
-        } else
-        {
-            do
-            {
+        } else {
+            do {
                 baos.write(buffer, 0, len);
                 if (len < buffer.length) {
-					break;
+                    break;
                 }
-				int av = is.available();
-				if (av == 0) {
-					break;
-				}
+                int av = is.available();
+                if (av == 0) {
+                    break;
+                }
             } while ((len = is.read(buffer)) > 0);
 
             baos.flush();
             baos.close();
             return baos.toByteArray();
         }
-	}
-	
-	public void write(OutputStream os, byte[] data) throws IOException 
-	{
-		os.write(data);
-	}
+    }
+
+    public void write(OutputStream os, byte[] data) throws IOException
+    {
+        os.write(data);
+    }
 
 }

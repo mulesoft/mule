@@ -15,11 +15,12 @@
 
 package org.mule.test.util;
 
-import junit.framework.TestCase;
-import org.mule.util.PropertiesHelper;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.TestCase;
+
+import org.mule.util.PropertiesHelper;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -116,4 +117,3 @@ public class PropertiesHelperTestCase extends TestCase
         assertEquals("name2", newProps.get("value2"));
     }
 }
-

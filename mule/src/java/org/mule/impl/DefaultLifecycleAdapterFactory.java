@@ -23,7 +23,7 @@ import org.mule.umo.model.UMOEntryPointResolver;
 
 /**
  * <code>DefaultLifecycleAdapterFactory</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -33,11 +33,14 @@ public class DefaultLifecycleAdapterFactory implements UMOLifecycleAdapterFactor
     {
     }
 
-
-    /* (non-Javadoc)
-     * @see org.mule.umo.lifecycle.UMOLifecycleAdapterFactory#create(java.lang.Object, org.mule.umo.UMODescriptor)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.lifecycle.UMOLifecycleAdapterFactory#create(java.lang.Object,
+     *      org.mule.umo.UMODescriptor)
      */
-    public UMOLifecycleAdapter create(Object component, UMODescriptor descriptor, UMOEntryPointResolver resolver) throws UMOException
+    public UMOLifecycleAdapter create(Object component, UMODescriptor descriptor, UMOEntryPointResolver resolver)
+            throws UMOException
     {
         return new DefaultLifecycleAdapter(component, descriptor, resolver);
     }

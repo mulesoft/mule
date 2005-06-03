@@ -1,18 +1,20 @@
 package org.mule.management.stats;
 
-import org.mule.management.stats.printers.SimplePrinter;
-
 import java.io.PrintWriter;
 
+import org.mule.management.stats.printers.SimplePrinter;
+
 /**
- * <code>ComponentStatistics</code> is used for capturing compenet event processing
- * statistics that can be exposed via management services such as JMX.
+ * <code>ComponentStatistics</code> is used for capturing compenet event
+ * processing statistics that can be exposed via management services such as
+ * JMX.
  * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane </a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason </a>
  * @version $Revision$
  */
-public class ComponentStatistics implements Statistics {
+public class ComponentStatistics implements Statistics
+{
 
     private String name;
     private long totalExecTime = 0;
@@ -47,7 +49,8 @@ public class ComponentStatistics implements Statistics {
      * 
      * @param name
      */
-    public ComponentStatistics(String name, int componentPoolsize, int threadPoolSize) {
+    public ComponentStatistics(String name, int componentPoolsize, int threadPoolSize)
+    {
         super();
         this.name = name;
         this.componentPoolMaxSize = componentPoolsize;
@@ -59,116 +62,140 @@ public class ComponentStatistics implements Statistics {
     /**
      * Are statistics logged
      */
-    public boolean isEnabled() {
+    public boolean isEnabled()
+    {
         return enabled;
     }
 
     /**
      * Enable statistics logs (this is a dynamic parameter)
      */
-    public synchronized void setEnabled(boolean b) {
+    public synchronized void setEnabled(boolean b)
+    {
         enabled = b;
 
-        if (inboundRouterStat != null)
+        if (inboundRouterStat != null) {
             inboundRouterStat.setEnabled(b);
-
-        if (outboundRouterStat != null)
+        }
+        if (outboundRouterStat != null) {
             outboundRouterStat.setEnabled(b);
-
+        }
     }
 
-    public synchronized void incReceivedEventSync() {
+    public synchronized void incReceivedEventSync()
+    {
         receivedEventSync++;
     }
 
-    public synchronized void incReceivedEventASync() {
+    public synchronized void incReceivedEventASync()
+    {
         receivedEventASync++;
     }
 
-    public synchronized void incExecutionError() {
+    public synchronized void incExecutionError()
+    {
         executionError++;
     }
 
-    public synchronized void incFatalError() {
+    public synchronized void incFatalError()
+    {
         fatalError++;
     }
 
-    public synchronized void incSentEventSync() {
+    public synchronized void incSentEventSync()
+    {
         sentEventSync++;
     }
 
-    public synchronized void incSentEventASync() {
+    public synchronized void incSentEventASync()
+    {
         sentEventASync++;
     }
 
-    public synchronized void incSentReplyToEvent() {
+    public synchronized void incSentReplyToEvent()
+    {
         sentReplyToEvent++;
     }
 
-    public synchronized void incQueuedEvent() {
+    public synchronized void incQueuedEvent()
+    {
         queuedEvent++;
         totalQueuedEvent++;
-        if(queuedEvent > maxQueuedEvent) {
+        if (queuedEvent > maxQueuedEvent) {
             maxQueuedEvent = queuedEvent;
         }
-       // if(queuedEvent > 1) {
-            averageQueueSize = Math.round(getAsyncEventsReceived() / totalQueuedEvent);
-       // }
+        // if(queuedEvent > 1) {
+        averageQueueSize = Math.round(getAsyncEventsReceived() / totalQueuedEvent);
+        // }
     }
 
-    public synchronized void decQueuedEvent() {
+    public synchronized void decQueuedEvent()
+    {
         queuedEvent--;
     }
 
-    public synchronized void addExecutionTime(long time) {
+    public synchronized void addExecutionTime(long time)
+    {
         executedEvent++;
 
-        totalExecTime += (time==0?1:time);
+        totalExecTime += (time == 0 ? 1 : time);
 
-        if (minExecutionTime == 0 || time < minExecutionTime)
+        if (minExecutionTime == 0 || time < minExecutionTime) {
             minExecutionTime = time;
-
-        if (maxExecutionTime == 0 || time > maxExecutionTime)
+        }
+        if (maxExecutionTime == 0 || time > maxExecutionTime) {
             maxExecutionTime = time;
-
+        }
         averageExecutionTime = Math.round(totalExecTime / executedEvent);
     }
 
-    public long getAverageExecutionTime() {
+    public long getAverageExecutionTime()
+    {
         return averageExecutionTime;
     }
 
-    public long getAverageQueueSize() {
+    public long getAverageQueueSize()
+    {
         return averageQueueSize;
     }
 
-    public long getMaxQueueSize() {
+    public long getMaxQueueSize()
+    {
         return maxQueuedEvent;
     }
-    public long getMaxExecutionTime() {
+
+    public long getMaxExecutionTime()
+    {
         return maxExecutionTime;
     }
 
-    public long getFatalErrors() {
+    public long getFatalErrors()
+    {
         return fatalError;
     }
-    public long getMinExecutionTime() {
+
+    public long getMinExecutionTime()
+    {
         return minExecutionTime;
     }
 
-    public long getTotalExecutionTime() {
+    public long getTotalExecutionTime()
+    {
         return totalExecTime;
     }
 
-    public long getQueuedEvents() {
+    public long getQueuedEvents()
+    {
         return queuedEvent;
     }
 
-    public long getAsyncEventsReceived() {
+    public long getAsyncEventsReceived()
+    {
         return receivedEventASync;
     }
 
-    public long getSyncEventsReceived() {
+    public long getSyncEventsReceived()
+    {
         return receivedEventSync;
     }
 
@@ -177,50 +204,61 @@ public class ComponentStatistics implements Statistics {
         return sentReplyToEvent;
     }
 
-    public long getSyncEventsSent() {
+    public long getSyncEventsSent()
+    {
         return sentEventSync;
     }
 
-    public long getAsyncEventsSent() {
+    public long getAsyncEventsSent()
+    {
         return sentEventASync;
     }
 
-    public long getTotalEventsSent() {
+    public long getTotalEventsSent()
+    {
         return getSyncEventsSent() + getAsyncEventsSent();
     }
 
-    public long getTotalEventsReceived() {
+    public long getTotalEventsReceived()
+    {
         return getSyncEventsReceived() + getAsyncEventsReceived();
     }
 
-    public long getExecutedEvents() {
+    public long getExecutedEvents()
+    {
         return executedEvent;
     }
 
-    public long getExecutionErrors() {
+    public long getExecutionErrors()
+    {
         return executionError;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public synchronized void setName(String name) {
+    public synchronized void setName(String name)
+    {
         this.name = name;
     }
 
     /**
      * log in info level the main statistics
      */
-    public void logSummary() {
+    public void logSummary()
+    {
         logSummary(new SimplePrinter(System.out));
     }
 
-    public void logSummary(PrintWriter printer) {
+    public void logSummary(PrintWriter printer)
+    {
         printer.print(this);
     }
 
-    public synchronized void clear() {
+    public synchronized void clear()
+    {
 
         componentPoolSize = 0;
         componentPoolAbsoluteMaxSize = 0;
@@ -243,10 +281,12 @@ public class ComponentStatistics implements Statistics {
         minExecutionTime = 0;
         maxExecutionTime = 0;
 
-        if (getInboundRouterStat() != null)
+        if (getInboundRouterStat() != null) {
             getInboundRouterStat().clear();
-        if (getOutboundRouterStat() != null)
+        }
+        if (getOutboundRouterStat() != null) {
             getOutboundRouterStat().clear();
+        }
 
         samplePeriod = System.currentTimeMillis();
 
@@ -255,15 +295,16 @@ public class ComponentStatistics implements Statistics {
     /**
      * @return Returns the inboundRouterStat.
      */
-    public RouterStatistics getInboundRouterStat() {
+    public RouterStatistics getInboundRouterStat()
+    {
         return inboundRouterStat;
     }
 
     /**
-     * @param inboundRouterStat
-     *            The inboundRouterStat to set.
+     * @param inboundRouterStat The inboundRouterStat to set.
      */
-    public void setInboundRouterStat(RouterStatistics inboundRouterStat) {
+    public void setInboundRouterStat(RouterStatistics inboundRouterStat)
+    {
         this.inboundRouterStat = inboundRouterStat;
         this.inboundRouterStat.setEnabled(enabled);
     }
@@ -271,15 +312,16 @@ public class ComponentStatistics implements Statistics {
     /**
      * @return Returns the outboundRouterStat.
      */
-    public RouterStatistics getOutboundRouterStat() {
+    public RouterStatistics getOutboundRouterStat()
+    {
         return outboundRouterStat;
     }
 
     /**
-     * @param outboundRouterStat
-     *            The outboundRouterStat to set.
+     * @param outboundRouterStat The outboundRouterStat to set.
      */
-    public void setOutboundRouterStat(RouterStatistics outboundRouterStat) {
+    public void setOutboundRouterStat(RouterStatistics outboundRouterStat)
+    {
         this.outboundRouterStat = outboundRouterStat;
         this.outboundRouterStat.setEnabled(enabled);
     }
@@ -302,7 +344,7 @@ public class ComponentStatistics implements Statistics {
     public synchronized void setComponentPoolSize(int componentPoolSize)
     {
         this.componentPoolSize = componentPoolSize;
-        if(componentPoolSize > componentPoolAbsoluteMaxSize) {
+        if (componentPoolSize > componentPoolAbsoluteMaxSize) {
             componentPoolAbsoluteMaxSize = componentPoolSize;
         }
     }

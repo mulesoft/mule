@@ -14,11 +14,11 @@
 
 package org.mule.providers.jms;
 
+import java.net.URI;
+
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
-
-import java.net.URI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -45,7 +45,6 @@ public class JmsEndpointTestCase extends NamedTestCase
         assertEquals("jmsProvider", url.getEndpointName());
         assertEquals("jms:/jmsProvider/my.queue", url.toString());
     }
-
 
     public void testJmsUrl() throws Exception
     {

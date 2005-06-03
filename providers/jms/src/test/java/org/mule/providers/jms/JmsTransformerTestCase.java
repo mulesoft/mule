@@ -16,21 +16,21 @@ package org.mule.providers.jms;
 
 import org.mule.providers.jms.transformers.AbstractJmsTransformer;
 import org.mule.tck.NamedTestCase;
-import org.mule.umo.transformer.TransformerException;
 
 /**
- * TODO: document this class 
- *
+ * TODO: document this class
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class JmsTransformerTestCase extends NamedTestCase {
+public class JmsTransformerTestCase extends NamedTestCase
+{
 
-	
-	public void testHeaders() {
-		assertEquals("identifier", AbstractJmsTransformer.encodeHeader("identifier"));
-		assertEquals("ident_ifier", AbstractJmsTransformer.encodeHeader("ident_ifier"));
-		assertEquals("ident_ifier", AbstractJmsTransformer.encodeHeader("ident-ifier"));
-	}
-	
+    public void testHeaders()
+    {
+        assertEquals("identifier", AbstractJmsTransformer.encodeHeader("identifier"));
+        assertEquals("ident_ifier", AbstractJmsTransformer.encodeHeader("ident_ifier"));
+        assertEquals("ident_ifier", AbstractJmsTransformer.encodeHeader("ident-ifier"));
+    }
+
 }

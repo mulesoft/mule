@@ -13,19 +13,21 @@
  */
 package org.mule.extras.client;
 
+import java.util.EventObject;
+
 import org.mule.impl.MuleMessage;
 import org.mule.umo.transformer.TransformerException;
 
-import java.util.EventObject;
-
 /**
- * <code>EventObjectTransformer</code> converts a <code>java.util.EventObject</code>
- * into a <code>MuleMessage</code>.  This transformer is used by the MuleProxyListener
- * to marshall events into something that Mule understands.
+ * <code>EventObjectTransformer</code> converts a
+ * <code>java.util.EventObject</code> into a <code>MuleMessage</code>. This
+ * transformer is used by the MuleProxyListener to marshall events into
+ * something that Mule understands.
+ * 
  * @see MuleProxyListener
  * @see MuleMessage
  * @see EventObject
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,7 +41,7 @@ public class EventObjectTransformer extends AbstractEventTransformer
 
     public Object doTransform(Object src) throws TransformerException
     {
-        EventObject event = (EventObject)src;
+        EventObject event = (EventObject) src;
         return new MuleMessage(event.getSource(), null);
     }
 }

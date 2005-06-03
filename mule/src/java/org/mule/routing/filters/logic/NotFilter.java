@@ -17,7 +17,7 @@ import org.mule.umo.UMOFilter;
 
 /**
  * <code>NotFilter</code> accepts if the filter does not accept
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -35,7 +35,6 @@ public class NotFilter implements UMOFilter
         this.filter = filter;
     }
 
-
     public UMOFilter getFilter()
     {
         return filter;
@@ -45,7 +44,6 @@ public class NotFilter implements UMOFilter
     {
         this.filter = filter;
     }
-
 
     public boolean accept(Object object)
     {

@@ -21,7 +21,7 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 
 /**
  * <code>UnauthorisedException</code> is thrown if authentication fails
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -48,18 +48,24 @@ public class UnauthorisedException extends SecurityException
         super(message, umoMessage, cause);
     }
 
-    public UnauthorisedException(UMOMessage umoMessage, UMOSecurityContext context, UMOImmutableEndpoint endpoint, UMOEndpointSecurityFilter filter)
+    public UnauthorisedException(UMOMessage umoMessage,
+                                 UMOSecurityContext context,
+                                 UMOImmutableEndpoint endpoint,
+                                 UMOEndpointSecurityFilter filter)
     {
         super(constructMessage(context, endpoint, filter), umoMessage);
     }
 
-    private static Message constructMessage(UMOSecurityContext context, UMOImmutableEndpoint endpoint, UMOEndpointSecurityFilter filter) {
+    private static Message constructMessage(UMOSecurityContext context,
+                                            UMOImmutableEndpoint endpoint,
+                                            UMOEndpointSecurityFilter filter)
+    {
 
         Message m = null;
-        if(context==null) {
+        if (context == null) {
             m = new Message(Messages.AUTH_SET_TO_X_BUT_NO_CONTEXT, filter.getClass().getName());
         } else {
-             m = new Message(Messages.AUTH_FAILED_FOR_USER_X, context.getAuthentication().getPrincipal());
+            m = new Message(Messages.AUTH_FAILED_FOR_USER_X, context.getAuthentication().getPrincipal());
         }
         m.setNextMessage(new Message(Messages.AUTH_DENIED_ON_ENDPOINT_X, endpoint.getEndpointURI()));
         return m;

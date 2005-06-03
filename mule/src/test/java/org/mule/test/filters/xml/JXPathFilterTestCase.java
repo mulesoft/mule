@@ -13,12 +13,12 @@
  */
 package org.mule.test.filters.xml;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.tck.NamedTestCase;
 import org.mule.transformers.xml.XmlToDomDocument;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
 
 /**
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
@@ -51,7 +51,6 @@ public class JXPathFilterTestCase extends NamedTestCase
 
     }
 
-
     public void testFilter3() throws Exception
     {
         Object obj = transformer.transform(xmlData);
@@ -75,17 +74,16 @@ public class JXPathFilterTestCase extends NamedTestCase
 
     protected void setUp() throws Exception
     {
-       //Read Xml file
+        // Read Xml file
         BufferedReader br = new BufferedReader(new FileReader("src/test/conf/cdcatalog.xml"));
         String nextLine = "";
         StringBuffer sb = new StringBuffer();
-        while ((nextLine = br.readLine()) != null)
-        {
+        while ((nextLine = br.readLine()) != null) {
             sb.append(nextLine);
         }
         xmlData = sb.toString();
 
-        //new UMOFilter
+        // new UMOFilter
         myFilter = new JXPathFilter();
         transformer = new XmlToDomDocument();
     }

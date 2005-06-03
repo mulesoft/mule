@@ -30,22 +30,23 @@ package org.mule.providers.http;
 
 import org.mule.providers.tcp.TcpConnector;
 
-
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http
- * requests and responses.  The UMOConnector itself handles dispatching http requests.
- * The <code>HttpMessageReceiver</code> handles the receiving requests and processing of headers
- * This endpoint recognises the following  properties -
- * <p/>
+ * requests and responses. The UMOConnector itself handles dispatching http
+ * requests. The <code>HttpMessageReceiver</code> handles the receiving
+ * requests and processing of headers This endpoint recognises the following
+ * properties - <p/>
  * <ul>
  * <li>hostname - The hostname to send and receive http requests</li>
- * <li>port - The port to listen on.  The industry standard is 80 and if this propert is not set it will default to 80</li>
- * <li>proxyHostname - If you access the web through a proxy, this holds the server address</li>
+ * <li>port - The port to listen on. The industry standard is 80 and if this
+ * propert is not set it will default to 80</li>
+ * <li>proxyHostname - If you access the web through a proxy, this holds the
+ * server address</li>
  * <li>proxyPort - The port the proxy is configured on</li>
  * <li>proxyUsername - If the proxy requires authentication supply a username</li>
  * <li>proxyPassword - If the proxy requires authentication supply a password</li>
  * </ul>
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -64,7 +65,7 @@ public class HttpConnector extends TcpConnector
     public static final String HTTP_PARAMS = "http.params";
     public static final String HTTP_GET_BODY_PARAM_PROPERTY = "http.get.body.param";
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
-	public static final String HTTP_POST_BODY_PARAM_PROPERTY = "http.post.body.param";
+    public static final String HTTP_POST_BODY_PARAM_PROPERTY = "http.post.body.param";
 
     public static final int DEFAULT_PORT = 80;
     public static String DEFAULT_HTTP_VERSION = HttpConstants.HTTP11;
@@ -81,7 +82,9 @@ public class HttpConnector extends TcpConnector
 
     private boolean keepAlive = true;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.umo.provider.UMOConnector#getProtocol()
      */
     public String getProtocol()

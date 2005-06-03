@@ -18,8 +18,9 @@ package org.mule.transaction;
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public interface TransactionCallback {
+public interface TransactionCallback
+{
 
-	Object doInTransaction() throws Exception;
-	
+    Object doInTransaction() throws Exception;
+
 }

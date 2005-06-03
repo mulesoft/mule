@@ -22,9 +22,9 @@ import org.mule.util.StringMessageHelper;
 
 /**
  * <code>FunctionalTestComponent</code> is a component that can be used by
- * functional tests.  This component accepts an EventCallback that can be used to assert the
- * state of the current event.
- *
+ * functional tests. This component accepts an EventCallback that can be used to
+ * assert the state of the current event.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  * @see EventCallback
@@ -40,13 +40,13 @@ public class FunctionalTestComponent implements Callable
     {
         String contents = context.getMessageAsString();
         String msg = null;
-        msg = StringMessageHelper.getBoilerPlate("Message Received in component: " +
-            context.getComponentDescriptor().getName() + ". Content is: " + StringMessageHelper.truncate(contents, 100, true), '*', 80);
+        msg = StringMessageHelper.getBoilerPlate("Message Received in component: "
+                + context.getComponentDescriptor().getName() + ". Content is: "
+                + StringMessageHelper.truncate(contents, 100, true), '*', 80);
         logger.info(msg);
 
         contents += " Received";
-        if (eventCallback != null)
-        {
+        if (eventCallback != null) {
             eventCallback.eventReceived(context, this);
         }
         return contents;

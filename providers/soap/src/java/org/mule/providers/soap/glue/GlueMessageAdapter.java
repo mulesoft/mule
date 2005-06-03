@@ -13,17 +13,18 @@
  */
 package org.mule.providers.soap.glue;
 
-import electric.glue.context.ThreadContext;
-import electric.service.IService;
 import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.IteratorAdapter;
 
+import electric.glue.context.ThreadContext;
+import electric.service.IService;
+
 /**
  * <code>GlueMessageAdapter</code> wraps a Glue soap request
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -34,32 +35,36 @@ public class GlueMessageAdapter extends AbstractMessageAdapter
 
     public GlueMessageAdapter(Object message)
     {
-        if(message instanceof GlueMessageHolder) {
+        if (message instanceof GlueMessageHolder) {
             GlueMessageHolder holder = (GlueMessageHolder) message;
             this.message = holder.getMessage();
             IteratorAdapter iter = new IteratorAdapter(holder.getService().getContext().getPropertyNames());
             String key;
-            while(iter.hasNext()) {
+            while (iter.hasNext()) {
                 key = iter.next().toString();
                 setProperty(key, holder.getService().getContext().getProperty(key));
             }
         } else {
             this.message = message;
         }
-        String value = (String)ThreadContext.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
-        if(value!=null) setReplyTo(value);
-        value = (String)ThreadContext.removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
-        if(value!=null) setCorrelationId(value);
+        String value = (String) ThreadContext.removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+        if (value != null)
+            setReplyTo(value);
+        value = (String) ThreadContext.removeProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY);
+        if (value != null)
+            setCorrelationId(value);
 
-        value = (String)ThreadContext.removeProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
-        if(value !=null && !"-1".equals(value)) setCorrelationSequence(Integer.parseInt(value));
-        value = (String)ThreadContext.removeProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
-        if(value !=null && !"-1".equals(value)) setCorrelationGroupSize(Integer.parseInt(value));
+        value = (String) ThreadContext.removeProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY);
+        if (value != null && !"-1".equals(value))
+            setCorrelationSequence(Integer.parseInt(value));
+        value = (String) ThreadContext.removeProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY);
+        if (value != null && !"-1".equals(value))
+            setCorrelationGroupSize(Integer.parseInt(value));
     }
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
@@ -70,13 +75,13 @@ public class GlueMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     *
+     * 
      * @return String representation of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return (byte[])trans.transform(message);
+        return (byte[]) trans.transform(message);
     }
 
     /**

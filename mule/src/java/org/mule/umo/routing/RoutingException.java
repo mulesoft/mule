@@ -21,11 +21,11 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
- * <code>RoutingException</code> is a base class for al routing exceptions.  Routing
- * exceptions are only thrown for InboundMessageRouter and OutboundMessageRouter and
- * deriving types.  Mule itself does not throw routing exceptions when routing internal
- * events.
- *
+ * <code>RoutingException</code> is a base class for al routing exceptions.
+ * Routing exceptions are only thrown for InboundMessageRouter and
+ * OutboundMessageRouter and deriving types. Mule itself does not throw routing
+ * exceptions when routing internal events.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -62,13 +62,14 @@ public class RoutingException extends MessagingException
         return endpoint;
     }
 
-     private static Message generateMessage(Message message, UMOEndpoint endpoint) {
-         Message m = new Message(Messages.FAILED_TO_ROUTER_VIA_ENDPOINT, endpoint);
-         if(message!=null) {
-             message.setNextMessage(m);
-             return message;
-         } else {
-             return m;
-         }
+    private static Message generateMessage(Message message, UMOEndpoint endpoint)
+    {
+        Message m = new Message(Messages.FAILED_TO_ROUTER_VIA_ENDPOINT, endpoint);
+        if (message != null) {
+            message.setNextMessage(m);
+            return message;
+        } else {
+            return m;
+        }
     }
 }

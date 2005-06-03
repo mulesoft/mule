@@ -13,17 +13,17 @@
  */
 package org.mule.providers.multicast;
 
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.URI;
+
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.udp.UdpMessageAdapter;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
-
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.URI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -36,7 +36,6 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
     private MulticastSocket s2 = null;
     private InetAddress inet = null;
     private URI uri;
-
 
     protected void setUp() throws Exception
     {
@@ -59,36 +58,35 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
         super.tearDown();
     }
 
-//    public void testX() throws Exception
-//    {
-//        String msg = "Hello";
-//        InetAddress group = InetAddress.getByName("228.5.6.7");
-//        MulticastSocket s = new MulticastSocket(6789);
-//        s.joinGroup(group);
-//        DatagramPacket hi = new DatagramPacket(msg.getBytes(), msg.length(),
-//                group, 6789);
-//        s.send(hi);
-//        // get their responses!
-//        byte[] buf = new byte[1000];
-//        DatagramPacket recv = new DatagramPacket(buf, buf.length);
-//        s.setBroadcast(true);
-//        s.receive(recv);
-//        // OK, I'm done talking - leave the group...
-//        System.out.println(new String(recv.getData()));
-//        s.leaveGroup(group);
-//    }
+    // public void testX() throws Exception
+    // {
+    // String msg = "Hello";
+    // InetAddress group = InetAddress.getByName("228.5.6.7");
+    // MulticastSocket s = new MulticastSocket(6789);
+    // s.joinGroup(group);
+    // DatagramPacket hi = new DatagramPacket(msg.getBytes(), msg.length(),
+    // group, 6789);
+    // s.send(hi);
+    // // get their responses!
+    // byte[] buf = new byte[1000];
+    // DatagramPacket recv = new DatagramPacket(buf, buf.length);
+    // s.setBroadcast(true);
+    // s.receive(recv);
+    // // OK, I'm done talking - leave the group...
+    // System.out.println(new String(recv.getData()));
+    // s.leaveGroup(group);
+    // }
 
     protected void sendTestData(int iterations) throws Exception
     {
 
         s1 = new MulticastSocket(uri.getPort());
         s1.joinGroup(inet);
-		
+
         s2 = new MulticastSocket(uri.getPort());
         s2.joinGroup(inet);
-		
-        for (int i = 0; i < iterations; i++)
-        {
+
+        for (int i = 0; i < iterations; i++) {
             String msg = "Hello" + i;
 
             DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(), inet, uri.getPort());
@@ -101,8 +99,7 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
     protected void receiveAndTestResults() throws Exception
     {
         s2.setSoTimeout(2000);
-        for (int i = 0; i < 100; i++)
-        {
+        for (int i = 0; i < 100; i++) {
 
             DatagramPacket packet = new DatagramPacket(new byte[32], 32, inet, uri.getPort());
 
@@ -111,16 +108,14 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
             System.out.println("Received message: " + adapter.getPayloadAsString());
 
         }
-		Thread.sleep(3000);
+        Thread.sleep(3000);
     }
 
     protected UMOEndpointURI getInDest()
     {
-        try
-        {
+        try {
             return new MuleEndpointURI("multicast://228.8.9.10:6677");
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -136,7 +131,7 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
         MulticastConnector connector = new MulticastConnector();
         connector.setName("testMulticast");
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-        
+
         connector.setBufferSize(1024);
         return connector;
     }

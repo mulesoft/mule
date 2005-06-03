@@ -13,7 +13,17 @@
  */
 package org.mule.providers.email;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.util.Properties;
+
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
+
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -22,14 +32,13 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.mail.*;
-import java.util.Properties;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
- * <code>Pop3MessageDispatcher</code> For Pop3 connections the dispatcher can only be used
- * to receive message (as opposed  to listening for them). Trying to send or dispatch will
- * throw an UnsupportedOperationException.
- *
+ * <code>Pop3MessageDispatcher</code> For Pop3 connections the dispatcher can
+ * only be used to receive message (as opposed to listening for them). Trying to
+ * send or dispatch will throw an UnsupportedOperationException.
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -44,7 +53,6 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 
     private SynchronizedBoolean initialised = new SynchronizedBoolean(false);
 
-
     public Pop3MessageDispatcher(Pop3Connector connector)
     {
         super(connector);
@@ -53,8 +61,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 
     protected void initialise(UMOEndpointURI endpoint) throws MessagingException
     {
-        if(!initialised.get())
-        {
+        if (!initialised.get()) {
             URLName url = new URLName(endpoint.getAddress());
 
             Properties props = System.getProperties();
@@ -69,20 +76,20 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
             store.connect();
 
             String folder = null;
-            if(connector.getProtocol().equals("imap") && endpoint.getParams().get("folder") != null)
-            {
-                folder = (String)endpoint.getParams().get("folder");
+            if (connector.getProtocol().equals("imap") && endpoint.getParams().get("folder") != null) {
+                folder = (String) endpoint.getParams().get("folder");
             } else {
                 folder = Pop3Connector.MAILBOX;
             }
-            //Will always be INBOX for pop3
+            // Will always be INBOX for pop3
             inbox = store.getFolder(folder);
-            if (!inbox.isOpen()) inbox.open(Folder.READ_ONLY);
+            if (!inbox.isOpen())
+                inbox.open(Folder.READ_ONLY);
         }
     }
 
     /**
-     *
+     * 
      * @param event
      * @throws UnsupportedOperationException
      */
@@ -90,8 +97,9 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
     {
         throw new UnsupportedOperationException("Cannot dispatch from a Pop3 connection");
     }
+
     /**
-     *
+     * 
      * @param event
      * @return
      * @throws UnsupportedOperationException
@@ -102,9 +110,8 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
     }
 
     /**
-     * Endpoint can be in the form of
-     * pop3://username:password@pop3.muleumo.org
-     *
+     * Endpoint can be in the form of pop3://username:password@pop3.muleumo.org
+     * 
      * @param endpointUri
      * @param timeout
      * @return
@@ -114,27 +121,24 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
     {
         initialise(endpointUri);
 
-            int count = inbox.getMessageCount();
-            if (count > 0)
-            {
-                Message[] message = inbox.getMessages();
-                return new MuleMessage(connector.getMessageAdapter(message[0]));
-            }
-            else if (count == -1)
-            {
-                throw new MessagingException("Cannot monitor folder: " + inbox.getFullName() + " as folder is closed");
+        int count = inbox.getMessageCount();
+        if (count > 0) {
+            Message[] message = inbox.getMessages();
+            return new MuleMessage(connector.getMessageAdapter(message[0]));
+        } else if (count == -1) {
+            throw new MessagingException("Cannot monitor folder: " + inbox.getFullName() + " as folder is closed");
+        } else {
+            Thread.sleep(timeout);
+            count = inbox.getMessageCount();
+            if (count > 0) {
+                Message message = inbox.getMessage(0);
+                // so we don't get the same message again
+                message.setFlag(Flags.Flag.DELETED, true);
+                return new MuleMessage(connector.getMessageAdapter(message));
             } else {
-                Thread.sleep(timeout);
-                count = inbox.getMessageCount();
-                if(count > 0) {
-                    Message message = inbox.getMessage(0);
-                    //so we don't get the same message again
-                    message.setFlag(Flags.Flag.DELETED, true);
-                    return new MuleMessage(connector.getMessageAdapter(message));
-                } else {
-                    return null;
-                }
+                return null;
             }
+        }
     }
 
     public Object getDelegateSession() throws UMOException
@@ -150,12 +154,11 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
     public void doDispose()
     {
         initialised.set(false);
-        //close and expunge deleted messages
-        try
-        {
-            if(inbox!=null) inbox.close(true);
-        } catch (MessagingException e)
-        {
+        // close and expunge deleted messages
+        try {
+            if (inbox != null)
+                inbox.close(true);
+        } catch (MessagingException e) {
             logger.error("Failed to close pop3 inbox: " + e.getMessage(), e);
         }
     }

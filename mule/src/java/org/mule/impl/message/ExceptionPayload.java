@@ -13,15 +13,15 @@
  */
 package org.mule.impl.message;
 
+import java.util.Map;
+
 import org.mule.config.ExceptionHelper;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOExceptionPayload;
 
-import java.util.Map;
-
 /**
  * <code>ExceptionPayload</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -33,10 +33,11 @@ public class ExceptionPayload implements UMOExceptionPayload
     private Map info = null;
     private Throwable exception;
 
-    public ExceptionPayload(Throwable exception) {
+    public ExceptionPayload(Throwable exception)
+    {
         this.exception = ExceptionHelper.getRootException(exception);
         UMOException muleRoot = ExceptionHelper.getRootMuleException(exception);
-        if(muleRoot!=null) {
+        if (muleRoot != null) {
             message = muleRoot.getMessage();
             code = muleRoot.getExceptionCode();
             info = muleRoot.getInfo();
@@ -45,19 +46,23 @@ public class ExceptionPayload implements UMOExceptionPayload
         }
     }
 
-    public int getCode() {
+    public int getCode()
+    {
         return code;
     }
 
-    public String getMessage() {
+    public String getMessage()
+    {
         return message;
     }
 
-    public Map getInfo() {
+    public Map getInfo()
+    {
         return info;
     }
 
-    public Throwable getException() {
+    public Throwable getException()
+    {
         return exception;
     }
 

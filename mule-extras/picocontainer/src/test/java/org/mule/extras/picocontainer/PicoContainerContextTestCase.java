@@ -27,7 +27,9 @@ public class PicoContainerContextTestCase extends AbstractContainerContextTestCa
 
     PicoContainerContext context;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mule.tck.model.AbstractComponentResolverTestCase#getConfiguredResolver()
      */
     public UMOContainerContext getContainerContext()
@@ -35,7 +37,9 @@ public class PicoContainerContextTestCase extends AbstractContainerContextTestCa
         return context;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see junit.framework.TestCase#setUp()
      */
     protected void setUp() throws Exception
