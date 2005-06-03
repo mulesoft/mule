@@ -19,6 +19,7 @@ import java.io.FilenameFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>FilenameWildcardFilter</code> Filters the incoming files from the
@@ -61,5 +62,13 @@ public class FilenameWildcardFilter extends WildcardFilter implements FilenameFi
         } else {
             return accept(name);
         }
+    }
+    
+    public boolean accept(Object object)
+    {
+        if (object instanceof UMOMessage) {
+            return true;
+        }
+        return super.accept(object);
     }
 }
