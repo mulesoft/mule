@@ -22,8 +22,10 @@ import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
 
 /**
- * This factory retrieves the transaction manager for <a href="http://jotm.objectweb.org">JOTM </a>. If an existing JOTM
- * instance exists (for example if running on JOnAS) it will retrieve it, else if will create a new local JOTM instance.
+ * This factory retrieves the transaction manager for <a
+ * href="http://jotm.objectweb.org">JOTM </a>. If an existing JOTM instance
+ * exists (for example if running on JOnAS) it will retrieve it, else if will
+ * create a new local JOTM instance.
  * 
  * @author Guillaume Nodet
  * @version $Revision$
@@ -40,7 +42,8 @@ public class JotmTransactionManagerFactory implements UMOTransactionManagerFacto
     }
 
     /**
-     * Retrieves the JOTM Current object that implements the TransactionManager interface.
+     * Retrieves the JOTM Current object that implements the TransactionManager
+     * interface.
      * 
      * @see org.mule.umo.manager.UMOTransactionManagerFactory#create()
      */
