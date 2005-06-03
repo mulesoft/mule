@@ -778,7 +778,6 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         // Set exception strategy
         addExceptionStrategyRules(digester, path);
 
-        addSetPropertiesRule(path, digester);
         addMulePropertiesRule(path, digester, false);
         digester.addSetNext(path + "/properties", "setProperties");
 
