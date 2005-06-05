@@ -102,11 +102,16 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
         Properties props = System.getProperties();
         props.put("mail.smtp.host", endpoint.getEndpointURI().getHost());
         props.put("mail.smtp.port", String.valueOf(endpoint.getEndpointURI().getPort()));
-        session = Session.getDefaultInstance(props, null);
-        session.setDebug(logger.isDebugEnabled());
-        PasswordAuthentication pw = new PasswordAuthentication(endpoint.getEndpointURI().getUsername(),
+
+        if(url.getUsername()!=null) {
+            props.put("mail.smtp.auth", "true");
+            SMTPAuthenticator customAuthenticator = new SMTPAuthenticator(endpoint.getEndpointURI().getUsername(),
                                                                endpoint.getEndpointURI().getPassword());
-        session.setPasswordAuthentication(url, pw);
+            session = Session.getInstance(props, customAuthenticator);
+        } else {
+            session = Session.getDefaultInstance(props, null);
+        }
+        session.setDebug(logger.isDebugEnabled());
 
         Store store = session.getStore(url);
         store.connect();
@@ -297,6 +302,25 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
                 folder.close(false);
         } catch (MessagingException e) {
             logger.error("Failed to close pop3  inbox: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * SimpleAuthenticator is used to do simple authentication when the SMTP
+     * server requires it.
+     */
+    private class SMTPAuthenticator extends javax.mail.Authenticator
+    {
+        private String username = null;
+        private String password = null;
+
+        public SMTPAuthenticator(String user, String pwd) {
+            username = user;
+            password = pwd;
+        }
+        public PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(username, password);
         }
     }
 }
