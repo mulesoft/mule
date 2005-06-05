@@ -105,27 +105,13 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
             createConsumer();
         } catch (Exception e) {
             throw new ConnectException(e, this);
+        } finally {
+            closeConsumer(true);
         }
     }
 
     public void doDisconnect() throws ConnectException
     {
-        try {
-            JmsThreadContext ctx = context.getContext();
-            if (ctx == null)
-                return;
-
-            JmsUtils.closeQuietly(ctx.consumer);
-            ctx.consumer = null;
-
-            // Do not close session if a transaction is in progress
-            // the session will be close by the transaction
-            JmsUtils.closeQuietly(ctx.session);
-            ctx.session = null;
-
-        } catch (Exception e) {
-            throw new ConnectException(e, this);
-        }
     }
 
     /**
@@ -143,7 +129,7 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
             super.poll();
         } finally {
             // Close consumer if necessary
-            closeConsumer();
+            closeConsumer(false);
         }
     }
 
@@ -209,19 +195,19 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
         // message is processed when received
     }
 
-    protected void closeConsumer()
+    protected void closeConsumer(boolean force)
     {
         JmsThreadContext ctx = context.getContext();
         if (ctx == null)
             return;
         // Close consumer
-        if (!reuseSession || !reuseConsumer) {
+        if (force || !reuseSession || !reuseConsumer) {
             JmsUtils.closeQuietly(ctx.consumer);
             ctx.consumer = null;
         }
         // Do not close session if a transaction is in progress
         // the session will be close by the transaction
-        if (!reuseSession) {
+        if (force || !reuseSession) {
             JmsUtils.closeQuietly(ctx.session);
             ctx.session = null;
         }
