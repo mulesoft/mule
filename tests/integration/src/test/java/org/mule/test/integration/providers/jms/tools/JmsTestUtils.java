@@ -223,7 +223,7 @@ public class JmsTestUtils
         Queue q = session.createQueue(queue);
         QueueReceiver receiver = session.createReceiver(q);
         // Add a delay so that activeMQ can fetch messages from the broker
-        Thread.sleep(5000);
+        //Thread.sleep(5000);
         Message msg = null;
         while ((msg = receiver.receive(1000)) != null)
         {

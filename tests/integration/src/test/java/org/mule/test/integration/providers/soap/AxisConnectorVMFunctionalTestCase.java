@@ -44,7 +44,7 @@ public class AxisConnectorVMFunctionalTestCase extends AbstractMuleTestCase
         super.setUp();
         if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/soap/axis-test-vm-mule-config.xml");
+        configBuilder.configure("org/mule/test/integration/providers/soap/axis-test-vm-mule-config.xml");
     }
 
     public void testRequestResponse() throws Throwable

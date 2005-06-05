@@ -25,7 +25,7 @@ public class MultipleJmsConnectorsTestCase extends NamedTestCase
     public void testMultipleJmsClientConnections() throws Exception {
         MuleClient client = new MuleClient();
         client.setProperty("jms.connectionFactoryJndiName", "ConnectionFactory");
-        client.setProperty("jms.jndiInitialFactory", "org.codehaus.activemq.jndi.ActiveMQInitialContextFactory");
+        client.setProperty("jms.jndiInitialFactory", "org.activemq.jndi.ActiveMQInitialContextFactory");
         client.setProperty("jms.specification", "1.1");
 
         client.dispatch("jms://admin:admin@admin.queue?createConnector=ALWAYS", "admin", null);
