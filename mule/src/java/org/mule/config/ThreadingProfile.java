@@ -107,7 +107,7 @@ public class ThreadingProfile
         this.threadFactory = tp.getThreadFactory();
         this.workManagerFactory = tp.getWorkManagerFactory();
         this.threadPriority = tp.getThreadPriority();
-
+        this.maxBufferSize = tp.getMaxBufferSize();
     }
 
     public int getMaxThreadsActive()
