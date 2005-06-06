@@ -22,7 +22,7 @@ import org.mule.util.Utility;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XsltTransaformerTestCase extends AbstractTransformerTestCase
+public class XsltTransformerTestCase extends AbstractTransformerTestCase
 {
 
     private String srcData;
