@@ -97,10 +97,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     protected UMOTransformer outboundTransformer = null;
 
     /**
-     * The properties for the Mule UMO. Note HashMap is used instead of Map due
-     * to a Spring quirk where the property is not found if specified as a map
+     * The properties for the Mule UMO. 
      */
-    protected HashMap properties = new HashMap();
+    protected Map properties = new HashMap();
 
     /**
      * The transformer for the response

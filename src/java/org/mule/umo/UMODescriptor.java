@@ -15,8 +15,8 @@
 package org.mule.umo;
 
 import java.beans.ExceptionListener;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mule.MuleException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -95,7 +95,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor
      *            the UMO when it's initialise method is called or set as bean
      *            properties whe the UMO is created
      */
-    void setProperties(HashMap props);
+    void setProperties(Map props);
 
     /**
      * The version on the Mule UMO. This is currently not used by the mule
