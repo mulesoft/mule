@@ -1021,7 +1021,13 @@ or relax dtd validation on their parser
   	<i>org.mule.UMOInterceptor</i>.
 
 -->
-<!ATTLIST interceptor className 			NMTOKEN 		#REQUIRED>
+<!ATTLIST interceptor className 			NMTOKEN 		#IMPLIED>
+
+<!--
+	The name of a registered interceptor stack.
+
+-->
+<!ATTLIST interceptor name 			NMTOKEN 		#IMPLIED>
 
 <!--
   An exception strategy overrides the default exceptionStrategy in order to control the

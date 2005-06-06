@@ -114,7 +114,7 @@
                 <router className="org.mule.tck.testmodels.mule.TestResponseAggregator"/>
             </response-router>
 
-            <interceptor className="default"/>
+            <interceptor name="default"/>
             <interceptor className="org.mule.interceptors.TimerInterceptor"/>
 
             <exception-strategy className="org.mule.impl.DefaultComponentExceptionStrategy">
