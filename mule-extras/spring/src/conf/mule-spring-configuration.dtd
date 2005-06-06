@@ -1011,6 +1011,12 @@ or relax dtd validation on their parser
 <!ATTLIST interceptor className 			NMTOKEN 		#REQUIRED>
 
 <!--
+	The name of a registered interceptor stack.
+
+-->
+<!ATTLIST interceptor name 			NMTOKEN 		#IMPLIED>
+
+<!--
   An exception strategy overrides the default exceptionStrategy in order to control the
   exception handling beaviour in the system. The class specified must implement
   <i>org.mule.exception.ExceptionStrategy</i>.

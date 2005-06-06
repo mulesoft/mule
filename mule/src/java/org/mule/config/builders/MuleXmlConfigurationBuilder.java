@@ -749,7 +749,10 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester.addRule(path + "/interceptor", new Rule() {
             public void begin(String string, String string1, Attributes attributes) throws Exception
             {
-                String value = attributes.getValue("className");
+                String value = attributes.getValue("name");
+				if (value == null) {
+					value = attributes.getValue("className");
+				}
                 UMOManager man = (UMOManager) digester.getRoot();
                 UMOInterceptorStack interceptorStack = man.lookupInterceptorStack(value);
                 MuleDescriptor temp = (MuleDescriptor) digester.peek();

@@ -196,15 +196,7 @@
 <!--        </property>-->
     </bean>
 
-    <bean id="muleInterceptorStacks" class="java.util.HashMap">
-        <constructor-arg>
-            <map>
-                <entry key="default"><ref local="defaultInterceptorStack"/></entry>
-            </map>
-        </constructor-arg>
-    </bean>
-
-    <bean id="defaultInterceptorStack" class="org.mule.interceptors.InterceptorStack">
+    <bean id="default" class="org.mule.interceptors.InterceptorStack">
         <property name="interceptors">
             <list>
                 <ref local="loggingInterceptor"/>
@@ -303,7 +295,7 @@
 
         <property name="interceptors">
             <list>
-                <ref local="defaultInterceptorStack"/>
+                <ref local="default"/>
                 <ref local="timerInterceptor"/>
             </list>
         </property>

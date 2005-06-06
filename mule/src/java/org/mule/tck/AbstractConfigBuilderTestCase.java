@@ -140,6 +140,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
     public void testInterceptorStacks()
     {
         UMOInterceptorStack stack = MuleManager.getInstance().lookupInterceptorStack("default");
+		assertNotNull(stack);
         assertEquals(2, stack.getInterceptors().size());
         assertTrue(stack.getInterceptors().get(0) instanceof LoggingInterceptor);
         assertTrue(stack.getInterceptors().get(1) instanceof TimerInterceptor);

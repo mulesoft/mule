@@ -197,25 +197,24 @@
     </xsl:template>
 
     <xsl:template match="interceptor-stack">
-        <bean name="muleInterceptorStacks" class="java.util.HashMap">
-            <constructor-arg>
-                <map>
-                    <entry key="{@name}">
-                        <bean class="org.mule.interceptors.InterceptorStack">
-                            <property name="interceptors">
-                                <list>
-                                    <xsl:apply-templates select="interceptor"/>
-                                </list>
-                            </property>
-                        </bean>
-                    </entry>
-                </map>
-            </constructor-arg>
+        <bean name="{@name}" class="org.mule.interceptors.InterceptorStack">
+            <property name="interceptors">
+                <list>
+                    <xsl:apply-templates select="interceptor"/>
+                </list>
+            </property>
         </bean>
     </xsl:template>
 
     <xsl:template match="interceptor">
-        <bean class="{@className}"/>
+    	<xsl:choose>
+    		<xsl:when test="@name">
+    			<ref local="{@name}" />
+    		</xsl:when>
+    		<xsl:otherwise>
+    			<bean class="{@className}" />
+    		</xsl:otherwise>
+    	</xsl:choose>
     </xsl:template>
 
     <xsl:template match="model">

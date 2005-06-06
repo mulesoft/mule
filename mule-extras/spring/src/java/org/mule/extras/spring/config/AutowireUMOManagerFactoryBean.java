@@ -165,7 +165,7 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
             setContainerContext(containers);
 
             // interceptors
-            Map interceptors = (Map) getBean(MULE_INTERCEPTOR_STACK_BEAN_NAME, Map.class);
+            Map interceptors = context.getBeansOfType(UMOInterceptorStack.class, true, true);
             setInterceptorStacks(interceptors);
             // create the model
             createModel();
@@ -311,10 +311,10 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
     {
         if (stacks == null)
             return;
-        Map.Entry entry;
         for (Iterator iterator = stacks.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
-            manager.registerInterceptorStack(entry.getKey().toString(), (UMOInterceptorStack) entry.getValue());
+			Map.Entry entry = (Map.Entry) iterator.next();
+			String name = entry.getKey().toString();
+            manager.registerInterceptorStack(name, (UMOInterceptorStack) entry.getValue());
         }
     }
 
