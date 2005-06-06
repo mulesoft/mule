@@ -18,9 +18,9 @@ package org.mule.impl;
 import java.beans.ExceptionListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -142,7 +142,7 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
      * 
      * @see org.mule.umo.UMODescriptor#getPropertiesForURI(java.util.Properties)
      */
-    public void setProperties(HashMap props)
+    public void setProperties(Map props)
     {
         properties = props;
         String delegate = (String) properties.get(MULE_PROPERTY_DOT_PROPERTIES);
