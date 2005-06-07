@@ -59,6 +59,11 @@ public class GlueConnector extends AbstractServiceEnabledConnector
         return receiver;
     }
 
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
+    {
+        return endpoint.getEndpointURI().getAddress() + "/" + component.getDescriptor().getName();
+    }
+    
     private boolean shouldCreateServer(String endpoint) throws URISyntaxException
     {
         URI uri = new URI(endpoint);
