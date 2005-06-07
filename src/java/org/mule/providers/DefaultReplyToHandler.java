@@ -62,10 +62,10 @@ public class DefaultReplyToHandler implements ReplyToHandler
         if (logger.isDebugEnabled()) {
             logger.debug("sending reply to: " + returnMessage.getReplyTo());
         }
-        String replytToEndpoint = replyTo.toString();
+        String replyToEndpoint = replyTo.toString();
 
         // get the endpoint for this url
-        UMOEndpoint endpoint = getEndpoint(event, replytToEndpoint);
+        UMOEndpoint endpoint = getEndpoint(event, replyToEndpoint);
         if (transformer != null) {
             endpoint.setTransformer(transformer);
         }
