@@ -81,9 +81,16 @@ public class TransactionTemplate
                 }
                 return result;
             } catch (Exception e) {
-                logger.info("Exception Caught in Transaction template.  Handing of to exception handler: "
-                        + exceptionListener);
-                exceptionListener.exceptionThrown(e);
+                if (exceptionListener != null) {
+                    logger.info("Exception Caught in Transaction template.  Handing of to exception handler: "
+                            + exceptionListener);
+                    exceptionListener.exceptionThrown(e);
+                } else {
+                    logger.info("Exception Caught in Transaction template without any exception listeners defined, exception is rethrown.");
+                    if (tx != null) {
+                        tx.setRollbackOnly();
+                    }
+                }
                 if (tx != null) {
                     // The exception strategy can choose to route exception
                     // messages
@@ -99,9 +106,12 @@ public class TransactionTemplate
                         tx.commit();
                     }
                 }
-                // throw e;
                 // we've handled this exception above. just return null now
-                return null;
+                if (exceptionListener != null) {
+                    return null;
+                } else {
+                    throw e;
+                }
             } catch (Error e) {
                 if (tx != null) {
                     logger.info("Error caught: rollback transaction", e);
