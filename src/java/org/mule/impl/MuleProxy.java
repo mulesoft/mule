@@ -279,7 +279,7 @@ public class MuleProxy implements Work, Lifecycle
             if (e instanceof UMOException) {
                 handleException(e);
             } else {
-                handleException(new MessagingException(new Message(Messages.EVENT_PROCIESSING_FAILED_FOR_X,
+                handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
                                                                    descriptor.getName()), event.getMessage(), e));
             }
         } finally {
@@ -483,7 +483,7 @@ public class MuleProxy implements Work, Lifecycle
             if (e instanceof UMOException) {
                 handleException(e);
             } else {
-                handleException(new MessagingException(new Message(Messages.EVENT_PROCIESSING_FAILED_FOR_X,
+                handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
                                                                    descriptor.getName()), event.getMessage(), e));
             }
         } finally {

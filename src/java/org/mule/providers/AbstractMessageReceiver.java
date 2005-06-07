@@ -300,7 +300,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
                 endpoint.getSecurityFilter().authenticate(muleEvent);
             } catch (SecurityException e) {
                 logger.warn("Request was made but was not authenticated: " + e.getMessage(), e);
-                connector.fireEvent(new SecurityEvent(e, SecurityEvent.SECURITY_AUTHENITCATION_FAILED));
+                connector.fireEvent(new SecurityEvent(e, SecurityEvent.SECURITY_AUTHENTICATION_FAILED));
                 handleException(e);
                 return message;
             }
