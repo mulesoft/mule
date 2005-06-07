@@ -177,7 +177,7 @@ public class JcaComponent implements UMOComponent
     public synchronized void initialise() throws InitialisationException, RecoverableException
     {
         if (initialised.get()) {
-            throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALSIED, "Component '"
+            throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED, "Component '"
                     + descriptor.getName() + "'"), this);
         }
         descriptor.initialise();
