@@ -13,16 +13,17 @@
  */
 package org.mule.test.integration.providers.jms.openjms;
 
-import org.mule.providers.jms.JmsConnector;
-import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
-import org.mule.umo.provider.UMOConnector;
+import java.util.HashMap;
+import java.util.Properties;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.naming.NamingException;
-import java.util.HashMap;
-import java.util.Properties;
+
+import org.mule.providers.jms.JmsConnector;
+import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
+import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
+import org.mule.umo.provider.UMOConnector;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -46,7 +47,7 @@ public class OpenJmsQueueFunctionalTestCase extends AbstractJmsQueueFunctionalTe
         connector.setConnectionFactoryJndiName("JmsQueueConnectionFactory");
         connector.setProviderProperties(props);
         connector.setName(CONNECTOR_NAME);
-        connector.getDispatcherThreadingProfile().setDoThreading(false);        
+        connector.getDispatcherThreadingProfile().setDoThreading(false);
 
         HashMap overrides = new HashMap();
         overrides.put("message.receiver", JmsMessageReceiverSynchronous.class.getName());
@@ -56,19 +57,17 @@ public class OpenJmsQueueFunctionalTestCase extends AbstractJmsQueueFunctionalTe
 
     public void testJndiDestinations() throws Exception
     {
-        JmsConnector cnn = (JmsConnector)createConnector();
+        JmsConnector cnn = (JmsConnector) createConnector();
         cnn.initialise();
         Object o = cnn.getJndiContext().lookup("queue1");
         assertNotNull(o);
         assertTrue(o instanceof Destination);
 
-        try
-        {
+        try {
             Object o2 = cnn.getJndiContext().lookup("queue1BlahBlah");
             fail("destination does not exist");
-        } catch (NamingException e)
-        {
-            //expected
+        } catch (NamingException e) {
+            // expected
         }
     }
 

@@ -14,9 +14,8 @@
 package org.mule.test.integration.service;
 
 /**
- * <code>PeopleService</code> is a test service that returns
- * complex types
- *
+ * <code>PeopleService</code> is a test service that returns complex types
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

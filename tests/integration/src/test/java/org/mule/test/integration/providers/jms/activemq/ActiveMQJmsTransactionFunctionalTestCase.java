@@ -13,15 +13,16 @@
  */
 package org.mule.test.integration.providers.jms.activemq;
 
+import java.util.Properties;
+
+import javax.jms.Connection;
+
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsTransactionFactory;
 import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.provider.UMOConnector;
-
-import javax.jms.Connection;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -38,7 +39,7 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
 
     public Connection getConnection() throws Exception
     {
-        //default to ActiveMq for Jms 1.1 support
+        // default to ActiveMq for Jms 1.1 support
         Properties p = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
         Connection cnn = JmsTestUtils.getQueueConnection(p);
         cnn.start();
@@ -55,7 +56,7 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
         connector.setProviderProperties(props);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-		connector.getReceiverThreadingProfile().setMaxThreadsActive(1);
+        connector.getReceiverThreadingProfile().setMaxThreadsActive(1);
 
         return connector;
     }

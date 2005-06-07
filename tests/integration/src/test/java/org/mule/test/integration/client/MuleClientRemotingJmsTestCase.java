@@ -29,7 +29,8 @@ public class MuleClientRemotingJmsTestCase extends AbstractMuleTestCase
     public void setUp() throws Exception
     {
         System.setProperty("org.mule.disable.server.connections", "false");
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("org/mule/test/integration/client/test-client-mule-config-remote-jms.xml");
         System.setProperty("org.mule.disable.server.connections", "true");
@@ -42,7 +43,7 @@ public class MuleClientRemotingJmsTestCase extends AbstractMuleTestCase
 
     public void testClientSendToRemoteComponent() throws Exception
     {
-        //Will connect to the server using tcp://localhost:60504
+        // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
         MuleManager.getConfiguration().setSynchronous(true);
 
@@ -55,15 +56,16 @@ public class MuleClientRemotingJmsTestCase extends AbstractMuleTestCase
     public void testClientSendAndReceiveRemote() throws Exception
     {
         String remoteEndpoint = "vm://vmRemoteProvider/remote.queue";
-        //Will connect to the server using tcp://localhost:60504
+        // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
         MuleManager.getConfiguration().setSynchronous(true);
 
         RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
         UMOMessage message = dispatcher.receiveRemote(remoteEndpoint, 1000);
         assertNull(message);
-        //We do a send instead of a dispatch here so the operation is synchronous
-        //thus eaiser to test
+        // We do a send instead of a dispatch here so the operation is
+        // synchronous
+        // thus eaiser to test
         dispatcher.sendRemote(remoteEndpoint, "Test Remote Message 2", null);
 
         message = dispatcher.receiveRemote(remoteEndpoint, 100000);

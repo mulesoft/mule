@@ -15,7 +15,7 @@ package org.mule.test.integration.spring.events;
 
 /**
  * <code>OrderManager</code> TODO
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

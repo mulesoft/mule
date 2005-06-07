@@ -12,21 +12,44 @@
 
 package org.mule.test.integration.providers.jms.tools;
 
-import org.mule.util.ClassHelper;
-import org.mule.util.Utility;
-
-import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueReceiver;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicPublisher;
+import javax.jms.TopicSession;
+import javax.jms.TopicSubscriber;
+import javax.jms.XAConnection;
+import javax.jms.XAQueueConnection;
+import javax.jms.XAQueueConnectionFactory;
+import javax.jms.XASession;
+import javax.jms.XATopicConnection;
+import javax.jms.XATopicConnectionFactory;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.mule.util.ClassHelper;
+import org.mule.util.Utility;
+
 /**
  * <code>JmsTestUtils</code> TODO (document class)
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -47,14 +70,12 @@ public class JmsTestUtils
     public static final String JNDI_XAQUEUE_CONECTION_NAME_PROPERTY = "XAQueueConnectionFactoryJNDIName";
     public static final String JNDI_XATOPIC_CONECTION_NAME_PROPERTY = "XATopicConnectionFactoryJNDIName";
 
-
     public static Properties getJmsProperties() throws IOException
     {
-        InputStream is = ClassHelper.getResourceAsStream(JMS_PROPERTIES,  JmsTestUtils.class);
+        InputStream is = ClassHelper.getResourceAsStream(JMS_PROPERTIES, JmsTestUtils.class);
 
         String jmsProps = OPEN_JMS_PROPERTIES;
-        if(is != null)
-        {
+        if (is != null) {
             Properties p = new Properties();
             p.load(is);
             jmsProps = p.getProperty("jms.provider.properties", OPEN_JMS_PROPERTIES);
@@ -62,9 +83,10 @@ public class JmsTestUtils
         }
         return getJmsProperties(jmsProps);
     }
+
     public static Properties getJmsProperties(String propertyFile) throws IOException
     {
-        InputStream is = ClassHelper.getResourceAsStream(propertyFile,  JmsTestUtils.class);
+        InputStream is = ClassHelper.getResourceAsStream(propertyFile, JmsTestUtils.class);
 
         Properties p = new Properties();
         p.load(is);
@@ -77,7 +99,7 @@ public class JmsTestUtils
     public static void fixProviderUrl(Properties props) throws IOException
     {
         String providerUrl = props.getProperty(Context.PROVIDER_URL);
-        if(providerUrl!=null && !providerUrl.startsWith("file:") && providerUrl.indexOf(':') < 0) {
+        if (providerUrl != null && !providerUrl.startsWith("file:") && providerUrl.indexOf(':') < 0) {
             providerUrl = "file:" + File.separator + Utility.getResourcePath(providerUrl, JmsTestUtils.class);
             System.out.println("Setting provider url to: " + providerUrl);
             props.setProperty(Context.PROVIDER_URL, providerUrl);
@@ -93,22 +115,22 @@ public class JmsTestUtils
     {
         return getXAQueueConnection(getJmsProperties());
     }
-    
-    public static XAQueueConnection getXAQueueConnection(Properties props) throws IOException, NamingException, JMSException
+
+    public static XAQueueConnection getXAQueueConnection(Properties props) throws IOException, NamingException,
+            JMSException
     {
         String cnnFactoryName = props.getProperty(JNDI_XAQUEUE_CONECTION_NAME_PROPERTY);
-        if (cnnFactoryName == null)
-        {
-            throw new IOException("You must set the property " + JNDI_XAQUEUE_CONECTION_NAME_PROPERTY + "in the JNDI property file");
+        if (cnnFactoryName == null) {
+            throw new IOException("You must set the property " + JNDI_XAQUEUE_CONECTION_NAME_PROPERTY
+                    + "in the JNDI property file");
         }
         Context ctx = new InitialContext(props);
         XAQueueConnectionFactory qcf = (XAQueueConnectionFactory) ctx.lookup(cnnFactoryName);
         XAQueueConnection cnn;
-        String username = (String)props.get("username");
+        String username = (String) props.get("username");
 
-        if(username != null)
-        {
-            String password = (String)props.get("password");
+        if (username != null) {
+            String password = (String) props.get("password");
             cnn = qcf.createXAQueueConnection(username, password);
         } else {
             cnn = qcf.createXAQueueConnection();
@@ -117,23 +139,23 @@ public class JmsTestUtils
         return cnn;
     }
 
-    public static QueueConnection getQueueConnection(Properties props) throws IOException, NamingException, JMSException
+    public static QueueConnection getQueueConnection(Properties props) throws IOException, NamingException,
+            JMSException
     {
         fixProviderUrl(props);
         String cnnFactoryName = props.getProperty(DEFAULT_JNDI_CONECTION_NAME_PROPERTY);
-        if (cnnFactoryName == null)
-        {
-            throw new IOException("You must set the property " + DEFAULT_JNDI_CONECTION_NAME_PROPERTY + "in the JNDI property file");
+        if (cnnFactoryName == null) {
+            throw new IOException("You must set the property " + DEFAULT_JNDI_CONECTION_NAME_PROPERTY
+                    + "in the JNDI property file");
         }
         Context ctx = new InitialContext(props);
         Object obj = ctx.lookup(cnnFactoryName);
         QueueConnectionFactory qcf = (QueueConnectionFactory) obj;
         QueueConnection cnn;
-        String username = (String)props.get("username");
+        String username = (String) props.get("username");
 
-        if(username != null)
-        {
-            String password = (String)props.get("password");
+        if (username != null) {
+            String password = (String) props.get("password");
             cnn = qcf.createQueueConnection(username, password);
         } else {
             cnn = qcf.createQueueConnection();
@@ -147,22 +169,22 @@ public class JmsTestUtils
         return getTopicConnection(getJmsProperties());
     }
 
-    public static TopicConnection getTopicConnection(Properties props) throws IOException, NamingException, JMSException
+    public static TopicConnection getTopicConnection(Properties props) throws IOException, NamingException,
+            JMSException
     {
         fixProviderUrl(props);
         String cnnFactoryName = props.getProperty(JNDI_TOPIC_CONECTION_NAME_PROPERTY);
-        if (cnnFactoryName == null)
-        {
-            throw new IOException("You must set the property " + DEFAULT_JNDI_CONECTION_NAME_PROPERTY + "in the JNDI property file");
+        if (cnnFactoryName == null) {
+            throw new IOException("You must set the property " + DEFAULT_JNDI_CONECTION_NAME_PROPERTY
+                    + "in the JNDI property file");
         }
         Context ctx = new InitialContext(props);
         TopicConnectionFactory tcf = (TopicConnectionFactory) ctx.lookup(cnnFactoryName);
         TopicConnection cnn;
-        String username = (String)props.get("username");
+        String username = (String) props.get("username");
 
-        if(username != null)
-        {
-            String password = (String)props.get("password");
+        if (username != null) {
+            String password = (String) props.get("password");
             cnn = tcf.createTopicConnection(username, password);
         } else {
             cnn = tcf.createTopicConnection();
@@ -175,18 +197,17 @@ public class JmsTestUtils
     {
         Properties props = getJmsProperties();
         String cnnFactoryName = props.getProperty(JNDI_XATOPIC_CONECTION_NAME_PROPERTY);
-        if (cnnFactoryName == null)
-        {
-            throw new IOException("You must set the property " + JNDI_XAQUEUE_CONECTION_NAME_PROPERTY + "in the JNDI property file");
+        if (cnnFactoryName == null) {
+            throw new IOException("You must set the property " + JNDI_XAQUEUE_CONECTION_NAME_PROPERTY
+                    + "in the JNDI property file");
         }
         Context ctx = new InitialContext(props);
         XATopicConnectionFactory tcf = (XATopicConnectionFactory) ctx.lookup(cnnFactoryName);
         XATopicConnection cnn;
-        String username = (String)props.get("username");
+        String username = (String) props.get("username");
 
-        if(username != null)
-        {
-            String password = (String)props.get("password");
+        if (username != null) {
+            String password = (String) props.get("password");
             cnn = tcf.createXATopicConnection(username, password);
         } else {
             cnn = tcf.createXATopicConnection();
@@ -198,10 +219,10 @@ public class JmsTestUtils
     public static Session getSession(Connection cnn) throws JMSException
     {
         Session session;
-        if(cnn instanceof QueueConnection) {
-            session = ((QueueConnection)cnn).createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+        if (cnn instanceof QueueConnection) {
+            session = ((QueueConnection) cnn).createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
         } else {
-            session = ((TopicConnection)cnn).createTopicSession(false, QueueSession.AUTO_ACKNOWLEDGE);
+            session = ((TopicConnection) cnn).createTopicSession(false, QueueSession.AUTO_ACKNOWLEDGE);
         }
         return session;
     }
@@ -209,10 +230,10 @@ public class JmsTestUtils
     public static XASession getXASession(XAConnection cnn) throws JMSException
     {
         XASession session;
-        if(cnn instanceof XAQueueConnection) {
-            session = ((XAQueueConnection)cnn).createXAQueueSession();
+        if (cnn instanceof XAQueueConnection) {
+            session = ((XAQueueConnection) cnn).createXAQueueSession();
         } else {
-            session = ((XATopicConnection)cnn).createXATopicSession();
+            session = ((XATopicConnection) cnn).createXATopicSession();
         }
         return session;
     }
@@ -223,10 +244,9 @@ public class JmsTestUtils
         Queue q = session.createQueue(queue);
         QueueReceiver receiver = session.createReceiver(q);
         // Add a delay so that activeMQ can fetch messages from the broker
-        //Thread.sleep(5000);
+        // Thread.sleep(5000);
         Message msg = null;
-        while ((msg = receiver.receive(1000)) != null)
-        {
+        while ((msg = receiver.receive(1000)) != null) {
             System.out.println("Removing message: " + msg);
             msg.acknowledge();
         }
@@ -241,12 +261,10 @@ public class JmsTestUtils
 
         TopicSubscriber subscriber = session.createSubscriber(t);
         Message msg = subscriber.receiveNoWait();
-        while (msg != null)
-        {
+        while (msg != null) {
             try {
                 msg.acknowledge();
-            }
-            catch (JMSException e) {
+            } catch (JMSException e) {
 
             }
             msg = subscriber.receiveNoWait();
@@ -260,7 +278,12 @@ public class JmsTestUtils
         return getSession(cnn).createTextMessage(message);
     }
 
-    public static void queueSend(QueueConnection cnn, String queueName, String payload, boolean transacted, int ack, String replyTo) throws JMSException
+    public static void queueSend(QueueConnection cnn,
+                                 String queueName,
+                                 String payload,
+                                 boolean transacted,
+                                 int ack,
+                                 String replyTo) throws JMSException
     {
         QueueSession session = cnn.createQueueSession(transacted, ack);
         Queue queue = session.createQueue(queueName);
@@ -268,7 +291,7 @@ public class JmsTestUtils
         TextMessage msg = session.createTextMessage();
         msg.setText(payload);
         msg.setJMSDeliveryMode(ack);
-        if(replyTo != null) {
+        if (replyTo != null) {
             msg.setJMSReplyTo(session.createQueue(replyTo));
         }
 
@@ -277,11 +300,18 @@ public class JmsTestUtils
         session.close();
     }
 
-    public static void topicPublish(TopicConnection cnn, String topicName, String payload, boolean transacted, int ack) throws JMSException
+    public static void topicPublish(TopicConnection cnn, String topicName, String payload, boolean transacted, int ack)
+            throws JMSException
     {
-        topicPublish(cnn, topicName,  payload, transacted, ack, null);
+        topicPublish(cnn, topicName, payload, transacted, ack, null);
     }
-    public static void topicPublish(TopicConnection cnn, String topicName, String payload, boolean transacted, int ack, String replyTo) throws JMSException
+
+    public static void topicPublish(TopicConnection cnn,
+                                    String topicName,
+                                    String payload,
+                                    boolean transacted,
+                                    int ack,
+                                    String replyTo) throws JMSException
     {
         TopicSession session = cnn.createTopicSession(transacted, ack);
         Topic topic = session.createTopic(topicName);
@@ -289,7 +319,7 @@ public class JmsTestUtils
         TextMessage msg = session.createTextMessage();
         msg.setText(payload);
         msg.setJMSDeliveryMode(ack);
-        if(replyTo != null) {
+        if (replyTo != null) {
             msg.setJMSReplyTo(session.createTopic(replyTo));
         }
         publisher.publish(msg);
@@ -297,28 +327,30 @@ public class JmsTestUtils
         session.close();
     }
 
-    public static Message queueReceiver(QueueConnection cnn, String queueName, long timeout ) throws JMSException
+    public static Message queueReceiver(QueueConnection cnn, String queueName, long timeout) throws JMSException
     {
         QueueSession session = cnn.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue queue = session.createQueue(queueName);
         QueueReceiver receiver = session.createReceiver(queue);
         Message msg = receiver.receive(timeout);
-        if(msg!=null) msg.acknowledge();
+        if (msg != null)
+            msg.acknowledge();
         receiver.close();
         session.close();
         return msg;
     }
 
-    public static Message topicSubscribe(TopicConnection cnn, String topicName, long timeout ) throws JMSException
+    public static Message topicSubscribe(TopicConnection cnn, String topicName, long timeout) throws JMSException
     {
         TopicSubscriber receiver = getTopicSubscriber(cnn, topicName);
         Message msg = receiver.receive(timeout);
-        if(msg!=null) msg.acknowledge();
+        if (msg != null)
+            msg.acknowledge();
         receiver.close();
         return msg;
     }
 
-    public static TopicSubscriber getTopicSubscriber(TopicConnection cnn, String topicName ) throws JMSException
+    public static TopicSubscriber getTopicSubscriber(TopicConnection cnn, String topicName) throws JMSException
     {
         TopicSession session = cnn.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         Topic topic = session.createTopic(topicName);
@@ -326,7 +358,7 @@ public class JmsTestUtils
         return receiver;
     }
 
-    public static QueueReceiver getQueueReceiver(QueueConnection cnn, String queueName ) throws JMSException
+    public static QueueReceiver getQueueReceiver(QueueConnection cnn, String queueName) throws JMSException
     {
         QueueSession session = cnn.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
         Queue queue = session.createQueue(queueName);

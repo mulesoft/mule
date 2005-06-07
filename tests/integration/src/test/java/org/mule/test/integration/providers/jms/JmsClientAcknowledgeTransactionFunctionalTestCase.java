@@ -13,15 +13,16 @@
  */
 package org.mule.test.integration.providers.jms;
 
+import java.util.Properties;
+
+import javax.jms.Connection;
+import javax.jms.Session;
+
 import org.mule.providers.jms.JmsClientAcknowledgeTransactionFactory;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.provider.UMOConnector;
-
-import javax.jms.Connection;
-import javax.jms.Session;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -56,16 +57,23 @@ public class JmsClientAcknowledgeTransactionFunctionalTestCase extends AbstractJ
         return connector;
     }
 
-    protected int getAcknowledgementMode() {
+    protected int getAcknowledgementMode()
+    {
         return Session.CLIENT_ACKNOWLEDGE;
+    }
+
+    public void testSendTransactedAlways() throws Exception
+    {
+        super.testSendTransactedAlways();
     }
 
     public void testSendTransactedRollback() throws Exception
     {
-    	// Rollback not allowed for client acknowledge
+        // Rollback not allowed for client acknowledge
     }
 
-    public void testTransactedRedeliveryToDLDestination() throws Exception {
-        //messages are not marked for redelivery in Client Ack mode
+    public void testTransactedRedeliveryToDLDestination() throws Exception
+    {
+        // messages are not marked for redelivery in Client Ack mode
     }
 }

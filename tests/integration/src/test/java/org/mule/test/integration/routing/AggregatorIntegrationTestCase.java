@@ -29,7 +29,8 @@ public class AggregatorIntegrationTestCase extends AbstractMuleTestCase
 {
     protected void setUp() throws Exception
     {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
     }
 
     public void testAggregator() throws UMOException
@@ -41,7 +42,7 @@ public class AggregatorIntegrationTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         UMOMessage result = client.send("vm://distributor.queue", message, null);
         assertNotNull(result);
-        //Te
+        // Te
         assertEquals(message + message, result.getPayload());
     }
 }

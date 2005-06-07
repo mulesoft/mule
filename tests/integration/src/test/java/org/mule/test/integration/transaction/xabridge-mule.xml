@@ -25,9 +25,8 @@
 	        <property name="connectionFactoryJndiName" value="XAJmsQueueConnectionFactory"/>
 	        <property name="jndiInitialFactory" value="com.sun.jndi.fscontext.RefFSContextFactory"/>
 	        <property name="jndiProviderUrl" value="file:src/test/conf/jndi/activemq"/>
-<!--            <container-property name="connectionFactory" reference="jmsConnectionFactoryXa" />-->
 			<map name="providerProperties">
-				<property name="brokerUrl" value="tcp://localhost:61616"/>
+				<property name="brokerURL" value="tcp://localhost:61616"/>
 			</map>
 		</properties>
     </connector>
@@ -66,7 +65,7 @@
             implementation="org.mule.test.integration.transaction.XABridgeComponent"
 			containerManaged="false">
             <inbound-router>
-                <endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=true">
+                <endpoint address="jms://my.queue?frequency=60000&amp;reuseSession=false">
 					<transaction action="ALWAYS_BEGIN" factory="org.mule.transaction.XaTransactionFactory"/>					
 				</endpoint>
             </inbound-router>

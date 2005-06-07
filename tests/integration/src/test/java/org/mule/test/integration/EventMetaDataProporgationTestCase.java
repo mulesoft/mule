@@ -13,6 +13,9 @@
  */
 package org.mule.test.integration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
@@ -21,12 +24,14 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.*;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.transformer.TransformerException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -41,13 +46,13 @@ public class EventMetaDataProporgationTestCase extends AbstractMuleTestCase impl
         super.setUp();
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         builder.createStartedManager(true, null);
-        UMODescriptor c1 = builder.registerComponentInstance(this, "component1",
-                new MuleEndpointURI("vm://component1"),
-                new MuleEndpointURI("vm://component2"));
+        UMODescriptor c1 = builder.registerComponentInstance(this,
+                                                             "component1",
+                                                             new MuleEndpointURI("vm://component1"),
+                                                             new MuleEndpointURI("vm://component2"));
         c1.getOutboundEndpoint().setTransformer(new DummyTransformer());
 
-        builder.registerComponentInstance(this, "component2",
-                new MuleEndpointURI("vm://component2"));
+        builder.registerComponentInstance(this, "component2", new MuleEndpointURI("vm://component2"));
     }
 
     protected void tearDown() throws Exception
@@ -59,16 +64,18 @@ public class EventMetaDataProporgationTestCase extends AbstractMuleTestCase impl
     public void testEventMetaDataProporgation() throws UMOException
     {
         UMOSession session = MuleManager.getInstance().getModel().getComponentSession("component1");
-        UMOEvent event = new MuleEvent(new MuleMessage("Test Event", null), session.getComponent().getDescriptor().getInboundEndpoint(), session, true);
+        UMOEvent event = new MuleEvent(new MuleMessage("Test Event", null), session.getComponent()
+                                                                                   .getDescriptor()
+                                                                                   .getInboundEndpoint(), session, true);
         session.sendEvent(event);
     }
 
     public Object onCall(UMOEventContext context) throws Exception
     {
-        if("component1".equals(context.getComponentDescriptor().getName())) {
+        if ("component1".equals(context.getComponentDescriptor().getName())) {
             Map props = new HashMap();
             props.put("stringParam", "param1");
-            props.put("objectParam",testObjectProperty);
+            props.put("objectParam", testObjectProperty);
             props.put("doubleParam", new Double(12345.6));
             props.put("integerParam", new Integer(12345));
             props.put("longParam", new Long(123456789));

@@ -13,6 +13,8 @@
  */
 package org.mule.test.integration.client;
 
+import java.util.Properties;
+
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.NamedTestCase;
 
@@ -22,11 +24,15 @@ import org.mule.tck.NamedTestCase;
  */
 public class MultipleJmsConnectorsTestCase extends NamedTestCase
 {
-    public void testMultipleJmsClientConnections() throws Exception {
+    public void testMultipleJmsClientConnections() throws Exception
+    {
         MuleClient client = new MuleClient();
         client.setProperty("jms.connectionFactoryJndiName", "ConnectionFactory");
         client.setProperty("jms.jndiInitialFactory", "org.activemq.jndi.ActiveMQInitialContextFactory");
         client.setProperty("jms.specification", "1.1");
+        Properties props = new Properties();
+        props.put("brokerURL", "tcp://localhost:61616");
+        client.setProperty("jms.providerProperties", props);
 
         client.dispatch("jms://admin:admin@admin.queue?createConnector=ALWAYS", "admin", null);
         client.dispatch("jms://ross:ross@ross.queue?createConnector=ALWAYS", "admin", null);

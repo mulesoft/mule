@@ -17,9 +17,9 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>StringToOrder</code> convers a string representation of an order
- * to an order object
- *
+ * <code>StringToOrder</code> convers a string representation of an order to
+ * an order object
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

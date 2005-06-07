@@ -28,9 +28,12 @@ import org.mule.umo.manager.UMOContainerContext;
  */
 public class MultiContainerTestCase extends NamedTestCase
 {
-    protected void setUp() throws Exception {
+    protected void setUp() throws Exception
+    {
         super.setUp();
-        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated()) {
+            MuleManager.getInstance().dispose();
+        }
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("org/mule/test/integration/config/multi-container-test.xml");
     }
@@ -48,7 +51,7 @@ public class MultiContainerTestCase extends NamedTestCase
             context.getComponent("WaterMelon");
             fail("Object should  not found");
         } catch (ObjectNotFoundException e) {
-            //ignore
+            // ignore
         }
     }
 
@@ -56,16 +59,16 @@ public class MultiContainerTestCase extends NamedTestCase
     {
         UMOContainerContext context = MuleManager.getInstance().getContainerContext();
         assertNotNull(context);
-        Orange o = (Orange)context.getComponent(new ContainerKeyPair("spring", "Orange"));
+        Orange o = (Orange) context.getComponent(new ContainerKeyPair("spring", "Orange"));
         assertNotNull(o);
         assertEquals(new Integer(8), o.getSegments());
 
-        o = (Orange)context.getComponent(new ContainerKeyPair("plexus", "Orange"));
+        o = (Orange) context.getComponent(new ContainerKeyPair("plexus", "Orange"));
         assertNotNull(o);
         assertEquals(new Integer(10), o.getSegments());
 
-        //gets the component from the first container
-        o = (Orange)context.getComponent("Orange");
+        // gets the component from the first container
+        o = (Orange) context.getComponent("Orange");
         assertNotNull(o);
         assertEquals(new Integer(10), o.getSegments());
     }

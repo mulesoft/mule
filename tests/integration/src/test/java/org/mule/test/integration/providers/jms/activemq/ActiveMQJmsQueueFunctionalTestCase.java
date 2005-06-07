@@ -13,14 +13,15 @@
  */
 package org.mule.test.integration.providers.jms.activemq;
 
+import java.util.HashMap;
+import java.util.Properties;
+
+import javax.jms.Connection;
+
 import org.mule.providers.jms.JmsConnector;
 import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.provider.UMOConnector;
-
-import javax.jms.Connection;
-import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -31,7 +32,7 @@ public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunction
 {
     public Connection getConnection() throws Exception
     {
-        //default to ActiveMq for Jms 1.1 support
+        // default to ActiveMq for Jms 1.1 support
         Properties p = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
         return JmsTestUtils.getQueueConnection(p);
     }
@@ -46,7 +47,7 @@ public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunction
         connector.setProviderProperties(props);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-        
+
         HashMap overrides = new HashMap();
         overrides.put("message.receiver", JmsMessageReceiverSynchronous.class.getName());
         connector.setServiceOverrides(overrides);

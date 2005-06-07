@@ -15,7 +15,7 @@ package org.mule.test.integration.service;
 
 /**
  * <code>DateService</code> defines a getDate service
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

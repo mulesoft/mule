@@ -13,6 +13,9 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
+import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
+
 import org.enhydra.jdbc.standard.StandardXADataSource;
 import org.mule.providers.jdbc.xa.DataSourceWrapper;
 import org.mule.transaction.XaTransactionFactory;
@@ -20,42 +23,42 @@ import org.mule.umo.UMOTransactionFactory;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
 
-import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
-
 /**
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase {
+public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase
+{
 
-	private TransactionManager txManager;
-	
-    protected void setUp() throws Exception {
-		// check for already active JOTM instance
-    	txManager = Current.getCurrent();
-		// if none found, create new local JOTM instance
-		if (txManager == null) {
-			new Jotm(true, false);
-			txManager = Current.getCurrent();
-		}
-    	super.setUp();
-    	manager.setTransactionManager(txManager);
+    private TransactionManager txManager;
+
+    protected void setUp() throws Exception
+    {
+        // check for already active JOTM instance
+        txManager = Current.getCurrent();
+        // if none found, create new local JOTM instance
+        if (txManager == null) {
+            new Jotm(true, false);
+            txManager = Current.getCurrent();
+        }
+        super.setUp();
+        manager.setTransactionManager(txManager);
     }
 
-    protected UMOTransactionFactory getTransactionFactory() {
+    protected UMOTransactionFactory getTransactionFactory()
+    {
         return new XaTransactionFactory();
     }
-    
-	protected DataSource createDataSource() throws Exception {
-		StandardXADataSource ds = new StandardXADataSource();
-		ds.setDriverName("org.hsqldb.jdbcDriver");
+
+    protected DataSource createDataSource() throws Exception
+    {
+        StandardXADataSource ds = new StandardXADataSource();
+        ds.setDriverName("org.hsqldb.jdbcDriver");
         ds.setUrl("jdbc:hsqldb:mem:.");
         ds.setUser("sa");
         ds.setPassword("");
         ds.setTransactionManager(txManager);
         return new DataSourceWrapper(ds, txManager);
-	}
-	
-	
+    }
+
 }

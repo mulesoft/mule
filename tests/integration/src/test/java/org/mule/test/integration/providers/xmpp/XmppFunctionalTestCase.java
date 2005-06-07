@@ -33,7 +33,7 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
     protected void sendTestData(int iterations) throws Exception
     {
         cnn = connector.findOrCreateXmppConnection(getInDest());
-        for(int i=0;i<100;i++) {
+        for (int i = 0; i < 100; i++) {
             cnn.createChat("mule1").sendMessage("Test Message:" + i);
         }
     }
@@ -42,12 +42,13 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
     {
 
         Thread.sleep(7000);
-        //seem to be getting messages after the test messages??
+        // seem to be getting messages after the test messages??
         assertTrue(callbackCount > 100);
     }
 
-    protected UMOEndpointURI getInDest() {
-         try {
+    protected UMOEndpointURI getInDest()
+    {
+        try {
             return new MuleEndpointURI("xmpp://mule1:mule@jabber.org.au");
         } catch (MalformedEndpointException e) {
             fail(e.getMessage());
@@ -55,7 +56,8 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
         }
     }
 
-    protected UMOEndpointURI getOutDest() {
+    protected UMOEndpointURI getOutDest()
+    {
         try {
             return new MuleEndpointURI("xmpp://mule2:mule@jabber.org.au");
         } catch (MalformedEndpointException e) {
@@ -64,11 +66,11 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
         }
     }
 
-    protected UMOConnector createConnector() throws Exception {
+    protected UMOConnector createConnector() throws Exception
+    {
         connector = new XmppConnector();
         connector.setName("test");
         return connector;
     }
-
 
 }

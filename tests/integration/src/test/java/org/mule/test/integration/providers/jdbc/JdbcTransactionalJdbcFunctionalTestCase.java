@@ -13,34 +13,37 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
+import javax.sql.DataSource;
+
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.mule.providers.jdbc.JdbcTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
-
-import javax.sql.DataSource;
 
 /**
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class JdbcTransactionalJdbcFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase {
+public class JdbcTransactionalJdbcFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase
+{
 
-    protected void setUp() throws Exception {
-    	super.setUp();
+    protected void setUp() throws Exception
+    {
+        super.setUp();
     }
 
-    protected UMOTransactionFactory getTransactionFactory() {
+    protected UMOTransactionFactory getTransactionFactory()
+    {
         return new JdbcTransactionFactory();
     }
-    
-	protected DataSource createDataSource() throws Exception {
-		StandardDataSource ds = new StandardDataSource();
-		ds.setDriverName("org.hsqldb.jdbcDriver");
+
+    protected DataSource createDataSource() throws Exception
+    {
+        StandardDataSource ds = new StandardDataSource();
+        ds.setDriverName("org.hsqldb.jdbcDriver");
         ds.setUrl("jdbc:hsqldb:mem:.");
         ds.setUser("sa");
         ds.setPassword("");
-    	return ds;
-	}
-	
-	
+        return ds;
+    }
+
 }

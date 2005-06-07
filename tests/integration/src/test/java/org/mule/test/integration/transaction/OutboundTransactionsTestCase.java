@@ -24,8 +24,13 @@ import org.mule.tck.AbstractMuleTestCase;
  */
 public class OutboundTransactionsTestCase extends AbstractMuleTestCase
 {
+    private static final int TIMEOUT = 2000;
+    
     protected void setUp() throws Exception
     {
+        if (MuleManager.isInstanciated()) {
+            MuleManager.getInstance().dispose();
+        }
         new MuleXmlConfigurationBuilder().configure("org/mule/test/integration/transaction/outbound-transactions.xml");
     }
 
@@ -37,22 +42,28 @@ public class OutboundTransactionsTestCase extends AbstractMuleTestCase
     public void testOutboundRouterTransactions() throws Exception
     {
         MuleClient client = new MuleClient();
+        while (client.receive("jms://my.queue1", TIMEOUT) != null);
+        while (client.receive("jms://my.queue2", TIMEOUT) != null);
+        
         client.sendNoReceive("vm://component1", "test", null);
 
-        assertNotNull(client.receive("jms://my.queue1", 2000));
-        assertNotNull(client.receive("jms://my.queue2", 2000));
-        assertNull(client.receive("jms://my.queue1", 2000));
-        assertNull(client.receive("jms://my.queue2", 2000));
+        assertNotNull(client.receive("jms://my.queue1", TIMEOUT));
+        assertNotNull(client.receive("jms://my.queue2", TIMEOUT));
+        assertNull(client.receive("jms://my.queue1", TIMEOUT));
+        assertNull(client.receive("jms://my.queue2", TIMEOUT));
     }
 
     public void testOutboundRouterTransactions2() throws Exception
     {
         MuleClient client = new MuleClient();
+        while (client.receive("jms://my.queue3", TIMEOUT) != null);
+        while (client.receive("jms://my.queue4", TIMEOUT) != null);
+        
         client.sendNoReceive("jms://component2", "test", null);
 
-        assertNotNull(client.receive("jms://my.queue3", 3000));
-        assertNotNull(client.receive("jms://my.queue4", 3000));
-        assertNull(client.receive("jms://my.queue3", 3000));
-        assertNull(client.receive("jms://my.queue4", 3000));
+        assertNotNull(client.receive("jms://my.queue3", TIMEOUT));
+        assertNotNull(client.receive("jms://my.queue4", TIMEOUT));
+        assertNull(client.receive("jms://my.queue3", TIMEOUT));
+        assertNull(client.receive("jms://my.queue4", TIMEOUT));
     }
 }

@@ -14,6 +14,8 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
+import javax.transaction.TransactionManager;
+
 import org.mule.MuleManager;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.transaction.XaTransactionFactory;
@@ -22,8 +24,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
 
-import javax.transaction.TransactionManager;
-
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
@@ -31,20 +31,20 @@ import javax.transaction.TransactionManager;
  */
 public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTransactionFunctionalTestCase
 {
-	private TransactionManager txManager;
-	
+    private TransactionManager txManager;
+
     protected void setUp() throws Exception
     {
-		// check for already active JOTM instance
-    	txManager = Current.getCurrent();
-		// if none found, create new local JOTM instance
-		if (txManager == null) {
-			new Jotm(true, false);
-			txManager = Current.getCurrent();
-		}
-		txManager.setTransactionTimeout(15000);
-    	super.setUp();
-    	MuleManager.getInstance().setTransactionManager(txManager);
+        // check for already active JOTM instance
+        txManager = Current.getCurrent();
+        // if none found, create new local JOTM instance
+        if (txManager == null) {
+            new Jotm(true, false);
+            txManager = Current.getCurrent();
+        }
+        txManager.setTransactionTimeout(15000);
+        super.setUp();
+        MuleManager.getInstance().setTransactionManager(txManager);
     }
 
     public UMOConnector createConnector() throws Exception
@@ -66,12 +66,13 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
 
     public void testSendNotTransacted() throws Exception
     {
-        //Cannot send non transacted messages when the connection is an XAConnection
+        // Cannot send non transacted messages when the connection is an
+        // XAConnection
     }
 
     public void testSendTransactedIfPossibleWithoutTransaction() throws Exception
     {
-        //there will always be a transaction available if using an Xa connector
-        //so this will always fail
+        // there will always be a transaction available if using an Xa connector
+        // so this will always fail
     }
 }

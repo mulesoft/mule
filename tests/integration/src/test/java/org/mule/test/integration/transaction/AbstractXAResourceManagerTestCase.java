@@ -32,90 +32,113 @@ import org.objectweb.jotm.Jotm;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class AbstractXAResourceManagerTestCase extends TestCase {
+public class AbstractXAResourceManagerTestCase extends TestCase
+{
 
-	
-	private Jotm jotm;
-	private TransactionManager tm;
-	
-	protected void setUp() throws Exception {
-		jotm = new Jotm(true, false);
-		tm = jotm.getTransactionManager();
-	}
-	
-	protected void tearDown() throws Exception {
-		jotm.stop();
-		jotm = null;
-		tm = null;
-	}
-	
-	public void test1() throws Exception {
-		TestXAResourceManager rm = new TestXAResourceManager();
-		rm.start();
-		AbstractSession s = rm.createSession();
-		
-		tm.begin();
-		Transaction tx = tm.getTransaction();
-		tx.enlistResource(s);
-		
-		tx.delistResource(s, XAResource.TMSUCCESS);
-		tx.commit();
-		
-	}
-	
-	protected static class TestXAResourceManager extends AbstractXAResourceManager {
+    private Jotm jotm;
+    private TransactionManager tm;
 
-		private static Log logger = LogFactory.getLog(TestXAResourceManager.class); 
-		
-		public AbstractSession createSession() {
-			return new AbstractSession();
-		}
-		
-		/* (non-Javadoc)
-		 * @see org.mule.transaction.xa.AbstractResourceManager#getLogger()
-		 */
-		protected Log getLogger() {
-			return logger;
-		}
+    protected void setUp() throws Exception
+    {
+        jotm = new Jotm(true, false);
+        tm = jotm.getTransactionManager();
+    }
 
-		/* (non-Javadoc)
-		 * @see org.mule.transaction.xa.AbstractResourceManager#createTransactionContext(java.lang.Object)
-		 */
-		protected AbstractTransactionContext createTransactionContext(Object session) {
-			return new AbstractTransactionContext();
-		}
+    protected void tearDown() throws Exception
+    {
+        jotm.stop();
+        jotm = null;
+        tm = null;
+    }
 
-		/* (non-Javadoc)
-		 * @see org.mule.transaction.xa.AbstractResourceManager#doBegin(org.mule.transaction.xa.AbstractTransactionContext)
-		 */
-		protected void doBegin(AbstractTransactionContext context) {
-			// TODO Auto-generated method stub
-			
-		}
+    public void test1() throws Exception
+    {
+        TestXAResourceManager rm = new TestXAResourceManager();
+        rm.start();
+        AbstractSession s = rm.createSession();
 
-		/* (non-Javadoc)
-		 * @see org.mule.transaction.xa.AbstractResourceManager#doPrepare(org.mule.transaction.xa.AbstractTransactionContext)
-		 */
-		protected int doPrepare(AbstractTransactionContext context) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+        tm.begin();
+        Transaction tx = tm.getTransaction();
+        tx.enlistResource(s);
 
-		/* (non-Javadoc)
-		 * @see org.mule.transaction.xa.AbstractResourceManager#doCommit(org.mule.transaction.xa.AbstractTransactionContext)
-		 */
-		protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException {
-			// TODO Auto-generated method stub
-			
-		}
+        tx.delistResource(s, XAResource.TMSUCCESS);
+        tx.commit();
 
-		/* (non-Javadoc)
-		 * @see org.mule.transaction.xa.AbstractResourceManager#doRollback(org.mule.transaction.xa.AbstractTransactionContext)
-		 */
-		protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
+    }
+
+    protected static class TestXAResourceManager extends AbstractXAResourceManager
+    {
+
+        private static Log logger = LogFactory.getLog(TestXAResourceManager.class);
+
+        public AbstractSession createSession()
+        {
+            return new AbstractSession();
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.mule.transaction.xa.AbstractResourceManager#getLogger()
+         */
+        protected Log getLogger()
+        {
+            return logger;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.mule.transaction.xa.AbstractResourceManager#createTransactionContext(java.lang.Object)
+         */
+        protected AbstractTransactionContext createTransactionContext(Object session)
+        {
+            return new AbstractTransactionContext();
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.mule.transaction.xa.AbstractResourceManager#doBegin(org.mule.transaction.xa.AbstractTransactionContext)
+         */
+        protected void doBegin(AbstractTransactionContext context)
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.mule.transaction.xa.AbstractResourceManager#doPrepare(org.mule.transaction.xa.AbstractTransactionContext)
+         */
+        protected int doPrepare(AbstractTransactionContext context)
+        {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.mule.transaction.xa.AbstractResourceManager#doCommit(org.mule.transaction.xa.AbstractTransactionContext)
+         */
+        protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.mule.transaction.xa.AbstractResourceManager#doRollback(org.mule.transaction.xa.AbstractTransactionContext)
+         */
+        protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
+        {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
 }

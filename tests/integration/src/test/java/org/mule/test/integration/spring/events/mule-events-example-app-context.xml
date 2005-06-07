@@ -2,11 +2,16 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
     <!-- the jms server connector config -->
-   <bean id="jmsConnector" class="org.mule.providers.jms.JmsConnector">
-       <property name="connectionFactoryJndiName"><value>ConnectionFactory</value></property>
-       <property name="jndiInitialFactory"><value>org.activemq.jndi.ActiveMQInitialContextFactory</value></property>
-       <property name="specification"><value>1.1</value></property>
-   </bean>
+	<bean id="jmsConnector" class="org.mule.providers.jms.JmsConnector">
+       	<property name="connectionFactoryJndiName"><value>ConnectionFactory</value></property>
+       	<property name="jndiInitialFactory"><value>org.activemq.jndi.ActiveMQInitialContextFactory</value></property>
+       	<property name="specification"><value>1.1</value></property>
+		<property name="providerProperties">
+			<map>
+				<entry key="brokerURL" value="tcp://localhost:61616"/>
+			</map>
+		</property>
+	</bean>
 
    <!-- The Mule implementation of the Spring ApplicationEventMulticaster.  On startup the
    application context will look in the container for a bean called applicationEventMulticaster and

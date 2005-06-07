@@ -59,13 +59,5 @@
 			<value>true</value>
 		</property>
 	</bean>
-	<bean id="jmsConnectionFactory">
-		<property name="xaConnectionFactory">
-			<ref local="jmsConnectionFactoryXa"/>
-		</property>
-		<property name="transactionManager">
-			<ref local="jotm"/>
-		</property>
-	</bean>
 
 </beans>

@@ -14,6 +14,9 @@
 
 package org.mule.test.integration.providers.http;
 
+import java.net.URI;
+import java.net.URL;
+
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -30,9 +33,6 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
-import java.net.URI;
-import java.net.URL;
-
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -45,11 +45,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected UMOEndpointURI getInDest()
     {
-        try
-        {
+        try {
             return new MuleEndpointURI("http://localhost:60198");
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -57,11 +55,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected UMOEndpointURI getOutDest()
     {
-        try
-        {
+        try {
             return new MuleEndpointURI("http://localhost:60199");
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -90,7 +86,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     {
         byte[] buf = new byte[1024 * 4];
         int len = cnn.getResponseInputStream().read(buf);
-        if(len < 1) {
+        if (len < 1) {
             fail("Nothing was sent back in the response");
         }
         String msg = new String(buf, 0, len);
@@ -99,33 +95,46 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         assertEquals(TEST_MESSAGE + " Received", msg);
     }
 
-    protected String getClientUrl() {
+    protected String getClientUrl()
+    {
         return "http://www.google.com.au";
     }
 
     public void testClient() throws Exception
     {
         UMOEndpointURI request = new MuleEndpointURI(getClientUrl());
-        HttpConnector c = (HttpConnector)createConnector();
+        HttpConnector c = (HttpConnector) createConnector();
         c.initialise();
         UMOMessageDispatcher d = c.getDispatcher(request.getAddress());
-        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test", request, c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null));
+        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test",
+                                                                      request,
+                                                                      c,
+                                                                      null,
+                                                                      UMOEndpoint.ENDPOINT_TYPE_SENDER,
+                                                                      0,
+                                                                      null));
         UMOMessage m = d.send(e);
         assertNotNull(m);
         assertNotNull(m.getPayload());
-        assertTrue(m.getPayload().toString().indexOf("google") > -1);
+        assertTrue(m.getPayloadAsString().indexOf("google") > -1);
     }
 
     public void testClientWithPath() throws Exception
     {
         UMOEndpointURI request = new MuleEndpointURI("http://www.muleumo.org/docs/apidocs");
-        HttpConnector c = (HttpConnector)createConnector();
+        HttpConnector c = (HttpConnector) createConnector();
         c.initialise();
         UMOMessageDispatcher d = c.getDispatcher(request.getAddress());
-        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test", request, c, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null));
+        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test",
+                                                                      request,
+                                                                      c,
+                                                                      null,
+                                                                      UMOEndpoint.ENDPOINT_TYPE_SENDER,
+                                                                      0,
+                                                                      null));
         UMOMessage m = d.send(e);
         assertNotNull(m);
         assertNotNull(m.getPayload());
-        assertTrue(m.getPayload().toString().indexOf("javadoc") > -1);
+        assertTrue(m.getPayloadAsString().indexOf("javadoc") > -1);
     }
 }

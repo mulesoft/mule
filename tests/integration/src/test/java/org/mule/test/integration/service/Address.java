@@ -15,7 +15,7 @@ package org.mule.test.integration.service;
 
 /**
  * <code>Address</code> is a persons address
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

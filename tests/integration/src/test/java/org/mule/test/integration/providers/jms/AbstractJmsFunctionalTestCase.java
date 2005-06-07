@@ -13,6 +13,14 @@
  */
 package org.mule.test.integration.providers.jms;
 
+import java.util.HashMap;
+
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.QueueConnection;
+import javax.jms.TopicConnection;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -27,9 +35,6 @@ import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
-
-import javax.jms.*;
-import java.util.HashMap;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -54,20 +59,23 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     protected Connection cnn;
     protected Message currentMsg;
     protected int eventCount = 0;
-    
-    protected final transient Log logger = LogFactory.getLog(getClass());  
 
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected void setUp() throws Exception
     {
-    	super.setUp();
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        //By default the JmsTestUtils use the openjms config, though you can pass
-        //in other configs using the property below
+        super.setUp();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
+        // By default the JmsTestUtils use the openjms config, though you can
+        // pass
+        // in other configs using the property below
 
-        //Make sure we are running synchronously
+        // Make sure we are running synchronously
         MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().getPoolingProfile().setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
+        MuleManager.getConfiguration()
+                   .getPoolingProfile()
+                   .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
         MuleManager.getInstance().setModel(new MuleModel());
         callbackCalled = false;
@@ -80,15 +88,13 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         eventCount = 0;
     }
 
-
-
     protected void drainDestinations() throws Exception
     {
-        if(!useTopics()) {
+        if (!useTopics()) {
             System.out.println("@@@@ Draining Queues @@@@");
-            JmsTestUtils.drainQueue((QueueConnection)cnn, getInDest().getAddress());
+            JmsTestUtils.drainQueue((QueueConnection) cnn, getInDest().getAddress());
             assertNull(receive(getInDest().getAddress(), 10));
-            JmsTestUtils.drainQueue((QueueConnection)cnn, getOutDest().getAddress());
+            JmsTestUtils.drainQueue((QueueConnection) cnn, getOutDest().getAddress());
             assertNull(receive(getOutDest().getAddress(), 10));
         }
 
@@ -99,11 +105,10 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     protected void tearDown() throws Exception
     {
         MuleManager.getInstance().dispose();
-        try
-        {
+        try {
             cnn.close();
+        } catch (JMSException e) {
         }
-        catch (JMSException e) { }
     }
 
     public void initialiseComponent(EventCallback callback) throws Exception
@@ -112,9 +117,11 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
 
-        builder.registerComponent(
-                FunctionalTestComponent.class.getName(),
-                "testComponent", getInDest(), getOutDest(), props);
+        builder.registerComponent(FunctionalTestComponent.class.getName(),
+                                  "testComponent",
+                                  getInDest(),
+                                  getOutDest(),
+                                  props);
     }
 
     public void afterInitialise() throws Exception
@@ -124,15 +131,13 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
     protected UMOEndpointURI getInDest()
     {
-        try
-        {
-            if(!useTopics()) {	
+        try {
+            if (!useTopics()) {
                 return new MuleEndpointURI(DEFAULT_IN_QUEUE);
             } else {
                 return new MuleEndpointURI(DEFAULT_IN_TOPIC);
             }
-        } catch (MalformedEndpointException e)
-        {
+        } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
         }
@@ -140,15 +145,13 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
     protected UMOEndpointURI getOutDest()
     {
-        try
-        {
-            if(!useTopics()) {
+        try {
+            if (!useTopics()) {
                 return new MuleEndpointURI(DEFAULT_OUT_QUEUE);
             } else {
                 return new MuleEndpointURI(DEFAULT_OUT_TOPIC);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             fail(e.getMessage());
             return null;
         }
@@ -156,25 +159,31 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
     protected void send(String payload, boolean transacted, int ack, String replyTo) throws JMSException
     {
-        if(!useTopics()) {
-            JmsTestUtils.queueSend((QueueConnection)cnn, getInDest().getAddress(), payload, transacted, ack, replyTo);
+        if (!useTopics()) {
+            JmsTestUtils.queueSend((QueueConnection) cnn, getInDest().getAddress(), payload, transacted, ack, replyTo);
         } else {
-            JmsTestUtils.topicPublish((TopicConnection)cnn, getInDest().getAddress(), payload, transacted, ack, replyTo);
+            JmsTestUtils.topicPublish((TopicConnection) cnn,
+                                      getInDest().getAddress(),
+                                      payload,
+                                      transacted,
+                                      ack,
+                                      replyTo);
         }
     }
 
     protected Message receive(String dest, long timeout) throws JMSException
     {
         Message msg = null;
-        if(!useTopics()) {
-            msg = JmsTestUtils.queueReceiver((QueueConnection)cnn, dest, timeout);
+        if (!useTopics()) {
+            msg = JmsTestUtils.queueReceiver((QueueConnection) cnn, dest, timeout);
         } else {
-            msg = JmsTestUtils.topicSubscribe((TopicConnection)cnn, dest, timeout);
+            msg = JmsTestUtils.topicSubscribe((TopicConnection) cnn, dest, timeout);
         }
         return msg;
     }
 
-    public boolean useTopics() {
+    public boolean useTopics()
+    {
         return false;
     }
 

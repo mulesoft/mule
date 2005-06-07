@@ -13,6 +13,8 @@
  */
 package org.mule.test.integration.routing;
 
+import java.util.Iterator;
+
 import org.mule.impl.MuleMessage;
 import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.EventGroup;
@@ -21,39 +23,33 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
 
-import java.util.Iterator;
-
 /**
- *
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class TestAggregator extends CorrelationAggregator
 {
     /**
-     * This method is invoked if the shouldAggregate method is called and returns
-     * true.  Once this method returns an aggregated message the event group is removed
-     * from the router
-     *
+     * This method is invoked if the shouldAggregate method is called and
+     * returns true. Once this method returns an aggregated message the event
+     * group is removed from the router
+     * 
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws org.mule.umo.routing.RoutingException
-     *          if the aggregation fails.  in this scenario the whole
-     *          event group is removed and passed to the exception handler for this
-     *          componenet
+     * @throws org.mule.umo.routing.RoutingException if the aggregation fails.
+     *             in this scenario the whole event group is removed and passed
+     *             to the exception handler for this componenet
      */
     protected UMOMessage aggregateEvents(EventGroup events) throws RoutingException
     {
         StringBuffer buffer = new StringBuffer();
-        for (Iterator iterator = events.getEvents().iterator(); iterator.hasNext();)
-        {
+        for (Iterator iterator = events.getEvents().iterator(); iterator.hasNext();) {
             UMOEvent event = (UMOEvent) iterator.next();
-            try
-            {
+            try {
                 buffer.append(event.getTransformedMessageAsString());
-            } catch (TransformerException e)
-            {
-                throw new RoutingException(event.getMessage(),  event.getEndpoint(), e);
+            } catch (TransformerException e) {
+                throw new RoutingException(event.getMessage(), event.getEndpoint(), e);
             }
         }
         System.out.println("event payload is: " + buffer.toString());

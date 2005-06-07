@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="file_test" version="1.0">
+
+    <model name="test">
+        <mule-descriptor name="mycomponent"
+            implementation="org.mule.tck.functional.FunctionalTestComponent">
+			<inbound-router>
+				<endpoint address="file://./test">
+					<filter pattern="*.txt" className="org.mule.providers.file.filters.FilenameWildcardFilter"/>
+				</endpoint>
+			</inbound-router>
+        </mule-descriptor>
+
+    </model>
+</mule-configuration>

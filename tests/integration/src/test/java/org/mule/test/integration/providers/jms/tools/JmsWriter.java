@@ -15,21 +15,35 @@
 
 package org.mule.test.integration.providers.jms.tools;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.util.Utility;
-
-import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicPublisher;
+import javax.jms.TopicSession;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.util.Utility;
 
 public class JmsWriter
-        {
+{
 
     Log logger = LogFactory.getLog(JmsWriter.class);
 
@@ -41,83 +55,62 @@ public class JmsWriter
     public JmsWriter(String jndiProps, boolean isQueue)
     {
         this.isQueue = isQueue;
-        try
-        {
+        try {
             FileInputStream fis = new FileInputStream(new File(jndiProps));
             Properties p = new Properties();
             p.load(fis);
             fis.close();
             String cnnFactoryName = p.getProperty("connectionFactoryJNDIName");
-            if (cnnFactoryName == null)
-            {
+            if (cnnFactoryName == null) {
 
                 throw new Exception("You must set the property connectionFactoryJNDIName in the JNDI property file");
             }
             Context ctx = new InitialContext(p);
 
-            if (isQueue)
-            {
+            if (isQueue) {
                 QueueConnectionFactory qcf = (QueueConnectionFactory) ctx.lookup(cnnFactoryName);
                 cnn = qcf.createQueueConnection();
                 session = ((QueueConnection) cnn).createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);
-            }
-            else
-            {
+            } else {
                 TopicConnectionFactory tcf = (TopicConnectionFactory) ctx.lookup(cnnFactoryName);
                 cnn = tcf.createTopicConnection();
                 session = ((TopicConnection) cnn).createTopicSession(false, 0);
             }
             cnn.start();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Initialisation failed: " + e, e);
             System.exit(0);
         }
     }
 
-
     public void write(String data, String destination, int noOfMessages)
     {
-        try
-        {
+        try {
 
-            if (isQueue)
-            {
+            if (isQueue) {
                 Queue queue = ((QueueSession) session).createQueue(destination);
                 producer = ((QueueSession) session).createSender(queue);
-            }
-            else
-            {
+            } else {
                 Topic topic = ((TopicSession) session).createTopic(destination);
                 producer = ((TopicSession) session).createPublisher(topic);
             }
 
             TextMessage tm;
             logger.info("Sending message: " + data + " on " + destination);
-            for (int i = 0; i < noOfMessages; i++)
-            {
+            for (int i = 0; i < noOfMessages; i++) {
                 tm = session.createTextMessage(data);
-                if (isQueue)
-                {
+                if (isQueue) {
                     ((QueueSender) producer).send(tm);
-                }
-                else
-                {
+                } else {
                     ((TopicPublisher) producer).publish(tm);
                 }
             }
             logger.info(noOfMessages + " message(s) sent successfully");
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.error("Initialisation failed: " + e, e);
-            try
-            {
+            try {
                 cnn.close();
-            }
-            catch (JMSException e1)
-            {
+            } catch (JMSException e1) {
                 System.exit(0);
             }
             System.exit(0);
@@ -126,12 +119,9 @@ public class JmsWriter
 
     public void close()
     {
-        try
-        {
+        try {
             cnn.close();
-        }
-        catch (JMSException e)
-        {
+        } catch (JMSException e) {
             logger.error("Exception occurred while closing: " + e);
         }
     }
@@ -140,19 +130,15 @@ public class JmsWriter
     {
         int noOfMessages = 1;
         boolean queue = false;
-        if (args.length == 5)
-        {
+        if (args.length == 5) {
             noOfMessages = Integer.parseInt(args[4]);
-            if (args[3].equals("-q")) queue = true;
+            if (args[3].equals("-q"))
+                queue = true;
             String data = args[0];
-            if (data.endsWith(".xml"))
-            {
-                try
-                {
+            if (data.endsWith(".xml")) {
+                try {
                     data = Utility.fileToString(data);
-                }
-                catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                     System.exit(0);
                 }
@@ -161,9 +147,7 @@ public class JmsWriter
 
             Jms.write(data, args[2], noOfMessages);
             Jms.close();
-        }
-        else
-        {
+        } else {
             usage();
         }
 

@@ -1,0 +1,161 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.test.integration.client;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
+import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.extras.client.MuleClient;
+import org.mule.impl.MuleTransactionConfig;
+import org.mule.providers.jms.JmsTransactionFactory;
+import org.mule.tck.NamedTestCase;
+import org.mule.transaction.TransactionCallback;
+import org.mule.transaction.TransactionCoordination;
+import org.mule.transaction.TransactionTemplate;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionConfig;
+
+/**
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @version $Revision$
+ */
+public class MuleClientTransactionTestCase extends NamedTestCase
+{
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        if (MuleManager.isInstanciated()) {
+            MuleManager.getInstance().dispose();
+        }
+        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
+        builder.configure("org/mule/test/integration/client/test-client-jms-mule-config.xml");
+    }
+    
+    public void testTransactionsWithSetRollbackOnly() throws Exception 
+    {
+        final MuleClient client = new MuleClient();
+        final Map props = new HashMap();
+        props.put("JMSReplyTo", "replyTo.queue");
+        props.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
+        
+        // Empty reply queue
+        while (client.receive("jms://replyTo.queue", 2000) != null);
+        
+        MuleTransactionConfig tc = new MuleTransactionConfig();
+        tc.setFactory(new JmsTransactionFactory());
+        tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
+        TransactionTemplate tt = new TransactionTemplate(tc, null);
+        tt.execute(new TransactionCallback() {
+            public Object doInTransaction() throws Exception 
+            {
+                for (int i = 0; i < 100; i++) {
+                    client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
+                }
+                UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+                assertNotNull(tx);
+                tx.setRollbackOnly();
+                return null;
+            }
+        });
+        
+        UMOMessage result = client.receive("jms://replyTo.queue", 2000);
+        assertNull(result);
+    }
+
+    public void testTransactionsWithExceptionThrown() throws Exception 
+    {
+        final MuleClient client = new MuleClient();
+        final Map props = new HashMap();
+        props.put("JMSReplyTo", "replyTo.queue");
+        props.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
+        
+        // Empty reply queue
+        while (client.receive("jms://replyTo.queue", 2000) != null);
+        
+        MuleTransactionConfig tc = new MuleTransactionConfig();
+        tc.setFactory(new JmsTransactionFactory());
+        tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
+        TransactionTemplate tt = new TransactionTemplate(tc, null);
+        try {
+            tt.execute(new TransactionCallback() {
+                public Object doInTransaction() throws Exception 
+                {
+                    for (int i = 0; i < 100; i++) {
+                        client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
+                    }
+                    throw new Exception();
+                }
+            });
+            fail();
+        } catch (Exception e) {
+            // this is ok
+        }
+        
+        UMOMessage result = client.receive("jms://replyTo.queue", 2000);
+        assertNull(result);
+    }
+
+    public void testTransactionsWithCommit() throws Exception 
+    {
+        final MuleClient client = new MuleClient();
+        final Map props = new HashMap();
+        props.put("JMSReplyTo", "replyTo.queue");
+        props.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
+        
+        // Empty reply queue
+        while (client.receive("jms://replyTo.queue", 2000) != null);
+        
+        MuleTransactionConfig tc = new MuleTransactionConfig();
+        tc.setFactory(new JmsTransactionFactory());
+        tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
+        TransactionTemplate tt = new TransactionTemplate(tc, null);
+        tt.execute(new TransactionCallback() {
+            public Object doInTransaction() throws Exception 
+            {
+                for (int i = 0; i < 100; i++) {
+                    client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
+                }
+                return null;
+            }
+        });
+
+        for (int i = 0; i < 100; i++) {
+            UMOMessage result = client.receive("jms://replyTo.queue", 2000);
+            assertNotNull(result);
+        }
+        UMOMessage result = client.receive("jms://replyTo.queue", 2000);
+        assertNull(result);
+    }
+    
+    protected void emptyReplyQueue() throws Exception {
+        final MuleClient client = new MuleClient();
+        MuleTransactionConfig tc = new MuleTransactionConfig();
+        tc.setFactory(new JmsTransactionFactory());
+        tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
+        TransactionTemplate tt = new TransactionTemplate(tc, null);
+        tt.execute(new TransactionCallback() {
+            public Object doInTransaction() throws Exception 
+            {
+                while (client.receive("jms://replyTo.queue", 2000) != null);
+                return null;
+            }
+        });
+    }
+
+}

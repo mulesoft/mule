@@ -16,6 +16,9 @@
             <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
             <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
             <property name="specification" value="1.1"/>
+			<map name="providerProperties">
+				<property name="brokerURL" value="tcp://localhost:61616"/>
+			</map>
         </properties>
     </connector>
 
@@ -28,8 +31,12 @@
             </inbound-router>
             <outbound-router>
                 <router className="org.mule.routing.outbound.MulticastingRouter">
-                    <endpoint address="jms://my.queue1"/>
-                    <endpoint address="jms://my.queue2"/>
+                    <endpoint address="jms://my.queue1">
+	                    <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    </endpoint>
+                    <endpoint address="jms://my.queue2">
+	                    <transaction action="ALWAYS_JOIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
+                    </endpoint>
                     <transaction action="ALWAYS_BEGIN" factory="org.mule.providers.jms.JmsTransactionFactory"/>
                 </router>
             </outbound-router>
@@ -46,7 +53,6 @@
                 <router className="org.mule.routing.outbound.MulticastingRouter">
                     <endpoint address="jms://my.queue3"/>
                     <endpoint address="jms://my.queue4"/>
-                    <transaction action="ALWAYS_JOIN"/>
                 </router>
             </outbound-router>
         </mule-descriptor>

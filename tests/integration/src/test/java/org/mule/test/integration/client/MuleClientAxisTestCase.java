@@ -22,10 +22,10 @@ import org.mule.test.integration.service.Person;
 import org.mule.umo.UMOMessage;
 
 /**
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class MuleSoapClientTestCase extends NamedTestCase
+public class MuleClientAxisTestCase extends NamedTestCase
 {
     protected void setUp() throws Exception
     {
@@ -34,14 +34,14 @@ public class MuleSoapClientTestCase extends NamedTestCase
             MuleManager.getInstance().dispose();
         }
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/client/glue-test-mule-config.xml");
+        configBuilder.configure("org/mule/test/integration/client/axis-test-mule-config.xml");
     }
 
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage result = client.send("glue:http://localhost:38004/mule/mycomponent2?method=echo", "test", null);
+        UMOMessage result = client.send("axis:http://localhost:38004/mule/services/mycomponent2?method=echo", "test", null);
         assertNotNull(result);
         assertEquals("test", result.getPayloadAsString());
     }
@@ -50,7 +50,7 @@ public class MuleSoapClientTestCase extends NamedTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage result = client.send("glue:http://localhost:38004/mule/mycomponent3?method=getPerson", "Fred", null);
+        UMOMessage result = client.send("axis:http://localhost:38004/mule/services/mycomponent3?method=getPerson", "Fred", null);
         assertNotNull(result);
         System.out.println(result.getPayload());
         assertTrue(result.getPayload() instanceof Person);
@@ -63,14 +63,14 @@ public class MuleSoapClientTestCase extends NamedTestCase
         MuleClient client = new MuleClient();
 
         String[] args = new String[] { "Ross", "Mason" };
-        UMOMessage result = client.send("glue:http://localhost:38004/mule/mycomponent3?method=addPerson", args, null);
+        UMOMessage result = client.send("axis:http://localhost:38004/mule/services/mycomponent3?method=addPerson", args, null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Ross", ((Person) result.getPayload()).getFirstName());
         assertEquals("Mason", ((Person) result.getPayload()).getLastName());
 
         // do a receive
-        result = client.send("glue:http://localhost:38004/mule/mycomponent3?method=getPerson", "Ross", null);
+        result = client.send("axis:http://localhost:38004/mule/services/mycomponent3?method=getPerson", "Ross", null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Ross", ((Person) result.getPayload()).getFirstName());

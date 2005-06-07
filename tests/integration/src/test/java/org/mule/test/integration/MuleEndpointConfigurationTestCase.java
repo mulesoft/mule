@@ -35,16 +35,17 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
 
     public MuleEndpointConfigurationTestCase()
     {
-        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
     }
 
     protected void setUp() throws Exception
     {
-        if (!initialised)
-        {
+        if (!initialised) {
             System.setProperty("org.mule.disable.server.connections", "true");
 
-            if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
+            if (MuleManager.isInstanciated())
+                MuleManager.getInstance().dispose();
             ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
             configBuilder.configure(getConfigResource());
             initialised = true;
@@ -58,7 +59,7 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
 
     public void testComponent1Endpoints() throws Exception
     {
-        //test inbound
+        // test inbound
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent1");
         assertNotNull(descriptor);
         UMOEndpoint endpoint = descriptor.getInboundEndpoint();
@@ -69,7 +70,7 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
         assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
 
-        //test outbound
+        // test outbound
         endpoint = descriptor.getOutboundEndpoint();
         assertNotNull(endpoint);
         assertEquals("stream", endpoint.getConnector().getProtocol().toLowerCase());
@@ -82,7 +83,7 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
 
     public void testComponent2Endpoints() throws Exception
     {
-        //test inbound
+        // test inbound
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent2");
         assertNotNull(descriptor);
         UMOEndpoint endpoint = descriptor.getInboundEndpoint();
@@ -100,7 +101,7 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
 
     public void testComponent3Endpoints() throws Exception
     {
-        //test inbound
+        // test inbound
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent3");
         assertNotNull(descriptor);
         UMOEndpoint endpoint = descriptor.getInboundEndpoint();
@@ -112,7 +113,7 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
         assertTrue(endpoint.getTransformer() instanceof ObjectToXml);
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
 
-        //test outbound
+        // test outbound
         endpoint = descriptor.getOutboundEndpoint();
         assertNotNull(endpoint);
         assertEquals("tcp", endpoint.getConnector().getProtocol().toLowerCase());
@@ -126,23 +127,23 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
 
     public void testComponent3RouterEndpoints() throws Exception
     {
-        //test inbound
+        // test inbound
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent3");
         assertNotNull(descriptor);
         UMOOutboundMessageRouter outboundRouter = descriptor.getOutboundRouter();
         assertNotNull(outboundRouter);
         assertEquals(2, outboundRouter.getRouters().size());
-        //first Router
+        // first Router
         UMOOutboundRouter router1 = (UMOOutboundRouter) outboundRouter.getRouters().get(0);
         assertEquals(1, router1.getEndpoints().size());
         UMOEndpoint endpoint = (UMOEndpoint) router1.getEndpoints().get(0);
         assertEquals("file", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("/C:/temp", endpoint.getEndpointURI().getAddress());
         assertNotNull(endpoint.getTransformer());
-        //assertTrue(provider.getTransformer() instanceof ObjectToFileMessage);
+        // assertTrue(provider.getTransformer() instanceof ObjectToFileMessage);
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
-        //second Router
+        // second Router
         UMOOutboundRouter router2 = (UMOOutboundRouter) outboundRouter.getRouters().get(1);
         assertEquals(2, router2.getEndpoints().size());
         endpoint = (UMOEndpoint) router2.getEndpoints().get(0);
@@ -162,12 +163,12 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
 
     public void testComponent4Endpoints() throws Exception
     {
-        //test inbound
+        // test inbound
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent4");
         assertNotNull(descriptor);
         assertNotNull(descriptor.getInboundRouter().getEndpoints());
         assertEquals(1, descriptor.getInboundRouter().getEndpoints().size());
-        UMOEndpoint endpoint = (UMOEndpoint)descriptor.getInboundRouter().getEndpoints().get(0);
+        UMOEndpoint endpoint = (UMOEndpoint) descriptor.getInboundRouter().getEndpoints().get(0);
         assertNotNull(endpoint);
         assertEquals("vm", endpoint.getConnector().getProtocol().toLowerCase());
         assertTrue(endpoint.getName().equals("testEndpoint"));
@@ -176,19 +177,19 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
         assertTrue(endpoint.getTransformer() instanceof ObjectToXml);
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
 
-        //test outbound
+        // test outbound
         assertNull(descriptor.getOutboundEndpoint());
     }
 
     public void testComponent4RouterEndpoints() throws Exception
     {
-        //test inbound
+        // test inbound
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent4");
         assertNotNull(descriptor);
         UMOOutboundMessageRouter outboundRouter = descriptor.getOutboundRouter();
         assertNotNull(outboundRouter);
         assertEquals(1, outboundRouter.getRouters().size());
-        //first Router
+        // first Router
         UMOOutboundRouter router = (UMOOutboundRouter) outboundRouter.getRouters().get(0);
         assertEquals(2, router.getEndpoints().size());
         UMOEndpoint endpoint = (UMOEndpoint) router.getEndpoints().get(0);
@@ -209,32 +210,31 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
 
     public void testComponent5Endpoints() throws Exception
     {
-        //test inbound
+        // test inbound
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent5");
         assertNotNull(descriptor);
         UMOEndpoint endpoint = descriptor.getInboundEndpoint();
         assertNotNull(endpoint);
         assertEquals("vm", endpoint.getConnector().getProtocol().toLowerCase());
-        //assertTrue(!provider.getName().equals("testEndpoint"));
+        // assertTrue(!provider.getName().equals("testEndpoint"));
         assertTrue(endpoint.getConnector().getName().equals("testConnector2"));
         assertEquals("some.queue", endpoint.getEndpointURI().getAddress());
         assertNull(endpoint.getTransformer());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
 
-        //test outbound
+        // test outbound
         assertNull(descriptor.getOutboundEndpoint());
     }
 
-
     public void testComponent5RouterEndpoints() throws Exception
     {
-        //test inbound
+        // test inbound
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent5");
         assertNotNull(descriptor);
         UMOOutboundMessageRouter outboundRouter = descriptor.getOutboundRouter();
         assertNotNull(outboundRouter);
         assertEquals(1, outboundRouter.getRouters().size());
-        //first Router
+        // first Router
         UMOOutboundRouter router = (UMOOutboundRouter) outboundRouter.getRouters().get(0);
         assertEquals(2, router.getEndpoints().size());
         UMOEndpoint endpoint = (UMOEndpoint) router.getEndpoints().get(0);
@@ -254,7 +254,7 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
 
     public void testComponent6Endpoints() throws Exception
     {
-        //test outbound
+        // test outbound
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("TestComponent6");
         assertNotNull(descriptor);
         UMOEndpoint endpoint = descriptor.getOutboundEndpoint();
@@ -265,7 +265,7 @@ public class MuleEndpointConfigurationTestCase extends NamedTestCase
         assertEquals("org.mule.transformers.simple.StringToByteArray", endpoint.getTransformer().getClass().getName());
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_SENDER, endpoint.getType());
 
-        //test inbound
+        // test inbound
         assertNull(descriptor.getInboundEndpoint());
     }
 }
