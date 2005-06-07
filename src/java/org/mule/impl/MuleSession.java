@@ -176,9 +176,9 @@ public final class MuleSession implements UMOSession
      */
     public UMOMessage sendEvent(UMOEvent event) throws UMOException
     {
-        String timeout = (String) event.removeProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY);
-        if (timeout != null) {
-            event.setTimeout(Integer.parseInt(timeout));
+        int timeout = event.getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
+        if (timeout >= 0) {
+            event.setTimeout(timeout);
         }
 
         if (event.getEndpoint().canSend()) {
