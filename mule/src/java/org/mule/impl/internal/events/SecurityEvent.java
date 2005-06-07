@@ -28,7 +28,7 @@ import org.mule.umo.manager.UMOServerEvent;
  */
 public class SecurityEvent extends UMOServerEvent
 {
-    public static final int SECURITY_AUTHENITCATION_FAILED = SECURITY_EVENT_ACTION_START_RANGE + 1;
+    public static final int SECURITY_AUTHENTICATION_FAILED = SECURITY_EVENT_ACTION_START_RANGE + 1;
 
     private static final transient String[] ACTIONS = new String[] { "authentication failed" };
 

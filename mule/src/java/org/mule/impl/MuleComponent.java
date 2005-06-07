@@ -136,7 +136,7 @@ public final class MuleComponent implements UMOComponent, Work
     public synchronized void initialise() throws InitialisationException
     {
         if (initialised.get()) {
-            throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALSIED, "Component '"
+            throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED, "Component '"
                     + descriptor.getName() + "'"), this);
         }
         descriptor.initialise();
@@ -483,7 +483,7 @@ public final class MuleComponent implements UMOComponent, Work
                 } else if (e instanceof UMOException) {
                     handleException(e);
                 } else if (e instanceof WorkException) {
-                    handleException(new ComponentException(new Message(Messages.EVENT_PROCIESSING_FAILED_FOR_X,
+                    handleException(new ComponentException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
                                                                        descriptor.getName()),
                                                            event.getMessage(),
                                                            this,
