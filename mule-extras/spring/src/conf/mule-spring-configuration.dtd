@@ -978,6 +978,7 @@ I am going to define a common set of attributes for filters but users can add th
 or relax dtd validation on their parser
 -->
 <!ATTLIST left-filter pattern                   CDATA           #IMPLIED>
+<!ATTLIST left-filter expression                CDATA           #IMPLIED>
 <!ATTLIST left-filter configFile                CDATA           #IMPLIED>
 <!ATTLIST left-filter expectedType              CDATA           #IMPLIED>
 <!ATTLIST left-filter path                      CDATA           #IMPLIED>
@@ -993,6 +994,7 @@ I am going to define a common set of attributes for filters but users can add th
 or relax dtd validation on their parser
 -->
 <!ATTLIST right-filter pattern                   CDATA           #IMPLIED>
+<!ATTLIST right-filter expression                CDATA           #IMPLIED>
 <!ATTLIST right-filter configFile                CDATA           #IMPLIED>
 <!ATTLIST right-filter expectedType              CDATA           #IMPLIED>
 <!ATTLIST right-filter path                      CDATA           #IMPLIED>
