@@ -753,9 +753,9 @@ public class MuleClient implements Disposable
             for (Iterator iterator = dispatchers.iterator(); iterator.hasNext();) {
                 RemoteDispatcher remoteDispatcher = (RemoteDispatcher) iterator.next();
                 remoteDispatcher.dispose();
-                dispatchers.remove(remoteDispatcher);
                 remoteDispatcher = null;
             }
+            dispatchers.clear();
         }
         // Dispose the manager only if the manager was created for this client
         if (MuleManager.getConfiguration().isClientMode()) {
