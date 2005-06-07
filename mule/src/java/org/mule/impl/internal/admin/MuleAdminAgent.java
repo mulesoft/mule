@@ -98,10 +98,23 @@ public class MuleAdminAgent implements UMOAgent
     {
         serverEndpoint = MuleManager.getConfiguration().getServerUrl();
         UMOManager manager = MuleManager.getInstance();
+
         try {
+
+            if ("".equals(serverEndpoint)) {
+                // no serverUrl specified, warn a user
+                logger.warn("No serverEndpointUrl specified, MuleAdminAgent will not start. E.g. use " +
+                        "<mule-environment-properties serverUrl=\"tcp://example.com:60504\"/> ");
+
+                // abort the agent registration process
+                manager.removeAgent(this.getName());
+
+                return;
+            }
+
             // Check for override
             if (manager.getModel().isComponentRegistered(MuleManagerComponent.MANAGER_COMPONENT_NAME)) {
-                logger.info("Mule manager component has been already initialsied, ignoring server url");
+                logger.info("Mule manager component has already been initialised, ignoring server url");
             } else {
                 if (manager.lookupConnector(DEFAULT_MANAGER_PROVIDER) != null) {
                     throw new AlreadyInitialisedException("Server Components", this);

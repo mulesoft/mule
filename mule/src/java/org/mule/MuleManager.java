@@ -959,8 +959,8 @@ public class MuleManager implements UMOManager
         UMOAgent agent = (UMOAgent) agents.remove(name);
         if (agent != null) {
             agent.dispose();
+            agent.unregistered();
         }
-        agent.unregistered();
         return agent;
     }
 

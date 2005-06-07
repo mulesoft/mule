@@ -20,6 +20,7 @@ import org.mule.umo.manager.UMOManager;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
 
@@ -33,4 +34,13 @@ public class MuleManagerTestCase extends AbstractUMOManagerTestCase
         UMOManager manager = builder.configure("test-config-for-manager.xml");
         return manager;
     }
+
+    public void testRemoveNonExistentAgent() throws Exception
+    {
+        UMOManager manager = this.getUMOManager();
+        manager.removeAgent("DOES_NOT_EXIST");
+
+        // should not throw NPE
+    }
+
 }
