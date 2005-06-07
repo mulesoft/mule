@@ -135,15 +135,18 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     }
                     replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
                 }
-                msg.setJMSReplyTo(replyTo);
             }
-
-            // Are we going to wait for a return event?
+            // Are we going to wait for a return event ?
             if (syncReceive && replyTo == null) {
                 replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
+            }
+            // Set the replyTo property
+            if (replyTo != null) {
                 msg.setJMSReplyTo(replyTo);
             }
-            if (replyTo != null) {
+            
+            // Are we going to wait for a return event ?
+            if (syncReceive) {
                 consumer = connector.getJmsSupport().createConsumer(session, replyTo);
             }
 
@@ -186,9 +189,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             return null;
         } finally {
+            JmsUtils.closeQuietly(consumer);
+            JmsUtils.closeQuietly(producer);
             if (session != null && session != txSession) {
-                JmsUtils.closeQuietly(consumer);
-                JmsUtils.closeQuietly(producer);
                 JmsUtils.closeQuietly(session);
             }
         }

@@ -90,7 +90,7 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
         this.reuseConsumer = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseConsumer", true);
         this.reuseSession = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseSession", true);
 
-        receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
+        receiveMessagesInTransaction = endpoint.getTransactionConfig().getFactory() != null;
         try {
             redeliveryHandler = this.connector.createRedeliveryHandler();
             redeliveryHandler.setConnector(this.connector);

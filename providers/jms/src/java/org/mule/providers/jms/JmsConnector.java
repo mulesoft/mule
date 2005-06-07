@@ -237,14 +237,14 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 
     public Session getSession(boolean transacted) throws JMSException
     {
+        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         Session session = getCurrentSession();
         if (session != null) {
             logger.debug("Retrieving jms session from current transaction");
             return session;
         }
         logger.debug("Retrieving new jms session from connection");
-        session = jmsSupport.createSession(connection, transacted, acknowledgementMode, noLocal);
-        UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
+        session = jmsSupport.createSession(connection, transacted || tx != null, acknowledgementMode, noLocal);
         if (tx != null) {
             logger.debug("Binding session to current transaction");
             try {
@@ -294,11 +294,19 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     protected void doDispose()
     {
         super.doDispose();
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (JMSException e) {
+                logger.error("Jms connector failed to dispose properly: ", e);
+            }
+            connection = null;
+        }
         if (jndiContext != null) {
             try {
                 jndiContext.close();
             } catch (NamingException e) {
-                logger.error("Jms connector failed to close properly: " + e);
+                logger.error("Jms connector failed to dispose properly: ", e);
             }
         }
     }
