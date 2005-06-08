@@ -16,6 +16,7 @@ package org.mule.routing;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -35,7 +36,7 @@ import org.mule.umo.routing.RoutingException;
 
 public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
 {
-    private boolean sendTransformed = true;
+    private boolean sendTransformed = false;
 
     public UMOMessage catchMessage(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
@@ -48,6 +49,12 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
         try {
             UMOMessageDispatcher dispatcher = getEndpoint().getConnector().getDispatcher(getEndpoint().getEndpointURI()
                                                                                                       .getAddress());
+            
+            if (sendTransformed && getEndpoint().getTransformer() != null) {
+                Object payload = message.getPayload();
+                payload = getEndpoint().getTransformer().transform(payload);
+                message = new MuleMessage(payload, message.getProperties());
+            }
             UMOEvent newEvent = new MuleEvent(message, getEndpoint(), session, synchronous);
 
             if (synchronous) {
