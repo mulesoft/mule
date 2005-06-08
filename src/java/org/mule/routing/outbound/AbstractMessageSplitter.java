@@ -35,7 +35,7 @@ import org.mule.umo.routing.RoutingException;
 
 public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 {
-    // determines if the same endpoint will be matched multimple
+    // determines if the same endpoint will be matched multiple
     // times until a match is not found
     // This should be set by overriding classes
     protected boolean multimatch = true;
@@ -55,7 +55,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             endpoint = (UMOEndpoint) iterator.next();
             message = getMessagePart(message, endpoint);
             if (message == null) {
-                // Log a warning if there are no messages for a given endpont
+                // Log a warning if there are no messages for a given endpoint
                 logger.warn("Message part is null for endpoint: " + endpoint.getEndpointURI().toString());
             }
             // We'll keep looping to get all messages for the current endpoint
@@ -63,9 +63,9 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
             // This can be turned off by setting the multimatch flag to false
             while (message != null) {
                 try {
-                    if (enableCorrelation != ENABLE_CORREATION_NEVER) {
+                    if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
                         boolean correlationSet = message.getCorrelationId() != null;
-                        if (correlationSet && (enableCorrelation == ENABLE_CORREATION_IF_NOT_SET)) {
+                        if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
                             logger.debug("CorrelationId is already set, not setting Correlation group size");
                         } else {
                             // the correlationId will be set by the
@@ -110,7 +110,7 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
 
     /**
      * Retrieves a specific message part for the given endpoint. the message
-     * will then be routed via the parovider.
+     * will then be routed via the provider.
      * 
      * @param message the current message being processed
      * @param endpoint the endpoint that will be used to route the resulting

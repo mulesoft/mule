@@ -15,45 +15,35 @@ package org.mule.routing.filters.xml;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
 /**
- * <code>JXPathFilter</code> evaluates an XPath expression against an Xml
- * document or bean and returns true if the result is expected.
+ * <code>JXPathMessageFilter</code> evaluates an XPath expression against an 
+ * UMOMessage object.
  * 
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$
  */
-public class JXPathFilter implements UMOFilter
+public class JXPathMessageFilter implements UMOFilter
 {
 
-    private static final Logger logger = Logger.getLogger(JXPathFilter.class);
+    private static final Logger logger = Logger.getLogger(JXPathMessageFilter.class);
 
     private String expression;
 
     private String value;
 
-    public boolean accept(UMOMessage obj)
+    public boolean accept(UMOMessage message)
     {
-        return accept(obj.getPayload());
-    }
-    
-    private boolean accept(Object obj)
-    {
-        if (obj == null) {
-            return false;
-        }
         if (expression == null) {
-            logger.warn("Expression for JXPathFilter is not set");
+            logger.warn("Expression for JXPathMessageFilter is not set");
             return false;
         }
 
         if (value == null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Value for JXPathFilter is not set : true by default");
+                logger.debug("Value for JXPathMessageFilter is not set : true by default");
             }
             value = Boolean.TRUE.toString();
         }
@@ -63,30 +53,25 @@ public class JXPathFilter implements UMOFilter
         try {
             Object o = null;
 
-            if (obj instanceof String) {
-                Document doc = DocumentHelper.parseText((String) obj);
-                o = doc.valueOf(expression);
-            } else {
-                JXPathContext context = JXPathContext.newContext(obj);
-                o = context.getValue(expression);
-            }
+            JXPathContext context = JXPathContext.newContext(message);
+            o = context.getValue(expression);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("JXPathFilter Expression result='" + o + "' -  Expected value='" + value + "'");
+                logger.debug("JXPathMessageFilter Expression result='" + o + "' -  Expected value='" + value + "'");
             }
 
             if (o != null) {
                 res = value.equals(o.toString());
             } else {
                 res = false;
-                logger.warn("JXPathFilter Expression result is null (" + expression + ")");
+                logger.warn("JXPathMessageFilter Expression result is null (" + expression + ")");
             }
         } catch (Exception e) {
-            logger.warn("JXPathFilter cannot evaluate expression (" + expression + ") :" + e.getMessage(), e);
+            logger.warn("JXPathMessageFilter cannot evaluate expression (" + expression + ") :" + e.getMessage(), e);
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("JXPathFilter accept object  : " + res);
+            logger.debug("JXPathMessageFilter accept object  : " + res);
         }
         return res;
 

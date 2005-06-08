@@ -74,8 +74,6 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         message.setProperty("foo", "bar");
         assertTrue(filter.accept(message));
         filter.setCaseSensitive(false);
-        assertTrue(!filter.accept(null));
-        assertTrue(!filter.accept("Not an Event"));
 
         filter = new MessagePropertyFilter("foo2 =null");
         message.setProperty("foo2", null);

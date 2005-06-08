@@ -13,22 +13,13 @@
  */
 package org.mule.routing.filters;
 
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOFilter;
-
 /**
- * <code>UMOEventFilter</code> is a filter for determining if the object is a
- * UMOEvent. This filter will allways be used in conjunction with at least one
- * other filter.
+ * Interface for filtering any kind of objects.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
- */
-
-public class UMOEventFilter implements UMOFilter
+ **/
+public interface ObjectFilter
 {
-    public boolean accept(Object object)
-    {
-        return object instanceof UMOEvent;
-    }
+    boolean accept(Object object);
 }

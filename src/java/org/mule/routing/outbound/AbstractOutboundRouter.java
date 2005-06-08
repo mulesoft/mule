@@ -42,9 +42,9 @@ import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 {
-    public static final int ENABLE_CORREATION_IF_NOT_SET = 0;
-    public static final int ENABLE_CORREATION_ALWAYS = 1;
-    public static final int ENABLE_CORREATION_NEVER = 2;
+    public static final int ENABLE_CORRELATION_IF_NOT_SET = 0;
+    public static final int ENABLE_CORRELATION_ALWAYS = 1;
+    public static final int ENABLE_CORRELATION_NEVER = 2;
     /**
      * logger used by this class
      */
@@ -54,7 +54,7 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     protected String replyTo = null;
 
-    protected int enableCorrelation = ENABLE_CORREATION_IF_NOT_SET;
+    protected int enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
 
     protected PropertyExtractor propertyExtractor = new DefaultPropertiesExtractor();
 
@@ -104,9 +104,9 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
                 logger.debug("Setting replyTo=" + replyTo + " for outbound endpoint: " + endpoint.getEndpointURI());
             }
         }
-        if (enableCorrelation != ENABLE_CORREATION_NEVER) {
+        if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
             boolean correlationSet = message.getCorrelationId() != null;
-            if (correlationSet && (enableCorrelation == ENABLE_CORREATION_IF_NOT_SET)) {
+            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
                 logger.debug("CorrelationId is already set, not setting it again");
                 return;
             } else if (correlationSet) {
@@ -231,11 +231,11 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     {
         if (enableCorrelation != null) {
             if (enableCorrelation.equals("ALWAYS")) {
-                this.enableCorrelation = ENABLE_CORREATION_ALWAYS;
+                this.enableCorrelation = ENABLE_CORRELATION_ALWAYS;
             } else if (enableCorrelation.equals("NEVER")) {
-                this.enableCorrelation = ENABLE_CORREATION_NEVER;
+                this.enableCorrelation = ENABLE_CORRELATION_NEVER;
             } else if (enableCorrelation.equals("IF_NOT_SET")) {
-                this.enableCorrelation = ENABLE_CORREATION_IF_NOT_SET;
+                this.enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
             } else {
                 throw new IllegalArgumentException("Value for enableCorrelation not recognised: " + enableCorrelation);
             }

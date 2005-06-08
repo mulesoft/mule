@@ -17,10 +17,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.MuleMessage;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.umo.transformer.TransformerException;
@@ -53,10 +55,11 @@ public class SelectiveConsumer implements UMOInboundRouter
         if (filter == null) {
             return true;
         }
-        Object payload = null;
+        UMOMessage message;
         if (transformFirst) {
             try {
-                payload = event.getTransformedMessage();
+                Object payload = event.getTransformedMessage();
+                message = new MuleMessage(payload, event.getMessage().getProperties());
             } catch (TransformerException e) {
                 throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER),
                                            event.getMessage(),
@@ -64,9 +67,9 @@ public class SelectiveConsumer implements UMOInboundRouter
                                            e);
             }
         } else {
-            payload = event.getMessage().getPayload();
+            message = event.getMessage();
         }
-        return filter.accept(payload);
+        return filter.accept(message);
     }
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException

@@ -14,6 +14,7 @@
 package org.mule.routing.filters;
 
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 import org.mule.util.Utility;
 
 /**
@@ -33,7 +34,7 @@ import org.mule.util.Utility;
  * @version $Revision$
  */
 
-public class WildcardFilter implements UMOFilter
+public class WildcardFilter implements UMOFilter, ObjectFilter
 {
     protected String[] patterns;
     protected String pattern;
@@ -45,6 +46,11 @@ public class WildcardFilter implements UMOFilter
     public WildcardFilter(String pattern)
     {
         setPattern(pattern);
+    }
+    
+    public boolean accept(UMOMessage message)
+    {
+        return accept(message.getPayload());
     }
 
     public boolean accept(Object object)

@@ -14,6 +14,7 @@
 package org.mule.routing.filters.logic;
 
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>OrFilter</code> accepts if the leftFilter or rightFilter filter
@@ -58,8 +59,8 @@ public class OrFilter implements UMOFilter
         return rightFilter;
     }
 
-    public boolean accept(Object object)
+    public boolean accept(UMOMessage message)
     {
-        return leftFilter.accept(object) || rightFilter.accept(object);
+        return leftFilter.accept(message) || rightFilter.accept(message);
     }
 }

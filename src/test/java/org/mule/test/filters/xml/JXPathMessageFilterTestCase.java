@@ -17,28 +17,29 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import org.mule.impl.MuleMessage;
-import org.mule.routing.filters.xml.JXPathFilter;
+import org.mule.routing.filters.xml.JXPathMessageFilter;
 import org.mule.tck.NamedTestCase;
 import org.mule.transformers.xml.XmlToDomDocument;
+import org.mule.umo.UMOMessage;
 
 /**
- * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class JXPathFilterTestCase extends NamedTestCase
+public class JXPathMessageFilterTestCase extends NamedTestCase
 {
     private String xmlData = null;
 
-    private JXPathFilter myFilter = null;
+    private JXPathMessageFilter myFilter = null;
     private XmlToDomDocument transformer = null;
 
     public void testFilter1() throws Exception
     {
         Object obj = transformer.transform(xmlData);
-
-        myFilter.setExpression("catalog/cd[3]/title");
+        UMOMessage message = new MuleMessage(obj, null);
+        myFilter.setExpression("payload/catalog/cd[3]/title");
         myFilter.setValue("Greatest Hits");
-        boolean res = myFilter.accept(new MuleMessage(obj, null));
+        boolean res = myFilter.accept(message);
         assertTrue(res);
 
     }
@@ -46,8 +47,9 @@ public class JXPathFilterTestCase extends NamedTestCase
     public void testFilter2() throws Exception
     {
         Object obj = transformer.transform(xmlData);
-        myFilter.setExpression("(catalog/cd[3]/title) ='Greatest Hits'");
-        boolean res = myFilter.accept(new MuleMessage(obj, null));
+        UMOMessage message = new MuleMessage(obj, null);
+        myFilter.setExpression("(payload/catalog/cd[3]/title) ='Greatest Hits'");
+        boolean res = myFilter.accept(message);
         assertTrue(res);
 
     }
@@ -55,8 +57,9 @@ public class JXPathFilterTestCase extends NamedTestCase
     public void testFilter3() throws Exception
     {
         Object obj = transformer.transform(xmlData);
-        myFilter.setExpression("count(catalog/cd) = 26");
-        boolean res = myFilter.accept(new MuleMessage(obj, null));
+        UMOMessage message = new MuleMessage(obj, null);
+        myFilter.setExpression("count(payload/catalog/cd) = 26");
+        boolean res = myFilter.accept(message);
         assertTrue(res);
 
     }
@@ -66,9 +69,9 @@ public class JXPathFilterTestCase extends NamedTestCase
         Dummy d = new Dummy();
         d.setId(10);
         d.setContent("hello");
-
-        myFilter.setExpression("id=10 and content='hello'");
-        boolean res = myFilter.accept(new MuleMessage(d, null));
+        UMOMessage message = new MuleMessage(d, null);
+        myFilter.setExpression("payload/id=10 and payload/content='hello'");
+        boolean res = myFilter.accept(message);
         assertTrue(res);
 
     }
@@ -85,7 +88,7 @@ public class JXPathFilterTestCase extends NamedTestCase
         xmlData = sb.toString();
 
         // new UMOFilter
-        myFilter = new JXPathFilter();
+        myFilter = new JXPathMessageFilter();
         transformer = new XmlToDomDocument();
     }
 }

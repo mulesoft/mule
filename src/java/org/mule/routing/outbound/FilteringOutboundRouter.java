@@ -15,7 +15,7 @@ package org.mule.routing.outbound;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.routing.filters.MessageFilter;
+import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
@@ -75,21 +75,18 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter
         if (getFilter() == null) {
             return true;
         }
-        if (getFilter() instanceof MessageFilter) {
-            return getFilter().accept(message);
-        }
-        Object payload = message.getPayload();
-        try {
-            if (transformer != null) {
-                payload = transformer.transform(message);
+        if (transformer != null) {
+            try {
+                Object payload = transformer.transform(message.getPayload());
+                message = new MuleMessage(payload, message.getProperties());
+            } catch (TransformerException e) {
+                throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER),
+                                           message,
+                                           (UMOEndpoint) endpoints.get(0),
+                                           e);
             }
-        } catch (TransformerException e) {
-            throw new RoutingException(new Message(Messages.TRANSFORM_FAILED_BEFORE_FILTER),
-                                       message,
-                                       (UMOEndpoint) endpoints.get(0),
-                                       e);
         }
-        return getFilter().accept(payload);
+        return getFilter().accept(message);
     }
 
     public UMOTransformer getTransformer()

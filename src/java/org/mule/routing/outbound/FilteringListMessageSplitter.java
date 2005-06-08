@@ -13,6 +13,7 @@
  */
 package org.mule.routing.outbound;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,33 +67,23 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
      */
     protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
     {
-        Object object;
-        UMOMessage result = null;
         for (int i = 0; i < payload.size(); i++) {
-            object = payload.get(i);
+            Object object = payload.get(i);
+            UMOMessage result = new MuleMessage(object, new HashMap(properties));
             // If there is no filter assume that the endpoint can accept the
             // message.
             // Endpoints will be processed in order to only the last (if any) of
             // the
             // the endpoints may not have a filter
-            if (endpoint.getFilter() == null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("There is not filter configured on: " + endpoint.getEndpointURI().toString()
-                            + ". Using endpoint");
-                }
-                result = new MuleMessage(object, properties);
-                payload.remove(i);
-                break;
-            } else if (endpoint.getFilter().accept(object)) {
+            if (endpoint.getFilter() == null || endpoint.getFilter().accept(result)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Endpoint filter matched. Routing message over: "
-                            + endpoint.getEndpointURI().toString());
+                                 + endpoint.getEndpointURI().toString());
                 }
-                result = new MuleMessage(object, properties);
                 payload.remove(i);
-                break;
+                return result;
             }
         }
-        return result;
+        return null;
     }
 }

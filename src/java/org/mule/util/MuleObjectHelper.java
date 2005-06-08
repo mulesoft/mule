@@ -25,8 +25,8 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.routing.filters.EqualsFilter;
+import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
@@ -89,7 +89,7 @@ public class MuleObjectHelper
 
     public static UMOEndpoint getEndpointByEndpointUri(String endpointUri, boolean wildcardMatch)
     {
-        UMOFilter filter;
+        ObjectFilter filter;
         if (wildcardMatch) {
             filter = new WildcardFilter(endpointUri);
         } else {

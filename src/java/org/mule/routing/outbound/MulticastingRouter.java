@@ -40,9 +40,9 @@ public class MulticastingRouter extends FilteringOutboundRouter
         if (endpoints == null || endpoints.size() == 0) {
             throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
         }
-        if (enableCorrelation != ENABLE_CORREATION_NEVER) {
+        if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
             boolean correlationSet = message.getCorrelationId() != null;
-            if (correlationSet && (enableCorrelation == ENABLE_CORREATION_IF_NOT_SET)) {
+            if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
                 logger.debug("CorrelationId is already set, not setting Correlation group size");
             } else {
                 // the correlationId will be set by the AbstractOutboundRouter

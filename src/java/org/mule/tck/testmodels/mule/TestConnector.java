@@ -21,7 +21,6 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -108,11 +107,6 @@ public class TestConnector extends AbstractConnector
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
         UMOMessageReceiver receiver = new AbstractMessageReceiver(this, component, endpoint) {
-            protected boolean allowFilter(UMOFilter filter) throws UnsupportedOperationException
-            {
-                return true;
-            }
-
             public void doConnect() throws Exception
             {
             }

@@ -305,7 +305,7 @@ public interface UMOEvent
     /**
      * The number of milliseconds to wait for a return event when running
      * synchronously. 0 wait forever -1 try and receive, but do not wait or a
-     * positive millisecod value
+     * positive millisecond value
      * 
      * @return the event timeout in milliseconds
      */

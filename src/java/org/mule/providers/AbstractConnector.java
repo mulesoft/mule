@@ -285,7 +285,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     public final synchronized void dispose()
     {
-        disposed.set(true);
         if (logger.isInfoEnabled()) {
             logger.info("Disposing Connector: " + getClass().getName());
             logger.debug("Disposing Receivers");
@@ -316,6 +315,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             logger.debug("Dispatchers Disposed");
         }
         doDispose();
+        disposed.set(true);
 
         if (logger.isInfoEnabled()) {
             logger.info("Connector " + getClass().getName() + " has been disposed.");

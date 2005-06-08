@@ -13,9 +13,7 @@
  */
 package org.mule.transaction.constraints;
 
-import org.mule.routing.filters.UMOEventFilter;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOFilter;
 
 /**
  * <code>ConstraintFilter</code> TODO
@@ -24,25 +22,13 @@ import org.mule.umo.UMOFilter;
  * @version $Revision$
  */
 
-public class ConstraintFilter implements UMOFilter, Cloneable
+public class ConstraintFilter implements Cloneable
 {
-    private UMOFilter eventFilter = null;
-
     public ConstraintFilter()
     {
-        eventFilter = new UMOEventFilter();
     }
 
-    public final boolean accept(Object object)
-    {
-        if (eventFilter.accept(object)) {
-            return accept((UMOEvent) object);
-        } else {
-            return false;
-        }
-    }
-
-    protected boolean accept(UMOEvent event)
+    public boolean accept(UMOEvent event)
     {
         return true;
     }

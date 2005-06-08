@@ -16,6 +16,7 @@ package org.mule.routing.filters;
 import java.util.regex.Pattern;
 
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>RegExFilter</code> is used to match a rgular expression against a
@@ -25,7 +26,7 @@ import org.mule.umo.UMOFilter;
  * @version $Revision$
  */
 
-public class RegExFilter implements UMOFilter
+public class RegExFilter implements UMOFilter, ObjectFilter
 {
     private Pattern pattern;
 
@@ -36,6 +37,11 @@ public class RegExFilter implements UMOFilter
     public RegExFilter(String pattern)
     {
         this.pattern = Pattern.compile(pattern);
+    }
+
+    public boolean accept(UMOMessage message)
+    {
+        return accept(message.getPayload());
     }
 
     public boolean accept(Object object)
