@@ -18,6 +18,7 @@ import javax.mail.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>AbstractMailFilter</code> is a base class for all javax.mail.Message
@@ -33,10 +34,9 @@ public abstract class AbstractMailFilter implements UMOFilter
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public final boolean accept(Object object)
+    public final boolean accept(UMOMessage message)
     {
-        if (object == null)
-            throw new NullPointerException("object cannot be null for this filter");
+        Object object = message.getPayload();
         if (object instanceof Message) {
             return accept((Message) object);
         } else {

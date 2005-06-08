@@ -15,6 +15,7 @@
 package org.mule.providers.ftp;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,11 +48,16 @@ public class FtpMessageReceiver extends PollingMessageReceiver
 
     protected FtpConnector connector;
 
+    private FilenameFilter filenameFilter = null;
+    
     public FtpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint, Long frequency)
             throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
         this.connector = (FtpConnector) connector;
+        if (endpoint.getFilter() instanceof FilenameFilter) {
+            filenameFilter = (FilenameFilter) endpoint.getFilter();
+        }
     }
 
     public void poll() throws Exception
@@ -100,7 +106,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver
             ArrayList v = new ArrayList();
             for (int i = 0; i < files.length; i++) {
                 if (files[i].isFile()) {
-                    if (filter == null || filter.accept(files[i].getName())) {
+                    if (filenameFilter == null || filenameFilter.accept(null, files[i].getName())) {
                         v.add(files);
                     }
                 }

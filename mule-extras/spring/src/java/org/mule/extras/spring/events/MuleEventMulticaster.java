@@ -35,11 +35,11 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -282,12 +282,10 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      */
     private boolean isSubscriptionMatch(String endpoint, String[] subscriptions)
     {
-        UMOFilter filter = null;
-        String subscription;
         for (int i = 0; i < subscriptions.length; i++) {
-            subscription = PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(),
-                                                              subscriptions[i],
-                                                              subscriptions[i]);
+            String subscription = PropertiesHelper.getStringProperty(MuleManager.getInstance().getEndpointIdentifiers(),
+                                                                     subscriptions[i],
+                                                                     subscriptions[i]);
 
             // Subscriptions can be full Mule Urls or resource specific such as
             // my.queue
@@ -306,7 +304,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 subscription = ep.getAddress();
             }
 
-            filter = createFilter(subscription);
+            ObjectFilter filter = createFilter(subscription);
             if (filter.accept(endpoint)) {
                 return true;
             }
@@ -603,13 +601,13 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         return descriptor;
     }
 
-    protected UMOFilter createFilter(String pattern)
+    protected ObjectFilter createFilter(String pattern)
     {
         try {
             if (getSubscriptionFilter() == null)
                 setSubscriptionFilter(WildcardFilter.class);
-            UMOFilter filter = (UMOFilter) ClassHelper.instanciateClass(getSubscriptionFilter(),
-                                                                        new Object[] { pattern });
+            ObjectFilter filter = (ObjectFilter) ClassHelper.instanciateClass(getSubscriptionFilter(),
+                                                                              new Object[] { pattern });
             return filter;
         } catch (Exception e) {
             logger.error("Failed to load filter: " + getSubscriptionFilter() + " : " + e.getMessage());

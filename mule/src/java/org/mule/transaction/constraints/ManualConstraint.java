@@ -24,7 +24,7 @@ import org.mule.umo.UMOEvent;
  */
 public class ManualConstraint extends ConstraintFilter
 {
-    protected boolean accept(UMOEvent event)
+    public boolean accept(UMOEvent event)
     {
         return false;
     }

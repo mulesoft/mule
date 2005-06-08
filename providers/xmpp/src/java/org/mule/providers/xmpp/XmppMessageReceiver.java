@@ -30,7 +30,6 @@ import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -58,7 +57,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         try {
             XmppConnector cnn = (XmppConnector) connector;
             xmppConnection = cnn.findOrCreateXmppConnection(endpoint.getEndpointURI());
-            if (endpoint.getFilter() != null) {
+            if (endpoint.getFilter() instanceof PacketFilter) {
                 xmppConnection.addPacketListener(this, (PacketFilter) endpoint.getFilter());
             } else {
                 PacketFilter filter = new PacketTypeFilter(Message.class);
@@ -77,11 +76,6 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
             xmppConnection.removePacketListener(this);
             xmppConnection.close();
         }
-    }
-
-    protected boolean allowFilter(UMOFilter filter) throws UnsupportedOperationException
-    {
-        return filter instanceof PacketFilter;
     }
 
     public void doDispose()

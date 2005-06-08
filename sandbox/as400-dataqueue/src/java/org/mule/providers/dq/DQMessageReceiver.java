@@ -99,6 +99,14 @@ public class DQMessageReceiver extends PollingMessageReceiver
         message.setSenderInformation(entry.getSenderInformation());
 
         UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(message));
-        routeMessage(umoMessage, true);
+        routeMessage(umoMessage);
+    }
+
+    public void doConnect() throws Exception
+    {
+    }
+
+    public void doDisconnect() throws Exception
+    {
     }
 }

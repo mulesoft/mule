@@ -13,12 +13,13 @@
  */
 package org.mule.routing.filters;
 
+import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 
 /**
  * <code>MessagePropertyFilter</code> can be used to filter against properties
  * on an event. This can be very useful as the event properties represent all
- * the meta information about the evnet from the underlying transport, so for an
+ * the meta information about the event from the underlying transport, so for an
  * event received over Http you can check for Http Headers or For Jms you can
  * check for Jms Headers. The pattern should be expresed as a key/value pair
  * i.e.
@@ -34,7 +35,7 @@ import org.mule.umo.UMOMessage;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MessagePropertyFilter extends MessageFilter
+public class MessagePropertyFilter implements UMOFilter
 {
     private boolean caseSensitive = true;
     private boolean not = false;
@@ -53,11 +54,7 @@ public class MessagePropertyFilter extends MessageFilter
 
     public boolean accept(UMOMessage message)
     {
-        if (message == null) {
-            return false;
-        }
         Object value = message.getProperty(propertyName);
-
         if (value == null) {
             return compare(null, propertyValue);
         } else {

@@ -14,6 +14,7 @@
 package org.mule.providers.jms.filters;
 
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>JmsSelectorFilter</code> is a wrapper for a Jms Selector. This filter
@@ -27,7 +28,7 @@ public class JmsSelectorFilter implements UMOFilter
 {
     private String expression = null;
 
-    public boolean accept(Object object)
+    public boolean accept(UMOMessage message)
     {
         // If we have received the message the selector has been honoured
         return true;

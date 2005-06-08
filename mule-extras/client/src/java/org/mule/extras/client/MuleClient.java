@@ -429,7 +429,7 @@ public class MuleClient implements Disposable
      */
     public UMOMessage send(String url, Object payload, Map messageProperties) throws UMOException
     {
-        return send(url, payload, messageProperties, 0);
+        return send(url, payload, messageProperties, MuleManager.getConfiguration().getSynchronousEventTimeout());
     }
 
     /**

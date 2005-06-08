@@ -24,9 +24,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
 import org.mule.providers.PollingMessageReceiver;
-import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -68,10 +66,8 @@ public class FileMessageReceiver extends PollingMessageReceiver
         this.readDir = readDir;
         this.moveDir = moveDir;
         this.moveToPattern = moveToPattern;
-        if (endpoint.getFilter() != null) {
+        if (endpoint.getFilter() instanceof FilenameFilter) {
             filenameFilter = (FilenameFilter) endpoint.getFilter();
-        } else {
-            filenameFilter = new FilenameWildcardFilter("*");
         }
     }
 
@@ -200,8 +196,4 @@ public class FileMessageReceiver extends PollingMessageReceiver
         return todoFiles;
     }
 
-    protected boolean allowFilter(UMOFilter filter) throws UnsupportedOperationException
-    {
-        return filter instanceof FilenameFilter;
-    }
 }

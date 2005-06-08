@@ -30,7 +30,7 @@ public class ExpiryMonitorTestCase extends NamedTestCase
         expired = false;
     }
 
-    public void testExiry() throws InterruptedException
+    public void testExpiry() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
         Expirable e = new Expirable() {
@@ -45,7 +45,7 @@ public class ExpiryMonitorTestCase extends NamedTestCase
         assertTrue(!monitor.isRegistered(e));
     }
 
-    public void testNotExiry() throws InterruptedException
+    public void testNotExpiry() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
         Expirable e = new Expirable() {
@@ -62,7 +62,7 @@ public class ExpiryMonitorTestCase extends NamedTestCase
         assertTrue(!monitor.isRegistered(e));
     }
 
-    public void testExiryWithReset() throws InterruptedException
+    public void testExpiryWithReset() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
         Expirable e = new Expirable() {
@@ -83,7 +83,7 @@ public class ExpiryMonitorTestCase extends NamedTestCase
         assertTrue(!monitor.isRegistered(e));
     }
 
-    public void testNotExiryWithRemove() throws InterruptedException
+    public void testNotExpiryWithRemove() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor(100);
         Expirable e = new Expirable() {

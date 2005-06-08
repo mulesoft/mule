@@ -14,6 +14,7 @@
 package org.mule.routing.filters.logic;
 
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>NotFilter</code> accepts if the filter does not accept
@@ -45,8 +46,8 @@ public class NotFilter implements UMOFilter
         this.filter = filter;
     }
 
-    public boolean accept(Object object)
+    public boolean accept(UMOMessage message)
     {
-        return !filter.accept(object);
+        return !filter.accept(message);
     }
 }

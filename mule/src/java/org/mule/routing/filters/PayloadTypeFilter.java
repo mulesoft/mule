@@ -14,6 +14,7 @@
 package org.mule.routing.filters;
 
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>PayloadTypeFilter</code> filters based on the type of the object
@@ -36,9 +37,9 @@ public class PayloadTypeFilter implements UMOFilter
         this.expectedType = expectedType;
     }
 
-    public boolean accept(Object object)
+    public boolean accept(UMOMessage message)
     {
-        return expectedType.isAssignableFrom(object.getClass());
+        return expectedType.isAssignableFrom(message.getPayload().getClass());
     }
 
     public Class getExpectedType()

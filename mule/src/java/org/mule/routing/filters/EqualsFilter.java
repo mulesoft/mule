@@ -14,6 +14,7 @@
 package org.mule.routing.filters;
 
 import org.mule.umo.UMOFilter;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>EqualsFilter</code> is a filer for comparing two objects using the
@@ -22,8 +23,7 @@ import org.mule.umo.UMOFilter;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-
-public class EqualsFilter implements UMOFilter
+public class EqualsFilter implements UMOFilter, ObjectFilter
 {
     private Object pattern;
 
@@ -34,6 +34,11 @@ public class EqualsFilter implements UMOFilter
     public EqualsFilter(Object compareTo)
     {
         this.pattern = compareTo;
+    }
+    
+    public boolean accept(UMOMessage message)
+    {
+        return accept(message.getPayload());
     }
 
     public boolean accept(Object object)

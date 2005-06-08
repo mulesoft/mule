@@ -14,7 +14,7 @@
 package org.mule.umo;
 
 /**
- * <code>UMOFilter</code> well known filter interface
+ * The <code>UMOFilter</code> interface allows UMOMessage filtering.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -22,5 +22,11 @@ package org.mule.umo;
 
 public interface UMOFilter
 {
-    boolean accept(Object object);
+    /**
+     * Check a given message against this filter.
+     * 
+     * @param message a non null message to filter.
+     * @return <code>true</code> if the message matches the filter
+     */
+    boolean accept(UMOMessage message);
 }

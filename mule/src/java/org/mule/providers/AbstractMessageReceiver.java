@@ -34,7 +34,6 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
@@ -178,11 +177,13 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         }
         connector.getExceptionListener().exceptionThrown(exception);
         setExceptionCode(exception);
-        try {
-            connectionStrategy.connect(this);
-        } catch (UMOException e) {
-            connector.getExceptionListener().exceptionThrown(e);
-            setExceptionCode(exception);
+        if (exception instanceof ConnectException) {
+	        try {
+	            connectionStrategy.connect(this);
+	        } catch (UMOException e) {
+	            connector.getExceptionListener().exceptionThrown(e);
+	            setExceptionCode(exception);
+	        }
         }
     }
 
@@ -344,10 +345,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         if (endpoint == null) {
             throw new IllegalArgumentException("Provider cannot be null");
         }
-        if (endpoint.getFilter() != null && !allowFilter(endpoint.getFilter())) {
-            throw new UnsupportedOperationException("Message filter: " + endpoint.getFilter().getClass().getName()
-                    + " is not supported by this connector: " + connector.getClass().getName());
-        }
         this.endpoint = endpoint;
     }
 
@@ -386,21 +383,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         return endpointUri;
     }
 
-    boolean acceptMessage(Object message)
-    {
-        if (endpoint.getFilter() != null) {
-            return endpoint.getFilter().accept(message);
-        } else {
-            return true;
-        }
-    }
-
-    protected boolean allowFilter(UMOFilter filter) throws UnsupportedOperationException
-    {
-        // By default we support all filters on endpoints
-        return true;
-    }
-
     public boolean isServerSide()
     {
         return serverSide;
@@ -423,12 +405,15 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     public void connect() throws Exception
     {
+        if (connected.get()) {
+            return;
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Attempting to connect to: " + endpoint.getEndpointURI());
         }
         if (!connecting) {
             connecting = true;
-            connectionStrategy.connect(AbstractMessageReceiver.this);
+            connectionStrategy.connect(this);
             logger.info("Successfully connected to: " + endpoint.getEndpointURI());
             return;
         }

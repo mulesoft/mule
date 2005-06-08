@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <extend>../../../project.xml</extend>
+    <extend>../../project.xml</extend>
     <id>mule-webapp</id>
     <groupId>mule</groupId>
     <pomVersion>3</pomVersion>
@@ -23,11 +23,11 @@
             </properties>
         </dependency>
         <dependency>
-            <id>spring</id>
-            <version>1.1-rc1</version>
+            <artifactId>spring</artifactId>
+            <groupId>springframework</groupId>
+            <version>${spring_version}</version>
             <url>http://www.springframework.org</url>
             <properties>
-                <mule.core.jar>true</mule.core.jar>
                 <war.bundle>true</war.bundle>
             </properties>
         </dependency>

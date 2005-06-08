@@ -90,14 +90,14 @@
         as the endpoiint though fully qualified uri will work ie. file:///usr/test-data/samples/errorhandler/in
         -->
         <mule-descriptor name="Error Manager"
-            inboundEndpoint="file://localhost?endpointUri=../test-data/in"
+            inboundEndpoint="file://../test-data/in"
             inboundTransformer="FileMessageToObject XMLToExceptionBean ExceptionBeanToErrorMessage"
             implementation="errorManager">
 
             <outbound-router>
                 <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="file:./test-data/samples/errorhandler/exceptions" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
+                    <endpoint address="file://../test-data/samples/errorhandler/exceptions" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
                         <properties>
                             <property name="outputPattern" value="Exception-${UUID}.xml"/>
                         </properties>

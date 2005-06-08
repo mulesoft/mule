@@ -51,7 +51,6 @@ import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -97,11 +96,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     protected Work createWork(Socket socket)
     {
         return new HttpWorker(socket);
-    }
-
-    protected boolean allowFilter(UMOFilter filter) throws UnsupportedOperationException
-    {
-        return true;
     }
 
     public void doDispose()

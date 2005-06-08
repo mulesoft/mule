@@ -26,7 +26,6 @@ public class TransactionConstraintTestCase extends AbstractMuleTestCase
     public void testConstraintFilter() throws Exception
     {
         ConstraintFilter filter = new ConstraintFilter();
-        assertTrue(!filter.accept(new String()));
         assertTrue(filter.accept(getTestEvent("test")));
 
         ConstraintFilter clone = (ConstraintFilter) filter.clone();

@@ -259,6 +259,15 @@
             </properties>
         </dependency>
         <dependency>
+            <id>mule:mule-extras-plexus</id>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
             <artifactId>spring</artifactId>
             <groupId>springframework</groupId>
             <version>${spring_version}</version>
