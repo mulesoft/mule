@@ -23,6 +23,7 @@ import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformers.DefaultTransformer;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -30,7 +31,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.routing.RoutingException;
+import org.mule.umo.transformer.TransformerException;
 
+import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
@@ -74,6 +77,54 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         connector.expectAndReturn("getDispatcher", "dummy", (UMOMessageDispatcher) dispatcher.proxy());
         dispatcher.expect("dispatch", C.isA(UMOEvent.class));
         strategy.catchMessage(event.getMessage(), null, false);
+
+        endpoint.verify();
+        dispatcher.verify();
+        connector.verify();
+
+        assertNotNull(strategy.getEndpoint());
+    }
+
+    private class TestEventTransformer extends DefaultTransformer
+    {
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
+         */
+        public Object doTransform(Object src) throws TransformerException
+        {
+            return "Transformed Test Data";
+        }
+    }
+    
+    public void testForwardingStrategyWithTransform() throws Exception
+    {
+        ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
+        strategy.setSendTransformed(true);
+        Mock endpoint = getMockEndpoint();
+        Mock dispatcher = new Mock(UMOMessageDispatcher.class);
+        Mock connector = getMockConnector();
+        UMOEvent event = getTestEvent("UncaughtEvent");
+        strategy.setEndpoint((UMOEndpoint) endpoint.proxy());
+
+        endpoint.expectAndReturn("getTransformer", new TestEventTransformer());
+        endpoint.expectAndReturn("getTransformer", new TestEventTransformer());
+        endpoint.expectAndReturn("getProperties", new HashMap());
+        endpoint.expectAndReturn("getProperties", new HashMap());
+        endpoint.expectAndReturn("getConnector", (UMOConnector) connector.proxy());
+        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
+        connector.expectAndReturn("getDispatcher", "dummy", (UMOMessageDispatcher) dispatcher.proxy());
+        dispatcher.expect("send", new Constraint() {
+            public boolean eval(Object arg0)
+            {
+                if (arg0 instanceof UMOEvent) {
+                    return "Transformed Test Data".equals(((UMOEvent) arg0).getMessage().getPayload());
+                }
+                return false;
+            }
+        });
+        strategy.catchMessage(event.getMessage(), null, true);
 
         endpoint.verify();
         dispatcher.verify();
