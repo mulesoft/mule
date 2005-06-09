@@ -37,15 +37,14 @@ import org.mule.util.Utility;
  */
 public class SslConnector extends TcpConnector
 {
-    public static final String DEFAULT_KEYSTORE = ".keystore";
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
     public static final String DEFAULT_MANAGER_ALGORITHM = "SunX509";
     public static final String DEFAULT_PROTOCOL_HANDLER = "com.sun.net.ssl.internal.www.protocol";
 
-    private String keyStore = DEFAULT_KEYSTORE;
+    private String keyStore = null;
     private String keyPassword = null;
     private String storePassword = null;
-    private String keystoreType = KeyStore.getDefaultType();
+    private String keyStoreType = DEFAULT_KEYSTORE_TYPE;
     private String keyManagerAlgorithm = DEFAULT_MANAGER_ALGORITHM;
     private Provider provider = new com.sun.net.ssl.internal.ssl.Provider();
     private String protocolHandler = DEFAULT_PROTOCOL_HANDLER;
@@ -60,41 +59,50 @@ public class SslConnector extends TcpConnector
 
     public void doInitialise() throws InitialisationException
     {
-        if (getProvider() == null)
+        if (getProvider() == null) {
             throw new NullPointerException("The security provider cannot be null");
-        if (getKeyStore() == null)
-            throw new NullPointerException("The KeyStore location cannot be null");
-        if (getKeyPassword() == null)
-            throw new NullPointerException("The Key password cannot be null");
-        if (getStorePassword() == null)
-            throw new NullPointerException("The KeyStore password cannot be null");
-        if (getKeyManagerAlgorithm() == null)
-            throw new NullPointerException("The Key Manager Algorithm cannot be null");
-
-        KeyStore keystore = null;
-        try {
-            Security.addProvider(getProvider());
-            // Create keyStore
-            keystore = KeyStore.getInstance(keystoreType);
-            InputStream is = Utility.loadResource(getKeyStore(), getClass());
-            if (is == null) {
-                throw new FileNotFoundException("Failed to load keystore from classpath or local file: "
-                        + getKeyStore());
-            }
-            keystore.load(is, getKeyPassword().toCharArray());
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "KeyStore: " + getKeyStore()),
-                                              e,
-                                              this);
         }
-        try {
-            // Get key manager
-            keyManagerFactory = KeyManagerFactory.getInstance(getKeyManagerAlgorithm());
-            // Initialize the KeyManagerFactory to work with our keyStore
-            keyManagerFactory.init(keystore, getStorePassword().toCharArray());
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager ("
-                    + getKeyManagerAlgorithm() + ")"), e, this);
+        if (getKeyStore() != null) {
+            if (getKeyPassword() == null) {
+                throw new NullPointerException("The Key password cannot be null");
+            }
+            if (getStorePassword() == null) {
+                throw new NullPointerException("The KeyStore password cannot be null");
+            }
+            if (getKeyManagerAlgorithm() == null) {
+                throw new NullPointerException("The Key Manager Algorithm cannot be null");
+            }
+            if (getKeyStoreType() == null) {
+                throw new NullPointerException("The KeyStore type cannot be null");
+            }
+        }
+
+        if (getKeyStore() != null) {
+            KeyStore keystore = null;
+            try {
+                Security.addProvider(getProvider());
+                // Create keyStore
+                keystore = KeyStore.getInstance(keyStoreType);
+                InputStream is = Utility.loadResource(getKeyStore(), getClass());
+                if (is == null) {
+                    throw new FileNotFoundException("Failed to load keystore from classpath or local file: "
+                            + getKeyStore());
+                }
+                keystore.load(is, getKeyPassword().toCharArray());
+            } catch (Exception e) {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "KeyStore: " + getKeyStore()),
+                                                  e,
+                                                  this);
+            }
+            try {
+                // Get key manager
+                keyManagerFactory = KeyManagerFactory.getInstance(getKeyManagerAlgorithm());
+                // Initialize the KeyManagerFactory to work with our keyStore
+                keyManagerFactory.init(keystore, getStorePassword().toCharArray());
+            } catch (Exception e) {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Key Manager ("
+                        + getKeyManagerAlgorithm() + ")"), e, this);
+            }
         }
 
         super.doInitialise();
@@ -165,14 +173,14 @@ public class SslConnector extends TcpConnector
         this.storePassword = storePassword;
     }
 
-    public String getKeystoreType()
+    public String getKeyStoreType()
     {
-        return keystoreType;
+        return keyStoreType;
     }
 
-    public void setKeystoreType(String keystoreType)
+    public void setKeyStoreType(String keyStoreType)
     {
-        this.keystoreType = keystoreType;
+        this.keyStoreType = keyStoreType;
     }
 
     public String getKeyManagerAlgorithm()

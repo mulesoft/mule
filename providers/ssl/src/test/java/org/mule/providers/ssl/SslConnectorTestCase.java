@@ -51,6 +51,15 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         return cnn;
     }
 
+    public void testClientConnector() throws Exception
+    {
+        SslConnector cnn = new SslConnector();
+        cnn.setClientKeyStore("clientKeystore");
+        cnn.setClientKeyStorePassword("mulepassword");
+        cnn.getDispatcherThreadingProfile().setDoThreading(false);
+        cnn.initialise();
+    }
+    
     public String getTestEndpointURI()
     {
         return "ssl://localhost:56801";
