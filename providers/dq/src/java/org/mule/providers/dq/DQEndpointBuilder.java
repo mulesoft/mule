@@ -13,16 +13,16 @@
  */
 package org.mule.providers.dq;
 
-import org.mule.impl.endpoint.ResourceNameEndpointBuilder;
-import org.mule.umo.endpoint.MalformedEndpointException;
-
 import java.net.URI;
 import java.util.Properties;
 
+import org.mule.impl.endpoint.ResourceNameEndpointBuilder;
+import org.mule.umo.endpoint.MalformedEndpointException;
+
 /**
- * <code>DQEndpointBuilder</code> constructs an endpoint used by AS400
- * data queues
- *
+ * <code>DQEndpointBuilder</code> constructs an endpoint used by AS400 data
+ * queues
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -30,25 +30,26 @@ public class DQEndpointBuilder extends ResourceNameEndpointBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
-        String lib = (String)props.get("lib");
-        if (uri.getPath().length() > 0)
-        {
+        String lib = (String) props.get("lib");
+        if (uri.getPath().length() > 0) {
             lib = uri.getHost();
             props.setProperty("lib", lib);
             address = "/" + lib + uri.getPath();
-        } else if(lib==null) {
-            throw new MalformedEndpointException("Could not extract Lib name: " + uri );
+        } else if (lib == null) {
+            throw new MalformedEndpointException("Could not extract Lib name: " + uri);
         } else {
-            if(!lib.startsWith("/")) lib = "/" + lib;
-            if(!lib.endsWith("/")) lib += "/";
+            if (!lib.startsWith("/"))
+                lib = "/" + lib;
+            if (!lib.endsWith("/"))
+                lib += "/";
             address = lib + uri.getHost();
         }
-//Resource info
-//        int x = address.indexOf(":");
-//        if(x > -1) {
-//            String resourceInfo = address.substring(0, x);
-//            props.setProperty("resourceInfo", resourceInfo);
-//            address = address.substring(x+1);
-//        }
+        // Resource info
+        // int x = address.indexOf(":");
+        // if(x > -1) {
+        // String resourceInfo = address.substring(0, x);
+        // props.setProperty("resourceInfo", resourceInfo);
+        // address = address.substring(x+1);
+        // }
     }
 }

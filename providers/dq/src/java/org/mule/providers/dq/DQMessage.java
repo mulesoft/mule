@@ -13,18 +13,22 @@
  */
 package org.mule.providers.dq;
 
-import org.apache.commons.collections.map.LinkedMap;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author m999svm
  * 
  * <code>DQMessage</code> An encapsulation of a dataqueue message.
- *  
+ * 
  */
-public class DQMessage implements Serializable {
+public class DQMessage implements Serializable
+{
 
     public static final String XML_ROOT = "DQMessage";
     public static final String XML_ENTRY = "entry";
@@ -33,24 +37,28 @@ public class DQMessage implements Serializable {
     private Map entries = new HashMap();
     private String senderInformation;
 
-   
     /**
      * @return Returns the senderInformation.
      */
-    public final String getSenderInformation() {
+    public final String getSenderInformation()
+    {
         return senderInformation;
     }
+
     /**
      * @param pSenderInformation The senderInformation to set.
      */
-    public final void setSenderInformation(final String pSenderInformation) {
+    public final void setSenderInformation(final String pSenderInformation)
+    {
         senderInformation = pSenderInformation;
     }
+
     /**
      * Constructor
-     *  
+     * 
      */
-    public DQMessage() {
+    public DQMessage()
+    {
         super();
     }
 
@@ -58,38 +66,37 @@ public class DQMessage implements Serializable {
      * 
      * The constructor
      * 
-     * @param pMessage
-     *            The message
+     * @param pMessage The message
      */
-    public DQMessage(final DQMessage pMessage) {
+    public DQMessage(final DQMessage pMessage)
+    {
         this();
-        if (pMessage == null)
+        if (pMessage == null) {
             return;
-
-        this.entries = new LinkedMap(pMessage.entries);
+        }
+        this.entries = new LinkedHashMap(pMessage.entries);
         this.senderInformation = pMessage.senderInformation;
     }
 
     /**
      * Add an entry
      * 
-     * @param name
-     *            The name
-     * @param value
-     *            The value
+     * @param name The name
+     * @param value The value
      */
-    public final void addEntry(final String name, final Object value) {
+    public final void addEntry(final String name, final Object value)
+    {
         entries.put(name, value);
     }
 
     /**
      * Returns a value entry by name
      * 
-     * @param name
-     *            The name
+     * @param name The name
      * @return The value
      */
-    public final Object getEntry(final String name) {
+    public final Object getEntry(final String name)
+    {
         return entries.get(name);
     }
 
@@ -97,7 +104,8 @@ public class DQMessage implements Serializable {
      * 
      * @return The entries
      */
-    public final Iterator getEntries() {
+    public final Iterator getEntries()
+    {
         return entries.values().iterator();
     }
 
@@ -105,7 +113,8 @@ public class DQMessage implements Serializable {
      * 
      * @return The entry names
      */
-    public final List getEntryNames() {
+    public final List getEntryNames()
+    {
         ArrayList list = new ArrayList();
 
         Iterator it = entries.keySet().iterator();
@@ -119,14 +128,20 @@ public class DQMessage implements Serializable {
 
     public boolean equals(Object o)
     {
-        if (this == o) return true;
-        if (!(o instanceof DQMessage)) return false;
-
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DQMessage)) {
+            return false;
+        }
         final DQMessage dqMessage = (DQMessage) o;
-
-        if (entries != null ? !entries.equals(dqMessage.entries) : dqMessage.entries != null) return false;
-        if (senderInformation != null ? !senderInformation.equals(dqMessage.senderInformation) : dqMessage.senderInformation != null) return false;
-
+        if (entries != null ? !entries.equals(dqMessage.entries) : dqMessage.entries != null) {
+            return false;
+        }
+        if (senderInformation != null ? !senderInformation.equals(dqMessage.senderInformation)
+                : dqMessage.senderInformation != null) {
+            return false;
+        }
         return true;
     }
 

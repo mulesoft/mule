@@ -2,7 +2,6 @@ package org.mule.providers.dq.transformers;
 
 import java.util.Iterator;
 
-import org.apache.commons.lang.StringUtils;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.mule.providers.dq.DQMessage;
@@ -10,27 +9,31 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- * <code>DQMessageToXml</code> Will convert a DQMessage to an xml string by extracting
- * the message payload. The xml exemple:
+ * <code>DQMessageToXml</code> Will convert a DQMessage to an xml string by
+ * extracting the message payload. The xml exemple:
  * 
  * <pre>
  * 
- *  &amp;ltDQMessage&amp;gt
- *  		&amp;ltentry name=&quot;the name&quot;&amp;gt The value &amp;lt/entry&amp;gt
- *         ....
- *   &amp;lt/DQMessage&amp;gt
+ *  
+ *   &amp;ltDQMessage&amp;gt
+ *   		&amp;ltentry name=&quot;the name&quot;&amp;gt The value &amp;lt/entry&amp;gt
+ *          ....
+ *    &amp;lt/DQMessage&amp;gt
+ *   
  *  
  * </pre>
  * 
  * @author m999svm
  */
-public class DQMessageToXml extends AbstractTransformer {
+public class DQMessageToXml extends AbstractTransformer
+{
 
     /**
      * Constructor
-     *  
+     * 
      */
-    public DQMessageToXml() {
+    public DQMessageToXml()
+    {
         registerSourceType(DQMessage.class);
         setReturnClass(String.class);
     }
@@ -38,7 +41,8 @@ public class DQMessageToXml extends AbstractTransformer {
     /**
      * @see org.mule.transformers.AbstractTransformer#doTransform(Object)
      */
-    public final Object doTransform(final Object src) throws TransformerException {
+    public final Object doTransform(final Object src) throws TransformerException
+    {
         DQMessage msg = (DQMessage) src;
 
         try {
@@ -53,12 +57,16 @@ public class DQMessageToXml extends AbstractTransformer {
                 name = (String) it.next();
                 field = msg.getEntry(name);
 
-                if (field instanceof String)
-                    field = StringUtils.trimToNull((String) field);
+                if (field instanceof String) {
+                    String f = ((String) field).trim();
+                    field = (f.length() == 0) ? null : f;
+                }
 
-                if (field != null)
-                    root.addElement(DQMessage.XML_ENTRY).addAttribute(DQMessage.XML_NAME,
-                            name).addText(field.toString());
+                if (field != null) {
+                    root.addElement(DQMessage.XML_ENTRY)
+                        .addAttribute(DQMessage.XML_NAME, name)
+                        .addText(field.toString());
+                }
             }
 
             return document.asXML();

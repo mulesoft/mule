@@ -23,9 +23,11 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
  * 
  * DQMessageDispatcherFactory
  */
-public class DQMessageDispatcherFactory implements UMOMessageDispatcherFactory {
+public class DQMessageDispatcherFactory implements UMOMessageDispatcherFactory
+{
 
-    public final UMOMessageDispatcher create(final UMOConnector connector) throws UMOException {
+    public final UMOMessageDispatcher create(final UMOConnector connector) throws UMOException
+    {
         return new DQMessageDispatcher((DQConnector) connector);
     }
 

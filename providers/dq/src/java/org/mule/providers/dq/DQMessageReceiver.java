@@ -13,10 +13,6 @@
  */
 package org.mule.providers.dq;
 
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.DataQueue;
-import com.ibm.as400.access.DataQueueEntry;
-import com.ibm.as400.access.RecordFormat;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -27,10 +23,13 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.DataQueue;
+import com.ibm.as400.access.DataQueueEntry;
+import com.ibm.as400.access.RecordFormat;
+
 /**
- * @author m999svm
- *         <p/>
- *         DQMessageReceiver
+ * @author m999svm <p/> DQMessageReceiver
  */
 public class DQMessageReceiver extends PollingMessageReceiver
 {
@@ -38,28 +37,31 @@ public class DQMessageReceiver extends PollingMessageReceiver
     private DataQueue dataQueue = null;
     private RecordFormat format = null;
 
-    public DQMessageReceiver(UMOConnector connector, UMOComponent component,
-                             UMOEndpoint endpoint, Long frequency,
-                             DataQueue pDq, AS400 pAs400) throws InitialisationException
+    public DQMessageReceiver(UMOConnector connector,
+                             UMOComponent component,
+                             UMOEndpoint endpoint,
+                             Long frequency,
+                             DataQueue pDq,
+                             AS400 pAs400) throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
 
         this.dataQueue = pDq;
 
-        String recordDescriptor = (String) endpoint.getEndpointURI().getParams().get(DQConnector.RECORD_DESCRIPTOR_PROPERTY);
-        if(recordDescriptor==null) {
-            format = ((DQConnector)connector).getFormat();
-            if(format==null) {
+        String recordDescriptor = (String) endpoint.getEndpointURI()
+                                                   .getParams()
+                                                   .get(DQConnector.RECORD_DESCRIPTOR_PROPERTY);
+        if (recordDescriptor == null) {
+            format = ((DQConnector) connector).getFormat();
+            if (format == null) {
                 throw new InitialisationException(new Message("dq", 1), this);
             }
         } else {
-            try
-            {
-
+            try {
                 format = DQMessageUtils.getRecordFormat(recordDescriptor, pAs400);
-            } catch (Exception e)
-            {
-                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "recordDescriptor: " + recordDescriptor), e, this);
+            } catch (Exception e) {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "recordDescriptor: "
+                        + recordDescriptor), e, this);
             }
         }
     }
@@ -69,19 +71,16 @@ public class DQMessageReceiver extends PollingMessageReceiver
      */
     public final void poll()
     {
-        try
-        {
+        try {
             DataQueueEntry entry = dataQueue.read();
 
-            if (entry == null)
-            {
+            if (entry == null) {
                 return;
             }
 
             processEntry(entry);
 
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             handleException(e);
         }
 
@@ -89,7 +88,7 @@ public class DQMessageReceiver extends PollingMessageReceiver
 
     /**
      * Process a received message entry
-     *
+     * 
      * @param entry The entry
      * @throws Exception Error during process
      */

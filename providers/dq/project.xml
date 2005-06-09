@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <artifactId>mule-dq-provider</artifactId>
+    <name>Mule AS400 Data Queue Provider</name>
+    <shortDescription>dq</shortDescription>
+    <description>Mule AS400 Data Queue Provider
+    </description>
+    <dependencies>
+        <dependency>
+            <artifactId>as400dq</artifactId>
+            <groupId>as400dq</groupId>
+            <jar>jt400-1.jar</jar>
+        </dependency>
+    </dependencies>
+</project>

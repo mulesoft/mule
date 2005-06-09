@@ -37,8 +37,8 @@ public class DQTransformersTestCase extends AbstractTransformerTestCase
     public Object getTestData()
     {
         DQMessage msg = new DQMessage();
-		msg.addEntry("entry1","12345678910111");
-		msg.addEntry("entry2","yahooo");
+        msg.addEntry("entry1", "12345678910111");
+        msg.addEntry("entry2", "yahooo");
         return msg;
     }
 

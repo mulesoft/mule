@@ -18,12 +18,13 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.util.Utility;
 
 /**
- * <code>DQMessageAdapter</code> provides a wrapper for a DataQueue Message. Users can
- * obtain the contents of the message through the payload property.
+ * <code>DQMessageAdapter</code> provides a wrapper for a DataQueue Message.
+ * Users can obtain the contents of the message through the payload property.
  * 
  * @author m999svm
  */
-public class DQMessageAdapter extends AbstractMessageAdapter {
+public class DQMessageAdapter extends AbstractMessageAdapter
+{
 
     private DQMessage message;
 
@@ -34,8 +35,8 @@ public class DQMessageAdapter extends AbstractMessageAdapter {
      */
     public DQMessageAdapter(Object message) throws MessageTypeNotSupportedException
     {
-        if(message instanceof DQMessage) {
-            this.message = (DQMessage)message;
+        if (message instanceof DQMessage) {
+            this.message = (DQMessage) message;
         } else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
@@ -44,7 +45,8 @@ public class DQMessageAdapter extends AbstractMessageAdapter {
     /**
      * @see org.mule.umo.provider.UMOMessageAdapter#getPayload()
      */
-    public final Object getPayload() {
+    public final Object getPayload()
+    {
         return message;
     }
 
@@ -52,14 +54,16 @@ public class DQMessageAdapter extends AbstractMessageAdapter {
      * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsBytes()
      */
 
-    public final byte[] getPayloadAsBytes() throws Exception {
+    public final byte[] getPayloadAsBytes() throws Exception
+    {
         return Utility.objectToByteArray(message);
     }
 
     /**
      * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsString()
      */
-    public final String getPayloadAsString() throws Exception {
+    public final String getPayloadAsString() throws Exception
+    {
         return new String(getPayloadAsBytes());
     }
 

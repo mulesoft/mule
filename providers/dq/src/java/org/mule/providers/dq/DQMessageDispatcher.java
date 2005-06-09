@@ -13,7 +13,6 @@
  */
 package org.mule.providers.dq;
 
-import com.ibm.as400.access.*;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -21,10 +20,14 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.DataQueue;
+import com.ibm.as400.access.DataQueueEntry;
+import com.ibm.as400.access.Record;
+import com.ibm.as400.access.RecordFormat;
+
 /**
- * @author m999svm
- *         <p/>
- *         DQMessageDispatcher
+ * @author m999svm <p/> DQMessageDispatcher
  */
 public class DQMessageDispatcher extends AbstractMessageDispatcher
 {
@@ -32,7 +35,7 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
 
     /**
      * Constructor
-     *
+     * 
      * @param connector The connector
      */
     public DQMessageDispatcher(DQConnector connector)
@@ -41,11 +44,9 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
         this.connector = connector;
     }
 
-
     public void doDispatch(UMOEvent event) throws Exception
     {
-        try
-        {
+        try {
             DQMessage msg = (DQMessage) event.getMessage().getPayload();
             AS400 system = connector.getSystem();
 
@@ -55,12 +56,10 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
             DataQueue dq = new DataQueue(system, event.getEndpoint().getEndpointURI().getAddress());
             dq.write(rec.getContents());
 
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             getConnector().handleException(e);
         }
-        if (logger.isDebugEnabled())
-        {
+        if (logger.isDebugEnabled()) {
             logger.debug("doDispatch(UMOEvent) - end");
         }
     }
@@ -68,15 +67,20 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
     protected RecordFormat getRecordFormat(UMOEndpointURI endpointUri) throws Exception
     {
         String recordDescriptor = (String) endpointUri.getParams().get(DQConnector.RECORD_DESCRIPTOR_PROPERTY);
-        if(recordDescriptor==null) {
-            if(connector.getFormat()==null) {
-                throw new IllegalArgumentException("Property " + DQConnector.RECORD_DESCRIPTOR_PROPERTY + " must be set on the endpoint");
+        if (recordDescriptor == null) {
+            if (connector.getFormat() == null) {
+                throw new IllegalArgumentException("Property " + DQConnector.RECORD_DESCRIPTOR_PROPERTY
+                        + " must be set on the endpoint");
             } else {
-                if(logger.isDebugEnabled()) logger.debug("Defaulting to connector format: " + connector.getRecordFormat());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Defaulting to connector format: " + connector.getRecordFormat());
+                }
                 return connector.getFormat();
             }
         }
-        if(logger.isDebugEnabled()) logger.debug("Using endpoint-specific format: " + connector.getRecordFormat());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Using endpoint-specific format: " + connector.getRecordFormat());
+        }
         return DQMessageUtils.getRecordFormat(recordDescriptor, connector.getSystem());
     }
 
@@ -94,11 +98,9 @@ public class DQMessageDispatcher extends AbstractMessageDispatcher
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
         DataQueue dq = new DataQueue(connector.getSystem(), endpointUri.getAddress());
-        if (dq != null)
-        {
+        if (dq != null) {
             DataQueueEntry entry = dq.read((int) timeout);
-            if (entry != null)
-            {
+            if (entry != null) {
                 RecordFormat format = getRecordFormat(endpointUri);
                 DQMessage message = DQMessageUtils.getDQMessage(entry.getData(), format);
                 message.setSenderInformation(entry.getSenderInformation());

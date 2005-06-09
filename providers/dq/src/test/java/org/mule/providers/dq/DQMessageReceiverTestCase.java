@@ -13,13 +13,15 @@
  */
 package org.mule.providers.dq;
 
-import com.ibm.as400.access.DataQueue;
-import com.mockobjects.dynamic.Mock;
+import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import com.ibm.as400.access.DataQueue;
+import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -27,6 +29,7 @@ import org.mule.umo.provider.UMOMessageReceiver;
  */
 public class DQMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
+    
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         DQConnector c = new DQConnector();
@@ -35,12 +38,15 @@ public class DQMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         c.setUsername("xxx");
         c.setPassword("xxx");
         c.setHostname("localhost");
-        c.initialise();
+        MuleManager.getInstance().registerConnector(c);
 
         endpoint = new MuleEndpoint("dq://QSYS.LIB/L701QUEUE.DTAQ", true);
-        endpoint.setConnector(c);
         Mock mockComponent = new Mock(UMOComponent.class);
-        return new DQMessageReceiver((AbstractConnector) endpoint.getConnector(), (UMOComponent) mockComponent.proxy(), endpoint, new Long(1000), new DataQueue(c.getSystem(), "/QSYS.LIB/L701QUEUE.DTAQ"), c.getSystem());
+        return new DQMessageReceiver((AbstractConnector) endpoint.getConnector(),
+                                     (UMOComponent) mockComponent.proxy(),
+                                     endpoint,
+                                     new Long(1000),
+                                     new DataQueue(c.getSystem(), "/QSYS.LIB/L701QUEUE.DTAQ"),
+                                     c.getSystem());
     }
 }
-

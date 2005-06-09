@@ -13,9 +13,8 @@
  */
 package org.mule.providers.dq;
 
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.DataQueue;
-import com.ibm.as400.access.RecordFormat;
+import java.util.Map;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -25,14 +24,15 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import java.util.Map;
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.DataQueue;
+import com.ibm.as400.access.RecordFormat;
 
 /**
- * @author m999svm
- *         <p/>
- *         <code>DQConnector</code> A delegate provider that encapsulates a As400 DataQueue
- *         provider. The properties hostname, userId and password must be set for connection.
- *         The Message Queue location is the provider EndPoint.
+ * @author m999svm <p/> <code>DQConnector</code> A delegate provider that
+ *         encapsulates a As400 DataQueue provider. The properties hostname,
+ *         userId and password must be set for connection. The Message Queue
+ *         location is the provider EndPoint.
  */
 
 public class DQConnector extends AbstractServiceEnabledConnector
@@ -53,29 +53,26 @@ public class DQConnector extends AbstractServiceEnabledConnector
 
     private AS400 as400System = null;
 
-
     /**
-     * @see org.mule.providers.AbstractConnector#createReceiver(org.mule.umo.UMOComponent, org.mule.umo.endpoint.UMOEndpoint)
+     * @see org.mule.providers.AbstractConnector#createReceiver(org.mule.umo.UMOComponent,
+     *      org.mule.umo.endpoint.UMOEndpoint)
      */
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
         Map props = endpoint.getProperties();
-        if (props != null)
-        {
-            //Override properties on the provider for the specific endpoint
+        if (props != null) {
+            // Override properties on the provider for the specific endpoint
             String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
-            if (tempPolling != null)
-            {
+            if (tempPolling != null) {
                 pollingFrequency = new Long(tempPolling);
             }
         }
-        if (pollingFrequency.longValue() <= 0)
-        {
+        if (pollingFrequency.longValue() <= 0) {
             pollingFrequency = new Long(DEFAULT_POLLING);
         }
         logger.debug("set polling frequency to: " + pollingFrequency);
 
-        //todo Can we include the Lib as part of the URI
+        // todo Can we include the Lib as part of the URI
         String lib = (String) endpoint.getEndpointURI().getParams().get(LIB_PROPERTY);
         logger.debug("provider endpoint: " + endpoint.getName() + " - lib: " + lib);
         String name = "";
@@ -86,7 +83,8 @@ public class DQConnector extends AbstractServiceEnabledConnector
         name += endpoint.getEndpointURI().getAddress();
 
         DataQueue dq = new DataQueue(as400System, name);
-        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[]{pollingFrequency, dq, as400System});
+        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[] { pollingFrequency, dq,
+                as400System });
 
     }
 
@@ -177,13 +175,13 @@ public class DQConnector extends AbstractServiceEnabledConnector
     {
         super.doInitialise();
         as400System = new AS400(hostname, username, password);
-        if(recordFormat!=null) {
-            try
-            {
+        if (recordFormat != null) {
+            try {
                 format = DQMessageUtils.getRecordFormat(recordFormat, as400System);
-            } catch (Exception e)
-            {
-                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Record Format: " + recordFormat), e, this);
+            } catch (Exception e) {
+                throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Record Format: " + recordFormat),
+                                                  e,
+                                                  this);
             }
 
         }
