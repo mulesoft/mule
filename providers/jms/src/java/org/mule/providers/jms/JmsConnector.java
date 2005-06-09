@@ -235,7 +235,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         return null;
     }
 
-    public Session getSession(boolean transacted) throws JMSException
+    public Session getSession(boolean transacted, boolean topic) throws JMSException
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         Session session = getCurrentSession();
@@ -244,7 +244,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
             return session;
         }
         logger.debug("Retrieving new jms session from connection");
-        session = jmsSupport.createSession(connection, transacted || tx != null, acknowledgementMode, noLocal);
+        session = jmsSupport.createSession(connection, topic, transacted || tx != null, acknowledgementMode, noLocal);
         if (tx != null) {
             logger.debug("Binding session to current transaction");
             try {
@@ -429,7 +429,9 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 
     public Session getSession(UMOEndpoint endpoint) throws Exception
     {
-        return getSession(endpoint.getTransactionConfig().isTransacted());
+        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
+        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+        return getSession(endpoint.getTransactionConfig().isTransacted(), topic);
     }
 
     public ConnectionFactory getConnectionFactory()

@@ -38,7 +38,7 @@ public interface JmsSupport
     Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
             throws JMSException;
 
-    Session createSession(Connection connection, boolean transacted, int ackMode, boolean noLocal) throws JMSException;
+    Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal) throws JMSException;
 
     MessageProducer createProducer(Session session, Destination destination) throws JMSException;
 

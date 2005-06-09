@@ -18,6 +18,7 @@ import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.mule.impl.MuleComponent;
 import org.mule.providers.DefaultReplyToHandler;
@@ -62,7 +63,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             if (getTransformer() != null) {
                 payload = getTransformer().transform(payload);
             }
-            session = connector.getSession(false);
+            session = connector.getSession(false, replyToDestination instanceof Topic);
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);
 
             if (logger.isDebugEnabled()) {

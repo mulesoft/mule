@@ -83,17 +83,19 @@ public class Jms102bSupport extends Jms11Support
         }
     }
 
-    public Session createSession(Connection connection, boolean transacted, int ackMode, boolean noLocal)
+    public Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal)
             throws JMSException
     {
-        if (connection instanceof QueueConnection) {
-            return ((QueueConnection) connection).createQueueSession(transacted, ackMode);
-        } else if (connection instanceof TopicConnection) {
-            return ((TopicConnection) connection).createTopicSession(noLocal, ackMode);
+        if (topic) {
+            if (connection instanceof TopicConnection) {
+                return ((TopicConnection) connection).createTopicSession(noLocal, ackMode);
+            }
         } else {
-            throw new IllegalArgumentException("Unknown Jms connection: " + connection.getClass().getName());
+            if (connection instanceof QueueConnection) {
+                return ((QueueConnection) connection).createQueueSession(transacted, ackMode);
+            } 
         }
-
+        throw new IllegalArgumentException("Unknown Jms connection: " + connection.getClass().getName());
     }
 
     public MessageConsumer createConsumer(Session session,

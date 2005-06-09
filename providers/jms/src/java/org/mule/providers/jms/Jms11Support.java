@@ -68,7 +68,7 @@ public class Jms11Support implements JmsSupport
         return connectionFactory.createConnection();
     }
 
-    public Session createSession(Connection connection, boolean transacted, int ackMode, boolean noLocal)
+    public Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal)
             throws JMSException
     {
         return connection.createSession(transacted, (transacted ? Session.SESSION_TRANSACTED : ackMode));

@@ -83,14 +83,22 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
     public JmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException
     {
-        super(connector, component, endpoint, new Long(10));
+        super(connector, component, endpoint, new Long(0));
         this.connector = (JmsConnector) connector;
 
         this.frequency = PropertiesHelper.getLongProperty(endpoint.getProperties(), "frequency", 10000L);
         this.reuseConsumer = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseConsumer", true);
         this.reuseSession = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseSession", true);
 
-        receiveMessagesInTransaction = endpoint.getTransactionConfig().getFactory() != null;
+        // Check if the destination is a queue and
+        // if we are in transactional mode.
+        // If true, set receiveMessagesInTransaction to true.
+        // It will start multiple threads, depending on the threading profile.
+        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
+        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+        if (!topic && endpoint.getTransactionConfig().getFactory() != null) {
+            receiveMessagesInTransaction = true;
+        }
         try {
             redeliveryHandler = this.connector.createRedeliveryHandler();
             redeliveryHandler.setConnector(this.connector);

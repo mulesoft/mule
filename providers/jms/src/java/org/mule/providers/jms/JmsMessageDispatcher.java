@@ -225,7 +225,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             String resourceInfo = endpointUri.getResourceInfo();
             topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
 
-            session = connector.getSession(false);
+            session = connector.getSession(false, topic);
             dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
             consumer = connector.getJmsSupport().createConsumer(session, dest);
 
@@ -269,7 +269,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             // Else create a session for this dispatcher and
             // use it each time
             if (delegateSession == null) {
-                delegateSession = connector.getSession(false);
+                delegateSession = connector.getSession(false, false);
             }
             return delegateSession;
         } catch (Exception e) {
