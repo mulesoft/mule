@@ -133,11 +133,15 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setTargetEndpointAddress(endpointUri.getAddress());
         call.setSOAPActionURI(endpointUri.getAddress());
         call.setOperationName(method);
-        // set Mule event here so that hsandlers can extract info
+        // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-
+        // Set timeout
+        int timeout = event.getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
+        if (timeout >= 0) {
+            call.setTimeout(new Integer(timeout));
+        }
+        // Add User Creds
         if (endpointUri.getUserInfo() != null) {
-            // Add User Creds
             call.setUsername(endpointUri.getUsername());
             call.setPassword(endpointUri.getPassword());
         }
