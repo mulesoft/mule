@@ -16,6 +16,8 @@ package org.mule.routing;
 import org.mule.config.MuleProperties;
 import org.mule.config.PropertyExtractor;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.provider.UniqueIdNotSupportedException;
+import org.mule.util.UUID;
 
 /**
  * <code>DefaultPropertiesExtractor</code> is a default implementation used
@@ -61,7 +63,11 @@ public class DefaultPropertiesExtractor implements PropertyExtractor
 
     public String getCorrelationId(UMOMessage message)
     {
-        return getMessageId(message);
+        try {
+            return getMessageId(message);
+        } catch (UniqueIdNotSupportedException e) {
+            return new UUID().getUUID();
+        }
     }
 
     // public String getCorrelationGroupSize(UMOMessage message) {
