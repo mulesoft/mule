@@ -293,6 +293,9 @@ public final class MuleComponent implements UMOComponent, Work
 
     public void dispatchEvent(UMOEvent event) throws UMOException
     {
+        if (stopping.get() || stopped.get()) {
+            throw new ComponentException(new Message(Messages.COMPONENT_X_IS_STOPPED, getDescriptor().getName()), event.getMessage(), this);
+        }
         // Dispatching event to an inbound endpoint
         // TODO: remove this code as it is already done
         // in the MuleSession#dispatchEvent
@@ -342,6 +345,9 @@ public final class MuleComponent implements UMOComponent, Work
 
     public UMOMessage sendEvent(UMOEvent event) throws UMOException
     {
+        if (stopping.get() || stopped.get()) {
+            throw new ComponentException(new Message(Messages.COMPONENT_X_IS_STOPPED, getDescriptor().getName()), event.getMessage(), this);
+        }
         if (logger.isDebugEnabled() && paused.get()) {
             logger.debug("Component: " + descriptor.getName() + " is paused. Blocking call until resume is called");
         }
@@ -355,8 +361,10 @@ public final class MuleComponent implements UMOComponent, Work
         if (stats.isEnabled()) {
             stats.incReceivedEventSync();
         }
-        logger.debug("Component: " + descriptor.getName() + " has received synchronous event on: "
-                + event.getEndpoint().getEndpointURI());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Component: " + descriptor.getName() + " has received synchronous event on: "
+                    + event.getEndpoint().getEndpointURI());
+        }
         UMOMessage result = null;
         MuleProxy proxy = null;
         try {
