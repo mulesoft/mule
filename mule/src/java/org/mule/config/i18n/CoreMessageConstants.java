@@ -184,4 +184,6 @@ public interface CoreMessageConstants
     int RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X = 164;
     int CANT_SET_X_ONCE_IT_HAS_BEEN_SET = 165;
     int EVENT_TYPE_X_NOT_RECOGNISED = 166;
+    
+    int COMPONENT_X_IS_STOPPED = 167;
 }
