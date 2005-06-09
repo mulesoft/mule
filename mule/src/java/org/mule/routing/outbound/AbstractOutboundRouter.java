@@ -27,7 +27,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.UMOOutboundRouter;
 
 import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
@@ -39,7 +38,6 @@ import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-
 public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 {
     public static final int ENABLE_CORRELATION_IF_NOT_SET = 0;
@@ -91,7 +89,6 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     }
 
     protected void setMessageProperties(UMOSession session, UMOMessage message, UMOEndpoint endpoint)
-            throws UniqueIdNotSupportedException
     {
         if (replyTo != null) {
             // if replyTo is set we'll probably want the correlationId set as
@@ -115,8 +112,9 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
             String correlation = null;
             Object o = propertyExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, message);
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("Extracted correlation Id as: " + o);
+            }
             correlation = o.toString();
 
             int seq = 1;

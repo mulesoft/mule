@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mule.impl.MuleMessage;
+import org.mule.providers.DefaultMessageAdapter;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
@@ -25,6 +26,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.RoutingException;
 
 import com.mockobjects.dynamic.C;
@@ -163,5 +165,34 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         assertEquals(1, catchAllCount[0]);
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);
+    }
+    
+    private static class TestFilteringOutboundRouter extends FilteringOutboundRouter 
+    {
+        public void setMessageProperties(UMOSession session, UMOMessage message, UMOEndpoint endpoint)
+        {
+            super.setMessageProperties(session, message, endpoint);
+        }
+    }
+    
+    private static class TestMessageAdapter extends DefaultMessageAdapter
+    {
+        public TestMessageAdapter(Object message)
+        {
+            super(message);
+        }
+        public String getUniqueId() throws UniqueIdNotSupportedException
+        {
+            throw new UniqueIdNotSupportedException(this);
+        }
+    }
+    
+    public void testCorrelation() throws Exception {
+        TestFilteringOutboundRouter filterRouter = new TestFilteringOutboundRouter();
+        UMOSession session = getTestSession(getTestComponent(getTestDescriptor("test", "test")));
+        UMOMessage message = new MuleMessage(new TestMessageAdapter(new StringBuffer()), null);
+        UMOEndpoint endpoint = getTestEndpoint("test", "sender");
+        filterRouter.setMessageProperties(session, message, endpoint);
+        assertNotNull(message.getCorrelationId());
     }
 }
