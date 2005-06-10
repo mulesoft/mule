@@ -39,6 +39,7 @@ public class DQMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         c.setPassword("xxx");
         c.setHostname("localhost");
         MuleManager.getInstance().registerConnector(c);
+        MuleManager.getInstance().start();
 
         endpoint = new MuleEndpoint("dq://QSYS.LIB/L701QUEUE.DTAQ", true);
         Mock mockComponent = new Mock(UMOComponent.class);
