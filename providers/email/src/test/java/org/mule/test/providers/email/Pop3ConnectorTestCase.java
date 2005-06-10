@@ -58,6 +58,16 @@ public class Pop3ConnectorTestCase extends AbstractConnectorTestCase
         }
         return message;
     }
+    
+    public void testReceiver() throws Exception
+    {
+        UMOConnector connector = getConnector();
+        assertNotNull(connector);
+        MuleDescriptor d = getTestDescriptor("orange", Orange.class.getName());
+        UMOComponent component = getTestComponent(d);
+        UMOEndpoint endpoint = new MuleEndpoint(getTestEndpointURI(), true);
+        connector.registerListener(component, endpoint);
+    }
 
     public void testConnectorListenerSupport() throws Exception
     {

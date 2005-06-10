@@ -14,6 +14,9 @@
 package org.mule.providers.email;
 
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
  * <code>Pop3Connector</code> is used to connect and receive mail from a pop3
@@ -83,4 +86,14 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
     {
         backupFolder = string;
     }
+
+    /* (non-Javadoc) 
+     * @see org.mule.providers.UMOConnector#registerListener(javax.jms.MessageListener, java.lang.String) 
+     */ 
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception 
+    {
+        Object[] args = {new Long(checkFrequency), backupFolder};
+        return serviceDescriptor.createMessageReceiver(this, component, endpoint, args); 
+    } 
+ 
 }

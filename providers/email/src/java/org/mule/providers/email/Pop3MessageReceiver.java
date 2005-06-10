@@ -49,14 +49,14 @@ import org.mule.util.UUID;
 import org.mule.util.Utility;
 
 /**
- * <code>MailMessageReceiver</code> polls a pop3 mailbox for messages removes
+ * <code>Pop3MessageReceiver</code> polls a pop3 mailbox for messages removes
  * the messages and routes them as events into Mule.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class MailMessageReceiver extends PollingMessageReceiver implements MessageCountListener, Startable, Stoppable
+public class Pop3MessageReceiver extends PollingMessageReceiver implements MessageCountListener, Startable, Stoppable
 {
     private Folder folder = null;
 
@@ -64,7 +64,7 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
 
     protected Session session;
 
-    public MailMessageReceiver(UMOConnector connector,
+    public Pop3MessageReceiver(UMOConnector connector,
                                UMOComponent component,
                                UMOEndpoint endpoint,
                                Long checkFrequency,
@@ -72,7 +72,6 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
     {
         super(connector, component, endpoint, checkFrequency);
 
-        setFolder(folder);
         if ("".equals(backupFolder)) {
             this.backupFolder = MuleManager.getConfiguration().getWorkingDirectory() + "/mail/" + folder.getName();
         } else {
@@ -82,7 +81,7 @@ public class MailMessageReceiver extends PollingMessageReceiver implements Messa
             this.backupFolder += File.separator;
         }
     }
-
+    
     public void doConnect() throws Exception
     {
         String inbox = null;
