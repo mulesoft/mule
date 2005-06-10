@@ -35,4 +35,9 @@ public class SmtpConnectorTestCase extends Pop3ConnectorTestCase
     {
         return "smtp://a:a@a.com";
     }
+
+    public void testReceiver() throws Exception
+    {
+    }
+
 }
