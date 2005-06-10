@@ -70,6 +70,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver
                     public void run()
                     {
                         try {
+                            currentFiles.add(file.getName()); 
                             processFile(file);
                         } catch (Exception e) {
                             connector.handleException(e);
