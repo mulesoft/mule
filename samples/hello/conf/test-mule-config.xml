@@ -81,7 +81,7 @@
             <!--
                              Here we tell this component to use the interceptor stack defined above
             -->
-            <interceptor className="default"/>
+            <interceptor name="default"/>
         </mule-descriptor>
 
         <mule-descriptor name="ChitChatUMO"
@@ -90,7 +90,7 @@
             outboundEndpoint="stream://System.out"
             implementation="org.mule.samples.hello.ChitChatter">
 
-            <interceptor className="default"/>
+            <interceptor name="default"/>
         </mule-descriptor>
     </model>
 </mule-configuration>

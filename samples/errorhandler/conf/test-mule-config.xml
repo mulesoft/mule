@@ -127,7 +127,7 @@
                     </properties>
                 </router>
             </outbound-router>
-            <interceptor className="default"/>
+            <interceptor name="default"/>
         </mule-descriptor>
 
         <mule-descriptor name="Business Error Manager"

@@ -58,7 +58,7 @@
             <inbound-router>
                 <router className="org.mule.routing.inbound.ForwardingConsumer"/>
             </inbound-router>
-            <interceptor className="default"/>
+            <interceptor name="default"/>
         </mule-descriptor>
        <mule-descriptor name="RunJob"
             inboundEndpoint="jms://queue"
@@ -68,7 +68,7 @@
             <inbound-router>
                 <router className="org.mule.routing.inbound.ForwardingConsumer"/>
             </inbound-router>
-            <interceptor className="default"/>
+            <interceptor name="default"/>
         </mule-descriptor>
     </model>
 </mule-configuration>
