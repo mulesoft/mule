@@ -25,8 +25,6 @@ import javax.mail.Transport;
 import javax.mail.URLName;
 import javax.mail.internet.InternetAddress;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -42,11 +40,6 @@ import org.mule.util.PropertiesHelper;
  */
 public class SmtpMessageDispatcher extends AbstractMessageDispatcher
 {
-    /**
-     * logger used by this class
-     */
-    private static transient Log logger = LogFactory.getLog(SmtpMessageDispatcher.class);
-
     private Session session;
 
     private SmtpConnector connector;
@@ -65,7 +58,8 @@ public class SmtpMessageDispatcher extends AbstractMessageDispatcher
                                   null,
                                   connector.getUsername(),
                                   connector.getPassword());
-        session = connector.createMailSession(url);
+        session = MailUtils.createMailSession(url);
+        session.setDebug(logger.isDebugEnabled());
     }
 
     /*

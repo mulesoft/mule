@@ -132,7 +132,7 @@ public class MuleEndpointURI implements UMOEndpointURI
                 uri = uri.replaceFirst(schemeMetaInfo + ":", "");
             }
             this.uri = new URI(uri);
-            this.userInfo = this.uri.getUserInfo();
+            this.userInfo = this.uri.getRawUserInfo();
         } catch (URISyntaxException e) {
             throw new MalformedEndpointException(uri, e);
         }

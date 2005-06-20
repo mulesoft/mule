@@ -13,13 +13,10 @@
  */
 package org.mule.providers.email;
 
-import java.util.Properties;
-
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
@@ -47,7 +44,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 {
     private Pop3Connector connector;
 
-    private Folder inbox;
+    private Folder folder;
 
     private Session session = null;
 
@@ -62,29 +59,38 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
     protected void initialise(UMOEndpointURI endpoint) throws MessagingException
     {
         if (!initialised.get()) {
-            URLName url = new URLName(endpoint.getAddress());
+            String inbox = null;
+            if (connector.getProtocol().equals("imap") && endpoint.getParams().get("folder") != null) {
+                inbox = (String) endpoint.getParams().get("folder");
+            } else {
+                inbox = Pop3Connector.MAILBOX;
+            }
 
-            Properties props = System.getProperties();
-            props.put("mail.smtp.host", url.getHost());
-            props.put("mail.smtp.port", String.valueOf(url.getPort()));
-            session = Session.getDefaultInstance(props, null);
+            URLName url = new URLName(endpoint.getScheme(),
+                                      endpoint.getHost(),
+                                      endpoint.getPort(),
+                                      inbox,
+                                      endpoint.getUsername(),
+                                      endpoint.getPassword());
+
+            session = MailUtils.createMailSession(url);
             session.setDebug(logger.isDebugEnabled());
-            PasswordAuthentication pw = new PasswordAuthentication(url.getUsername(), url.getPassword());
-            session.setPasswordAuthentication(url, pw);
 
             Store store = session.getStore(url);
             store.connect();
-
-            String folder = null;
-            if (connector.getProtocol().equals("imap") && endpoint.getParams().get("folder") != null) {
-                folder = (String) endpoint.getParams().get("folder");
-            } else {
-                folder = Pop3Connector.MAILBOX;
+            folder = store.getFolder(inbox);
+            if (!folder.isOpen()) {
+                try {
+                    // Depending on Server implementation it's not always
+                    // necessary
+                    // to open the folder to check it
+                    // Opening folders can be exprensive!
+                    // folder.open(Folder.READ_ONLY);
+                    folder.open(Folder.READ_WRITE);
+                } catch (MessagingException e) {
+                    logger.warn("Failed to open folder: " + folder.getFullName(), e);
+                }
             }
-            // Will always be INBOX for pop3
-            inbox = store.getFolder(folder);
-            if (!inbox.isOpen())
-                inbox.open(Folder.READ_ONLY);
         }
     }
 
@@ -121,24 +127,31 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
     {
         initialise(endpointUri);
 
-        int count = inbox.getMessageCount();
-        if (count > 0) {
-            Message[] message = inbox.getMessages();
-            return new MuleMessage(connector.getMessageAdapter(message[0]));
-        } else if (count == -1) {
-            throw new MessagingException("Cannot monitor folder: " + inbox.getFullName() + " as folder is closed");
-        } else {
-            Thread.sleep(timeout);
-            count = inbox.getMessageCount();
+        long t0 = System.currentTimeMillis();
+        if (timeout < 0) {
+            timeout = Long.MAX_VALUE;
+        }
+        do {
+            int count = folder.getMessageCount();
             if (count > 0) {
-                Message message = inbox.getMessage(0);
+                Message message = folder.getMessage(1);
                 // so we don't get the same message again
                 message.setFlag(Flags.Flag.DELETED, true);
                 return new MuleMessage(connector.getMessageAdapter(message));
+            } else if (count == -1) {
+                throw new MessagingException("Cannot monitor folder: " + folder.getFullName() + " as folder is closed");
+            }
+            long sleep = Math.min(this.connector.getCheckFrequency(), timeout - (System.currentTimeMillis() - t0));
+            if (sleep > 0) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("No results, sleeping for " + sleep);
+                }
+                Thread.sleep(sleep);
             } else {
+                logger.debug("Timeout");
                 return null;
             }
-        }
+        } while (true);
     }
 
     public Object getDelegateSession() throws UMOException
@@ -156,8 +169,9 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
         initialised.set(false);
         // close and expunge deleted messages
         try {
-            if (inbox != null)
-                inbox.close(true);
+            if (folder != null) {
+                folder.close(true);
+            }
         } catch (MessagingException e) {
             logger.error("Failed to close pop3 inbox: " + e.getMessage(), e);
         }

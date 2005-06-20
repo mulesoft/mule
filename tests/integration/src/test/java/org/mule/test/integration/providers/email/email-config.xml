@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="email_test" version="1.0">
+
+ <connector name="smtpConnector" className="org.mule.providers.email.SmtpConnector">
+    <properties>
+      <property name="fromAddress" value="eat@deliasystems.com"/>
+      <property name="port" value="25"/>
+      <property name="hostname" value="smtp.fr.oleane.com"/>
+      <property name="username" value="eat@delisys4.fr.fto"/>
+      <property name="password" value="kIxUjC6R"/>
+    </properties>
+  </connector>
+ 
+  <connector name="pop3Connector" className="org.mule.providers.email.Pop3Connector">
+    <properties>
+      <property name="hostname" value="pop.fr.oleane.com"/>
+      <property name="port" value="110"/>
+      <property name="username" value="eat@delisys4.fr.fto"/>
+      <property name="password" value="kIxUjC6R"/>
+      <property name="checkFrequency" value="1000"/>
+    </properties>
+  </connector>
+  
+</mule-configuration>

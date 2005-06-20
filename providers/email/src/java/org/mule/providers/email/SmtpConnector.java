@@ -29,14 +29,11 @@
 package org.mule.providers.email;
 
 import java.util.Calendar;
-import java.util.Properties;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
-import javax.mail.URLName;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -381,18 +378,4 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
         this.port = port;
     }
 
-    protected Session createMailSession(URLName url)
-    {
-        if (url == null) {
-            throw new IllegalArgumentException("Url argument cannot be null when creating a session");
-        }
-        Properties props = System.getProperties();
-        props.put("mail.smtp.host", url.getHost());
-        props.put("mail.smtp.port", String.valueOf(url.getPort()));
-        Session session = Session.getDefaultInstance(props, null);
-        session.setDebug(logger.isDebugEnabled());
-        PasswordAuthentication pw = new PasswordAuthentication(url.getUsername(), url.getPassword());
-        session.setPasswordAuthentication(url, pw);
-        return session;
-    }
 }

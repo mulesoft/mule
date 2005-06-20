@@ -18,13 +18,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
@@ -98,24 +96,12 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
                                   endpoint.getEndpointURI().getUsername(),
                                   endpoint.getEndpointURI().getPassword());
 
-        Properties props = System.getProperties();
-        props.put("mail.smtp.host", endpoint.getEndpointURI().getHost());
-        props.put("mail.smtp.port", String.valueOf(endpoint.getEndpointURI().getPort()));
-
-        if(url.getUsername()!=null) {
-            props.put("mail.smtp.auth", "true");
-            SMTPAuthenticator customAuthenticator = new SMTPAuthenticator(endpoint.getEndpointURI().getUsername(),
-                                                               endpoint.getEndpointURI().getPassword());
-            session = Session.getInstance(props, customAuthenticator);
-        } else {
-            session = Session.getDefaultInstance(props, null);
-        }
+        session = MailUtils.createMailSession(url);
         session.setDebug(logger.isDebugEnabled());
 
         Store store = session.getStore(url);
         store.connect();
         folder = store.getFolder(inbox);
-        session.setDebug(logger.isDebugEnabled());
     }
 
     public void doDisconnect() throws Exception
@@ -304,22 +290,4 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
         }
     }
 
-
-    /**
-     * SimpleAuthenticator is used to do simple authentication when the SMTP
-     * server requires it.
-     */
-    private class SMTPAuthenticator extends javax.mail.Authenticator
-    {
-        private String username = null;
-        private String password = null;
-
-        public SMTPAuthenticator(String user, String pwd) {
-            username = user;
-            password = pwd;
-        }
-        public PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication(username, password);
-        }
-    }
 }

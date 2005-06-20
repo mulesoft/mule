@@ -25,7 +25,6 @@ import org.mule.umo.provider.UMOMessageReceiver;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-
 public class Pop3Connector extends AbstractServiceEnabledConnector
 {
     public static final String MAILBOX = "INBOX";
@@ -66,8 +65,9 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
      */
     public void setCheckFrequency(long l)
     {
-        if (l < 1)
+        if (l < 1) {
             l = DEFAULT_CHECK_FREQUENCY;
+        }
         checkFrequency = l;
     }
 
