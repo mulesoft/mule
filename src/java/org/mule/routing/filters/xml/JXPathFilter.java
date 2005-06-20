@@ -14,7 +14,8 @@
 package org.mule.routing.filters.xml;
 
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.mule.umo.UMOFilter;
@@ -30,7 +31,7 @@ import org.mule.umo.UMOMessage;
 public class JXPathFilter implements UMOFilter
 {
 
-    private static final Logger logger = Logger.getLogger(JXPathFilter.class);
+    private static final Log LOGGER = LogFactory.getLog(JXPathFilter.class);
 
     private String expression;
 
@@ -47,13 +48,13 @@ public class JXPathFilter implements UMOFilter
             return false;
         }
         if (expression == null) {
-            logger.warn("Expression for JXPathFilter is not set");
+            LOGGER.warn("Expression for JXPathFilter is not set");
             return false;
         }
 
         if (value == null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Value for JXPathFilter is not set : true by default");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Value for JXPathFilter is not set : true by default");
             }
             value = Boolean.TRUE.toString();
         }
@@ -71,22 +72,22 @@ public class JXPathFilter implements UMOFilter
                 o = context.getValue(expression);
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("JXPathFilter Expression result='" + o + "' -  Expected value='" + value + "'");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("JXPathFilter Expression result='" + o + "' -  Expected value='" + value + "'");
             }
 
             if (o != null) {
                 res = value.equals(o.toString());
             } else {
                 res = false;
-                logger.warn("JXPathFilter Expression result is null (" + expression + ")");
+                LOGGER.warn("JXPathFilter Expression result is null (" + expression + ")");
             }
         } catch (Exception e) {
-            logger.warn("JXPathFilter cannot evaluate expression (" + expression + ") :" + e.getMessage(), e);
+            LOGGER.warn("JXPathFilter cannot evaluate expression (" + expression + ") :" + e.getMessage(), e);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("JXPathFilter accept object  : " + res);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("JXPathFilter accept object  : " + res);
         }
         return res;
 
