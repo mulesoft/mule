@@ -13,16 +13,22 @@
  */
 package org.mule.management.agents;
 
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectName;
-
 import org.apache.log4j.jmx.HierarchyDynamicMBean;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>Log4jAgent</code> exposes the configuration of the Log4J instance
@@ -36,6 +42,7 @@ public class Log4jAgent implements UMOAgent
 
     private String name;
     private MBeanServer mBeanServer;
+    public static final String JMX_OBJECT_NAME = "log4j:type=Hierarchy";
 
     /*
      * (non-Javadoc)
@@ -76,11 +83,30 @@ public class Log4jAgent implements UMOAgent
     {
         try {
             mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
-            // mBeanServer.registerMBean(new HierarchyMBeanImpl(), new
-            // ObjectName("Log4j:type=Hierarchy"));
-            mBeanServer.registerMBean(new HierarchyDynamicMBean(), new ObjectName("log4j:type=Hierarchy"));
+            final ObjectName objectName = ObjectName.getInstance(JMX_OBJECT_NAME);
+            // unregister existing Log4j MBean first if required
+            unregisterMBeansIfNecessary();
+            mBeanServer.registerMBean(new HierarchyDynamicMBean(), objectName);
         } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "JMX Agent"), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_START_X, "JMX Agent"), e, this);
+        }
+    }
+
+    /**
+     * Unregister all log4j MBeans if there are any left over the old deployment
+     */
+    protected void unregisterMBeansIfNecessary()
+            throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
+    {
+        if (mBeanServer.isRegistered(ObjectName.getInstance(JMX_OBJECT_NAME))) {
+            // unregister all log4jMBeans and loggers
+            Set log4jMBeans = mBeanServer.queryMBeans(ObjectName.getInstance("log4j*:*"), null);
+            for (Iterator it = log4jMBeans.iterator(); it.hasNext();)
+            {
+                ObjectInstance objectInstance = (ObjectInstance) it.next();
+                ObjectName theName = objectInstance.getObjectName();
+                mBeanServer.unregisterMBean(theName);
+            }
         }
     }
 

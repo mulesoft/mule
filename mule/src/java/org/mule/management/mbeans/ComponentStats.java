@@ -17,6 +17,8 @@ import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.management.stats.RouterStatistics;
 
@@ -29,6 +31,11 @@ import org.mule.management.stats.RouterStatistics;
 public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
 {
 
+	/**
+	 * logger used by this class
+	 */
+	private static transient Log LOGGER = LogFactory.getLog(ComponentStats.class);
+	
     private MBeanServer server;
 
     private ObjectName name;
@@ -218,15 +225,23 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
             RouterStatistics is = this.statistics.getInboundRouterStat();
             if (is != null) {
                 inboundName = new ObjectName(name.toString() + ",router=inbound");
+                // unregister old version if exists
+                if (this.server.queryNames(inboundName, null).size() != 0) {
+                	this.server.unregisterMBean(inboundName);
+                }
                 this.server.registerMBean(new RouterStats(is), this.inboundName);
             }
             RouterStatistics os = this.statistics.getOutboundRouterStat();
             if (os != null) {
                 outboundName = new ObjectName(name.toString() + ",router=outbound");
+                // unregister old version if exists
+                if (this.server.queryNames(outboundName, null).size() != 0) {
+                	this.server.unregisterMBean(outboundName);
+                }
                 this.server.registerMBean(new RouterStats(os), this.outboundName);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error post-registering MBean", e);
         }
     }
 
