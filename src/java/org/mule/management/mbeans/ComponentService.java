@@ -17,6 +17,8 @@ import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.MuleComponent;
 import org.mule.umo.UMOException;
@@ -32,6 +34,11 @@ import org.mule.umo.UMOSession;
 public class ComponentService implements ComponentServiceMBean, MBeanRegistration
 {
 
+	/**
+	 * logger used by this class
+	 */
+	private static transient Log LOGGER = LogFactory.getLog(ComponentService.class);
+	
     private MBeanServer server;
 
     private String name;
@@ -148,17 +155,24 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
      * 
      * @see javax.management.MBeanRegistration#postRegister(java.lang.Boolean)
      */
-    public void postRegister(Boolean registrationDone)
-    {
-        try {
-            if (getComponent().getStatistics() != null) {
-                statsName = new ObjectName(objectName.getDomain() + ":type=statistics,name=" + getName());
-                this.server.registerMBean(new ComponentStats(getComponent().getStatistics()), this.statsName);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    public void postRegister(Boolean registrationDone) {
+		try {
+			if (getComponent().getStatistics() != null) {
+				statsName = new ObjectName(objectName.getDomain()
+						+ ":type=statistics,name=" + getName());
+				// deregister the old version to avoid an
+				// InstanceAlreadyExistsException
+				// query by full jmx object name, no query given
+				if (this.server.queryNames(statsName, null).size() != 0) {
+					this.server.unregisterMBean(statsName);
+				}
+				this.server.registerMBean(new ComponentStats(getComponent()
+						.getStatistics()), this.statsName);
+			}
+		} catch (Exception e) {
+			LOGGER.error("Error post-registering the MBean", e);
+		}
+	}
 
     /*
      * (non-Javadoc)
