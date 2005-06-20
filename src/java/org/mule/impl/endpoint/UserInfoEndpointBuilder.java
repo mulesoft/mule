@@ -50,13 +50,13 @@ public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
         if (uri.getUserInfo() != null) {
             int x = uri.getUserInfo().indexOf(":");
             if (x > -1) {
-                String user = uri.getUserInfo().substring(0, x);
+                String user = uri.getRawUserInfo().substring(0, x);
                 address = user + "@" + address;
             } else {
-                address = uri.getUserInfo() + "@" + address;
+                address = uri.getRawUserInfo() + "@" + address;
             }
         } else {
-            throw new MalformedEndpointException("User info is not set");
+            throw new MalformedEndpointException(uri.toString(), new Exception("User info is not set"));
         }
         if (uri.getPath() != null && !"".equals(uri.getPath())) {
             props.put("folder", uri.getPath().substring(1));
