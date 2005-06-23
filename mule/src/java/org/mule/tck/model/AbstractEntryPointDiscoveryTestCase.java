@@ -149,7 +149,7 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         }
 
         /**
-         * @return Returns the compoenntClass.
+         * @return Returns the componentClass.
          */
         public Class getComponentClass()
         {

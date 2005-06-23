@@ -85,7 +85,7 @@ public interface UMOModel extends Lifecycle, Initialisable
      * Unregisters a component From the model
      * 
      * @param descriptor the descriptor of the componnt to remove
-     * @throws UMOException if the compoennt is not registered or it failed to
+     * @throws UMOException if the component is not registered or it failed to
      *             be disposing or the descriptor is null
      */
     void unregisterComponent(UMODescriptor descriptor) throws UMOException;

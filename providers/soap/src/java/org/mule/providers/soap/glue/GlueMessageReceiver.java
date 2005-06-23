@@ -43,7 +43,7 @@ import electric.util.interceptor.SendThreadContext;
 
 /**
  * <code>GlueMessageReceiver</code> is used to recieve Glue bounded services
- * for Mule compoennts.
+ * for Mule components.
  * 
  * services are bound in the Glue Registry using the Virtualservice
  * implementation

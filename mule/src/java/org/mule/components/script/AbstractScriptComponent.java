@@ -28,7 +28,7 @@ import org.mule.util.monitor.FileListener;
 import org.mule.util.monitor.FileMonitor;
 
 /**
- * <code>AbstractScriptComponent</code> is a compoennt that can execute
+ * <code>AbstractScriptComponent</code> is a component that can execute
  * scripts as components in Mule. This component also supports reloading if the
  * script file changes (providing the file is on the file system)
  * 

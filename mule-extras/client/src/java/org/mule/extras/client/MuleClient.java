@@ -59,17 +59,18 @@ import EDU.oswego.cs.dl.util.concurrent.Callable;
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
  * receive events from a Mule Server. In most Mule applications events are
- * triggered by some external occurrence such as a messge being received on a
+ * triggered by some external occurrence such as a message being received on a
  * queue or file being copied to a directory. The Mule client allows the user to
  * send and receive events programmatically through its Api. <p/> The client
  * defines a UMOEndpointURI which is used to determine how a message is sent of
  * received. The url defines the protocol, the endpointUri destination of the
  * message and optionally the endpoint to use when dispatching the event. For
- * example - <p/> vm://my.object dispatches to a my.object destination using the
+ * example - <p/> <code>vm://my.object</code> dispatches to a <code>my.object</code>
+ * destination using the
  * VM endpoint. There needs to be a global Vm endpoint registered for the
- * message to be sent <p/> jms://jmsProvider/orders.topic dispatches a jms
+ * message to be sent <p/> <code>jms://jmsProvider/orders.topic</code> dispatches a jms
  * message via the globally registered jmsProvider over a topic destination
- * called orders.topic. <p/> jms://orders.topic Is equivilent to the above
+ * called <code>orders.topic</code>. <p/> <code>jms://orders.topic</code> Is equivilent to the above
  * except that the endpoint is determined by the protocol, so the first jms
  * endpoint is used. <p/> <p/> Note that there must be a configured MuleManager
  * for this client to work. It will use the one available using
