@@ -28,19 +28,14 @@ import org.mule.config.i18n.Messages;
  * @version $Revision$
  */
 
-public class SimpleRetryConnectionStrategy implements ConnectionStrategy
+public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
 {
-
-    /**
-     * logger used by this class
-     */
-    protected transient Log logger = LogFactory.getLog(getClass());
 
     private int retryCount = 2;
     private long frequency = 2000;
     private int count = 0;
 
-    public void connect(AbstractMessageReceiver receiver) throws FatalConnectException
+    public void doConnect(AbstractMessageReceiver receiver) throws FatalConnectException
     {
         while (true) {
             try {
@@ -48,7 +43,9 @@ public class SimpleRetryConnectionStrategy implements ConnectionStrategy
                 receiver.connect();
                 // reset counter
                 count = 0;
-                logger.debug("Successfully connected to " + receiver.getEndpoint().getEndpointURI());
+                if (logger.isDebugEnabled()) {
+                	logger.debug("Successfully connected to " + receiver.getEndpoint().getEndpointURI());
+                }
                 break;
             } catch (Exception e) {
                 if (count == retryCount) {
@@ -57,11 +54,15 @@ public class SimpleRetryConnectionStrategy implements ConnectionStrategy
                                                                 receiver.getEndpoint().getEndpointURI()), e, receiver);
                 }
                 logger.warn("Failed to connect/reconnect on endpoint: " + receiver.getEndpoint().getEndpointURI());
-                logger.debug("Waiting for " + frequency + "ms before reconnecting");
+                if (logger.isDebugEnabled()) {
+                	logger.debug("Waiting for " + frequency + "ms before reconnecting");
+                }
                 try {
                     Thread.sleep(frequency);
                 } catch (InterruptedException e1) {
-
+                    throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
+                            getClass().getName(),
+                            receiver.getEndpoint().getEndpointURI()), e, receiver);
                 }
             }
         }

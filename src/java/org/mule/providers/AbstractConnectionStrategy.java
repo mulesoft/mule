@@ -17,6 +17,9 @@ package org.mule.providers;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * todo document
  * 
@@ -26,11 +29,15 @@ import javax.resource.spi.work.WorkException;
 public abstract class AbstractConnectionStrategy implements ConnectionStrategy
 {
 
-    private boolean doThreading = false;
+   /**
+    * logger used by this class
+    */
+   protected transient Log logger = LogFactory.getLog(getClass());
+
+   private boolean doThreading = false;
 
     public final void connect(final AbstractMessageReceiver receiver) throws FatalConnectException
     {
-
         if (doThreading) {
             try {
                 receiver.getWorkManager().scheduleWork(new Work() {

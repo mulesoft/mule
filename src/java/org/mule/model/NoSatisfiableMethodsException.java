@@ -31,8 +31,6 @@ import org.mule.util.StringMessageHelper;
  */
 public class NoSatisfiableMethodsException extends ModelException
 {
-    private static final String msg = "Could not find entry point on: ";
-
     /**
      * @param component
      */

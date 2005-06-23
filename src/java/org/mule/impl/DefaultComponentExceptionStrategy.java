@@ -24,7 +24,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * <code>DefaultComponentExceptionStrategy</code> is the default exception
- * handler for compoennts.
+ * handler for components.
  * 
  * The handler logs errors and will forward the message and exception to an
  * exception endpointUri if one is set on this Exception strategy
