@@ -14,6 +14,7 @@
 package org.mule.management.mbeans;
 
 import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -66,12 +67,14 @@ public class ComponentServiceTestCase extends AbstractMuleTestCase
         final String domainOriginal = "TEST_DOMAIN_1";
 
 
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
         MuleManager manager = (MuleManager) getTestManager();
         final MuleDescriptor descriptor = new MuleDescriptor("TEST_SERVICE");
         descriptor.setImplementation(new Object());
         manager.getModel().registerComponent(descriptor);
 
         manager.start();
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
 
         final ComponentService service = new ComponentService("TEST_SERVICE");
         final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_SERVICE");
