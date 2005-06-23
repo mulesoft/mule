@@ -22,7 +22,7 @@ import org.mule.tck.AbstractMuleTestCase;
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  * $Id$
  */
-public class MuleAdminAgentTest extends AbstractMuleTestCase
+public class MuleAdminAgentTestCase extends AbstractMuleTestCase
 {
     private MuleManager manager;
 

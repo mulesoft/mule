@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * $Id$
  */
-public class Log4jAgentTest extends AbstractMuleTestCase
+public class Log4jAgentTestCase extends AbstractMuleTestCase
 {
     private MBeanServer mBeanServer;
 
