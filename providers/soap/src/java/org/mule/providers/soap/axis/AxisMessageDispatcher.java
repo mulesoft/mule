@@ -100,28 +100,40 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         clientConfig.deployTransport(HTTPTransport.DEFAULT_TRANSPORT_NAME, transport);
 
         String wsdlUrl = getWsdlUrl(event);
-        Parser parser = new Parser();
-        parser.run(wsdlUrl);
-        Map map = parser.getSymbolTable().getHashMap();
-        List entries = new ArrayList();
-        for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
-            Vector v = (Vector) entry.getValue();
-            for (Iterator it2 = v.iterator(); it2.hasNext();) {
-                SymTabEntry e = (SymTabEntry) it2.next();
-                if (ServiceEntry.class.isInstance(e)) {
-                    entries.add(entry.getKey());
-                }
-            }
+        // If an wsdl url is given use it 
+        if (wsdlUrl.length() > 0) {
+        	// Parse the wsdl
+	        Parser parser = new Parser();
+	        parser.run(wsdlUrl);
+	        // Retrieves the defined services
+	        Map map = parser.getSymbolTable().getHashMap();
+	        List entries = new ArrayList();
+	        for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
+	            Map.Entry entry = (Map.Entry) it.next();
+	            Vector v = (Vector) entry.getValue();
+	            for (Iterator it2 = v.iterator(); it2.hasNext();) {
+	                SymTabEntry e = (SymTabEntry) it2.next();
+	                if (ServiceEntry.class.isInstance(e)) {
+	                    entries.add(entry.getKey());
+	                }
+	            }
+	        }
+	        // Currently, only one service should be defined
+	        if (entries.size() != 1) {
+	            throw new Exception("Need one and only one service entry, found " + entries.size());
+	        }
+	        // Create the axis service
+	        Service service = new Service(parser, (QName) entries.get(0));
+	        service.setEngineConfiguration(clientConfig);
+	        service.setEngine(new AxisClient(clientConfig));
+	        return service;
+        } else {
+        	// Create a simple axis service without wsdl
+	        Service service = new Service();
+	        service.setEngineConfiguration(clientConfig);
+	        service.setEngine(new AxisClient(clientConfig));
+	        return service;
         }
-        if (entries.size() != 1) {
-            throw new Exception("Need one and only one service entry, found " + entries.size());
-        }
-
-        Service service = new Service(parser, (QName) entries.get(0));
-        service.setEngineConfiguration(clientConfig);
-        service.setEngine(new AxisClient(clientConfig));
-        return service;
     }
 
     protected String getWsdlUrl(UMOEvent event)
