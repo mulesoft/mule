@@ -160,12 +160,10 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 			if (getComponent().getStatistics() != null) {
 				statsName = new ObjectName(objectName.getDomain()
 						+ ":type=statistics,name=" + getName());
-				// deregister the old version to avoid an
-				// InstanceAlreadyExistsException
-				// query by full jmx object name, no query given
-				if (this.server.queryNames(statsName, null).size() != 0) {
-					this.server.unregisterMBean(statsName);
-				}
+                // unregister old version if exists
+                if (this.server.isRegistered(statsName)) {
+                	this.server.unregisterMBean(statsName);
+                }
 				this.server.registerMBean(new ComponentStats(getComponent()
 						.getStatistics()), this.statsName);
 			}
@@ -181,6 +179,14 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
      */
     public void preDeregister() throws Exception
     {
+        try {
+            if (this.server.isRegistered(statsName)) {
+                this.server.unregisterMBean(statsName);
+            }
+        } catch(Exception ex) {
+            LOGGER.error("Error unregistering ComponentService child " + statsName.getCanonicalName(),
+                        ex);
+        }
     }
 
     /*
