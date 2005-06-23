@@ -13,6 +13,8 @@
  */
 package org.mule.routing.filters;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.util.Utility;
@@ -36,6 +38,8 @@ import org.mule.util.Utility;
 
 public class WildcardFilter implements UMOFilter, ObjectFilter
 {
+	private static final Log LOGGER = LogFactory.getLog(WildcardFilter.class);
+	
     protected String[] patterns;
     protected String pattern;
 
@@ -50,7 +54,12 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
     
     public boolean accept(UMOMessage message)
     {
-        return accept(message.getPayload());
+    	try {
+    		return accept(message.getPayloadAsString());
+    	} catch (Exception e) {
+    		LOGGER.warn("An exception occured while filering", e);
+    		return false;
+    	}
     }
 
     public boolean accept(Object object)
