@@ -599,7 +599,7 @@ public class MuleManager implements UMOManager
 
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_INITIALISNG));
             if (id == null) {
-                logger.warn("No unique id has be set on this manager");
+                logger.warn("No unique id has been set on this manager");
             }
             try {
                 if (securityManager != null) {
