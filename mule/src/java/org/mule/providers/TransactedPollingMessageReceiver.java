@@ -125,6 +125,7 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
         {
             this.tt = tt;
             this.message = message;
+            this.sync = sync;
         }
 
         public void release()
@@ -136,8 +137,10 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
             try {
                 tt.execute(this);
             } catch (Exception e) {
-                // TODO: handle exception
-            }
+                handleException(e);
+            } finally {
+            	sync.release();
+			}
         }
 
         public Object doInTransaction() throws Exception
