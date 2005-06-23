@@ -87,7 +87,6 @@ public class BenchmarkTestCase extends TestCase
                 QueueSession s = mgr.getQueueSession();
                 Queue q = s.getQueue(queue);
 
-                long t0 = System.currentTimeMillis();
                 for (int i = 0; i < OUTERLOOP; i++) {
                     for (int j = 0; j < INNERLOOP; j++) {
                         byte[] o = new byte[(rnd.nextInt(16) + 1) * OBJSIZE];

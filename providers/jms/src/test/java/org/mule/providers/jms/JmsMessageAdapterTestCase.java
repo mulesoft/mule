@@ -15,8 +15,6 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.Message;
-
 import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
 
@@ -34,7 +32,7 @@ public class JmsMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      */
     public UMOMessageAdapter createAdapter(Object payload) throws Exception
     {
-        return new JmsMessageAdapter((Message) payload);
+        return new JmsMessageAdapter(payload);
     }
 
     public Object getValidMessage() throws Exception

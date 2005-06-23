@@ -58,17 +58,17 @@ public class MulticastingRouter extends FilteringOutboundRouter
                     if (synchronous) {
                         // Were we have multiple outbound endpoints
                         if (result == null) {
-                            result = send(session, message, (UMOEndpoint) endpoint);
+                            result = send(session, message, endpoint);
                         } else {
                             String def = (String) endpoint.getProperties().get("default");
                             if (def != null) {
-                                result = send(session, message, (UMOEndpoint) endpoint);
+                                result = send(session, message, endpoint);
                             } else {
-                                send(session, message, (UMOEndpoint) endpoint);
+                                send(session, message, endpoint);
                             }
                         }
                     } else {
-                        dispatch(session, message, (UMOEndpoint) endpoint);
+                        dispatch(session, message, endpoint);
                     }
                 }
             }

@@ -70,7 +70,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 logger.debug("Sending jms reply to: " + replyToDestination + "("
                         + replyToDestination.getClass().getName() + ")");
             }
-            replyToProducer = ((JmsConnector) connector).getJmsSupport().createProducer(session, replyToDestination);
+            replyToProducer = connector.getJmsSupport().createProducer(session, replyToDestination);
 
             // QoS support
             String ttlString = (String) event.removeProperty("TimeToLive");

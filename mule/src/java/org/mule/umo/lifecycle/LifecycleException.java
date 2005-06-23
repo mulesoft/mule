@@ -62,7 +62,8 @@ public class LifecycleException extends UMOException
 
     private void addDetails()
     {
-        Message m = new Message(Messages.OBJECT_CAUSED_ERROR_IS_X, component);
+    	// TODO dead code?
+        // Message m = new Message(Messages.OBJECT_CAUSED_ERROR_IS_X, component);
         addInfo("Object", component.toString());
     }
 

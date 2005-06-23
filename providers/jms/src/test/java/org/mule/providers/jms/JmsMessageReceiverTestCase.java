@@ -68,7 +68,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
             Mock connectionFactory = new Mock(ConnectionFactory.class);
             Mock connection = new Mock(Connection.class);
-            connectionFactory.expectAndReturn("createConnection", (Connection) connection.proxy());
+            connectionFactory.expectAndReturn("createConnection", connection.proxy());
             connection.expect("close");
             connection.expect("start");
             connection.expect("stop");

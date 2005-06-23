@@ -56,7 +56,7 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
     public void doStart() throws UMOException
     {
         super.doStart();
-        ThreadingProfile tp = ((AbstractConnector) connector).getReceiverThreadingProfile();
+        ThreadingProfile tp = connector.getReceiverThreadingProfile();
         if (receiveMessagesInTransaction && tp.isDoThreading()) {
             for (int i = 0; i < tp.getMaxThreadsActive(); i++) {
                 super.start();

@@ -42,9 +42,15 @@ public class OutboundTransactionsTestCase extends AbstractMuleTestCase
     public void testOutboundRouterTransactions() throws Exception
     {
         MuleClient client = new MuleClient();
-        while (client.receive("jms://my.queue1", TIMEOUT) != null);
-        while (client.receive("jms://my.queue2", TIMEOUT) != null);
-        
+
+        while (client.receive("jms://my.queue1", TIMEOUT) != null) {
+        	// consume messages
+        }
+
+        while (client.receive("jms://my.queue2", TIMEOUT) != null) {
+        	// consume messages
+        }
+
         client.sendNoReceive("vm://component1", "test", null);
 
         assertNotNull(client.receive("jms://my.queue1", TIMEOUT));
@@ -56,9 +62,15 @@ public class OutboundTransactionsTestCase extends AbstractMuleTestCase
     public void testOutboundRouterTransactions2() throws Exception
     {
         MuleClient client = new MuleClient();
-        while (client.receive("jms://my.queue3", TIMEOUT) != null);
-        while (client.receive("jms://my.queue4", TIMEOUT) != null);
-        
+
+        while (client.receive("jms://my.queue3", TIMEOUT) != null) {
+        	// consume messages
+        }
+
+        while (client.receive("jms://my.queue4", TIMEOUT) != null) {
+        	// consume messages
+        }
+
         client.sendNoReceive("jms://component2", "test", null);
 
         assertNotNull(client.receive("jms://my.queue3", TIMEOUT));
@@ -66,4 +78,5 @@ public class OutboundTransactionsTestCase extends AbstractMuleTestCase
         assertNull(client.receive("jms://my.queue3", TIMEOUT));
         assertNull(client.receive("jms://my.queue4", TIMEOUT));
     }
+
 }

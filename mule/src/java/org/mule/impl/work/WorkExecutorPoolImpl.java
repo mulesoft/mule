@@ -125,7 +125,6 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
      */
     public WorkExecutorPool stop()
     {
-        int maxSize = getMaximumPoolSize();
         pooledExecutor.shutdownNow();
         try {
             pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT);

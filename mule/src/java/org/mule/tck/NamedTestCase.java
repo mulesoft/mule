@@ -48,7 +48,6 @@ public abstract class NamedTestCase extends TestCase
     protected void setUp() throws Exception
     {
         System.out.println(StringMessageHelper.getBoilerPlate("Testing: " + toString(), '=', 80));
-        ;
         MuleManager.getConfiguration().getDefaultThreadingProfile().setDoThreading(false);
     }
 

@@ -126,21 +126,21 @@ public class JdbcConnector extends AbstractServiceEnabledConnector
         }
         // Find ack statement
         String ackStmt = null;
-        if ((str = (String) endpointUri.getParams().getProperty("ack")) != null) {
+        if ((str = endpointUri.getParams().getProperty("ack")) != null) {
             ackStmt = str;
             if ((str = getQuery(endpoint, ackStmt)) != null) {
                 ackStmt = str;
             }
         } else {
             ackStmt = readStmt + ".ack";
-            if ((str = (String) getQuery(endpoint, ackStmt)) != null) {
+            if ((str = getQuery(endpoint, ackStmt)) != null) {
                 ackStmt = str;
             } else {
                 ackStmt = null;
             }
         }
         // Translate both using queries map
-        if ((str = (String) getQuery(endpoint, readStmt)) != null) {
+        if ((str = getQuery(endpoint, readStmt)) != null) {
             readStmt = str;
         }
         if (readStmt == null) {

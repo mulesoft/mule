@@ -23,6 +23,7 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpConstants;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOMessage;
@@ -37,8 +38,10 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 {
     public void setUp() throws Exception
     {
-        if (MuleManager.isInstanciated())
+        if (MuleManager.isInstanciated()) {
             MuleManager.getInstance().dispose();
+        }
+
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("test-acegi-encrypt-config.xml");
     }
@@ -53,11 +56,8 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         MuleClient client = new MuleClient();
         UMOMessage m = client.send("vm://my.queue", "foo", null);
         assertNotNull(m);
-        int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        System.out.println(m.getPayload());
         assertNotNull(m.getExceptionPayload());
         assertEquals(ExceptionHelper.getErrorCode(CredentialsNotSetException.class), m.getExceptionPayload().getCode());
-
     }
 
     public void testAuthenticationFailureBadCredentials() throws Exception
@@ -71,11 +71,8 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 
         UMOMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
-        int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        System.out.println(m.getPayload());
         assertNotNull(m.getExceptionPayload());
         assertEquals(ExceptionHelper.getErrorCode(UnauthorisedException.class), m.getExceptionPayload().getCode());
-
     }
 
     public void testAuthenticationAuthorised() throws Exception
@@ -91,8 +88,6 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         UMOMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
         assertNull(m.getExceptionPayload());
-
-        System.out.println(m.getPayload());
     }
 
     public void testAuthenticationFailureBadCredentialsHttp() throws Exception
@@ -106,9 +101,9 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 
         UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
+
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        System.out.println(m.getPayload());
-        assertEquals(401, status);
+        assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
     }
 
     public void testAuthenticationAuthorisedHttp() throws Exception
@@ -124,7 +119,6 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
-        System.out.println(m.getPayload());
-        assertEquals(200, status);
+        assertEquals(HttpConstants.SC_OK, status);
     }
 }

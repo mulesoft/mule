@@ -201,8 +201,8 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
                 // property here. However
                 // When jms bridging other, non-JMS-compliant message servers
                 // occur, there is no guarantee that
-                // Custom properties will be proporgated
-                byte[] bytes = JmsMessageUtils.getBytesFromMessage((BytesMessage) source);
+                // Custom properties will be propagated
+                byte[] bytes = JmsMessageUtils.getBytesFromMessage(source);
                 if (CompressionHelper.isCompressed(bytes)) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Message recieved is compressed");

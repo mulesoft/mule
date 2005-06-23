@@ -166,7 +166,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         UMOMessage message = new MuleMessage(adapter);
 
                         if (logger.isDebugEnabled()) {
-                            logger.debug((String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
+                            logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
                         }
                         OutputStream os = new ResponseOutputStream(dataOut, socket);
                         UMOMessage returnMessage = routeMessage(message, endpoint.isSynchronous(), os);

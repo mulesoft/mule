@@ -57,14 +57,14 @@ public class OpenJmsQueueFunctionalTestCase extends AbstractJmsQueueFunctionalTe
 
     public void testJndiDestinations() throws Exception
     {
-        JmsConnector cnn = (JmsConnector) createConnector();
-        cnn.initialise();
-        Object o = cnn.getJndiContext().lookup("queue1");
+        JmsConnector conn = (JmsConnector) createConnector();
+        conn.initialise();
+        Object o = conn.getJndiContext().lookup("queue1");
         assertNotNull(o);
         assertTrue(o instanceof Destination);
 
         try {
-            Object o2 = cnn.getJndiContext().lookup("queue1BlahBlah");
+            conn.getJndiContext().lookup("queue1BlahBlah");
             fail("destination does not exist");
         } catch (NamingException e) {
             // expected

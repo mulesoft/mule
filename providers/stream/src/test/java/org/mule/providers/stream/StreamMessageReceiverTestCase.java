@@ -37,15 +37,19 @@ public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCa
         // FIX A bit hard testing receive from a unit test as we need to reg
         // listener etc
         // file endpoint functiona tests for this
-
     }
 
     public void testOtherProperties() throws Exception
     {
         StreamMessageReceiver receiver = (StreamMessageReceiver) getMessageReceiver();
         UMOEndpoint endpoint = getTestEndpoint("test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+
         MuleDescriptor descriptor = getTestDescriptor("orange", Orange.class.getName());
+        assertNotNull(descriptor);
+
         UMOComponent component = getTestComponent(descriptor);
+        assertNotNull(component);
+
         endpoint.getConnector().start();
         Mock connector = new Mock(UMOConnector.class);
         connector.expectAndReturn("getExceptionListener", new DefaultExceptionStrategy());

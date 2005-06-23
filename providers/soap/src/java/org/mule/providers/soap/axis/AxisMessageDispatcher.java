@@ -1,5 +1,7 @@
 /*
- * $Header$
+ * $Header:
+/home/projects/mule/scm/mule/providers/soap/src/java/org/mule/providers/soap/axis/AxisMessageDispatcher.java,v
+1.9 2005/06/09 21:15:40 gnt Exp $
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
@@ -13,14 +15,18 @@
  */
 package org.mule.providers.soap.axis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Vector;
 
-import javax.xml.rpc.ServiceException;
+import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPEnvelope;
 
+import org.apache.axis.AxisProperties;
 import org.apache.axis.Handler;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -31,6 +37,9 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.transport.http.HTTPTransport;
+import org.apache.axis.wsdl.gen.Parser;
+import org.apache.axis.wsdl.symbolTable.ServiceEntry;
+import org.apache.axis.wsdl.symbolTable.SymTabEntry;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -50,46 +59,84 @@ import org.mule.util.BeanUtils;
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the
  * Axis soap client.
  * 
- * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @version $Revision$
+ *  <at> author <a href="mailto:ross.mason@...">Ross Mason</a>
+ *  <at> version $Revision$
  */
 public class AxisMessageDispatcher extends AbstractMessageDispatcher
 {
-    private Service service;
+    private Map services;
 
     public AxisMessageDispatcher(AxisConnector connector)
     {
         super(connector);
-        try {
-            service = new Service();
-            // todo for some reason loading the client handlers this way isn't
-            // working for me?
-            // Doesn't seem to load the optimised http transport...
-            // SimpleProvider clientConfig = connector.getClientProvider();
-
-            SimpleProvider clientConfig = new SimpleProvider();
-            Handler muleHandler = (Handler) new MuleSoapHeadersHandler();
-            SimpleChain reqHandler = new SimpleChain();
-            SimpleChain respHandler = new SimpleChain();
-            reqHandler.addHandler(muleHandler);
-            respHandler.addHandler(muleHandler);
-            Handler pivot = (Handler) new MuleHttpSender();
-            Handler transport = new SimpleTargetedChain(reqHandler, pivot, respHandler);
-            clientConfig.deployTransport(HTTPTransport.DEFAULT_TRANSPORT_NAME, transport);
-
-            service.setEngineConfiguration(clientConfig);
-            service.setEngine(new AxisClient(clientConfig));
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+        services = new HashMap();
     }
 
     public void doDispose()
     {
     }
 
+    protected synchronized Service getService(UMOEvent event) throws Exception 
+    {
+        String wsdlUrl = getWsdlUrl(event);
+        Service service = (Service) services.get(wsdlUrl);
+        if (service == null) {
+            service = createService(event);
+            services.put(wsdlUrl, service);
+        }
+        return service;
+    }
+
+    protected Service createService(UMOEvent event) throws Exception
+    {
+        SimpleProvider clientConfig = new SimpleProvider();
+        Handler muleHandler = new MuleSoapHeadersHandler();
+        SimpleChain reqHandler = new SimpleChain();
+        SimpleChain respHandler = new SimpleChain();
+        reqHandler.addHandler(muleHandler);
+        respHandler.addHandler(muleHandler);
+        Handler pivot = new MuleHttpSender();
+        Handler transport = new SimpleTargetedChain(reqHandler, pivot, respHandler);
+        clientConfig.deployTransport(HTTPTransport.DEFAULT_TRANSPORT_NAME, transport);
+
+        String wsdlUrl = getWsdlUrl(event);
+        Parser parser = new Parser();
+        parser.run(wsdlUrl);
+        Map map = parser.getSymbolTable().getHashMap();
+        List entries = new ArrayList();
+        for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
+            Map.Entry entry = (Map.Entry) it.next();
+            Vector v = (Vector) entry.getValue();
+            for (Iterator it2 = v.iterator(); it2.hasNext();) {
+                SymTabEntry e = (SymTabEntry) it2.next();
+                if (ServiceEntry.class.isInstance(e)) {
+                    entries.add(entry.getKey());
+                }
+            }
+        }
+        if (entries.size() != 1) {
+            throw new Exception("Need one and only one service entry, found " + entries.size());
+        }
+
+        Service service = new Service(parser, (QName) entries.get(0));
+        service.setEngineConfiguration(clientConfig);
+        service.setEngine(new AxisClient(clientConfig));
+        return service;
+    }
+
+    protected String getWsdlUrl(UMOEvent event)
+    {
+        Object wsdlUrlProp = event.getProperties().get(AxisConnector.WSDL_URL_PROPERTY);
+        String wsdlUrl = "";
+        if (wsdlUrlProp != null) {
+            wsdlUrl = wsdlUrlProp.toString();
+        }
+        return wsdlUrl;
+    }
+
     public void doDispatch(UMOEvent event) throws Exception
     {
+        AxisProperties.setProperty("axis.doAutoTypes", "true");
         Call call = getCall(event);
         // dont use invokeOneWay here as we are already in a thread pool.
         // Axis creates a new thread for every invoke one way call. nasty!
@@ -101,8 +148,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
+        AxisProperties.setProperty("axis.doAutoTypes", "true");
         Call call = getCall(event);
-        Object result = call.invoke(getArgs(event));
+        Object[] args = getArgs(event);
+        Object result = call.invoke(args);
         if (result == null) {
             return null;
         } else {
@@ -112,7 +161,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    private Call getCall(UMOEvent event) throws ServiceException, DispatchException
+    private Call getCall(UMOEvent event) throws Exception
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         String method = (String) endpointUri.getParams().remove("method");
@@ -126,7 +175,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             }
         }
 
-        Call call = (Call) service.createCall();
+        Call call = (Call) getService(event).createCall();
         // set properties on the call from the endpoint properties
         BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
 

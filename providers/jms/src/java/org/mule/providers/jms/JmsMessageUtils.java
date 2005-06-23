@@ -144,7 +144,7 @@ public class JmsMessageUtils
                 result = ((TextMessage) source).getText();
 
             } else if (source instanceof BytesMessage) {
-                byte[] bytes = getBytesFromMessage((BytesMessage) source);
+                byte[] bytes = getBytesFromMessage(source);
                 return CompressionHelper.uncompressByteArray(bytes);
             } else if (source instanceof StreamMessage) {
 

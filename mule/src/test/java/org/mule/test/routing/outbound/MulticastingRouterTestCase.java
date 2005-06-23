@@ -43,8 +43,10 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        assertNotNull(endpoint1);
+
         UMOEndpoint endpoint2 = getTestEndpoint("Test2Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        OutboundMessageRouter outboundRouter = new OutboundMessageRouter();
+        assertNotNull(endpoint2);
 
         MulticastingRouter router = new MulticastingRouter();
         RegExFilter filter = new RegExFilter("(.*) event");

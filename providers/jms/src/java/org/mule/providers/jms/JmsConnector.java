@@ -187,7 +187,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         }
         if (connectionFactory != null && connectionFactory instanceof XAConnectionFactory) {
             if (MuleManager.getInstance().getTransactionManager() != null) {
-                connectionFactory = new ConnectionFactoryWrapper((XAConnectionFactory) connectionFactory,
+                connectionFactory = new ConnectionFactoryWrapper(connectionFactory,
                                                                  MuleManager.getInstance().getTransactionManager());
             }
         }

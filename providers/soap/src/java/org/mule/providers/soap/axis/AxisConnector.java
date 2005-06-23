@@ -73,6 +73,8 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public static final String ENDPOINT_COUNTERS_PROPERTY = "endpointCounters";
 
+    public static final String WSDL_URL_PROPERTY = "wsdlUrl";
+
     private String serverConfig;
     private AxisServer axisServer;
     private SimpleProvider serverProvider;
@@ -255,14 +257,11 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         // the
         // port is different
         String endpoint = receiver.getEndpointURI().getAddress();
-        boolean startsWith = false;
         String scheme = ep.getScheme().toLowerCase();
         if (scheme.equals("http") || scheme.equals("tcp")) {
             endpoint = scheme + "://" + ep.getHost() + ":" + ep.getPort();
-            startsWith = true;
             // if we are using a socket based endpointUri make sure it is
-            // running
-            // synchronously by default
+            // running synchronously by default
             String sync = "synchronous=" + receiver.getEndpoint().isSynchronous();
             if (endpoint.indexOf("?") > -1) {
                 endpoint += "&" + sync;

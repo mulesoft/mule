@@ -1021,7 +1021,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
             public void end(String endpointName, String endpointName1) throws Exception
             {
-                endpointReferences.add((EndpointReference) digester.pop());
+                endpointReferences.add(digester.pop());
             }
         });
         addCommonEndpointRules(digester, path, null);

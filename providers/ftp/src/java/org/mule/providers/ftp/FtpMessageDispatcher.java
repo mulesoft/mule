@@ -69,7 +69,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
                 buf = data.toString().getBytes();
             }
 
-            client = (FTPClient) connector.getFtp(uri);
+            client = connector.getFtp(uri);
             if (!client.changeWorkingDirectory(uri.getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }

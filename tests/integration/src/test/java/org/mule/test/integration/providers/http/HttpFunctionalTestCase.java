@@ -15,7 +15,6 @@
 package org.mule.test.integration.providers.http;
 
 import java.net.URI;
-import java.net.URL;
 
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
@@ -74,7 +73,6 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     protected void sendTestData(int iterations) throws Exception
     {
         URI uri = getInDest().getUri();
-        URL url = new URL(uri.getScheme(), uri.getHost(), uri.getPort(), "/");
         PostMethod postMethod = new PostMethod(uri.toString());
         postMethod.setRequestBody(TEST_MESSAGE);
         postMethod.setRequestContentLength(TEST_MESSAGE.length());

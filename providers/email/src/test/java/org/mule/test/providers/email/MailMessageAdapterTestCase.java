@@ -40,7 +40,7 @@ public class MailMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      */
     public UMOMessageAdapter createAdapter(Object payload) throws Exception
     {
-        return new MailMessageAdapter((Message) payload);
+        return new MailMessageAdapter(payload);
     }
 
     /*

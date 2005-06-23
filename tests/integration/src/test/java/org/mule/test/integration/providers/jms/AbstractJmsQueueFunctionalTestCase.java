@@ -109,8 +109,6 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         // Start the server
         MuleManager.getInstance().start();
 
-        Message msg = null;
-
         MessageConsumer mc;
         // check replyTo
         if (useTopics()) {

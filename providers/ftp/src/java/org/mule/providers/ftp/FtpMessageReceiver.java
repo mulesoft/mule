@@ -30,7 +30,6 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -92,7 +91,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver
         FTPClient client = null;
         UMOEndpointURI uri = endpoint.getEndpointURI();
         try {
-            client = (FTPClient) connector.getFtp(uri);
+            client = connector.getFtp(uri);
             if (!client.changeWorkingDirectory(uri.getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
@@ -100,7 +99,6 @@ public class FtpMessageReceiver extends PollingMessageReceiver
             if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
-            UMOFilter filter = endpoint.getFilter();
             if (files == null || files.length > 0) {
                 return files;
             }
@@ -123,7 +121,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver
         FTPClient client = null;
         UMOEndpointURI uri = endpoint.getEndpointURI();
         try {
-            client = (FTPClient) connector.getFtp(uri);
+            client = connector.getFtp(uri);
             if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
@@ -144,7 +142,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver
 
     public void doConnect() throws Exception
     {
-        FTPClient client = (FTPClient) connector.getFtp(getEndpointURI());
+        FTPClient client = connector.getFtp(getEndpointURI());
         connector.releaseFtp(getEndpointURI(), client);
     }
 

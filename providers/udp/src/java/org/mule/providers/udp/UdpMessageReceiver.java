@@ -28,7 +28,6 @@ import javax.resource.spi.work.WorkManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
@@ -105,7 +104,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     {
         UMOTransformer transformer = component.getDescriptor().getResponseTransformer();
         if (transformer == null) {
-            return ((AbstractConnector) connector).getDefaultResponseTransformer();
+            return connector.getDefaultResponseTransformer();
         }
         return transformer;
     }

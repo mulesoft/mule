@@ -52,7 +52,9 @@ public class AxisConnectorVMFunctionalTestCase extends AbstractMuleTestCase
     {
         MuleClient client = new MuleClient();
         Service service = new Service();
-        Call call = (Call) service.createCall();
+
+        Call call = (Call)service.createCall();
+        assertNotNull(call);
 
         // String endpoint = "http://localhost:38009/mule/mycomponent";
         // call.setTargetEndpointAddress(endpoint);

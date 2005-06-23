@@ -56,7 +56,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         if (connector.isQueueEvents()) {
             // Ensure we can create a vm queue
             QueueSession queueSession = connector.getQueueSession();
-            Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
+            queueSession.getQueue(endpoint.getEndpointURI().getAddress());
         }
     }
 

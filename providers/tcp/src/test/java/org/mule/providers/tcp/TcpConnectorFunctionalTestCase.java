@@ -125,7 +125,7 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
                                         context.getOutputStream().write(result.getBytes());
                                         context.getOutputStream().flush();
                                     }
-                                    ;
+
                                     callbackCalled = true;
                                 }
                             });

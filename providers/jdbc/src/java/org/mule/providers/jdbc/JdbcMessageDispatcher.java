@@ -69,7 +69,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         UMOEndpointURI endpointURI = endpoint.getEndpointURI();
         String writeStmt = endpointURI.getAddress();
         String str;
-        if ((str = (String) this.connector.getQuery(endpoint, writeStmt)) != null) {
+        if ((str = this.connector.getQuery(endpoint, writeStmt)) != null) {
             writeStmt = str;
         }
         if (writeStmt == null) {

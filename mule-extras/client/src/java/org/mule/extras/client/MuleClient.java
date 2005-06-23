@@ -565,7 +565,6 @@ public class MuleClient implements Disposable
     {
         UMOEndpoint endpoint = manager.lookupEndpoint(uri);
         if (endpoint == null) {
-            UMOEndpointURI muleEndpoint = new MuleEndpointURI(uri);
             endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, type);
         }
         return endpoint;

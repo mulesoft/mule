@@ -127,7 +127,7 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
                                         context.getOutputStream().write(result.getBytes());
                                         context.getOutputStream().flush();
                                     }
-                                    ;
+                                    
                                     callbackCalled = true;
                                 }
                             });

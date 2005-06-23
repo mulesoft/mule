@@ -45,7 +45,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        OutboundMessageRouter outboundRouter = new OutboundMessageRouter();
+        assertNotNull(endpoint1);
 
         FilteringOutboundRouter router = new FilteringOutboundRouter();
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);

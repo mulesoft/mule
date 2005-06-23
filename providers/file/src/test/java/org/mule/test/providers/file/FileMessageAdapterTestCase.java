@@ -55,6 +55,6 @@ public class FileMessageAdapterTestCase extends org.mule.tck.providers.AbstractM
      */
     public UMOMessageAdapter createAdapter(Object payload) throws Exception
     {
-        return new FileMessageAdapter((File) payload);
+        return new FileMessageAdapter(payload);
     }
 }

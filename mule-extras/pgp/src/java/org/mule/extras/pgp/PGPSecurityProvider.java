@@ -75,7 +75,7 @@ public class PGPSecurityProvider implements UMOSecurityProvider
             throw new UnauthorisedException(new org.mule.config.i18n.Message(Messages.X_IS_NULL, "UserId"));
         }
 
-        KeyBundle userKeyBundle = (KeyBundle) keyManager.getKeyBundle(userId);
+        KeyBundle userKeyBundle = keyManager.getKeyBundle(userId);
 
         if (userKeyBundle == null) {
             throw new UnauthorisedException(new org.mule.config.i18n.Message("pgp", 1, userId));

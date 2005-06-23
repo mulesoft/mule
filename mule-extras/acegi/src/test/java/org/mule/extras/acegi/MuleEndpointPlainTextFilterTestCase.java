@@ -29,8 +29,10 @@ public class MuleEndpointPlainTextFilterTestCase extends NamedTestCase
 {
     public void setUp() throws Exception
     {
-        if (MuleManager.isInstanciated())
+        if (MuleManager.isInstanciated()) {
             MuleManager.getInstance().dispose();
+        }
+
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("test-acegi-encrypt-config.xml");
     }
@@ -47,7 +49,6 @@ public class MuleEndpointPlainTextFilterTestCase extends NamedTestCase
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-
     }
 
     public void testAuthenticationFailureBadCredentials() throws Exception
@@ -57,7 +58,6 @@ public class MuleEndpointPlainTextFilterTestCase extends NamedTestCase
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-        System.out.println(m.getPayload());
     }
 
     public void testAuthenticationAuthorised() throws Exception
@@ -67,6 +67,5 @@ public class MuleEndpointPlainTextFilterTestCase extends NamedTestCase
         assertNotNull(m);
         int status = m.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_OK, status);
-        System.out.println(m.getPayload());
     }
 }

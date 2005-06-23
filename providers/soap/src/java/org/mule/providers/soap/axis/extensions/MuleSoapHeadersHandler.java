@@ -88,7 +88,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
             throws Exception
     {
 
-        SOAPMessageContext soapMsgContext = (SOAPMessageContext) msgContext;
+        SOAPMessageContext soapMsgContext = msgContext;
         SOAPMessage msg = soapMsgContext.getMessage();
         if (msg == null) {
             return;
@@ -112,9 +112,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
      */
     protected void processClientResponse(MessageContext msgContext) throws Exception
     {
-
-        SOAPMessageContext soapMsgContext = (SOAPMessageContext) msgContext;
-
+        SOAPMessageContext soapMsgContext = msgContext;
         SOAPMessage msg = soapMsgContext.getMessage();
         if (msg == null) {
             return;
@@ -122,8 +120,6 @@ public class MuleSoapHeadersHandler extends BasicHandler
         SOAPEnvelope env = msg.getSOAPPart().getEnvelope();
         MuleSoapHeaders headers = new MuleSoapHeaders(env.getHeader());
         headers.setAsClientProperties(msgContext);
-        // msgContext.setProperty(MuleSoapHeaders.ENV_REQUEST_HEADERS, headers
-        // );
     }
 
     /**
@@ -134,8 +130,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
      */
     protected void processServerRequest(MessageContext msgContext) throws Exception
     {
-        SOAPMessageContext soapMsgContext = (SOAPMessageContext) msgContext;
-
+        SOAPMessageContext soapMsgContext = msgContext;
         SOAPMessage msg = soapMsgContext.getMessage();
         if (msg == null) {
             return;
@@ -151,8 +146,7 @@ public class MuleSoapHeadersHandler extends BasicHandler
      */
     protected void processServerResponse(MessageContext msgContext, boolean setMustUnderstand) throws Exception
     {
-
-        SOAPMessageContext soapMsgContext = (SOAPMessageContext) msgContext;
+        SOAPMessageContext soapMsgContext = msgContext;
         SOAPMessage msg = soapMsgContext.getMessage();
         if (msg == null) {
             return;

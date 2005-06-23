@@ -58,7 +58,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
 
     public boolean isBinary()
     {
-        return message instanceof byte[];
+        return message != null;
     }
 
     /*

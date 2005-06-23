@@ -55,7 +55,9 @@ public class MuleClientTransactionTestCase extends NamedTestCase
         props.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
         
         // Empty reply queue
-        while (client.receive("jms://replyTo.queue", 2000) != null);
+        while (client.receive("jms://replyTo.queue", 2000) != null) {
+        	// slurp
+        }
         
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
@@ -86,8 +88,10 @@ public class MuleClientTransactionTestCase extends NamedTestCase
         props.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
         
         // Empty reply queue
-        while (client.receive("jms://replyTo.queue", 2000) != null);
-        
+        while (client.receive("jms://replyTo.queue", 2000) != null) {
+        	// hmm..mesages
+        }
+
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
         tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
@@ -119,8 +123,10 @@ public class MuleClientTransactionTestCase extends NamedTestCase
         props.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
         
         // Empty reply queue
-        while (client.receive("jms://replyTo.queue", 2000) != null);
-        
+        while (client.receive("jms://replyTo.queue", 2000) != null) {
+        	// yum!
+        }
+
         MuleTransactionConfig tc = new MuleTransactionConfig();
         tc.setFactory(new JmsTransactionFactory());
         tc.setAction(UMOTransactionConfig.ACTION_ALWAYS_BEGIN);
@@ -152,7 +158,10 @@ public class MuleClientTransactionTestCase extends NamedTestCase
         tt.execute(new TransactionCallback() {
             public Object doInTransaction() throws Exception 
             {
-                while (client.receive("jms://replyTo.queue", 2000) != null);
+                while (client.receive("jms://replyTo.queue", 2000) != null) {
+                	// munch..
+                }
+
                 return null;
             }
         });

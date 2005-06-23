@@ -208,7 +208,7 @@ public class AxisConnectorFunctionalTestCase extends AbstractMuleTestCase
                                                 null);
         UMOEvent event = getTestEvent(new Person("Nodet", "Guillaume"), endpoint);
         try {
-            UMOMessage result = dispatcher.send(event);
+            dispatcher.send(event);
             fail("An AxisFault should have been raised");
         } catch (AxisFault f) {
             // This is ok
