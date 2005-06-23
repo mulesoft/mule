@@ -56,6 +56,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
     {
         List list = getRecipients(message);
         List results = new ArrayList();
+
         if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
             boolean correlationSet = message.getCorrelationGroupSize() != -1;
             if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
@@ -67,11 +68,9 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
 
         UMOMessage result = null;
-        // synchronized(list) {
-
         UMOEndpoint endpoint;
+
         for (Iterator iterator = list.iterator(); iterator.hasNext();)
-        // for (int i =0; i < list.size(); i++)
         {
             String recipient = (String) iterator.next();
             endpoint = getRecipientEndpoint(message, recipient);
@@ -95,13 +94,12 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         }
 
         if (results != null && results.size() == 1) {
-            return new MuleMessage(results.get(0), ((UMOMessage) result).getProperties());
+            return new MuleMessage(results.get(0), result.getProperties());
         } else if (results.size() == 0) {
             return null;
         } else {
             return new MuleMessage(results, (result == null ? null : result.getProperties()));
         }
-        // }
     }
 
     protected UMOEndpoint getRecipientEndpoint(UMOMessage message, String recipient) throws RoutingException

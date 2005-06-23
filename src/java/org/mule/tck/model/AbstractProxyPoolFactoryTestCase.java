@@ -17,7 +17,6 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleProxy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.umo.manager.UMOManager;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 
@@ -34,9 +33,6 @@ public abstract class AbstractProxyPoolFactoryTestCase extends AbstractMuleTestC
         Mock mockPool = new Mock(ObjectPool.class);
         MuleDescriptor descriptor = getTestDescriptor("apple", Apple.class.getName());
         ObjectFactory factory = getProxyFactory(descriptor, (ObjectPool) mockPool.proxy());
-
-        UMOManager manager = getManager();
-
         Object result = factory.create();
         assertNotNull(result);
         MuleProxy proxy = (MuleProxy) result;

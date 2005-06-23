@@ -47,7 +47,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public void testPropertyTypesConfig() throws Exception
     {
-        UMODescriptor d = (UMODescriptor) MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
+        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
         assertNotNull(d);
         assertNotNull(d.getProperties().get("factoryObject"));
         assertTrue(d.getProperties().get("factoryObject") instanceof Orange);
@@ -62,7 +62,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public void testMapPropertyTypesConfig() throws Exception
     {
-        UMODescriptor d = (UMODescriptor) MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
+        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
         assertNotNull(d);
         Map props = (Map) d.getProperties().get("propertiesMap");
         assertNotNull(props);
@@ -79,7 +79,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public void testListPropertyTypesConfig() throws Exception
     {
-        UMODescriptor d = (UMODescriptor) MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
+        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
         assertNotNull(d);
         List props = (List) d.getProperties().get("propertiesList");
         assertNotNull(props);
@@ -98,7 +98,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 
     public void testEndpointURIParamsConfig()
     {
-        UMODescriptor d = (UMODescriptor) MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
+        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("testPropertiesComponent");
         assertNotNull(d);
         assertNotNull(d.getInboundEndpoint());
         assertNotNull(d.getInboundTransformer());

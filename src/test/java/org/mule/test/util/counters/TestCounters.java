@@ -36,8 +36,10 @@ public class TestCounters extends TestCase
 
         assertNotNull(CounterFactory.getCounter("create1"));
         assertNull(CounterFactory.getCounter("zzz"));
+
         for (Iterator it = CounterFactory.getCounters(); it.hasNext();) {
             Counter ct = (Counter) it.next();
+            assertNotNull(ct);
         }
 
         try {
@@ -149,14 +151,22 @@ public class TestCounters extends TestCase
     public void testRatePerUnit() throws InterruptedException
     {
         Counter ct = CounterFactory.createCounter("testRatePerUnit", Type.NUMBER);
+        assertNotNull(ct);
+
         Counter rsec = CounterFactory.createCounter("testRatePerUnit.rate.sec", "testRatePerUnit", Type.RATE_PER_SECOND);
+        assertNotNull(rsec);
+
         Counter rmin = CounterFactory.createCounter("testRatePerUnit.rate.min", "testRatePerUnit", Type.RATE_PER_MINUTE);
+        assertNotNull(rmin);
 
         assertEquals("Rate", 0.0, rsec.nextValue(), delta);
+
         for (int i = 0; i < 50; i++) {
             ct.setRawValue(1);
             Thread.sleep(100);
         }
-        assertEquals("Rate", 10.0, rsec.nextValue(), 10.0 * 0.20);
+
+        assertEquals("RatePerSecond", 10.0, rsec.nextValue(), 10.0 * 0.20);
+        assertEquals("RatePerMinute", 50.0, rmin.nextValue(), 10.0 * 0.20);
     }
 }

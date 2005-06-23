@@ -59,7 +59,7 @@ public class Number extends AbstractCounter
 
     public synchronized double nextValue()
     {
-        return (double) this.value;
+        return this.value;
     }
 
 }

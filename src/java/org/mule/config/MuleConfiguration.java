@@ -272,14 +272,14 @@ public class MuleConfiguration
     private ThreadingProfile getThreadingProfile(ThreadingProfile profile)
     {
         if (profile != null) {
-            return new ThreadingProfile((ThreadingProfile) profile);
+            return new ThreadingProfile(profile);
         }
-        return new ThreadingProfile((ThreadingProfile) defaultThreadingProfile);
+        return new ThreadingProfile(defaultThreadingProfile);
     }
 
     public PoolingProfile getPoolingProfile()
     {
-        return new PoolingProfile((PoolingProfile) poolingProfile);
+        return new PoolingProfile(poolingProfile);
     }
 
     public void setPoolingProfile(PoolingProfile poolingProfile)

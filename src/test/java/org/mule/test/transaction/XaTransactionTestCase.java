@@ -53,7 +53,7 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
     {
         Mock mockTx = new Mock(Transaction.class);
         mockTm.expect("begin");
-        mockTm.expectAndReturn("getTransaction", (Transaction) mockTx.proxy());
+        mockTm.expectAndReturn("getTransaction", mockTx.proxy());
 
         XaTransaction tx = new XaTransaction();
         assertFalse(tx.isBegun());

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mule.impl.MuleMessage;
-import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
@@ -39,7 +38,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     {
         Mock session = getMockSession();
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        OutboundMessageRouter outboundRouter = new OutboundMessageRouter();
+        assertNotNull(endpoint1);
 
         List recipients = new ArrayList();
         recipients.add("test://recipient1");
@@ -78,8 +77,9 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     public void testBadRecipientListRouter() throws Exception
     {
         Mock session = getMockSession();
+
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        OutboundMessageRouter outboundRouter = new OutboundMessageRouter();
+        assertNotNull(endpoint1);
 
         List recipients = new ArrayList();
         recipients.add("malformed-endpointUri-recipient1");

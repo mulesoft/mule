@@ -36,7 +36,7 @@ public class MessagesTestCase extends NamedTestCase
     public void testBadBundle()
     {
         try {
-            Message message = new Message("blah", 1);
+            new Message("blah", 1);
             fail("should throw resource bundle not found exception");
         } catch (MissingResourceException e) {
             assertTrue(e.getMessage().startsWith("Can't find bundle"));

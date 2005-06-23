@@ -44,6 +44,7 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
     {
         Mock session = getMockSession();
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
+        assertNotNull(testComponent);
 
         UMOInboundMessageRouter messageRouter = new InboundMessageRouter();
         SimpleEventResequencer router = new SimpleEventResequencer(3);

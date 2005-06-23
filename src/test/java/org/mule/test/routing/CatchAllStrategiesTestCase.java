@@ -28,7 +28,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
@@ -72,9 +71,9 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
-        endpoint.expectAndReturn("getConnector", (UMOConnector) connector.proxy());
+        endpoint.expectAndReturn("getConnector", connector.proxy());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        connector.expectAndReturn("getDispatcher", "dummy", (UMOMessageDispatcher) dispatcher.proxy());
+        connector.expectAndReturn("getDispatcher", "dummy", dispatcher.proxy());
         dispatcher.expect("dispatch", C.isA(UMOEvent.class));
         strategy.catchMessage(event.getMessage(), null, false);
 
@@ -112,9 +111,9 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("getTransformer", new TestEventTransformer());
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
-        endpoint.expectAndReturn("getConnector", (UMOConnector) connector.proxy());
+        endpoint.expectAndReturn("getConnector", connector.proxy());
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
-        connector.expectAndReturn("getDispatcher", "dummy", (UMOMessageDispatcher) dispatcher.proxy());
+        connector.expectAndReturn("getDispatcher", "dummy", dispatcher.proxy());
         dispatcher.expect("send", new Constraint() {
             public boolean eval(Object arg0)
             {

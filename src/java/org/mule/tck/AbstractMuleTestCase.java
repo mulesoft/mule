@@ -110,12 +110,15 @@ public abstract class AbstractMuleTestCase extends NamedTestCase
     public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor) throws Exception
     {
         UMOComponent component = getTestComponent(descriptor);
-
+        assertNotNull(component);
+ 
         UMOSession session = getTestSession(component);
-        UMOEvent event = new MuleEvent(new MuleMessage(data, null),
-                                       getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER),
-                                       getTestSession(component),
-                                       true);
+        assertNotNull(session);
+
+        UMOEndpoint endpoint = getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        assertNotNull(endpoint);
+
+        UMOEvent event = new MuleEvent(new MuleMessage(data, null), endpoint, session, true);
         return event;
     }
 
@@ -136,7 +139,7 @@ public abstract class AbstractMuleTestCase extends NamedTestCase
 
     public static UMOSession getTestSession(UMOComponent component)
     {
-        return new MuleSession((MuleComponent) component, null);
+        return new MuleSession(component, null);
     }
 
     public static TestConnector getTestConnector()

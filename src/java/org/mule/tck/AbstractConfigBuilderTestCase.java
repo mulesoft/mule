@@ -293,7 +293,7 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
                                                    .getEndpoint()
                                                    .getEndpointURI()
                                                    .toString());
-        endpoint = (UMOEndpoint) descriptor.getInboundRouter().getEndpoint("orangeEndpoint");
+        endpoint = descriptor.getInboundRouter().getEndpoint("orangeEndpoint");
         assertNotNull(endpoint);
         assertEquals("orangeEndpoint", endpoint.getName());
         assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());

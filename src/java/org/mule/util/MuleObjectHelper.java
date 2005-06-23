@@ -49,7 +49,7 @@ public class MuleObjectHelper
 
     public static UMOTransformer getTransformer(String list, String delim) throws MuleException
     {
-        StringTokenizer st = new StringTokenizer((String) list, delim);
+        StringTokenizer st = new StringTokenizer(list, delim);
 
         UMOTransformer tempTrans = null;
         UMOTransformer currentTrans = null;

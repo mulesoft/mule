@@ -45,7 +45,7 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
             // expected
             return;
         }
-        assertTrue(ep instanceof UMOEntryPoint);
+        assertTrue(ep != null);
         try {
 
             RequestContext.setEvent(getTestEvent("Hello"));
@@ -82,6 +82,8 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         UMOEntryPointResolver epr = getEntryPointResolver();
         UMODescriptor descriptor = getDescriptorToResolve(mapping.getComponentClass().getName());
         UMOEntryPoint ep = epr.resolveEntryPoint(descriptor);
+        assertNotNull(ep);
+        // TODO
         // if(!(ep instanceof DynamicEntryPoint)) {
         // assertEquals(ep.getName(), mapping.getMethodName());
         // assertEquals(ep.getParameterType(), mapping.getMethodArgumentType());
@@ -94,7 +96,7 @@ public abstract class AbstractEntryPointDiscoveryTestCase extends AbstractMuleTe
         UMODescriptor descriptor = getDescriptorToResolve(mapping.getComponentClass().getName());
 
         try {
-            UMOEntryPoint ep = epr.resolveEntryPoint(descriptor);
+            epr.resolveEntryPoint(descriptor);
             fail("Resolving should have failed for: " + mapping.toString());
         } catch (Exception e) {
             // expected
