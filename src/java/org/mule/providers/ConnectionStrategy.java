@@ -14,6 +14,8 @@
  */
 package org.mule.providers;
 
+import org.mule.umo.provider.UMOMessageReceiver;
+
 /**
  * Allows developers to plug in customised reconnection behaviour
  * 
@@ -30,5 +32,5 @@ public interface ConnectionStrategy
      * @throws FatalConnectException is thrown if the strategy finally fails to
      *             make a connection.
      */
-    void connect(AbstractMessageReceiver receiver) throws FatalConnectException;
+    void connect(UMOMessageReceiver receiver) throws FatalConnectException;
 }

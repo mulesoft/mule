@@ -14,10 +14,9 @@
  */
 package org.mule.providers;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
  * A simple connection retry strategy where the a connection will be attempted X
@@ -35,7 +34,7 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
     private long frequency = 2000;
     private int count = 0;
 
-    public void doConnect(AbstractMessageReceiver receiver) throws FatalConnectException
+    public void doConnect(UMOMessageReceiver receiver) throws FatalConnectException
     {
         while (true) {
             try {
