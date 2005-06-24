@@ -14,6 +14,7 @@
 package org.mule.providers.jdbc;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,10 +64,13 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 
     public void doConnect() throws Exception
     {
+    	Connection con = null;
         try {
-            this.connector.getConnection();
+            con = this.connector.getConnection();
         } catch (Exception e) {
             throw new ConnectException(e, this);
+        } finally {
+        	JdbcUtils.close(con);
         }
     }
 
@@ -103,7 +107,11 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     {
         Connection con = null;
         try {
-            con = this.connector.getConnection();
+        	try {
+        		con = this.connector.getConnection();
+        	} catch (SQLException e) {
+        		throw new ConnectException(e, this);
+        	}
             Object[] readParams = JdbcUtils.getParams(getEndpointURI(), this.readParams, null);
             Object results = new QueryRunner().query(con, this.readStmt, readParams, new MapListHandler());
             return (List) results;

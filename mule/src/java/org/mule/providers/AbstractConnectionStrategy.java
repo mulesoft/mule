@@ -19,6 +19,8 @@ import javax.resource.spi.work.WorkException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
  * todo document
@@ -36,11 +38,11 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
 
    private boolean doThreading = false;
 
-    public final void connect(final AbstractMessageReceiver receiver) throws FatalConnectException
+    public final void connect(final UMOMessageReceiver receiver) throws FatalConnectException
     {
         if (doThreading) {
             try {
-                receiver.getWorkManager().scheduleWork(new Work() {
+                MuleManager.getInstance().getWorkManager().scheduleWork(new Work() {
                     public void release()
                     {
                     }
@@ -50,12 +52,15 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
                         try {
                             doConnect(receiver);
                         } catch (FatalConnectException e) {
-                            receiver.handleException(e);
+                        	// TODO: this cast is evil
+                        	if (receiver instanceof AbstractMessageReceiver) {
+                        		((AbstractMessageReceiver) receiver).handleException(e);
+                        	}
                         }
                     }
                 });
             } catch (WorkException e) {
-                receiver.handleException(e);
+                throw new FatalConnectException(e, receiver);
             }
         } else {
             doConnect(receiver);
@@ -72,5 +77,5 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
         this.doThreading = doThreading;
     }
 
-    public abstract void doConnect(AbstractMessageReceiver receiver) throws FatalConnectException;
+    public abstract void doConnect(UMOMessageReceiver receiver) throws FatalConnectException;
 }
