@@ -48,6 +48,7 @@ import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.security.SecurityException;
 
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all
@@ -88,9 +89,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     protected SynchronizedBoolean disposing = new SynchronizedBoolean(false);
 
-    protected SynchronizedBoolean connected = new SynchronizedBoolean(false);
+    protected WaitableBoolean connected = new WaitableBoolean(false);
 
-    protected SynchronizedBoolean stopped = new SynchronizedBoolean(true);
+    protected WaitableBoolean stopped = new WaitableBoolean(true);
 
     private SynchronizedBoolean connecting = new SynchronizedBoolean(false);
 
