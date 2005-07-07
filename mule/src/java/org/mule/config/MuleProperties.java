@@ -47,6 +47,8 @@ public interface MuleProperties
     String MULE_CORRELATION_GROUP_SIZE_PROPERTY = PROPERTY_PREFIX + "CORRELATION_GROUP";
     String MULE_CORRELATION_SEQUENCE_PROPERTY = PROPERTY_PREFIX + "CORRELATION_SEQUENCE";
     String MULE_SYNCHRONOUS_RECEIVE_PROPERTY = PROPERTY_PREFIX + "SYNC_RECEIVE";
+
+    final String MULE_SOAP_METHOD = PROPERTY_PREFIX + "SOAP_METHOD";
     // End Generic connector Event properties
 
     // Connector Service descriptor properties
@@ -63,5 +65,4 @@ public interface MuleProperties
     String CONNECTOR_SERVICE_FINDER = "service.finder";
     String CONNECTOR_SERVICE_ERROR = "service.error";
     // End Connector Service descriptor properties
-
 }

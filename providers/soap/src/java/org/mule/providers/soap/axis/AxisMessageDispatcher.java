@@ -15,17 +15,6 @@
  */
 package org.mule.providers.soap.axis;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Vector;
-
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPEnvelope;
-
 import org.apache.axis.AxisProperties;
 import org.apache.axis.Handler;
 import org.apache.axis.Message;
@@ -45,6 +34,8 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
+import org.mule.providers.soap.NamedParameter;
+import org.mule.providers.soap.SoapMethod;
 import org.mule.providers.soap.axis.extensions.MuleHttpSender;
 import org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler;
 import org.mule.umo.UMOEvent;
@@ -54,6 +45,16 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
+
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPEnvelope;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the
@@ -65,6 +66,8 @@ import org.mule.util.BeanUtils;
 public class AxisMessageDispatcher extends AbstractMessageDispatcher
 {
     private Map services;
+
+    private Map callParameters;
 
     public AxisMessageDispatcher(AxisConnector connector)
     {
@@ -152,6 +155,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         Call call = getCall(event);
         // dont use invokeOneWay here as we are already in a thread pool.
         // Axis creates a new thread for every invoke one way call. nasty!
+        // Mule overides the default Axis HttpSender to return immediately if
+        //the axis.one.way property is set
         Object[] args = getArgs(event);
         call.setProperty("axis.one.way", Boolean.TRUE);
         call.invoke(args);
@@ -162,6 +167,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         AxisProperties.setProperty("axis.doAutoTypes", "true");
         Call call = getCall(event);
+
         Object[] args = getArgs(event);
         Object result = call.invoke(args);
         if (result == null) {
@@ -192,7 +198,14 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
 
         call.setTargetEndpointAddress(endpointUri.getAddress());
-        call.setSOAPActionURI(endpointUri.getAddress());
+
+        //Set custom soap action if set on the event or endpoint
+        String soapAction = (String)event.getProperty("soapAction");
+        if(soapAction != null) {
+            soapAction = parseSoapAction(soapAction, method, event);
+            call.setSOAPActionURI(soapAction);
+            call.setUseSOAPAction(Boolean.TRUE.booleanValue());
+        }
         call.setOperationName(method);
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
@@ -206,6 +219,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             call.setUsername(endpointUri.getUsername());
             call.setPassword(endpointUri.getPassword());
         }
+
+        setCallParams(call, event, method);
         return call;
     }
 
@@ -308,5 +323,63 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     public Object getDelegateSession() throws UMOException
     {
         return null;
+    }
+
+    public String parseSoapAction(String soapAction, String method, UMOEvent event) {
+        if(soapAction.indexOf("${") > -1)
+        {
+            UMOEndpointURI endpointURI = event.getEndpoint().getEndpointURI();
+            soapAction = soapAction.replaceFirst("\\$\\{method\\}", method);
+            soapAction = soapAction.replaceFirst("\\$\\{address\\}", endpointURI.getAddress());
+            soapAction = soapAction.replaceFirst("\\$\\{scheme\\}", endpointURI.getScheme());
+            soapAction = soapAction.replaceFirst("\\$\\{host\\}", endpointURI.getHost());
+            soapAction = soapAction.replaceFirst("\\$\\{port\\}", String.valueOf(endpointURI.getPort()));
+            soapAction = soapAction.replaceFirst("\\$\\{path\\}", endpointURI.getPath());
+            soapAction = soapAction.replaceFirst("\\$\\{hostInfo\\}", endpointURI.getScheme() + "://" + endpointURI.getHost() +
+                    (endpointURI.getPort() > -1 ? ":" + String.valueOf(endpointURI.getPort()) : ""));
+            soapAction = soapAction.replaceFirst("\\$\\{serviceName\\}", event.getComponent().getDescriptor().getName());
+        }
+        if(logger.isDebugEnabled()) {
+            logger.debug("SoapAction for this call is: " + soapAction);
+        }
+        return soapAction;
+    }
+
+    private void setCallParams(Call call, UMOEvent event, String method) throws ClassNotFoundException {
+        if(callParameters==null) {
+            loadCallParams(event);
+        }
+
+        SoapMethod soapMethod;
+        soapMethod = (SoapMethod)event.removeProperty(MuleProperties.MULE_SOAP_METHOD);
+        if(soapMethod==null) {
+            soapMethod = (SoapMethod)callParameters.get(method);
+        }
+        if(soapMethod!=null) {
+            for (Iterator iterator = soapMethod.getNamedParameters().iterator(); iterator.hasNext();) {
+                NamedParameter parameter = (NamedParameter) iterator.next();
+                call.addParameter(parameter.getName(), parameter.getType(), parameter.getMode());
+            }
+            if(soapMethod.getReturnType()!=null) {
+                call.setReturnType(soapMethod.getReturnType());
+            }
+            if(soapMethod.getReturnClass()!=null) {
+                call.setReturnClass(soapMethod.getReturnClass());
+            }
+        }
+    }
+
+    private void loadCallParams(UMOEvent event) throws ClassNotFoundException {
+        callParameters = new HashMap();
+        Map methodCalls = (Map)event.getProperty("soapMethods");
+        if(methodCalls==null) return;
+
+        Map.Entry entry;
+        SoapMethod soapMethod;
+        for (Iterator iterator = methodCalls.entrySet().iterator(); iterator.hasNext();) {
+            entry = (Map.Entry)iterator.next();
+            soapMethod = new SoapMethod(entry.getKey().toString(), entry.getValue().toString());
+            callParameters.put(soapMethod.getName(), soapMethod);
+        }
     }
 }
