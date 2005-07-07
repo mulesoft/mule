@@ -110,7 +110,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
             if (methods.size() == 1) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Dynamic Entrypoint using method: " + component.getClass().getName() + "."
-                            + ((Method) methods.get(0)).getName() + "(" + context.getClass().getName() + ")");
+                            + ((Method) methods.get(0)).getName() + "(" + payload.getClass().getName() + ")");
                 }
                 addMethod(component, (Method) methods.get(0), payload.getClass());
                 return invokeCurrent(component, payload);
