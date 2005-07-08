@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <name>Mule JBI Wsdl</name>
+    <groupId>mule</groupId>
+    <artifactId>mule-jbi-schemas</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>xmlbeans</groupId>
+            <artifactId>xbean</artifactId>
+            <version>${xbean_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+            <version>${stax_api_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax</artifactId>
+            <version>${stax_ri_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>xml-resolver</groupId>
+            <artifactId>xml-resolver</artifactId>
+            <version>1.1</version>
+        </dependency>
+    </dependencies>
+	<build>
+		<sourceDirectory>${basedir}/target/xmlbeans/java</sourceDirectory>
+	</build>
+</project>

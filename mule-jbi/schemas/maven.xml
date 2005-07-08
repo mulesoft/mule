@@ -1,0 +1,37 @@
+<project default="jar"
+    xmlns:j="jelly:core"
+    xmlns:u="jelly:util"
+    xmlns:ant="jelly:ant"
+    xmlns:maven="jelly:maven">
+
+    <preGoal name="java:compile">
+        <attainGoal name="xmlbeans"/>
+    </preGoal>
+    
+    <goal name="xmlbeans">
+        <j:forEach var="artifact" items="${pom.artifacts}">
+   		    <echo>${artifact.name}</echo>
+    		<echo>before: ${xmlbeansClasspath}</echo>
+    		<j:choose>
+    			<j:when test="${xmlbeansClasspath == null}">
+        			<j:set var="xmlbeansClasspath" value="${artifact.path}"/>
+        		</j:when>
+        		<j:otherwise>
+	        		<j:set var="xmlbeansClasspath" value="${xmlbeansClasspath};${artifact.path}"/>
+	        	</j:otherwise>
+        	</j:choose>
+    		<echo>after: ${xmlbeansClasspath}</echo>
+        </j:forEach>
+        <echo>${xmlbeansClasspath}</echo>
+        <taskdef name="xmlbean" 
+				 classname="org.apache.xmlbeans.impl.tool.XMLBean" 
+				 classpath="${xmlbeansClasspath}" />
+		<xmlbean schema="${basedir}/main/src/xsd"
+				 download="false"
+				 srconly="true"
+				 srcgendir="${basedir}/target/xmlbeans/java"
+				 classgendir="${basedir}/target/classes"
+				 javasource="1.4" />
+    </goal>
+
+</project>

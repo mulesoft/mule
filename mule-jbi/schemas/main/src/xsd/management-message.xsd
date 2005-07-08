@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://java.sun.com/xml/ns/managementMessage" xmlns:m="http://java.sun.com/xml/ns/managementMessage">
+  <xs:element name="jbi-task">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="m:jbi-task-result">
+          <xs:attribute name="version" use="required" type="xs:decimal"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="jbi-task-result">
+    <xs:sequence>
+      <xs:element ref="m:jbi-task-result"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="jbi-task-result">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="m:frmwk-task-result"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="m:component-task-result"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="frmwk-task-result">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="m:frmwk-task-result-details"/>
+        <xs:element minOccurs="0" ref="m:is-cause-framework"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="is-cause-framework">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="YES"/>
+        <xs:enumeration value="NO"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="component-task-result">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="m:component-name"/>
+        <xs:element ref="m:component-task-result-details"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="component-name" type="xs:string"/>
+  <xs:element name="frmwk-task-result-details">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="m:task-result-details">
+          <xs:sequence>
+            <xs:element ref="m:locale"/>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="locale" type="xs:string"/>
+  <xs:element name="component-task-result-details" type="m:task-result-details"/>
+  <xs:complexType name="task-result-details">
+    <xs:sequence>
+      <xs:element ref="m:task-result-details"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="task-result-details">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="m:task-id"/>
+        <xs:element ref="m:task-result"/>
+        <xs:element minOccurs="0" ref="m:message-type"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="m:task-status-msg"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="m:exception-info"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="task-id" type="xs:string"/>
+  <xs:element name="task-result">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="SUCCESS"/>
+        <xs:enumeration value="FAILED"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="message-type">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="ERROR"/>
+        <xs:enumeration value="WARNING"/>
+        <xs:enumeration value="INFO"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="task-status-msg">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="m:msg-loc-info"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="msg-loc-info">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="m:loc-token"/>
+        <xs:element ref="m:loc-message"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="m:loc-param"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="loc-token" type="xs:string"/>
+  <xs:element name="loc-message" type="xs:string"/>
+  <xs:element name="loc-param" type="xs:string"/>
+  <xs:element name="exception-info">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="m:nesting-level"/>
+        <xs:element ref="m:msg-loc-info"/>
+        <xs:element ref="m:stack-trace"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nesting-level" type="xs:string"/>
+  <xs:element name="stack-trace" type="xs:string"/>
+</xs:schema>

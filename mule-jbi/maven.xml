@@ -1,0 +1,7 @@
+<project default="multiproject:install-snapshot"
+    xmlns:j="jelly:core"
+    xmlns:u="jelly:util"
+    xmlns:ant="jelly:ant"
+    xmlns:maven="jelly:maven">
+
+</project>
