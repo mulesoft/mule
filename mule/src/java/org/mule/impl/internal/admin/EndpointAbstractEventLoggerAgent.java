@@ -13,6 +13,8 @@
  */
 package org.mule.impl.internal.admin;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -33,6 +35,11 @@ import org.mule.umo.provider.UMOMessageDispatcher;
  */
 public class EndpointAbstractEventLoggerAgent extends AbstractEventLoggerAgent
 {
+    /**
+     * logger used by this class
+     */
+    private static transient Log LOGGER = LogFactory.getLog(AbstractEventLoggerAgent.class);
+    
     private String endpointAddress;
     private UMOEndpoint logEndpoint = null;
     private UMOSession session = null;
@@ -59,7 +66,7 @@ public class EndpointAbstractEventLoggerAgent extends AbstractEventLoggerAgent
                 UMOEvent event = new MuleEvent(new MuleMessage(e.toString(), null), logEndpoint, session, false);
                 dispatcher.dispatch(event);
             } catch (Exception e1) {
-                logger.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + logEndpoint
+                LOGGER.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + logEndpoint
                         + ". Error is: " + e1.getMessage(), e1);
             }
         }
