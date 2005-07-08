@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.test.integration.providers.soap;
@@ -58,11 +58,14 @@ protected void setUp() throws Exception
     {
         MuleClient client = new MuleClient();
         Map props = new HashMap();
+        //create the soap method passing in the method name and return type
         SoapMethod soapMethod = new SoapMethod("echo", NamedParameter.XSD_STRING);
+        //add one or more parameters
         soapMethod.addNamedParameter("value", NamedParameter.XSD_STRING, ParameterMode.IN);
+        //set the soap method as a property and pass the properties
+        //when making the call
         props.put(MuleProperties.MULE_SOAP_METHOD, soapMethod);
-        //The component itself with throw an exceptin if the parameters in the request
-        //soap message are not named
+
         UMOMessage result = client.send("axis:http://localhost:38011/mule/mycomponent2?method=echo", "Hello Named", props);
         assertEquals("Hello Named", result.getPayload());
     }

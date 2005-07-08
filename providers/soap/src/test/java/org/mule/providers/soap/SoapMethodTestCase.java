@@ -33,13 +33,15 @@ public class SoapMethodTestCase extends NamedTestCase
         assertEquals(Person.class, method.getReturnClass());
         assertNull(method.getReturnType());
 
+        NamedParameter[] nps = new NamedParameter[2];
+        nps = (NamedParameter[])method.getNamedParameters().toArray(nps);
         Iterator i = method.getNamedParameters().iterator();
-        NamedParameter np = (NamedParameter)i.next();
+        NamedParameter np = nps[0];
         assertEquals("firstName", np.getName());
         assertEquals(NamedParameter.XSD_STRING, np.getType());
         assertEquals(ParameterMode.IN, np.getMode());
 
-        np = (NamedParameter)i.next();
+        np = nps[1];
         assertEquals("age", np.getName());
         assertEquals(NamedParameter.XSD_INTEGER, np.getType());
         assertEquals(ParameterMode.IN, np.getMode());
