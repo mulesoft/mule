@@ -333,7 +333,7 @@ The <i>connection-descriptor</i> element specifies one or more message
   connections for Mule components.
 -->
   
-<!ELEMENT connector (properties?, threading-profile?, exception-strategy?)>
+<!ELEMENT connector (properties?, threading-profile?, exception-strategy?, connection-strategy?)>
 
 <!--
 	The name attribute is used to bind a connection to a logical name in the system
@@ -439,7 +439,7 @@ a connection to the underlying resource
     	the transformer can validate that the returnObject is of expected type before return
     	to the callee.
 -->
-<!ATTLIST transformer returnClass             NMTOKEN 			"java.lang.Object">
+<!ATTLIST transformer returnClass             CDATA 			"java.lang.Object">
 
 <!--	
 	<i>global-endpoints</i> are endpoint configurations made available to all components in
@@ -1258,8 +1258,7 @@ Whether the properties in the file override properties already set on this objec
 -->
 <!ELEMENT bean (
         description?,
-        (constructor-arg | spring-property)*,
-		(lookup-method)*
+        (constructor-arg | spring-property | lookup-method | replaced-method)*
 )>
 
 <!--
@@ -1286,7 +1285,32 @@ Whether the properties in the file override properties already set on this objec
 	like lazy initialization or autowire settings.
 -->
 <!ATTLIST bean class CDATA #IMPLIED>
+
+<!--
+	Optionally specify a parent bean definition.
+
+	Will use the bean class of the parent if none specified, but can
+	also override it. In the latter case, the child bean class must be
+	compatible with the parent, i.e. accept the parent's property values
+	and constructor argument values, if any.
+
+	A child bean definition will inherit constructor argument values,
+	property values and method overrides from the parent, with the option
+	to add new values. If init method, destroy method, factory bean and/or factory
+	method are specified, they will override the corresponding parent settings.
+
+	The remaining settings will always be taken from the child definition:
+	depends on, autowire mode, dependency check, singleton, lazy init.
+-->
 <!ATTLIST bean parent CDATA #IMPLIED>
+
+<!--
+	Is this bean "abstract", i.e. not meant to be instantiated itself but
+	rather just serving as parent for concrete child bean definitions.
+	Default is false. Specify true to tell the bean factory to not try to
+	instantiate that particular bean in any case.
+-->
+<!ATTLIST bean abstract (true | false) "false">
 
 <!--
 	Is this bean a "singleton" (one shared instance, which will
@@ -1404,6 +1428,16 @@ Whether the properties in the file override properties already set on this objec
 <!ATTLIST bean factory-method CDATA #IMPLIED>
 
 <!--
+	Alternative to class attribute for factory-method usage.
+	If this is specified, no class attribute should be used.
+	This should be set to the name of a bean in the current or
+	ancestor factories that contains the relevant factory method.
+	This allows the factory itself to be configured using Dependency
+	Injection, and an instance (rather than static) method to be used.
+-->
+<!ATTLIST bean factory-bean CDATA #IMPLIED>
+
+<!--
 	Bean definitions can specify zero or more constructor arguments.
 	They correspond to either a specific index of the constructor argument list
 	or are supposed to be matched generically by type.
@@ -1413,7 +1447,7 @@ Whether the properties in the file override properties already set on this objec
 -->
 <!ELEMENT constructor-arg (
         description?,
-        (bean | ref | idref | spring-list | set | spring-map | props | value | null)
+        (bean | ref | idref | value | null | spring-list | set | spring-map | props)
 )>
 
 <!--
@@ -1432,6 +1466,16 @@ Whether the properties in the file override properties already set on this objec
 <!ATTLIST constructor-arg type CDATA #IMPLIED>
 
 <!--
+  A short-cut alternative to a child element "ref bean=".
+-->
+<!ATTLIST constructor-arg ref CDATA #IMPLIED>
+
+<!--
+  A short-cut alternative to a child element "value".
+-->
+<!ATTLIST constructor-arg value CDATA #IMPLIED>
+
+<!--
     Mule-specific spring-property  element used to differenciate between Mule property element
     and springs
 
@@ -1442,7 +1486,7 @@ Whether the properties in the file override properties already set on this objec
 -->
 <!ELEMENT spring-property (
         description?,
-        (bean | ref | idref | spring-list | set | spring-map | props | value | null)
+        (bean | ref | idref | value | null | spring-list | set | spring-map | props)
 )>
 
 <!--
@@ -1452,6 +1496,81 @@ Whether the properties in the file override properties already set on this objec
 -->
 <!ATTLIST spring-property name CDATA #REQUIRED>
 
+<!--
+  A short-cut alternative to a child element "ref bean=".
+-->
+<!ATTLIST property ref CDATA #IMPLIED>
+
+<!--
+  A short-cut alternative to a child element "value".
+-->
+<!ATTLIST property value CDATA #IMPLIED>
+
+<!--
+	A lookup method causes the IoC container to override the given method and return
+	the bean with the name given in the bean attribute. This is a form of Method Injection.
+	It's particularly useful as an alternative to implementing the BeanFactoryAware
+	interface, in order to be able to make getBean() calls for non-singleton instances
+	at runtime. In this case, Method Injection is a less invasive alternative.
+-->
+<!ELEMENT lookup-method EMPTY>
+
+<!--
+	Name of a lookup method. This method should take no arguments.
+-->
+<!ATTLIST lookup-method name CDATA #IMPLIED>
+
+<!--
+	Name of the bean in the current or ancestor factories that the lookup method
+	should resolve to. Often this bean will be a prototype, in which case the
+	lookup method will return a distinct instance on every invocation. This
+	is useful for single-threaded objects.
+-->
+<!ATTLIST lookup-method bean CDATA #IMPLIED>
+
+<!--
+	Similar to the lookup method mechanism, the replaced-method element is used to control
+	IoC container method overriding: Method Injection. This mechanism allows the overriding
+	of a method with arbitrary code. 
+-->
+<!ELEMENT replaced-method (
+	(arg-type)*
+)>
+
+<!--
+	Name of the method whose implementation should be replaced by the IoC container.
+	If this method is not overloaded, there's no need to use arg-type subelements.
+	If this method is overloaded, arg-type subelements must be used for all 
+	override definitions for the method.
+-->
+<!ATTLIST replaced-method name CDATA #IMPLIED>
+
+<!--
+	Bean name of an implementation of the MethodReplacer interface
+	in the current or ancestor factories. This may be a singleton or prototype
+	bean. If it's a prototype, a new instance will be used for each method replacement.
+	Singleton usage is the norm.
+-->
+<!ATTLIST replaced-method replacer CDATA #IMPLIED>
+
+<!--
+	Subelement of replaced-method identifying an argument for a replaced method
+	in the event of method overloading.
+-->
+<!ELEMENT arg-type (#PCDATA)>
+
+<!--
+	Specification of the type of an overloaded method argument as a String. 
+	For convenience, this may be a substring of the FQN. E.g. all the
+	following would match "java.lang.String":
+	- java.lang.String
+	- String
+	- Str
+	
+	As the number of arguments will be checked also, this convenience can often
+	be used to save typing.
+-->
+<!ATTLIST arg-type match CDATA #IMPLIED>
 
 <!--
 	Defines a reference to another bean in this factory or an external
@@ -1492,27 +1611,33 @@ Whether the properties in the file override properties already set on this objec
 <!ATTLIST idref local IDREF #IMPLIED>
 
 <!--
-	A lookup method causes the IoC container to override the given method and return
-	the bean with the name given in the bean attribute. This is a form of Method Injection.
-	It's particularly useful as an alternative to implementing the BeanFactoryAware
-	interface, in order to be able to make getBean() calls for non-singleton instances
-	at runtime. In this case, Method Injection is a less invasive alternative.
+	Contains a string representation of a property value.
+	The property may be a string, or may be converted to the
+	required type using the JavaBeans PropertyEditor
+	machinery. This makes it possible for application developers
+	to write custom PropertyEditor implementations that can
+	convert strings to objects.
+
+	Note that this is recommended for simple objects only.
+	Configure more complex objects by populating JavaBean
+	properties with references to other beans.
 -->
-<!ELEMENT lookup-method EMPTY>
+<!ELEMENT value (#PCDATA)>
 
 <!--
-	Name of a lookup method. This method should take no arguments.
+	The value tag can have an optional type attribute, to specify the
+	exact type that the value should be converted to. Only needed
+	if the type of the target property or constructor argument is
+	too generic: for example, in case of a collection element.
 -->
-<!ATTLIST lookup-method name CDATA #IMPLIED>
+<!ATTLIST value type CDATA #IMPLIED>
 
 <!--
-	Name of the bean in the current or ancestor factories that the lookup method
-	should resolve to. Often this bean will be a prototype, in which case the
-	lookup method will return a distinct instance on every invocation. This
-	is useful for single-threaded objects.
+	Denotes a Java null value. Necessary because an empty "value" tag
+	will resolve to an empty String, which will not be resolved to a
+	null value unless a special PropertyEditor does so.
 -->
-<!ATTLIST lookup-method bean CDATA #IMPLIED>
-
+<!ELEMENT null (#PCDATA)>
 
 <!--
 	A list can contain multiple inner bean, ref, collection, or value elements.
@@ -1522,7 +1647,7 @@ Whether the properties in the file override properties already set on this objec
 	is automatically performed by the BeanFactory.
 -->
 <!ELEMENT spring-list (
-        (bean | ref | idref | spring-list | set | spring-map | props | value | null)*
+        (bean | ref | idref | value | null | spring-list | set | spring-map | props)*
 )>
 
 <!--
@@ -1531,7 +1656,7 @@ Whether the properties in the file override properties already set on this objec
 	although references will be strongly typed.
 -->
 <!ELEMENT set (
-        (bean | ref | idref | spring-list | set | spring-map | props | value | null)*
+        (bean | ref | idref | value | null | spring-list | set | spring-map | props)*
 )>
 
 <!--
@@ -1547,13 +1672,36 @@ Whether the properties in the file override properties already set on this objec
 	The name of the property is given by the "key" attribute.
 -->
 <!ELEMENT spring-entry (
-        (bean | ref | idref | spring-list | set | spring-map | props | value | null)
+  key?,
+        (bean | ref | idref | value | null | spring-list | set | spring-map | props)
 )>
 
 <!--
 	Each map element must specify its key.
 -->
 <!ATTLIST spring-entry key CDATA #REQUIRED>
+
+<!--
+  A short-cut alternative to a "key" element with a "ref bean=" child element.
+-->
+<!ATTLIST spring-entry key-ref CDATA #IMPLIED>
+
+<!--
+  A short-cut alternative to a child element "value".
+-->
+<!ATTLIST spring-entry value CDATA #IMPLIED>
+
+<!--
+  A short-cut alternative to a child element "ref bean=".
+-->
+<!ATTLIST spring-entry value-ref CDATA #IMPLIED>
+
+<!--
+	A key element can contain an inner bean, ref, value, or collection.
+-->
+<!ELEMENT key (
+	(bean | ref | idref | value | null | spring-list | set | spring-map | props)
+)>
 
 <!--
 	Props elements differ from map elements in that values must be strings.
@@ -1568,8 +1716,7 @@ Whether the properties in the file override properties already set on this objec
 	Note that whitespace is trimmed off to avoid unwanted whitespace
 	caused by typical XML formatting.
 -->
-<!ELEMENT prop
-(#PCDATA)
+<!ELEMENT prop (#PCDATA)
 >
 
 <!--
@@ -1577,23 +1724,3 @@ Whether the properties in the file override properties already set on this objec
 -->
 <!ATTLIST prop key CDATA #REQUIRED>
 
-<!--
-	Contains a string representation of a property value.
-	The property may be a string, or may be converted to the
-	required type using the JavaBeans PropertyEditor
-	machinery. This makes it possible for application developers
-	to write custom PropertyEditor implementations that can
-	convert strings to objects.
-
-	Note that this is recommended for simple objects only.
-	Configure more complex objects by populating JavaBean
-	properties with references to other beans.
--->
-<!ELEMENT value (#PCDATA)>
-
-<!--
-	Denotes a Java null value. Necessary because an empty "value" tag
-	will resolve to an empty String, which will not be resolved to a
-	null value unless a special PropertyEditor does so.
--->
-<!ELEMENT null (#PCDATA)>
