@@ -21,6 +21,8 @@ import javax.xml.rpc.ParameterMode;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.StringTokenizer;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * A soap method representation where the parameters are named
@@ -43,7 +45,7 @@ public class SoapMethod {
      */
     public SoapMethod(String methodName, String params) throws ClassNotFoundException {
         name = methodName;
-        this.namedParameters = new HashSet();
+        this.namedParameters = new TreeSet();
         NamedParameter param;
         for (StringTokenizer stringTokenizer = new StringTokenizer(params, ","); stringTokenizer.hasMoreTokens();) {
             String s = stringTokenizer.nextToken().trim();
@@ -66,26 +68,26 @@ public class SoapMethod {
 
     public SoapMethod(String name) {
         this.name = name;
-        this.namedParameters = new HashSet();
+        this.namedParameters = new TreeSet();
         this.returnType = null;
     }
 
     public SoapMethod(String name, QName returnType) {
         this.name = name;
-        this.namedParameters = new HashSet();
+        this.namedParameters = new TreeSet();
         this.returnType = returnType;
     }
 
     public SoapMethod(String name, QName returnType, Class returnClass) {
         this.name = name;
-        this.namedParameters = new HashSet();
+        this.namedParameters = new TreeSet();
         this.returnType = returnType;
         this.returnClass = returnClass;
     }
 
      public SoapMethod(String name, Class returnClass) {
         this.name = name;
-        this.namedParameters = new HashSet();
+        this.namedParameters = new TreeSet();
         this.returnClass = returnClass;
     }
 
