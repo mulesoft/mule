@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.internal.events.AdminEventListener;
 import org.mule.impl.internal.events.ComponentEventListener;
@@ -44,12 +42,7 @@ import org.mule.umo.manager.UMOServerEventListener;
  */
 public abstract class AbstractEventLoggerAgent implements UMOAgent
 {
-    /**
-     * logger used by this class
-     */
-    protected static transient Log logger = LogFactory.getLog(AbstractEventLoggerAgent.class);
 
-    protected static transient Log eventLogger;
     private String name;
 
     private boolean ignoreManagerEvents = false;

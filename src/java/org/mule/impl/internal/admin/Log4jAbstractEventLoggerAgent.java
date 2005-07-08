@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -44,12 +42,8 @@ import org.mule.util.Utility;
  */
 public class Log4jAbstractEventLoggerAgent extends AbstractEventLoggerAgent
 {
-    /**
-     * logger used by this class
-     */
-    protected static transient Log logger = LogFactory.getLog(Log4jAbstractEventLoggerAgent.class);
 
-    protected static transient Logger eventLogger;
+    protected Logger eventLogger;
     private String logName = Log4jAbstractEventLoggerAgent.class.getName();
     private String logFile = null;
     private String logConfigFile = null;
