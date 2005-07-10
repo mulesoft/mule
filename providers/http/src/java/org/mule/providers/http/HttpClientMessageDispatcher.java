@@ -163,7 +163,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         Object body = event.getTransformedMessage();
         if (body instanceof HttpMethod) {
             httpMethod = (HttpMethod) body;
-        } else if ("GET".equals(method) || body instanceof NullPayload) {
+        } else if ("GET".equalsIgnoreCase(method) || body instanceof NullPayload) {
             httpMethod = new GetMethod(uri.toString());
         } else {
             PostMethod postMethod = new PostMethod(uri.toString());
