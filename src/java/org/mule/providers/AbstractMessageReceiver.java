@@ -331,9 +331,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         try {
             messageId = message.getUniqueId();
         } catch (UniqueIdNotSupportedException e) {
-            messageId = "'no unique id'";
+            messageId = "'Current Message (no unique id)'";
         }
-        logger.warn("Message " + messageId + " failed to pass filter on endpoint: " + endpoint
+        logger.debug("Message " + messageId + " failed to pass filter on endpoint: " + endpoint
                 + ". Message is being ignored");
 
         return null;

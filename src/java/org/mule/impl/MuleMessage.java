@@ -140,7 +140,7 @@ public class MuleMessage implements UMOMessage
         Object key;
         for (Iterator iter = getPropertyNames(); iter.hasNext();) {
             key = iter.next();
-            props.put(key, getProperty(key));
+            if(key!=null) props.put(key, getProperty(key));
         }
         return Collections.unmodifiableMap(props);
     }
