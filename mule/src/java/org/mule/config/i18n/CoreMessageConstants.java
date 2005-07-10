@@ -187,4 +187,6 @@ public interface CoreMessageConstants
     
     int COMPONENT_X_IS_STOPPED = 167;
     int X_PROPERTY_IS_NOT_SET_ON_EVENT = 168;
+    int EJB_OBJECT_X_MISSING_CREATE = 169;
+    int EJB_KEY_REF_X_NOT_VALID = 170;
 }
