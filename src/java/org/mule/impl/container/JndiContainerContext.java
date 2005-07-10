@@ -37,12 +37,17 @@ import org.mule.umo.manager.ObjectNotFoundException;
  */
 public class JndiContainerContext extends AbstractContainerContext
 {
-    private InitialContext initialContext;
+    protected InitialContext context;
     private Map environment;
 
     public JndiContainerContext()
     {
         super("jndi");
+    }
+
+    protected JndiContainerContext(String name)
+    {
+        super(name);
     }
 
     public Map getEnvironment()
@@ -55,13 +60,26 @@ public class JndiContainerContext extends AbstractContainerContext
         this.environment = environment;
     }
 
+    public InitialContext getContext() {
+        return context;
+    }
+
+    public void setContext(InitialContext context) {
+        this.context = context;
+    }
+
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
         try {
+            if(key==null) {
+                throw new ObjectNotFoundException("null");
+            }
             if (key instanceof Name) {
-                return initialContext.lookup((Name) key);
+                return context.lookup((Name) key);
+            } else if(key instanceof Class){
+                return context.lookup(((Class)key).getName());
             } else {
-                return initialContext.lookup(key.toString());
+                return context.lookup(key.toString());
             }
         } catch (NamingException e) {
             throw new ObjectNotFoundException(key.toString(), e);
@@ -76,9 +94,11 @@ public class JndiContainerContext extends AbstractContainerContext
     public void initialise() throws InitialisationException
     {
         try {
-            initialContext = new InitialContext(new Hashtable(environment));
+            if(context==null) {
+                context = new InitialContext(new Hashtable(environment));
+            }
         } catch (NamingException e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), e);
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), e, this);
         }
     }
 }

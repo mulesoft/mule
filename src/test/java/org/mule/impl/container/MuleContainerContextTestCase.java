@@ -13,7 +13,7 @@
  *
  */
 
-package org.mule.test.mule.model;
+package org.mule.impl.container;
 
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.tck.model.AbstractContainerContextTestCase;
@@ -22,9 +22,6 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.UMOContainerContext;
 
 /**
- * <p>
- * <code>MuleContainerContextTestCase</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
