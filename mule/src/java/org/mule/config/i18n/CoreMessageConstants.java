@@ -186,4 +186,5 @@ public interface CoreMessageConstants
     int EVENT_TYPE_X_NOT_RECOGNISED = 166;
     
     int COMPONENT_X_IS_STOPPED = 167;
+    int X_PROPERTY_IS_NOT_SET_ON_EVENT = 168;
 }
