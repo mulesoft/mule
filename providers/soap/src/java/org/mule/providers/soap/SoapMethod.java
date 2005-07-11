@@ -14,15 +14,14 @@
  */
 package org.mule.providers.soap;
 
-import org.mule.util.ClassHelper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.StringTokenizer;
-import java.util.SortedSet;
-import java.util.TreeSet;
+
+import org.mule.util.ClassHelper;
 
 /**
  * A soap method representation where the parameters are named
@@ -33,7 +32,7 @@ import java.util.TreeSet;
 public class SoapMethod {
 
     private String name;
-    private Set namedParameters;
+    private List namedParameters = new ArrayList();
     private QName returnType;
     private Class returnClass;
 
@@ -45,7 +44,6 @@ public class SoapMethod {
      */
     public SoapMethod(String methodName, String params) throws ClassNotFoundException {
         name = methodName;
-        this.namedParameters = new TreeSet();
         NamedParameter param;
         for (StringTokenizer stringTokenizer = new StringTokenizer(params, ","); stringTokenizer.hasMoreTokens();) {
             String s = stringTokenizer.nextToken().trim();
@@ -68,36 +66,32 @@ public class SoapMethod {
 
     public SoapMethod(String name) {
         this.name = name;
-        this.namedParameters = new TreeSet();
         this.returnType = null;
     }
 
     public SoapMethod(String name, QName returnType) {
         this.name = name;
-        this.namedParameters = new TreeSet();
         this.returnType = returnType;
     }
 
     public SoapMethod(String name, QName returnType, Class returnClass) {
         this.name = name;
-        this.namedParameters = new TreeSet();
         this.returnType = returnType;
         this.returnClass = returnClass;
     }
 
      public SoapMethod(String name, Class returnClass) {
         this.name = name;
-        this.namedParameters = new TreeSet();
         this.returnClass = returnClass;
     }
 
-    public SoapMethod(String name, Set namedParameters, QName returnType) {
+    public SoapMethod(String name, List namedParameters, QName returnType) {
         this.name = name;
         this.namedParameters = namedParameters;
         this.returnType = returnType;
     }
 
-    public SoapMethod(String name, Set namedParameters ) {
+    public SoapMethod(String name, List namedParameters ) {
         this.name = name;
         this.namedParameters = namedParameters;
         this.returnType = null;
@@ -127,7 +121,7 @@ public class SoapMethod {
         return name;
     }
 
-    public Set getNamedParameters() {
+    public List getNamedParameters() {
         return namedParameters;
     }
 
