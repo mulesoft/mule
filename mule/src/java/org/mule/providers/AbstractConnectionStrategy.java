@@ -20,6 +20,7 @@ import javax.resource.spi.work.WorkException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
+import org.mule.umo.provider.UMOConnectable;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
@@ -38,7 +39,7 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
 
    private boolean doThreading = false;
 
-    public final void connect(final UMOMessageReceiver receiver) throws FatalConnectException
+    public final void connect(final UMOConnectable connectable) throws FatalConnectException
     {
         if (doThreading) {
             try {
@@ -50,20 +51,20 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
                     public void run()
                     {
                         try {
-                            doConnect(receiver);
+                            doConnect(connectable);
                         } catch (FatalConnectException e) {
                         	// TODO: this cast is evil
-                        	if (receiver instanceof AbstractMessageReceiver) {
-                        		((AbstractMessageReceiver) receiver).handleException(e);
+                        	if (connectable instanceof AbstractMessageReceiver) {
+                        		((AbstractMessageReceiver) connectable).handleException(e);
                         	}
                         }
                     }
                 });
             } catch (WorkException e) {
-                throw new FatalConnectException(e, receiver);
+                throw new FatalConnectException(e, connectable);
             }
         } else {
-            doConnect(receiver);
+            doConnect(connectable);
         }
     }
 
@@ -77,5 +78,14 @@ public abstract class AbstractConnectionStrategy implements ConnectionStrategy
         this.doThreading = doThreading;
     }
 
-    public abstract void doConnect(UMOMessageReceiver receiver) throws FatalConnectException;
+    public abstract void doConnect(UMOConnectable connectable) throws FatalConnectException;
+
+    protected String getDescription(UMOConnectable connectable) {
+    	if (connectable instanceof UMOMessageReceiver) {
+    		return ((UMOMessageReceiver) connectable).getEndpointURI().toString();
+    	} else {
+    		return connectable.toString();
+    	}
+    }
+
 }

@@ -16,6 +16,7 @@ package org.mule.providers;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.umo.provider.UMOConnectable;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
@@ -34,25 +35,25 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
     private long frequency = 2000;
     private int count = 0;
 
-    public void doConnect(UMOMessageReceiver receiver) throws FatalConnectException
+    public void doConnect(UMOConnectable connectable) throws FatalConnectException
     {
         while (true) {
             try {
                 count++;
-                receiver.connect();
+                connectable.connect();
                 // reset counter
                 count = 0;
                 if (logger.isDebugEnabled()) {
-                	logger.debug("Successfully connected to " + receiver.getEndpoint().getEndpointURI());
+                	logger.debug("Successfully connected to " + getDescription(connectable));
                 }
                 break;
             } catch (Exception e) {
                 if (count == retryCount) {
                     throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
                                                                 getClass().getName(),
-                                                                receiver.getEndpoint().getEndpointURI()), e, receiver);
+                                                                getDescription(connectable)), e, connectable);
                 }
-                logger.warn("Failed to connect/reconnect on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                logger.warn("Failed to connect/reconnect on endpoint: " + getDescription(connectable));
                 if (logger.isDebugEnabled()) {
                 	logger.debug("Waiting for " + frequency + "ms before reconnecting");
                 }
@@ -61,12 +62,12 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                 } catch (InterruptedException e1) {
                     throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
                             getClass().getName(),
-                            receiver.getEndpoint().getEndpointURI()), e, receiver);
+                            getDescription(connectable)), e, connectable);
                 }
             }
         }
     }
-
+    
     public int getRetryCount()
     {
         return retryCount;

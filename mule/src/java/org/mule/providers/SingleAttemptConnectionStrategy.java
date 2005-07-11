@@ -16,7 +16,7 @@ package org.mule.providers;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOConnectable;
 
 /**
  * Attempts to make a connection once and fails if there is an exception
@@ -26,14 +26,14 @@ import org.mule.umo.provider.UMOMessageReceiver;
  */
 public class SingleAttemptConnectionStrategy extends AbstractConnectionStrategy
 {
-    public void doConnect(UMOMessageReceiver receiver) throws FatalConnectException
+    public void doConnect(UMOConnectable connectable) throws FatalConnectException
     {
         try {
-            receiver.connect();
+        	connectable.connect();
         } catch (Exception e) {
             throw new FatalConnectException(new Message(Messages.RECONNECT_STRATEGY_X_FAILED_ENDPOINT_X,
                                                         getClass().getName(),
-                                                        receiver.getEndpoint().getEndpointURI()), e, receiver);
+                                                        getDescription(connectable)), e, connectable);
 
         }
     }

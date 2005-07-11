@@ -17,6 +17,7 @@ package org.mule.providers.jms;
 import java.util.List;
 
 import javax.jms.Destination;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
@@ -24,6 +25,7 @@ import javax.jms.Topic;
 
 import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
+import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.providers.TransactedPollingMessageReceiver;
 import org.mule.providers.jms.filters.JmsSelectorFilter;
 import org.mule.transaction.TransactionCoordination;
@@ -87,8 +89,16 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
         this.connector = (JmsConnector) connector;
 
         this.frequency = PropertiesHelper.getLongProperty(endpoint.getProperties(), "frequency", 10000L);
-        this.reuseConsumer = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseConsumer", true);
-        this.reuseSession = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseSession", true);
+        // If reconnection is set, default reuse strategy to false
+        // as some jms brokers will not detect lost connections if the
+        // same consumer / session is used 
+        if (this.connectionStrategy instanceof SingleAttemptConnectionStrategy) {
+        	this.reuseConsumer = true;
+        	this.reuseSession = true;
+        }
+        // User may override reuse strategy if necessary 
+        this.reuseConsumer = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseConsumer", this.reuseConsumer);
+        this.reuseSession = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "reuseSession", this.reuseSession);
 
         // Check if the destination is a queue and
         // if we are in transactional mode.
@@ -107,19 +117,34 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
-    public void doConnect() throws ConnectException
+    /*
+    public void connect() throws Exception
     {
-        try {
-            createConsumer();
-        } catch (Exception e) {
-            throw new ConnectException(e, this);
-        } finally {
-            closeConsumer(true);
-        }
+    	if (isConnected()) {
+    		return;
+    	}
+		connector.connect();
     }
 
-    public void doDisconnect() throws ConnectException
+    public void disconnect() throws Exception
     {
+    	connector.disconnect();
+    }
+    
+    public boolean isConnected()
+    {
+    	return connector.isConnected();
+    }
+    */
+    
+    public void doConnect() throws Exception
+    {
+		connector.connect();
+    }
+
+    public void doDisconnect() throws Exception
+    {
+    	connector.disconnect();
     }
 
     /**
@@ -232,7 +257,11 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
         JmsThreadContext ctx = context.getContext();
         // Create session if none exists
         if (ctx.session == null) {
-            ctx.session = this.connector.getSession(endpoint);
+        	try {
+        		ctx.session = this.connector.getSession(endpoint);
+        	} catch (JMSException e) {
+        		throw new ConnectException(e, this);
+        	}
         }
 
         // Create destination
@@ -265,4 +294,18 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
         // Create consumer
         ctx.consumer = jmsSupport.createConsumer(ctx.session, dest, selector, connector.isNoLocal(), durableName);
     }
+
+	public void handleException(Exception exception) {
+		/*
+		boolean connected = true;
+		if (exception instanceof JMSException) {
+			try {
+				connector.
+			} catch (JMSException e) {
+				
+			}
+		}
+		*/
+		super.handleException(exception);
+	}
 }

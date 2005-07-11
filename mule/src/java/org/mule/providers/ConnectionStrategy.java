@@ -14,7 +14,7 @@
  */
 package org.mule.providers;
 
-import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOConnectable;
 
 /**
  * Allows developers to plug in customised reconnection behaviour
@@ -28,9 +28,9 @@ public interface ConnectionStrategy
     /**
      * Attempts to connect to a resource according the strategy implemented
      * 
-     * @param receiver the receiver to connect to a resource
+     * @param connectable the object to connect to a resource
      * @throws FatalConnectException is thrown if the strategy finally fails to
      *             make a connection.
      */
-    void connect(UMOMessageReceiver receiver) throws FatalConnectException;
+    void connect(UMOConnectable connectable) throws FatalConnectException;
 }

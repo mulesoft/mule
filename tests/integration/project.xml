@@ -15,6 +15,11 @@
         	<artifactId>cglib-full</artifactId>
         	<version>${cglib_full_version}</version>
         </dependency>
+        <dependency>
+        	<groupId>ant</groupId>
+        	<artifactId>ant</artifactId>
+        	<version>${ant_version}</version>
+        </dependency>
    </dependencies>
     <unitTest>
             <includes>

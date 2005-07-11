@@ -261,6 +261,19 @@
             </properties>
         </dependency>
 
+
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-ejb</artifactId>
+            <version>${geronimo_spec_ejb_version}</version>
+            <properties>
+                <mule.core.jar>false</mule.core.jar>
+                <mule.mini>false</mule.mini>
+                <rar.bundle>false</rar.bundle>
+                <war.bundle>false</war.bundle>
+            </properties>
+        </dependency>
+        
         <!-- optional management deps -->
         <dependency>
             <groupId>jmxri</groupId>

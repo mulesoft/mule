@@ -31,7 +31,9 @@ import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.internal.events.ConnectionEvent;
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.ConnectException;
 import org.mule.providers.ReplyToHandler;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
 import org.mule.transaction.TransactionCoordination;
@@ -42,9 +44,12 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
+import org.mule.umo.provider.UMOConnectable;
 import org.mule.util.ClassHelper;
 
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
 
 /**
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be
@@ -57,7 +62,7 @@ import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
  * @version $Revision$
  */
 
-public class JmsConnector extends AbstractServiceEnabledConnector
+public class JmsConnector extends AbstractServiceEnabledConnector implements UMOConnectable
 {
 
     public static final String JMS_SELECTOR_PROPERTY = "selector";
@@ -104,6 +109,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 
     private String redeliveryHandler = DefaultRedeliveryHandler.class.getName();
 
+    protected WaitableBoolean connected = new WaitableBoolean(false);
+
     public JmsConnector()
     {
         receivers = new ConcurrentHashMap();
@@ -134,12 +141,13 @@ public class JmsConnector extends AbstractServiceEnabledConnector
             } else {
                 jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);
             }
-            connection = createConnection();
+            connectionFactory = createConnectionFactory();
         } catch (Exception e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jms Connector"), e, this);
         }
     }
-
+    
+    
     protected void initJndiContext() throws NamingException, InitialisationException
     {
         if (jndiContext == null) {
@@ -204,6 +212,73 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         return connection;
     }
 
+    public void connect() throws Exception
+    {
+        if (connected.get()) {
+            return;
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Attempting to connect");
+        }
+        try {
+            doConnect();
+            fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_CONNECTED));
+        } catch (Exception e) {
+            fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_FAILED));
+            if (e instanceof ConnectException) {
+                throw (ConnectException) e;
+            } else {
+                throw new ConnectException(e, this);
+            }
+        }
+        connected.set(true);
+    }
+
+    public void disconnect() throws Exception
+    {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Disconnecting");
+        }
+        fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_DISCONNECTED));
+        connected.set(false);
+        doDisconnect();
+        logger.info("Disconnected");
+    }
+    
+    public boolean isConnected()
+    {
+    	return (connection != null);
+    }
+    
+    public String getConnectionDescription() {
+    	return toString();
+    }
+
+    public void doConnect() throws ConnectException 
+    {
+    	try {
+            connection = createConnection();
+            if (started.get()) {
+            	connection.start();
+            }
+    	} catch (Exception e) {
+    		throw new ConnectException(e, this);
+    	}
+    }
+    
+    public void doDisconnect() throws ConnectException
+    {
+    	try {
+    		if (connection != null) {
+    			connection.close();
+    		}
+    	} catch (Exception e) {
+    		throw new ConnectException(e, this);
+    	} finally {
+    		connection = null;
+    	}
+    }
+    
     protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
     {
         return component.getDescriptor().getName() + "~" + endpoint.getEndpointURI().getAddress();
@@ -269,11 +344,13 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 
     public void doStart() throws UMOException
     {
-        try {
-            connection.start();
-        } catch (JMSException e) {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jms Connection"), e);
-        }
+    	if (connection != null) {
+	        try {
+        		connection.start();
+	        } catch (JMSException e) {
+	            throw new LifecycleException(new Message(Messages.FAILED_TO_START_X, "Jms Connection"), e);
+	        }
+    	}
     }
 
     /*

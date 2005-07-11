@@ -105,7 +105,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
     private UMOWorkManager workManager;
 
-    private ConnectionStrategy connectionStrategy;
+    protected ConnectionStrategy connectionStrategy;
 
     /**
      * Creates the Message Receiver
@@ -173,7 +173,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
             } catch (Exception e) {
                 connector.getExceptionListener().exceptionThrown(e);
                 setExceptionCode(exception);
-                return;
             }
         }
         connector.getExceptionListener().exceptionThrown(exception);
@@ -423,9 +422,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
 
         try {
             doConnect();
-            connector.fireEvent(new ConnectionEvent(endpoint.getEndpointURI(), ConnectionEvent.CONNECTION_CONNECTED));
+            connector.fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_CONNECTED));
         } catch (Exception e) {
-            connector.fireEvent(new ConnectionEvent(endpoint.getEndpointURI(), ConnectionEvent.CONNECTION_FAILED));
+            connector.fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_FAILED));
             if (e instanceof ConnectException) {
                 throw (ConnectException) e;
             } else {
@@ -441,10 +440,14 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver
         if (logger.isDebugEnabled()) {
             logger.debug("Disconnecting from: " + endpoint.getEndpointURI());
         }
+        connector.fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_DISCONNECTED));
+        connected.set(false);
         doDisconnect();
         logger.info("Disconnected from: " + endpoint.getEndpointURI());
-        connector.fireEvent(new ConnectionEvent(endpoint.getEndpointURI(), ConnectionEvent.CONNECTION_DISCONNECTED));
-        connected.set(false);
+    }
+    
+    public String getConnectionDescription() {
+    	return endpoint.getEndpointURI().toString();
     }
 
     public final void start() throws UMOException
