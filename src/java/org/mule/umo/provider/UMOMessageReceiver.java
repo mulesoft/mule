@@ -34,7 +34,7 @@ import org.mule.umo.lifecycle.Lifecycle;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOMessageReceiver extends Lifecycle
+public interface UMOMessageReceiver extends Lifecycle, UMOConnectable
 {
     /**
      * @return the receivers endpoint
@@ -76,26 +76,4 @@ public interface UMOMessageReceiver extends Lifecycle
      */
     UMOEndpointURI getEndpointURI();
 
-    /**
-     * Make the connection to the underlying transport. Once a connection is
-     * made the Message Reciever should remain in a stopped state if the
-     * MessageReceiver was stopped before this method was called
-     * 
-     * @throws Exception
-     */
-    void connect() throws Exception;
-
-    /**
-     * Disconnect the Message Receiver from the underlying transport
-     * 
-     * @throws Exception
-     */
-    void disconnect() throws Exception;
-
-    /**
-     * Determines if the the Message Receiver is connected or not
-     * 
-     * @return
-     */
-    boolean isConnected();
 }

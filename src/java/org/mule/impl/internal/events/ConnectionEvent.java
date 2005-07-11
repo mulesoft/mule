@@ -16,6 +16,7 @@ package org.mule.impl.internal.events;
 
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.provider.UMOConnectable;
 
 /**
  * todo document
@@ -31,7 +32,7 @@ public class ConnectionEvent extends UMOServerEvent
 
     private static final transient String[] ACTIONS = new String[] { "connected", "connect failed", "disconnected" };
 
-    public ConnectionEvent(UMOEndpointURI message, int action)
+    public ConnectionEvent(UMOConnectable message, int action)
     {
         super(message, action);
         resourceIdentifier = message.toString();
@@ -39,6 +40,9 @@ public class ConnectionEvent extends UMOServerEvent
 
     protected String getPayloadToString()
     {
+    	if (source instanceof UMOConnectable) {
+    		return ((UMOConnectable) source).getConnectionDescription();
+    	}
         return source.toString();
     }
 
