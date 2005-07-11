@@ -141,7 +141,9 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
             } else {
                 jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);
             }
-            connectionFactory = createConnectionFactory();
+            if (connectionFactory == null) {
+            	connectionFactory = createConnectionFactory();
+            }
         } catch (Exception e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jms Connector"), e, this);
         }
