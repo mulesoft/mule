@@ -11,10 +11,16 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.messaging;
+package org.mule.jbi.framework;
 
-import javax.jbi.messaging.Fault;
+import org.mule.jbi.JbiContainer;
 
-public class FaultImpl extends NormalizedMessageImpl implements Fault {
+public abstract class AbstractJbiService {
 
+	protected JbiContainer container;
+	
+	public AbstractJbiService(JbiContainer container) {
+		this.container = container;
+	}
+	
 }

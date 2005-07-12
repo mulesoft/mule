@@ -1,15 +1,15 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
- * ------------------------------------------------------------------------------------------------------
- *
- * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * Copyright 2005 SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
+ * 
+ * ------------------------------------------------------------------------------------------------------
+ * $Header$
+ * $Revision$
+ * $Date$
  */
 package org.mule.jbi.management;
 
@@ -17,6 +17,7 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
@@ -59,14 +60,14 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 		this.container = container;
 		this.installRoot = installRoot;
 		this.jbi = jbi;
-		this.classPathElements = this.jbi.getComponent().getComponentClassPath().getPathElementList();
+		this.classPathElements = Arrays.asList(this.jbi.getComponent().getComponentClassPath().getPathElementArray());
 	}
 	
 	protected ClassLoader createBootstrapClassLoader() throws Exception {
 		if (this.jbi.getComponent().isSetBootstrapClassLoaderDelegation()) {
 			// TODO: use this
 		}
-		return createClassLoader(this.jbi.getComponent().getBootstrapClassPath().getPathElementList());
+		return createClassLoader(Arrays.asList(this.jbi.getComponent().getBootstrapClassPath().getPathElementArray()));
 	}
 	
 	protected Bootstrap createBootstrap() throws Exception {

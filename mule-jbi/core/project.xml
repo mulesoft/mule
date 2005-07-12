@@ -61,5 +61,15 @@
             <artifactId>mx4j-jmx</artifactId>
             <version>${mx4j_jmx_version}</version>
         </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <version>${axis_wsdl4j_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>axis2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>${axis2_version}</version>
+        </dependency>
     </dependencies>
 </project>

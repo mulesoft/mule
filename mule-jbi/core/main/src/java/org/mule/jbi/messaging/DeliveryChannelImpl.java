@@ -1,15 +1,15 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
- * ------------------------------------------------------------------------------------------------------
- *
- * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * Copyright 2005 SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
+ * 
+ * ------------------------------------------------------------------------------------------------------
+ * $Header$
+ * $Revision$
+ * $Date$
  */
 package org.mule.jbi.messaging;
 
@@ -25,6 +25,9 @@ import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
 
 import org.mule.jbi.JbiContainer;
+import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class DeliveryChannelImpl implements DeliveryChannel {
 
@@ -41,29 +44,29 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 	}
 	
 	public void close() throws MessagingException {
-		// TODO deactivate all endpoints
+		this.container.getEndpointRegistry().unregisterEndpoints(this.component);
 		this.closed = true;
 	}
 
 	public MessageExchangeFactory createExchangeFactory() {
-		MessageExchangeFactoryImpl mep = new MessageExchangeFactoryImpl();
+		MessageExchangeFactoryImpl mep = new MessageExchangeFactoryImpl(this);
 		return mep;
 	}
 
 	public MessageExchangeFactory createExchangeFactory(QName interfaceName) {
-		MessageExchangeFactoryImpl mep = new MessageExchangeFactoryImpl();
+		MessageExchangeFactoryImpl mep = new MessageExchangeFactoryImpl(this);
 		mep.setInterfaceName(interfaceName);
 		return mep;
 	}
 
 	public MessageExchangeFactory createExchangeFactoryForService(QName serviceName) {
-		MessageExchangeFactoryImpl mep = new MessageExchangeFactoryImpl();
+		MessageExchangeFactoryImpl mep = new MessageExchangeFactoryImpl(this);
 		mep.setService(serviceName);
 		return mep;
 	}
 
 	public MessageExchangeFactory createExchangeFactory(ServiceEndpoint endpoint) {
-		MessageExchangeFactoryImpl mep = new MessageExchangeFactoryImpl();
+		MessageExchangeFactoryImpl mep = new MessageExchangeFactoryImpl(this);
 		mep.setEndpoint(endpoint);
 		return mep;
 	}
@@ -110,7 +113,9 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 		if (me.getRole() == MessageExchange.Role.CONSUMER) {
 			if (me.getConsumer() == null) {
 				me.setConsumer(this.component);
-				target = this.container.getRouter().getTargetComponent(exchange);
+				ServiceEndpoint se = this.container.getRouter().getTargetEndpoint(exchange);
+				me.setEndpoint(se);
+				target = ((AbstractServiceEndpoint) se).getComponent();
 				me.setProvider(target);
 			} else {
 				target = me.getProvider();
@@ -128,29 +133,8 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 	}
 
 	public boolean sendSync(MessageExchange exchange, long timeout) throws MessagingException {
-		if (this.closed) {
-			throw new MessagingException("Channel is closed");
-		}
-		if (!(exchange instanceof MessageExchangeProxy)) {
-			throw new MessagingException("exchange should be created with MessageExchangeFactory");
-		}
-		MessageExchangeProxy me = (MessageExchangeProxy) exchange;
-		String target;
-		if (me.getRole() == MessageExchange.Role.CONSUMER) {
-			if (me.getConsumer() == null) {
-				me.setConsumer(this.component);
-				target = this.container.getRouter().getTargetComponent(exchange);
-				me.setProvider(target);
-			} else {
-				target = me.getProvider();
-			}
-		} else {
-			target = me.getConsumer();
-		}
-		me.handleSend(false);
-		DeliveryChannelImpl ch = (DeliveryChannelImpl) this.container.getComponentRegistry().getComponent(target).getContext().getDeliveryChannel();
-		ch.enqueue(me.getTwin());
-		return false;
+		// TODO: implement sync send
+		throw new NotImplementedException();
 	}
 	
 	private void handleReceive(MessageExchange exchange) throws MessagingException {
@@ -163,6 +147,14 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 	
 	public void enqueue(MessageExchange exchange) {
 		queue.add(exchange);
+	}
+
+	public boolean isClosed() {
+		return closed;
+	}
+
+	public JbiContainer getContainer() {
+		return container;
 	}
 
 }

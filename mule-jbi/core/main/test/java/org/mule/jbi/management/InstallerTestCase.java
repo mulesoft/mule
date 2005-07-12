@@ -29,6 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 import junit.framework.TestCase;
 
 import org.mule.jbi.JbiContainer;
+import org.mule.jbi.framework.JbiContainerImpl;
 import org.mule.jbi.util.IOUtils;
 import org.w3c.dom.DocumentFragment;
 
@@ -42,7 +43,7 @@ public class InstallerTestCase extends TestCase {
 	}
 	
 	public void testInstallationDescriptorExtension() throws Exception {
-		JbiContainer container = new JbiContainer();
+		JbiContainerImpl container = new JbiContainerImpl();
 		container.setWorkingDir(new File("target/.mule-jbi"));
 		InputStream jbiIs = Thread.currentThread().getContextClassLoader().getResourceAsStream("test-jbi-installation-descriptor.xml");
 		Jbi jbi = JbiDocument.Factory.parse(jbiIs).getJbi();

@@ -1,15 +1,15 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
- * ------------------------------------------------------------------------------------------------------
- *
- * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * Copyright 2005 SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
+ * 
+ * ------------------------------------------------------------------------------------------------------
+ * $Header$
+ * $Revision$
+ * $Date$
  */
 package org.mule.jbi.management;
 
@@ -74,33 +74,57 @@ public class InstallationService implements InstallationServiceMBean {
 		}
 	}
 	
+    /**
+     * Load the installer for a new component from a component installation package.
+     *
+     * @param installJarURL - URL locating a jar file containing a
+     * JBI Installable Component.
+     * @return - the JMX ObjectName of the InstallerMBean loaded from
+     * installJarURL.
+     */
 	public synchronized ObjectName loadNewInstaller(String installJarURI) {
 		File dir = null;
 		try {
+			LOGGER.info("Creating new installer for " + installJarURI);
 			// Check that the url is valid
 			URI uri = new URI(installJarURI);
 			// Create a temporary dir
 			dir = getTmpDir();
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Temporary dir: " + dir);
+			}
 			IOUtils.createDirs(dir);
 			File f = new File(dir, "jbi.zip");
 			// Download file
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Copying installation jar to " + f);
+			}
 			IOUtils.copy(uri.toURL(), f);
 			// Install from the downloaded file
-			return loadNewInstaller(f, dir);
+			ObjectName result = loadNewInstaller(f, dir);
+			return result;
 		} catch (Exception e) {
-			RuntimeException re = new RuntimeException("Could not install component", e); 
-			LOGGER.error(re);
-			throw re;
+			LOGGER.error("Could not create installer", e);
+			throw new RuntimeException("Could not create installer", e);
 		} finally {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Deleting temporary dir: " + dir);
+			}
 			IOUtils.deleteFile(dir);
 		}
 	}
 
 	private ObjectName loadNewInstaller(File file, File dir) throws Exception {
 		// Unzip file to temp dir
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Expanding installation archive");
+		}
 		File unzip = new File(dir, "unzip");
 		IOUtils.unzip(file, unzip);
 		// Load jbi descriptor
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Loading jbi descriptor");
+		}
 		File jbiFile = new File(unzip, JBI_DESCRIPTOR);
 		if (!jbiFile.isFile()) {
 			throw new JBIException("Jar has no jbi.xml");
@@ -114,7 +138,6 @@ public class InstallationService implements InstallationServiceMBean {
 		if (!jbi.isSetComponent()) {
 			throw new JBIException("component should be set");
 		}
-		// TODO: check libs
 		String name = jbi.getComponent().getIdentification().getName();
 		// Check that component does not already exists
 		if (this.container.getComponentRegistry().getComponent(name) != null) {
@@ -123,6 +146,14 @@ public class InstallationService implements InstallationServiceMBean {
 		// Check that an installer has not been create already
 		if (this.installers.get(name) != null) {
 			throw new JBIException("an installer has already been created");
+		}
+		// Check shared libraries
+		com.sun.java.xml.ns.jbi.ComponentDocument.Component.SharedLibrary[] libs = jbi.getComponent().getSharedLibraryArray();
+		for (int i = 0; i < libs.length; i++) {
+			String libName = libs[i].getDomNode().getFirstChild().getNodeValue();
+			if (this.container.getComponentRegistry().getSharedLibrary(libName) == null) {
+				throw new JBIException("Component requires a missing shared library: " + libName);
+			}
 		}
 		// Move unzipped files to install dir
 		File installDir = new File(cmpDir, name);

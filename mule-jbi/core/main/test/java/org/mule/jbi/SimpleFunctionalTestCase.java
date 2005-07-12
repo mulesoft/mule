@@ -32,7 +32,9 @@ import javax.xml.transform.stream.StreamSource;
 
 import junit.framework.TestCase;
 
-import org.mule.jbi.routing.Router;
+import org.mule.jbi.framework.ComponentRegistryImpl;
+import org.mule.jbi.framework.JbiContainerImpl;
+import org.mule.jbi.routing.RouterImpl;
 import org.mule.jbi.util.IOUtils;
 
 public class SimpleFunctionalTestCase extends TestCase {
@@ -46,24 +48,25 @@ public class SimpleFunctionalTestCase extends TestCase {
 	
 	public void setUp() throws Exception {
 		IOUtils.deleteFile(new File("target/.mule-jbi"));
-		container = new JbiContainer();
-		container.setWorkingDir(new File("target/.mule-jbi"));
+		JbiContainerImpl jbi = new JbiContainerImpl();
+		jbi.setWorkingDir(new File("target/.mule-jbi"));
 		List l = MBeanServerFactory.findMBeanServer(null);
 		if (l != null && l.size() > 0) {
-			container.setMBeanServer((MBeanServer) l.get(0));
+			jbi.setMBeanServer((MBeanServer) l.get(0));
 		} else {
-			container.setMBeanServer(MBeanServerFactory.createMBeanServer());
+			jbi.setMBeanServer(MBeanServerFactory.createMBeanServer());
 		}
-		container.setRouter(new Router(container));
-		container.start();
+		jbi.setRouter(new RouterImpl(jbi));
+		jbi.start();
+		container = jbi;
 	}
 	
 	public void testInOnly() throws Exception {
 		// Create components
 		TestComponent provider = new TestComponent();
 		TestComponent consumer = new TestComponent();
-		container.getComponentRegistry().registerTransientEngineComponent("provider", provider);
-		container.getComponentRegistry().registerTransientEngineComponent("consumer", consumer);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
 		// Activate endpoint
 		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
@@ -91,8 +94,8 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Create components
 		TestComponent provider = new TestComponent();
 		TestComponent consumer = new TestComponent();
-		container.getComponentRegistry().registerTransientEngineComponent("provider", provider);
-		container.getComponentRegistry().registerTransientEngineComponent("consumer", consumer);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
 		// Activate endpoint
 		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
@@ -127,8 +130,8 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Create components
 		TestComponent provider = new TestComponent();
 		TestComponent consumer = new TestComponent();
-		container.getComponentRegistry().registerTransientEngineComponent("provider", provider);
-		container.getComponentRegistry().registerTransientEngineComponent("consumer", consumer);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
 		// Activate endpoint
 		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
@@ -163,8 +166,8 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Create components
 		TestComponent provider = new TestComponent();
 		TestComponent consumer = new TestComponent();
-		container.getComponentRegistry().registerTransientEngineComponent("provider", provider);
-		container.getComponentRegistry().registerTransientEngineComponent("consumer", consumer);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
 		// Activate endpoint
 		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
@@ -199,8 +202,8 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Create components
 		TestComponent provider = new TestComponent();
 		TestComponent consumer = new TestComponent();
-		container.getComponentRegistry().registerTransientEngineComponent("provider", provider);
-		container.getComponentRegistry().registerTransientEngineComponent("consumer", consumer);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
 		// Activate endpoint
 		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
@@ -228,8 +231,8 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Create components
 		TestComponent provider = new TestComponent();
 		TestComponent consumer = new TestComponent();
-		container.getComponentRegistry().registerTransientEngineComponent("provider", provider);
-		container.getComponentRegistry().registerTransientEngineComponent("consumer", consumer);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
 		// Activate endpoint
 		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
@@ -262,8 +265,8 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Create components
 		TestComponent provider = new TestComponent();
 		TestComponent consumer = new TestComponent();
-		container.getComponentRegistry().registerTransientEngineComponent("provider", provider);
-		container.getComponentRegistry().registerTransientEngineComponent("consumer", consumer);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
 		// Activate endpoint
 		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
@@ -303,8 +306,8 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Create components
 		TestComponent provider = new TestComponent();
 		TestComponent consumer = new TestComponent();
-		container.getComponentRegistry().registerTransientEngineComponent("provider", provider);
-		container.getComponentRegistry().registerTransientEngineComponent("consumer", consumer);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
 		// Activate endpoint
 		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
@@ -332,8 +335,8 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Create components
 		TestComponent provider = new TestComponent();
 		TestComponent consumer = new TestComponent();
-		container.getComponentRegistry().registerTransientEngineComponent("provider", provider);
-		container.getComponentRegistry().registerTransientEngineComponent("consumer", consumer);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
+		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
 		// Activate endpoint
 		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange

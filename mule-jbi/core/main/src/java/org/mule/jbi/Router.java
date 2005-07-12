@@ -11,10 +11,13 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.messaging;
+package org.mule.jbi;
 
-import javax.jbi.messaging.Fault;
+import javax.jbi.messaging.MessageExchange;
+import javax.jbi.messaging.MessagingException;
+import javax.jbi.servicedesc.ServiceEndpoint;
 
-public class FaultImpl extends NormalizedMessageImpl implements Fault {
+public interface Router {
 
+	ServiceEndpoint getTargetEndpoint(MessageExchange me) throws MessagingException;
 }

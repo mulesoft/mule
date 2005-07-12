@@ -1,19 +1,23 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
- * ------------------------------------------------------------------------------------------------------
- *
- * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * Copyright 2005 SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
+ * 
+ * ------------------------------------------------------------------------------------------------------
+ * $Header$
+ * $Revision$
+ * $Date$
  */
 package org.mule.jbi.messaging;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.jbi.messaging.InOnly;
 import javax.jbi.messaging.InOptionalOut;
@@ -23,21 +27,84 @@ import javax.jbi.messaging.MessageExchangeFactory;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.RobustInOnly;
 import javax.jbi.servicedesc.ServiceEndpoint;
+import javax.wsdl.Definition;
+import javax.wsdl.factory.WSDLFactory;
+import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+
+import org.apache.axis2.wsdl.builder.wsdl4j.WSDLPump;
+import org.apache.wsdl.WSDLConstants;
+import org.apache.wsdl.WSDLDescription;
+import org.apache.wsdl.WSDLInterface;
+import org.apache.wsdl.WSDLOperation;
+import org.apache.wsdl.impl.WSDLDescriptionImpl;
+import org.mule.jbi.framework.ComponentInfo;
+import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
+import org.w3c.dom.Document;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class MessageExchangeFactoryImpl implements MessageExchangeFactory {
 
-	public static final URI IN_ONLY_PATTERN = URI.create("http://www.w3.org/2004/08/wsdl/in-only");
-	public static final URI IN_OPTIONAL_OUT_PATTERN = URI.create("http://www.w3.org/2004/08/wsdl/in-opt-out");
-	public static final URI IN_OUT_PATTERN = URI.create("http://www.w3.org/2004/08/wsdl/in-out");
-	public static final URI ROBUST_IN_ONLY_PATTERN = URI.create("http://www.w3.org/2004/08/wsdl/robust-in-only");
+	public static final URI IN_ONLY_PATTERN = URI.create(WSDLConstants.MEP_URI_IN_ONLY);
+	public static final URI IN_OPTIONAL_OUT_PATTERN = URI.create(WSDLConstants.MEP_URI_IN_OPTIONAL_OUT);
+	public static final URI IN_OUT_PATTERN = URI.create(WSDLConstants.MEP_URI_IN_OUT);
+	public static final URI ROBUST_IN_ONLY_PATTERN = URI.create(WSDLConstants.MEP_URI_ROBUST_IN_ONLY);
 	
 	private QName interfaceName;
 	private QName service;
 	private ServiceEndpoint endpoint;
+	private DeliveryChannelImpl channel;
+	
+	public MessageExchangeFactoryImpl(DeliveryChannelImpl channel) {
+		this.channel = channel;
+	}
 	
 	public MessageExchange createExchange(QName serviceName, QName operationName) throws MessagingException {
-		MessageExchange me = createExchange(IN_ONLY_PATTERN);
+		if (channel.isClosed()) {
+			throw new MessagingException("Channel is closed");
+		}
+		ServiceEndpoint[] endpoints = this.channel.getContainer().getEndpointRegistry().getInternalEndpointsForService(serviceName);
+		Set meps = new HashSet();
+		for (int i = 0; i < endpoints.length; i++) {
+			try {
+				// TODO: use axis builders when available
+				// TODO: extract this code elsewhere
+				String name = ((AbstractServiceEndpoint) endpoints[i]).getComponent();
+				ComponentInfo info = this.channel.getContainer().getComponentRegistry().getComponent(name);
+				Document doc = info.getComponent().getServiceDescription(endpoints[i]);
+				String uri = doc.getDocumentElement().getNamespaceURI();
+				WSDLDescription desc = null; 
+				if (WSDLConstants.WSDL2_0_NAMESPACE.equals(uri)) {
+					throw new NotImplementedException();
+				} else if (WSDLConstants.WSDL1_1_NAMESPACE.equals(uri)) {
+			        WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
+			        Definition def = reader.readWSDL(null, doc);
+			        desc = new WSDLDescriptionImpl();
+					WSDLPump pump = new WSDLPump(desc, def);
+			        pump.pump();
+				} else {
+					throw new UnsupportedOperationException();
+				}
+				Collection interfaces = desc.getWsdlInterfaces().values();
+				for (Iterator iter = interfaces.iterator(); iter.hasNext();) {
+					WSDLInterface itf = (WSDLInterface) iter.next();
+					WSDLOperation op = itf.getOperation(operationName.getLocalPart());
+					if (op != null) {
+						meps.add(op.getMessageExchangePattern());
+					}
+				}
+			} catch (Exception e) {
+				// continue on
+			}
+		}
+		if (meps.size() == 0) {
+			throw new MessagingException("Could not determine mep");
+		}
+		if (meps.size() > 1) {
+			throw new MessagingException("More than one mep for this operation");
+		}
+		MessageExchange me = createExchange(URI.create(meps.iterator().next().toString()));
 		init(me);
 		me.setService(serviceName);
 		me.setOperation(operationName);
@@ -45,6 +112,9 @@ public class MessageExchangeFactoryImpl implements MessageExchangeFactory {
 	}
 
 	public MessageExchange createExchange(URI pattern) throws MessagingException {
+		if (channel.isClosed()) {
+			throw new MessagingException("Channel is closed");
+		}
 		MessageExchange me;
 		if (IN_ONLY_PATTERN.equals(pattern)) {
 			me = new InOnlyImpl();

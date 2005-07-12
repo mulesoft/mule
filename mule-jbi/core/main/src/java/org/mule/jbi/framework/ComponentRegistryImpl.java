@@ -1,21 +1,22 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
- * ------------------------------------------------------------------------------------------------------
- *
- * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * Copyright 2005 SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
+ * 
+ * ------------------------------------------------------------------------------------------------------
+ * $Header$
+ * $Revision$
+ * $Date$
  */
 package org.mule.jbi.framework;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -28,24 +29,24 @@ import javax.management.ObjectName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xmlbeans.XmlOptions;
+import org.mule.jbi.ComponentRegistry;
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.componentRegistry.RegistryDocument;
 import org.mule.jbi.componentRegistry.EntryDocument.Entry;
 
-public class ComponentRegistry {
+public class ComponentRegistryImpl extends AbstractJbiService implements ComponentRegistry {
 
 	public static final String REGISTRY_FILE = "registry.xml";
 	
-	private static final Log LOGGER = LogFactory.getLog(ComponentRegistry.class);
+	private static final Log LOGGER = LogFactory.getLog(ComponentRegistryImpl.class);
 	
-	private JbiContainer container;
 	private File regFile;
 	private RegistryDocument registry;
 	private Map components;
 	private Map libraries;
 	
-	public ComponentRegistry(JbiContainer container) {
-		this.container = container;
+	public ComponentRegistryImpl(JbiContainer container) {
+		super(container);
 		this.components = new HashMap();
 		this.libraries = new HashMap();
 	}
@@ -74,8 +75,12 @@ public class ComponentRegistry {
 		}
 	}
 	
-	public Map getComponents() {
-		return this.components;
+	public void stop() throws JBIException {
+	}
+	
+	public ComponentInfo[] getComponents() {
+		Collection col = this.components.values();
+		return (ComponentInfo[]) col.toArray(new ComponentInfo[col.size()]);
 	}
 	
 	public ComponentInfo registerTransientEngineComponent(String name, Component component) throws JBIException {

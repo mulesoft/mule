@@ -25,6 +25,8 @@ import javax.management.ObjectName;
 import junit.framework.TestCase;
 
 import org.mule.jbi.JbiContainer;
+import org.mule.jbi.framework.JbiContainerImpl;
+import org.mule.jbi.routing.RouterImpl;
 import org.mule.jbi.util.IOUtils;
 
 public class InstallationServiceTestCase extends TestCase {
@@ -33,15 +35,17 @@ public class InstallationServiceTestCase extends TestCase {
 	
 	public void setUp() throws Exception {
 		IOUtils.deleteFile(new File("target/.mule-jbi"));
-		container = new JbiContainer();
-		container.setWorkingDir(new File("target/.mule-jbi"));
+		JbiContainerImpl jbi = new JbiContainerImpl();
+		jbi.setWorkingDir(new File("target/.mule-jbi"));
 		List l = MBeanServerFactory.findMBeanServer(null);
 		if (l != null && l.size() > 0) {
-			container.setMBeanServer((MBeanServer) l.get(0));
+			jbi.setMBeanServer((MBeanServer) l.get(0));
 		} else {
-			container.setMBeanServer(MBeanServerFactory.createMBeanServer());
+			jbi.setMBeanServer(MBeanServerFactory.createMBeanServer());
 		}
-		container.start();
+		jbi.setRouter(new RouterImpl(jbi));
+		jbi.start();
+		container = jbi;
 	}
 	
 	public void testInstallComponent() throws Exception {

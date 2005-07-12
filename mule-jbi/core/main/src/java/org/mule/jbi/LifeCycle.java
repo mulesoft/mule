@@ -11,10 +11,14 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.messaging;
+package org.mule.jbi;
 
-import javax.jbi.messaging.Fault;
+import javax.jbi.JBIException;
 
-public class FaultImpl extends NormalizedMessageImpl implements Fault {
+public interface LifeCycle {
+
+	void start() throws JBIException;
+	
+	void stop() throws JBIException;
 
 }

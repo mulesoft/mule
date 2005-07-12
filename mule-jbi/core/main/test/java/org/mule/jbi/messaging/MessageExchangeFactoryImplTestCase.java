@@ -31,7 +31,7 @@ public class MessageExchangeFactoryImplTestCase extends TestCase {
 	}
 	
 	protected MessageExchangeFactory createMessageExchangeFactory() {
-		return new MessageExchangeFactoryImpl();
+		return new MessageExchangeFactoryImpl(new DeliveryChannelImpl(null, null));
 	}
 	
 	public void testCreateExchangeWithInvalidPattern() throws Exception {
