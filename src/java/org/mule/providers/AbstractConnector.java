@@ -265,11 +265,11 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             }
             doStop();
             for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-                AbstractMessageReceiver amr = (AbstractMessageReceiver) iterator.next();
+            	UMOMessageReceiver mr = (UMOMessageReceiver) iterator.next();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Stopping receiver on endpoint: " + amr.getEndpoint().getEndpointURI());
+                    logger.debug("Stopping receiver on endpoint: " + mr.getEndpoint().getEndpointURI());
                 }
-                amr.stop();
+                mr.stop();
             }
             started.set(false);
             if (logger.isInfoEnabled()) {
