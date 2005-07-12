@@ -164,6 +164,12 @@ public class MuleModel implements UMOModel
             descriptor.setExceptionListener(exceptionListener);
         }
 
+        // detect duplicate descriptor declarations
+        if (descriptors.get(descriptor.getName()) != null) {
+            throw new ModelException(new Message(Messages.DESCRIPTOR_X_ALREADY_EXISTS,
+                                     descriptor.getName()));
+        }
+
         UMOComponent component = (UMOComponent) components.get(descriptor.getName());
 
         if (component == null) {

@@ -189,4 +189,5 @@ public interface CoreMessageConstants
     int X_PROPERTY_IS_NOT_SET_ON_EVENT = 168;
     int EJB_OBJECT_X_MISSING_CREATE = 169;
     int EJB_KEY_REF_X_NOT_VALID = 170;
+    int DESCRIPTOR_X_ALREADY_EXISTS = 171;
 }

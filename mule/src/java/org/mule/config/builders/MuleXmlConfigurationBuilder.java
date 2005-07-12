@@ -790,11 +790,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             {
                 UMODescriptor descriptor = (UMODescriptor) digester.peek();
                 Object obj = digester.peek(1);
+                final UMOModel model;
                 if (obj instanceof UMOManager) {
-                    ((UMOManager) obj).getModel().registerComponent(descriptor);
+                    model = ((UMOManager) obj).getModel();
                 } else {
-                    ((UMOModel) obj).registerComponent(descriptor);
+                    model = (UMOModel) obj;
                 }
+                model.registerComponent(descriptor);
             }
         });
     }
