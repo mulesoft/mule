@@ -194,8 +194,12 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
         // Process message
         if (logger.isDebugEnabled()) {
             logger.debug("Message received it is of type: " + message.getClass().getName());
-            logger.debug("Message received on " + message.getJMSDestination() + " ("
-                    + message.getJMSDestination().getClass().getName() + ")");
+            if (message.getJMSDestination() != null) {
+	            logger.debug("Message received on " + message.getJMSDestination() + " ("
+	                    + message.getJMSDestination().getClass().getName() + ")");
+            } else {
+	            logger.debug("Message received on unknown destination");
+            }
             logger.debug("Message CorrelationId is: " + message.getJMSCorrelationID());
             logger.debug("Jms Message Id is: " + message.getJMSMessageID());
         }
