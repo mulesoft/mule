@@ -53,7 +53,7 @@ public class MuleModelTestCase extends AbstractMuleTestCase
             // expected
             final String message = mex.getMessage();
             assertTrue("Exception message should contain our descriptor name.",
-                       message.contains("\"" + descriptorName + "\""));
+                       (message.indexOf("\"" + descriptorName + "\"") > -1));
         }
 
         // count components (no direct method to count 'em)
