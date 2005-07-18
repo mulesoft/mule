@@ -315,29 +315,6 @@ public class Utility
         return resource;
     }
 
-    public static String inputStreamToString(InputStream is, int bufferSize) throws IOException
-    {
-        return new String(inputStreamToByteArray(is, bufferSize));
-    }
-
-    public static byte[] inputStreamToByteArray(InputStream is, int bufferSize) throws IOException
-    {
-        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-
-        byte[] buffer = new byte[bufferSize];
-        int len = 0;
-        while ((len = is.read(buffer, len, buffer.length)) != -1) {
-            baos.write(buffer, 0, len);
-            if (len != buffer.length) {
-                break;
-            }
-        }
-        baos.flush();
-        byte[] result = baos.toByteArray();
-        baos.close();
-        return result;
-    }
-
     public static boolean deleteTree(File dir)
     {
         if (dir == null) {

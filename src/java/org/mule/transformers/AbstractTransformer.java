@@ -14,10 +14,6 @@
  */
 package org.mule.transformers;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,6 +25,10 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>AbstractTransformer</code> Is a base class for all transformers.
@@ -60,6 +60,8 @@ public abstract class AbstractTransformer implements UMOTransformer
     private List sourceTypes = new ArrayList();
 
     protected UMOTransformer transformer;
+
+    private boolean ignoreBadInput = false;
 
     /**
      * default constructor required for discovery
@@ -170,10 +172,15 @@ public abstract class AbstractTransformer implements UMOTransformer
         }
 
         if (!isSourceTypeSupported(src.getClass())) {
-            throw new TransformerException(new Message(Messages.TRANSFORM_X_UNSUPORTED_TYPE_X_ENDPOINT_X,
+            if(ignoreBadInput) {
+                logger.debug("Source type is incompatible with this transformer. Property 'ignoreBadInput' is set to true so the transformer chain will continue");
+                return src;
+            } else {
+                throw new TransformerException(new Message(Messages.TRANSFORM_X_UNSUPORTED_TYPE_X_ENDPOINT_X,
                                                        getName(),
                                                        src.getClass().getName(),
                                                        endpoint.getEndpointURI()), this);
+            }
         } else {
             result = doTransform(src);
             result = checkReturnClass(result);
@@ -294,9 +301,17 @@ public abstract class AbstractTransformer implements UMOTransformer
         registerSourceType(clazz);
     }
 
+    public boolean isIgnoreBadInput() {
+        return ignoreBadInput;
+    }
+
+    public void setIgnoreBadInput(boolean ignoreBadInput) {
+        this.ignoreBadInput = ignoreBadInput;
+    }
+
     public String toString()
     {
-        return "AbstractTransformer{" + "name='" + name + "'" + ", returnClass=" + returnClass + ", sourceTypes="
-                + sourceTypes + "}";
+        return "AbstractTransformer{" + "name='" + name + "'" + ", returnClass=" + ignoreBadInput + ", returnClass=" +
+                ignoreBadInput + ", sourceTypes=" + sourceTypes + "}";
     }
 }

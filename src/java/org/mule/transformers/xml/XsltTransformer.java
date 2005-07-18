@@ -13,14 +13,6 @@
  */
 package org.mule.transformers.xml;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamSource;
-
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.DocumentResult;
@@ -30,26 +22,34 @@ import org.mule.config.i18n.Messages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.Utility;
+
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamSource;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * <code>XsltTransformer</code> performs a xslt transform on a Dom object
- * 
+ *
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class XsltTransformer extends AbstractTransformer
-{
+public class XsltTransformer extends AbstractTransformer {
 
     private Transformer transformer;
 
     private String xslFile;
 
-    public XsltTransformer()
-    {
+    public XsltTransformer() {
         registerSourceType(String.class);
+        registerSourceType(byte[].class);
         registerSourceType(DocumentSource.class);
         registerSourceType(Document.class);
     }
@@ -58,8 +58,7 @@ public class XsltTransformer extends AbstractTransformer
      * @see org.mule.umo.lifecycle.Initialisable#initialise()
      */
 
-    public void initialise() throws InitialisationException
-    {
+    public void initialise() throws InitialisationException {
         try {
             StreamSource source = getStreamSource();
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -71,15 +70,18 @@ public class XsltTransformer extends AbstractTransformer
 
     /**
      * Tranform, using XSLT, a XML String to another String.
-     * 
+     *
      * @param src The source String
      * @return The result String
      */
-    public Object doTransform(Object src) throws TransformerException
-    {
+    public Object doTransform(Object src) throws TransformerException {
         try {
             DocumentSource sourceDoc = null;
             DocumentResult resultDoc = new DocumentResult();
+            DefaultErrorListener errorListener = null;
+            if(src instanceof byte[]) {
+                src = new String((byte[])src);
+            }
 
             if (src instanceof String) {
                 String xml = (String) src;
@@ -90,9 +92,14 @@ public class XsltTransformer extends AbstractTransformer
             } else if (src instanceof Document) {
                 sourceDoc = new DocumentSource((Document) src);
             }
+            errorListener = new DefaultErrorListener(this);
+            transformer.setErrorListener(errorListener);
 
             transformer.transform(sourceDoc, resultDoc);
 
+            if(errorListener.isError()) {
+                throw errorListener.getException();
+            }
             if (Document.class.equals(returnClass)) {
                 return resultDoc.getDocument();
             } else {
@@ -107,27 +114,24 @@ public class XsltTransformer extends AbstractTransformer
     /**
      * @return Returns the xslFile.
      */
-    public String getXslFile()
-    {
+    public String getXslFile() {
         return xslFile;
     }
 
     /**
      * @param xslFile The xslFile to set.
      */
-    public void setXslFile(String xslFile)
-    {
+    public void setXslFile(String xslFile) {
         this.xslFile = xslFile;
     }
 
     /**
      * Returns the StreamSource corresponding to xslFile
-     * 
+     *
      * @return The StreamSource
      * @throws InitialisationException
      */
-    private StreamSource getStreamSource() throws InitialisationException
-    {
+    private StreamSource getStreamSource() throws InitialisationException {
         if (xslFile == null) {
             throw new InitialisationException(new Message(Messages.X_IS_NULL, "xslFile"), this);
         }
@@ -149,8 +153,7 @@ public class XsltTransformer extends AbstractTransformer
         return source;
     }
 
-    public Object clone() throws CloneNotSupportedException
-    {
+    public Object clone() throws CloneNotSupportedException {
         XsltTransformer x = (XsltTransformer) super.clone();
 
         try {
@@ -161,5 +164,38 @@ public class XsltTransformer extends AbstractTransformer
             throw new CloneNotSupportedException(e.getMessage());
         }
         return x;
+    }
+
+    private class DefaultErrorListener implements ErrorListener
+    {
+        private TransformerException e = null;
+        private UMOTransformer trans;
+
+        public DefaultErrorListener(UMOTransformer trans) {
+            this.trans = trans;
+        }
+
+        public TransformerException getException() {
+            return e;
+        }
+
+        public boolean isError() {
+            return e!=null;
+        }
+
+        public void error(javax.xml.transform.TransformerException exception) throws javax.xml.transform.TransformerException {
+            logger.error(exception.getMessage(), exception);
+            e = new TransformerException(trans, exception);
+        }
+
+        public void fatalError(javax.xml.transform.TransformerException exception) throws javax.xml.transform.TransformerException {
+            logger.fatal(exception.getMessage());
+            e = new TransformerException(trans, exception);
+        }
+
+
+        public void warning(javax.xml.transform.TransformerException exception) throws javax.xml.transform.TransformerException {
+            logger.warn(exception.getMessage());
+        }
     }
 }

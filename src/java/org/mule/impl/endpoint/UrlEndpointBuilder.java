@@ -13,10 +13,10 @@
  */
 package org.mule.impl.endpoint;
 
+import org.mule.umo.endpoint.MalformedEndpointException;
+
 import java.net.URI;
 import java.util.Properties;
-
-import org.mule.umo.endpoint.MalformedEndpointException;
 
 /**
  * <code>UrlEndpointBuilder</code> is the default endpointUri strategy
@@ -41,6 +41,10 @@ public class UrlEndpointBuilder extends AbstractEndpointBuilder
         }
         if (uri.getPath() != null) {
             address += uri.getPath();
+        }
+
+        if (uri.getQuery() != null) {
+            address += "?" + uri.getQuery();
         }
     }
 }
