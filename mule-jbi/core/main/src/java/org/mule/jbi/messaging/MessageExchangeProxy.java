@@ -23,6 +23,10 @@ import javax.jbi.messaging.NormalizedMessage;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public abstract class MessageExchangeProxy implements MessageExchange {
 
 	protected static final int CAN_SET_IN_MSG 		= 0x00000001;

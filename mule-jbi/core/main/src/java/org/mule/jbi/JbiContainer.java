@@ -15,29 +15,65 @@ package org.mule.jbi;
 
 import java.io.File;
 
+import javax.jbi.JBIException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
 
-public interface JbiContainer extends LifeCycle {
+import org.mule.jbi.registry.Registry;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
+public interface JbiContainer {
+
+	/**
+	 * Access to the deployement registry.
+	 * @return
+	 */
+	Registry getRegistry();
+	
+	/**
+	 * Access to the endpoints registry.
+	 * @return
+	 */
+	Endpoints getEndpoints();
+	
+	/**
+	 * Router
+	 * @return
+	 */
+	Router getRouter();
+	
+	Messaging getMessaging();
+	
 	MBeanServer getMBeanServer();
 
 	TransactionManager getTransactionManager();
 
 	String getJmxDomainName();
 
-	Router getRouter();
-
 	InitialContext getNamingContext();
 	
 	File getWorkingDir();
 
-	ObjectName createComponentMBeanName(String componentName, String type, String name);
+	ObjectName createMBeanName(String componentName, String type, String name);
 
-	ComponentRegistry getComponentRegistry();
-
-	EndpointRegistry getEndpointRegistry();
-
+	void initialize() throws JBIException;
+	
+	void start() throws JBIException;
+	
+	void shutDown() throws JBIException;
+	
+	public static class Factory {
+		private static JbiContainer instance;
+		public static JbiContainer getInstance() {
+			return Factory.instance;
+		}
+		public static void setInstance(JbiContainer instance) {
+			Factory.instance = instance;
+		}
+	}
 }

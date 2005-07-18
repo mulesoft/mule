@@ -38,12 +38,16 @@ import org.apache.wsdl.WSDLDescription;
 import org.apache.wsdl.WSDLInterface;
 import org.apache.wsdl.WSDLOperation;
 import org.apache.wsdl.impl.WSDLDescriptionImpl;
-import org.mule.jbi.framework.ComponentInfo;
+import org.mule.jbi.registry.Component;
 import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 import org.w3c.dom.Document;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public class MessageExchangeFactoryImpl implements MessageExchangeFactory {
 
 	public static final URI IN_ONLY_PATTERN = URI.create(WSDLConstants.MEP_URI_IN_ONLY);
@@ -64,14 +68,14 @@ public class MessageExchangeFactoryImpl implements MessageExchangeFactory {
 		if (channel.isClosed()) {
 			throw new MessagingException("Channel is closed");
 		}
-		ServiceEndpoint[] endpoints = this.channel.getContainer().getEndpointRegistry().getInternalEndpointsForService(serviceName);
+		ServiceEndpoint[] endpoints = this.channel.getContainer().getEndpoints().getInternalEndpointsForService(serviceName);
 		Set meps = new HashSet();
 		for (int i = 0; i < endpoints.length; i++) {
 			try {
 				// TODO: use axis builders when available
 				// TODO: extract this code elsewhere
 				String name = ((AbstractServiceEndpoint) endpoints[i]).getComponent();
-				ComponentInfo info = this.channel.getContainer().getComponentRegistry().getComponent(name);
+				Component info = this.channel.getContainer().getRegistry().getComponent(name);
 				Document doc = info.getComponent().getServiceDescription(endpoints[i]);
 				String uri = doc.getDocumentElement().getNamespaceURI();
 				WSDLDescription desc = null; 

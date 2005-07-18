@@ -29,6 +29,10 @@ import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public class DeliveryChannelImpl implements DeliveryChannel {
 
 	private BlockingQueue queue;
@@ -44,7 +48,7 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 	}
 	
 	public void close() throws MessagingException {
-		this.container.getEndpointRegistry().unregisterEndpoints(this.component);
+		this.container.getEndpoints().unregisterEndpoints(this.component);
 		this.closed = true;
 	}
 
@@ -124,7 +128,7 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			target = me.getConsumer();
 		}
 		me.handleSend(false);
-		DeliveryChannelImpl ch = (DeliveryChannelImpl) this.container.getComponentRegistry().getComponent(target).getContext().getDeliveryChannel();
+		DeliveryChannelImpl ch = (DeliveryChannelImpl) this.container.getRegistry().getComponent(target).getChannel();
 		ch.enqueue(me.getTwin());
 	}
 

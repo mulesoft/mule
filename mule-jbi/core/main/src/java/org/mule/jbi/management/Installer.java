@@ -14,6 +14,7 @@
 package org.mule.jbi.management;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -27,9 +28,9 @@ import javax.jbi.JBIException;
 import javax.jbi.component.Bootstrap;
 import javax.jbi.component.Component;
 import javax.jbi.component.ComponentContext;
-import javax.jbi.component.ComponentLifeCycle;
 import javax.jbi.component.InstallationContext;
 import javax.jbi.management.InstallerMBean;
+import javax.jbi.management.LifeCycleMBean;
 import javax.jbi.management.MBeanNames;
 import javax.jbi.messaging.DeliveryChannel;
 import javax.jbi.messaging.MessagingException;
@@ -40,7 +41,6 @@ import javax.naming.InitialContext;
 import javax.xml.namespace.QName;
 
 import org.mule.jbi.JbiContainer;
-import org.mule.jbi.framework.ComponentInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
@@ -48,19 +48,27 @@ import org.w3c.dom.NodeList;
 
 import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
 
-public class Installer implements InstallerMBean, InstallationContext, ComponentContext {
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
+public class Installer implements InstallerMBean, InstallationContext, ComponentContext, MBeanNames {
 
 	private JbiContainer container;
 	private File installRoot;
 	private Jbi jbi;
-	private List classPathElements;
 	private Bootstrap bootstrap;
+	private org.mule.jbi.registry.Component component;
+	private boolean install;
 	
-	public Installer(JbiContainer container, File installRoot, Jbi jbi) {
+	public Installer(JbiContainer container, org.mule.jbi.registry.Component component) throws Exception {
 		this.container = container;
-		this.installRoot = installRoot;
-		this.jbi = jbi;
-		this.classPathElements = Arrays.asList(this.jbi.getComponent().getComponentClassPath().getPathElementArray());
+		this.component = component;
+		this.installRoot = new File(this.component.getInstallRoot());
+		this.jbi = component.getDescriptor();
+		this.install = true;
+		List l = Arrays.asList(this.jbi.getComponent().getComponentClassPath().getPathElementArray());
+		this.component.setClassPathElements(l);
 	}
 	
 	protected ClassLoader createBootstrapClassLoader() throws Exception {
@@ -82,7 +90,7 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 		if (this.jbi.getComponent().isSetComponentClassLoaderDelegation()) {
 			// TODO: use this
 		}
-		return createClassLoader(this.classPathElements);
+		return createClassLoader(this.component.getClassPathElements());
 	}
 	
 	protected ClassLoader createClassLoader(List classPath) throws Exception {
@@ -136,19 +144,8 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 	public synchronized ObjectName install() throws JBIException {
 		try {
 			this.bootstrap.onInstall();
-			String name = this.jbi.getComponent().getIdentification().getName();
-			javax.jbi.component.Component c = createComponent();
-			boolean isEngine = (this.jbi.getComponent().getType() == com.sun.java.xml.ns.jbi.ComponentDocument.Component.Type.SERVICE_ENGINE); 
-			ComponentLifeCycle lf = c.getLifeCycle();
-			ObjectName objName = createComponentLifeCycleName(name);
-			ComponentInfo info = this.container.getComponentRegistry().registerComponent(name, isEngine);
-			info.setObjectName(objName);
-			info.setComponent(c);
-			info.setInstallRoot(getInstallRoot());
-			lf.init(info.getContext());
-			org.mule.jbi.management.ComponentLifeCycle lfmbean = new org.mule.jbi.management.ComponentLifeCycle(lf);
-			this.container.getMBeanServer().registerMBean(lfmbean, objName);
-			return objName;
+			this.component.install();
+			return this.component.getObjectName();
 		} catch (Exception e) {
 			throw new JBIException(e);
 		} finally {
@@ -156,19 +153,20 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 		}
 	}
 
-	private ObjectName createComponentLifeCycleName(String name) {
-		return this.container.createComponentMBeanName(name, "lifecycle", null);
-	}
-
 	public synchronized boolean isInstalled() {
-		String name = getComponentName();
-		ComponentInfo info = this.container.getComponentRegistry().getComponent(name);
-		return info != null;
+		try {
+			return !this.component.getCurrentState().equals(LifeCycleMBean.UNKNOWN);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public synchronized void uninstall() throws JBIException {
-		// TODO Auto-generated method stub
-
+		try {
+			this.component.uninstall();
+		} catch (IOException e) {
+			throw new JBIException(e);
+		}
 	}
 
 	public synchronized ObjectName getInstallerConfigurationMBean() throws JBIException {
@@ -183,7 +181,7 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 	}
 
 	public List getClassPathElements() {
-		return this.classPathElements;
+		return this.component.getClassPathElements();
 	}
 
 	public String getComponentName() {
@@ -195,12 +193,11 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 	}
 
 	public boolean isInstall() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.install;
 	}
 
 	public void setClassPathElements(List classPathElements) {
-		this.classPathElements = classPathElements;
+		this.component.setClassPathElements(classPathElements);
 	}
 
 	public ServiceEndpoint activateEndpoint(QName serviceName, String endpointName) throws JBIException {
@@ -256,7 +253,7 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 	}
 
 	public MBeanNames getMBeanNames() {
-		throw new IllegalStateException("Illegal call in an installation context");
+		return this;
 	}
 
 	public MBeanServer getMBeanServer() {
@@ -273,5 +270,13 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 
 	public String getWorkspaceRoot() {
 		return this.container.getWorkingDir().getAbsolutePath();
+	}
+
+	public ObjectName createCustomComponentMBeanName(String customName) {
+		return this.container.createMBeanName(getComponentName(), "custom", customName);
+	}
+
+	public String getJmxDomainName() {
+		return this.container.getJmxDomainName();
 	}
 }

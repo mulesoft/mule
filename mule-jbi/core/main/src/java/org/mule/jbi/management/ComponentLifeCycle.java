@@ -19,34 +19,63 @@ import javax.jbi.JBIException;
 import javax.jbi.management.ComponentLifeCycleMBean;
 import javax.management.ObjectName;
 
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.framework.ComponentContextImpl;
+import org.mule.jbi.registry.Component;
+
+/**
+ * Management bean for a component lifecycle.
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public class ComponentLifeCycle implements ComponentLifeCycleMBean {
 
-	private javax.jbi.component.ComponentLifeCycle lifeCycle;
+	private JbiContainer container;
+	private Component component;
 	
-	public ComponentLifeCycle(javax.jbi.component.ComponentLifeCycle lifeCycle) {
-		this.lifeCycle = lifeCycle;
+	public ComponentLifeCycle(JbiContainer container, Component component) {
+		this.container = container;
+		this.component = component;
 	}
 	
+	public void init() throws JBIException {
+		ComponentContextImpl context = new ComponentContextImpl(this.container, this.component);
+		this.component.getComponent().getLifeCycle().init(context);
+	}
+	
+	/* (non-Javadoc)
+	 * @see javax.jbi.management.ComponentLifeCycleMBean#getExtensionMBeanName()
+	 */
 	public ObjectName getExtensionMBeanName() throws JBIException {
-		// TODO Auto-generated method stub
-		return this.lifeCycle.getExtensionMBeanName();
+		return this.component.getComponent().getLifeCycle().getExtensionMBeanName();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.jbi.management.LifeCycleMBean#start()
+	 */
 	public void start() throws JBIException, IOException {
-		this.lifeCycle.start();
+		this.component.start();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.jbi.management.LifeCycleMBean#stop()
+	 */
 	public void stop() throws JBIException, IOException {
-		this.lifeCycle.stop();
+		this.component.stop();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.jbi.management.LifeCycleMBean#shutDown()
+	 */
 	public void shutDown() throws JBIException, IOException {
-		this.lifeCycle.shutDown();
+		this.component.shutDown();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.jbi.management.LifeCycleMBean#getCurrentState()
+	 */
 	public String getCurrentState() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.component.getCurrentState();
 	}
 
 }

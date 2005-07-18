@@ -18,6 +18,10 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.DocumentFragment;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public abstract class AbstractServiceEndpoint implements ServiceEndpoint {
 
 	protected String component;

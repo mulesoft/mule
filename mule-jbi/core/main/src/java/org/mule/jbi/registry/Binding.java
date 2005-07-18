@@ -11,14 +11,12 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi;
+package org.mule.jbi.registry;
 
-import javax.jbi.JBIException;
-
-public interface LifeCycle {
-
-	void start() throws JBIException;
-	
-	void stop() throws JBIException;
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
+public interface Binding extends Component {
 
 }

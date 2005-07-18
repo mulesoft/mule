@@ -16,6 +16,10 @@ package org.mule.jbi.servicedesc;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public class DynamicEndpointImpl extends AbstractServiceEndpoint {
 
 	private ServiceEndpoint ref;

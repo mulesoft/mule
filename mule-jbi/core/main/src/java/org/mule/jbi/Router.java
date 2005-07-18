@@ -17,6 +17,10 @@ import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.servicedesc.ServiceEndpoint;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public interface Router {
 
 	ServiceEndpoint getTargetEndpoint(MessageExchange me) throws MessagingException;

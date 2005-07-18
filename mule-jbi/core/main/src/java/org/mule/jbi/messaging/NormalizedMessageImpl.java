@@ -23,6 +23,10 @@ import javax.jbi.messaging.NormalizedMessage;
 import javax.security.auth.Subject;
 import javax.xml.transform.Source;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public class NormalizedMessageImpl implements NormalizedMessage {
 
 	private Source content;

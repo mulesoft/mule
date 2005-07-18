@@ -11,14 +11,31 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.messaging;
+package org.mule.jbi.registry;
 
-import javax.jbi.messaging.Fault;
+import java.io.IOException;
+import java.util.List;
+
+import javax.jbi.JBIException;
 
 /**
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public class FaultImpl extends NormalizedMessageImpl implements Fault {
+public interface Library extends Entry {
 
+	Component[] getComponents();
+	
+	List getClassPathElements();
+	
+	boolean isClassLoaderParentFirst();
+	
+	void addComponent(Component component);
+	
+	void removeComponent(Component component);
+	
+	void install() throws JBIException, IOException;
+
+	void uninstall() throws JBIException, IOException;
+	
 }

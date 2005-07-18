@@ -11,14 +11,14 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.messaging;
+package org.mule.jbi.registry.impl;
 
-import javax.jbi.messaging.Fault;
+import org.mule.jbi.registry.Engine;
 
 /**
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public class FaultImpl extends NormalizedMessageImpl implements Fault {
+public class EngineImpl extends AbstractComponent implements Engine {
 
 }

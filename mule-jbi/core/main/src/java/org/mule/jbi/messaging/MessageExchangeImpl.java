@@ -13,6 +13,7 @@
  */
 package org.mule.jbi.messaging;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,11 @@ import javax.xml.namespace.QName;
 
 import org.mule.jbi.util.UUID;
 
-public class MessageExchangeImpl implements MessageExchange {
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
+public class MessageExchangeImpl implements MessageExchange, Serializable {
 
 	public static final String IN = "in";
 	public static final String OUT = "out";
@@ -54,7 +59,7 @@ public class MessageExchangeImpl implements MessageExchange {
 	}
 	
 	public URI getPattern() {
-		return null;
+		throw new IllegalStateException();
 	}
 	
 	public String getExchangeId() {
@@ -168,5 +173,5 @@ public class MessageExchangeImpl implements MessageExchange {
 	public void setProvider(String provider) {
 		this.provider = provider;
 	}
-	
+
 }

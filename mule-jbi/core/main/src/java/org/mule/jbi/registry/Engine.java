@@ -11,16 +11,12 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.framework;
+package org.mule.jbi.registry;
 
-import org.mule.jbi.JbiContainer;
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
+public interface Engine extends Component {
 
-public abstract class AbstractJbiService {
-
-	protected JbiContainer container;
-	
-	public AbstractJbiService(JbiContainer container) {
-		this.container = container;
-	}
-	
 }

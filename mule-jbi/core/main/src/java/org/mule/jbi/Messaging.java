@@ -11,14 +11,16 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.messaging;
+package org.mule.jbi;
 
-import javax.jbi.messaging.Fault;
+import javax.jbi.messaging.DeliveryChannel;
 
 /**
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public class FaultImpl extends NormalizedMessageImpl implements Fault {
+public interface Messaging {
 
+	DeliveryChannel getDeliveryChannel(String component);
+	
 }

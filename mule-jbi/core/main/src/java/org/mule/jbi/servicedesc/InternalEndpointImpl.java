@@ -15,6 +15,10 @@ package org.mule.jbi.servicedesc;
 
 import javax.xml.namespace.QName;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public class InternalEndpointImpl extends AbstractServiceEndpoint {
 
 	private String endpointName;

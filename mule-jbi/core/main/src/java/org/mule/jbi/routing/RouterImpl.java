@@ -23,22 +23,25 @@ import javax.xml.namespace.QName;
 
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.Router;
-import org.mule.jbi.framework.AbstractJbiService;
-import org.mule.jbi.framework.ComponentInfo;
+import org.mule.jbi.registry.Component;
 import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 
-public class RouterImpl extends AbstractJbiService implements Router {
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
+public class RouterImpl  implements Router {
 
-	public RouterImpl(JbiContainer container) {
-		super(container);
+	public RouterImpl() {
 	}
 	
 	public ServiceEndpoint getTargetEndpoint(MessageExchange me) throws MessagingException {
+		JbiContainer container = JbiContainer.Factory.getInstance();
 		ServiceEndpoint se = me.getEndpoint();
 		QName service = me.getService();
 		QName interf = me.getInterfaceName();
 		if (se != null) {
-			se = this.container.getEndpointRegistry().getEndpoint(se.getServiceName(), se.getEndpointName());
+			se = container.getEndpoints().getEndpoint(se.getServiceName(), se.getEndpointName());
 			if (se == null) {
 				throw new MessagingException("Could not find activated endpoint");
 			}
@@ -50,13 +53,13 @@ public class RouterImpl extends AbstractJbiService implements Router {
 		if (se == null && service != null) {
 			ServiceEndpoint[] endpoints;
 			// Test internal services
-			endpoints = this.container.getEndpointRegistry().getInternalEndpointsForService(service);
+			endpoints = container.getEndpoints().getInternalEndpointsForService(service);
 			se = selectEndpoint(me, endpoints);
 		}
 		if (se == null && interf != null) {
 			ServiceEndpoint[] endpoints;
 			// Test internal interfaces
-			endpoints = this.container.getEndpointRegistry().getInternalEndpoints(interf);
+			endpoints = container.getEndpoints().getInternalEndpoints(interf);
 			se = selectEndpoint(me, endpoints);
 		}
 		if (se == null) {
@@ -78,11 +81,12 @@ public class RouterImpl extends AbstractJbiService implements Router {
 	}
 
 	protected ServiceEndpoint[] getPossibleEndpoints(MessageExchange me, ServiceEndpoint[] endpoints) {
+		JbiContainer container = JbiContainer.Factory.getInstance();
 		List result = new ArrayList();
 		for (int i = 0; i < endpoints.length; i++) {
 			AbstractServiceEndpoint se = (AbstractServiceEndpoint) endpoints[i];
 			String compName = se.getComponent();
-			ComponentInfo compInfo = this.container.getComponentRegistry().getComponent(compName);
+			Component compInfo = container.getRegistry().getComponent(compName);
 			if (me.getRole() == MessageExchange.Role.CONSUMER) {
 				if (compInfo.getComponent().isExchangeWithConsumerOkay(se, me)) {
 					result.add(se);
@@ -95,5 +99,5 @@ public class RouterImpl extends AbstractJbiService implements Router {
 		}
 		return (ServiceEndpoint[]) result.toArray(new ServiceEndpoint[result.size()]);
 	}
-	
+
 }

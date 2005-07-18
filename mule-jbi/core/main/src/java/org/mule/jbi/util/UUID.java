@@ -13,6 +13,10 @@
  */
 package org.mule.jbi.util;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public class UUID {
 
 	public static String next() {

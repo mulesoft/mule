@@ -22,35 +22,25 @@ import javax.jbi.JBIException;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
 
-import org.mule.jbi.EndpointRegistry;
-import org.mule.jbi.JbiContainer;
+import org.mule.jbi.Endpoints;
+import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 import org.mule.jbi.servicedesc.ExternalEndpointImpl;
 import org.mule.jbi.servicedesc.InternalEndpointImpl;
-import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 
 /**
  * 
- * TODO: all endpoints query could be optimized by using four maps,
- * indexing endpoints on serviceName / interfaceName  
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public class EndpointRegistryImpl extends AbstractJbiService implements EndpointRegistry {
+public class EndpointsImpl implements Endpoints {
 
 	private List internalEndpoints;
 	private List externalEndpoints;
 	
-	public EndpointRegistryImpl(JbiContainer container) {
-		super(container);
-	}
-
-	public void start() throws JBIException {
+	public EndpointsImpl() {
 		this.internalEndpoints = new CopyOnWriteArrayList();
 		this.externalEndpoints = new CopyOnWriteArrayList();
 	}
 	
-	public void stop() throws JBIException {
-	}
 	
 	public void registerInternalEndpoint(ServiceEndpoint endpoint) throws JBIException {
 		if (getEndpoint(this.internalEndpoints, endpoint.getServiceName(), endpoint.getEndpointName()) != null) {

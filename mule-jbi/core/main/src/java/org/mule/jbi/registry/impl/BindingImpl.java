@@ -11,14 +11,14 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.messaging;
+package org.mule.jbi.registry.impl;
 
-import javax.jbi.messaging.Fault;
+import org.mule.jbi.registry.Binding;
 
 /**
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public class FaultImpl extends NormalizedMessageImpl implements Fault {
+public class BindingImpl extends AbstractComponent implements Binding {
 
 }

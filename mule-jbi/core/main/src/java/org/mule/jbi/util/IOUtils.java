@@ -24,6 +24,10 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public class IOUtils {
 
     /**
@@ -72,7 +76,7 @@ public class IOUtils {
 			IOUtils.closeQuietly(os);
 		}
     }
-
+    
     /**
      * Unconditionally close an <code>InputStream</code>.
      * <p>

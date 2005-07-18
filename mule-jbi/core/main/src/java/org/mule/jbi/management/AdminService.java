@@ -17,31 +17,50 @@ import javax.jbi.management.AdminServiceMBean;
 import javax.management.ObjectName;
 
 import org.mule.jbi.JbiContainer;
-import org.mule.jbi.framework.ComponentInfo;
+import org.mule.jbi.registry.Binding;
+import org.mule.jbi.registry.Component;
+import org.mule.jbi.registry.Engine;
 
+/**
+ * 
+ * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ */
 public class AdminService implements AdminServiceMBean {
 
-	private JbiContainer container;
+	protected JbiContainer container;
 	
 	public AdminService(JbiContainer container) {
 		this.container = container;
 	}
 	
 	public ObjectName[] getEngineComponents() {
-		return this.container.getComponentRegistry().getEngineComponentNames();
+		Engine[] engines = this.container.getRegistry().getEngines();
+		ObjectName[] names = new ObjectName[engines.length];
+		for (int i = 0; i < names.length; i++) {
+			names[i] = engines[i].getObjectName();
+		}
+		return names;
 	}
 
 	public ObjectName[] getBindingComponents() {
-		return this.container.getComponentRegistry().getBindingComponentNames();
+		Binding[] bindings = this.container.getRegistry().getBindings();
+		ObjectName[] names = new ObjectName[bindings.length];
+		for (int i = 0; i < names.length; i++) {
+			names[i] = bindings[i].getObjectName();
+		}
+		return names;
 	}
 
 	public ObjectName getComponentByName(String name) {
-		return this.container.getComponentRegistry().getComponentName(name);
+		Component comp = this.container.getRegistry().getComponent(name);
+		if (comp != null) {
+			return comp.getObjectName();
+		}
+		return null;
 	}
 
 	public String getSystemInfo() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Mule JBI version 0.1";
 	}
 
 	public ObjectName getSystemService(String serviceName) {
@@ -51,23 +70,17 @@ public class AdminService implements AdminServiceMBean {
 
 	public ObjectName[] getSystemServices() {
 		// TODO Auto-generated method stub
-		return null;
+		return new ObjectName[0];
 	}
 
 	public boolean isBinding(String componentName) {
-		ComponentInfo cci = this.container.getComponentRegistry().getComponent(componentName);
-		if (cci != null) {
-			return !cci.isEngine();
-		}
-		return false;
+		Component comp = this.container.getRegistry().getComponent(componentName);
+		return comp instanceof Binding;
 	}
 
 	public boolean isEngine(String componentName) {
-		ComponentInfo cci = this.container.getComponentRegistry().getComponent(componentName);
-		if (cci != null) {
-			return cci.isEngine();
-		}
-		return false;
+		Component comp = this.container.getRegistry().getComponent(componentName);
+		return comp instanceof Engine;
 	}
 
 }
