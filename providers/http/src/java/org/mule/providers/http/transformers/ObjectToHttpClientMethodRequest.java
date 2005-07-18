@@ -13,14 +13,6 @@
  */
 package org.mule.providers.http.transformers;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -32,7 +24,13 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.util.Utility;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a UMOMessage into a
@@ -82,16 +80,18 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
 
             } else {
                 PostMethod postMethod = new PostMethod(uri.toString());
+                addParameters(uri.getQuery(), postMethod);
                 String paramName = (String) context.getProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
+
                 if (paramName == null) {
-                    if (src instanceof String) {
-                        postMethod.setRequestBody(src.toString());
-                        postMethod.setRequestContentLength(src.toString().length());
-                    } else {
-                        byte[] buffer = Utility.objectToByteArray(src);
-                        postMethod.setRequestBody(new ByteArrayInputStream(buffer));
-                        postMethod.setRequestContentLength(buffer.length);
-                    }
+//                    if (src instanceof String) {
+//                        postMethod.setRequestBody(src.toString());
+//                        postMethod.setRequestContentLength(src.toString().length());
+//                    } else {
+//                        byte[] buffer = Utility.objectToByteArray(src);
+//                        postMethod.setRequestBody(new ByteArrayInputStream(buffer));
+//                        postMethod.setRequestContentLength(buffer.length);
+//                    }
                 } else {
                     postMethod.addParameter(paramName, src.toString());
                 }
@@ -154,5 +154,42 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
+    }
+
+    private int addParameters(String param, PostMethod postMethod)
+    {
+        //Parse the HTTP argument list and convert to a NameValuePair collection
+
+        int equals;
+        String currentParam;
+        equals = param.indexOf("&");
+        if(equals > -1) {
+            currentParam = param.substring(0, equals);
+            param = param.substring(equals + 1);
+        } else {
+            currentParam = param;
+            param = "";
+        }
+        int parameterIndex = -1;
+        while (currentParam != "") {
+            String paramName, paramValue;
+            equals = currentParam.indexOf("=");
+            if (equals > -1) {
+                paramName = currentParam.substring(0, equals);
+                paramValue = currentParam.substring(equals + 1);
+                parameterIndex ++;
+                postMethod.addParameter(paramName, paramValue);
+            }
+            equals = param.indexOf("&");
+            if(equals > -1) {
+                currentParam = param.substring(0, equals);
+                param = param.substring(equals + 1);
+            } else {
+                currentParam = param;
+                param = "";
+            }
+        }
+
+        return parameterIndex + 1;
     }
 }

@@ -15,11 +15,6 @@
 
 package org.mule.providers.http;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Properties;
-
 import org.apache.commons.httpclient.ConnectMethod;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpConnection;
@@ -44,8 +39,12 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
-
 import sun.misc.BASE64Encoder;
+
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Properties;
 
 /**
  * <p>
@@ -171,9 +170,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             if (body instanceof String) {
                 ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
                 httpMethod = (HttpMethod) trans.transform(body.toString());
-                // postMethod.setRequestBody(body.toString());
-                // postMethod.setRequestContentLength(body.toString().length());
-                // httpMethod = postMethod;
+                 postMethod.setRequestBody(body.toString());
+                 postMethod.setRequestContentLength(body.toString().length());
+                 httpMethod = postMethod;
             } else if (body instanceof HttpMethod) {
                 httpMethod = (HttpMethod) body;
             } else {
@@ -184,6 +183,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
 
         }
+
         HttpConnection connection = null;
         try {
             connection = getConnection(uri);
@@ -211,7 +211,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             String status = String.valueOf(httpMethod.getStatusCode());
             h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
             logger.debug("Http response is: " + status);
-            return new MuleMessage(httpMethod.getResponseBody(), h);
+            return new MuleMessage(httpMethod.getResponseBodyAsString(), h);
         } catch (Exception e) {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         } finally {
@@ -239,5 +239,4 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     {
         state = null;
     }
-
 }

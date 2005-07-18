@@ -30,6 +30,8 @@ package org.mule.providers.http;
 
 import org.mule.providers.tcp.TcpConnector;
 
+import java.util.Map;
+
 /**
  * <code>HttpConnector</code> provides a way of receiving and sending http
  * requests and responses. The UMOConnector itself handles dispatching http
@@ -174,5 +176,9 @@ public class HttpConnector extends TcpConnector
     public void setKeepAlive(boolean keepAlive)
     {
         this.keepAlive = keepAlive;
+    }
+
+    public Map getReceivers() {
+        return this.receivers;
     }
 }

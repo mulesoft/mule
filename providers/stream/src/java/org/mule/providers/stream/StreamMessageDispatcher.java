@@ -61,7 +61,13 @@ public class StreamMessageDispatcher extends AbstractMessageDispatcher
      */
     public void doDispatch(UMOEvent event) throws Exception
     {
-        connector.getOutputStream().write(event.getTransformedMessageAsBytes());
+        Object data = event.getTransformedMessage();
+        if(data instanceof byte[]) {
+            connector.getOutputStream().write((byte[])data);
+        } else {
+            connector.getOutputStream().write(data.toString().getBytes());
+        }
+        connector.getOutputStream().flush();
     }
 
     /*

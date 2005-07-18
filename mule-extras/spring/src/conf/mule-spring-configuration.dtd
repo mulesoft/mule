@@ -425,7 +425,7 @@ a connection to the underlying resource
     	If this attibute is not set then it will default to it's class 
     	name without the pakage prefix.   
 -->
-<!ATTLIST transformer name	                  ID    			#IMPLIED>
+<!ATTLIST transformer name	                  ID    			#REQUIRED>
 <!--
     The className attribute represents the full qualified class name
     of the Transformer implementation 
@@ -441,7 +441,13 @@ a connection to the underlying resource
 -->
 <!ATTLIST transformer returnClass             CDATA 			"java.lang.Object">
 
-<!--	
+<!--
+    Determines whether the tranformer should through an exception if an incompatible source type
+    is received or whether to ignore it so that the next transformer can be invoked
+ -->
+<!ATTLIST transformer ignoreBadInput          (true|false) 			#IMPLIED>
+
+<!--
 	<i>global-endpoints</i> are endpoint configurations made available to all components in
 	a model through the MuleManager. This is a grouping element for individual 
 	<i>endpoint</i> instances

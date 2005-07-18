@@ -14,8 +14,6 @@
  */
 package org.mule.providers.stream;
 
-import java.io.InputStream;
-
 import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
@@ -23,6 +21,8 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+
+import java.io.InputStream;
 
 /**
  * <code>StreamMessageReceiver</code> is a listener of events from a mule
@@ -37,6 +37,7 @@ public class StreamMessageReceiver extends PollingMessageReceiver
 
     private int bufferSize = DEFAULT_BUFFER_SIZE;
     private InputStream inputStream;
+    private StreamConnector connector;
 
     public StreamMessageReceiver(UMOConnector connector,
                                  UMOComponent component,
@@ -46,6 +47,7 @@ public class StreamMessageReceiver extends PollingMessageReceiver
     {
 
         super(connector, component, endpoint, checkFrequency);
+        this.connector = (StreamConnector)connector;
         inputStream = stream;
 
     }

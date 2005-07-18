@@ -32,14 +32,14 @@ public class XsltTransformerTestCase extends AbstractTransformerTestCase
     {
         super.setUp();
 
-        srcData = Utility.loadResourceAsString("cdcatalog.xml", getClass());
+        srcData = Utility.loadResourceAsString("stock.xml", getClass());
         resultData = Utility.loadResourceAsString("cdcatalog.html", getClass());
     }
 
     public UMOTransformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-        transformer.setXslFile("cdcatalog.xsl");
+        transformer.setXslFile("stock.xsl");
         transformer.initialise();
         return transformer;
     }
