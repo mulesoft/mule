@@ -16,6 +16,14 @@
         </dependency>
         <dependency>
             <groupId>mule</groupId>
+            <artifactId>mule-jbi-shared</artifactId>
+            <version>${pom.currentVersion}</version>
+            <properties>
+              <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
             <artifactId>mule-jbi-schemas</artifactId>
             <version>${pom.currentVersion}</version>
             <properties>
@@ -47,6 +55,11 @@
             <version>${geronimo_spec_javamail_version}</version>
         </dependency>
         <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee-connector</artifactId>
+            <version>${geronimo_spec_j2ee_connector_version}</version>
+        </dependency>
+        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>${commons_logging_version}</version>
@@ -70,6 +83,11 @@
             <groupId>axis2</groupId>
             <artifactId>axis2</artifactId>
             <version>${axis2_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>concurrent</groupId>
+            <artifactId>concurrent</artifactId>
+            <version>${concurrent_version}</version>
         </dependency>
     </dependencies>
 </project>

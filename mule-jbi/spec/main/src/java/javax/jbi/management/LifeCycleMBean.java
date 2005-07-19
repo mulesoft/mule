@@ -28,7 +28,7 @@ public interface LifeCycleMBean
      * @exception javax.jbi.JBIException if the item fails to start.
      * @throws IOException 
      */
-    void start() throws JBIException , IOException;
+    void start() throws JBIException, IOException;
 
     /**
      * Stop the item. This suspends current messaging activities.

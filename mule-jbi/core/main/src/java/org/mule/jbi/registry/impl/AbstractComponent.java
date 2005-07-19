@@ -43,15 +43,15 @@ import org.mule.jbi.util.IOUtils;
 public class AbstractComponent extends AbstractEntry implements Component {
 
 	private transient javax.jbi.component.Component component;
-	private transient List units;
-	private transient List libraries;
 	private transient ObjectName objectName;
 	private transient DeliveryChannel channel;
+	private List units;
+	private List libraries;
 	private String workspaceRoot;
 	private List classPathElements;
 	private String componentClassName;
 	private boolean isClassLoaderParentFirst;
-	private boolean isTransientComponent;
+	private boolean isTransient;
 	
 	public AbstractComponent() {
 		this.units = new ArrayList();
@@ -60,8 +60,7 @@ public class AbstractComponent extends AbstractEntry implements Component {
 	
 	protected void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		super.readObject(in);
-		this.units = new ArrayList();
-		this.libraries = new ArrayList();
+		in.defaultReadObject();
 	}
 	
 	/* (non-Javadoc)
@@ -165,6 +164,9 @@ public class AbstractComponent extends AbstractEntry implements Component {
 		if (!getCurrentState().equals(UNKNOWN)) {
 			throw new JBIException("Illegal status: " + getCurrentState());
 		}
+		if (isTransient) {
+			return;
+		}
 		// Check shared libraries
 		com.sun.java.xml.ns.jbi.ComponentDocument.Component.SharedLibrary[] libs = getDescriptor().getComponent().getSharedLibraryArray();
 		for (int i = 0; i < libs.length; i++) {
@@ -193,7 +195,7 @@ public class AbstractComponent extends AbstractEntry implements Component {
 		if (!getCurrentState().equals(UNKNOWN)) {
 			throw new JBIException("Illegal status: " + getCurrentState());
 		}
-		if (!isTransientComponent) {
+		if (!isTransient) {
 			createComponent();
 		}
 		initComponent();
@@ -328,12 +330,12 @@ public class AbstractComponent extends AbstractEntry implements Component {
 		this.component = component;
 	}
 
-	public boolean isTransientComponent() {
-		return isTransientComponent;
+	public boolean isTransient() {
+		return isTransient;
 	}
 
-	public void setTransientComponent(boolean isTransientComponent) {
-		this.isTransientComponent = isTransientComponent;
+	public void setTransient(boolean isTransient) {
+		this.isTransient = isTransient;
 	}
 
 }

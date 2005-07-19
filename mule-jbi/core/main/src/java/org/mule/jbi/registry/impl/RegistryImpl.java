@@ -23,7 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.jbi.JBIException;
+import javax.jbi.component.Bootstrap;
 
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.management.Directories;
+import org.mule.jbi.management.InstallationContextImpl;
 import org.mule.jbi.registry.Assembly;
 import org.mule.jbi.registry.Binding;
 import org.mule.jbi.registry.Component;
@@ -117,22 +121,36 @@ public class RegistryImpl implements Registry {
 		this.componentsMap.put(name, e);
 		return e;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.mule.jbi.registry.Registry#addTransientEngine(java.lang.String, javax.jbi.component.Component)
 	 */
 	public synchronized Engine addTransientEngine(String name, javax.jbi.component.Component engine) throws JBIException, IOException {
+		return addTransientEngine(name, engine, null);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.registry.Registry#addTransientEngine(java.lang.String, javax.jbi.component.Component)
+	 */
+	public synchronized Engine addTransientEngine(String name, javax.jbi.component.Component engine, Bootstrap bootstrap) throws JBIException, IOException {
 		Component c = getComponent(name);
 		if (c == null) {
 			EngineImpl e = new EngineImpl();
 			e.setName(name);
-			e.setTransientComponent(true);
+			e.setTransient(true);
 			e.setComponent(engine);
+			e.setStateAtShutdown(Engine.RUNNING);
+			e.setWorkspaceRoot(Directories.getEngineWorkspaceDir(JbiContainer.Factory.getInstance().getWorkingDir(), name).getAbsoluteFile().getCanonicalPath());
 			this.engines.add(e);
 			this.componentsMap.put(name, e);
+			if (bootstrap != null) {
+				InstallationContextImpl ctx = new InstallationContextImpl(e, bootstrap);
+				bootstrap.init(ctx);
+				ctx.install();
+			}
 			return e;
 		} else {
-			if (!(c instanceof EngineImpl) || !c.isTransientComponent()) {
+			if (!(c instanceof EngineImpl) || !c.isTransient()) {
 				throw new JBIException("A non-transient or non-engine component is already registered: " + name);
 			}
 			EngineImpl e = (EngineImpl) c;
@@ -171,20 +189,29 @@ public class RegistryImpl implements Registry {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Registry#addTransientBinding(java.lang.String, org.mule.jbi.registry.Component)
+	 * @see org.mule.jbi.registry.Registry#addTransientBinding(java.lang.String, javax.jbi.component.Component)
 	 */
 	public synchronized Binding addTransientBinding(String name, javax.jbi.component.Component binding) throws JBIException, IOException {
+		return addTransientBinding(name, binding, null);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.registry.Registry#addTransientBinding(java.lang.String, org.mule.jbi.registry.Component)
+	 */
+	public synchronized Binding addTransientBinding(String name, javax.jbi.component.Component binding, Bootstrap bootstrap) throws JBIException, IOException {
 		Component c = getComponent(name);
 		if (c == null) {
 			BindingImpl b = new BindingImpl();
 			b.setName(name);
-			b.setTransientComponent(true);
+			b.setTransient(true);
 			b.setComponent(binding);
+			b.setStateAtShutdown(Binding.RUNNING);
+			b.setWorkspaceRoot(Directories.getBindingWorkspaceDir(JbiContainer.Factory.getInstance().getWorkingDir(), name).getAbsoluteFile().getCanonicalPath());
 			this.bindings.add(b);
 			this.componentsMap.put(name, b);
 			return b;
 		} else {
-			if (!(c instanceof BindingImpl) || !c.isTransientComponent()) {
+			if (!(c instanceof BindingImpl) || !c.isTransient()) {
 				throw new JBIException("A non-transient or non-binding component is already registered: " + name);
 			}
 			BindingImpl b = (BindingImpl) c;
@@ -292,6 +319,10 @@ public class RegistryImpl implements Registry {
 			for (int i = 0; i < components.length; i++) {
 				components[i].restoreState();
 			}
+			Assembly[] assemblies = getAssemblies();
+			for (int i = 0; i < assemblies.length; i++) {
+				assemblies[i].restoreState();
+			}
 		} catch (Exception e) {
 			throw new JBIException(e);
 		}
@@ -312,4 +343,30 @@ public class RegistryImpl implements Registry {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.registry.Registry#addTransientUnit(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	public synchronized void addTransientUnit(String suName, Component component, String installDir) throws JBIException, IOException {
+		Assembly a = getAssembly(suName);
+		if (a == null) {
+			AssemblyImpl assembly = new AssemblyImpl();
+			assembly.setName(suName);
+			assembly.setTransient(true);
+			assembly.setStateAtShutdown(Assembly.RUNNING);
+			UnitImpl unit = new UnitImpl();
+			unit.setName(suName);
+			unit.setAssembly(assembly);
+			unit.setComponent(component);
+			unit.setInstallRoot(new File(installDir).getAbsoluteFile().getCanonicalPath());
+			this.assemblies.add(assembly);
+			this.assembliesMap.put(suName, assembly);
+			unit.deploy();
+			unit.start();
+			assembly.setCurrentState(Assembly.RUNNING);
+		} else {
+			if (!(a instanceof AssemblyImpl) || !a.isTransient()) {
+				throw new JBIException("A non-transient or assembly is already deployed: " + suName);
+			}
+		}
+	}
 }

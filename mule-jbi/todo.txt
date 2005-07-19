@@ -1,0 +1,27 @@
+Full JBI spec conformance
+Minimum dependencies
+
+Components MUST be jbi implementation neutrals
+    * the only available dependencies are
+        - javax.jbi.*
+        - JRE 1.4
+    * use shared libraries or internal jars
+    
+Binding components:
+    * mule
+    * jms
+    * file
+    * ws (http/soap) with axis
+    
+Reconnections
+Management 
+    
+JAXR / UDDI : apache scout / uddi4j
+
+JSR 106 : XML Digital Encryption (http://xml.apache.org/security/)
+
+Scripting: JSR 223 / JSR 241
+
+Wsdl4j : JSR 110
+
+Rules based router : JSR-94 + Drools

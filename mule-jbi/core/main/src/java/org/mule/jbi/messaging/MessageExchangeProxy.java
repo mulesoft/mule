@@ -131,6 +131,10 @@ public abstract class MessageExchangeProxy implements MessageExchange {
 		if (!can(CAN_OWNER)) {
 			throw new IllegalStateException("component is not owner");
 		}
+		if (name == null) {
+			throw new IllegalArgumentException("name should not be null");
+		}
+		name = name.toLowerCase();
 		return me.getMessage(name);
 	}
 
@@ -236,6 +240,7 @@ public abstract class MessageExchangeProxy implements MessageExchange {
 		if (name == null) {
 			throw new IllegalArgumentException("name should not be null");
 		}
+		name = name.toLowerCase();
 		if (MessageExchangeImpl.IN.equals(name) && !can(CAN_SET_IN_MSG)) {
 			throw new MessagingException("In not supported");
 		}

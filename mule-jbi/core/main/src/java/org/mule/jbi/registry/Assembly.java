@@ -25,6 +25,12 @@ import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
  */
 public interface Assembly extends Entry {
 
+	void restoreState() throws JBIException, IOException;
+
+	void saveAndShutdown() throws JBIException, IOException;
+	
+	boolean isTransient();
+	
     /**
      * Start the item.
      * 

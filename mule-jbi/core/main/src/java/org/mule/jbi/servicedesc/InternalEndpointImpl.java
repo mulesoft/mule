@@ -13,7 +13,17 @@
  */
 package org.mule.jbi.servicedesc;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.wsdl.Definition;
+import javax.wsdl.Port;
+import javax.wsdl.Service;
+import javax.wsdl.factory.WSDLFactory;
 import javax.xml.namespace.QName;
+
+import org.w3c.dom.Document;
 
 /**
  * 
@@ -47,6 +57,19 @@ public class InternalEndpointImpl extends AbstractServiceEndpoint {
 
 	public void setServiceName(QName serviceName) {
 		this.serviceName = serviceName;
+	}
+
+	public void parseWsdl(Document doc) {
+		try {
+			Set interfaces = new HashSet();
+			Definition def = WSDLFactory.newInstance().newWSDLReader().readWSDL(null, doc);
+			Service service = def.getService(this.serviceName);
+			Port port = service.getPort(this.endpointName);
+			interfaces.add(port.getBinding().getQName());
+			this.interfaces = (QName[]) interfaces.toArray(new QName[interfaces.size()]);
+		} catch (Exception e) {
+			this.interfaces = new QName[0];
+		}
 	}
 
 }

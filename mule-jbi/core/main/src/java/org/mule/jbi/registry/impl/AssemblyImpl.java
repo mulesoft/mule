@@ -46,6 +46,7 @@ import com.sun.java.xml.ns.jbi.ServiceUnitDocument.ServiceUnit;
 public class AssemblyImpl extends AbstractEntry implements Assembly {
 
 	private List units;
+	private boolean isTransient;
 	
 	public AssemblyImpl() {
 		this.units = new ArrayList();
@@ -245,6 +246,43 @@ public class AssemblyImpl extends AbstractEntry implements Assembly {
 		setCurrentState(UNKNOWN);
 		// TODO: return info
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.registry.Assembly#isTransient()
+	 */
+	public boolean isTransient() {
+		return isTransient;
+	}
+
+	public void setTransient(boolean isTransient) {
+		this.isTransient = isTransient;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.registry.Assembly#restoreState()
+	 */
+	public void restoreState() throws JBIException, IOException {
+		Unit[] units = getUnits();
+		for (int i = 0; i < units.length; i++) {
+			units[i].init();
+			if (units[i].getStateAtShutdown().equals(Unit.RUNNING)) {
+				units[i].start();
+			} else if (units[i].getStateAtShutdown().equals(Unit.SHUTDOWN)) {
+				units[i].shutDown();
+			}
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.registry.Assembly#saveAndShutdown()
+	 */
+	public void saveAndShutdown() throws JBIException, IOException {
+		Unit[] units = getUnits();
+		for (int i = 0; i < units.length; i++) {
+			units[i].setStateAtShutdown(units[i].getCurrentState());
+			units[i].shutDown();
+		}
 	}
 
 }

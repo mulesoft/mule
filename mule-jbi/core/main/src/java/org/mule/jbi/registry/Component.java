@@ -78,7 +78,7 @@ public interface Component extends Entry {
 
 	boolean isClassLoaderParentFirst();
 	
-	boolean isTransientComponent();
+	boolean isTransient();
 	
 	/**
 	 * Return the jbi component implementation.

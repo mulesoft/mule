@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.jbi.JBIException;
+import javax.jbi.component.Bootstrap;
 
 /**
  * 
@@ -63,6 +64,8 @@ public interface Registry {
 	
 	Engine addTransientEngine(String name, javax.jbi.component.Component engine) throws JBIException, IOException;
 	
+	Engine addTransientEngine(String name, javax.jbi.component.Component engine, Bootstrap bootsrap) throws JBIException, IOException;
+	
 	Binding[] getBindings();
 	
 	Binding getBinding(String name);
@@ -70,6 +73,8 @@ public interface Registry {
 	Binding addBinding(String name) throws JBIException;
 	
 	Binding addTransientBinding(String name, javax.jbi.component.Component binding) throws JBIException, IOException;
+	
+	Binding addTransientBinding(String name, javax.jbi.component.Component binding, Bootstrap bootstrap) throws JBIException, IOException;
 	
 	Library[] getLibraries();
 	
@@ -86,6 +91,8 @@ public interface Registry {
 	Assembly addAssembly(String name);
 	
 	void removeAssembly(Assembly assembly);
+	
+	void addTransientUnit(String suName, Component component, String installRoot) throws JBIException, IOException;
 	
 	void start() throws JBIException;
 	

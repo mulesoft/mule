@@ -74,6 +74,8 @@ public class MessageExchangeFactoryImpl implements MessageExchangeFactory {
 			try {
 				// TODO: use axis builders when available
 				// TODO: extract this code elsewhere
+				// TODO: service descriptions should be cached
+				// TODO: operations can be put on the endpoint 
 				String name = ((AbstractServiceEndpoint) endpoints[i]).getComponent();
 				Component info = this.channel.getContainer().getRegistry().getComponent(name);
 				Document doc = info.getComponent().getServiceDescription(endpoints[i]);
@@ -90,6 +92,8 @@ public class MessageExchangeFactoryImpl implements MessageExchangeFactory {
 				} else {
 					throw new UnsupportedOperationException();
 				}
+				//WSDLService service = desc.getService(endpoints[i].getServiceName());
+				//WSDLEndpoint endpoint = service.getEndpoint(new QName(service.getNamespace(), endpoints[i].getEndpointName()));
 				Collection interfaces = desc.getWsdlInterfaces().values();
 				for (Iterator iter = interfaces.iterator(); iter.hasNext();) {
 					WSDLInterface itf = (WSDLInterface) iter.next();

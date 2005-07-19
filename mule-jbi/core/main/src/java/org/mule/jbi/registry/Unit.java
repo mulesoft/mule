@@ -22,6 +22,8 @@ import javax.jbi.JBIException;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
 public interface Unit extends Entry {
+	
+	void init() throws JBIException, IOException;
 
     /**
      * Start the item.
@@ -29,7 +31,7 @@ public interface Unit extends Entry {
      * @exception javax.jbi.JBIException if the item fails to start.
      * @throws IOException 
      */
-    String start() throws JBIException, IOException;
+    void start() throws JBIException, IOException;
 
     /**
      * Stop the item. This suspends current messaging activities.
@@ -37,7 +39,7 @@ public interface Unit extends Entry {
      * @exception javax.jbi.JBIException if the item fails to stop.
      * @throws IOException 
      */
-    String stop() throws JBIException, IOException;
+    void stop() throws JBIException, IOException;
 
     /**
      * Shut down the item. The releases resources, preparatory to 
@@ -46,7 +48,7 @@ public interface Unit extends Entry {
      * @exception javax.jbi.JBIException if the item fails to shut down.
      * @throws IOException 
      */
-    String shutDown() throws JBIException, IOException;
+    void shutDown() throws JBIException, IOException;
     
 	Component getComponent();
 	

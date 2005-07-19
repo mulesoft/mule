@@ -1,21 +1,20 @@
 /*
- * $Header$
- * $Revision$
- * $Date$
- * ------------------------------------------------------------------------------------------------------
- *
- * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * Copyright 2005 SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
  *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
+ * 
+ * ------------------------------------------------------------------------------------------------------
+ * $Header$
+ * $Revision$
+ * $Date$
  */
 package org.mule.jbi;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.List;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.InOnly;
@@ -25,17 +24,12 @@ import javax.jbi.messaging.MessageExchangeFactory;
 import javax.jbi.messaging.NormalizedMessage;
 import javax.jbi.messaging.RobustInOnly;
 import javax.jbi.servicedesc.ServiceEndpoint;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
 import junit.framework.TestCase;
 
-import org.mule.jbi.framework.ComponentRegistryImpl;
 import org.mule.jbi.framework.JbiContainerImpl;
-import org.mule.jbi.routing.RouterImpl;
-import org.mule.jbi.util.IOUtils;
 
 public class SimpleFunctionalTestCase extends TestCase {
 
@@ -44,31 +38,40 @@ public class SimpleFunctionalTestCase extends TestCase {
 	public static final String PAYLOAD = "<payload/>";
 	public static final String RESPONSE = "<response/>";
 	
-	protected JbiContainer container;
+	private JbiContainer container;
+	private TestComponent provider;
+	private TestComponent consumer;
+	private ServiceEndpoint endpoint;
 	
 	public void setUp() throws Exception {
-		IOUtils.deleteFile(new File("target/.mule-jbi"));
+		// Remove jbi workspace
+		//IOUtils.deleteFile(new File("target/.mule-jbi"));
+		// Create jbi container
 		JbiContainerImpl jbi = new JbiContainerImpl();
 		jbi.setWorkingDir(new File("target/.mule-jbi"));
-		List l = MBeanServerFactory.findMBeanServer(null);
-		if (l != null && l.size() > 0) {
-			jbi.setMBeanServer((MBeanServer) l.get(0));
-		} else {
-			jbi.setMBeanServer(MBeanServerFactory.createMBeanServer());
-		}
-		jbi.setRouter(new RouterImpl(jbi));
-		jbi.start();
 		container = jbi;
+		// Initialize jbi
+		container.initialize();
+		// Create components
+		provider = new TestComponent();
+		consumer = new TestComponent();
+		// Register components
+		container.getRegistry().addTransientEngine("provider", provider);
+		container.getRegistry().addTransientEngine("consumer", consumer);
+		// Start jbi
+		container.start();
+		// Activate endpoint
+		endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
+	}
+	
+	public void tearDown() throws Exception {
+		if (container != null) {
+			container.shutDown();
+		}
+		container = null;
 	}
 	
 	public void testInOnly() throws Exception {
-		// Create components
-		TestComponent provider = new TestComponent();
-		TestComponent consumer = new TestComponent();
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
-		// Activate endpoint
-		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
 		InOnly mec = mef.createInOnlyExchange();
@@ -91,13 +94,6 @@ public class SimpleFunctionalTestCase extends TestCase {
 	}
 	
 	public void testInOut() throws Exception {
-		// Create components
-		TestComponent provider = new TestComponent();
-		TestComponent consumer = new TestComponent();
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
-		// Activate endpoint
-		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
 		InOut mec = mef.createInOutExchange();
@@ -127,13 +123,6 @@ public class SimpleFunctionalTestCase extends TestCase {
 	}
 	
 	public void testInOutWithFault() throws Exception {
-		// Create components
-		TestComponent provider = new TestComponent();
-		TestComponent consumer = new TestComponent();
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
-		// Activate endpoint
-		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
 		InOut mec = mef.createInOutExchange();
@@ -163,13 +152,6 @@ public class SimpleFunctionalTestCase extends TestCase {
 	}
 	
 	public void testInOptOutWithRep() throws Exception {
-		// Create components
-		TestComponent provider = new TestComponent();
-		TestComponent consumer = new TestComponent();
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
-		// Activate endpoint
-		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
 		InOptionalOut mec = mef.createInOptionalOutExchange();
@@ -199,13 +181,6 @@ public class SimpleFunctionalTestCase extends TestCase {
 	}
 	
 	public void testInOptOutWithoutRep() throws Exception {
-		// Create components
-		TestComponent provider = new TestComponent();
-		TestComponent consumer = new TestComponent();
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
-		// Activate endpoint
-		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
 		InOptionalOut mec = mef.createInOptionalOutExchange();
@@ -228,13 +203,6 @@ public class SimpleFunctionalTestCase extends TestCase {
 	}
 	
 	public void testInOptOutWithProviderFault() throws Exception {
-		// Create components
-		TestComponent provider = new TestComponent();
-		TestComponent consumer = new TestComponent();
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
-		// Activate endpoint
-		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
 		InOptionalOut mec = mef.createInOptionalOutExchange();
@@ -262,13 +230,6 @@ public class SimpleFunctionalTestCase extends TestCase {
 	}
 	
 	public void testInOptOutWithRepAndConsumerFault() throws Exception {
-		// Create components
-		TestComponent provider = new TestComponent();
-		TestComponent consumer = new TestComponent();
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
-		// Activate endpoint
-		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
 		InOptionalOut mec = mef.createInOptionalOutExchange();
@@ -303,13 +264,6 @@ public class SimpleFunctionalTestCase extends TestCase {
 	}
 	
 	public void testRobustInOnly() throws Exception {
-		// Create components
-		TestComponent provider = new TestComponent();
-		TestComponent consumer = new TestComponent();
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
-		// Activate endpoint
-		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
 		RobustInOnly mec = mef.createRobustInOnlyExchange();
@@ -332,13 +286,6 @@ public class SimpleFunctionalTestCase extends TestCase {
 	}
 	
 	public void testRobustInOnlyWithFault() throws Exception {
-		// Create components
-		TestComponent provider = new TestComponent();
-		TestComponent consumer = new TestComponent();
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("provider", provider);
-		((ComponentRegistryImpl) container.getComponentRegistry()).registerTransientEngineComponent("consumer", consumer);
-		// Activate endpoint
-		ServiceEndpoint endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
 		RobustInOnly mec = mef.createRobustInOnlyExchange();

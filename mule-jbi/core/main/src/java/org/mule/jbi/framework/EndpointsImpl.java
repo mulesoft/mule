@@ -23,9 +23,12 @@ import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
 
 import org.mule.jbi.Endpoints;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.registry.Component;
 import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 import org.mule.jbi.servicedesc.ExternalEndpointImpl;
 import org.mule.jbi.servicedesc.InternalEndpointImpl;
+import org.w3c.dom.Document;
 
 /**
  * 
@@ -133,10 +136,19 @@ public class EndpointsImpl implements Endpoints {
 		for (Iterator it = endpoints.iterator(); it.hasNext();) {
 			ServiceEndpoint se = (ServiceEndpoint) it.next();
 			QName[] itfs = se.getInterfaces();
-			for (int i = 0; i < itfs.length; i++) {
-				if (itfs[i].equals(interfaceName)) {
-					ses.add(se);
-					break;
+			if (itfs == null && se instanceof InternalEndpointImpl) {
+				InternalEndpointImpl ie = (InternalEndpointImpl) se;
+				Component component = JbiContainer.Factory.getInstance().getRegistry().getComponent(ie.getComponent());
+				Document doc = component.getComponent().getServiceDescription(ie);
+				ie.parseWsdl(doc);
+				itfs = se.getInterfaces();
+			}
+			if (itfs != null) {
+				for (int i = 0; i < itfs.length; i++) {
+					if (itfs[i].equals(interfaceName)) {
+						ses.add(se);
+						break;
+					}
 				}
 			}
 		}

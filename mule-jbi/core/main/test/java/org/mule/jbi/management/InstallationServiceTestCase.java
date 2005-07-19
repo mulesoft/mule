@@ -37,22 +37,16 @@ public class InstallationServiceTestCase extends TestCase {
 		IOUtils.deleteFile(new File("target/.mule-jbi"));
 		JbiContainerImpl jbi = new JbiContainerImpl();
 		jbi.setWorkingDir(new File("target/.mule-jbi"));
-		List l = MBeanServerFactory.findMBeanServer(null);
-		if (l != null && l.size() > 0) {
-			jbi.setMBeanServer((MBeanServer) l.get(0));
-		} else {
-			jbi.setMBeanServer(MBeanServerFactory.createMBeanServer());
-		}
-		jbi.setRouter(new RouterImpl(jbi));
+		jbi.initialize();
 		jbi.start();
 		container = jbi;
 	}
 	
 	public void testInstallComponent() throws Exception {
 		Locale.setDefault(Locale.US);
-		InstallationService install = new InstallationService(container);
 		URL url = Thread.currentThread().getContextClassLoader().getResource("filebinding.jar");
-		ObjectName installON = install.loadNewInstaller(url.toString());
+		ObjectName serviceON = container.createMBeanName(null, "service", "install");
+		ObjectName installON = (ObjectName) container.getMBeanServer().invoke(serviceON, "loadNewInstaller", new Object[] { url.toString() }, new String[] { "java.lang.String" });
 		assertNotNull(installON);
 		ObjectName lifecycleON = (ObjectName) container.getMBeanServer().invoke(installON, "install", null, null);
 		assertNotNull(lifecycleON);
@@ -61,41 +55,31 @@ public class InstallationServiceTestCase extends TestCase {
 	}
 	
 	public void testInstallComponentWithInfo() throws Exception {
-		InstallationService install = new InstallationService(container);
 		URL url = Thread.currentThread().getContextClassLoader().getResource("component.zip");
-		ObjectName result = install.loadNewInstaller(url.toString());
+		ObjectName serviceON = container.createMBeanName(null, "service", "install");
+		ObjectName result = (ObjectName) container.getMBeanServer().invoke(serviceON, "loadNewInstaller", new Object[] { url.toString() }, new String[] { "java.lang.String" });
 		assertNotNull(result);
 	}
 	
 	public void testInstallBadComponent() throws Exception {
-		InstallationService install = new InstallationService(container);
 		URL url = Thread.currentThread().getContextClassLoader().getResource("wsdlsl.jar");
-		ObjectName result = install.loadNewInstaller(url.toString());
+		ObjectName serviceON = container.createMBeanName(null, "service", "install");
+		ObjectName result = (ObjectName) container.getMBeanServer().invoke(serviceON, "loadNewInstaller", new Object[] { url.toString() }, new String[] { "java.lang.String" });
 		assertNull(result);
 	}
 	
 	public void testInstallSharedLibrary() throws Exception {
-		InstallationService install = new InstallationService(container);
 		URL url = Thread.currentThread().getContextClassLoader().getResource("wsdlsl.jar");
-		String result = install.installSharedLibrary(url.toString());
+		ObjectName serviceON = container.createMBeanName(null, "service", "install");
+		String result = (String) container.getMBeanServer().invoke(serviceON, "installSharedLibrary", new Object[] { url.toString() }, new String[] { "java.lang.String" });
 		assertNotNull(result);
 	}
 	
 	public void testInstallBadSharedLibrary() throws Exception {
-		InstallationService install = new InstallationService(container);
 		URL url = Thread.currentThread().getContextClassLoader().getResource("filebinding.jar");
-		String result = install.installSharedLibrary(url.toString());
+		ObjectName serviceON = container.createMBeanName(null, "service", "install");
+		String result = (String) container.getMBeanServer().invoke(serviceON, "installSharedLibrary", new Object[] { url.toString() }, new String[] { "java.lang.String" });
 		assertNull(result);
-	}
-	
-	public void testInstallUninstallReinstallSharedLibrary() throws Exception {
-		InstallationService install = new InstallationService(container);
-		URL url = Thread.currentThread().getContextClassLoader().getResource("wsdlsl.jar");
-		String result = install.installSharedLibrary(url.toString());
-		assertNotNull(result);
-		assertTrue(install.uninstallSharedLibrary(result));
-		result = install.installSharedLibrary(url.toString());
-		assertNotNull(result);
 	}
 	
 }

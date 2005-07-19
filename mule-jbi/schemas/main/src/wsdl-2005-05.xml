@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE xs:schema PUBLIC "-//W3C//DTD XMLSCHEMA 200102//EN" "http://www.w3.org/2001/XMLSchema.dtd">
+<!-- $Id$ -->
+<!-- 
+   W3C XML Schema defined in the Web Services Description (WSDL)
+    Version 2.0 specification
+     http://www.w3.org/TR/wsdl20
+
+   Copyright (c) 2005 World Wide Web Consortium,
+  
+   (Massachusetts Institute of Technology, European Research Consortium for
+   Informatics and Mathematics, Keio University). All Rights Reserved. This
+   work is distributed under the W3C(r) Software License [1] in the hope that
+   it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  
+   [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://www.w3.org/2005/05/wsdl" targetNamespace="http://www.w3.org/2005/05/wsdl" elementFormDefault="qualified">
+
+  <xs:element name="documentation" type="wsdl:DocumentationType"/>
+  <xs:complexType name="DocumentationType" mixed="true">
+    <xs:sequence>
+      <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DocumentedType">
+    <xs:annotation>
+      <xs:documentation>
+      This type is extended by component types to allow them to be documented.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element ref="wsdl:documentation" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ExtensibleDocumentedType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+      This type is extended by component types to allow 
+      attributes from other namespaces to be added.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="wsdl:DocumentedType">
+	    <xs:anyAttribute namespace="##other" processContents="lax"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- description element decl and type def -->
+  <xs:element name="description" type="wsdl:DescriptionType">
+    <xs:unique name="interface">
+      <xs:selector xpath="wsdl:interface"/>
+      <xs:field xpath="@name"/>
+    </xs:unique>
+    <xs:unique name="binding">
+      <xs:selector xpath="wsdl:binding"/>
+      <xs:field xpath="@name"/>
+    </xs:unique>
+    <xs:unique name="service">
+      <xs:selector xpath="wsdl:service"/>
+      <xs:field xpath="@name"/>
+    </xs:unique>
+  </xs:element>
+
+  <xs:complexType name="DescriptionType">
+    <xs:annotation>
+      <xs:documentation>
+        Please refer to the WSDL 2.0 specification for
+	additional constraints on the contents of this type.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="wsdl:import"/>
+          <xs:element ref="wsdl:include"/>
+          <xs:element ref="wsdl:types"/>
+          <xs:element ref="wsdl:interface"/>
+	      <xs:element ref="wsdl:binding"/>
+	      <xs:element ref="wsdl:service"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+	<xs:attribute name="targetNamespace" type="xs:anyURI" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- types for import and include elements -->
+  <xs:element name="import" type="wsdl:ImportType"/>
+  <xs:complexType name="ImportType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:attribute name="namespace" type="xs:anyURI" use="required"/>
+        <xs:attribute name="location" type="xs:anyURI" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="include" type="wsdl:IncludeType"/>
+  <xs:complexType name="IncludeType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:attribute name="location" type="xs:anyURI" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="types" type="wsdl:TypesType"/>
+  <xs:complexType name="TypesType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+	    <xs:sequence>
+	      <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
+	    </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- parts related to wsdl:interface -->
+  <xs:element name="interface" type="wsdl:InterfaceType">
+	<xs:unique name="operation">
+	  <xs:selector xpath="wsdl:operation"/>
+	  <xs:field xpath="@name"/>
+	</xs:unique>
+	<xs:unique name="fault">
+	  <xs:selector xpath="wsdl:fault"/>
+	  <xs:field xpath="@name"/>
+	</xs:unique>
+  </xs:element>
+  <xs:complexType name="InterfaceType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="operation" type="wsdl:InterfaceOperationType"/>
+          <xs:element name="fault" type="wsdl:InterfaceFaultType"/>
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:NCName" use="required"/>
+        <xs:attribute name="extends" use="optional">
+		  <xs:simpleType>
+		    <xs:list itemType="xs:QName"/>
+		  </xs:simpleType>
+	</xs:attribute>
+        <xs:attribute name="styleDefault" use="optional">
+		  <xs:simpleType>
+		    <xs:list itemType="xs:anyURI"/>
+		  </xs:simpleType>
+	</xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="InterfaceOperationType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="input" type="wsdl:MessageRefType"/>
+          <xs:element name="output" type="wsdl:MessageRefType"/>
+          <xs:element name="infault" type="wsdl:MessageRefFaultType"/>
+          <xs:element name="outfault" type="wsdl:MessageRefFaultType"/>
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:NCName" use="required"/>
+        <xs:attribute name="pattern" type="xs:anyURI" use="required"/>
+        <xs:attribute name="style" type="xs:anyURI" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="MessageRefType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="messageLabel" type="xs:NCName" use="optional"/>
+        <xs:attribute name="element" type="wsdl:ElementReferenceType" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="ElementReferenceType">
+    <xs:annotation>
+      <xs:documentation>
+      Use the QName of a GED that describes the content, 
+      #any for any content, 
+      #none for empty content, or 
+      #other for content described by some other extension attribute that references a declaration in a non-XML extension type system.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="xs:QName">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="#any"/>
+          <xs:enumeration value="#none"/>
+          <xs:enumeration value="#other"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:complexType name="MessageRefFaultType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="ref" type="xs:QName" use="required"/>
+        <xs:attribute name="messageLabel" type="xs:NCName" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="InterfaceFaultType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:NCName" use="required"/>
+        <xs:attribute name="element" type="xs:QName" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="feature" type="wsdl:FeatureType"/>
+  <xs:complexType name="FeatureType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="uri" type="xs:QName" use="required"/>
+        <xs:attribute name="required" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="property" type="wsdl:PropertyType"/>
+  <xs:complexType name="PropertyType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:sequence>
+          <xs:choice minOccurs="0">
+            <xs:element name="value" type="xs:anyType"/>
+            <xs:element name="constraint" type="xs:QName"/>
+          </xs:choice>
+          <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="uri" type="xs:QName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- types related to wsdl:binding -->
+  <xs:element name="binding" type="wsdl:BindingType"/>
+  <xs:complexType name="BindingType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="operation" type="wsdl:BindingOperationType"/>
+          <xs:element name="fault" type="wsdl:BindingFaultType"/>
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:NCName" use="required"/>
+        <xs:attribute name="type" type="xs:anyURI" use="required"/>
+        <xs:attribute name="interface" type="xs:QName" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="BindingOperationType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="input" type="wsdl:BindingOperationMessageType"/>
+          <xs:element name="output" type="wsdl:BindingOperationMessageType"/>
+          <xs:element name="infault" type="wsdl:BindingOperationFaultType"/>
+          <xs:element name="outfault" type="wsdl:BindingOperationFaultType"/>
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="ref" type="xs:QName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="BindingOperationMessageType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="messageLabel" type="xs:NCName" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="BindingOperationFaultType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="ref" type="xs:QName" use="required"/>
+        <xs:attribute name="messageLabel" type="xs:NCName" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="BindingFaultType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="ref" type="xs:QName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- types related to service -->
+  <xs:element name="service" type="wsdl:ServiceType">
+	<xs:unique name="endpoint">
+	  <xs:selector xpath="wsdl:endpoint"/>
+	  <xs:field xpath="@name"/>
+	</xs:unique>
+  </xs:element>
+  <xs:complexType name="ServiceType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="1" maxOccurs="unbounded">
+          <xs:element ref="wsdl:endpoint"/>
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:NCName" use="optional"/>
+        <xs:attribute name="interface" type="xs:QName" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:element name="endpoint" type="wsdl:EndpointType"/>
+  <xs:complexType name="EndpointType">
+    <xs:complexContent>
+      <xs:extension base="wsdl:ExtensibleDocumentedType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="wsdl:feature"/>
+          <xs:element ref="wsdl:property"/>
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:NCName" use="optional"/>
+        <xs:attribute name="binding" type="xs:QName" use="required"/>
+        <xs:attribute name="address" type="xs:anyURI" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:attribute name="required" type="xs:boolean"/>
+
+  <xs:complexType name="ExtensibilityElement" abstract="true">
+    <xs:annotation>
+	  <xs:documentation>
+	  This abstract type is intended to serve as the base type for
+      extensibility elements. It includes the wsdl:required attribute
+      which it is anticipated will be used by most extension elements
+	  </xs:documentation>
+	</xs:annotation>
+    <xs:attribute ref="wsdl:required" use="optional"/>
+  </xs:complexType>
+
+</xs:schema>

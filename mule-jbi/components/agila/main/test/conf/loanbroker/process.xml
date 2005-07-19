@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process name="loanApprovalProcess"
+    targetNamespace="http://www.apache.org/agila/samples/exemple1/process/"
+    xmlns="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+    xmlns:lns="http://www.apache.org/agila/samples/exemple1/definition/">
+
+    <correlationSets>
+        <correlationSet properties="lns:customerFirstName lns:customerLastName" name="requestCorr"/>
+        <correlationSet properties="lns:workitem" name="workCorr"/>
+    </correlationSets>
+
+    <partnerLinks>
+        <partnerLink name="loaner" partnerLinkType="lns:loanPartnerLinkType" myRole="loanService"/>
+        <partnerLink name="customer" partnerLinkType="lns:loanPartnerLinkType" partnerRole="customerService"/>
+
+        <partnerLink name="assessor" partnerLinkType="lns:riskAssessmentLinkType" partnerRole="assessor"/>
+        <partnerLink name="assessmentReceiver" partnerLinkType="lns:riskAssessmentLinkType" myRole="assessmentReceiver"/>
+    </partnerLinks>
+
+    <variables>
+        <variable name="request" messageType="lns:creditInformationMessage"/>
+        <variable name="risk" messageType="lns:riskAssessmentMessage"/>
+        <variable name="approval" messageType="lns:approvalMessage"/>
+        <variable name="loanwork" messageType="lns:loanApprovalRequestMessage"/>
+        <variable name="loanMgrAnswer" messageType="lns:approvalMessage"/>
+        <variable name="workAnswer" messageType="lns:answerMessage"/>
+    </variables>
+
+    <sequence>
+        <receive partnerLink="loaner" portType="lns:loanService" operation="request"
+            variable="request" createInstance="yes">
+            <correlations>
+                <correlation set="requestCorr" initiate="true"/>
+            </correlations>
+        </receive>
+
+        <invoke partnerLink="assessor" portType="lns:riskAssessment" operation="check"
+            inputVariable="request">
+            <correlations>
+                <correlation set="requestCorr"/>
+            </correlations>
+        </invoke>
+        <receive partnerLink="assessmentReceiver" portType="lns:riskReceiver" operation="receiveRisk"
+            variable="risk">
+            <correlations>
+                <correlation set="requestCorr"/>
+            </correlations>
+        </receive>
+
+        <switch>
+            <case condition="bpws:getVariableData('request','amount')&lt;10000 and bpws:getVariableData('risk','level')='low'">
+                <assign>
+                    <copy>
+                        <from expression="'yes'"/>
+                        <to variable="approval" part="accept"/>
+                    </copy>
+                </assign>
+            </case>
+            <otherwise>
+                <sequence>
+                    <!-- Create a Work Item for a loan manager -->
+                    <assign>
+                        <copy>
+                            <from>loanmanager</from>
+                            <to variable="loanwork" part="wipart" query="/user"/>
+                        </copy>
+                        <copy>
+                            <from>Validate this loan request</from>
+                            <to variable="loanwork" part="wipart" query="/description"/>
+                        </copy>
+                        <copy>
+                            <from variable="request" part="firstName"/>
+                            <to variable="loanwork" part="firstName"/>
+                        </copy>
+                        <copy>
+                            <from variable="request" part="lastName"/>
+                            <to variable="loanwork" part="lastName"/>
+                        </copy>
+                    </assign>
+                    <invoke partnerLink="approver" portType="WorkListPT" operation="createWork"
+                        inputVariable="loanwork" outputVariable="workAnswer">
+                        <correlations>
+                            <correlation set="workCorr" initiate="true" pattern="in"/>
+                        </correlations>
+                    </invoke>
+                    <receive partnerLink="WorkListMgr" portType="WorkListAnswerPT" operation="receiveAnswer"
+                        variable="loanMgrAnswer">
+                        <correlations>
+                            <correlation set="workCorr"/>
+                        </correlations>
+                    </receive>
+                    <!-- We should copy from the loanMgrAnswer variable instead of a static assignment-->
+                    <assign>
+                        <copy>
+                            <from variable="loanMgrAnswer" part="accept" />
+                            <to variable="approval" part="accept"/>
+                        </copy>
+                    </assign>
+                </sequence>
+            </otherwise>
+        </switch>
+
+        <invoke partnerLink="customer" portType="lns:loanService" operation="response"
+            inputVariable="approval">
+            <correlations>
+                <correlation set="requestCorr" initiate="false"/>
+            </correlations>
+        </invoke>
+    </sequence>
+
+</process>

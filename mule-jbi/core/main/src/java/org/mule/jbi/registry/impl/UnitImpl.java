@@ -64,36 +64,42 @@ public class UnitImpl extends AbstractEntry implements Unit {
 			throw new JBIException("Illegal status: " + getCurrentState());
 		}
 		String result = getServiceUnitManager().deploy(getName(), getInstallRoot());
+		getServiceUnitManager().init(getName(), getInstallRoot());
 		// TODO: analyse result
 		((AbstractComponent) getComponent()).addUnit(this);
 		((AssemblyImpl) getAssembly()).addUnit(this);
-		setCurrentState(SHUTDOWN);
+		setCurrentState(STOPPED);
 		return result;
 	}
 
 	/* (non-Javadoc)
+	 * @see org.mule.jbi.registry.Unit#init()
+	 */
+	public synchronized void init() throws JBIException, IOException {
+		if (!getCurrentState().equals(UNKNOWN)) {
+			throw new JBIException("Illegal status: " + getCurrentState());
+		}
+		getServiceUnitManager().init(getName(), getInstallRoot());
+		setCurrentState(STOPPED);
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.mule.jbi.registry.Unit#start()
 	 */
-	public synchronized String start() throws JBIException, IOException {
+	public synchronized void start() throws JBIException, IOException {
 		if (getCurrentState().equals(UNKNOWN)) {
 			throw new JBIException("Illegal status: " + getCurrentState());
 		}
 		if (!getCurrentState().equals(RUNNING)) {
-			if (getCurrentState().equals(SHUTDOWN)) {
-				getServiceUnitManager().init(getName(), getInstallRoot());
-				setCurrentState(STOPPED);
-			}
 			getServiceUnitManager().start(getName());
 			setCurrentState(RUNNING);
 		}
-		// TODO
-		return "";
 	}
 
 	/* (non-Javadoc)
 	 * @see org.mule.jbi.registry.Unit#stop()
 	 */
-	public synchronized String stop() throws JBIException, IOException {
+	public synchronized void stop() throws JBIException, IOException {
 		if (getCurrentState().equals(UNKNOWN) || getCurrentState().equals(SHUTDOWN)) {
 			throw new JBIException("Illegal status: " + getCurrentState());
 		}
@@ -101,14 +107,12 @@ public class UnitImpl extends AbstractEntry implements Unit {
 			getServiceUnitManager().stop(getName());
 			setCurrentState(STOPPED);
 		}
-		// TODO:
-		return "";
 	}
 
 	/* (non-Javadoc)
 	 * @see org.mule.jbi.registry.Unit#shutDown()
 	 */
-	public synchronized String shutDown() throws JBIException, IOException {
+	public synchronized void shutDown() throws JBIException, IOException {
 		if (getCurrentState().equals(UNKNOWN)) {
 			throw new JBIException("Illegal status: " + getCurrentState());
 		}
@@ -117,8 +121,6 @@ public class UnitImpl extends AbstractEntry implements Unit {
 			getServiceUnitManager().shutDown(getName());
 			setCurrentState(SHUTDOWN);
 		}
-		// TODO
-		return "";
 	}
 	
 	/* (non-Javadoc)

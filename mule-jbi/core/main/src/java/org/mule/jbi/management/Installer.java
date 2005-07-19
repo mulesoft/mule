@@ -269,7 +269,7 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 	}
 
 	public String getWorkspaceRoot() {
-		return this.container.getWorkingDir().getAbsolutePath();
+		return this.component.getWorkspaceRoot();
 	}
 
 	public ObjectName createCustomComponentMBeanName(String customName) {

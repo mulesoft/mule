@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <name>Mule JBI File Binding Component</name>
+    <groupId>mule</groupId>
+    <artifactId>mule-jbi-file</artifactId>
+    <dependencies>
+    </dependencies>
+</project>
