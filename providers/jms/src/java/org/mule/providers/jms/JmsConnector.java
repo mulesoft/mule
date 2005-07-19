@@ -14,19 +14,8 @@
 
 package org.mule.providers.jms;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Hashtable;
-import java.util.Map;
-
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import javax.jms.XAConnectionFactory;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
@@ -45,11 +34,20 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnectable;
+import org.mule.util.BeanUtils;
 import org.mule.util.ClassHelper;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.jms.XAConnectionFactory;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be
@@ -87,7 +85,9 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
 
     private boolean persistentDelivery;
 
-    private Map providerProperties;
+    private Map jndiProviderProperties;
+
+    private Map connectionFactoryProperties;
 
     private Connection connection;
 
@@ -144,6 +144,10 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
             if (connectionFactory == null) {
             	connectionFactory = createConnectionFactory();
             }
+            if (connectionFactoryProperties != null && !connectionFactoryProperties.isEmpty()) {
+                // apply connection factory properties
+                BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
+            }
         } catch (Exception e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jms Connector"), e, this);
         }
@@ -157,15 +161,15 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
 
             if (jndiInitialFactory != null) {
                 props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
-            } else if (providerProperties == null || !providerProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY)) {
+            } else if (jndiProviderProperties == null || !jndiProviderProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY)) {
                 throw new InitialisationException(new Message(Messages.X_IS_NULL, "jndiInitialFactory"), this);
             }
 
             if (jndiProviderUrl != null)
                 props.put(Context.PROVIDER_URL, jndiProviderUrl);
 
-            if (providerProperties != null) {
-                props.putAll(providerProperties);
+            if (jndiProviderProperties != null) {
+                props.putAll(jndiProviderProperties);
             }
             jndiContext = new InitialContext(props);
         }
@@ -471,19 +475,56 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
     }
 
     /**
-     * @return Returns the endpointProperties.
+     * @return Returns the JNDI providerProperties.
+     * @deprecated use #getJndiProviderProperties
      */
     public Map getProviderProperties()
     {
-        return providerProperties;
+        return jndiProviderProperties;
     }
 
     /**
-     * @param endpointProperties The endpointProperties to set.
+     * @param providerProperties The JNDI providerProperties to set.
+     * @deprecated use #setJndiProviderProperties
      */
-    public void setProviderProperties(Map endpointProperties)
+    public void setProviderProperties(Map providerProperties)
     {
-        this.providerProperties = endpointProperties;
+        this.jndiProviderProperties = providerProperties;
+    }
+
+    /**
+     * @return Returns the JNDI providerProperties.
+     * @since 1.1
+     */
+    public Map getJndiProviderProperties()
+    {
+        return jndiProviderProperties;
+    }
+
+    /**
+     * @param jndiProviderProperties The JNDI providerProperties to set.
+     * @since 1.1
+     */
+    public void setJndiProviderProperties(final Map jndiProviderProperties)
+    {
+        this.jndiProviderProperties = jndiProviderProperties;
+    }
+
+    /**
+     * @return Returns underlying connection factory properties.
+     */
+    public Map getConnectionFactoryProperties()
+    {
+        return connectionFactoryProperties;
+    }
+
+    /**
+     * @param connectionFactoryProperties properties to be set
+     *        on the underlying ConnectionFactory.
+     */
+    public void setConnectionFactoryProperties(final Map connectionFactoryProperties)
+    {
+        this.connectionFactoryProperties = connectionFactoryProperties;
     }
 
     public String getJndiInitialFactory()

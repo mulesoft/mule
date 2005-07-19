@@ -47,16 +47,6 @@ of all the parameters.
             </properties>
 
         </mule-descriptor>
-<!--        <mule-descriptor name="HTTPPostSample"-->
-<!--            inboundEndpoint="stream://System.in"-->
-<!--            outboundEndpoint="stream://System.out"-->
-<!--            outboundTransformer="SgmlDecoder Xslt XmlToObject"-->
-<!--            implementation="org.mule.components.simple.StaticComponent">-->
-<!---->
-<!--            <properties>-->
-<!--                <property name="dataFile" value="stock.xml"/>-->
-<!--            </properties>-->
-<!---->
-<!--        </mule-descriptor>-->
+
     </model>
 </mule-configuration>
