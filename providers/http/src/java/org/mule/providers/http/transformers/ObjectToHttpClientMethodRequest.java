@@ -159,7 +159,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
     private int addParameters(String param, PostMethod postMethod)
     {
         //Parse the HTTP argument list and convert to a NameValuePair collection
-
+        if(param==null || "".equals(param)) {
+            return 0;
+        }
         int equals;
         String currentParam;
         equals = param.indexOf("&");
