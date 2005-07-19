@@ -31,7 +31,7 @@
             %><li><%=iter.next().toString()%></li><%
         }%>
         </ol>
-        <p/>You can view the statistics for these requests <a href="http://localhost:9092/InvokeAction//Mule%3Atype%3Dstatistics/action=printHtmlSummary?action=printHtmlSummary">here</a>.</b>
+        <p/>You can view the statistics for these requests <a href="http://localhost:9092/InvokeAction//Mule%3Atype%3Dstatistics/action=printHtmlSummary?action=printHtmlSummary">here</a>.
         <%
     } else if(amountString!=null && durationString!=null && name!=null) {
         MuleClient client = new MuleClient();
@@ -51,7 +51,7 @@
         </td></tr>
     </table>
 </form>
-<br/>- Or -</br>
+<br/>- Or -<br/>
 <form method="POST" name="submitRequest" action="">
     Please enter your Loan Details:
 	<table>
