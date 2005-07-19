@@ -199,7 +199,9 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                 }
             }
         };
-        digester.setEntityResolver(new MuleDtdResolver());
+
+         String dtd = System.getProperty("org.mule.xml.dtd", MuleDtdResolver.DEFAULT_MULE_DTD);
+        digester.setEntityResolver(new MuleDtdResolver(dtd));
 
         String temp = System.getProperty("org.mule.xml.validate", "true");
         digester.setValidating((temp.equalsIgnoreCase("true")));
