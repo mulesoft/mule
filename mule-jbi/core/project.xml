@@ -89,5 +89,10 @@
             <artifactId>concurrent</artifactId>
             <version>${concurrent_version}</version>
         </dependency>
+        <dependency>
+            <groupId>xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>${xstream_version}</version>
+        </dependency>
     </dependencies>
 </project>
