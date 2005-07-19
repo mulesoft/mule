@@ -13,7 +13,7 @@
  */
 package org.mule.providers.file;
 
-import org.mule.umo.UMOEvent;
+import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * <code>FilenameParser</code> is a simple expression parser interface for
@@ -24,5 +24,5 @@ import org.mule.umo.UMOEvent;
  */
 public interface FilenameParser
 {
-    public String getFilename(UMOEvent event, String pattern);
+    public String getFilename(UMOMessageAdapter adaptor, String pattern);
 }

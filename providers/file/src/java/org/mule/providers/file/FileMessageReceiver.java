@@ -15,9 +15,6 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -25,12 +22,16 @@ import org.mule.impl.MuleMessage;
 import org.mule.providers.ConnectException;
 import org.mule.providers.PollingMessageReceiver;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.Utility;
+
+import java.io.File;
+import java.io.FilenameFilter;
 
 /**
  * <code>FileMessageReceiver</code> is a polling listener that reads files
@@ -109,10 +110,12 @@ public class FileMessageReceiver extends PollingMessageReceiver
         }
     }
 
-    public synchronized void processFile(File file) throws MuleException
+    public synchronized void processFile(File file) throws UMOException
     {
         File destinationFile = null;
         String orginalFilename = file.getName();
+        UMOMessageAdapter msgAdapter = connector.getMessageAdapter(file);
+        msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, orginalFilename);
         if (moveDir != null) {
             String fileName = file.getName();
             if (moveToPattern != null) {
@@ -136,8 +139,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
                     }
                     file = destinationFile;
                 }
-                UMOMessageAdapter msgAdapter = connector.getMessageAdapter(file);
-                msgAdapter.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, orginalFilename);
+
                 if (((FileConnector) connector).isAutoDelete()) {
                     msgAdapter.getPayloadAsBytes();
 

@@ -13,7 +13,7 @@
  */
 package org.mule.providers.file;
 
-import org.mule.umo.UMOEvent;
+import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.UUID;
 import org.mule.util.Utility;
 
@@ -44,19 +44,19 @@ public class SimpleFilenameParser implements FilenameParser
 
     private long count = 1;
 
-    public String getFilename(UMOEvent event, String pattern)
+    public String getFilename(UMOMessageAdapter adaptor, String pattern)
     {
         String result = null;
         if (pattern != null && pattern.indexOf('{') > -1) {
-            result = getFilename(event, pattern, '{', '}');
+            result = getFilename(adaptor, pattern, '{', '}');
         } else {
-            result = getFilename(event, pattern, '[', ']');
+            result = getFilename(adaptor, pattern, '[', ']');
         }
 
         return result;
     }
 
-    protected String getFilename(UMOEvent event, String pattern, char left, char right)
+    protected String getFilename(UMOMessageAdapter adaptor, String pattern, char left, char right)
     {
         String filename = pattern;
         if (pattern == null) {
@@ -92,8 +92,8 @@ public class SimpleFilenameParser implements FilenameParser
                 filename = filename.replaceAll("\\$\\" + left + "COUNT\\" + right, String.valueOf(getCount()));
             }
             index = pattern.indexOf("$" + left + "ORIGINALNAME" + right);
-            if (index > -1 && event != null) {
-                String name = (String) event.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
+            if (index > -1 && adaptor != null) {
+                String name = (String) adaptor.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
                 if (name != null) {
                     filename = filename.replaceAll("\\$\\" + left + "ORIGINALNAME\\" + right, name);
                 }
