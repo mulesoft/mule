@@ -61,7 +61,16 @@
     </transformers>
 
     <global-endpoints>
-        <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ"/>
+        <endpoint name="fruitBowlEndpoint" address="test://fruitBowlPublishQ">
+            <filter className="org.mule.routing.filters.xml.JXPathFilter" expression="name">
+                <properties>
+                    <property name="value" value="bar"/>
+                    <map name="namespaces">
+                        <property name="foo" value="http://foo.com"/>
+                    </map>
+                </properties>
+            </filter>
+        </endpoint>
         <endpoint name="waterMelonEndpoint" address="Test Queue"/>
         <endpoint name="appleInEndpoint" type="receiver" address="test://AppleQueue"/>
         <endpoint name="appleResponseEndpoint" type="receiver" address="test://AppleResponseQueue"/>

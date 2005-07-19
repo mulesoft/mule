@@ -13,6 +13,7 @@
  */
 package org.mule.routing.filters.xml;
 
+import org.apache.commons.jxpath.AbstractFactory;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +21,9 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>JXPathFilter</code> evaluates an XPath expression against an Xml
@@ -36,6 +40,14 @@ public class JXPathFilter implements UMOFilter
     private String expression;
 
     private String value;
+
+    private Map namespaces = null;
+
+    private Map contextProperties = null;
+
+    private AbstractFactory factory;
+
+    private boolean lenient = true;
 
     public boolean accept(UMOMessage obj)
     {
@@ -69,6 +81,7 @@ public class JXPathFilter implements UMOFilter
                 o = doc.valueOf(expression);
             } else {
                 JXPathContext context = JXPathContext.newContext(obj);
+                initialise(context);
                 o = context.getValue(expression);
             }
 
@@ -91,6 +104,29 @@ public class JXPathFilter implements UMOFilter
         }
         return res;
 
+    }
+
+    protected void initialise(JXPathContext context)
+    {
+        Map.Entry entry = null;
+        if(namespaces!=null) {
+            for (Iterator iterator = namespaces.entrySet().iterator(); iterator.hasNext();) {
+                entry = (Map.Entry) iterator.next();
+                context.registerNamespace(entry.getKey().toString(), entry.getValue().toString());
+            }
+        }
+
+        if(contextProperties!=null) {
+            for (Iterator iterator = namespaces.entrySet().iterator(); iterator.hasNext();) {
+                entry = (Map.Entry) iterator.next();
+                context.setValue(entry.getKey().toString(), entry.getValue());
+            }
+        }
+
+        if(factory!=null) {
+            context.setFactory(factory);
+        }
+        context.setLenient(lenient);
     }
 
     /**
@@ -123,5 +159,37 @@ public class JXPathFilter implements UMOFilter
     public void setValue(String value)
     {
         this.value = value;
+    }
+
+    public Map getNamespaces() {
+        return namespaces;
+    }
+
+    public void setNamespaces(Map namespaces) {
+        this.namespaces = namespaces;
+    }
+
+    public Map getContextProperties() {
+        return contextProperties;
+    }
+
+    public void setContextProperties(Map contextProperties) {
+        this.contextProperties = contextProperties;
+    }
+
+    public AbstractFactory getFactory() {
+        return factory;
+    }
+
+    public void setFactory(AbstractFactory factory) {
+        this.factory = factory;
+    }
+
+    public boolean isLenient() {
+        return lenient;
+    }
+
+    public void setLenient(boolean lenient) {
+        this.lenient = lenient;
     }
 }

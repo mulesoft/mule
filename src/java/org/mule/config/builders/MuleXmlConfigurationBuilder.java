@@ -14,32 +14,6 @@
 
 package org.mule.config.builders;
 
-import java.beans.ExceptionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.digester.CallMethodRule;
@@ -121,6 +95,31 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.beans.ExceptionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that
@@ -975,6 +974,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         path += "/left-filter";
         digester.addObjectCreate(path, FILTER_INTERFACE, "className");
         addSetPropertiesRule(path, digester);
+        addMulePropertiesRule(path, digester, true);
         digester.addSetNext(path, "setLeftFilter");
     }
 
@@ -983,6 +983,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         path += "/right-filter";
         digester.addObjectCreate(path, FILTER_INTERFACE, "className");
         addSetPropertiesRule(path, digester);
+        addMulePropertiesRule(path, digester, true);
         digester.addSetNext(path, "setRightFilter");
     }
 
@@ -991,6 +992,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         path += "/filter";
         digester.addObjectCreate(path, FILTER_INTERFACE, "className");
         addSetPropertiesRule(path, digester);
+        addMulePropertiesRule(path, digester, true);
         digester.addSetNext(path, "setFilter");
     }
 

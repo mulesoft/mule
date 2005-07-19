@@ -14,9 +14,6 @@
 
 package org.mule.tck;
 
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
@@ -38,6 +35,7 @@ import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.logic.AndFilter;
+import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.outbound.FilteringOutboundRouter;
@@ -66,6 +64,9 @@ import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -122,6 +123,11 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint("fruitBowlEndpoint");
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
+        assertNotNull(endpoint.getFilter());
+        JXPathFilter filter = (JXPathFilter)endpoint.getFilter();
+        assertEquals("name", filter.getExpression());
+        assertEquals("bar", filter.getValue());
+        assertEquals("http://foo.com", filter.getNamespaces().get("foo"));
     }
 
     public void testEndpointConfig()
