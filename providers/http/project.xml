@@ -22,6 +22,15 @@
             </properties>
         </dependency>
         <dependency>
+            <artifactId>org.mortbay.jetty</artifactId>
+            <groupId>jetty</groupId>
+            <version>${jetty_version}</version>
+            <url>http://jetty.mortbay.com</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+            </properties>
+        </dependency>
+        <dependency>
             <groupId>mule</groupId>
             <artifactId>mule-tcp-provider</artifactId>
             <version>${pom.currentVersion}</version>

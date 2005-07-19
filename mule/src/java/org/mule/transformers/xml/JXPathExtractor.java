@@ -14,10 +14,8 @@
 package org.mule.transformers.xml;
 
 import org.apache.commons.jxpath.JXPathContext;
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
-import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
@@ -30,8 +28,6 @@ import org.mule.umo.transformer.TransformerException;
  */
 public class JXPathExtractor extends AbstractTransformer
 {
-
-    private static final Logger logger = Logger.getLogger(JXPathFilter.class);
 
     private String expression;
 

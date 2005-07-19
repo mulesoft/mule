@@ -18,8 +18,7 @@ import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.http.HttpConnector;
-import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
+import org.mule.providers.http.jetty.JettyConnector;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
@@ -30,7 +29,7 @@ import java.net.URI;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
+public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 {
     protected static final String TEST_MESSAGE = "Test Http Request";
 
@@ -39,7 +38,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     protected UMOEndpointURI getInDest()
     {
         try {
-            return new MuleEndpointURI("http://localhost:60198");
+            return new MuleEndpointURI("jetty:http://localhost:60198");
         } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
@@ -49,7 +48,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     protected UMOEndpointURI getOutDest()
     {
         try {
-            return new MuleEndpointURI("http://localhost:60199");
+            return new MuleEndpointURI("jetty:http://localhost:60199");
         } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
@@ -58,9 +57,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected UMOConnector createConnector() throws Exception
     {
-        HttpConnector connector = new HttpConnector();
-        connector.setName("testHttp");
-        connector.getDispatcherThreadingProfile().setDoThreading(false);
+        JettyConnector connector = new JettyConnector();
+        connector.setName("testJettyHttp");
+
         return connector;
     }
 
@@ -73,10 +72,12 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         cnn = new HttpConnection(uri.getHost(), uri.getPort());
         postMethod.execute(new HttpState(), cnn);
     }
-
+//
     protected void receiveAndTestResults() throws Exception
     {
+        Thread.sleep(3000);
         byte[] buf = new byte[1024 * 4];
+        assertTrue(cnn.isResponseAvailable());
         int len = cnn.getResponseInputStream().read(buf);
         if (len < 1) {
             fail("Nothing was sent back in the response");
@@ -84,15 +85,6 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         String msg = new String(buf, 0, len);
 
         assertNotNull(msg);
-        assertEquals(TEST_MESSAGE + " Received", msg);
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        try {
-            cnn.close();
-        } catch (Exception e) {
-
-        }
+        assertEquals(TEST_MESSAGE + "\n Received", msg);
     }
 }

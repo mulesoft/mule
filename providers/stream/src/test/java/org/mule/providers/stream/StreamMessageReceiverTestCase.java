@@ -12,18 +12,17 @@
 
 package org.mule.providers.stream;
 
+import com.mockobjects.dynamic.Mock;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
-
-import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -42,7 +41,6 @@ public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCa
     public void testOtherProperties() throws Exception
     {
         StreamMessageReceiver receiver = (StreamMessageReceiver) getMessageReceiver();
-        UMOEndpoint endpoint = getTestEndpoint("test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
 
         MuleDescriptor descriptor = getTestDescriptor("orange", Orange.class.getName());
         assertNotNull(descriptor);
@@ -69,6 +67,12 @@ public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCa
      */
     public UMOMessageReceiver getMessageReceiver() throws InitialisationException
     {
-        return new StreamMessageReceiver(connector, component, endpoint, System.in, new Long(1000));
+        return new StreamMessageReceiver(endpoint.getConnector(), component, endpoint, System.in, new Long(1000));
+    }
+
+    public UMOEndpoint getEndpoint() throws Exception
+    {
+        endpoint = new MuleEndpoint("stream://System", true);
+        return endpoint;
     }
 }

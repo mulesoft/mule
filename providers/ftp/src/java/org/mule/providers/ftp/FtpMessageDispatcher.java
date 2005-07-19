@@ -14,15 +14,15 @@
  */
 package org.mule.providers.ftp;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
 import org.apache.commons.net.ftp.FTPClient;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -105,7 +105,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         if (pattern == null) {
             pattern = connector.getOutputPattern();
         }
-        return connector.getFilenameParser().getFilename(event, pattern);
+        return connector.getFilenameParser().getFilename(event.getMessage(), pattern);
     }
 
 }

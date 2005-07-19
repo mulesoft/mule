@@ -14,10 +14,6 @@
  */
 package org.mule.providers.file;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
@@ -28,6 +24,10 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.Utility;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the
@@ -192,7 +192,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         if (pattern == null) {
             pattern = connector.getOutputPattern();
         }
-        return connector.getFilenameParser().getFilename(event, pattern);
+        return connector.getFilenameParser().getFilename(event.getMessage(), pattern);
     }
 
     public void doDispose()

@@ -15,24 +15,18 @@
 
 package org.mule.test.providers.file;
 
-import java.io.File;
-
+import com.mockobjects.dynamic.Mock;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FileMessageReceiver;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import com.mockobjects.dynamic.Mock;
+import java.io.File;
 
 /**
- * <code>FileMessageReceiverTestCase</code> TODO (document class)
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -42,7 +36,6 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     File read = new File("testcasedata/read");
     File move = new File("testcasedata/move");
     Mock session = getMockSession();
-    UMOEndpoint endpoint = getTestProvider("simple", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
 
     public void testReceiver() throws Exception
     {
@@ -72,19 +65,10 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
                                        new Long(1000));
     }
 
-    public static UMOEndpoint getTestProvider(String name, String type)
+
+
+    public UMOEndpoint getEndpoint() throws Exception
     {
-        UMOEndpoint endpoint = new MuleEndpoint();
-
-        endpoint.setConnector(new FileConnector());
-        try {
-            endpoint.setEndpointURI(new MuleEndpointURI("file://./simple"));
-        } catch (EndpointException e) {
-            fail(e.getMessage());
-        }
-        endpoint.setName(name);
-        endpoint.setType(type);
-        return endpoint;
+        return new MuleEndpoint("file://./simple", true);
     }
-
 }

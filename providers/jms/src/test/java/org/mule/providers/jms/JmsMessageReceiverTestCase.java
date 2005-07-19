@@ -15,18 +15,17 @@
 
 package org.mule.providers.jms;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-
+import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import com.mockobjects.dynamic.Mock;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -55,8 +54,7 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         MuleDescriptor descriptor = getTestDescriptor("orange", Orange.class.getName());
-        UMOEndpoint endpoint = getTestEndpoint("test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
-        return new JmsMessageReceiver(new JmsConnector(), getTestComponent(descriptor), endpoint);
+        return new JmsMessageReceiver(endpoint.getConnector(), getTestComponent(descriptor), endpoint);
     }
 
     public UMOConnector getConnector() throws Exception
@@ -81,5 +79,12 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     public Object getValidMessage() throws Exception
     {
         return JmsConnectorTestCase.getMessage();
+    }
+
+    public UMOEndpoint getEndpoint() throws Exception
+    {
+        endpoint = new MuleEndpoint("jms://testcase", true);
+        endpoint.setConnector(getConnector());
+        return endpoint;
     }
 }

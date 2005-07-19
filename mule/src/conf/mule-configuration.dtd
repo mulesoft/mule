@@ -965,7 +965,7 @@ Is a fully qualified class name of the catch all strategy class
     these can be used when using logic filters to join filters.
 -->
 
-<!ELEMENT filter (filter?, left-filter?, right-filter?)>
+<!ELEMENT filter (properties?, filter?, left-filter?, right-filter?)>
 
 <!--
     className
@@ -987,7 +987,7 @@ or relax dtd validation on their parser
 <!ATTLIST filter path                      CDATA           #IMPLIED>
 
 <!-- see explanation for 'filter' element -->
-<!ELEMENT left-filter (filter?, left-filter?, right-filter?)>
+<!ELEMENT left-filter (properties?, filter?, left-filter?, right-filter?)>
 
 <!-- see explanation for 'filter' element -->
 <!ATTLIST left-filter className                   NMTOKEN           #REQUIRED>
@@ -1003,7 +1003,7 @@ or relax dtd validation on their parser
 <!ATTLIST left-filter path                      CDATA           #IMPLIED>
 
 <!-- see explanation for 'filter' element -->
-<!ELEMENT right-filter (filter?, left-filter?, right-filter?)>
+<!ELEMENT right-filter (properties?, filter?, left-filter?, right-filter?)>
 
 <!-- see explanation for 'filter' element -->
 <!ATTLIST right-filter className                   NMTOKEN           #REQUIRED>

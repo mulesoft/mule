@@ -17,7 +17,6 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
@@ -28,13 +27,11 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
 {
     protected UMOComponent component;
     protected UMOEndpoint endpoint;
-    protected UMOConnector connector;
 
     protected void setUp() throws Exception
     {
-        connector = getTestConnector();
         component = getTestComponent(getTestDescriptor("orange", Orange.class.getName()));
-        endpoint = getTestEndpoint("Test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint = getEndpoint();
     }
 
     public void testCreate() throws Exception
@@ -67,4 +64,12 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
     }
 
     public abstract UMOMessageReceiver getMessageReceiver() throws Exception;
+
+    /**
+     * Implementations of this method should ensure that the correct connector is set
+     * on the endpoint
+     * @return
+     * @throws Exception
+     */
+    public abstract UMOEndpoint getEndpoint() throws Exception;
 }
