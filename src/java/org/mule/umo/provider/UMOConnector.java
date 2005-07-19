@@ -14,14 +14,14 @@
  */
 package org.mule.umo.provider;
 
-import java.beans.ExceptionListener;
-
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
+
+import java.beans.ExceptionListener;
 
 /**
  * <code>UMOConnector</code> is the mechanism used to connect to external
@@ -34,7 +34,7 @@ public interface UMOConnector extends Lifecycle, Initialisable
 {
     /**
      * This creates a <code>UMOMessageReceiver</code> associated with this
-     * endpoint and registers it with the endpoint
+     * endpoint and registers it with the connector
      * 
      * @param component the listening component
      * @param endpoint the endpoint contains the listener endpointUri on which
@@ -59,13 +59,19 @@ public interface UMOConnector extends Lifecycle, Initialisable
     boolean isStarted();
 
     /**
-     * @return true if the endpoint is alive and well or false if the endpoint
+     * @return false if the connector is alive and well or true if the connector
      *         is being destroyed
      */
     boolean isDisposed();
 
     /**
-     * Gets a <code>UMOMessageAdapter</code> for the endpoint for the given
+     * @return false if the connector is alive and well or true if the connector
+     *         has been told to dispose
+     */
+    boolean isDisposing();
+
+    /**
+     * Gets a <code>UMOMessageAdapter</code> from the connector for the given
      * message (data)
      * 
      * @param message the data with which to initialise the

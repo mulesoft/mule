@@ -12,12 +12,8 @@
 
 package org.mule.providers;
 
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,8 +40,11 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.transformer.UMOTransformer;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all
@@ -84,14 +83,19 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     protected String name = null;
 
     /**
-     * The exception strategy used by this endpoint
+     * The exception strategy used by this connector
      */
     protected ExceptionListener exceptionListener = null;
 
     /**
-     * Determines in the endpoint is alive and well
+     * Determines in the connector is alive and well
      */
     protected SynchronizedBoolean disposed = new SynchronizedBoolean(false);
+
+    /**
+     * Determines in connector has been told to dispose
+     */
+    protected SynchronizedBoolean disposing = new SynchronizedBoolean(false);
 
     /**
      * Factory used to create dispatchers for this connector
@@ -285,6 +289,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     public final synchronized void dispose()
     {
+        disposing.set(true);
         if (logger.isInfoEnabled()) {
             logger.info("Disposing Connector: " + getClass().getName());
             logger.debug("Disposing Receivers");
@@ -697,5 +702,9 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             beans.add(new EndpointService(receiver));
         }
         return beans;
+    }
+
+    public boolean isDisposing() {
+        return disposing.get();
     }
 }
