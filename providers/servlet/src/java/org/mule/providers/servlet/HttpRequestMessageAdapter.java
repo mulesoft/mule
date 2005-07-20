@@ -13,22 +13,20 @@
  */
 package org.mule.providers.servlet;
 
-import java.io.IOException;
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.servlet.AbstractReceiverServlet;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.IteratorAdapter;
-import org.mule.util.Utility;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Iterator;
 
 /**
  * <code>HttpRequestMessageAdapter</code> TODO
@@ -39,8 +37,6 @@ import org.mule.util.Utility;
 
 public class HttpRequestMessageAdapter implements UMOMessageAdapter
 {
-    public static final String PAYLOAD_PARAMETER_NAME = "org.mule.servlet.payload.param";
-    public static final String DEFAULT_PAYLOAD_PARAMETER_NAME = "payload";
 
     private Object message = null;
 
@@ -106,22 +102,22 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
         if (message instanceof HttpServletRequest) {
             try {
                 request = (HttpServletRequest) message;
-                String payloadParam = (String) request.getAttribute(PAYLOAD_PARAMETER_NAME);
+                String payloadParam = (String) request.getAttribute(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME);
 
                 if (payloadParam == null) {
-                    payloadParam = DEFAULT_PAYLOAD_PARAMETER_NAME;
+                    payloadParam = AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME;
                 }
                 String payload = request.getParameter(payloadParam);
                 if (payload == null) {
                     if (isText(request.getContentType())) {
-                        this.message = Utility.inputStreamToString(request.getInputStream(), 4096);
+                        //this.message = Utility.inputStreamToString(request.getInputStream(), 4096);
                     } else {
-                        this.message = Utility.inputStreamToByteArray(request.getInputStream(), 4096);
+                        //this.message = Utility.inputStreamToByteArray(request.getInputStream(), 4096);
                     }
                 } else {
                     this.message = payload;
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new MessagingException(new Message("servlet", 3, request.getRequestURL().toString()), e);
             }
 

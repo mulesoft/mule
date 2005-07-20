@@ -15,18 +15,17 @@
 
 package org.mule.impl.container;
 
-import org.mule.impl.container.MuleContainerContext;
+import org.mule.impl.jndi.MuleInitialContextFactory;
 import org.mule.tck.model.AbstractContainerContextTestCase;
-import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.umo.UMODescriptor;
+import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.manager.UMOContainerContext;
 
-import javax.naming.InitialContext;
 import javax.naming.Context;
-import java.util.Map;
+import javax.naming.InitialContext;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -54,7 +53,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         super.setUp();
         context = new JndiContainerContext();
         Map env = new HashMap();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, DummyContextFactory.class.getName());
+        env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         context.setEnvironment(env);
         context.initialise();
         InitialContext ic = context.getContext();

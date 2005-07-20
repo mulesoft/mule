@@ -24,7 +24,9 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.Utility;
 
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,9 +53,47 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         requestHeaders = new ArrayList(Arrays.asList(HttpConstants.REQUEST_HEADER_NAMES));
         responseHeaders = new ArrayList(Arrays.asList(HttpConstants.RESPONSE_HEADER_NAMES));
     }
+    private int addParameters(String queryString, PostMethod postMethod)
+    {
+        //Parse the HTTP argument list and convert to a NameValuePair collection
+
+        if(queryString==null || queryString.length()==0) return 0;
+
+        String currentParam;
+        int equals;
+        equals = queryString.indexOf("&");
+        if(equals > -1) {
+            currentParam = queryString.substring(0, equals);
+            queryString = queryString.substring(equals + 1);
+        } else {
+            currentParam = queryString;
+            queryString = "";
+        }
+        int parameterIndex = -1;
+        while (currentParam != "") {
+            String paramName, paramValue;
+            equals = currentParam.indexOf("=");
+            if (equals > -1) {
+                paramName = currentParam.substring(0, equals);
+                paramValue = currentParam.substring(equals + 1);
+                parameterIndex ++;
+                postMethod.addParameter(paramName, paramValue);
+            }
+            equals = queryString.indexOf("&");
+            if(equals > -1) {
+                currentParam = queryString.substring(0, equals);
+                queryString = queryString.substring(equals + 1);
+            } else {
+                currentParam = queryString;
+                queryString = "";
+            }
+        }
+        return parameterIndex + 1;
+    }
 
     public Object transform(Object src, UMOEventContext context) throws TransformerException
     {
+        boolean setContentLengthHeader = true;
         String endpoint = (String) context.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
         if (endpoint == null) {
             throw new TransformerException(new Message(Messages.EVENT_PROPERTY_X_NOT_SET_CANT_PROCESS_REQUEST,
@@ -80,22 +120,26 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
 
             } else {
                 PostMethod postMethod = new PostMethod(uri.toString());
-                addParameters(uri.getQuery(), postMethod);
                 String paramName = (String) context.getProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
-
                 if (paramName == null) {
-//                    if (src instanceof String) {
-//                        postMethod.setRequestBody(src.toString());
-//                        postMethod.setRequestContentLength(src.toString().length());
-//                    } else {
-//                        byte[] buffer = Utility.objectToByteArray(src);
-//                        postMethod.setRequestBody(new ByteArrayInputStream(buffer));
-//                        postMethod.setRequestContentLength(buffer.length);
-//                    }
+                    setContentLengthHeader = false;
+                    if (src instanceof String) {
+                        postMethod.setRequestBody(src.toString());
+                        postMethod.setRequestContentLength(src.toString().length());
+                        postMethod.setRequestHeader("Content-Length", String.valueOf(src.toString().length()));
+                    } else {
+                        byte[] buffer = Utility.objectToByteArray(src);
+                        postMethod.setRequestBody(new ByteArrayInputStream(buffer));
+                        postMethod.setRequestContentLength(buffer.length);
+                        postMethod.setRequestHeader("Content-Length", String.valueOf(buffer.length));
+                    }
+                    //Call method to manage the parameter array
+                    addParameters(uri.getQuery(), postMethod);
                 } else {
                     postMethod.addParameter(paramName, src.toString());
                 }
                 httpMethod = postMethod;
+
             }
             // Standard requestHeaders
             Map.Entry header;
@@ -108,90 +152,16 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX)) {
                         headerName = "X-" + headerName;
                     }
-                    httpMethod.addRequestHeader(headerName, (String) header.getValue());
+                    //Make sure we have a valid header name otherwise we will corrupt the request
+                    if ((headerName.startsWith("Content-Length")) && (setContentLengthHeader)) {
+                        httpMethod.addRequestHeader(headerName, (String) header.getValue());
+                    }
                 }
             }
-
-            // Custom requestHeaders
-            // Map customHeaders =
-            // (Map)context.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
-            // if(customHeaders!=null) {
-            // Map.Entry entry;
-            // for (Iterator iterator = customHeaders.entrySet().iterator();
-            // iterator.hasNext();)
-            // {
-            // entry = (Map.Entry)iterator.next();
-            // httpMethod.addRequestHeader(entry.getKey().toString(),
-            // entry.getValue().toString());
-            // }
-            // }
-            // //Mule properties
-            // UMOMessage m = context.getMessage();
-            // String user =
-            // (String)m.getProperty(MuleProperties.MULE_USER_PROPERTY);
-            // if(user!=null) {
-            // httpMethod.addRequestHeader("X-" +
-            // MuleProperties.MULE_USER_PROPERTY, user);
-            // }
-            // if(m.getCorrelationId()!=null) {
-            // httpMethod.addRequestHeader("X-" +
-            // MuleProperties.MULE_CORRELATION_ID_PROPERTY,
-            // m.getCorrelationId());
-            // httpMethod.addRequestHeader("X-" +
-            // MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-            // String.valueOf(m.getCorrelationGroupSize()));
-            // httpMethod.addRequestHeader("X-" +
-            // MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
-            // String.valueOf(m.getCorrelationSequence()));
-            // }
-            // if(m.getReplyTo()!=null) {
-            // httpMethod.addRequestHeader("X-" +
-            // MuleProperties.MULE_REPLY_TO_PROPERTY,
-            // m.getReplyTo().toString());
-            // }
 
             return httpMethod;
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
-    }
-
-    private int addParameters(String param, PostMethod postMethod)
-    {
-        //Parse the HTTP argument list and convert to a NameValuePair collection
-        if(param==null || "".equals(param)) {
-            return 0;
-        }
-        int equals;
-        String currentParam;
-        equals = param.indexOf("&");
-        if(equals > -1) {
-            currentParam = param.substring(0, equals);
-            param = param.substring(equals + 1);
-        } else {
-            currentParam = param;
-            param = "";
-        }
-        int parameterIndex = -1;
-        while (currentParam != "") {
-            String paramName, paramValue;
-            equals = currentParam.indexOf("=");
-            if (equals > -1) {
-                paramName = currentParam.substring(0, equals);
-                paramValue = currentParam.substring(equals + 1);
-                parameterIndex ++;
-                postMethod.addParameter(paramName, paramValue);
-            }
-            equals = param.indexOf("&");
-            if(equals > -1) {
-                currentParam = param.substring(0, equals);
-                param = param.substring(equals + 1);
-            } else {
-                currentParam = param;
-                param = "";
-            }
-        }
-
-        return parameterIndex + 1;
     }
 }
