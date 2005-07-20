@@ -267,7 +267,13 @@ threading in every connector
 	The connection implementation will then handle how these properties are set.
 -->
 
-<!ATTLIST transaction-manager factory        		NMTOKEN         		#REQUIRED>
+<!ATTLIST transaction-manager factory        		NMTOKEN         		#IMPLIED>
+
+<!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST transaction-manager ref             		CDATA         		#IMPLIED>
 
 <!--
 	This element specifies the security manager to use (if any) for this Mule Server instance
@@ -284,6 +290,12 @@ threading in every connector
 <!ATTLIST security-manager className        		NMTOKEN         		#IMPLIED>
 
 <!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST security-manager ref             		CDATA         		#IMPLIED>
+
+<!--
    A security provider allows credentials to be authenticated against various credential
    providers.
 -->
@@ -292,7 +304,13 @@ threading in every connector
 <!--
  A fully qualified class name of the security provider to use
  -->
-<!ATTLIST security-provider className        		NMTOKEN         		#REQUIRED>
+<!ATTLIST security-provider className        		NMTOKEN         		#IMPLIED>
+
+<!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST security-provider ref             		CDATA         		#IMPLIED>
 
 <!--
  A unique name that identifies the security provider
@@ -333,7 +351,13 @@ The <i>connector</i> element specifies one or more message
 <!--
 	The fully qualified classname to instanciate the connector with  
 -->
-<!ATTLIST connector className			NMTOKEN		#REQUIRED>
+<!ATTLIST connector className			NMTOKEN		#IMPLIED>
+
+<!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST connector ref             		CDATA         		#IMPLIED>
 
 <!--
 The <i>connection-strategy</i> element specifies a strategy implementation used when making
@@ -419,7 +443,13 @@ a connection to the underlying resource
     The className attribute represents the full qualified class name
     of the Transformer implementation 
  -->
-<!ATTLIST transformer className               NMTOKEN 			#REQUIRED>
+<!ATTLIST transformer className               NMTOKEN 			#IMPLIED>
+
+<!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST transformer ref             		CDATA         		#IMPLIED>
 
 <!--
     	The returnClass attribute represents the full qualified class name
@@ -466,6 +496,12 @@ a connection to the underlying resource
 -->
 
 <!ATTLIST endpoint name 		ID    		#IMPLIED>
+
+<!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST endpoint ref             		CDATA         		#IMPLIED>
 <!--
 	This specifes the communication endpoint.  This will have a different format depending
 	on the transport protocol being used i.e.
@@ -684,7 +720,12 @@ Agents is a collection of one or more agent configurations
 <!--
     The fully qualified classname of the Agent
 -->
-<!ATTLIST agent className 			NMTOKEN 		#REQUIRED>
+<!ATTLIST agent className 			NMTOKEN 		#IMPLIED>
+<!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST agent ref             		CDATA         		#IMPLIED>
 
 <![IGNORE[
    <!ELEMENT configuration>
@@ -749,6 +790,11 @@ Can be null if fragment is not Xml.  If not set UTF-8 will be used.
 
 <!ATTLIST model name  			CDATA		#REQUIRED>
 
+<!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST model ref             		CDATA         		#IMPLIED>
 <!--
 	An entry Point resolver is used to determine which method on a UMO object
 	should receive events
@@ -816,6 +862,12 @@ Can be null if fragment is not Xml.  If not set UTF-8 will be used.
 -->
 
 <!ATTLIST mule-descriptor name 				    		CDATA   	    #REQUIRED>
+
+<!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST mule-descriptor ref             		CDATA         		#IMPLIED>
 
 <!--
 	The transformer to use when receiving events on the specified inboundProvider. 

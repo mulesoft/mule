@@ -13,53 +13,39 @@
  *
  */
 
-package org.mule.impl.container;
+package org.mule.impl.jndi;
 
-import org.mule.impl.container.MuleContainerContext;
-import org.mule.tck.model.AbstractContainerContextTestCase;
-import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.manager.UMOContainerContext;
-
-import javax.naming.InitialContext;
+import javax.naming.Binding;
+import javax.naming.CompositeName;
 import javax.naming.Context;
-import javax.naming.InvalidNameException;
-import javax.naming.OperationNotSupportedException;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
+import javax.naming.Name;
+import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameClassPair;
 import javax.naming.NameNotFoundException;
-import javax.naming.NameAlreadyBoundException;
 import javax.naming.NameParser;
-import javax.naming.Name;
-import javax.naming.CompositeName;
-import javax.naming.Binding;
-import java.util.Map;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.jar.Attributes;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-  public class DummyContext implements Context
+  public class SimpleContext implements Context
 {
-     	/*** What holds the bindings.  Keys are {@link String}s, values are {@link Object}s. */
+    /** What holds the bindings. */
  	Map bindings = new HashMap();
 
- 	/*** Context's environment. */
+ 	/** Context's environment. */
  	private Hashtable environment;
-      /***
-  	 * Creates a new <code>TestContext</code> instance.
-  	 *
-  	 */
-  	public DummyContext() {
+     
+  	public SimpleContext() {
   	}
-
 
     public Object lookupLink(Name name) throws NamingException {
         return null;
@@ -191,7 +177,7 @@ import java.util.jar.Attributes;
  		return getNameParser(name.toString());
  	}
  	public NameParser getNameParser(String name) {
- 		throw new java.lang.UnsupportedOperationException("getNameParser");
+ 		throw new UnsupportedOperationException("getNameParser");
  	}
  	public String composeName(String name, String prefix) throws NamingException {
  		return composeName(new CompositeName(name), new CompositeName(prefix)).toString();
