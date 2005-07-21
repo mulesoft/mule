@@ -32,14 +32,14 @@ public class SoapEndpointTestCase extends NamedTestCase
         assertEquals("glue", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl", endpointUri.getAddress());
+        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
         assertEquals(3, endpointUri.getParams().size());
 
         url = "glue:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
         endpointUri = new MuleEndpointURI(url);
         assertEquals("glue", endpointUri.getSchemeMetaInfo());
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl", endpointUri.getAddress());
+        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
         assertEquals(3, endpointUri.getParams().size());
     }
@@ -51,7 +51,7 @@ public class SoapEndpointTestCase extends NamedTestCase
         assertEquals("glue", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl", endpointUri.getAddress());
+        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
         assertEquals(3, endpointUri.getParams().size());
         assertEquals("admin:pwd", endpointUri.getUserInfo());
@@ -66,7 +66,7 @@ public class SoapEndpointTestCase extends NamedTestCase
         assertEquals("soap", endpointUri.getSchemeMetaInfo());
         // it's up to the client to actually strip off the method name if
         // necessary
-        assertEquals("http://www.xmethods.net/wsdl/query.wsdl", endpointUri.getAddress());
+        assertEquals("http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2", endpointUri.getAddress());
         assertEquals("getSomething", endpointUri.getParams().getProperty("method"));
         assertEquals(3, endpointUri.getParams().size());
 

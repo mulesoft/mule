@@ -13,6 +13,11 @@
  */
 package org.mule.providers.servlet;
 
+import org.mule.tck.providers.AbstractMessageAdapterTestCase;
+import org.mule.umo.provider.UMOMessageAdapter;
+
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
@@ -20,12 +25,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-
-import org.mule.tck.providers.AbstractMessageAdapterTestCase;
-import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -79,5 +78,9 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
                                                   }
                                               });
         return (HttpServletRequest) proxy;
+    }
+
+    public void testMessageRetrieval() throws Exception {
+        
     }
 }

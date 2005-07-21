@@ -13,20 +13,6 @@
  */
 package org.mule.providers.soap.axis;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.AxisEngine;
 import org.apache.axis.AxisFault;
 import org.apache.axis.ConfigurationException;
@@ -61,6 +47,19 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.w3c.dom.Document;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>AxisServiceComponent</code> is a Mule component implementation of the
@@ -694,15 +693,23 @@ public class AxisServiceComponent implements Initialisable, Callable
         if (serviceName == null || serviceName.length() == 0) {
             serviceName = getSoapAction(context);
             serviceName = serviceName.replaceAll("\"", "");
-            serviceName = serviceName.substring(serviceName.indexOf("/", serviceName.indexOf("//") + 2));
+            int i = serviceName.indexOf("/", serviceName.indexOf("//"));
+            if(i<-1) {
+                serviceName = serviceName.substring(i + 2);
+            }
 
         }
         // int i = serviceName.lastIndexOf("/");
         // if (i > -1) serviceName = serviceName.substring(0, i);
 
         int i = serviceName.lastIndexOf("/");
-        if (i > -1)
+        if (i > -1) {
             serviceName = serviceName.substring(i);
+        }
+        i = serviceName.lastIndexOf("?");
+        if (i > -1) {
+            serviceName = serviceName.substring(0, i);
+        }
         return serviceName;
     }
 

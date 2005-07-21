@@ -13,17 +13,6 @@
  */
 package org.mule.providers.soap.axis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-
 import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.deployment.wsdd.WSDDConstants;
@@ -48,6 +37,16 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassHelper;
+
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AxisConnector</code> is used to maintain one or more Services for
@@ -257,17 +256,13 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         // the
         // port is different
         String endpoint = receiver.getEndpointURI().getAddress();
+
         String scheme = ep.getScheme().toLowerCase();
+        boolean sync = receiver.getEndpoint().isSynchronous();
         if (scheme.equals("http") || scheme.equals("tcp")) {
-            endpoint = scheme + "://" + ep.getHost() + ":" + ep.getPort();
             // if we are using a socket based endpointUri make sure it is
             // running synchronously by default
-            String sync = "synchronous=" + receiver.getEndpoint().isSynchronous();
-            if (endpoint.indexOf("?") > -1) {
-                endpoint += "&" + sync;
-            } else {
-                endpoint += "?" + sync;
-            }
+            sync = true;
         }
 
         Map endpointCounters = (Map) axisDescriptor.getProperties().get(ENDPOINT_COUNTERS_PROPERTY);
@@ -283,6 +278,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         if (count.intValue() == 0) {
             UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
+            serviceEndpoint.setSynchronous(sync);
             serviceEndpoint.setName(ep.getScheme() + ":" + receiver.getComponent().getDescriptor().getName());
             // set the filter on the axis endpoint on the real receiver endpoint
             serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());

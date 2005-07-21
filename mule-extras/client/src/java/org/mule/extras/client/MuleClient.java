@@ -13,12 +13,7 @@
  */
 package org.mule.extras.client;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -54,7 +49,11 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
-import EDU.oswego.cs.dl.util.concurrent.Callable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
@@ -553,7 +552,7 @@ public class MuleClient implements Disposable
         try {
             MuleSession session = new MuleSession();
             if (user != null) {
-                message.setProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + user.getToken());
+                message.setProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
             }
             MuleEvent event = new MuleEvent(message, endpoint, session, synchronous);
             return event;
@@ -737,7 +736,7 @@ public class MuleClient implements Disposable
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint, String user, String password)
             throws MalformedEndpointException
     {
-        RemoteDispatcher rd = new RemoteDispatcher(this, serverEndpoint, user, password);
+        RemoteDispatcher rd = new RemoteDispatcher(this, serverEndpoint, new MuleCredentials(user, password.toCharArray()));
         dispatchers.add(rd);
         return rd;
     }

@@ -117,11 +117,12 @@ public class MuleCredentials implements UMOCredentials
         return buf.toString();
     }
 
-    public static String createHeader(String username, char[] password, String encryptionName, UMOEncryptionStrategy es) throws CryptoFailureException {
+    public static String createHeader(String username, String password, String encryptionName, UMOEncryptionStrategy es) throws CryptoFailureException {
         StringBuffer buf = new StringBuffer();
         buf.append(encryptionName).append(" ");
         String creds = username + TOKEN_DELIM + password;
-        buf.append(es.encrypt(creds.getBytes(), null));
+        byte[] encrypted = es.encrypt(creds.getBytes(), null);
+        buf.append(new String(encrypted));
 
         return buf.toString();
     }

@@ -65,7 +65,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("anonX", "anonX".toCharArray(), "PBE ", strategy);
+        String header=  MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("vm://my.queue", "foo", props);
@@ -80,7 +80,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("anon", "anon".toCharArray(), "PBE ", strategy);
+        String header=  MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("vm://my.queue", "foo", props);
@@ -93,7 +93,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header=  MuleCredentials.createHeader("anonX", "anonX".toCharArray(), "PBE ", strategy);
+        String header=  MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
@@ -109,7 +109,7 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("anonX", "anonX".toCharArray(), "PBE ", strategy);
+        String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("http://localhost:4567/index.html", "", props);

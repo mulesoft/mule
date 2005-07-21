@@ -13,8 +13,9 @@
  */
 package org.mule.providers.soap.glue;
 
-import java.util.Map;
-
+import electric.glue.context.ThreadContext;
+import electric.proxy.IProxy;
+import electric.registry.Registry;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -28,9 +29,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 
-import electric.glue.context.ThreadContext;
-import electric.proxy.IProxy;
-import electric.registry.Registry;
+import java.util.Map;
 
 /**
  * <code>GlueMessageDispatcher</code> will make web services calls using the
@@ -61,11 +60,15 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
         String method = (String) endpointUri.getParams().remove("method");
         setContext(event);
         IProxy proxy = null;
-        String bindService = endpointUri.getAddress();
-        if (bindService.indexOf(".wsdl") == -1) {
-            bindService = bindService.replaceAll("/" + method, ".wsdl/" + method);
+        String bindAddress = endpointUri.getAddress();
+        if (bindAddress.indexOf(".wsdl") == -1) {
+            bindAddress = bindAddress.replaceAll("/" + method, ".wsdl/" + method);
         }
-        proxy = Registry.bind(bindService);
+        int i = bindAddress.indexOf("?");
+        if(i > -1) {
+            bindAddress = bindAddress.substring(0,i);
+        }
+        proxy = Registry.bind(bindAddress);
 
         Object payload = event.getTransformedMessage();
         Object[] args;
@@ -99,7 +102,12 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
         Map params = ep.getParams();
         String method = (String) params.remove("method");
 
-        IProxy proxy = Registry.bind(ep.getAddress());
+        String bindAddress = ep.getAddress();
+        int i = bindAddress.indexOf("?");
+        if(i > -1) {
+            bindAddress = bindAddress.substring(0,i);
+        }
+        IProxy proxy = Registry.bind(bindAddress);
         try {
             Object result = proxy.invoke(method, params.values().toArray());
             return new MuleMessage(result, null);
