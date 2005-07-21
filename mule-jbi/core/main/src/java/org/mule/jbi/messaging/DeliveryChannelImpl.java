@@ -27,8 +27,6 @@ import javax.xml.namespace.QName;
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 /**
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -137,8 +135,43 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 	}
 
 	public boolean sendSync(MessageExchange exchange, long timeout) throws MessagingException {
-		// TODO: implement sync send
-		throw new NotImplementedException();
+		if (this.closed) {
+			throw new MessagingException("Channel is closed");
+		}
+		if (!(exchange instanceof MessageExchangeProxy)) {
+			throw new MessagingException("exchange should be created with MessageExchangeFactory");
+		}
+		MessageExchangeProxy me = (MessageExchangeProxy) exchange;
+		String target;
+		if (me.getRole() == MessageExchange.Role.CONSUMER) {
+			if (me.getConsumer() == null) {
+				me.setConsumer(this.component);
+				ServiceEndpoint se = this.container.getRouter().getTargetEndpoint(exchange);
+				me.setEndpoint(se);
+				target = ((AbstractServiceEndpoint) se).getComponent();
+				me.setProvider(target);
+			} else {
+				target = me.getProvider();
+			}
+		} else {
+			target = me.getConsumer();
+		}
+		me.handleSend(true);
+		DeliveryChannelImpl ch = (DeliveryChannelImpl) this.container.getRegistry().getComponent(target).getChannel();
+		ch.enqueue(me.getTwin());
+		try {
+			synchronized (exchange) {
+				exchange.wait(timeout);
+				if (me.getSyncState() == MessageExchangeProxy.SYNC_STATE_SYNC_RECEIVED) {
+					me.handleAccept();
+					return true;
+				} else {
+					return false;
+				}
+			}
+		} catch (InterruptedException e) {
+			throw new MessagingException(e);
+		}
 	}
 	
 	private void handleReceive(MessageExchange exchange) throws MessagingException {
@@ -149,8 +182,19 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 		me.handleAccept();
 	}
 	
-	public void enqueue(MessageExchange exchange) {
-		queue.add(exchange);
+	public void enqueue(MessageExchange exchange) throws MessagingException {
+		if (!(exchange instanceof MessageExchangeProxy)) {
+			throw new MessagingException("exchange should be created with MessageExchangeFactory");
+		}
+		MessageExchangeProxy me = (MessageExchangeProxy) exchange;
+		if (me.getSyncState() == MessageExchangeProxy.SYNC_STATE_SYNC_SENT) {
+			synchronized (me) {
+				me.setSyncState(MessageExchangeProxy.SYNC_STATE_SYNC_RECEIVED);
+				me.notify();
+			}
+		} else {
+			queue.add(exchange);
+		}
 	}
 
 	public boolean isClosed() {

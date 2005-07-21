@@ -15,6 +15,8 @@ import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.resource.spi.work.Work;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -230,11 +232,27 @@ public class AbstractComponent implements Component, ComponentLifeCycle, Service
 					DeliveryChannel channel = AbstractComponent.this.context.getDeliveryChannel();
 					while (true) {
 						final MessageExchange me = channel.accept();
+						if (me.isTransacted()) {
+							TransactionManager mgr = (TransactionManager) AbstractComponent.this.context.getTransactionManager();
+							Transaction tx = (Transaction) me.getProperty(MessageExchange.JTA_TRANSACTION_PROPERTY_NAME);
+							if (tx == mgr.getTransaction()) {
+								mgr.suspend();
+							}
+						}
 						AbstractComponent.this.workManager.scheduleWork(new Work() {
 							public void release() {
 							}
 							public void run() {
-								AbstractComponent.this.process(me);
+								try {
+									if (me.isTransacted()) {
+										TransactionManager mgr = (TransactionManager) AbstractComponent.this.context.getTransactionManager();
+										Transaction tx = (Transaction) me.getProperty(MessageExchange.JTA_TRANSACTION_PROPERTY_NAME);
+										mgr.resume(tx);
+									}
+									AbstractComponent.this.process(me);
+								} catch (Exception e) {
+									logger.error("Error processing message", e);
+								}
 							} 
 						});
 					}

@@ -29,5 +29,10 @@
             <artifactId>geronimo-spec-j2ee-connector</artifactId>
             <version>${geronimo_spec_j2ee_connector_version}</version>
         </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jta</artifactId>
+            <version>${geronimo_spec_jta_version}</version>
+        </dependency>
     </dependencies>
 </project>

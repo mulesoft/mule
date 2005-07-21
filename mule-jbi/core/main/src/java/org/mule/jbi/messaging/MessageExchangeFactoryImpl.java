@@ -223,7 +223,7 @@ public class MessageExchangeFactoryImpl implements MessageExchangeFactory {
 		};
 		private static int[][] STATES_PROVIDER = {
 			{ CAN_PROVIDER, 1, -1, -1 },
-			{ CAN_PROVIDER + CAN_OWNER + CAN_SET_OUT_MSG + CAN_SEND + CAN_STATUS_ACTIVE + CAN_STATUS_ERROR, 2, 2, -1 },
+			{ CAN_PROVIDER + CAN_OWNER + CAN_SET_OUT_MSG + CAN_SEND + CAN_SEND_SYNC + CAN_STATUS_ACTIVE + CAN_STATUS_ERROR, 2, 2, -1 },
 			{ CAN_PROVIDER, -1, -1, 3 },
 			{ CAN_PROVIDER + CAN_OWNER, -1, -1, -1 },
 		};

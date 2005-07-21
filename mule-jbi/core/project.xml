@@ -43,6 +43,12 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>stax</groupId>
+            <artifactId>stax</artifactId>
+            <version>${stax_ri_version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jta</artifactId>
             <version>${geronimo_spec_jta_version}</version>
@@ -70,6 +76,12 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>${commons_logging_version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons_collections_version}</version>
             <type>jar</type>
         </dependency>
         <dependency>

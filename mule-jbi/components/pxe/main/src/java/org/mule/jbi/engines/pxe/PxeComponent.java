@@ -33,6 +33,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.ObjectName;
 import javax.naming.InitialContext;
+import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
@@ -277,9 +278,12 @@ public class PxeComponent extends AbstractComponent {
 				if (svcName.equals(service.getServiceName())) {
 					ServicePort svcPort = service.getImport(port);
 					if (svcPort != null) {
-						TransactionManager tx = (TransactionManager) this.context.getTransactionManager();
+						TransactionManager mgr = (TransactionManager) this.context.getTransactionManager();
+						Transaction tx = mgr.getTransaction();
 						try {
-							tx.begin();
+							if (tx == null) {
+								mgr.begin();
+							}
 							DOMResult r = new DOMResult();
 							TransformerFactory.newInstance().newTransformer().transform(me.getMessage("in").getContent(), r);
 							com.fs.pxe.sfwk.spi.MessageExchange mePxe = service.createMessageExchange(svcPort, null, oper);
@@ -288,7 +292,9 @@ public class PxeComponent extends AbstractComponent {
 							mePxe.input(im);
 							break;
 						} finally {
-							tx.commit();
+							if (tx == null) {
+								mgr.commit();
+							}
 						}
 					}
 				}

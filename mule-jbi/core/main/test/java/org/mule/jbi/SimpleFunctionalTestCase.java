@@ -93,6 +93,36 @@ public class SimpleFunctionalTestCase extends TestCase {
 		assertNull(provider.getChannel().accept(10L)); // receive in
 	}
 	
+	public void testInOnlySync() throws Exception {
+		// Create thread to answer
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					// Provider side
+					InOnly mep = (InOnly) provider.getChannel().accept(10000L);
+					assertNotNull(mep);
+					assertEquals(ExchangeStatus.ACTIVE, mep.getStatus());
+					mep.setStatus(ExchangeStatus.DONE);
+					provider.getChannel().send(mep);
+				} catch (Exception e) {
+					e.printStackTrace();
+					fail();
+				}
+			}
+		}).start();
+		// Send message exchange
+		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
+		InOnly mec = mef.createInOnlyExchange();
+		NormalizedMessage m = mec.createMessage();
+		m.setContent(new StreamSource(new ByteArrayInputStream(PAYLOAD.getBytes())));
+		mec.setInMessage(m);
+		consumer.getChannel().sendSync(mec, 10000L);
+		assertEquals(ExchangeStatus.DONE, mec.getStatus());
+		// Nothing left
+		assertNull(consumer.getChannel().accept(10L)); // receive in
+		assertNull(provider.getChannel().accept(10L)); // receive in
+	}
+	
 	public void testInOut() throws Exception {
 		// Send message exchange
 		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
@@ -117,6 +147,81 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Provider site
 		assertSame(mep, provider.getChannel().accept(10L));
 		assertEquals(ExchangeStatus.DONE, mec.getStatus());
+		// Nothing left
+		assertNull(consumer.getChannel().accept(10L)); // receive in
+		assertNull(provider.getChannel().accept(10L)); // receive in
+	}
+	
+	public void testInOutSync() throws Exception {
+		// Create thread to answer
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					// Provider side
+					InOut mep = (InOut) provider.getChannel().accept(10000L);
+					assertNotNull(mep);
+					assertEquals(ExchangeStatus.ACTIVE, mep.getStatus());
+					NormalizedMessage m = mep.createMessage();
+					m.setContent(new StreamSource(new ByteArrayInputStream(RESPONSE.getBytes())));
+					mep.setOutMessage(m);
+					provider.getChannel().send(mep);
+				} catch (Exception e) {
+					e.printStackTrace();
+					fail();
+				}
+			}
+		}).start();
+		// Send message exchange
+		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
+		InOut mec = mef.createInOutExchange();
+		NormalizedMessage m = mec.createMessage();
+		m.setContent(new StreamSource(new ByteArrayInputStream(PAYLOAD.getBytes())));
+		mec.setInMessage(m);
+		consumer.getChannel().sendSync(mec, 10000L);
+		assertEquals(ExchangeStatus.ACTIVE, mec.getStatus());
+		mec.setStatus(ExchangeStatus.DONE);
+		consumer.getChannel().send(mec);
+		// Provider site
+		assertNotNull(provider.getChannel().accept(10L));
+		assertEquals(ExchangeStatus.DONE, mec.getStatus());
+		// Nothing left
+		assertNull(consumer.getChannel().accept(10L)); // receive in
+		assertNull(provider.getChannel().accept(10L)); // receive in
+	}
+	
+	public void testInOutSyncSync() throws Exception {
+		// Create thread to answer
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+				try {
+					// Provider side
+					InOut mep = (InOut) provider.getChannel().accept(10000L);
+					assertNotNull(mep);
+					assertEquals(ExchangeStatus.ACTIVE, mep.getStatus());
+					NormalizedMessage m = mep.createMessage();
+					m.setContent(new StreamSource(new ByteArrayInputStream(RESPONSE.getBytes())));
+					mep.setOutMessage(m);
+					provider.getChannel().sendSync(mep);
+					assertEquals(ExchangeStatus.DONE, mep.getStatus());
+				} catch (Exception e) {
+					e.printStackTrace();
+					fail();
+				}
+			}
+		});
+		t.start();
+		// Send message exchange
+		MessageExchangeFactory mef = consumer.getChannel().createExchangeFactory(endpoint);
+		InOut mec = mef.createInOutExchange();
+		NormalizedMessage m = mec.createMessage();
+		m.setContent(new StreamSource(new ByteArrayInputStream(PAYLOAD.getBytes())));
+		mec.setInMessage(m);
+		consumer.getChannel().sendSync(mec, 10000L);
+		assertEquals(ExchangeStatus.ACTIVE, mec.getStatus());
+		mec.setStatus(ExchangeStatus.DONE);
+		consumer.getChannel().send(mec);
+		// Wait until other thread end
+		t.join(1000L);
 		// Nothing left
 		assertNull(consumer.getChannel().accept(10L)); // receive in
 		assertNull(provider.getChannel().accept(10L)); // receive in

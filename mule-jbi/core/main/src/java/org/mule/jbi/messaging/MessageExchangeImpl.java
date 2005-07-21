@@ -25,8 +25,12 @@ import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.NormalizedMessage;
 import javax.jbi.servicedesc.ServiceEndpoint;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
 
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.framework.JbiContainerImpl;
 import org.mule.jbi.util.UUID;
 
 /**
@@ -50,6 +54,7 @@ public class MessageExchangeImpl implements MessageExchange, Serializable {
 	private QName operation;
 	private String consumer;
 	private String provider;
+	private Transaction transaction;
 	
 	public MessageExchangeImpl() {
 		this.status =  ExchangeStatus.ACTIVE;
@@ -111,6 +116,12 @@ public class MessageExchangeImpl implements MessageExchange, Serializable {
 	}
 
 	public void setProperty(String name, Object obj) {
+		if (JTA_TRANSACTION_PROPERTY_NAME.equals(name)) {
+			if (!(obj instanceof Transaction)) {
+				throw new IllegalArgumentException("should be a javax.transaction.Transaction");
+			}
+			setTransactionContext((Transaction) obj);
+		}
 		this.properties.put(name, obj);
 	}
 
@@ -147,7 +158,7 @@ public class MessageExchangeImpl implements MessageExchange, Serializable {
 	}
 
 	public boolean isTransacted() {
-		return this.properties.get(JTA_TRANSACTION_PROPERTY_NAME) != null;
+		return this.transaction != null;
 	}
 
 	public Role getRole() {
@@ -172,6 +183,38 @@ public class MessageExchangeImpl implements MessageExchange, Serializable {
 
 	public void setProvider(String provider) {
 		this.provider = provider;
+	}
+	
+	void setTransactionContext(Transaction tx) {
+		this.transaction = tx;
+	}
+	
+	Transaction getTransactionContext() {
+		return this.transaction;
+	}
+	
+	void resumeTx() throws MessagingException {
+		if (this.transaction != null) {
+			TransactionManager mgr = JbiContainer.Factory.getInstance().getTransactionManager();
+			try {
+				mgr.resume(this.transaction);
+			} catch (Exception e) {
+				throw new MessagingException("Can not resume transaction", e);
+			}
+		}
+	}
+
+	void suspendTx() throws MessagingException {
+		if (this.transaction != null) {
+			TransactionManager mgr = JbiContainer.Factory.getInstance().getTransactionManager();
+			try {
+				if (mgr.getTransaction() == this.transaction) {
+					mgr.suspend();
+				}
+			} catch (Exception e) {
+				throw new MessagingException("Can not suspend transaction", e);
+			}
+		}
 	}
 
 }

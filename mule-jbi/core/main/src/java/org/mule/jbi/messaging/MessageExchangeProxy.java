@@ -29,6 +29,10 @@ import javax.xml.namespace.QName;
  */
 public abstract class MessageExchangeProxy implements MessageExchange {
 
+	public static final int SYNC_STATE_ASYNC = 0;
+	public static final int SYNC_STATE_SYNC_SENT = 1;
+	public static final int SYNC_STATE_SYNC_RECEIVED = 2;
+	
 	protected static final int CAN_SET_IN_MSG 		= 0x00000001;
 	protected static final int CAN_SET_OUT_MSG 		= 0x00000002;
 	protected static final int CAN_SET_FAULT_MSG 	= 0x00000004;
@@ -50,6 +54,7 @@ public abstract class MessageExchangeProxy implements MessageExchange {
 	protected int state;
 	protected MessageExchangeProxy twin;
 	protected int[][] states;
+	protected int syncState;
 	
 	public MessageExchangeProxy(int[][] states) {
 		this.state = 0;
@@ -305,6 +310,7 @@ public abstract class MessageExchangeProxy implements MessageExchange {
 				throw new MessagingException("illegal call to send");
 			}
 		}
+		this.syncState = sync ? 1 : 0;
 		// Check status
 		ExchangeStatus status = getStatus();
 		if (status == ExchangeStatus.ACTIVE && !can(CAN_STATUS_ACTIVE)) {
@@ -330,6 +336,8 @@ public abstract class MessageExchangeProxy implements MessageExchange {
 		if (this.state < 0 || this.state >= this.states.length) {
 			throw new IllegalStateException("next state is illegal");
 		}
+		// Suspend tx
+		this.me.suspendTx();
 	}
 
 	public void handleAccept() throws MessagingException {
@@ -347,6 +355,8 @@ public abstract class MessageExchangeProxy implements MessageExchange {
 		if (this.state < 0 || this.state >= this.states.length) {
 			throw new IllegalStateException("next state is illegal");
 		}
+		// Resume tx
+		this.me.resumeTx();
 	}
 
 	public void setTwin(MessageExchangeProxy twin) {
@@ -367,6 +377,14 @@ public abstract class MessageExchangeProxy implements MessageExchange {
 
 	public void setProvider(String provider) {
 		this.me.setProvider(provider);
+	}
+
+	public int getSyncState() {
+		return this.syncState;
+	}
+
+	public void setSyncState(int syncState) {
+		this.syncState = syncState;
 	}
 
 }

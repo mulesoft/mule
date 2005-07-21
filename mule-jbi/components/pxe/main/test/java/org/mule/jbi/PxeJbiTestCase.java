@@ -62,6 +62,10 @@ public class PxeJbiTestCase extends TestCase {
         org.w3c.dom.Document soap = dbf.newDocumentBuilder().parse(Thread.currentThread().getContextClassLoader().getResourceAsStream("message.xml"));
 		m.setContent(new DOMSource(soap.getDocumentElement()));
 		me.setInMessage(m);
+		
+		// Set transaction context
+		//container.getTransactionManager().begin();
+		//me.setProperty(me.JTA_TRANSACTION_PROPERTY_NAME, container.getTransactionManager().getTransaction());
 		consumer1.getChannel().send(me);
 		assertNotNull(consumer1.getChannel().accept(5000));
 		
