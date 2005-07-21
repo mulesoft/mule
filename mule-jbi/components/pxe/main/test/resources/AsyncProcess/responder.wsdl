@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  name="Responder"
+  targetNamespace="uri:com.bptest.responder"
+  xmlns:resp="uri:com.bptest.responder"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" 
+  xmlns:typ="uri:com.bptest.types"
+  xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/" 
+  xmlns="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+   <types>
+      <schema xmlns="http://www.w3.org/2001/XMLSchema">
+         <import namespace="uri:com.bptest.types" schemaLocation="types.xsd"/>
+      </schema>
+   </types>
+
+   <message name="AsyncRequestMessage">
+      <part name="payload" element="typ:AsyncRequest"/>
+   </message>
+
+   <message name="ResponseMessage">
+      <part name="payload" element="typ:AsyncRequest"/>
+   </message>
+
+   <portType name="ResponderPT">
+      <operation name="BookOrder">
+         <input message="resp:AsyncRequestMessage"/>
+      </operation>
+      <operation name="PaperOrder">
+         <input message="resp:AsyncRequestMessage"/>
+      </operation>
+   </portType>
+
+   <portType name="CallbackPT">
+      <operation name="Callback">
+         <input message="resp:ResponseMessage"/>
+      </operation>
+   </portType>
+
+   <binding name="ResponderBIND" type="resp:ResponderPT">
+      <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <operation name="BookOrder">
+         <soap:operation/>
+         <input>
+            <soap:body use="literal"/>
+         </input>
+      </operation>
+       <operation name="PaperOrder">
+         <soap:operation />
+         <input>
+            <soap:body use="literal"/>
+         </input>
+      </operation>
+   </binding>
+
+   <bpws:property name="OrderId" type="xsd:string" />
+
+   <bpws:propertyAlias 
+      propertyName="resp:OrderId"
+      messageType="resp:ResponseMessage"
+      part="payload"
+      query="/typ:AsyncRequest/typ:Order/typ:OrderId"/>
+
+   <bpws:propertyAlias 
+      propertyName="resp:OrderId"
+      messageType="resp:AsyncRequestMessage"
+      part="payload"
+      query="/typ:AsyncRequest/typ:Order/typ:OrderId"/>
+
+   <plnk:partnerLinkType name="AsyncCallerResponderLT">
+      <plnk:role name="Responder">
+         <plnk:portType name="resp:ResponderPT"/>
+      </plnk:role>
+      <plnk:role name="Caller">
+         <plnk:portType name="resp:CallbackPT"/>
+      </plnk:role>
+   </plnk:partnerLinkType>
+
+</definitions>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema 
+  targetNamespace="uri:com.bptest.types" 
+  xmlns:typ="uri:com.bptest.types"
+  elementFormDefault="qualified" 
+  attributeFormDefault="qualified" 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns="http://www.w3.org/2001/XMLSchema">
+
+   <!-- Shared datatypes -->
+   <complexType name="PaperOrderCT">
+      <sequence>
+         <element name="author" type="xs:string"/>
+         <element name="isbn" type="xs:string"/>
+         <element name="title" type="xs:string"/>
+         <element name="pages" type="xs:string"/>
+         <element name="price" type="xs:string"/>
+         <element name="level" type="xs:string"/>
+         <element name="publisher" type="xs:string"/>
+         <element name="reviewer" type="xs:string"/>
+         <element name="coauthor" type="xs:string"/>
+         <element name="foreword" type="xs:string"/>
+         <element name="summary" type="xs:string"/>
+         <element name="binding" type="xs:string"/>
+         <element name="papergrade" type="xs:int"/>
+         <element name="copyright" type="xs:string"/>
+         <element name="webvisible" type="xs:string"/>
+         <element name="legacy" type="xs:string"/>
+         <element name="security" type="xs:string"/>
+         <element name="specialorder" type="xs:string"/>
+         <element name="printingtype" type="xs:string"/>
+         <element name="inktype" type="xs:string"/>
+      </sequence>
+   </complexType>
+
+   <complexType name="BookOrderCT">
+      <sequence>
+         <element name="author" type="xs:string"/>
+         <element name="isbn" type="xs:string"/>
+         <element name="title" type="xs:string"/>
+         <element name="pages" type="xs:string"/>
+         <element name="price" type="xs:string"/>
+         <element name="level" type="xs:string"/>
+         <element name="publisher" type="xs:string"/>
+         <element name="reviewer" type="xs:string"/>
+         <element name="coauthor" type="xs:string"/>
+         <element name="foreword" type="xs:string"/>
+         <element name="summary" type="xs:string"/>
+         <element name="binding" type="xs:string"/>
+         <element name="papergrade" type="xs:int"/>
+         <element name="copyright" type="xs:string"/>
+         <element name="webvisible" type="xs:string"/>
+         <element name="legacy" type="xs:string"/>
+         <element name="security" type="xs:string"/>
+         <element name="specialorder" type="xs:string"/>
+         <element name="printingtype" type="xs:string"/>
+         <element name="inktype" type="xs:string"/>
+      </sequence>
+   </complexType>
+
+   <complexType name="PDFOrderCT">
+      <sequence>
+         <element name="author" type="xs:string"/>
+         <element name="isbn" type="xs:string"/>
+         <element name="title" type="xs:string"/>
+         <element name="pages" type="xs:string"/>
+         <element name="price" type="xs:string"/>
+         <element name="level" type="xs:string"/>
+         <element name="publisher" type="xs:string"/>
+         <element name="reviewer" type="xs:string"/>
+         <element name="coauthor" type="xs:string"/>
+         <element name="foreword" type="xs:string"/>
+         <element name="summary" type="xs:string"/>
+         <element name="binding" type="xs:string"/>
+         <element name="papergrade" type="xs:int"/>
+         <element name="copyright" type="xs:string"/>
+         <element name="webvisible" type="xs:string"/>
+         <element name="legacy" type="xs:string"/>
+         <element name="security" type="xs:string"/>
+         <element name="specialorder" type="xs:string"/>
+         <element name="printingtype" type="xs:string"/>
+         <element name="inktype" type="xs:string"/>
+      </sequence>
+   </complexType>
+
+   <complexType name="OrderDetailCT">
+      <choice>
+         <element name="PaperOrder" type="typ:PaperOrderCT"/>
+         <element name="BookOrder" type="typ:BookOrderCT"/>
+         <element name="PDFOrder" type="typ:PDFOrderCT"/>
+      </choice>
+   </complexType>
+
+   <complexType name="OrderCT">
+      <sequence>
+         <element name="OrderId" type="xs:string"/>
+         <element name="OrderType" type="xs:string"/>
+         <element name="OrderDetails" type="typ:OrderDetailCT"/>
+         <element name="TrackingNumber" type="xs:string"/>
+      </sequence>
+   </complexType>
+
+   <!-- Datatypes for Responder -->
+
+	<complexType name="AsyncRequestCT">
+      <sequence>
+         <element ref="typ:AsyncRequest"/>
+      </sequence>
+   </complexType>
+
+	<element name="AsyncRequest">
+            <complexType>
+               <sequence>
+                  <element name="Order" type="typ:OrderCT"/>
+                  <element name="CallbackEndpoint" type="xs:string"/>
+               </sequence>
+            </complexType>
+         </element>
+
+
+	<complexType name="ResponseCT">
+      <sequence>
+         <element ref="typ:Response"/>
+      </sequence>
+   </complexType>
+
+	<element name="Response">
+            <complexType>
+               <sequence>
+                  <element name="Order" type="typ:OrderCT"/>
+               </sequence>
+            </complexType>
+         </element>
+
+
+
+   <!-- Datatypes for BPEL -->
+   <complexType name="AllOrderCT">
+      <sequence>
+         <element ref="typ:AllOrders" minOccurs="1" maxOccurs="1"/>      
+	</sequence>
+   </complexType>
+
+	<element name="AllOrders">
+            <complexType>
+               <sequence>
+                  <element name="Order" type="typ:OrderCT" maxOccurs="unbounded"/>
+               </sequence>
+            </complexType>
+         </element>
+
+
+</schema>

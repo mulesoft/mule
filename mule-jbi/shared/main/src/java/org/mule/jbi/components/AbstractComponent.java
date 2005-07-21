@@ -143,7 +143,7 @@ public class AbstractComponent implements Component, ComponentLifeCycle, Service
 	protected void doInit() throws Exception {
 		Object mbean = getExtensionMBean();
 		if (mbean != null) {
-			this.mbeanName = this.context.getMBeanNames().createCustomComponentMBeanName("extension");
+			this.mbeanName = createExtensionMBeanName();
 			MBeanServer server = this.context.getMBeanServer();
 			if (server == null) {
 				throw new JBIException("null mBeanServer");
@@ -164,6 +164,10 @@ public class AbstractComponent implements Component, ComponentLifeCycle, Service
 	 */
 	protected Object getExtensionMBean() throws Exception {
 		return null;
+	}
+	
+	protected ObjectName createExtensionMBeanName() throws Exception {
+		return this.context.getMBeanNames().createCustomComponentMBeanName("extension");
 	}
 
 

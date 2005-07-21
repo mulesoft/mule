@@ -26,6 +26,7 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
 
@@ -42,6 +43,9 @@ import org.mule.jbi.management.InstallationService;
 import org.mule.jbi.registry.Registry;
 import org.mule.jbi.registry.RegistryIO;
 import org.mule.jbi.routing.RouterImpl;
+import org.objectweb.jotm.Jotm;
+
+import com.fs.naming.mem.InMemoryContextFactory;
 
 /**
  * 
@@ -62,6 +66,7 @@ public class JbiContainerImpl implements JbiContainer {
 	private Endpoints endpoints;
 	private Messaging messaging;
 	private File workingDir;
+	private InitialContext namingContext;
 	
 	public JbiContainerImpl() {
 		this.workingDir = new File(DEFAULT_WORKING_DIR);
@@ -101,12 +106,11 @@ public class JbiContainerImpl implements JbiContainer {
 	}
 	
 	public InitialContext getNamingContext() {
-		// TODO: handle naming context
-		return null;
+		return this.namingContext;
 	}
 	
 	public File getWorkingDir() {
-		return workingDir;
+		return this.workingDir;
 	}
 
 	public void setWorkingDir(File workingDir) {
@@ -165,11 +169,27 @@ public class JbiContainerImpl implements JbiContainer {
 					this.mBeanServer = MBeanServerFactory.createMBeanServer();
 				}
 			}
+			if (this.transactionManager == null) {
+				LOGGER.debug("Creating TransactionManager");
+				this.transactionManager = new Jotm(true, false).getTransactionManager();
+				this.transactionManager.setTransactionTimeout(60);
+			}
+			if (this.namingContext == null) {
+			    System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryContextFactory.class.getName());
+			    System.setProperty(Context.PROVIDER_URL, "mule-jbi");
+			}
 			this.endpoints = new EndpointsImpl();
 			File regStore = new File(this.workingDir, "/registry.xml");
 			if (regStore.isFile()) {
-				this.registry = RegistryIO.load(regStore);
+				try {
+					this.registry = RegistryIO.load(regStore);
+				} catch (Exception e) {
+					LOGGER.warn("Invalid registry found. Creating a new one");
+				}
 			} else {
+				LOGGER.info("No registry found. Creating a new one");
+			}
+			if (this.registry == null) {
 				this.registry = RegistryIO.create(regStore);
 			}
 			if (this.router == null) {
@@ -231,6 +251,10 @@ public class JbiContainerImpl implements JbiContainer {
 	private void registerMBean(Object mbean, ObjectName name) throws JMException {
 		unregisterMBean(name);
 		this.mBeanServer.registerMBean(mbean, name);
+	}
+
+	public void setNamingContext(InitialContext namingContext) {
+		this.namingContext = namingContext;
 	}
 
 }
