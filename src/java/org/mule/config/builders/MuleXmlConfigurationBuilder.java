@@ -468,8 +468,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         // Create container Context
         path += "/security-manager";
-        digester.addObjectCreate(path, DEFAULT_SECURITY_MANAGER, "className");
-
+        addObjectCreateOrGetFromContainer(path, DEFAULT_SECURITY_MANAGER, "className", "ref", false);
+        
         // Add propviders
         digester.addObjectCreate(path + "/security-provider", SECURITY_PROVIDER_INTERFACE, "className");
         addSetPropertiesRule(path + "/security-provider", digester);
@@ -549,7 +549,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         // Create Transformers
         path += "/transformers/transformer";
-        digester.addObjectCreate(path, TRANSFORMER_INTERFACE, "className");
+        addObjectCreateOrGetFromContainer(path, TRANSFORMER_INTERFACE, "className", "ref", true);
+
         addSetPropertiesRule(path, digester);
 
         addMulePropertiesRule(path, digester, true);
@@ -576,7 +577,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         // Create transactionManager
         path += "/transaction-manager";
-        digester.addObjectCreate(path, TRANSACTION_MANAGER_FACTORY_INTERFACE, "factory");
+        addObjectCreateOrGetFromContainer(path, TRANSACTION_MANAGER_FACTORY_INTERFACE, "factory", "ref", true);
         addMulePropertiesRule(path, digester, true);
 
         digester.addSetRoot(path, "setTransactionManager");
@@ -593,7 +594,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         // Create Agents
         path += "/agents/agent";
-        digester.addObjectCreate(path, AGENT_INTERFACE, "className");
+        addObjectCreateOrGetFromContainer(path, AGENT_INTERFACE, "className", "ref", true);
         addSetPropertiesRule(path, digester);
 
         addMulePropertiesRule(path, digester, true);
@@ -605,7 +606,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         // Create connectors
         path += "/connector";
-        digester.addObjectCreate(path, CONNECTOR_INTERFACE, "className");
+        addObjectCreateOrGetFromContainer(path, CONNECTOR_INTERFACE, "className", "ref", true);
+
         addSetPropertiesRule(path, digester);
 
         addMulePropertiesRule(path, digester, true);
@@ -694,7 +696,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         // Create Model
         path += "/model";
-        digester.addObjectCreate(path, DEFAULT_MODEL, "className");
+        addObjectCreateOrGetFromContainer(path, DEFAULT_MODEL, "className", "ref", false);
+
         addSetPropertiesRule(path, digester);
 
         digester.addSetRoot(path, "setModel");
@@ -729,7 +732,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         // Create Mule UMOs
         path += "/mule-descriptor";
-        digester.addObjectCreate(path, DEFAULT_DESCRIPTOR, "className");
+        addObjectCreateOrGetFromContainer(path, DEFAULT_DESCRIPTOR, "className", "ref", false);
+
         addSetPropertiesRule(path, digester);
 
         // Create Message Routers
@@ -1000,7 +1004,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         // Set message endpoint
         path += "/endpoint";
-        digester.addObjectCreate(path, DEFAULT_ENDPOINT);
+        addObjectCreateOrGetFromContainer(path, DEFAULT_ENDPOINT, "className", "ref", false);
         addCommonEndpointRules(digester, path, method);
     }
 
@@ -1488,5 +1492,27 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             attribs.setValue(i, value);
         }
         return attribs;
+    }
+
+    protected void addObjectCreateOrGetFromContainer(final String path, String defaultImpl, final String classAttrib, final String refAttrib, final boolean classRefRequired) {
+        digester.addRule(path, new ObjectCreateRule(defaultImpl, classAttrib)
+        {
+            public void begin(Attributes attributes) throws Exception
+            {
+                String ref = attributes.getValue(refAttrib);
+                if(ref!=null) {
+                    Object obj = manager.getContainerContext().getComponent(ref);
+                    digester.push(obj);
+                } else {
+                    String classRef = attributes.getValue(classAttrib);
+                    if(classRef==null && classRefRequired) {
+                        throw new ConfigurationException(new Message(
+                                Messages.MUST_SPECIFY_REF_ATTRIB_X_OR_CLASS_ATTRIB_X_FOR_X, refAttrib, classAttrib, path));
+                    } else {
+                        super.begin(attributes);
+                    }
+                }
+            }
+        });
     }
 }

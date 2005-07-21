@@ -61,13 +61,8 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
                                                  event.getEndpoint(),
                                                  this);
         }
-        byte[] creds = null;
-        if (userHeader.startsWith("Plain ")) {
-            creds = userHeader.substring(6).getBytes();
-        } else {
-            creds = strategy.decrypt(userHeader.getBytes(), null);
-        }
-        UMOCredentials user = new MuleCredentials(new String(creds));
+        
+        UMOCredentials user = new MuleCredentials(userHeader);
 
         UMOAuthentication authResult;
         UMOAuthentication umoAuthentication = new MuleAuthentication(user);

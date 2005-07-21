@@ -16,7 +16,6 @@ package org.mule.impl;
 
 import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.mule.MuleRuntimeException;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -194,15 +193,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
 
     protected void setCredentials() {
-        //set credentials
-        String creds = (String)properties.get(MuleProperties.MULE_USER_PROPERTY);
-        if(creds!=null) {
-            try {
-                credentials = new MuleCredentials(creds);
-            } catch (Exception e) {
-                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CREATE_X, "event: " + toString()), e);
-            } 
-        } else if(endpoint.getEndpointURI().getUserInfo()!=null) {
+         if(endpoint.getEndpointURI().getUserInfo()!=null) {
             credentials = new MuleCredentials(endpoint.getEndpointURI().getUsername(),
                     endpoint.getEndpointURI().getPassword().toCharArray());
         }
