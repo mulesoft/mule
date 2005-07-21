@@ -153,7 +153,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                         headerName = "X-" + headerName;
                     }
                     //Make sure we have a valid header name otherwise we will corrupt the request
-                    if ((headerName.startsWith("Content-Length")) && (setContentLengthHeader)) {
+                    if (headerName.startsWith("Content-Length")) {
+                        if(setContentLengthHeader) {
+                            httpMethod.addRequestHeader(headerName, (String) header.getValue());
+                        }
+                    }else {
                         httpMethod.addRequestHeader(headerName, (String) header.getValue());
                     }
                 }

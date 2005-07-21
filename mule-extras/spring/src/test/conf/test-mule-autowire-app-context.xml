@@ -110,16 +110,17 @@
         <property name="endpointURI">
             <bean class="org.mule.impl.endpoint.MuleEndpointURI">
                 <constructor-arg><value>test://fruitBowlPublishQ</value></constructor-arg>
-                <property name="filter">
-                    <bean class="org.mule.routing.filters.xml.JXPathFilter">
-                        <property name="expression"><value>name</value></property>
-                        <property name="value"><value>bar</value></property>
-                        <property name="namespaces"><map>
-                            <entry key="foo"><value>http://foo.com</value></entry>
-                        </map></property>
-                    </bean></property>
             </bean>
        </property>
+        <property name="filter">
+            <bean class="org.mule.routing.filters.xml.JXPathFilter">
+                <property name="expression"><value>name</value></property>
+                <property name="value"><value>bar</value></property>
+                <property name="namespaces"><map>
+                    <entry key="foo"><value>http://foo.com</value></entry>
+                </map></property>
+            </bean>
+        </property>
     </bean>
 
     <bean id="waterMelonEndpoint" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint">

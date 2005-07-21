@@ -14,6 +14,27 @@
  */
 package org.mule.impl;
 
+import org.mule.MuleException;
+import org.mule.MuleManager;
+import org.mule.MuleRuntimeException;
+import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.security.MuleCredentials;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.security.UMOCredentials;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.PropertiesHelper;
+import org.mule.util.UUID;
+import org.mule.util.Utility;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -21,24 +42,6 @@ import java.io.OutputStream;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.mule.MuleException;
-import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.PropertiesHelper;
-import org.mule.util.UUID;
-import org.mule.util.Utility;
 
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
@@ -81,6 +84,8 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     private transient Object transformedMessage = null;
 
+    private UMOCredentials credentials = null;
+
     /**
      * Properties cache that only reads properties once from the inbound message
      * and merges them with any properties on the endpoint. The message
@@ -113,7 +118,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * @param message the event payload
      * @param endpoint the endpoint to associate with the event
      * @param session the previous event if any
-     * @see UMOMessageAdapter
+     * @see org.mule.umo.provider.UMOMessageAdapter
      */
     public MuleEvent(UMOMessage message,
                      UMOEndpoint endpoint,
@@ -138,7 +143,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * @param message the event payload
      * @param endpoint the endpoint to associate with the event
      * @param session the previous event if any
-     * @see UMOMessageAdapter
+     * @see org.mule.umo.provider.UMOMessageAdapter
      */
     public MuleEvent(UMOMessage message, UMOEndpoint endpoint, UMOSession session, String eventId, boolean synchronous)
     {
@@ -184,8 +189,28 @@ public class MuleEvent extends EventObject implements UMOEvent
             properties.putAll(endpoint.getProperties());
         }
         properties.putAll(message.getProperties());
+        setCredentials();
     }
 
+
+    protected void setCredentials() {
+        //set credentials
+        String creds = (String)properties.get(MuleProperties.MULE_USER_PROPERTY);
+        if(creds!=null) {
+            try {
+                credentials = new MuleCredentials(creds);
+            } catch (Exception e) {
+                throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CREATE_X, "event: " + toString()), e);
+            } 
+        } else if(endpoint.getEndpointURI().getUserInfo()!=null) {
+            credentials = new MuleCredentials(endpoint.getEndpointURI().getUsername(),
+                    endpoint.getEndpointURI().getPassword().toCharArray());
+        }
+    }
+
+    public UMOCredentials getCredentials() {
+        return credentials;
+    }
     Object getCachedMessage()
     {
         return transformedMessage;

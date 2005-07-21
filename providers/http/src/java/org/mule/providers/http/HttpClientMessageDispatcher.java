@@ -193,11 +193,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
             httpMethod.setDoAuthentication(true);
 
-            if (event.getEndpoint().getEndpointURI().getUserInfo() != null) {
+            if (event.getCredentials() != null) {
                 // Add User Creds
                 StringBuffer header = new StringBuffer();
                 header.append("Basic ");
-                header.append(new BASE64Encoder().encode(event.getEndpoint().getEndpointURI().getUserInfo().getBytes()));
+                String creds = event.getCredentials().getUsername().getBytes() + ":" + new String(event.getCredentials().getPassword());
+                header.append(new BASE64Encoder().encode(creds.getBytes()));
                 httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
             }
 

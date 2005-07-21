@@ -243,6 +243,10 @@ threading in every connector
 <!ATTLIST queue-profile blockWait   NMTOKEN         #IMPLIED>
 
 <!--
+    Defines if this queue is persistent or not
+-->
+<!ATTLIST queue-profile persistent   (true | false)         "false">
+<!--
    A persistence strategy defines the mechanism used to store Mule events to a persistent store.  Primarily, this
    is used for for persisting queued events to disk so that the servers internal state is mirrored on disk in case
    the server fails and needs to be restarted.  

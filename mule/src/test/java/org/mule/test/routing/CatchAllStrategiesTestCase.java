@@ -13,8 +13,9 @@
  */
 package org.mule.test.routing;
 
-import java.util.HashMap;
-
+import com.mockobjects.constraint.Constraint;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.ForwardingCatchAllStrategy;
@@ -32,9 +33,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
 
-import com.mockobjects.constraint.Constraint;
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.util.HashMap;
 
 /**
  * <code>CatchAllStrategiesTestCase</code> TODO
@@ -72,6 +71,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getConnector", connector.proxy());
+        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         connector.expectAndReturn("getDispatcher", "dummy", dispatcher.proxy());
         dispatcher.expect("dispatch", C.isA(UMOEvent.class));
@@ -112,6 +112,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getProperties", new HashMap());
         endpoint.expectAndReturn("getConnector", connector.proxy());
+        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy"));
         connector.expectAndReturn("getDispatcher", "dummy", dispatcher.proxy());
         dispatcher.expect("send", new Constraint() {

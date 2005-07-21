@@ -13,9 +13,6 @@
  */
 package org.mule.extras.acegi;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleProperties;
@@ -29,6 +26,9 @@ import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.security.CredentialsNotSetException;
 import org.mule.umo.security.UnauthorisedException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -65,9 +65,8 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String user = new MuleCredentials("anonX", "anonX".toCharArray()).getToken();
-        user = new String(strategy.encrypt(user.getBytes(), null));
-        props.put(MuleProperties.MULE_USER_PROPERTY, user);
+        String header=  MuleCredentials.createHeader("anonX", "anonX".toCharArray(), "PBE ", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
@@ -81,9 +80,8 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String user = new MuleCredentials("anon", "anon".toCharArray()).getToken();
-        user = new String(strategy.encrypt(user.getBytes(), null));
-        props.put(MuleProperties.MULE_USER_PROPERTY, user);
+        String header=  MuleCredentials.createHeader("anon", "anon".toCharArray(), "PBE ", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("vm://my.queue", "foo", props);
         assertNotNull(m);
@@ -95,9 +93,8 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String user = new MuleCredentials("anonX", "anonX".toCharArray()).getToken();
-        user = new String(strategy.encrypt(user.getBytes(), null));
-        props.put(MuleProperties.MULE_USER_PROPERTY, user);
+        String header=  MuleCredentials.createHeader("anonX", "anonX".toCharArray(), "PBE ", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
@@ -112,9 +109,8 @@ public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
 
         Map props = new HashMap();
         UMOEncryptionStrategy strategy = MuleManager.getInstance().getSecurityManager().getEncryptionStrategy("PBE");
-        String user = new MuleCredentials("anon", "anon".toCharArray()).getToken();
-        user = new String(strategy.encrypt(user.getBytes(), null));
-        props.put(MuleProperties.MULE_USER_PROPERTY, user);
+        String header = MuleCredentials.createHeader("anonX", "anonX".toCharArray(), "PBE ", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
         UMOMessage m = client.send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
