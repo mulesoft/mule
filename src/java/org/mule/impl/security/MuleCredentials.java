@@ -13,9 +13,17 @@
  */
 package org.mule.impl.security;
 
-import java.util.StringTokenizer;
-
+import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOEncryptionStrategy;
+import org.mule.umo.security.CryptoFailureException;
+import org.mule.umo.security.EncryptionStrategyNotFoundException;
 import org.mule.umo.security.UMOCredentials;
+import org.mule.umo.security.UMOSecurityManager;
+
+import java.util.StringTokenizer;
 
 /**
  * <code>MuleCredentials</code> can be used to read and set Mule user
@@ -32,6 +40,7 @@ public class MuleCredentials implements UMOCredentials
     private String username;
     private char[] password;
     private Object roles;
+    private String scheme;
 
     public MuleCredentials(String username, char[] password)
     {
@@ -46,9 +55,25 @@ public class MuleCredentials implements UMOCredentials
         this.roles = roles;
     }
 
-    public MuleCredentials(String header)
-    {
-        StringTokenizer st = new StringTokenizer(header, TOKEN_DELIM);
+    public MuleCredentials(String header) throws EncryptionStrategyNotFoundException, CryptoFailureException {
+        int i = header.indexOf(" ");
+        if(i== -1) {
+            throw new IllegalArgumentException(new Message(Messages.HEADER_X_MALFORMED_VALUE_IS_X, MuleProperties.MULE_USER_PROPERTY, header).toString());
+        } else {
+            scheme = header.substring(0, i);
+        }
+        String creds = header.substring(i + 1);
+        if(!scheme.equals("Plain")) {
+            UMOSecurityManager sm = MuleManager.getInstance().getSecurityManager();
+
+            UMOEncryptionStrategy es = sm.getEncryptionStrategy(scheme);
+            if(es == null) {
+                throw new EncryptionStrategyNotFoundException(scheme);
+            } else {
+                creds = new String(es.decrypt(creds.getBytes(), null));
+            }
+        }
+        StringTokenizer st = new StringTokenizer(creds, TOKEN_DELIM);
         username = st.nextToken();
         password = st.nextToken().toCharArray();
         if (st.hasMoreTokens()) {
@@ -81,5 +106,23 @@ public class MuleCredentials implements UMOCredentials
     public Object getRoles()
     {
         return roles;
+    }
+
+    public static String createHeader(String username, char[] password) {
+        StringBuffer buf = new StringBuffer();
+        buf.append("Plain ");
+        buf.append(username).append(TOKEN_DELIM);
+        buf.append(password).append(TOKEN_DELIM);
+
+        return buf.toString();
+    }
+
+    public static String createHeader(String username, char[] password, String encryptionName, UMOEncryptionStrategy es) throws CryptoFailureException {
+        StringBuffer buf = new StringBuffer();
+        buf.append(encryptionName).append(" ");
+        String creds = username + TOKEN_DELIM + password;
+        buf.append(es.encrypt(creds.getBytes(), null));
+
+        return buf.toString();
     }
 }

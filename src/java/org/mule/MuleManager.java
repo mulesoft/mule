@@ -13,18 +13,7 @@
  */
 package org.mule;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
-
-import javax.transaction.TransactionManager;
-
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
@@ -53,6 +42,7 @@ import org.mule.impl.internal.events.ModelEventListener;
 import org.mule.impl.internal.events.SecurityEvent;
 import org.mule.impl.internal.events.SecurityEventListener;
 import org.mule.impl.internal.events.ServerEventManager;
+import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.umo.UMOException;
@@ -78,7 +68,16 @@ import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import javax.transaction.TransactionManager;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule
@@ -216,6 +215,7 @@ public class MuleManager implements UMOManager
         }
         setModel(new MuleModel());
         containerContext = new MultiContainerContext();
+        securityManager = new MuleSecurityManager();
     }
 
     /**

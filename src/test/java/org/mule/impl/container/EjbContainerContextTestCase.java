@@ -15,6 +15,7 @@
 
 package org.mule.impl.container;
 
+import org.mule.impl.jndi.MuleInitialContextFactory;
 import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMODescriptor;
@@ -54,7 +55,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
         super.setUp();
         context = new EjbContainerContext();
         Map env = new HashMap();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, DummyContextFactory.class.getName());
+        env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         context.setEnvironment(env);
         context.initialise();
         InitialContext ic = context.getContext();

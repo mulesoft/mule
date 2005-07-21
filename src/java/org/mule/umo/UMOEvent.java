@@ -14,11 +14,12 @@
 
 package org.mule.umo;
 
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.security.UMOCredentials;
+import org.mule.umo.transformer.TransformerException;
+
 import java.io.OutputStream;
 import java.util.Map;
-
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>UMOEvent</code> represents any data event occuring in the Mule
@@ -45,6 +46,8 @@ public interface UMOEvent
      * @return the message payload for this event
      */
     UMOMessage getMessage();
+
+    public UMOCredentials getCredentials();
 
     /**
      * Reterns the conents of the message as a byte array.

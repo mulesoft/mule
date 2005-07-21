@@ -25,6 +25,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CredentialsNotSetException;
 import org.mule.umo.security.CryptoFailureException;
+import org.mule.umo.security.EncryptionStrategyNotFoundException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.SecurityProviderNotFoundException;
 import org.mule.umo.security.UMOAuthentication;
@@ -51,7 +52,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
     }
 
     protected final void authenticateInbound(UMOEvent event) throws SecurityException, CryptoFailureException,
-            SecurityProviderNotFoundException, UnknownAuthenticationTypeException
+            EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
     {
         String userHeader = (String) getCredentialsAccessor().getCredentials(event);
         if (userHeader == null) {

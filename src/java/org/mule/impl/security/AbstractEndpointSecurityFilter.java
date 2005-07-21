@@ -23,6 +23,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
+import org.mule.umo.security.EncryptionStrategyNotFoundException;
 import org.mule.umo.security.SecurityException;
 import org.mule.umo.security.SecurityProviderNotFoundException;
 import org.mule.umo.security.UMOCredentialsAccessor;
@@ -139,7 +140,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
     }
 
     public void authenticate(UMOEvent event) throws SecurityException, UnknownAuthenticationTypeException,
-            CryptoFailureException, SecurityProviderNotFoundException
+            CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException
     {
         if (inbound) {
             authenticateInbound(event);
@@ -159,7 +160,7 @@ public abstract class AbstractEndpointSecurityFilter implements UMOEndpointSecur
     }
 
     protected abstract void authenticateInbound(UMOEvent event) throws SecurityException, CryptoFailureException,
-            SecurityProviderNotFoundException, UnknownAuthenticationTypeException;
+            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
 
     protected abstract void authenticateOutbound(UMOEvent event) throws SecurityException,
             SecurityProviderNotFoundException, CryptoFailureException;
