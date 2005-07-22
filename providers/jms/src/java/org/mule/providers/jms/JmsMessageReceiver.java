@@ -257,46 +257,46 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
      */
     protected void createConsumer() throws Exception
     {
-        JmsSupport jmsSupport = this.connector.getJmsSupport();
-        JmsThreadContext ctx = context.getContext();
-        // Create session if none exists
-        if (ctx.session == null) {
-        	try {
-        		ctx.session = this.connector.getSession(endpoint);
-        	} catch (JMSException e) {
-        		throw new ConnectException(e, this);
-        	}
-        }
-
-        // Create destination
-        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
-        Destination dest = jmsSupport.createDestination(ctx.session, endpoint.getEndpointURI().getAddress(), topic);
-
-        // Extract jms selector
-        String selector = null;
-        if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter) {
-            selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
-        } else if (endpoint.getProperties() != null) {
-            // still allow the selector to be set as a property on the endpoint
-            // to be backward compatable
-            selector = (String) endpoint.getProperties().get(JmsConnector.JMS_SELECTOR_PROPERTY);
-        }
-        String tempDurable = (String) endpoint.getProperties().get("durable");
-        boolean durable = connector.isDurable();
-        if (tempDurable != null)
-            durable = Boolean.valueOf(tempDurable).booleanValue();
-
-        // Get the durable subscriber name if there is one
-        String durableName = (String) endpoint.getProperties().get("durableName");
-        if (durableName == null && durable && dest instanceof Topic) {
-            durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
-            logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
-                    + durableName);
-        }
-
-        // Create consumer
-        ctx.consumer = jmsSupport.createConsumer(ctx.session, dest, selector, connector.isNoLocal(), durableName);
+    	try {
+	        JmsSupport jmsSupport = this.connector.getJmsSupport();
+	        JmsThreadContext ctx = context.getContext();
+	        // Create session if none exists
+	        if (ctx.session == null) {
+	    		ctx.session = this.connector.getSession(endpoint);
+	        }
+	
+	        // Create destination
+	        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
+	        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+	        Destination dest = jmsSupport.createDestination(ctx.session, endpoint.getEndpointURI().getAddress(), topic);
+	
+	        // Extract jms selector
+	        String selector = null;
+	        if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter) {
+	            selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
+	        } else if (endpoint.getProperties() != null) {
+	            // still allow the selector to be set as a property on the endpoint
+	            // to be backward compatable
+	            selector = (String) endpoint.getProperties().get(JmsConnector.JMS_SELECTOR_PROPERTY);
+	        }
+	        String tempDurable = (String) endpoint.getProperties().get("durable");
+	        boolean durable = connector.isDurable();
+	        if (tempDurable != null)
+	            durable = Boolean.valueOf(tempDurable).booleanValue();
+	
+	        // Get the durable subscriber name if there is one
+	        String durableName = (String) endpoint.getProperties().get("durableName");
+	        if (durableName == null && durable && dest instanceof Topic) {
+	            durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
+	            logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
+	                    + durableName);
+	        }
+	
+	        // Create consumer
+	        ctx.consumer = jmsSupport.createConsumer(ctx.session, dest, selector, connector.isNoLocal(), durableName);
+    	} catch (JMSException e) {
+    		throw new ConnectException(e, this);
+    	}
     }
 
 	public void handleException(Exception exception) {
