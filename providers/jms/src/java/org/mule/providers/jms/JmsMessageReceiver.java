@@ -117,26 +117,6 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
-    /*
-    public void connect() throws Exception
-    {
-    	if (isConnected()) {
-    		return;
-    	}
-		connector.connect();
-    }
-
-    public void disconnect() throws Exception
-    {
-    	connector.disconnect();
-    }
-    
-    public boolean isConnected()
-    {
-    	return connector.isConnected();
-    }
-    */
-    
     public void doConnect() throws Exception
     {
 		connector.connect();
@@ -160,6 +140,10 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
             }
             // Do polling
             super.poll();
+        } catch (Exception e) {
+            // Force consumer to close
+            closeConsumer(true);
+            throw e;
         } finally {
             // Close consumer if necessary
             closeConsumer(false);
@@ -299,17 +283,4 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
     	}
     }
 
-	public void handleException(Exception exception) {
-		/*
-		boolean connected = true;
-		if (exception instanceof JMSException) {
-			try {
-				connector.
-			} catch (JMSException e) {
-				
-			}
-		}
-		*/
-		super.handleException(exception);
-	}
 }
