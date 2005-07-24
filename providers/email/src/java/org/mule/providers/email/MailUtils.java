@@ -13,12 +13,11 @@
  */
 package org.mule.providers.email;
 
-import java.util.Properties;
-
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.URLName;
+import java.util.Properties;
 
 /**
  * Contains javax.mail.Session helpers.
@@ -38,7 +37,7 @@ public class MailUtils
         props.put("mail.smtp.host", url.getHost());
         props.put("mail.smtp.port", String.valueOf(url.getPort()));
         Session session;
-        if (url.getUsername() != null) {
+        if (url.getPassword() != null) {
             props.put("mail.smtp.auth", "true");
             Authenticator auth = new SMTPAuthenticator(url.getUsername(), url.getPassword());
             session = Session.getInstance(props, auth);
