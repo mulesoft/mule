@@ -43,7 +43,7 @@ of all the parameters.
                 <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
                 <property name="payloadParameterName" value="symbol"/>
                 <property name="httpMethod" value="POST"/>
-                <property name="errorExpression" value="N/A"/>
+                <property name="errorExpression" value="[^&lt;.*]"/>
             </properties>
 
         </mule-descriptor>
