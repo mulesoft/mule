@@ -13,10 +13,6 @@
  */
 package org.mule.ra;
 
-import java.util.Map;
-
-import javax.resource.ResourceException;
-
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -35,6 +31,9 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
+
+import javax.resource.ResourceException;
+import java.util.Map;
 
 /**
  * <code>MuleConnection</code> TODO
@@ -124,7 +123,7 @@ public class DefaultMuleConnection implements MuleConnection
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
         if (!endpoint.getConnector().isStarted() && manager.isStarted()) {
-            endpoint.getConnector().start();
+            endpoint.getConnector().startConnector();
         }
 
         try {

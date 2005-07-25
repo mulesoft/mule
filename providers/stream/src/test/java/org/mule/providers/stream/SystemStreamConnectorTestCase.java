@@ -66,7 +66,7 @@ public class SystemStreamConnectorTestCase extends AbstractConnectorTestCase
         event.expectAndReturn("getTransformedMessage", new byte[0]);
         event.expectAndReturn("getEndpoint", getTestEndpoint("test", UMOEndpoint.ENDPOINT_TYPE_SENDER));
         connector.registerListener(component, endpoint);
-        connector.start();
+        connector.startConnector();
         connector.getDispatcher("dummy").dispatch((UMOEvent) event.proxy());
         // running async we need to wait for everything to load
         Thread.sleep(1000);

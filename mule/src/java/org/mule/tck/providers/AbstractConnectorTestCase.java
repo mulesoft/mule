@@ -16,9 +16,8 @@
 
 package org.mule.tck.providers;
 
-import java.beans.ExceptionListener;
-import java.util.HashMap;
-
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
@@ -34,8 +33,8 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.beans.ExceptionListener;
+import java.util.HashMap;
 
 /**
  * <code>AbstractConnectorTestCase</code> tests common behaviour of all
@@ -105,10 +104,10 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         assertTrue(!connector.isStarted());
         assertTrue(!connector.isDisposed());
-        connector.start();
+        connector.startConnector();
         assertTrue(connector.isStarted());
         assertTrue(!connector.isDisposed());
-        connector.stop();
+        connector.stopConnector();
         assertTrue(!connector.isStarted());
         assertTrue(!connector.isDisposed());
         connector.dispose();
@@ -116,7 +115,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         assertTrue(connector.isDisposed());
 
         try {
-            connector.start();
+            connector.startConnector();
             fail("Connector cannot be restarted after being disposing");
         } catch (Exception e) {
             // expected

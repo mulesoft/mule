@@ -14,23 +14,24 @@
  */
 package org.mule.umo.provider;
 
+import org.mule.umo.UMOExceptionPayload;
+
+import javax.activation.DataHandler;
 import java.io.Serializable;
 import java.util.Iterator;
-
-import org.mule.umo.UMOExceptionPayload;
+import java.util.Set;
 
 /**
  * <code>UMOMessageAdapter</code> provides a common abstraction of different
  * message implementations provided by different underlying technologies
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOMessageAdapter extends Serializable
-{
+public interface UMOMessageAdapter extends Serializable {
     /**
      * Gets a property of the message implementation
-     * 
+     *
      * @param key the key on which to lookup the property value
      * @return the property value or null if the property does not exist
      */
@@ -38,15 +39,15 @@ public interface UMOMessageAdapter extends Serializable
 
     /**
      * Set a property on the message
-     * 
-     * @param key the key on which to associate the value
+     *
+     * @param key   the key on which to associate the value
      * @param value the property value
      */
     void setProperty(Object key, Object value);
 
     /**
      * Removes a property on this message
-     * 
+     *
      * @param key the property key to remove
      * @return the removed property value or null if the property did not exist
      */
@@ -54,7 +55,7 @@ public interface UMOMessageAdapter extends Serializable
 
     /**
      * Converts the message implementation into a String representation
-     * 
+     *
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
@@ -67,7 +68,7 @@ public interface UMOMessageAdapter extends Serializable
 
     /**
      * Converts the message implementation into a String representation
-     * 
+     *
      * @return String representation of the message
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
@@ -81,19 +82,19 @@ public interface UMOMessageAdapter extends Serializable
     /**
      * gets the unique identifier for the message. It's up to the implementation
      * to ensure a unique id
-     * 
+     *
      * @return a unique message id
      * @throws UniqueIdNotSupportedException if the message does not support a
-     *             unique identifier
+     *                                       unique identifier
      */
     String getUniqueId() throws UniqueIdNotSupportedException;
 
     /**
      * Gets a property from the event
-     * 
-     * @param name the name or key of the property
+     *
+     * @param name         the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the
-     *            event
+     *                     event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -101,10 +102,10 @@ public interface UMOMessageAdapter extends Serializable
 
     /**
      * Gets an integer property from the event
-     * 
-     * @param name the name or key of the property
+     *
+     * @param name         the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the
-     *            event
+     *                     event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -112,10 +113,10 @@ public interface UMOMessageAdapter extends Serializable
 
     /**
      * Gets a long property from the event
-     * 
-     * @param name the name or key of the property
+     *
+     * @param name         the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the
-     *            event
+     *                     event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -123,10 +124,10 @@ public interface UMOMessageAdapter extends Serializable
 
     /**
      * Gets a double property from the event
-     * 
-     * @param name the name or key of the property
+     *
+     * @param name         the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the
-     *            event
+     *                     event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -134,10 +135,10 @@ public interface UMOMessageAdapter extends Serializable
 
     /**
      * Gets a boolean property from the event
-     * 
-     * @param name the name or key of the property
+     *
+     * @param name         the name or key of the property
      * @param defaultValue a default value if the property doesn't exist in the
-     *            event
+     *                     event
      * @return the property value or the defaultValue if the property does not
      *         exist
      */
@@ -145,32 +146,32 @@ public interface UMOMessageAdapter extends Serializable
 
     /**
      * Sets a boolean property on the event
-     * 
-     * @param name the property name or key
+     *
+     * @param name  the property name or key
      * @param value the property value
      */
     void setBooleanProperty(String name, boolean value);
 
     /**
      * Sets a integerproperty on the event
-     * 
-     * @param name the property name or key
+     *
+     * @param name  the property name or key
      * @param value the property value
      */
     void setIntProperty(String name, int value);
 
     /**
      * Sets a long property on the event
-     * 
-     * @param name the property name or key
+     *
+     * @param name  the property name or key
      * @param value the property value
      */
     void setLongProperty(String name, long value);
 
     /**
      * Sets a double property on the event
-     * 
-     * @param name the property name or key
+     *
+     * @param name  the property name or key
      * @param value the property value
      */
     void setDoubleProperty(String name, double value);
@@ -178,13 +179,13 @@ public interface UMOMessageAdapter extends Serializable
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
      * components in the system to manage message relations
-     * 
+     * <p/>
      * transport protocol. As such not all messages will support the notion of a
      * correlationId i.e. tcp or file. In this situation the correlation Id is
      * set as a property of the message where it's up to developer to keep the
      * association with the message. For example if the message is serialised to
      * xml the correlationId will be available in the message.
-     * 
+     *
      * @param id the Id reference for this relationship
      */
     void setCorrelationId(String id);
@@ -192,14 +193,14 @@ public interface UMOMessageAdapter extends Serializable
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
      * components in the system to manage message relations.
-     * 
+     * <p/>
      * The correlationId is associated with the message using the underlying
      * transport protocol. As such not all messages will support the notion of a
      * correlationId i.e. tcp or file. In this situation the correlation Id is
      * set as a property of the message where it's up to developer to keep the
      * association with the message. For example if the message is serialised to
      * xml the correlationId will be available in the message.
-     * 
+     *
      * @return the correlationId for this message or null if one hasn't been set
      */
     String getCorrelationId();
@@ -207,7 +208,7 @@ public interface UMOMessageAdapter extends Serializable
     /**
      * Gets the sequence or ordering number for this message in the the
      * correlation group (as defined by the correlationId)
-     * 
+     *
      * @return the sequence number or -1 if the sequence is not important
      */
     int getCorrelationSequence();
@@ -215,24 +216,24 @@ public interface UMOMessageAdapter extends Serializable
     /**
      * Gets the sequence or ordering number for this message in the the
      * correlation group (as defined by the correlationId)
-     * 
+     *
      * @param sequence the sequence number or -1 if the sequence is not
-     *            important
+     *                 important
      */
     void setCorrelationSequence(int sequence);
 
     /**
      * Determines how many messages are in the correlation group
-     * 
+     *
      * @return total messages in this group or -1 if the size is not known
      */
     int getCorrelationGroupSize();
 
     /**
      * Determines how many messages are in the correlation group
-     * 
+     *
      * @param size the total messages in this group or -1 if the size is not
-     *            known
+     *             known
      */
     void setCorrelationGroupSize(int size);
 
@@ -241,7 +242,7 @@ public interface UMOMessageAdapter extends Serializable
      * asynchronous environment where the caller doesn't wait for a response and
      * the response needs to be routed somewhere for further processing. The
      * value of this field can be any valid endpointUri url.
-     * 
+     *
      * @param replyTo the endpointUri url to reply to
      */
     void setReplyTo(Object replyTo);
@@ -251,7 +252,7 @@ public interface UMOMessageAdapter extends Serializable
      * asynchronous environment where the caller doesn't wait for a response and
      * the response needs to be routed somewhere for further processing. The
      * value of this field can be any valid endpointUri url.
-     * 
+     *
      * @return the endpointUri url to reply to or null if one has not been set
      */
     Object getReplyTo();
@@ -260,7 +261,7 @@ public interface UMOMessageAdapter extends Serializable
      * If an error occurred during the processing of this message this will
      * return a ErrorPayload that contains the root exception and Mule error
      * code, plus any otherr releated info
-     * 
+     *
      * @return
      */
     UMOExceptionPayload getExceptionPayload();
@@ -269,8 +270,16 @@ public interface UMOMessageAdapter extends Serializable
      * If an error occurs while processing this message, a ErrorPayload is
      * attached which contains the root exception and Mule error code, plus any
      * otherr releated info
-     * 
+     *
      * @param payload The exception payloaad to attach to this message
      */
     void setExceptionPayload(UMOExceptionPayload payload);
+
+    public void addAttachment(String name, DataHandler dataHandler) throws Exception;
+
+    public void removeAttachment(String name) throws Exception;
+
+    public DataHandler getAttachment(String name);
+
+    public Set getAttachmentNames();
 }

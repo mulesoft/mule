@@ -23,12 +23,16 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.IteratorAdapter;
 
+import javax.activation.DataHandler;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <code>HttpRequestMessageAdapter</code> is a MUle message adapter
@@ -46,6 +50,8 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
     protected UMOExceptionPayload exceptionPayload;
 
     private HttpServletRequest request;
+
+    private Map attachments = new HashMap();
 
     public HttpRequestMessageAdapter(HttpServletRequest message) throws MessagingException
     {
@@ -385,5 +391,21 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
     public void setExceptionPayload(UMOExceptionPayload exceptionPayload)
     {
         this.exceptionPayload = exceptionPayload;
+    }
+
+    public void addAttachment(String name, DataHandler dataHandler) throws Exception {
+        attachments.put(name, dataHandler);
+    }
+
+    public void removeAttachment(String name) throws Exception {
+        attachments.remove(name);
+    }
+
+    public DataHandler getAttachment(String name) {
+        return (DataHandler) attachments.get(name);
+    }
+
+    public Set getAttachmentNames() {
+        return attachments.keySet();
     }
 }

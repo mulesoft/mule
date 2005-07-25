@@ -15,9 +15,7 @@
 
 package org.mule.test.providers.file;
 
-import java.io.File;
-import java.util.Properties;
-
+import com.mockobjects.dynamic.Mock;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FileMessageReceiver;
 import org.mule.tck.providers.AbstractConnectorTestCase;
@@ -28,7 +26,8 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import com.mockobjects.dynamic.Mock;
+import java.io.File;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -73,7 +72,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         UMOEvent event = getTestEvent("TestData");
 
         connector.registerListener(component, endpoint);
-        connector.start();
+        connector.startConnector();
         connector.getDispatcher("dummy").dispatch(event);
 
         session.verify();
@@ -93,7 +92,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         UMOComponent component = getTestComponent(descriptor);
 
         connector.registerListener(component, endpoint);
-        connector.start();
+        connector.startConnector();
         connector.getDispatcher("dummy").send(event);
     }
 

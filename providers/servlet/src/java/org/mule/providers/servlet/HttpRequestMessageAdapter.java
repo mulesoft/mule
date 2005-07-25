@@ -25,8 +25,10 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.IteratorAdapter;
 
+import javax.activation.DataHandler;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>HttpRequestMessageAdapter</code> TODO
@@ -365,5 +367,21 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
     public void setExceptionPayload(UMOExceptionPayload exceptionPayload)
     {
         this.exceptionPayload = exceptionPayload;
+    }
+
+    public void addAttachment(String name, DataHandler dataHandler) throws Exception {
+
+    }
+
+    public void removeAttachment(String name) throws Exception {
+
+    }
+
+    public DataHandler getAttachment(String name) {
+        return null;
+    }
+
+    public Set getAttachmentNames() {
+        return null;
     }
 }

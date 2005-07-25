@@ -165,9 +165,6 @@
                 <!-- Disable Multicast tests unless configured -->
                 <exclude>**/MulticastConnectorFunctionalTestCase.*</exclude>
 
-                <exclude>**/MuleEndpointPlainTextFilterTestCase.*</exclude>
-                <exclude>**/MuleEndpointEncryptionFilterTestCase.*</exclude>
-
                 <!-- this fail unless as security patch is applied to JAVA_HOME/lib -->
                 <exclude>**/KeyBasedEncryptionStrategyTestCase.*</exclude>
                 <exclude>**/PGPSecurityFilterTestCase.*</exclude>

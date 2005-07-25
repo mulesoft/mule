@@ -13,14 +13,18 @@
  */
 package org.mule.providers.soap.axis;
 
-import javax.xml.soap.SOAPException;
-
 import org.apache.axis.MessageContext;
+import org.apache.axis.attachments.AttachmentPart;
 import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.transformer.UMOTransformer;
+
+import javax.activation.DataHandler;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import java.util.Iterator;
 
 /**
  * <code>AxisMessageAdapter</code> TODO
@@ -30,14 +34,16 @@ import org.mule.umo.transformer.UMOTransformer;
  */
 public class AxisMessageAdapter extends AbstractMessageAdapter
 {
-    private Object message;
+    private Object payload;
+    private SOAPMessage message;
     private UMOTransformer trans = new SerializableToByteArray();
 
     public AxisMessageAdapter(Object message) throws MessagingException
     {
-        this.message = message;
+        this.payload = message;
         try {
             MessageContext ctx = MessageContext.getCurrentContext();
+
             if (ctx != null) {
                 MuleSoapHeaders header = new MuleSoapHeaders(ctx.getMessage().getSOAPPart().getEnvelope().getHeader());
 
@@ -56,6 +62,19 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
                 if (header.getCorrelationId() != null && !"".equals(header.getCorrelationId())) {
                     setCorrelationId(header.getCorrelationId());
                 }
+
+                this.message = ctx.getMessage();
+                int x=1;
+                try {
+                    for(Iterator i = this.message.getAttachments();i.hasNext();x++) {
+                        addAttachment(String.valueOf(x), ((AttachmentPart)i.next()).getActivationDataHandler());
+                    }
+                } catch (Exception e) {
+                    //this will not happen
+                    logger.fatal("Failed to read attachments", e);
+                }
+            } else {
+
             }
         } catch (SOAPException e) {
             throw new MessagingException(new Message("soap", 5), message, e);
@@ -63,9 +82,9 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
     }
 
     /**
-     * Converts the message implementation into a String representation
+     * Converts the payload implementation into a String representation
      * 
-     * @return String representation of the message payload
+     * @return String representation of the payload payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString() throws Exception
@@ -74,21 +93,39 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
     }
 
     /**
-     * Converts the message implementation into a String representation
+     * Converts the payload implementation into a String representation
      * 
-     * @return String representation of the message
+     * @return String representation of the payload
      * @throws Exception Implemetation may throw an endpoint specific exception
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return (byte[]) trans.transform(message);
+        return (byte[]) trans.transform(payload);
     }
 
     /**
-     * @return the current message
+     * @return the current payload
      */
     public Object getPayload()
     {
+        return payload;
+    }
+
+    public SOAPMessage getSoapMessage() {
         return message;
+    }
+
+    public void addAttachment(String name, DataHandler dataHandler) throws Exception {
+        message.addAttachmentPart(new AttachmentPart(dataHandler));
+        super.addAttachment(name, dataHandler);
+    }
+
+    public void removeAttachment(String name) throws Exception {
+        if("all".equalsIgnoreCase(name)) {
+            message.removeAllAttachments();
+            attachments.clear();
+        } else {
+            throw new SOAPException(new Message("soap", 6).toString());
+        }
     }
 }

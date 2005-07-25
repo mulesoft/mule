@@ -201,12 +201,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             ((Initialisable) exceptionListener).initialise();
         }
 
-        // if(eventManager==null) {
-        // eventManager = new
-        // ServerEventManager(MuleManager.getInstance().getWorkManager());
-        // }
-        // eventManager.registerEventType(ConnectionEvent.class,
-        // ConnectionEventListener.class);
         doInitialise();
         initialised.set(true);
     }
@@ -218,7 +212,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * 
      * @see org.mule.umo.provider.UMOConnector#start()
      */
-    public final void start() throws UMOException
+    public final void startConnector() throws UMOException
     {
         if (isDisposed()) {
             throw new ConnectorException(new Message(Messages.CANT_START_DISPOSED_CONNECTOR), this);
@@ -257,7 +251,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * 
      * @see org.mule.umo.provider.UMOConnector#stop()
      */
-    public final void stop() throws UMOException
+    public final void stopConnector() throws UMOException
     {
         if (isDisposed()) {
             return; // throw new MuleException("Cannot stop a connector once it
@@ -571,7 +565,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     protected void doDispose()
     {
         try {
-            stop();
+            stopConnector();
         } catch (UMOException e) {
             logger.warn("Failed to stop during shutdown: " + e.getMessage(), e);
         }

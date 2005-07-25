@@ -547,7 +547,7 @@ public class MuleClient implements Disposable
     {
         UMOEndpoint endpoint = getEndpoint(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         if (!endpoint.getConnector().isStarted() && manager.isStarted()) {
-            endpoint.getConnector().start();
+            endpoint.getConnector().startConnector();
         }
         try {
             MuleSession session = new MuleSession();
@@ -592,7 +592,7 @@ public class MuleClient implements Disposable
             connector = ConnectorFactory.createConnector(defaultEndpointUri);
             connector.initialise();
             manager.registerConnector(connector);
-            connector.start();
+            connector.startConnector();
             endpoint = new MuleEndpoint("muleClientProvider",
                                         defaultEndpointUri,
                                         connector,

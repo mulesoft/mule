@@ -13,8 +13,9 @@
  */
 package org.mule.providers.dq;
 
-import java.util.Map;
-
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.DataQueue;
+import com.ibm.as400.access.RecordFormat;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -24,9 +25,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.DataQueue;
-import com.ibm.as400.access.RecordFormat;
+import java.util.Map;
 
 /**
  * @author m999svm <p/> <code>DQConnector</code> A delegate provider that
@@ -199,9 +198,8 @@ public class DQConnector extends AbstractServiceEnabledConnector
      * @see org.mule.providers.AbstractConnector#stopConnector()
      */
 
-    protected void stopConnector() throws UMOException
+    protected void doStop() throws UMOException
     {
-
         as400System.disconnectAllServices();
     }
 

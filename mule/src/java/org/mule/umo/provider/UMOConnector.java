@@ -18,8 +18,8 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
-import org.mule.umo.lifecycle.Lifecycle;
 
 import java.beans.ExceptionListener;
 
@@ -30,7 +30,7 @@ import java.beans.ExceptionListener;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface UMOConnector extends Lifecycle, Initialisable
+public interface UMOConnector extends Disposable, Initialisable
 {
     /**
      * This creates a <code>UMOMessageReceiver</code> associated with this
@@ -112,13 +112,13 @@ public interface UMOConnector extends Lifecycle, Initialisable
 
     /**
      * @param listener the exception strategy to use with this endpoint
-     * @see UMOExceptionStrategy
+     * @see ExceptionListener
      */
     void setExceptionListener(ExceptionListener listener);
 
     /**
      * @return the Exception stategy used by the endpoint
-     * @see UMOExceptionStrategy
+     * @see ExceptionListener
      */
     ExceptionListener getExceptionListener();
 
@@ -142,4 +142,8 @@ public interface UMOConnector extends Lifecycle, Initialisable
      * @return the factory to use when a dispatcher request is madr
      */
     UMOMessageDispatcherFactory getDispatcherFactory();
+
+    public void startConnector() throws UMOException;
+
+    public void stopConnector() throws UMOException;
 }

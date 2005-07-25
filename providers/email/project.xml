@@ -22,10 +22,5 @@
                 <war.bundle.jar>true</war.bundle.jar>
             </properties>
         </dependency>
-        <dependency>
-            <groupId>activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>${activation_version}</version>
-        </dependency>
     </dependencies>
 </project>
