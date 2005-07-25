@@ -32,10 +32,15 @@ public class XmlToObject extends AbstractXStreamTransformer
     public XmlToObject()
     {
         registerSourceType(String.class);
+        registerSourceType(byte[].class);
     }
 
     public Object doTransform(Object src) throws TransformerException
     {
-        return getXStream().fromXML(src.toString());
+        if(src instanceof byte[]) {
+            return getXStream().fromXML(new String((byte[])src));            
+        } else {
+            return getXStream().fromXML(src.toString());
+        }
     }
 }
