@@ -469,7 +469,7 @@ public class MuleManager implements UMOManager
             connector.initialise();
         }
         if ((started.get() || starting.get()) && !connector.isStarted()) {
-            connector.start();
+            connector.startConnector();
         }
     }
 
@@ -558,6 +558,10 @@ public class MuleManager implements UMOManager
     public void setProperty(Object key, Object value)
     {
         applicationProps.put(key, value);
+    }
+
+    public void addProperties(Map props) {
+        applicationProps.putAll(props);
     }
 
     /**
@@ -710,7 +714,7 @@ public class MuleManager implements UMOManager
     {
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();) {
             UMOConnector c = (UMOConnector) iterator.next();
-            c.start();
+            c.startConnector();
         }
         logger.info("Connectors have been started successfully");
     }
@@ -754,7 +758,7 @@ public class MuleManager implements UMOManager
     {
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();) {
             UMOConnector c = (UMOConnector) iterator.next();
-            c.stop();
+            c.stopConnector();
         }
         logger.info("Connectors have been stopped successfully");
     }
@@ -1027,7 +1031,7 @@ public class MuleManager implements UMOManager
     }
 
     /**
-     * associates a Dependency Injector container with Mule. This can be used to
+     * associates a Dependency Injector container or Jndi container with Mule. This can be used to
      * integrate container managed resources with Mule resources
      * 
      * @param container a Container context to use. By default, there is a

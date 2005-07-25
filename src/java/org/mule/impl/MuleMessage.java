@@ -13,17 +13,19 @@
  */
 package org.mule.impl;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.PropertiesHelper;
+
+import javax.activation.DataHandler;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <code>MuleMessage</code> is a wrapper that contains a payload payload and
@@ -350,5 +352,21 @@ public class MuleMessage implements UMOMessage
         buf.append("/n").append(PropertiesHelper.propertiesToString(getProperties(), true));
         buf.append("}");
         return buf.toString();
+    }
+
+    public void addAttachment(String name, DataHandler dataHandler) throws Exception {
+        adapter.addAttachment(name, dataHandler);
+    }
+
+    public void removeAttachment(String name) throws Exception {
+        adapter.removeAttachment(name);
+    }
+
+    public DataHandler getAttachment(String name) {
+        return adapter.getAttachment(name);
+    }
+
+    public Set getAttachmentNames() {
+        return adapter.getAttachmentNames();
     }
 }

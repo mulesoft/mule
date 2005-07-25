@@ -14,14 +14,12 @@
 
 package org.mule.config.builders;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.digester.CallMethodRule;
-import org.apache.commons.digester.CallParamRule;
+import org.apache.commons.digester.AbstractObjectCreationFactory;
 import org.apache.commons.digester.Digester;
-import org.apache.commons.digester.NodeCreateRule;
 import org.apache.commons.digester.ObjectCreateRule;
 import org.apache.commons.digester.Rule;
+import org.apache.commons.digester.SetNextRule;
 import org.apache.commons.digester.SetPropertiesRule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,7 +29,6 @@ import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleDtdResolver;
 import org.mule.config.PoolingProfile;
-import org.mule.config.PropertyFactory;
 import org.mule.config.QueueProfile;
 import org.mule.config.ReaderResource;
 import org.mule.config.ThreadingProfile;
@@ -48,7 +45,6 @@ import org.mule.impl.MuleComponentFactory;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleModel;
 import org.mule.impl.MuleTransactionConfig;
-import org.mule.impl.container.MuleContainerContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.interceptors.InterceptorStack;
@@ -62,7 +58,6 @@ import org.mule.routing.response.ResponseMessageRouter;
 import org.mule.transaction.constraints.BatchConstraint;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.UMOTransactionFactory;
@@ -84,42 +79,15 @@ import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
 import org.mule.util.PropertiesHelper;
-import org.mule.util.Utility;
 import org.mule.util.queue.EventFilePersistenceStrategy;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.AttributesImpl;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.beans.ExceptionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * <code>MuleXmlConfigurationBuilder</code> is a configuration parser that
@@ -129,7 +97,7 @@ import java.util.Properties;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
+public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration implements ConfigurationBuilder
 {
     /**
      * logger used by this class
@@ -139,7 +107,6 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public static final String DEFAULT_ENTRY_POINT_RESOLVER = DynamicEntryPointResolver.class.getName();
     public static final String DEFAULT_LIFECYCLE_ADAPTER = DefaultLifecycleAdapter.class.getName();
     public static final String DEFAULT_COMPONENT_FACTORY = MuleComponentFactory.class.getName();
-    public static final String DEFAULT_CONTAINER_CONTEXT = MuleContainerContext.class.getName();
     public static final String DEFAULT_ENDPOINT = MuleEndpoint.class.getName();
     public static final String DEFAULT_TRANSACTION_CONFIG = MuleTransactionConfig.class.getName();
     public static final String DEFAULT_DESCRIPTOR = MuleDescriptor.class.getName();
@@ -169,66 +136,32 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     public static final String CONNECTOR_INTERFACE = UMOConnector.class.getName();
     public static final String INTERCEPTOR_INTERFACE = UMOInterceptor.class.getName();
     public static final String ROUTER_INTERFACE = UMOOutboundRouter.class.getName();
-    public static final String FILTER_INTERFACE = UMOFilter.class.getName();
     public static final String EXCEPTION_STRATEGY_INTERFACE = ExceptionListener.class.getName();
     public static final String CONNECTION_STRATEGY_INTERFACE = ConnectionStrategy.class.getName();
 
     protected UMOManager manager;
-    protected Digester digester;
-    private List containerReferences = new ArrayList();
+
     private List transformerReferences = new ArrayList();
     private List endpointReferences = new ArrayList();
 
     public MuleXmlConfigurationBuilder() throws ConfigurationException
     {
+        super(System.getProperty("org.mule.xml.validate", "true").equalsIgnoreCase("true"),
+                System.getProperty("org.mule.xml.dtd", MuleDtdResolver.DEFAULT_MULE_DTD));
+
         ConvertUtils.register(new EndpointConverter(), UMOEndpoint.class);
         ConvertUtils.register(new TransformerConverter(), UMOTransformer.class);
         ConvertUtils.register(new ConnectorConverter(), UMOConnector.class);
         ConvertUtils.register(new TransactionFactoryConverter(), UMOTransactionFactory.class);
         ConvertUtils.register(new EndpointURIConverter(), UMOEndpointURI.class);
 
-        // This is a hack to stop Digester spitting out unnecessary warnings
-        // where there is
-        // a customer error handler registered
-        digester = new Digester() {
-            public void warning(SAXParseException e) throws SAXException
-            {
-                if (errorHandler != null) {
-                    errorHandler.warning(e);
-                }
-            }
-        };
+        String path = getRootName();
+        addManagerRules(digester, path);
+        addServerPropertiesRules(path + "/environment-properties", "addProperties", 0);
+        addContainerContextRules(path + "/container-context", "setContainerContext", 0);
 
-         String dtd = System.getProperty("org.mule.xml.dtd", MuleDtdResolver.DEFAULT_MULE_DTD);
-        digester.setEntityResolver(new MuleDtdResolver(dtd));
-
-        String temp = System.getProperty("org.mule.xml.validate", "true");
-        digester.setValidating((temp.equalsIgnoreCase("true")));
-
-        digester.setErrorHandler(new ErrorHandler() {
-            public void error(SAXParseException exception) throws SAXException
-            {
-                logger.error(exception.getMessage(), exception);
-                throw new SAXException(exception);
-            }
-
-            public void fatalError(SAXParseException exception) throws SAXException
-            {
-                logger.fatal(exception.getMessage(), exception);
-                throw new SAXException(exception);
-            }
-
-            public void warning(SAXParseException exception) throws SAXException
-            {
-                logger.warn(exception.getMessage());
-            }
-        });
-
-        String path = "mule-configuration";
         addMuleConfigurationRules(digester, path);
-        addContainerContextRules(digester, path);
         addTransformerRules(digester, path);
-        addMuleEnvironmentPropertiesRules(digester, path);
         addSecurityManagerRules(digester, path);
         addTransactionManagerRules(digester, path);
         addGlobalEndpointRules(digester, path);
@@ -242,72 +175,18 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         addMuleDescriptorRules(digester, path);
     }
 
-    /**
-     * ConfigResource can be a url, a path on the local file system or a
-     * resource name on the classpath Finds and loads the configuration resource
-     * by doing the following - 1. load it form the classpath 2. load it from
-     * from the local file system 3. load it as a url
-     * 
-     * @param configResource
-     * @return an inputstream to the resource
-     * @throws ConfigurationException
-     */
-    protected InputStream loadConfig(String configResource) throws ConfigurationException
-    {
-        InputStream is = ClassHelper.getResourceAsStream(configResource, getClass());
-        if (is == null) {
-            File file = new File(configResource);
-            if (file.exists()) {
-                try {
-                    is = new FileInputStream(file);
-                } catch (FileNotFoundException e) {
-                    throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
-                                                                 configResource), e);
-                }
-            } else {
-                try {
-                    URL url = new URL(configResource);
-                    is = url.openStream();
-                } catch (Exception e) {
-                    throw new ConfigurationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE,
-                                                                 configResource));
-                }
-            }
-        }
-        return is;
+    public String getRootName() {
+        return "mule-configuration";
     }
 
     public UMOManager configure(String configResources) throws ConfigurationException
     {
-        String[] resources = Utility.split(configResources, ",");
-        MuleManager.getConfiguration().setConfigResources(resources);
-        ReaderResource[] readers = new ReaderResource[resources.length];
-        for (int i = 0; i < resources.length; i++) {
-            try {
-                readers[i] = new ReaderResource(resources[i].trim(),
-                                                new InputStreamReader(loadConfig(resources[i].trim()), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new ConfigurationException(e);
-            }
-        }
-        return configure(readers);
+        return configure(parseResources(configResources));
     }
 
     public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException
     {
-        manager = MuleManager.getInstance();
-
-        Reader configResource = null;
-        for (int i = 0; i < configResources.length; i++) {
-            try {
-                configResource = configResources[i].getReader();
-                digester.push(manager);
-                manager = (UMOManager) digester.parse(configResource);
-            } catch (Exception e) {
-                throw new ConfigurationException(new Message(Messages.FAILED_TO_PARSE_CONFIG_RESOURCE_X,
-                                                             configResources[i].getDescription()), e);
-            }
-        }
+        manager = (MuleManager)process(configResources);
         try {
             setContainerProperties();
             setTransformers();
@@ -380,6 +259,17 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         }
     }
 
+    protected void addManagerRules(Digester digester, String path)
+    {
+        digester.addFactoryCreate(path, new AbstractObjectCreationFactory(){
+            public Object createObject(Attributes attributes) throws Exception {
+                manager = MuleManager.getInstance();
+                return manager;
+            }
+        });
+        digester.addSetProperties(path);
+    }
+
     protected void addMuleConfigurationRules(Digester digester, String path)
     {
         digester.addSetProperties(path);
@@ -429,37 +319,23 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         // add persistence strategy
         digester.addObjectCreate(path + "/persistence-strategy", PERSISTENCE_STRATEGY_INTERFACE, "className");
-        addMulePropertiesRule(path + "/persistence-strategy", digester, true);
+        addMulePropertiesRule(path + "/persistence-strategy", digester);
         digester.addSetNext(path + "/persistence-strategy", "setPersistenceStrategy");
 
         // Connection strategy
         digester.addObjectCreate(path + "/connection-strategy", CONNECTION_STRATEGY_INTERFACE, "className");
-        addMulePropertiesRule(path + "/connection-strategy", digester, true);
-        digester.addSetNext(path + "/connection-strategy", "setConnectionStrategy");
+        addMulePropertiesRule(path + "/connection-strategy", digester);
+        //digester.addSetNext(path + "/connection-strategy", "setConnectionStrategy");
+        digester.addRule(path + "/connection-strategy",new SetNextRule("setConnectionStrategy"){
+            public void end(String s, String s1) throws Exception {
+                super.end(s, s1);
+            }
+        });
 
         digester.addRule(path, new Rule() {
             public void end(String s, String s1) throws Exception
             {
                 MuleManager.setConfiguration((MuleConfiguration) digester.peek());
-            }
-        });
-    }
-
-    protected void addMuleEnvironmentPropertiesRules(Digester digester, String path)
-    {
-        // Set environment properties
-        path += "/environment-properties";
-        addMulePropertiesRule(path, digester, false);
-        digester.addRule(path, new Rule() {
-            public void end(String s, String s1) throws Exception
-            {
-                Map prop = (Map) digester.peek();
-                Map.Entry entry;
-                for (Iterator iterator = prop.entrySet().iterator(); iterator.hasNext();) {
-                    entry = (Map.Entry) iterator.next();
-                    MuleManager.getInstance().setProperty(entry.getKey(), entry.getValue());
-                }
-                super.end(s, s1);
             }
         });
     }
@@ -473,13 +349,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         // Add propviders
         digester.addObjectCreate(path + "/security-provider", SECURITY_PROVIDER_INTERFACE, "className");
         addSetPropertiesRule(path + "/security-provider", digester);
-        addMulePropertiesRule(path + "/security-provider", digester, true);
+        addMulePropertiesRule(path + "/security-provider", digester);
         digester.addSetNext(path + "/security-provider", "addProvider");
 
         // Add encryption strategies
         digester.addObjectCreate(path + "/encryption-strategy", ENCRYPTION_STRATEGY_INTERFACE, "className");
         addSetPropertiesRule(path + "/encryption-strategy", digester);
-        addMulePropertiesRule(path + "/encryption-strategy", digester, true);
+        addMulePropertiesRule(path + "/encryption-strategy", digester);
         digester.addRule(path + "/encryption-strategy", new Rule() {
             private String name;
 
@@ -498,52 +374,6 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
     }
 
-    protected void addContainerContextRules(Digester digester, String path) throws ConfigurationException
-    {
-        // Create container Context
-        path += "/container-context";
-        digester.addObjectCreate(path, DEFAULT_CONTAINER_CONTEXT, "className");
-        addMulePropertiesRule(path, digester, true);
-
-        NodeCreateRule nodeCreateRule = null;
-        try {
-            nodeCreateRule = new NodeCreateRule(Node.DOCUMENT_FRAGMENT_NODE) {
-                private String encoding;
-                private String doctype;
-
-                public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception
-                {
-                    encoding = attributes.getValue("encoding");
-                    doctype = attributes.getValue("doctype");
-                    super.begin(endpointName, endpointName1, attributes);
-                }
-
-                public void end(String endpointName, String endpointName1) throws Exception
-                {
-                    super.end(endpointName, endpointName1);
-
-                    DocumentFragment config = (DocumentFragment) digester.pop();
-                    StringWriter s = new StringWriter();
-                    StreamResult streamResult = new StreamResult(s);
-                    TransformerFactory tFactory = TransformerFactory.newInstance();
-                    try {
-                        Transformer transformer = tFactory.newTransformer();
-                        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-                        transformer.transform(new DOMSource(config), streamResult);
-                    } catch (TransformerException e) {
-                        throw new ContainerException(new Message(Messages.COULD_NOT_RECOVER_CONTIANER_CONFIG), e);
-                    }
-                    Reader reader = new StringReader(s.toString());
-                    UMOContainerContext ctx = (UMOContainerContext) digester.peek();
-                    ctx.configure(reader, doctype, encoding);
-                }
-            };
-        } catch (ParserConfigurationException e) {
-            throw new ConfigurationException(e);
-        }
-        digester.addRule(path + "/configuration", nodeCreateRule);
-        digester.addSetRoot(path, "setContainerContext");
-    }
 
     protected void addTransformerRules(Digester digester, String path) throws ConfigurationException
     {
@@ -553,7 +383,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         addSetPropertiesRule(path, digester);
 
-        addMulePropertiesRule(path, digester, true);
+        addMulePropertiesRule(path, digester);
         digester.addSetRoot(path, "registerTransformer");
     }
 
@@ -578,7 +408,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         // Create transactionManager
         path += "/transaction-manager";
         addObjectCreateOrGetFromContainer(path, TRANSACTION_MANAGER_FACTORY_INTERFACE, "factory", "ref", true);
-        addMulePropertiesRule(path, digester, true);
+        addMulePropertiesRule(path, digester);
 
         digester.addSetRoot(path, "setTransactionManager");
         digester.addRule(path, new Rule() {
@@ -597,7 +427,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         addObjectCreateOrGetFromContainer(path, AGENT_INTERFACE, "className", "ref", true);
         addSetPropertiesRule(path, digester);
 
-        addMulePropertiesRule(path, digester, true);
+        addMulePropertiesRule(path, digester);
 
         digester.addSetRoot(path, "registerAgent");
     }
@@ -610,7 +440,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         addSetPropertiesRule(path, digester);
 
-        addMulePropertiesRule(path, digester, true);
+        addMulePropertiesRule(path, digester);
 
         digester.addRule(path + "/threading-profile", new Rule() {
             private String id;
@@ -652,8 +482,9 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         // Connection strategy
         digester.addObjectCreate(path + "/connection-strategy", CONNECTION_STRATEGY_INTERFACE, "className");
-        addMulePropertiesRule(path + "/connection-strategy", digester, true);
+        addMulePropertiesRule(path + "/connection-strategy", digester);
         digester.addSetNext(path + "/connection-strategy", "setConnectionStrategy");
+
         addExceptionStrategyRules(digester, path);
 
         // register conntector
@@ -781,12 +612,12 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
             }
         });
 
-        addMulePropertiesRule(path + "/interceptor", digester, true);
+        addMulePropertiesRule(path + "/interceptor", digester);
 
         // Set exception strategy
         addExceptionStrategyRules(digester, path);
 
-        addMulePropertiesRule(path, digester, false);
+        addMulePropertiesRule(path, digester, "setProperties");
         digester.addSetNext(path + "/properties", "setProperties");
 
         // register the component
@@ -903,7 +734,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         addEndpointRules(digester, path + "/catch-all-strategy", "setEndpoint");
         addGlobalReferenceEndpointRules(digester, path + "/catch-all-strategy", "setEndpoint");
 
-        addMulePropertiesRule(path + "/catch-all-strategy", digester, true);
+        addMulePropertiesRule(path + "/catch-all-strategy", digester);
         digester.addSetNext(path + "/catch-all-strategy", "setCatchAllStrategy");
 
         // Add router rules
@@ -928,7 +759,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                              digester,
                              new String[] { "enableCorrelation" },
                              new String[] { "enableCorrelationAsString" });
-        addMulePropertiesRule(path, digester, true);
+        addMulePropertiesRule(path, digester);
         if ("outbound".equals(type)) {
             addEndpointRules(digester, path, "addEndpoint");
             addGlobalReferenceEndpointRules(digester, path, "addEndpoint");
@@ -938,66 +769,6 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
 
         // Set the router on the to the message router
         digester.addSetNext(path, "addRouter");
-    }
-
-    protected void addFilterRules(Digester digester, String path) throws ConfigurationException
-    {
-        // three levels
-        addSingleFilterRule(digester, path);
-        path += "/filter";
-        addFilterGroupRule(digester, path);
-
-        addFilterGroupRule(digester, path + "/left-filter");
-        addFilterGroupRule(digester, path + "/right-filter");
-        addFilterGroupRule(digester, path + "/filter");
-
-        addFilterGroupRule(digester, path + "/left-filter/left-filter");
-        addFilterGroupRule(digester, path + "/left-filter/right-filter");
-        addFilterGroupRule(digester, path + "/left-filter/filter");
-
-        addFilterGroupRule(digester, path + "/right-filter/left-filter");
-        addFilterGroupRule(digester, path + "/right-filter/right-filter");
-        addFilterGroupRule(digester, path + "/right-filter/filter");
-
-        addFilterGroupRule(digester, path + "/filter/left-filter");
-        addFilterGroupRule(digester, path + "/filter/right-filter");
-        addFilterGroupRule(digester, path + "/filter/filter");
-
-        // digester.addSetNext(path, "setFilter");
-    }
-
-    protected void addFilterGroupRule(Digester digester, String path) throws ConfigurationException
-    {
-        addLeftFilterRule(digester, path);
-        addRightFilterRule(digester, path);
-        addSingleFilterRule(digester, path);
-    }
-
-    protected void addLeftFilterRule(Digester digester, String path) throws ConfigurationException
-    {
-        path += "/left-filter";
-        digester.addObjectCreate(path, FILTER_INTERFACE, "className");
-        addSetPropertiesRule(path, digester);
-        addMulePropertiesRule(path, digester, true);
-        digester.addSetNext(path, "setLeftFilter");
-    }
-
-    protected void addRightFilterRule(Digester digester, String path) throws ConfigurationException
-    {
-        path += "/right-filter";
-        digester.addObjectCreate(path, FILTER_INTERFACE, "className");
-        addSetPropertiesRule(path, digester);
-        addMulePropertiesRule(path, digester, true);
-        digester.addSetNext(path, "setRightFilter");
-    }
-
-    protected void addSingleFilterRule(Digester digester, String path) throws ConfigurationException
-    {
-        path += "/filter";
-        digester.addObjectCreate(path, FILTER_INTERFACE, "className");
-        addSetPropertiesRule(path, digester);
-        addMulePropertiesRule(path, digester, true);
-        digester.addSetNext(path, "setFilter");
     }
 
     protected void addEndpointRules(Digester digester, String path, String method) throws ConfigurationException
@@ -1043,7 +814,8 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                              digester,
                              new String[] { "address", "transformers", "createConnector" },
                              new String[] { "endpointURI", "transformer", "createConnectorAsString" });
-        addMulePropertiesRule(path, digester, false);
+        //todo test
+        addMulePropertiesRule(path, digester, "setProperties");
         addTransactionConfigRules(path, digester);
 
         addFilterRules(digester, path);
@@ -1054,7 +826,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         // Add security filter rules
         digester.addObjectCreate(path + "/security-filter", ENDPOINT_SECURITY_FILTER_INTERFACE, "className");
 
-        addMulePropertiesRule(path + "/security-filter", digester, true);
+        addMulePropertiesRule(path + "/security-filter", digester);
         digester.addSetNext(path + "/security-filter", "setSecurityFilter");
     }
 
@@ -1077,7 +849,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
     {
         path += "/exception-strategy";
         digester.addObjectCreate(path, EXCEPTION_STRATEGY_INTERFACE, "className");
-        addMulePropertiesRule(path, digester, true);
+        addMulePropertiesRule(path, digester);
 
         // Add endpoint rules
         addEndpointRules(digester, path, "addEndpoint");
@@ -1085,277 +857,7 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
         digester.addSetNext(path, "setExceptionListener");
     }
 
-    protected void addSetPropertiesRule(String path, Digester digester)
-    {
-        digester.addRule(path, new MuleSetPropertiesRule());
-    }
 
-    protected void addSetPropertiesRule(String path, Digester digester, String[] s1, String[] s2)
-    {
-        digester.addRule(path, new MuleSetPropertiesRule(s1, s2));
-    }
-
-    protected void addMulePropertiesRule(String path, Digester digester, final boolean setAsBeanProperties)
-    {
-        // small hack to allow the same property rules to be used but the
-        // environment-properties elements
-        if (!path.endsWith("environment-properties")) {
-            path += "/properties";
-        }
-        digester.addRule(path, new ObjectCreateRule(path, HashMap.class) {
-
-            // This will set the properties on the top object as bean setters if
-            // the flag is set
-            public void end(String string, String string1) throws Exception
-            {
-
-                Map props = (Map) digester.peek();
-                if (props.containsKey(MuleConfiguration.USE_MANAGER_PROPERTIES)) {
-                    props.putAll(MuleManager.getInstance().getProperties());
-                    props.remove(MuleConfiguration.USE_MANAGER_PROPERTIES);
-                }
-                super.end(string, string1);
-
-                // support for setting transformers as properties
-                String trans = (String) props.remove("transformer");
-                if (setAsBeanProperties) {
-                    org.mule.util.BeanUtils.populateWithoutFail(digester.peek(), props, true);
-                } else {
-                    BeanUtils.setProperty(digester.peek(), string1, props);
-                }
-                if (trans != null) {
-                    addTransformerReference("transformer", trans, digester.peek());
-                }
-            }
-        });
-        digester.addCallMethod(path + "/property", "put", 2);
-        digester.addRule(path + "/property", new CallParamRule(0, "name") {
-            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception
-            {
-                // Process template tokens
-                attributes = processAttributes(attributes, endpointName1);
-                super.begin(endpointName, endpointName1, attributes);
-            }
-        });
-
-        digester.addRule(path + "/property", new CallParamRule(1, "value") {
-            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception
-            {
-                // Process template tokens
-                attributes = processAttributes(attributes, endpointName1);
-                super.begin(endpointName, endpointName1, attributes);
-            }
-        });
-        // digester.addCallParam(path + "/property", 0, "name");
-        // digester.addCallParam(path + "/property", 1, "value");
-
-        addPropertyFactoryRule(digester, path + "/factory-property");
-        addSystemPropertyRule(digester, path + "/system-property");
-        addFilePropertiesRule(digester, path + "/file-properties");
-        addContainerPropertyRule(digester, path + "/container-property", setAsBeanProperties);
-
-        digester.addObjectCreate(path + "/map", HashMap.class);
-        digester.addCallMethod(path + "/map/property", "put", 2);
-
-        digester.addRule(path + "/map/property", new CallParamRule(0, "name") {
-            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception
-            {
-                // Process template tokens
-                attributes = processAttributes(attributes, endpointName1);
-                super.begin(endpointName, endpointName1, attributes);
-            }
-        });
-
-        digester.addRule(path + "/map/property", new CallParamRule(1, "value") {
-            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception
-            {
-                // Process template tokens
-                attributes = processAttributes(attributes, endpointName1);
-                super.begin(endpointName, endpointName1, attributes);
-            }
-        });
-        // digester.addCallParam(path + "/map/property", 0, "name");
-        // digester.addCallParam(path + "/map/property", 1, "value");
-
-        addPropertyFactoryRule(digester, path + "/map/factory-property");
-        addSystemPropertyRule(digester, path + "/map/system-property");
-        addFilePropertiesRule(digester, path + "/map/file-properties");
-        addContainerPropertyRule(digester, path + "/map/container-property", false);
-
-        // A small hack to call a method on top -1
-        digester.addRule(path + "/map", new CallMethodRule("put", 2) {
-            public void end(String string, String string1) throws Exception
-            {
-                Map props = (Map) digester.peek();
-                if (props.containsKey(MuleConfiguration.USE_MANAGER_PROPERTIES)) {
-                    props.putAll(MuleManager.getInstance().getProperties());
-                    props.remove(MuleConfiguration.USE_MANAGER_PROPERTIES);
-                }
-                Object o = digester.peek(1);
-                digester.push(o);
-                super.end(string, string1);
-                o = digester.pop();
-            }
-        });
-        digester.addCallParam(path + "/map", 0, "name");
-        digester.addCallParam(path + "/map", 1, true);
-
-        digester.addObjectCreate(path + "/list", ArrayList.class);
-
-        // digester.addCallMethod(path + "/list/entry", "add", 1);
-        digester.addRule(path + "/list/entry", new CallMethodRule("add", 1) {
-            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception
-            {
-                // Process template tokens
-                attributes = processAttributes(attributes, endpointName1);
-                super.begin(endpointName, endpointName1, attributes);
-            }
-        });
-        digester.addRule(path + "/list/entry", new CallParamRule(0, "value") {
-            public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception
-            {
-                // Process template tokens
-                attributes = processAttributes(attributes, endpointName1);
-                super.begin(endpointName, endpointName1, attributes);
-            }
-        });
-
-        addPropertyFactoryRule(digester, path + "/list/factory-entry");
-        addSystemPropertyRule(digester, path + "/list/system-entry");
-        addContainerPropertyRule(digester, path + "/list/container-entry", false);
-
-        // A small hack to call a method on top -1
-        digester.addRule(path + "/list", new CallMethodRule("put", 2) {
-            public void end(String string, String string1) throws Exception
-            {
-                Object o = digester.peek(1);
-                digester.push(o);
-                super.end(string, string1);
-                o = digester.pop();
-            }
-        });
-        digester.addCallParam(path + "/list", 0, "name");
-        digester.addCallParam(path + "/list", 1, true);
-    }
-
-    protected void addPropertyFactoryRule(Digester digester, String path)
-    {
-        digester.addRule(path, new Rule() {
-
-            public void begin(String s, String s1, Attributes attributes) throws Exception
-            {
-                // Process template tokens
-                attributes = processAttributes(attributes, s1);
-
-                String clazz = attributes.getValue("factory");
-                String name = attributes.getValue("name");
-                Object props = digester.peek();
-                Object obj = ClassHelper.instanciateClass(clazz, ClassHelper.NO_ARGS);
-                if (obj instanceof PropertyFactory) {
-                    if (props instanceof Map) {
-                        obj = ((PropertyFactory) obj).create((Map) props);
-                    } else {
-                        // this must be a list so we'll get the containing
-                        // properties map
-                        obj = ((PropertyFactory) obj).create((Map) digester.peek(1));
-                    }
-                }
-                if (obj != null) {
-                    if (props instanceof Map) {
-                        ((Map) props).put(name, obj);
-                    } else {
-                        ((List) props).add(obj);
-                    }
-                }
-            }
-        });
-    }
-
-    protected void addSystemPropertyRule(Digester digester, String path)
-    {
-        digester.addRule(path, new Rule() {
-            public void begin(String s, String s1, Attributes attributes) throws Exception
-            {
-                // Process template tokens
-                attributes = processAttributes(attributes, s1);
-
-                String name = attributes.getValue("name");
-                String key = attributes.getValue("key");
-                String defaultValue = attributes.getValue("defaultValue");
-                String value = System.getProperty(key, defaultValue);
-                if (value != null) {
-                    Object props = digester.peek();
-                    if (props instanceof Map) {
-                        ((Map) props).put(name, value);
-                    } else {
-                        ((List) props).add(value);
-                    }
-                }
-            }
-        });
-    }
-
-    protected void addFilePropertiesRule(Digester digester, String path)
-    {
-        digester.addRule(path, new Rule() {
-            public void begin(String s, String s1, Attributes attributes) throws Exception
-            {
-                // Process template tokens
-                attributes = processAttributes(attributes, s1);
-
-                String location = attributes.getValue("location");
-                String temp = attributes.getValue("override");
-                boolean override = "true".equalsIgnoreCase(temp);
-                InputStream is = Utility.loadResource(location, getClass());
-                if (is == null) {
-                    throw new FileNotFoundException(location);
-                }
-                Properties p = new Properties();
-                p.load(is);
-                Map props = (Map) digester.peek();
-                if (override) {
-                    props.putAll(p);
-                } else {
-                    String key;
-                    for (Iterator iterator = p.keySet().iterator(); iterator.hasNext();) {
-                        key = (String) iterator.next();
-                        if (!props.containsKey(key)) {
-                            props.put(key, p.getProperty(key));
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    protected void addContainerPropertyRule(Digester digester, String path, final boolean setAsBeanProperties)
-    {
-        digester.addRule(path, new Rule() {
-            public void begin(String s, String s1, Attributes attributes) throws Exception
-            {
-                attributes = processAttributes(attributes, s1);
-
-                String name = attributes.getValue("name");
-                String value = attributes.getValue("reference");
-                String required = attributes.getValue("required");
-                String container = attributes.getValue("container");
-                if (required == null) {
-                    required = "true";
-                }
-                boolean req = Boolean.valueOf(required).booleanValue();
-                // if we're not setting as bean properties we need get the
-                // topmost object
-                // which will be a list or Map
-                Object obj = null;
-                if (setAsBeanProperties) {
-                    obj = digester.peek(1);
-                } else {
-                    obj = digester.peek();
-                }
-                addContainerReference(name, value, obj, req, container);
-            }
-        });
-    }
 
     private void addContainerReference(String propName,
                                        String containerRef,
@@ -1364,6 +866,16 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                                        String container)
     {
         containerReferences.add(new ContainerReference(propName, containerRef, object, required, container));
+    }
+
+    protected void addSetPropertiesRule(String path, Digester digester, String[] s1, String[] s2)
+    {
+        digester.addRule(path, new ExtendedMuleSetPropertiesRule(s1, s2));
+    }
+
+    protected void addSetPropertiesRule(String path, Digester digester)
+    {
+        digester.addRule(path, new ExtendedMuleSetPropertiesRule());
     }
 
     private void addTransformerReference(String propName, String transName, Object object)
@@ -1384,26 +896,26 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
      * ${param-name}. These will get resolved against properties set in the
      * mule-properites element
      */
-    private class MuleSetPropertiesRule extends SetPropertiesRule
+    public class ExtendedMuleSetPropertiesRule extends MuleSetPropertiesRule
     {
-
-        public MuleSetPropertiesRule()
-        {
+        public ExtendedMuleSetPropertiesRule() {
         }
 
-        public MuleSetPropertiesRule(String s, String s1)
-        {
-            super(s, s1);
+        public ExtendedMuleSetPropertiesRule(PlaceholderProcessor processor) {
+            super(processor);
         }
 
-        public MuleSetPropertiesRule(String[] strings, String[] strings1)
-        {
+        public ExtendedMuleSetPropertiesRule(String[] strings, String[] strings1) {
             super(strings, strings1);
+        }
+
+        public ExtendedMuleSetPropertiesRule(String[] strings, String[] strings1, PlaceholderProcessor processor) {
+            super(strings, strings1, processor);
         }
 
         public void begin(String s1, String s2, Attributes attributes) throws Exception
         {
-            attributes = processAttributes(attributes, s2);
+            attributes = processor.processAttributes(attributes, s2);
             // Add transformer references that will be bound to their objects
             // once
             // all configuration has bean read
@@ -1449,70 +961,13 @@ public class MuleXmlConfigurationBuilder implements ConfigurationBuilder
                     addEndpointReference("setOutboundEndpoint", endpoint, digester.peek());
                 }
             }
-
             super.begin(attributes);
         }
     }
 
-    private static Attributes processAttributes(Attributes attributes, String elementName)
-            throws ConfigurationException
-    {
-        AttributesImpl attribs = new AttributesImpl(attributes);
-        String value = null;
-        String realValue = null;
-        String key = null;
-        if (elementName.equals("property")) {
-            System.out.println("");
-        }
-        UMOManager manager = MuleManager.getInstance();
-        for (int i = 0; i < attribs.getLength(); i++) {
-            value = attribs.getValue(i);
-            int x = value.indexOf("${");
-            while (x > -1) {
-                int y = value.indexOf("}", x + 1);
-                if (y == -1) {
-                    throw new ConfigurationException(new Message(Messages.PROPERTY_TEMPLATE_MALFORMED_X, "<"
-                            + elementName + attribs.getLocalName(i) + "='" + value + "' ...>"));
-                }
-                key = value.substring(x + 2, y);
-                realValue = (String) manager.getProperty(key);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Param is '" + value + "', Property key is '" + key + "', Property value is '"
-                            + realValue + "'");
-                }
-                if (realValue != null) {
-                    value = value.substring(0, x) + realValue + value.substring(y + 1);
-                } else {
-                    logger.info("Property for placeholder: '"
-                            + key
-                            + "' was not found.  Leaving place holder as is. This is not necessarily a problem as the placeholder may not be a Mule placeholder.");
-                }
-                x = value.indexOf("${", y);
-            }
-            attribs.setValue(i, value);
-        }
-        return attribs;
-    }
-
     protected void addObjectCreateOrGetFromContainer(final String path, String defaultImpl, final String classAttrib, final String refAttrib, final boolean classRefRequired) {
-        digester.addRule(path, new ObjectCreateRule(defaultImpl, classAttrib)
-        {
-            public void begin(Attributes attributes) throws Exception
-            {
-                String ref = attributes.getValue(refAttrib);
-                if(ref!=null) {
-                    Object obj = manager.getContainerContext().getComponent(ref);
-                    digester.push(obj);
-                } else {
-                    String classRef = attributes.getValue(classAttrib);
-                    if(classRef==null && classRefRequired) {
-                        throw new ConfigurationException(new Message(
-                                Messages.MUST_SPECIFY_REF_ATTRIB_X_OR_CLASS_ATTRIB_X_FOR_X, refAttrib, classAttrib, path));
-                    } else {
-                        super.begin(attributes);
-                    }
-                }
-            }
-        });
+        digester.addRule(path, new ObjectGetOrCreateRule(
+                defaultImpl, classAttrib, refAttrib, classAttrib,
+                classRefRequired, "getContainerContext"));
     }
 }

@@ -36,8 +36,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Placeholders are ant-like tags that are embedded in MUle Xml configuration i.e. ${property.name}
- * and are used to swap in property values registered with the manager instance when the
+ * Placeholders are ant-like tags that are embedded in Mule Xml configuration i.e. ${property.name}
+ * and are used to swap in property values registered with the Mule container instance when the
  * configuration is loaded.
  *
  * This is a helper class used for parsing these tags.
@@ -56,13 +56,20 @@ public class PlaceholderProcessor
 
     private static boolean strategiesLoaded = false;
 
-    private static Map types = new HashMap();
-    private static Map schemes = new HashMap();
-    static {
+    private Map types = new HashMap();
+    private Map schemes = new HashMap();
+
+    public PlaceholderProcessor()
+    {
         types.put("PBE", PasswordBasedEncryptionStrategy.class.getName());
     }
 
-    public static Attributes processAttributes(Attributes attributes, String elementName) throws ConfigurationException {
+    public PlaceholderProcessor(Map types) {
+        this.types = types;
+    }
+
+    public Attributes processAttributes(Attributes attributes, String elementName) throws ConfigurationException
+    {
         AttributesImpl attribs = new AttributesImpl(attributes);
         String value = null;
 
@@ -78,7 +85,7 @@ public class PlaceholderProcessor
         return attribs;
     }
 
-    public static String processValue(String value) throws ConfigurationException {
+    public String processValue(String value) throws ConfigurationException {
         String realValue = null;
         String key = null;
 
@@ -109,7 +116,7 @@ public class PlaceholderProcessor
         return value;
     }
 
-    protected static String processEncryptedValue(String value) throws ConfigurationException
+    protected String processEncryptedValue(String value) throws ConfigurationException
     {
         String scheme;
         int x = value.indexOf("{encrypt:");
@@ -136,14 +143,14 @@ public class PlaceholderProcessor
         }
     }
 
-    public static UMOEncryptionStrategy getEncryptionStrategy(String scheme) throws Exception {
+    public UMOEncryptionStrategy getEncryptionStrategy(String scheme) throws Exception {
         if(!strategiesLoaded) {
             loadStrategies();
         }
         return (UMOEncryptionStrategy)schemes.get(scheme);
     }
 
-    private static void loadStrategies() throws Exception
+    private void loadStrategies() throws Exception
     {
         String path = System.getProperty(MULE_ENCRYPTION_PROPERTIES, MuleManager.getConfiguration().getWorkingDirectory()
                 + File.separator + DEFAULT_ENCRYPTION_PROPERTIES_FILE);
