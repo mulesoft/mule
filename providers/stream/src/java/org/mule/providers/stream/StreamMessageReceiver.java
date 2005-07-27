@@ -49,7 +49,16 @@ public class StreamMessageReceiver extends PollingMessageReceiver
         super(connector, component, endpoint, checkFrequency);
         this.connector = (StreamConnector)connector;
         inputStream = stream;
-
+        if(connector instanceof SystemStreamConnector) {
+            String promptMessage = (String)endpoint.getProperties().get("promptMessage");
+            String messageDelayTime = (String)endpoint.getProperties().get("messageDelayTime");
+            if(promptMessage!=null) {
+                ((SystemStreamConnector)connector).setPromptMessage(promptMessage);
+            }
+            if(messageDelayTime!=null) {
+                ((SystemStreamConnector)connector).setMessageDelayTime(Long.valueOf(messageDelayTime).longValue());
+            }
+        }
     }
 
     public void doConnect() throws Exception

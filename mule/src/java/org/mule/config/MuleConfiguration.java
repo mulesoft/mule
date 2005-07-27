@@ -15,11 +15,6 @@
 
 package org.mule.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
@@ -29,6 +24,11 @@ import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.util.ClassHelper;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.mule.util.queue.QueuePersistenceStrategy;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * <code>MuleConfiguration</code> holds the runtime configuration specific to
@@ -192,6 +192,11 @@ public class MuleConfiguration
      */
     private boolean clientMode = false;
 
+    /**
+     * Whether the server is embedded by another framework and certain stand-alone
+     * features
+     */
+    private boolean embedded = false;
     /**
      * The default connection Strategy used for a connector when one hasn't been
      * defined for the connector
@@ -365,7 +370,11 @@ public class MuleConfiguration
 
     public void setServerUrl(String serverUrl)
     {
-        this.serverUrl = serverUrl;
+        if(embedded) {
+            serverUrl = null;
+        } else {
+            this.serverUrl = serverUrl;
+        }
     }
 
     public String getProductVersion()
@@ -466,5 +475,14 @@ public class MuleConfiguration
     public void setConnectionStrategy(ConnectionStrategy connectionStrategy)
     {
         this.connectionStrategy = connectionStrategy;
+    }
+
+    public boolean isEmbedded() {
+        return embedded;
+    }
+
+    public void setEmbedded(boolean embedded) {
+        this.embedded = embedded;
+        serverUrl=null;
     }
 }
