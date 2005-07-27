@@ -13,8 +13,8 @@
  */
 package org.mule.jbi;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
+import junit.framework.TestCase;
+import org.mule.jbi.framework.JbiContainerImpl;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.InOnly;
@@ -26,10 +26,8 @@ import javax.jbi.messaging.RobustInOnly;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
-
-import junit.framework.TestCase;
-
-import org.mule.jbi.framework.JbiContainerImpl;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 
 public class SimpleFunctionalTestCase extends TestCase {
 
@@ -53,8 +51,8 @@ public class SimpleFunctionalTestCase extends TestCase {
 		// Initialize jbi
 		container.initialize();
 		// Create components
-		provider = new TestComponent();
-		consumer = new TestComponent();
+		provider = new TestComponent("provider");
+		consumer = new TestComponent("consumer");
 		// Register components
 		container.getRegistry().addTransientEngine("provider", provider);
 		container.getRegistry().addTransientEngine("consumer", consumer);

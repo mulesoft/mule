@@ -13,13 +13,25 @@
  */
 package org.mule.jbi.engines.pxe;
 
-import java.io.File;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.fs.pxe.bpel.provider.BpelServiceProvider;
+import com.fs.pxe.kernel.modbpellog.ModBpelEventLogger;
+import com.fs.pxe.kernel.modhibernatedao.ModHibernateDAO;
+import com.fs.pxe.kernel.modjdbc.ModJdbcDS;
+import com.fs.pxe.kernel.modsfwk.ModSfwk;
+import com.fs.pxe.kernel.modsfwk.ModSvcProvider;
+import com.fs.pxe.sfwk.core.PxeSystemException;
+import com.fs.pxe.sfwk.deployment.SarFile;
+import com.fs.pxe.sfwk.deployment.SystemDeploymentBundle;
+import com.fs.pxe.sfwk.deployment.som.SystemDescriptor;
+import com.fs.pxe.sfwk.mngmt.DomainAdminMBean;
+import com.fs.pxe.sfwk.mngmt.SystemAdminMBean;
+import com.fs.pxe.sfwk.spi.Message;
+import com.fs.pxe.sfwk.spi.MessageExchangeEvent;
+import com.fs.pxe.sfwk.spi.ServiceContext;
+import com.fs.pxe.sfwk.spi.ServicePort;
+import com.fs.utils.DOMUtils;
+import org.mule.jbi.components.AbstractComponent;
+import org.w3c.dom.Document;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.InOnly;
@@ -40,27 +52,12 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-
-import org.mule.jbi.components.AbstractComponent;
-import org.w3c.dom.Document;
-
-import com.fs.pxe.bpel.provider.BpelServiceProvider;
-import com.fs.pxe.kernel.modbpellog.ModBpelEventLogger;
-import com.fs.pxe.kernel.modhibernatedao.ModHibernateDAO;
-import com.fs.pxe.kernel.modjdbc.ModJdbcDS;
-import com.fs.pxe.kernel.modsfwk.ModSfwk;
-import com.fs.pxe.kernel.modsfwk.ModSvcProvider;
-import com.fs.pxe.sfwk.core.PxeSystemException;
-import com.fs.pxe.sfwk.deployment.SarFile;
-import com.fs.pxe.sfwk.deployment.SystemDeploymentBundle;
-import com.fs.pxe.sfwk.deployment.som.SystemDescriptor;
-import com.fs.pxe.sfwk.mngmt.DomainAdminMBean;
-import com.fs.pxe.sfwk.mngmt.SystemAdminMBean;
-import com.fs.pxe.sfwk.spi.Message;
-import com.fs.pxe.sfwk.spi.MessageExchangeEvent;
-import com.fs.pxe.sfwk.spi.ServiceContext;
-import com.fs.pxe.sfwk.spi.ServicePort;
-import com.fs.utils.DOMUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class PxeComponent extends AbstractComponent {
 
@@ -69,11 +66,7 @@ public class PxeComponent extends AbstractComponent {
 	private Map services;
 	private Map endpoints;
 
-	public static final URI IN_ONLY_PATTERN = URI.create("http://www.w3.org/2004/08/wsdl/in-only");
-	public static final URI IN_OPTIONAL_OUT_PATTERN = URI.create("http://www.w3.org/2004/08/wsdl/in-opt-out");
-	public static final URI IN_OUT_PATTERN = URI.create("http://www.w3.org/2004/08/wsdl/in-out");
-	public static final URI ROBUST_IN_ONLY_PATTERN = URI.create("http://www.w3.org/2004/08/wsdl/robust-in-only");
-	
+
 	/** Singleton instance */
 	private static PxeComponent instance;
 	
@@ -91,7 +84,6 @@ public class PxeComponent extends AbstractComponent {
 	 * @see org.mule.jbi.components.AbstractComponent#doInit()
 	 */
 	protected void doInit() throws Exception {
-		super.doInit();
 		this.server = this.context.getMBeanServer();
 
 		InitialContext ctx = new InitialContext();
@@ -163,7 +155,6 @@ public class PxeComponent extends AbstractComponent {
 			this.server.invoke(this.names[i], "stop", new Object[0], new String[0]);
 			this.server.unregisterMBean(this.names[i]);
 		}
-		super.doShutDown();
 	}
 
 	/* (non-Javadoc)
@@ -266,8 +257,7 @@ public class PxeComponent extends AbstractComponent {
 			return;
 		}
 		try {
-			if (!me.getPattern().equals(IN_ONLY_PATTERN) &&
-				!me.getPattern().equals(ROBUST_IN_ONLY_PATTERN)) {
+			if (isInOnly(me)) {
 				throw new Exception("Unsupporte mep pattern: " + me.getPattern());
 			}
 			String svcName = me.getEndpoint().getServiceName().getLocalPart();

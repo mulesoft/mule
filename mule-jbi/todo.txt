@@ -8,10 +8,10 @@ Components MUST be jbi implementation neutrals
     * use shared libraries or internal jars
     
 Binding components:
-    * mule
+    * mule (we can use Mule for all binding)
     * jms
-    * file
     * ws (http/soap) with axis
+    * JBI binding for Mule
     
 Reconnections
 Management 
@@ -19,9 +19,14 @@ Management
 JAXR / UDDI : apache scout / uddi4j
 
 JSR 106 : XML Digital Encryption (http://xml.apache.org/security/)
+We should be able to reuse the Mule security provider stuff
 
 Scripting: JSR 223 / JSR 241
 
 Wsdl4j : JSR 110
 
 Rules based router : JSR-94 + Drools
+
+BPEL :
+Agila
+PXE

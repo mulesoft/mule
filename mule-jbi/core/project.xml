@@ -17,17 +17,20 @@
         </dependency>
         <dependency>
             <groupId>mule</groupId>
-            <artifactId>mule-jbi-shared</artifactId>
+            <artifactId>mule-jbi-schemas</artifactId>
             <version>${pom.currentVersion}</version>
             <type>jar</type>
-            <properties>
-                <eclipse.dependency>true</eclipse.dependency>
-            </properties>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
-            <artifactId>mule-jbi-schemas</artifactId>
-            <version>${pom.currentVersion}</version>
+            <artifactId>mule-core</artifactId>
+            <version>${mule_version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-jbi-provider</artifactId>
+            <version>${mule_jbi_provider_version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -64,6 +67,12 @@
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-javamail</artifactId>
             <version>${geronimo_spec_javamail_version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee-management</artifactId>
+            <version>${geronimo_spec_j2ee_management_version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -141,10 +150,22 @@
             <type>jar</type>
             <url>http://jotm.objectweb.org</url>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>pxe</groupId>-->
+<!--            <artifactId>naming</artifactId>-->
+<!--            <jar>naming.jar</jar>-->
+<!--            <type>jar</type>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>pxe</groupId>
-            <artifactId>naming</artifactId>
-            <jar>naming.jar</jar>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+            <version>${commons_digester_version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>${commons_beanutils_version}</version>
             <type>jar</type>
         </dependency>
     </dependencies>

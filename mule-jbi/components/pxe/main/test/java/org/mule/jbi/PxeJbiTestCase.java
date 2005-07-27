@@ -1,6 +1,10 @@
 package org.mule.jbi;
-import java.io.File;
-import java.net.URL;
+import com.fs.utils.DOMUtils;
+import junit.framework.TestCase;
+import org.mule.jbi.engines.pxe.PxeBootstrap;
+import org.mule.jbi.engines.pxe.PxeComponent;
+import org.mule.jbi.framework.JbiContainerImpl;
+import org.mule.jbi.registry.Engine;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.InOnly;
@@ -13,15 +17,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-
-import junit.framework.TestCase;
-
-import org.mule.jbi.engines.pxe.PxeBootstrap;
-import org.mule.jbi.engines.pxe.PxeComponent;
-import org.mule.jbi.framework.JbiContainerImpl;
-import org.mule.jbi.registry.Engine;
-
-import com.fs.utils.DOMUtils;
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
 
 public class PxeJbiTestCase extends TestCase {
 
@@ -46,7 +44,7 @@ public class PxeJbiTestCase extends TestCase {
 		// Deploy service unit
 		//URL url = Thread.currentThread().getContextClassLoader().getResource("AsyncProcess/AsyncProcess.bpel");
 		URL url = Thread.currentThread().getContextClassLoader().getResource("AsyncProcessSU/AsyncProcess.jar");
-		File asyncProcessDir = new File(url.toURI()).getParentFile();
+		File asyncProcessDir = new File(URI.create(url.toExternalForm())).getParentFile();
 		container.getRegistry().addTransientUnit("AsyncProcess", pxe, asyncProcessDir.getAbsolutePath());
 
 		// Register endpoints

@@ -13,14 +13,13 @@
  */
 package org.mule.jbi.registry.impl;
 
-import java.io.IOException;
-
-import javax.jbi.JBIException;
-import javax.jbi.component.ServiceUnitManager;
-
 import org.mule.jbi.registry.Assembly;
 import org.mule.jbi.registry.Component;
 import org.mule.jbi.registry.Unit;
+
+import javax.jbi.JBIException;
+import javax.jbi.component.ServiceUnitManager;
+import java.io.IOException;
 
 /**
  * 

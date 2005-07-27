@@ -13,26 +13,24 @@
  */
 package org.mule.jbi.registry.impl;
 
+import com.sun.java.xml.ns.jbi.ConnectionDocument.Connection;
+import com.sun.java.xml.ns.jbi.ConnectionsDocument.Connections;
+import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
+import com.sun.java.xml.ns.jbi.ServiceUnitDocument.ServiceUnit;
+import org.mule.jbi.registry.Assembly;
+import org.mule.jbi.registry.Component;
+import org.mule.jbi.registry.Unit;
+import org.mule.jbi.util.IOUtils;
+
+import javax.jbi.JBIException;
+import javax.jbi.component.ServiceUnitManager;
+import javax.xml.namespace.QName;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.jbi.JBIException;
-import javax.jbi.component.ServiceUnitManager;
-import javax.xml.namespace.QName;
-
-import org.mule.jbi.registry.Assembly;
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.registry.Unit;
-import org.mule.jbi.util.IOUtils;
-
-import com.sun.java.xml.ns.jbi.ConnectionDocument.Connection;
-import com.sun.java.xml.ns.jbi.ConnectionsDocument.Connections;
-import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
-import com.sun.java.xml.ns.jbi.ServiceUnitDocument.ServiceUnit;
 
 /**
  * TODO: each SU should be deployed independently
@@ -79,7 +77,7 @@ public class AssemblyImpl extends AbstractEntry implements Assembly {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.impl.AbstractEntry#checkDescriptor()
+	 * @see org.mule.jbi.registry.mule.AbstractEntry#checkDescriptor()
 	 */
 	protected void checkDescriptor() throws JBIException {
 		super.checkDescriptor();

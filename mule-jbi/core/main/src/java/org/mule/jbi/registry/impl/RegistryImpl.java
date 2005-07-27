@@ -13,18 +13,6 @@
  */
 package org.mule.jbi.registry.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.jbi.JBIException;
-import javax.jbi.component.Bootstrap;
-
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.management.Directories;
 import org.mule.jbi.management.InstallationContextImpl;
@@ -35,6 +23,17 @@ import org.mule.jbi.registry.Engine;
 import org.mule.jbi.registry.Library;
 import org.mule.jbi.registry.Registry;
 import org.mule.jbi.registry.RegistryIO;
+
+import javax.jbi.JBIException;
+import javax.jbi.component.Bootstrap;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -50,6 +49,9 @@ public class RegistryImpl implements Registry {
 	private transient Map librariesMap;
 	private transient Map assembliesMap;
 	private transient File store;
+
+    private boolean started = false;
+
 	public RegistryImpl() {
 		this.engines = new ArrayList();
 		this.bindings = new ArrayList();
@@ -133,9 +135,10 @@ public class RegistryImpl implements Registry {
 	 * @see org.mule.jbi.registry.Registry#addTransientEngine(java.lang.String, javax.jbi.component.Component)
 	 */
 	public synchronized Engine addTransientEngine(String name, javax.jbi.component.Component engine, Bootstrap bootstrap) throws JBIException, IOException {
-		Component c = getComponent(name);
+		EngineImpl e = null;
+        Component c = getComponent(name);
 		if (c == null) {
-			EngineImpl e = new EngineImpl();
+			e = new EngineImpl();
 			e.setName(name);
 			e.setTransient(true);
 			e.setComponent(engine);
@@ -143,20 +146,23 @@ public class RegistryImpl implements Registry {
 			e.setWorkspaceRoot(Directories.getEngineWorkspaceDir(JbiContainer.Factory.getInstance().getWorkingDir(), name).getAbsoluteFile().getCanonicalPath());
 			this.engines.add(e);
 			this.componentsMap.put(name, e);
+
 			if (bootstrap != null) {
 				InstallationContextImpl ctx = new InstallationContextImpl(e, bootstrap);
 				bootstrap.init(ctx);
 				ctx.install();
 			}
-			return e;
 		} else {
 			if (!(c instanceof EngineImpl) || !c.isTransient()) {
 				throw new JBIException("A non-transient or non-engine component is already registered: " + name);
 			}
-			EngineImpl e = (EngineImpl) c;
+		    e = (EngineImpl) c;
 			e.setComponent(engine);
-			return e;
 		}
+        if(c instanceof AbstractComponent && c.isTransient()) {
+            ((AbstractComponent)c).initComponent();
+        }
+        return e;
 	}
 
 	/* (non-Javadoc)
@@ -314,7 +320,8 @@ public class RegistryImpl implements Registry {
 	 * @see org.mule.jbi.registry.Registry#start()
 	 */
 	public synchronized void start() throws JBIException {
-		try {
+		started = true;
+        try {
 			Component[] components = getComponents();
 			for (int i = 0; i < components.length; i++) {
 				components[i].restoreState();

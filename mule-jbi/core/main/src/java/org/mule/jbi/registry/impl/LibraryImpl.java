@@ -13,6 +13,11 @@
  */
 package org.mule.jbi.registry.impl;
 
+import org.mule.jbi.registry.Component;
+import org.mule.jbi.registry.Library;
+import org.mule.jbi.util.IOUtils;
+
+import javax.jbi.JBIException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,12 +25,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.jbi.JBIException;
-
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.registry.Library;
-import org.mule.jbi.util.IOUtils;
 
 /**
  * 
@@ -63,7 +62,7 @@ public class LibraryImpl extends AbstractEntry implements Library {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.impl.AbstractEntry#checkDescriptor()
+	 * @see org.mule.jbi.registry.mule.AbstractEntry#checkDescriptor()
 	 */
 	protected void checkDescriptor() throws JBIException {
 		super.checkDescriptor();

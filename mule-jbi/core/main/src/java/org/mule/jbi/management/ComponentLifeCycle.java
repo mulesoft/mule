@@ -13,15 +13,14 @@
  */
 package org.mule.jbi.management;
 
-import java.io.IOException;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.framework.ComponentContextImpl;
+import org.mule.jbi.registry.Component;
 
 import javax.jbi.JBIException;
 import javax.jbi.management.ComponentLifeCycleMBean;
 import javax.management.ObjectName;
-
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.framework.ComponentContextImpl;
-import org.mule.jbi.registry.Component;
+import java.io.IOException;
 
 /**
  * Management bean for a component lifecycle.
@@ -38,7 +37,7 @@ public class ComponentLifeCycle implements ComponentLifeCycleMBean {
 		this.component = component;
 	}
 	
-	public void init() throws JBIException {
+	public synchronized void init() throws JBIException {
 		ComponentContextImpl context = new ComponentContextImpl(this.container, this.component);
 		this.component.getComponent().getLifeCycle().init(context);
 	}

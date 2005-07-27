@@ -13,20 +13,18 @@
  */
 package org.mule.jbi.registry.impl;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
-
-import javax.jbi.JBIException;
-
+import com.sun.java.xml.ns.jbi.JbiDocument;
+import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.registry.Entry;
 import org.mule.jbi.registry.Registry;
 import org.mule.jbi.registry.RegistryIO;
 
-import com.sun.java.xml.ns.jbi.JbiDocument;
-import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
+import javax.jbi.JBIException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * 

@@ -16,6 +16,10 @@
  */
 package org.mule.jbi.work;
 
+import EDU.oswego.cs.dl.util.concurrent.Latch;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkAdapter;
@@ -24,11 +28,6 @@ import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 import javax.resource.spi.work.WorkRejectedException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import EDU.oswego.cs.dl.util.concurrent.Latch;
 
 /**
  * <code>WorkerContext</code> TODO
@@ -114,7 +113,6 @@ public class WorkerContext implements Work
      * Create a WorkWrapper.
      * 
      * @param work Work to be wrapped.
-     * @param transactionContextManager
      */
     public WorkerContext(Work work)
     {
@@ -223,7 +221,6 @@ public class WorkerContext implements Work
      */
     public synchronized boolean isTimedOut()
     {
-    	//assert isAccepted : "The work is not accepted.";
         // A value of 0 means that the work never times out.
         // ??? really?
         if (0 == startTimeOut || startTimeOut == MuleWorkManager.INDEFINITE) {

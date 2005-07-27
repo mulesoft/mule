@@ -13,15 +13,16 @@
  */
 package org.mule.jbi;
 
-import java.io.File;
+import org.mule.jbi.nmr.InternalMessageRouter;
+import org.mule.jbi.registry.Registry;
+import org.mule.umo.manager.UMOContainerContext;
 
 import javax.jbi.JBIException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
-
-import org.mule.jbi.registry.Registry;
+import java.io.File;
 
 /**
  * 
@@ -45,7 +46,7 @@ public interface JbiContainer {
 	 * Router
 	 * @return
 	 */
-	Router getRouter();
+	InternalMessageRouter getRouter();
 	
 	Messaging getMessaging();
 	
@@ -76,4 +77,10 @@ public interface JbiContainer {
 			Factory.instance = instance;
 		}
 	}
+
+    UMOContainerContext getObjectContainer();
+
+    void addObjectContainer(UMOContainerContext container) throws JBIException;
+
+    UMOContainerContext removeObjectContainer(UMOContainerContext container);
 }

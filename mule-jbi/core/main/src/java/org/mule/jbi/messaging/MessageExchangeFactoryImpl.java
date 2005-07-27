@@ -13,11 +13,15 @@
  */
 package org.mule.jbi.messaging;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import org.apache.axis2.wsdl.builder.wsdl4j.WSDLPump;
+import org.apache.wsdl.WSDLConstants;
+import org.apache.wsdl.WSDLDescription;
+import org.apache.wsdl.WSDLInterface;
+import org.apache.wsdl.WSDLOperation;
+import org.apache.wsdl.impl.WSDLDescriptionImpl;
+import org.mule.jbi.registry.Component;
+import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
+import org.w3c.dom.Document;
 
 import javax.jbi.messaging.InOnly;
 import javax.jbi.messaging.InOptionalOut;
@@ -31,18 +35,11 @@ import javax.wsdl.Definition;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
-
-import org.apache.axis2.wsdl.builder.wsdl4j.WSDLPump;
-import org.apache.wsdl.WSDLConstants;
-import org.apache.wsdl.WSDLDescription;
-import org.apache.wsdl.WSDLInterface;
-import org.apache.wsdl.WSDLOperation;
-import org.apache.wsdl.impl.WSDLDescriptionImpl;
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
-import org.w3c.dom.Document;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import java.net.URI;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * 
@@ -82,7 +79,7 @@ public class MessageExchangeFactoryImpl implements MessageExchangeFactory {
 				String uri = doc.getDocumentElement().getNamespaceURI();
 				WSDLDescription desc = null; 
 				if (WSDLConstants.WSDL2_0_NAMESPACE.equals(uri)) {
-					throw new NotImplementedException();
+					throw new UnsupportedOperationException(uri);
 				} else if (WSDLConstants.WSDL1_1_NAMESPACE.equals(uri)) {
 			        WSDLReader reader = WSDLFactory.newInstance().newWSDLReader();
 			        Definition def = reader.readWSDL(null, doc);

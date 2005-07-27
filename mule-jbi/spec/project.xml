@@ -16,5 +16,23 @@
             <artifactId>geronimo-spec-javamail</artifactId>
             <version>${geronimo_spec_javamail_version}</version>
         </dependency>
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>${wsdl4j_version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-jaxrpc</artifactId>
+            <version>1.2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-jmx</artifactId>
+            <version>${mx4j_jmx_version}</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>

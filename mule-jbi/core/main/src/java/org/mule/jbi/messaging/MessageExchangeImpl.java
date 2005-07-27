@@ -13,11 +13,8 @@
  */
 package org.mule.jbi.messaging;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.util.UUID;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.Fault;
@@ -28,21 +25,18 @@ import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
-
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.framework.JbiContainerImpl;
-import org.mule.jbi.util.UUID;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
-public class MessageExchangeImpl implements MessageExchange, Serializable {
+public class MessageExchangeImpl implements MessageExchange, Serializable, MessageExchangeConstants {
 
-	public static final String IN = "in";
-	public static final String OUT = "out";
-	public static final String FAULT = "fault";
-	
 	private String exchangeId;
 	private ExchangeStatus status;
 	private Exception error;

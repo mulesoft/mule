@@ -13,8 +13,25 @@
  */
 package org.mule.jbi.framework;
 
-import java.io.File;
-import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.impl.container.MultiContainerContext;
+import org.mule.impl.jndi.MuleInitialContextFactory;
+import org.mule.jbi.Endpoints;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.Messaging;
+import org.mule.jbi.management.AdminService;
+import org.mule.jbi.management.DeploymentService;
+import org.mule.jbi.management.Directories;
+import org.mule.jbi.management.InstallationService;
+import org.mule.jbi.nmr.DirectRouter;
+import org.mule.jbi.nmr.InternalMessageRouter;
+import org.mule.jbi.registry.Registry;
+import org.mule.jbi.registry.RegistryIO;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOContainerContext;
+import org.objectweb.jotm.Jotm;
 
 import javax.jbi.JBIException;
 import javax.jbi.management.AdminServiceMBean;
@@ -29,23 +46,8 @@ import javax.management.StandardMBean;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.jbi.Endpoints;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.Messaging;
-import org.mule.jbi.Router;
-import org.mule.jbi.management.AdminService;
-import org.mule.jbi.management.DeploymentService;
-import org.mule.jbi.management.Directories;
-import org.mule.jbi.management.InstallationService;
-import org.mule.jbi.registry.Registry;
-import org.mule.jbi.registry.RegistryIO;
-import org.mule.jbi.routing.RouterImpl;
-import org.objectweb.jotm.Jotm;
-
-import com.fs.naming.mem.InMemoryContextFactory;
+import java.io.File;
+import java.util.List;
 
 /**
  * 
@@ -61,16 +63,18 @@ public class JbiContainerImpl implements JbiContainer {
 	private MBeanServer mBeanServer;
 	private TransactionManager transactionManager;
 	private String jmxDomainName;
-	private Router router;
 	private Registry registry;
 	private Endpoints endpoints;
 	private Messaging messaging;
 	private File workingDir;
 	private InitialContext namingContext;
-	
+    private MultiContainerContext objectContainer;
+    private InternalMessageRouter router;
+
 	public JbiContainerImpl() {
 		this.workingDir = new File(DEFAULT_WORKING_DIR);
 		this.jmxDomainName = DEFAULT_JMX_DOMAIN;
+        objectContainer = new MultiContainerContext();
 	}
 	
 	public MBeanServer getMBeanServer() {
@@ -97,11 +101,11 @@ public class JbiContainerImpl implements JbiContainer {
 		this.jmxDomainName = jmxDomainName;
 	}
 
-	public Router getRouter() {
+	public InternalMessageRouter getRouter() {
 		return this.router;
 	}
 
-	public void setRouter(Router router) {
+	public void setRouter(InternalMessageRouter router) {
 		this.router = router;
 	}
 	
@@ -160,6 +164,11 @@ public class JbiContainerImpl implements JbiContainer {
 		try {
 			JbiContainer.Factory.setInstance(this);
 			Directories.createDirectories(this.workingDir);
+            //initialise a Mule instance that will manage our connections
+            MuleManager.getConfiguration().setEmbedded(true);
+            MuleManager.getInstance().setTransactionManager(transactionManager);
+            //todo should set workmanager too
+            ((MuleManager)MuleManager.getInstance()).initialise();
 			if (this.mBeanServer == null) {
 				LOGGER.debug("Creating MBeanServer");
 				List l = MBeanServerFactory.findMBeanServer(null);
@@ -175,7 +184,7 @@ public class JbiContainerImpl implements JbiContainer {
 				this.transactionManager.setTransactionTimeout(60);
 			}
 			if (this.namingContext == null) {
-			    System.setProperty(Context.INITIAL_CONTEXT_FACTORY, InMemoryContextFactory.class.getName());
+			    System.setProperty(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
 			    System.setProperty(Context.PROVIDER_URL, "mule-jbi");
 			}
 			this.endpoints = new EndpointsImpl();
@@ -193,7 +202,7 @@ public class JbiContainerImpl implements JbiContainer {
 				this.registry = RegistryIO.create(regStore);
 			}
 			if (this.router == null) {
-				this.router = new RouterImpl();
+				this.router = new InternalMessageRouter(this, new DirectRouter(registry));
 			}
 		} catch (Exception e) {
 			if (e instanceof JBIException) {
@@ -217,6 +226,7 @@ public class JbiContainerImpl implements JbiContainer {
 			DeploymentService deploy = new DeploymentService(this);
 			registerMBean(new StandardMBean(deploy, DeploymentServiceMBean.class), createMBeanName(null, "service", "deploy"));
 			this.registry.start();
+            MuleManager.getInstance().start();
 		} catch (Exception e) {
 			if (e instanceof JBIException) {
 				throw (JBIException) e;
@@ -257,4 +267,37 @@ public class JbiContainerImpl implements JbiContainer {
 		this.namingContext = namingContext;
 	}
 
+    /**
+     * associatesone or more Dependency Injector/Jndi containers with this container.
+     * This can be used to integrate container managed resources with Mule resources
+     *
+     * @param container a Container context to use. By default, there is a
+     *            default Mule container <code>MuleContainerContext</code>
+     *            that will assume that the reference key for an oblect is a
+     *            classname and will try to instanciate it.
+     */
+    public void addObjectContainer(UMOContainerContext container) throws JBIException
+    {
+        if (container == null) {
+            if (objectContainer != null) {
+                objectContainer.dispose();
+            }
+            objectContainer = new MultiContainerContext();
+        } else {
+            try {
+                objectContainer.initialise();
+            } catch (InitialisationException e) {
+                throw new JBIException(e.getMessage(), e.getCause());
+            }
+            objectContainer.addContainer(container);
+        }
+    }
+
+    public UMOContainerContext getObjectContainer() {
+        return objectContainer;
+    }
+
+    public UMOContainerContext removeObjectContainer(UMOContainerContext container) {
+        return objectContainer.removeContainer(container.getName());
+    }
 }

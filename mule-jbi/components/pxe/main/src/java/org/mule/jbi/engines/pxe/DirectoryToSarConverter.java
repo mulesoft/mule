@@ -4,20 +4,6 @@
  */
 package org.mule.jbi.engines.pxe;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.zip.ZipException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
-
 import com.fs.pxe.bpel.capi.CompilationException;
 import com.fs.pxe.bpel.compiler.BpelC;
 import com.fs.pxe.sfwk.deployment.ExplodedSarFile;
@@ -28,6 +14,19 @@ import com.fs.pxe.sfwk.rr.RrException;
 import com.fs.pxe.sfwk.rr.wsdl.WsdlCacheRr;
 import com.fs.utils.TempFileManager;
 import com.fs.utils.sax.LoggingErrorHandler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.zip.ZipException;
 
 /**
  * Utility class that compiles JAR files contianing source artifacts such
@@ -45,7 +44,7 @@ class DirectoryToSarConverter {
    * or more WSDL files (if more than one, the "root" WSDL should be named
    * <code>main.wsdl</code>).  
    *
-   * @param jar JAR file containing source artifacts
+   * @param directory JAR file containing source artifacts
    *
    * @throws IOException
    * @throws URISyntaxException

@@ -70,5 +70,10 @@ public interface Entry {
     /** Value returned by {@link #getCurrentState()} for a component in an
      * unknown state. */
     final static String UNKNOWN  = "Unknown";
-    
+
+    /** Value returned by {@link #getCurrentState()} for a component in an
+     * initialised state. */
+    final static String INITIALIZED  = "Initialized";
+
+
 }

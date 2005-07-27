@@ -13,8 +13,6 @@
  */
 package org.mule.jbi.messaging;
 
-import java.util.Set;
-
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.Fault;
 import javax.jbi.messaging.MessageExchange;
@@ -22,6 +20,7 @@ import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.NormalizedMessage;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
+import java.util.Set;
 
 /**
  * 
@@ -173,7 +172,7 @@ public abstract class MessageExchangeProxy implements MessageExchange {
 
 	public Role getRole() {
 		if (!can(CAN_OWNER)) {
-			throw new IllegalStateException("component is not owner");
+			//throw new IllegalStateException("component is not owner");
 		}
 		return can(CAN_PROVIDER) ? Role.PROVIDER : Role.CONSUMER;
 	}

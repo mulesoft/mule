@@ -13,20 +13,6 @@
  */
 package org.mule.jbi.registry.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.jbi.JBIException;
-import javax.jbi.management.ComponentLifeCycleMBean;
-import javax.jbi.messaging.DeliveryChannel;
-import javax.management.ObjectName;
-import javax.management.StandardMBean;
-
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.framework.ClassLoaderFactory;
 import org.mule.jbi.management.ComponentLifeCycle;
@@ -35,6 +21,19 @@ import org.mule.jbi.registry.Component;
 import org.mule.jbi.registry.Library;
 import org.mule.jbi.registry.Unit;
 import org.mule.jbi.util.IOUtils;
+
+import javax.jbi.JBIException;
+import javax.jbi.management.ComponentLifeCycleMBean;
+import javax.jbi.messaging.DeliveryChannel;
+import javax.management.ObjectName;
+import javax.management.StandardMBean;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 
@@ -116,7 +115,7 @@ public class AbstractComponent extends AbstractEntry implements Component {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.impl.AbstractEntry#checkDescriptor()
+	 * @see org.mule.jbi.registry.mule.AbstractEntry#checkDescriptor()
 	 */
 	protected void checkDescriptor() throws JBIException {
 		super.checkDescriptor();
@@ -140,7 +139,7 @@ public class AbstractComponent extends AbstractEntry implements Component {
 				container.getMBeanServer().unregisterMBean(this.objectName);
 			}
 			container.getMBeanServer().registerMBean(new StandardMBean(lf, ComponentLifeCycleMBean.class), objectName);
-			setCurrentState(SHUTDOWN);
+			setCurrentState(INITIALIZED);
 			return objectName;
 		} catch (Exception e) {
 			throw new JBIException(e);
@@ -192,13 +191,14 @@ public class AbstractComponent extends AbstractEntry implements Component {
 	 * @see org.mule.jbi.registry.Component#restoreState(org.mule.jbi.JbiContainer)
 	 */
 	public synchronized void restoreState() throws JBIException, IOException {
-		if (!getCurrentState().equals(UNKNOWN)) {
+		if (!getCurrentState().equals(UNKNOWN) && !getCurrentState().equals(INITIALIZED)) {
 			throw new JBIException("Illegal status: " + getCurrentState());
 		}
 		if (!isTransient) {
 			createComponent();
+            initComponent();
 		}
-		initComponent();
+		//initComponent();
 		if (getStateAtShutdown().equals(RUNNING)) {
 			start();
 		}

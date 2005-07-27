@@ -13,19 +13,23 @@
  */
 package org.mule.jbi.messaging;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import EDU.oswego.cs.dl.util.concurrent.WaitFreeQueue;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.components.AbstractComponent;
+import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 
 import javax.jbi.messaging.DeliveryChannel;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessageExchangeFactory;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.servicedesc.ServiceEndpoint;
+import javax.transaction.InvalidTransactionException;
+import javax.transaction.SystemException;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
-
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 
 /**
  * 
@@ -33,20 +37,27 @@ import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
  */
 public class DeliveryChannelImpl implements DeliveryChannel {
 
-	private BlockingQueue queue;
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
+
+	private WaitFreeQueue queue;
 	private JbiContainer container;
-	private String component;
+	private AbstractComponent component;
+    private String componentName;
 	private boolean closed;
 	
 	public DeliveryChannelImpl(JbiContainer container, String component) {
 		this.container = container;
-		this.component = component;
+		this.component = (AbstractComponent)container.getRegistry().getComponent(component).getComponent();
+        this.componentName = component;
 		// TODO: queue creation should be customized
-		this.queue = new LinkedBlockingQueue();
+		this.queue = new WaitFreeQueue();
 	}
 	
 	public void close() throws MessagingException {
-		this.container.getEndpoints().unregisterEndpoints(this.component);
+		this.container.getEndpoints().unregisterEndpoints(this.componentName);
 		this.closed = true;
 	}
 
@@ -93,7 +104,7 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			throw new MessagingException("Channel is closed");
 		}
 		try {
-			MessageExchange me = (MessageExchange) queue.poll(timeout, TimeUnit.MILLISECONDS);
+			MessageExchange me = (MessageExchange) queue.poll(timeout);
 			if (me != null) {
 				handleReceive(me);
 			}
@@ -102,6 +113,19 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			throw new MessagingException(e);
 		}
 	}
+    public void receive(MessageExchange me) throws MessagingException, SystemException, InvalidTransactionException {
+        if (me.isTransacted()) {
+            TransactionManager mgr = (TransactionManager) component.getContext().getTransactionManager();
+            Transaction tx = (Transaction) me.getProperty(MessageExchange.JTA_TRANSACTION_PROPERTY_NAME);
+            mgr.resume(tx);
+        }
+
+        if(component instanceof MessageListener) {
+            ((MessageListener)component).onMessage(me);
+        } else {
+            enqueue(me);
+        }
+    }
 
 	public void send(MessageExchange exchange) throws MessagingException {
 		if (this.closed) {
@@ -114,7 +138,7 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 		String target;
 		if (me.getRole() == MessageExchange.Role.CONSUMER) {
 			if (me.getConsumer() == null) {
-				me.setConsumer(this.component);
+				me.setConsumer(this.componentName);
 				ServiceEndpoint se = this.container.getRouter().getTargetEndpoint(exchange);
 				me.setEndpoint(se);
 				target = ((AbstractServiceEndpoint) se).getComponent();
@@ -126,8 +150,8 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			target = me.getConsumer();
 		}
 		me.handleSend(false);
-		DeliveryChannelImpl ch = (DeliveryChannelImpl) this.container.getRegistry().getComponent(target).getChannel();
-		ch.enqueue(me.getTwin());
+        container.getRouter().send(me);
+
 	}
 
 	public boolean sendSync(MessageExchange exchange) throws MessagingException {
@@ -145,7 +169,7 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 		String target;
 		if (me.getRole() == MessageExchange.Role.CONSUMER) {
 			if (me.getConsumer() == null) {
-				me.setConsumer(this.component);
+				me.setConsumer(this.componentName);
 				ServiceEndpoint se = this.container.getRouter().getTargetEndpoint(exchange);
 				me.setEndpoint(se);
 				target = ((AbstractServiceEndpoint) se).getComponent();
@@ -179,7 +203,7 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			throw new MessagingException("exchange should be created with MessageExchangeFactory");
 		}
 		MessageExchangeProxy me = (MessageExchangeProxy) exchange;
-		me.handleAccept();
+	    me.handleAccept();
 	}
 	
 	public void enqueue(MessageExchange exchange) throws MessagingException {
@@ -193,8 +217,12 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 				me.notify();
 			}
 		} else {
-			queue.add(exchange);
-		}
+            try {
+                queue.put(exchange);
+            } catch (InterruptedException e) {
+                logger.error(e);
+            }
+        }
 	}
 
 	public boolean isClosed() {

@@ -16,11 +16,12 @@ package org.mule.jbi.util;
 /**
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @deprecated user org.mule.util.UUID
  */
 public class UUID {
 
 	public static String next() {
-		return java.util.UUID.randomUUID().toString();
+		return new org.mule.util.UUID().getUUID();
 	}
 	
 }
