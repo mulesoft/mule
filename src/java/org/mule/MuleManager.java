@@ -365,10 +365,13 @@ public class MuleManager implements UMOManager
         config = null;
         config = new MuleConfiguration();
         instance = null;
-        if (logger.isInfoEnabled()) {
-            logger.info("\n" + getEndSplash());
-        } else {
-            System.out.println(getEndSplash());
+
+        if(!config.isEmbedded()) {
+            if (logger.isInfoEnabled()) {
+                logger.info("\n" + getEndSplash());
+            } else {
+                System.out.println(getEndSplash());
+            }
         }
     }
 
@@ -578,7 +581,7 @@ public class MuleManager implements UMOManager
     /**
      * {@inheritDoc}
      */
-    synchronized void initialise() throws UMOException
+    public synchronized void initialise() throws UMOException
     {
         if (!initialised.get()) {
             initialising.set(true);
@@ -682,10 +685,12 @@ public class MuleManager implements UMOManager
             model.start();
             started.set(true);
             starting.set(false);
-            if (logger.isInfoEnabled()) {
-                logger.info("\n" + getStartSplash());
-            } else {
-                System.out.println(getStartSplash());
+            if(!config.isEmbedded()) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("\n" + getStartSplash());
+                } else {
+                    System.out.println(getStartSplash());
+                }
             }
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STARTED));
         }
