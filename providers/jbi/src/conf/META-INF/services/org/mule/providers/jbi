@@ -1,0 +1,7 @@
+connector=org.mule.providers.jbi.JbiConnector
+dispatcher.factory=org.mule.providers.jbi.JbiMessageDispatcherFactory
+message.receiver=org.mule.providers.jbi.JbiMessageReceiver
+message.adapter=org.mule.providers.jbi.JbiMessageAdapter
+inbound.transformer=
+outbound.transformer=
+endpoint.builder=org.mule.provider.jbi.JbiEndpointBuilder
