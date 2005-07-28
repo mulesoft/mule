@@ -79,6 +79,12 @@
             <id></id>
             <email></email>
         </developer>
+        <developer>
+            <name>Andrew Perepelytsya</name>
+            <id>aperepel</id>
+            <email>aperepel@itci.com</email>
+            <organization>IT Consulting International Corp.</organization>
+        </developer>
     </developers>
     <contributors>
         <contributor>
@@ -128,11 +134,6 @@
         </contributor>
         <contributor>
         	<name>Foo Shoong Weng</name>
-            <id></id>
-            <email></email>
-        </contributor>
-        <contributor>
-        	<name>Andrew Perepelytsya</name>
             <id></id>
             <email></email>
         </contributor>
