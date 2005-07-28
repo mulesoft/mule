@@ -11,17 +11,14 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.util;
+package org.mule.jbi;
 
-/**
- * 
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @deprecated user org.mule.util.UUID
- */
-public class UUID {
+import org.mule.jbi.components.AbstractComponent;
 
-	public static String next() {
-		return new org.mule.util.UUID().getUUID();
-	}
-	
+public class TestComponent extends AbstractComponent {
+
+    public TestComponent(String name) {
+        this.name = name;
+    }
+
 }

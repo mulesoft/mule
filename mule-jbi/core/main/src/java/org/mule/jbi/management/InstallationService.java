@@ -14,7 +14,9 @@
 package org.mule.jbi.management;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +68,12 @@ public class InstallationService implements InstallationServiceMBean {
 		try {
 			LOGGER.info("Creating new installer for " + installJarURI);
 			// Check that the url is valid
-			URI uri = new URI(installJarURI);
+			URI uri;
+			try {
+				uri = new URI(installJarURI);
+			} catch (URISyntaxException e) {
+				uri = new File(installJarURI).toURI();
+			}
 			// Create a temporary dir
 			dir = Directories.getNewTempDir(this.container.getWorkingDir());
 			if (LOGGER.isDebugEnabled()) {
@@ -120,6 +127,8 @@ public class InstallationService implements InstallationServiceMBean {
 				installDir = Directories.getBindingInstallDir(this.container.getWorkingDir(), name);
 				workspaceDir = Directories.getBindingWorkspaceDir(this.container.getWorkingDir(), name);
 			}
+			IOUtils.deleteFile(installDir);
+			IOUtils.deleteFile(workspaceDir);
 			IOUtils.createDirs(installDir);
 			IOUtils.createDirs(workspaceDir);
 			// Unzip all
@@ -181,8 +190,25 @@ public class InstallationService implements InstallationServiceMBean {
 	}
 
 	public synchronized boolean unloadInstaller(String aComponentName, boolean isToBeDeleted) {
-		// TODO Auto-generated method stub
-		return false;
+		Installer installer = (Installer) this.installers.get(aComponentName);
+		if (installer == null) {
+			return false;
+		}
+		try {
+			Component component = this.container.getRegistry().getComponent(aComponentName);
+			if (component != null && component.getCurrentState().equals(Component.UNKNOWN)) {
+				component.uninstall();
+			}
+			ObjectName objName = createComponentInstallerName(aComponentName);
+			if (this.container.getMBeanServer().isRegistered(objName)) {
+				this.container.getMBeanServer().unregisterMBean(objName);
+			}
+			this.installers.remove(aComponentName);
+			return true;
+		} catch (Exception e) {
+			LOGGER.info("unloadInstaller", e);
+			return false;
+		}
 	}
 
 	public synchronized String installSharedLibrary(String aSharedLibURI) {

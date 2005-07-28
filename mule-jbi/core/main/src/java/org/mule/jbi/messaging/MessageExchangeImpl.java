@@ -13,8 +13,11 @@
  */
 package org.mule.jbi.messaging;
 
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.util.UUID;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.Fault;
@@ -25,11 +28,9 @@ import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+
+import org.mule.jbi.JbiContainer;
+import org.mule.util.UUID;
 
 /**
  * 
@@ -54,7 +55,7 @@ public class MessageExchangeImpl implements MessageExchange, Serializable, Messa
 		this.status =  ExchangeStatus.ACTIVE;
 		this.messages = new HashMap();
 		this.properties = new HashMap();
-		this.exchangeId = UUID.next();
+		this.exchangeId = new UUID().getUUID();
 	}
 	
 	public URI getPattern() {

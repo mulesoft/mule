@@ -13,25 +13,12 @@
  */
 package org.mule.jbi.framework;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.impl.container.MultiContainerContext;
-import org.mule.impl.jndi.MuleInitialContextFactory;
-import org.mule.jbi.Endpoints;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.Messaging;
-import org.mule.jbi.management.AdminService;
-import org.mule.jbi.management.DeploymentService;
-import org.mule.jbi.management.Directories;
-import org.mule.jbi.management.InstallationService;
-import org.mule.jbi.nmr.DirectRouter;
-import org.mule.jbi.nmr.InternalMessageRouter;
-import org.mule.jbi.registry.Registry;
-import org.mule.jbi.registry.RegistryIO;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOContainerContext;
-import org.objectweb.jotm.Jotm;
+import java.io.File;
+import java.rmi.registry.LocateRegistry;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.jbi.JBIException;
 import javax.jbi.management.AdminServiceMBean;
@@ -43,11 +30,36 @@ import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
+import javax.management.remote.rmi.RMIConnectorServer;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
-import java.io.File;
-import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.impl.container.MultiContainerContext;
+import org.mule.impl.jndi.MuleInitialContextFactory;
+import org.mule.jbi.Endpoints;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.management.AdminService;
+import org.mule.jbi.management.AutoInstallService;
+import org.mule.jbi.management.AutoInstallServiceMBean;
+import org.mule.jbi.management.DeploymentService;
+import org.mule.jbi.management.Directories;
+import org.mule.jbi.management.InstallationService;
+import org.mule.jbi.nmr.DirectRouter;
+import org.mule.jbi.nmr.InternalMessageRouter;
+import org.mule.jbi.registry.Registry;
+import org.mule.jbi.registry.RegistryIO;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.util.queue.QueueSession;
+import org.objectweb.jotm.Jotm;
+
 
 /**
  * 
@@ -57,6 +69,10 @@ public class JbiContainerImpl implements JbiContainer {
 
 	private static final String DEFAULT_WORKING_DIR = ".mule-jbi";
 	private static final String DEFAULT_JMX_DOMAIN = "mule-jbi";
+
+    public static final String DEFAULT_URL = "service:jmx:rmi:///jndi/rmi://{0}:{1}/server";
+    public static final String DEFAULT_HOST = "localhost";
+    public static final int DEFAULT_PORT = 8000;
 	
 	private static final Log LOGGER = LogFactory.getLog(JbiContainer.class);
 	
@@ -65,12 +81,13 @@ public class JbiContainerImpl implements JbiContainer {
 	private String jmxDomainName;
 	private Registry registry;
 	private Endpoints endpoints;
-	private Messaging messaging;
 	private File workingDir;
 	private InitialContext namingContext;
     private MultiContainerContext objectContainer;
     private InternalMessageRouter router;
 
+    private static java.rmi.registry.Registry rmiRegistry = null;
+    
 	public JbiContainerImpl() {
 		this.workingDir = new File(DEFAULT_WORKING_DIR);
 		this.jmxDomainName = DEFAULT_JMX_DOMAIN;
@@ -156,10 +173,6 @@ public class JbiContainerImpl implements JbiContainer {
 		return this.endpoints;
 	}
 
-	public Messaging getMessaging() {
-		return this.messaging;
-	}
-	
 	public void initialize() throws JBIException {
 		try {
 			JbiContainer.Factory.setInstance(this);
@@ -178,6 +191,16 @@ public class JbiContainerImpl implements JbiContainer {
 					this.mBeanServer = MBeanServerFactory.createMBeanServer();
 				}
 			}
+			// Create jmx remote access
+			if (rmiRegistry == null) {
+				rmiRegistry = LocateRegistry.createRegistry(DEFAULT_PORT);
+			}
+			String url = MessageFormat.format(DEFAULT_URL, new Object[] { DEFAULT_HOST, Integer.toString(DEFAULT_PORT) });
+			Map env = new HashMap();
+			env.put(RMIConnectorServer.JNDI_REBIND_ATTRIBUTE, "true");
+			JMXConnectorServer con = JMXConnectorServerFactory.newJMXConnectorServer(new JMXServiceURL(url), env, this.mBeanServer);
+			con.start();
+			
 			if (this.transactionManager == null) {
 				LOGGER.debug("Creating TransactionManager");
 				this.transactionManager = new Jotm(true, false).getTransactionManager();
@@ -186,6 +209,7 @@ public class JbiContainerImpl implements JbiContainer {
 			if (this.namingContext == null) {
 			    System.setProperty(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
 			    System.setProperty(Context.PROVIDER_URL, "mule-jbi");
+			    this.namingContext = new InitialContext();
 			}
 			this.endpoints = new EndpointsImpl();
 			File regStore = new File(this.workingDir, "/registry.xml");
@@ -225,7 +249,13 @@ public class JbiContainerImpl implements JbiContainer {
 			registerMBean(new StandardMBean(install, InstallationServiceMBean.class), createMBeanName(null, "service", "install"));
 			DeploymentService deploy = new DeploymentService(this);
 			registerMBean(new StandardMBean(deploy, DeploymentServiceMBean.class), createMBeanName(null, "service", "deploy"));
+			AutoInstallService autoinstall = new AutoInstallService();
+			registerMBean(new StandardMBean(autoinstall, AutoInstallServiceMBean.class), createMBeanName(null, "service", "autoinstall"));
+			// TODO: debug only
+			autoinstall.setPollingFrequency(1000);
+			autoinstall.start();
 			this.registry.start();
+			Directories.deleteMarkedDirectories(getWorkingDir());
             MuleManager.getInstance().start();
 		} catch (Exception e) {
 			if (e instanceof JBIException) {
@@ -241,6 +271,7 @@ public class JbiContainerImpl implements JbiContainer {
 			unregisterMBean(createMBeanName(null, "service", "admin"));
 			unregisterMBean(createMBeanName(null, "service", "install"));
 			unregisterMBean(createMBeanName(null, "service", "deploy"));
+			unregisterMBean(createMBeanName(null, "service", "autoinstall"));
 			this.registry.shutDown();
 			JbiContainer.Factory.setInstance(null);
 		} catch (Exception e) {
@@ -299,5 +330,9 @@ public class JbiContainerImpl implements JbiContainer {
 
     public UMOContainerContext removeObjectContainer(UMOContainerContext container) {
         return objectContainer.removeContainer(container.getName());
+    }
+    
+    public QueueSession getQueueSession() {
+    	return MuleManager.getInstance().getQueueManager().getQueueSession();
     }
 }

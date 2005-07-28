@@ -31,19 +31,37 @@ import java.util.List;
 
 /**
  * 
+ * The <code>EndpointsImpl</code> is the default 
+ * implementation of the <code>Endpoints</code> interface.
+ * 
+ * It features endpoints registration / unregistration and queries.
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
 public class EndpointsImpl implements Endpoints {
 
+	/**
+	 * List of internal endpoints
+	 */
 	private List internalEndpoints;
+	
+	/**
+	 * List of external endpoints
+	 */
 	private List externalEndpoints;
 	
+	/**
+	 * Default constructor
+	 */
 	public EndpointsImpl() {
 		this.internalEndpoints = new CopyOnWriteArrayList();
 		this.externalEndpoints = new CopyOnWriteArrayList();
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.Endpoints#registerInternalEndpoint(javax.jbi.servicedesc.ServiceEndpoint)
+	 */
 	public void registerInternalEndpoint(ServiceEndpoint endpoint) throws JBIException {
 		if (getEndpoint(this.internalEndpoints, endpoint.getServiceName(), endpoint.getEndpointName()) != null) {
 			throw new JBIException("Endpoint is already registered");
@@ -56,6 +74,9 @@ public class EndpointsImpl implements Endpoints {
 		this.internalEndpoints.add(se);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.Endpoints#unregisterInternalEndpoint(javax.jbi.servicedesc.ServiceEndpoint)
+	 */
 	public void unregisterInternalEndpoint(ServiceEndpoint endpoint) throws JBIException {
 		if (getEndpoint(this.internalEndpoints, endpoint.getServiceName(), endpoint.getEndpointName()) == null) {
 			throw new JBIException("Endpoint is not registered");
@@ -68,6 +89,9 @@ public class EndpointsImpl implements Endpoints {
 		this.internalEndpoints.remove(se);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.Endpoints#registerExternalEndpoint(javax.jbi.servicedesc.ServiceEndpoint)
+	 */
 	public void registerExternalEndpoint(ServiceEndpoint endpoint) throws JBIException {
 		if (getEndpoint(this.externalEndpoints, endpoint.getServiceName(), endpoint.getEndpointName()) == null) {
 			throw new JBIException("Endpoint is already registered");
@@ -80,6 +104,9 @@ public class EndpointsImpl implements Endpoints {
 		this.externalEndpoints.add(se);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.Endpoints#unregisterExternalEndpoint(javax.jbi.servicedesc.ServiceEndpoint)
+	 */
 	public void unregisterExternalEndpoint(ServiceEndpoint endpoint) throws JBIException {
 		if (getEndpoint(this.externalEndpoints, endpoint.getServiceName(), endpoint.getEndpointName()) == null) {
 			throw new JBIException("Endpoint is not registered");
@@ -92,6 +119,9 @@ public class EndpointsImpl implements Endpoints {
 		this.externalEndpoints.remove(se);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.Endpoints#getEndpoint(javax.xml.namespace.QName, java.lang.String)
+	 */
 	public ServiceEndpoint getEndpoint(QName service, String name) {
 		for (Iterator it = this.internalEndpoints.iterator(); it.hasNext();) {
 			ServiceEndpoint se = (ServiceEndpoint) it.next();
@@ -103,6 +133,48 @@ public class EndpointsImpl implements Endpoints {
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.Endpoints#getInternalEndpoints(javax.xml.namespace.QName)
+	 */
+	public ServiceEndpoint[] getInternalEndpoints(QName interfaceName) {
+		return getEndpoints(this.internalEndpoints, interfaceName);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.Endpoints#getInternalEndpointsForService(javax.xml.namespace.QName)
+	 */
+	public ServiceEndpoint[] getInternalEndpointsForService(QName serviceName) {
+		return getEndpointsForService(this.internalEndpoints, serviceName);
+	}
+	
+	public ServiceEndpoint[] getExternalEndpoints(QName interfaceName) {
+		return getEndpoints(this.externalEndpoints, interfaceName);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.Endpoints#getExternalEndpointsForService(javax.xml.namespace.QName)
+	 */
+	public ServiceEndpoint[] getExternalEndpointsForService(QName serviceName) {
+		return getEndpointsForService(this.externalEndpoints, serviceName);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mule.jbi.Endpoints#unregisterEndpoints(java.lang.String)
+	 */
+	public void unregisterEndpoints(String component) {
+		unregisterEndpoints(this.internalEndpoints, component);
+		unregisterEndpoints(this.externalEndpoints, component);
+	}
+
+	/**
+	 * Search within the given list of endpoints,
+	 * for one that matches the service and name.
+	 * 
+	 * @param endpoints the endpoints list to look in
+	 * @param service the qualified name of the service
+	 * @param name the name of the endpoint
+	 * @return the matching endpoint or <code>null</code> if not found
+	 */
 	protected ServiceEndpoint getEndpoint(List endpoints, QName service, String name) {
 		for (Iterator it = endpoints.iterator(); it.hasNext();) {
 			ServiceEndpoint se = (ServiceEndpoint) it.next();
@@ -114,22 +186,14 @@ public class EndpointsImpl implements Endpoints {
 		return null;
 	}
 
-	public ServiceEndpoint[] getInternalEndpoints(QName interfaceName) {
-		return getEndpoints(this.internalEndpoints, interfaceName);
-	}
-	
-	public ServiceEndpoint[] getInternalEndpointsForService(QName serviceName) {
-		return getEndpointsForService(this.internalEndpoints, serviceName);
-	}
-	
-	public ServiceEndpoint[] getExternalEndpoints(QName interfaceName) {
-		return getEndpoints(this.externalEndpoints, interfaceName);
-	}
-	
-	public ServiceEndpoint[] getExternalEndpointsForService(QName serviceName) {
-		return getEndpointsForService(this.externalEndpoints, serviceName);
-	}
-	
+	/**
+	 * Search within the given list of endpoints,
+	 * for those that match the given interface.
+	 * 
+	 * @param endpoints the endpoints list to look in
+	 * @param interfaceName the qualified name of the interface
+	 * @return an array of endpoints (can not be <code>null</code>
+	 */
 	protected ServiceEndpoint[] getEndpoints(List endpoints, QName interfaceName) {
 		List ses = new ArrayList();
 		for (Iterator it = endpoints.iterator(); it.hasNext();) {
@@ -154,6 +218,14 @@ public class EndpointsImpl implements Endpoints {
 		return (ServiceEndpoint[]) ses.toArray(new ServiceEndpoint[ses.size()]);
 	}
 
+	/**
+	 * Search within the given list of endpoints,
+	 * for those that match the given service.
+	 * 
+	 * @param endpoints the endpoints list to look in
+	 * @param serviceName the qualified name of the service
+	 * @return an array of endpoints (can not be <code>null</code>
+	 */
 	protected ServiceEndpoint[] getEndpointsForService(List endpoints, QName serviceName) {
 		List ses = new ArrayList();
 		for (Iterator it = endpoints.iterator(); it.hasNext();) {
@@ -165,11 +237,12 @@ public class EndpointsImpl implements Endpoints {
 		return (ServiceEndpoint[]) ses.toArray(new ServiceEndpoint[ses.size()]);
 	}
 
-	public void unregisterEndpoints(String component) {
-		unregisterEndpoints(this.internalEndpoints, component);
-		unregisterEndpoints(this.externalEndpoints, component);
-	}
-
+	/**
+	 * Remove endpoints registered by the given component from the list.
+	 * 
+	 * @param endpoints the list to remove endpoints from
+	 * @param component the component name
+	 */
 	protected void unregisterEndpoints(List endpoints, String component) {
 		// Caution: this code relies on the fact that
 		// the iterator for a CopyOnWriteArrayList support

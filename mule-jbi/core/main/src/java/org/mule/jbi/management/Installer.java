@@ -40,6 +40,8 @@ import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.jbi.JbiContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -54,6 +56,8 @@ import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
  */
 public class Installer implements InstallerMBean, InstallationContext, ComponentContext, MBeanNames {
 
+	private transient Log logger = LogFactory.getLog(getClass()); 
+	
 	private JbiContainer container;
 	private File installRoot;
 	private Jbi jbi;
@@ -112,12 +116,12 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 	
 	public void init() throws Exception {
 		boolean success = false;
-		this.bootstrap = createBootstrap();
 		try {
+			this.bootstrap = createBootstrap();
 			this.bootstrap.init(this);
 			success = true;
 		} finally {
-			if (!success) {
+			if (!success && this.bootstrap != null) {
 				this.bootstrap.cleanUp();
 			}
 		}
@@ -146,8 +150,16 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 			this.bootstrap.onInstall();
 			this.component.install();
 			return this.component.getObjectName();
+		} catch (Error e) {
+			logger.info("An error occured during install", e);
+			throw e;
 		} catch (Exception e) {
-			throw new JBIException(e);
+			logger.info("An error occured during install", e);
+			if (e instanceof JBIException) {
+				throw (JBIException) e;
+			} else {
+				throw new JBIException(e);
+			}
 		} finally {
 			this.bootstrap.cleanUp();
 		}

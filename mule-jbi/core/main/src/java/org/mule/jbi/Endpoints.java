@@ -19,6 +19,9 @@ import javax.xml.namespace.QName;
 
 /**
  * 
+ * This interface acts as a registry for all endpoints.
+ * It features endpoints registration / unregistration and queries.
+ * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  */
 public interface Endpoints {
@@ -41,5 +44,10 @@ public interface Endpoints {
 	
 	ServiceEndpoint getEndpoint(QName service, String name);
 
+	/**
+	 * Remove all endpoints registered by a component.
+	 * 
+	 * @param component the component name
+	 */
 	void unregisterEndpoints(String component);
 }

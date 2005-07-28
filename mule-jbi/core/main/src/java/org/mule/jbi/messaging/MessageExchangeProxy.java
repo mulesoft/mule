@@ -319,7 +319,7 @@ public abstract class MessageExchangeProxy implements MessageExchange {
 			throw new MessagingException("illegal exchange status: done");
 		}
 		if (status == ExchangeStatus.ERROR && !can(CAN_STATUS_ERROR)) {
-			throw new MessagingException("illegal exchange status: done");
+			throw new MessagingException("illegal exchange status: error");
 		}
 		// Check message
 		// Change state

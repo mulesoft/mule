@@ -16,6 +16,7 @@ package org.mule.jbi;
 import org.mule.jbi.nmr.InternalMessageRouter;
 import org.mule.jbi.registry.Registry;
 import org.mule.umo.manager.UMOContainerContext;
+import org.mule.util.queue.QueueSession;
 
 import javax.jbi.JBIException;
 import javax.management.MBeanServer;
@@ -47,8 +48,6 @@ public interface JbiContainer {
 	 * @return
 	 */
 	InternalMessageRouter getRouter();
-	
-	Messaging getMessaging();
 	
 	MBeanServer getMBeanServer();
 
@@ -83,4 +82,6 @@ public interface JbiContainer {
     void addObjectContainer(UMOContainerContext container) throws JBIException;
 
     UMOContainerContext removeObjectContainer(UMOContainerContext container);
+    
+    QueueSession getQueueSession();
 }

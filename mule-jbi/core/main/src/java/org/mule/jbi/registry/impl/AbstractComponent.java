@@ -16,6 +16,7 @@ package org.mule.jbi.registry.impl;
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.framework.ClassLoaderFactory;
 import org.mule.jbi.management.ComponentLifeCycle;
+import org.mule.jbi.management.Directories;
 import org.mule.jbi.messaging.DeliveryChannelImpl;
 import org.mule.jbi.registry.Component;
 import org.mule.jbi.registry.Library;
@@ -129,7 +130,9 @@ public class AbstractComponent extends AbstractEntry implements Component {
 		if (!getCurrentState().equals(UNKNOWN) && !getCurrentState().equals(SHUTDOWN)) {
 			throw new JBIException("Illegal status: " + getCurrentState());
 		}
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		try {
+			Thread.currentThread().setContextClassLoader(this.component.getClass().getClassLoader());
 			JbiContainer container = getContainer();
 			this.objectName = container.createMBeanName(getName(), "lifecycle", null);
 			this.channel = new DeliveryChannelImpl(container, getName());
@@ -143,6 +146,8 @@ public class AbstractComponent extends AbstractEntry implements Component {
 			return objectName;
 		} catch (Exception e) {
 			throw new JBIException(e);
+		} finally {
+			Thread.currentThread().setContextClassLoader(cl);
 		}
 	}
 	
@@ -179,7 +184,7 @@ public class AbstractComponent extends AbstractEntry implements Component {
 		// Get class path elements
 		this.classPathElements = Arrays.asList(getDescriptor().getComponent().getComponentClassPath().getPathElementArray());
 		// Class loader delegation
-		this.isClassLoaderParentFirst = com.sun.java.xml.ns.jbi.ComponentDocument.Component.ComponentClassLoaderDelegation.PARENT_FIRST.equals(getDescriptor().getComponent().getComponentClassLoaderDelegation());
+		this.isClassLoaderParentFirst = !com.sun.java.xml.ns.jbi.ComponentDocument.Component.ComponentClassLoaderDelegation.SELF_FIRST.equals(getDescriptor().getComponent().getComponentClassLoaderDelegation());
 		// Get component class name
 		this.componentClassName = getDescriptor().getComponent().getComponentClassName().getDomNode().getFirstChild().getNodeValue();
 		// Create component
@@ -196,9 +201,8 @@ public class AbstractComponent extends AbstractEntry implements Component {
 		}
 		if (!isTransient) {
 			createComponent();
-            initComponent();
+			initComponent();
 		}
-		//initComponent();
 		if (getStateAtShutdown().equals(RUNNING)) {
 			start();
 		}
@@ -271,7 +275,7 @@ public class AbstractComponent extends AbstractEntry implements Component {
 	 * @see org.mule.jbi.registry.Component#uninstall()
 	 */
 	public synchronized void uninstall() throws JBIException, IOException {
-		if (!getCurrentState().equals(SHUTDOWN)) {
+		if (!getCurrentState().equals(SHUTDOWN) && !getCurrentState().equals(UNKNOWN)) {
 			throw new JBIException("Illegal status: " + getCurrentState());
 		}
 		if (this.units.size() > 0) {
@@ -281,8 +285,10 @@ public class AbstractComponent extends AbstractEntry implements Component {
 		for (int i = 0; i < libraries.length; i++) {
 			libraries[i].removeComponent(this);
 		}
-		IOUtils.deleteFile(new File(getInstallRoot()));
-		IOUtils.deleteFile(new File(getWorkspaceRoot()));
+		// Remove directories
+		Directories.deleteDir(getInstallRoot());
+		Directories.deleteDir(getWorkspaceRoot());
+		// Remove component from registry
 		getRegistry().removeComponent(this);
 		setCurrentState(UNKNOWN);
 	}

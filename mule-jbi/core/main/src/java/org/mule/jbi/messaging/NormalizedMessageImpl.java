@@ -36,6 +36,7 @@ public class NormalizedMessageImpl implements NormalizedMessage {
 	
 	public NormalizedMessageImpl() {
 		this.attachments = new HashMap();
+		this.properties = new HashMap();
 	}
 	
 	public void addAttachment(String id, DataHandler content) throws MessagingException {

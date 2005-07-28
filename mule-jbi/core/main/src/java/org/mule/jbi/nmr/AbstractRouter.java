@@ -48,13 +48,13 @@ public abstract class AbstractRouter implements InternalRouter
         String target = null;
 
         if (me.getRole() == MessageExchange.Role.CONSUMER) {
-            target = ((MessageExchangeProxy)me).getProvider();
+            target = ((MessageExchangeProxy) me).getProvider();
         } else if (me.getRole() == MessageExchange.Role.PROVIDER) {
-            target = ((MessageExchangeProxy)me).getProvider();
+            target = ((MessageExchangeProxy) me).getConsumer();
         } else {
             throw new UnknownRoleException(me.getRole());
         }
         DeliveryChannelImpl ch = (DeliveryChannelImpl) registry.getComponent(target).getChannel();
-		ch.enqueue(me);
+		ch.enqueue(((MessageExchangeProxy) me).getTwin());
     }
 }

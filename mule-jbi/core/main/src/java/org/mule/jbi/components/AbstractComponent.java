@@ -188,7 +188,7 @@ public abstract class AbstractComponent implements Component, ComponentLifeCycle
                 }
                 server.registerMBean(mbean, this.mbeanName);
             }
-            if(service==null) {
+            if (service == null) {
                 service = new QName(name);
             }
             // Create work manager
@@ -265,7 +265,7 @@ public abstract class AbstractComponent implements Component, ComponentLifeCycle
 			}
             this.workManager.start();
             channel = context.getDeliveryChannel();
-            if(this instanceof MessageListener) {
+            if (this instanceof MessageListener) {
                 workManager.scheduleWork(this);
             }
 			doStart();

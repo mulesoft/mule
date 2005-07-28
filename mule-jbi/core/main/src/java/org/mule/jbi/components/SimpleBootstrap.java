@@ -1,13 +1,13 @@
 package org.mule.jbi.components;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import javax.jbi.JBIException;
 import javax.jbi.component.Bootstrap;
 import javax.jbi.component.InstallationContext;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class SimpleBootstrap implements Bootstrap {
 
@@ -78,7 +78,6 @@ public class SimpleBootstrap implements Bootstrap {
 				this.logger.debug("Enter cleanUp");
 			}
 			doCleanUp();
-			this.installContext = null;
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("Exit cleanUp");
 			}

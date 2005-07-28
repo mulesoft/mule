@@ -2,9 +2,9 @@
 <project>
     <extend>${basedir}/../project.xml</extend>
     <pomVersion>3</pomVersion>
+    <artifactId>mule-jbi-core</artifactId>
     <name>JBI Api</name>
     <groupId>mule</groupId>
-    <artifactId>mule-jbi-core</artifactId>
     <dependencies>
         <dependency>
             <groupId>mule</groupId>
@@ -150,12 +150,6 @@
             <type>jar</type>
             <url>http://jotm.objectweb.org</url>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>pxe</groupId>-->
-<!--            <artifactId>naming</artifactId>-->
-<!--            <jar>naming.jar</jar>-->
-<!--            <type>jar</type>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>commons-digester</groupId>
             <artifactId>commons-digester</artifactId>
@@ -166,6 +160,12 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>${commons_beanutils_version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.6.5</version>
             <type>jar</type>
         </dependency>
     </dependencies>

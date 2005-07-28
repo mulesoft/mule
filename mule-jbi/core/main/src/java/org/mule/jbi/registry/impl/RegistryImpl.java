@@ -159,9 +159,7 @@ public class RegistryImpl implements Registry {
 		    e = (EngineImpl) c;
 			e.setComponent(engine);
 		}
-        if(c instanceof AbstractComponent && c.isTransient()) {
-            ((AbstractComponent)c).initComponent();
-        }
+		e.initComponent();
         return e;
 	}
 
@@ -324,7 +322,12 @@ public class RegistryImpl implements Registry {
         try {
 			Component[] components = getComponents();
 			for (int i = 0; i < components.length; i++) {
-				components[i].restoreState();
+				if (components[i].isTransient() && components[i].getComponent() == null) {
+					// a transient component was removed from config, so remove it from registry
+					removeComponent(components[i]);
+				} else {
+					components[i].restoreState();
+				}
 			}
 			Assembly[] assemblies = getAssemblies();
 			for (int i = 0; i < assemblies.length; i++) {

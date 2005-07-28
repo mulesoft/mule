@@ -13,23 +13,19 @@
  */
 package org.mule.jbi.messaging;
 
-import EDU.oswego.cs.dl.util.concurrent.WaitFreeQueue;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.components.AbstractComponent;
-import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
-
 import javax.jbi.messaging.DeliveryChannel;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessageExchangeFactory;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.servicedesc.ServiceEndpoint;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
+import org.mule.util.queue.Queue;
+import org.mule.util.queue.QueueSession;
 
 /**
  * 
@@ -42,18 +38,13 @@ public class DeliveryChannelImpl implements DeliveryChannel {
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-	private WaitFreeQueue queue;
 	private JbiContainer container;
-	private AbstractComponent component;
     private String componentName;
 	private boolean closed;
 	
 	public DeliveryChannelImpl(JbiContainer container, String component) {
 		this.container = container;
-		this.component = (AbstractComponent)container.getRegistry().getComponent(component).getComponent();
         this.componentName = component;
-		// TODO: queue creation should be customized
-		this.queue = new WaitFreeQueue();
 	}
 	
 	public void close() throws MessagingException {
@@ -89,6 +80,8 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			throw new MessagingException("Channel is closed");
 		}
 		try {
+			QueueSession qs = container.getQueueSession();
+			Queue queue = qs.getQueue(componentName);
 			MessageExchange me = (MessageExchange) queue.take();
 			if (me != null) {
 				handleReceive(me);
@@ -104,6 +97,8 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			throw new MessagingException("Channel is closed");
 		}
 		try {
+			QueueSession qs = container.getQueueSession();
+			Queue queue = qs.getQueue(componentName);
 			MessageExchange me = (MessageExchange) queue.poll(timeout);
 			if (me != null) {
 				handleReceive(me);
@@ -113,19 +108,6 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			throw new MessagingException(e);
 		}
 	}
-    public void receive(MessageExchange me) throws MessagingException, SystemException, InvalidTransactionException {
-        if (me.isTransacted()) {
-            TransactionManager mgr = (TransactionManager) component.getContext().getTransactionManager();
-            Transaction tx = (Transaction) me.getProperty(MessageExchange.JTA_TRANSACTION_PROPERTY_NAME);
-            mgr.resume(tx);
-        }
-
-        if(component instanceof MessageListener) {
-            ((MessageListener)component).onMessage(me);
-        } else {
-            enqueue(me);
-        }
-    }
 
 	public void send(MessageExchange exchange) throws MessagingException {
 		if (this.closed) {
@@ -218,7 +200,9 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			}
 		} else {
             try {
-                queue.put(exchange);
+    			QueueSession qs = container.getQueueSession();
+    			Queue queue = qs.getQueue(componentName);
+                queue.put(me);
             } catch (InterruptedException e) {
                 logger.error(e);
             }
