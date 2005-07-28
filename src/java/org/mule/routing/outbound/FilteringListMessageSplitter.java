@@ -13,21 +13,20 @@
  */
 package org.mule.routing.outbound;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>FilteringListMessageSplitter</code> Accepts a List as a message
  * payload then routes list elements as messages over an endpoint where the
  * endpoint's filter accepts the payload.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -39,7 +38,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
     /**
      * Template method can be used to split the message up before the
      * getMessagePart method is called .
-     * 
+     *
      * @param message the message being routed
      */
     protected void initialise(UMOMessage message)
@@ -47,7 +46,16 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
         if (message.getPayload() instanceof List) {
             // get a synchronised cloned list
             payload = new CopyOnWriteArrayList((List) message.getPayload());
-        } else {
+            if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
+                // always set correlation group size, even if correlation id
+                // has already been set (usually you don't have group size yet
+                // by this point.
+                final int groupSize = payload.size();
+                logger.debug("java.util.List payload detected, setting correlation group size to " + groupSize);
+                message.setCorrelationGroupSize(groupSize);
+            }
+        } else
+        {
             throw new IllegalArgumentException("The payload for this router must be of type java.util.list");
         }
         // Cache the properties here because for some message types getting the
@@ -59,10 +67,10 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
     /**
      * Retrieves a specific message part for the given endpoint. the message
      * will then be routed via the parovider.
-     * 
-     * @param message the current message being processed
+     *
+     * @param message  the current message being processed
      * @param endpoint the endpoint that will be used to route the resulting
-     *            message part
+     *                 message part
      * @return the message part to dispatch
      */
     protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
