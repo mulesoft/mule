@@ -65,21 +65,17 @@ public abstract class AbstractMessageSplitter extends FilteringOutboundRouter
                 try {
                     if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
                         boolean correlationSet = message.getCorrelationId() != null;
-                        if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
-                            logger.debug("CorrelationId is already set, not setting Correlation group size");
-                        } else {
-                            // the correlationId will be set by the
-                            // AbstractOutboundRouter
-                            // todo maybe the correlationId doesn't have to be
-                            // set here
+                        if (!correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
                             message.setCorrelationId(correlationId);
-                            message.setCorrelationGroupSize(list.size());
-                            message.setCorrelationSequence(i++);
                         }
+
+                        // take correlation group size from the message
+                        // properties, set by concrete message splitter
+                        // implementations
+                        final int groupSize = message.getCorrelationGroupSize();
+                        message.setCorrelationGroupSize(groupSize);
+                        message.setCorrelationSequence(i++);
                     }
-                    // message.setCorrelationId(correlationId);
-                    // message.setCorrelationSequence(i++);
-                    // message.setCorrelationGroupSize(list.size());
                     if (synchronous) {
                         result = send(session, message, endpoint);
                     } else {
