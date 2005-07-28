@@ -103,9 +103,21 @@ public class NamedParameter {
         setMode(mode);
     }
 
+    public NamedParameter(String name, String mode) {
+        this.name = name;
+        this.type = createQName(name);
+        setMode(mode);
+    }
+
     public NamedParameter(String name, QName type, ParameterMode mode) {
         this.name = name;
         this.type = type;
+        this.mode = mode;
+    }
+
+    public NamedParameter(String name, ParameterMode mode) {
+        this.name = name;
+        this.type = createQName(name);
         this.mode = mode;
     }
 

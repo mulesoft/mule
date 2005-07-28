@@ -77,4 +77,19 @@ public class MuleClientAxisTestCase extends NamedTestCase
         assertEquals("Mason", ((Person) result.getPayload()).getLastName());
 
     }
+
+
+    public void testRequestWithComplexArg() throws Exception
+    {
+        MuleClient client = new MuleClient();
+        Person person = new Person( "Joe", "Blow");
+        String uri = "axis:http://localhost:38004/mule/services/mycomponent3?method=addPerson";
+        client.send(uri, person, null);
+        uri = "axis:http://localhost:38004/mule/services/mycomponent3?method=getPerson";
+        UMOMessage result = client.send(uri, "Joe", null);
+        assertNotNull(result);
+        assertTrue(result.getPayload() instanceof Person);
+        assertEquals("Joe", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Blow", ((Person) result.getPayload()).getLastName());
+    }
 }

@@ -25,11 +25,14 @@ import org.apache.axis.client.AxisClient;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.configuration.SimpleProvider;
+import org.apache.axis.constants.Style;
+import org.apache.axis.constants.Use;
 import org.apache.axis.transport.http.HTTPTransport;
 import org.apache.axis.wsdl.gen.Parser;
 import org.apache.axis.wsdl.symbolTable.ServiceEntry;
 import org.apache.axis.wsdl.symbolTable.SymTabEntry;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -194,6 +197,30 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
 
         Call call = (Call) getService(event).createCall();
+        String style = (String) event.getProperties().get("style");
+        String use = (String) event.getProperties().get("use");
+
+        // Note that Axis has specific rules to how these two variables are
+        // combined. This is handled for us
+        // Set style: RPC/wrapped/Doc/Message
+        if (style != null) {
+            Style s = Style.getStyle(style);
+            if(s==null) {
+                throw new IllegalArgumentException(new org.mule.config.i18n.Message(Messages.X_IS_INVALID, "style=" + style).toString());
+            } else {
+                call.setOperationStyle(s);
+            }
+        }
+        // Set use: Endcoded/Literal
+        if (use != null) {
+            Use u = Use.getUse(use);
+            if(u==null) {
+                throw new IllegalArgumentException(new org.mule.config.i18n.Message(Messages.X_IS_INVALID, "use=" + use).toString());
+            } else {
+                call.setOperationUse(u);
+            }
+        }
+
         // set properties on the call from the endpoint properties
         BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
 
@@ -207,6 +234,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             call.setUseSOAPAction(Boolean.TRUE.booleanValue());
         }
         call.setOperationName(method);
+        call.setOperation(method);
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         // Set timeout

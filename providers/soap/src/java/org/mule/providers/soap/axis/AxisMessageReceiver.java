@@ -13,12 +13,6 @@
  */
 package org.mule.providers.soap.axis;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-
 import org.apache.axis.AxisProperties;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
@@ -43,6 +37,11 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.ClassHelper;
+
+import javax.xml.namespace.QName;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AxisMessageReceiver</code> is used to register a component as a
@@ -168,11 +167,23 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // Note that Axis has specific rules to how these two variables are
         // combined. This is handled for us
         // Set style: RPC/wrapped/Doc/Message
-        if (style != null)
-            sd.setStyle(Style.getStyle(style));
+        if (style != null) {
+            Style s = Style.getStyle(style);
+            if(s==null) {
+                throw new InitialisationException(new Message(Messages.X_IS_INVALID, "style=" + style), this);
+            } else {
+                sd.setStyle(s);
+            }
+        }
         // Set use: Endcoded/Literal
-        if (use != null)
-            sd.setUse(Use.getUse(use));
+        if (use != null) {
+            Use u = Use.getUse(use);
+            if(u==null) {
+                throw new InitialisationException(new Message(Messages.X_IS_INVALID, "use=" + use), this);
+            } else {
+                sd.setUse(u);
+            }
+        }
         sd.setDocumentation(doc);
 
         // Tell Axis to try and be intelligent about serialization.
@@ -240,8 +251,9 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             Class clazz;
             for (Iterator iterator = types.iterator(); iterator.hasNext();) {
                 clazz = ClassHelper.loadClass(iterator.next().toString(), getClass());
+                String localName = Types.getLocalNameFromFullName(clazz.getName());
                 QName xmlType = new QName(Namespaces.makeNamespace(clazz.getName()),
-                                          Types.getLocalNameFromFullName(clazz.getName()));
+                                          localName);
 
                 registry.getDefaultTypeMapping().register(clazz,
                                                           xmlType,
