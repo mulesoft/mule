@@ -17,24 +17,9 @@
             <artifactId>mule-jbi-spec</artifactId>
             <version>${mule_jbi_spec_version}</version>
             <url>http://www.mulejbi.org</url>
-        </dependency>
-        <dependency>
-            <groupId>mule</groupId>
-            <artifactId>mule-jbi-shared</artifactId>
-            <version>${mule_jbi_shared_version}</version>
-            <url>http://www.mulejbi.org</url>
-        </dependency>
-        <dependency>
-            <groupId>mule</groupId>
-            <artifactId>mule-jbi-core</artifactId>
-            <version>${mule_jbi_core_version}</version>
-            <url>http://www.mulejbi.org</url>
-        </dependency>
-        <dependency>
-            <groupId>mule</groupId>
-            <artifactId>mule-jbi-spec</artifactId>
-            <version>${mule_jbi_spec_version}</version>
-            <url>http://www.mulejbi.org</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
         </dependency>
         <dependency>
             <groupId>axis</groupId>

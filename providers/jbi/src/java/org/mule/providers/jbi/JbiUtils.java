@@ -14,21 +14,16 @@
 */
 package org.mule.providers.jbi;
 
-import org.mule.config.MuleProperties;
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
-import org.mule.jbi.components.AbstractComponent;
-import org.mule.providers.jbi.components.NullMuleComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
-
-import javax.jbi.messaging.MessagingException;
-import javax.jbi.messaging.NormalizedMessage;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.jbi.messaging.MessagingException;
+import javax.jbi.messaging.NormalizedMessage;
+
+import org.mule.config.MuleProperties;
+import org.mule.impl.MuleMessage;
+import org.mule.umo.UMOMessage;
 
 /**
  * Useful for converting message types
@@ -50,15 +45,6 @@ public class JbiUtils {
             properties.put(MuleProperties.MULE_USER_PROPERTY, message.getSecuritySubject());
         }
         return new MuleMessage(source, properties);
-    }
-
-    public static UMOEvent createEvent(NormalizedMessage message, AbstractComponent component) throws MessagingException {
-        UMOMessage umoMessage = createMessage(message);
-        UMOEndpoint endpoint = (UMOEndpoint)message.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-        if(endpoint == null) {
-            throw new MessagingException("Endpoint property '" + MuleProperties.MULE_ENDPOINT_PROPERTY + "' not set on message");
-        }
-        return new MuleEvent(umoMessage, endpoint, new MuleSession(new NullMuleComponent(component.getName()), null), endpoint.isSynchronous());
     }
 
     public static void populateNormalizedMessage(UMOMessage muleMessage, NormalizedMessage message) throws MessagingException {
