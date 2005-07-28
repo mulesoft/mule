@@ -1,2 +1,0 @@
-connector=org.mule.jbi.binding.local.ContainerConnector
-endpoint.builder=org.mule.jbi.binding.local.ServiceEndpointBuilder
