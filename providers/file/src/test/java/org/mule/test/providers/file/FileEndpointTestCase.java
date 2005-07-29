@@ -67,6 +67,14 @@ public class FileEndpointTestCase extends NamedTestCase
         assertEquals("./test-data/in", url.getAddress());
     }
 
+    public void testWinNetworkUri() throws Exception
+    {
+        String muleURI = "file:////192.168.0.1/test/";
+        UMOEndpointURI url = new MuleEndpointURI(muleURI);
+
+        assertEquals("//192.168.0.1/test/", url.getAddress());
+    }
+
     public void testRelativeFileUriAsParameter() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("file://?address=./temp&endpointName=fileEndpoint");
