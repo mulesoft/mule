@@ -62,10 +62,12 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 {
     public static final QName QNAME_MULERPC_PROVIDER = new QName(WSDDConstants.URI_WSDD_JAVA, "Mule");
     public static final QName QNAME_MULE_TYPE_MAPPINGS = new QName("http://www.muleumo.org/ws/mappings", "Mule");
+    public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
 
     public static final String DEFAULT_MULE_AXIS_SERVER_CONFIG = "mule-axis-server-config.wsdd";
     public static final String DEFAULT_MULE_AXIS_CLIENT_CONFIG = "mule-axis-client-config.wsdd";
     public static final String AXIS_SERVICE_COMPONENT_NAME = "_axisServiceComponent";
+    public static final String METHOD_NAMESPACE_PROPERTY = "methodNamespace";
 
     public static final String SERVICE_PROPERTY_COMPONENT_NAME = "componentName";
     public static final String SERVICE_PROPERTY_SERVCE_PATH = "servicePath";

@@ -11,8 +11,9 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.providers.servlet;
+package org.mule.providers.http;
 
+import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 

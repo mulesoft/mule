@@ -1,0 +1,5 @@
+connector=org.mule.providers.http.servlet.ServletConnector
+#dispatcher.factory=
+message.receiver=org.mule.providers.http.servlet.ServletMessageReceiver
+message.adapter=org.mule.providers.http.servlet.HttpRequestMessageAdapter
+endpoint.builder=org.mule.impl.endpoint.ResourceNameEndpointBuilder

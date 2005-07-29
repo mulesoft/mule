@@ -19,6 +19,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.providers.http.HttpConstants;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOExceptionPayload;
+import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.IteratorAdapter;
@@ -53,9 +54,13 @@ public class HttpRequestMessageAdapter implements UMOMessageAdapter
 
     private Map attachments = new HashMap();
 
-    public HttpRequestMessageAdapter(HttpServletRequest message) throws MessagingException
+    public HttpRequestMessageAdapter(Object message) throws MessagingException
     {
-        setPayload(message);
+        if(message instanceof HttpServletRequest) {
+            setPayload((HttpServletRequest)message);
+        } else {
+            throw new MessageTypeNotSupportedException(message, getClass());
+        }
     }
 
     /*

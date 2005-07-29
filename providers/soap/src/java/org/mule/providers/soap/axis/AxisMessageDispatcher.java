@@ -233,8 +233,13 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             call.setSOAPActionURI(soapAction);
             call.setUseSOAPAction(Boolean.TRUE.booleanValue());
         }
-        call.setOperationName(method);
-        call.setOperation(method);
+        String methodNamespace = (String)event.getProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY);
+        if(methodNamespace!=null) {
+            call.setOperationName(new QName(methodNamespace, method));
+        } else {
+            call.setOperationName(new QName(method));
+        }
+
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         // Set timeout
