@@ -34,6 +34,15 @@ public class JmsEndpointTestCase extends NamedTestCase
         assertEquals("jms:/my.queue", url.toString());
     }
 
+    public void testFullUrlWithSlashes() throws Exception
+    {
+        UMOEndpointURI url = new MuleEndpointURI("jms:////my/queue");
+        assertEquals("jms", url.getScheme());
+        assertEquals("my/queue", url.getAddress());
+        assertNull(url.getEndpointName());
+        assertEquals("jms:////my/queue", url.toString());
+    }
+
     public void testWithoutFullUrlAndProvider() throws Exception
     {
         UMOEndpointURI url = new MuleEndpointURI("jms:/jmsProvider/my.queue");

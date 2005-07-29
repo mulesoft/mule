@@ -138,10 +138,9 @@ public class MuleEndpointURI implements UMOEndpointURI
         }
 
         try {
-            EndpointBuilder builder = null;
             String scheme = (schemeMetaInfo == null ? this.uri.getScheme() : schemeMetaInfo);
             ConnectorServiceDescriptor csd = ConnectorFactory.getServiceDescriptor(scheme);
-            builder = csd.createEndpointBuilder();
+            EndpointBuilder builder = csd.createEndpointBuilder();
             UMOEndpointURI built = builder.build(this.uri);
             initialise(built);
         } catch (ConnectorFactoryException e) {
@@ -187,7 +186,7 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String getEndpointName()
     {
-        return endpointName;
+        return "".equals(endpointName) ? null : endpointName;
     }
 
     public static boolean isMuleUri(String url)
