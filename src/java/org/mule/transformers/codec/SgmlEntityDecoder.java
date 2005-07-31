@@ -12,7 +12,7 @@
 * the LICENSE.txt file. 
 *
 */
-package org.mule.transformers.xml;
+package org.mule.transformers.codec;
 
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;

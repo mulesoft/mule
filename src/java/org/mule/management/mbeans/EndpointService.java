@@ -37,6 +37,7 @@ public class EndpointService implements EndpointServiceMBean
 
     private UMOEndpoint endpoint;
     private UMOMessageReceiver receiver;
+    private String name;
 
     public EndpointService(UMOEndpoint endpoint)
     {
@@ -62,6 +63,16 @@ public class EndpointService implements EndpointServiceMBean
         if (receiver == null && !UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(endpoint.getType())) {
             throw new IllegalArgumentException("Recevier is null for Endpoint MBean but the endpoint itself is a receiving endpoint");
         }
+
+        //Endpoint naming is a little messy right now.  Need to tighten it up
+
+        name = endpoint.getConnector().getProtocol().toLowerCase() + "#";
+        if(endpoint.getName().startsWith(name)) {
+            name = endpoint.getName().replaceAll(":", "#");
+        } else {
+            name += endpoint.getName().replaceAll(":", "#");
+        }
+
     }
 
     public String getAddress()
@@ -71,7 +82,7 @@ public class EndpointService implements EndpointServiceMBean
 
     public String getName()
     {
-        return endpoint.getName().replaceAll(":", "#");
+        return name;
     }
 
     public boolean isConnected()
