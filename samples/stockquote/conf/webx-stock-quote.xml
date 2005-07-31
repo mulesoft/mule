@@ -14,7 +14,7 @@
 
     <transformers>
         <transformer name="XmlToObject" className="org.mule.transformers.xml.XmlToObject"/>
-        <transformer name="SgmlDecoder" className="org.mule.transformers.xml.SgmlEntityDecoder"/>
+        <transformer name="SgmlDecoder" className="org.mule.transformers.codec.SgmlEntityDecoder"/>
         <transformer name="Xslt" className="org.mule.transformers.xml.XsltTransformer">
             <properties>
                 <property name="xslFile" value="stock.xsl"/>
@@ -33,20 +33,23 @@ external sources.
             Please refer to the Configuration Guide for a full description
 of all the parameters.
         -->
-        <mule-descriptor name="HTTPPostSample"
-            inboundEndpoint="stream://System.in"
-            outboundEndpoint="stream://System.out"
-            outboundTransformer="SgmlDecoder Xslt XmlToObject"
-            implementation="org.mule.components.rest.RestServiceWrapper">
-
-            <properties>
-                <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
-                <property name="payloadParameterName" value="symbol"/>
-                <property name="httpMethod" value="POST"/>
-                <property name="errorExpression" value="[^&lt;.*]"/>
-            </properties>
-
-        </mule-descriptor>
+<mule-descriptor name="HTTPPostSample"
+    implementation="org.mule.components.rest.RestServiceWrapper">
+    <inbound-router>
+        <endpoint address="stream://System.in"/>
+    </inbound-router>
+    <outbound-router>
+        <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+            <endpoint address="stream://System.out" transformers="SgmlDecoder Xslt XmlToObject"/>
+        </router>
+    </outbound-router>
+    <properties>
+        <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
+        <property name="payloadParameterName" value="symbol"/>
+        <property name="httpMethod" value="POST"/>
+        <property name="errorExpression" value="[^&lt;.*]"/>
+    </properties>
+</mule-descriptor>
 
     </model>
 </mule-configuration>

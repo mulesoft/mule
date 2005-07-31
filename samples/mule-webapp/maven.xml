@@ -11,25 +11,32 @@
         <!-- copy libs -->
         <copy todir="webapp/WEB-INF/lib">
             <fileset dir="../../lib">
-               <include name="*.jar"/>
+                <include name="*.jar"/>
             </fileset>
         </copy>
         <copy todir="webapp/WEB-INF/lib">
             <fileset dir="../../lib/mule-extras-spring">
-               <include name="*.jar"/>
+                <include name="*.jar"/>
             </fileset>
         </copy>
         <copy todir="webapp/WEB-INF/lib" file="../../dist/mule-@VERSION@.jar"/>
 
         <copy todir="webapp/WEB-INF/classes">
-        	<fileset dir="../hello/classes"/>
+            <fileset dir="../hello/classes"/>
         </copy>
-   	<copy todir="webapp/WEB-INF/classes">
-   		<fileset dir="../loanbroker/classes"/>
+        <copy todir="webapp/WEB-INF/classes">
+            <fileset dir="../loanbroker/classes"/>
         </copy>
-   	<copy todir="webapp/WEB-INF/classes">
-   		<fileset dir="../errorhandler/classes"/>
+        <copy todir="webapp/WEB-INF/classes">
+            <fileset dir="../errorhandler/classes"/>
         </copy>
+
+        <copy todir="webapp/WEB-INF/classes">
+            <fileset dir="../stockquote/classes"/>
+        </copy>
+
+        <copy todir="webapp/WEB-INF/classes" file="../stockquote/conf/stock.xsl"/>
+
 
         <!-- create the war -->
         <zip zipfile="mule.war">

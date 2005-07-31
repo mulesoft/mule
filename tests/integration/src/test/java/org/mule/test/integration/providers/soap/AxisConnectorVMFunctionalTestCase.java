@@ -13,9 +13,6 @@
  */
 package org.mule.test.integration.providers.soap;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.mule.MuleManager;
@@ -32,6 +29,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -146,7 +146,7 @@ public class AxisConnectorVMFunctionalTestCase extends AbstractMuleTestCase
                                                 UMOEndpoint.ENDPOINT_TYPE_SENDER,
                                                 0,
                                                 null);
-        UMOEvent event = getTestEvent(new Person("Rossco", "Pico"), endpoint);
+        UMOEvent event = getTestEvent(new Person("Joe", "Blow"), endpoint);
 
         dispatcher.dispatch(event);
         Thread.sleep(2000);
@@ -155,7 +155,7 @@ public class AxisConnectorVMFunctionalTestCase extends AbstractMuleTestCase
                                                0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Rossco", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Pico", ((Person) result.getPayload()).getLastName());
+        assertEquals("Joe", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Blow", ((Person) result.getPayload()).getLastName());
     }
 }

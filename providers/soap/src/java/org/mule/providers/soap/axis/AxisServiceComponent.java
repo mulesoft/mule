@@ -143,8 +143,9 @@ public class AxisServiceComponent implements Initialisable, Callable
     public void doGet(UMOEventContext context, WriterMessageAdapter response) throws UMOException, IOException
     {
         try {
-            UMOEndpointURI endpointUri = new MuleEndpointURI("soap:" + context.getEndpointURI().getAddress()
-                    + context.getMessageAsString());
+            UMOEndpointURI endpointUri = context.getEndpointURI();
+//            UMOEndpointURI endpointUri = new MuleEndpointURI("soap:" + context.getEndpointURI().getAddress()
+//                    + context.getMessageAsString());
             AxisEngine engine = getAxisServer();
             String pathInfo = endpointUri.getPath();
             // String realpath =

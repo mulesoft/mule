@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 /**
@@ -72,6 +73,10 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
                             return payload;
                         } else if ("getReader".equals(method.getName())) {
                             return new BufferedReader(new StringReader(payload.toString()));
+                        } else if("getAttributeNames".equals(method.getName())) {
+                            return new Hashtable().elements();
+                        } else if("getHeaderNames".equals(method.getName())) {
+                            return new Hashtable().elements();
                         }
                         return null;
                     }

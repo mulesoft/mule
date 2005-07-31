@@ -3,11 +3,17 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="Samples" version="1.0">
+<mule-configuration id="Mule_Samples" version="1.0">
 
-    <mule-descriptor name="echoUMO"
-        inboundEndpoint="vm://echo"
-        implementation="org.mule.components.simple.EchoComponent">
+    <mule-descriptor name="echoUMO" implementation="org.mule.components.simple.EchoComponent">
+        <inbound-router>
+            <endpoint address="vm://echo"/>
+            <!--
+            Enable this endpoint to expose the Echo component as a webservice and bind it
+            to the local servlet container.
+            -->
+            <endpoint address="servlet:axis://localhost/services"/>
+        </inbound-router>
     </mule-descriptor>
 
 </mule-configuration>

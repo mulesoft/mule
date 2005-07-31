@@ -20,6 +20,15 @@
         	<artifactId>ant</artifactId>
         	<version>${ant_version}</version>
         </dependency>
+        <dependency>
+            <artifactId>org.mortbay.jetty</artifactId>
+            <groupId>jetty</groupId>
+            <version>${jetty_version}</version>
+            <url>http://jetty.mortbay.com</url>
+            <properties>
+                <war.bundle.jar>false</war.bundle.jar>
+            </properties>
+        </dependency>
    </dependencies>
     <unitTest>
             <includes>

@@ -31,7 +31,7 @@
             %><li><%=iter.next().toString()%></li><%
         }%>
         </ol>
-        <p/>You can view the statistics for these requests <a href="http://localhost:9092/InvokeAction//Mule%3Atype%3Dstatistics/action=printHtmlSummary?action=printHtmlSummary">here</a>.
+        <p/>You can view the statistics for these requests <a href="http://localhost:9092/InvokeAction//Samples%3Atype%3Dstatistics/action=printHtmlSummary?action=printHtmlSummary">here</a>.
         <%
     } else if(amountString!=null && durationString!=null && name!=null) {
         MuleClient client = new MuleClient();
@@ -74,7 +74,7 @@
 
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
-<tr><td>For more information about Loan Broker example go <a target="_blank" href="http://wiki.muleumo.org/display/MULE/Loan+Broker+Example">here</a>.<br/>
+<tr><td>For more information about Loan Broker example go <a target="_blank" href="http://mule.codehaus.org/Loan+Broker+Example">here</a>.<br/>
 To view the source and configuration go <a target="_blank" href="http://cvs.codehaus.org/viewrep/mule/mule/samples/loanbroker/">here</a>.</td></tr>
 </table>
 </body>

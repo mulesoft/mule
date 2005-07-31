@@ -32,8 +32,10 @@ public class ServletConnector extends AbstractServiceEnabledConnector
         return "servlet";
     }
 
-    public Map getServletReceivers()
+    public Map getReceivers()
     {
         return receivers;
     }
+
+    
 }

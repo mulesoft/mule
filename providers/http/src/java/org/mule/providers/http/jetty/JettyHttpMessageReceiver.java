@@ -35,7 +35,6 @@ import org.mortbay.util.InetAddrPort;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageReceiver;
-import org.mule.providers.http.servlet.DefaultMuleHttpReceiverServlet;
 import org.mule.providers.http.servlet.MuleRESTReceiverServlet;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -80,7 +79,7 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
         if("jetty:rest".equals(endpoint.getEndpointURI().getSchemeMetaInfo())) {
             handler.addServlet("MuleRESTReceiverServlet", path + "*", MuleRESTReceiverServlet.class.getName());
         } else {
-            handler.addServlet("MuleReceiverServlet", path + "*", DefaultMuleHttpReceiverServlet.class.getName());
+            handler.addServlet("JettyReceiverServlet", path + "*", JettyReceiverServlet.class.getName());
         }
 
         context.addHandler(handler);

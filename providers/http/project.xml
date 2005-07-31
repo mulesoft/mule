@@ -27,7 +27,7 @@
             <version>${jetty_version}</version>
             <url>http://jetty.mortbay.com</url>
             <properties>
-                <war.bundle.jar>true</war.bundle.jar>
+                <war.bundle.jar>false</war.bundle.jar>
             </properties>
         </dependency>
         <dependency>

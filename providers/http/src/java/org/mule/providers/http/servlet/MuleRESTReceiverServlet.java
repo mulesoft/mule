@@ -17,28 +17,23 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
-import org.mule.providers.http.HttpConnector;
-import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.NoReceiverForEndpointException;
-import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * <code>MuleRESTReceiverServlet</code> is used for sending a receiving events
  * from the Mule server via a serlet container. The servlet uses the REST style
- * of request processing GET METHOD will do a receive from an external source.
+ * of request processing GET METHOD will do a receive from an external source if an
+ * endpoint parameter is set otherwise it behaves the same way as POST.
  * you can either specify the transport name i.e. to read from Jms orders.queue
  * http://www.mycompany.com/rest/jms/orders/queue <p/> or a Mule endpoint name
  * to target a specific endpoint config. This would get the first email message
@@ -54,38 +49,34 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class MuleRESTReceiverServlet extends AbstractReceiverServlet
+public class MuleRESTReceiverServlet extends MuleReceiverServlet
 {
-    private Map receivers;
-
-    public void doInit(ServletConfig servletConfig) throws ServletException
-    {
-        UMOConnector cnn = null;
-
-        cnn = ConnectorFactory.getConnectorByProtocol("servlet");
-        if (cnn == null) {
-            throw new ServletException("No servlet connector found using protocol: servlet");
-        }
-        receivers = ((HttpConnector) cnn).getReceivers();
-    }
-
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws ServletException, IOException
     {
         try {
-            UMOEndpoint endpoint = getEndpointForURI(httpServletRequest);
-            String timeoutString = httpServletRequest.getParameter("timeout");
-            long to = timeout;
-            if (timeoutString != null) {
-                to = Long.valueOf(timeoutString).longValue();
+            if(httpServletRequest.getParameter("endpoint")!=null)
+            {
+                UMOEndpoint endpoint = getEndpointForURI(httpServletRequest);
+                String timeoutString = httpServletRequest.getParameter("timeout");
+                long to = timeout;
+                if (timeoutString != null) {
+                    to = Long.valueOf(timeoutString).longValue();
+                }
+                if (logger.isDebugEnabled())
+                    logger.debug("Making request using endpoint: " + endpoint.toString() + " timeout is: " + to);
+
+                UMOMessage returnMessage = endpoint.getConnector().getDispatcher("ANY").receive(endpoint.getEndpointURI(),
+                                                                                                to);
+
+                writeResponse(httpServletResponse, returnMessage);
+            } else {
+                AbstractMessageReceiver receiver = getReceiverForURI(httpServletRequest);
+                httpServletRequest.setAttribute(PAYLOAD_PARAMETER_NAME, payloadParameterName);
+                UMOMessage message = new MuleMessage(receiver.getConnector().getMessageAdapter(httpServletRequest));
+                UMOMessage returnMessage = receiver.routeMessage(message, true);
+                writeResponse(httpServletResponse, returnMessage);
             }
-            if (logger.isDebugEnabled())
-                logger.debug("Making request using endpoint: " + endpoint.toString() + " timeout is: " + to);
-
-            UMOMessage returnMessage = endpoint.getConnector().getDispatcher("ANY").receive(endpoint.getEndpointURI(),
-                                                                                            to);
-
-            writeResponse(httpServletResponse, returnMessage);
         } catch (Exception e) {
             handleException(e, "Failed to route event through Servlet Receiver", httpServletResponse);
         }
@@ -162,7 +153,7 @@ public class MuleRESTReceiverServlet extends AbstractReceiverServlet
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
         if (endpoint == null) {
             //if we dont find an endpoint for the given name, lets check the servlet receivers
-            UMOMessageReceiver receiver = (UMOMessageReceiver)receivers.get(endpointName);
+            UMOMessageReceiver receiver = (UMOMessageReceiver)getReceivers().get(endpointName);
             if (receiver == null) {
                 throw new EndpointNotFoundException(endpointName);
             }
@@ -170,22 +161,5 @@ public class MuleRESTReceiverServlet extends AbstractReceiverServlet
 
         }
         return endpoint;
-    }
-
-    protected AbstractMessageReceiver getReceiverForURI(HttpServletRequest httpServletRequest) throws EndpointException
-    {
-        String uri = httpServletRequest.getPathInfo();
-        if (uri == null) {
-            throw new EndpointException(new Message("http", 4, httpServletRequest.getRequestURI()));
-        }
-        if (uri.startsWith("/")) {
-            uri = uri.substring(1);
-        }
-
-        AbstractMessageReceiver receiver = (AbstractMessageReceiver) receivers.get(uri);
-        if (receiver == null) {
-            throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
-        }
-        return receiver;
     }
 }

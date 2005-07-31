@@ -3,7 +3,7 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="Samples" version="1.0">
+<mule-configuration id="Mule_Samples" version="1.0">
     <!--
            All transformers must be defined here.  For this example we have two transformers
            used to transform the inbound events for the Greeter and Chatter components into
@@ -23,17 +23,21 @@
         interact with the framework, other components in the system and external sources.
         Please refer to the Configuration Guide for a full description of all the parameters.
     -->
-    <mule-descriptor name="GreeterUMO"
-        inboundEndpoint="vm://greeter?transformers=StringToNameString"
-        outboundEndpoint="vm://chitchatter"
-        implementation="org.mule.samples.hello.Greeter">
+    <mule-descriptor name="GreeterUMO" implementation="org.mule.samples.hello.Greeter">
         <inbound-router>
+            <endpoint address="vm://greeter" transformers="StringToNameString"/>
             <endpoint address="servlet://greeter" transformers="StringToNameString"/>
         </inbound-router>
+        <outbound-router>
+            <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                <endpoint address="vm://chitchatter"/>
+            </router>
+        </outbound-router>
     </mule-descriptor>
 
-    <mule-descriptor name="ChitChatUMO"
-        inboundEndpoint="vm://chitchatter?transformers=NameStringToChatString"
-        implementation="org.mule.samples.hello.ChitChatter">
+    <mule-descriptor name="ChitChatUMO" implementation="org.mule.samples.hello.ChitChatter">
+        <inbound-router>
+            <endpoint address="vm://chitchatter" transformers="NameStringToChatString"/>
+        </inbound-router>
     </mule-descriptor>
 </mule-configuration>

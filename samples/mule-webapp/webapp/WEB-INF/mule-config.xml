@@ -3,7 +3,7 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="Samples" version="1.0">
+<mule-configuration id="Mule_Samples" version="1.0">
 
     <mule-environment-properties synchronous="true"/>
 

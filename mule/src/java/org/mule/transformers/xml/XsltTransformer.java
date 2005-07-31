@@ -144,6 +144,9 @@ public class XsltTransformer extends AbstractTransformer {
         } else {
             try {
                 InputStream stream = Utility.loadResource(xslFile, getClass());
+                if(stream==null) {
+                    throw new InitialisationException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, xslFile), this);
+                }
                 source = new StreamSource(stream);
             } catch (IOException e) {
                 throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, xslFile), e, this);

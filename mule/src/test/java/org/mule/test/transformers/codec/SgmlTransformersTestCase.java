@@ -15,8 +15,8 @@
 package org.mule.test.transformers.codec;
 
 import org.mule.tck.AbstractTransformerTestCase;
-import org.mule.transformers.xml.SgmlEntityDecoder;
-import org.mule.transformers.xml.SgmlEntityEncoder;
+import org.mule.transformers.codec.SgmlEntityDecoder;
+import org.mule.transformers.codec.SgmlEntityEncoder;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**

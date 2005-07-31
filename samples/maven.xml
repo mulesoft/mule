@@ -54,6 +54,13 @@
         <j:set var="mule.sample.testdata" value="false"/>
         <attainGoal name="dist-sample"/>
 
+        <!-- dist stockquote sample -->
+        <mkdir dir="${samples.dist}"/>
+        <j:set var="mule.sample.name" value="stockquote"/>
+        <j:set var="mule.sample.main" value="org.mule.MuleManager"/>
+        <j:set var="mule.sample.testdata" value="false"/>
+        <attainGoal name="dist-sample"/>
+
         <attainGoal name="dist-webapp-sample"/>
     </goal>
 
