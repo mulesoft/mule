@@ -16,59 +16,25 @@ package org.mule.management.mbeans;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleDescriptor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.AbstractMuleJmxTestCase;
 
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectInstance;
 import javax.management.ObjectName;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
- * TODO Extract JMX server code into AbstractMuleJmxTestCase. Update Log4jAgentTestCase. 
- *
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  *
  * $Id$$
  */
-public class ComponentServiceTestCase extends AbstractMuleTestCase
+public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
 {
-    private MBeanServer mBeanServer;
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        List servers = MBeanServerFactory.findMBeanServer(null);
-        if (servers.size() == 0) {
-            MBeanServerFactory.createMBeanServer();
-        }
-        mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
-
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        // unregister all MBeans
-        Set objectInstances = mBeanServer.queryMBeans(ObjectName.getInstance("*.*:*"), null);
-        for (Iterator it = objectInstances.iterator(); it.hasNext();)
-        {
-            ObjectInstance instance = (ObjectInstance) it.next();
-            mBeanServer.unregisterMBean(instance.getObjectName());
-        }
-
-        mBeanServer = null;
-    }
-
     public void testUndeploy() throws Exception
     {
         final String domainOriginal = "TEST_DOMAIN_1";
 
 
         System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
-        MuleManager manager = (MuleManager) getTestManager();
+        MuleManager manager = (MuleManager) getManager();
         final MuleDescriptor descriptor = new MuleDescriptor("TEST_SERVICE");
         descriptor.setImplementation(new Object());
         manager.getModel().registerComponent(descriptor);
