@@ -16,6 +16,7 @@ package org.mule;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.collections.SequencedHashMap;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
@@ -82,7 +83,7 @@ import java.util.jar.Manifest;
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule
  * instance.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -116,7 +117,7 @@ public class MuleManager implements UMOManager
     /**
      * Holds any registered agents
      */
-    private Map agents = new HashMap();
+    private Map agents = new SequencedHashMap();
 
     /**
      * Holds a list of global endpoints accessible to any client code
