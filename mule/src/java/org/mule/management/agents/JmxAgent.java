@@ -46,6 +46,8 @@ import org.mule.management.mbeans.MuleConfigurationServiceMBean;
 import org.mule.management.mbeans.MuleService;
 import org.mule.management.mbeans.MuleServiceMBean;
 import org.mule.management.mbeans.StatisticsService;
+import org.mule.management.mbeans.ConnectorServiceMBean;
+import org.mule.management.mbeans.ConnectorService;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -160,6 +162,7 @@ public class JmxAgent implements UMOAgent
                         registerModelService();
                         registerComponentServices();
                         registerEndpointServices();
+                        registerConnectorServices();
                     } catch (Exception e) {
                         throw new MuleRuntimeException(new Message(Messages.X_FAILED_TO_INITIALISE, "MBeans"), e);
                     }
@@ -256,7 +259,7 @@ public class JmxAgent implements UMOAgent
     protected void registerStatisticsService() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        ObjectName on = new ObjectName(getDomainName() + ":type=statistics");
+        ObjectName on = ObjectName.getInstance(getDomainName() + ":type=statistics");
         StatisticsService mBean = new StatisticsService();
         mBean.setManager(MuleManager.getInstance());
         mBean.setEnabled(isEnableStatistics());
@@ -268,7 +271,7 @@ public class JmxAgent implements UMOAgent
     protected void registerModelService() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        ObjectName on = new ObjectName(getDomainName() + ":type=control,name=ModelService");
+        ObjectName on = ObjectName.getInstance(getDomainName() + ":type=control,name=ModelService");
         ModelServiceMBean serviceMBean = new ModelService();
         logger.debug("Registering model with name: " + on);
         mBeanServer.registerMBean(serviceMBean, on);
@@ -278,7 +281,7 @@ public class JmxAgent implements UMOAgent
     protected void registerMuleService() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        ObjectName on = new ObjectName(getDomainName() + ":type=control,name=MuleService");
+        ObjectName on = ObjectName.getInstance(getDomainName() + ":type=control,name=MuleService");
         MuleServiceMBean serviceMBean = new MuleService();
         logger.debug("Registering mule with name: " + on);
         mBeanServer.registerMBean(serviceMBean, on);
@@ -288,7 +291,7 @@ public class JmxAgent implements UMOAgent
     protected void registerConfigurationService() throws NotCompliantMBeanException, MBeanRegistrationException,
             InstanceAlreadyExistsException, MalformedObjectNameException
     {
-        ObjectName on = new ObjectName(getDomainName() + ":type=control,name=ConfigurationService");
+        ObjectName on = ObjectName.getInstance(getDomainName() + ":type=control,name=ConfigurationService");
         MuleConfigurationServiceMBean serviceMBean = new MuleConfigurationService();
         logger.debug("Registering configuration with name: " + on);
         mBeanServer.registerMBean(serviceMBean, on);
@@ -302,7 +305,7 @@ public class JmxAgent implements UMOAgent
         String name;
         while (iter.hasNext()) {
             name = iter.next().toString();
-            ObjectName on = new ObjectName(getDomainName() + ":type=control,name=" + name + "ComponentService");
+            ObjectName on = ObjectName.getInstance(getDomainName() + ":type=control,name=" + name + "ComponentService");
             ComponentServiceMBean serviceMBean = new ComponentService(name);
             logger.debug("Registering component with name: " + on);
             mBeanServer.registerMBean(serviceMBean, on);
@@ -326,7 +329,7 @@ public class JmxAgent implements UMOAgent
                         logger.debug("Attempting to register service with name: " + getDomainName()
                                 + ":type=control,name=" + mBean.getName() + " EndpointService");
                     }
-                    ObjectName on = new ObjectName(getDomainName() + ":type=control,name=" + mBean.getName()
+                    ObjectName on = ObjectName.getInstance(getDomainName() + ":type=control,name=" + mBean.getName()
                             + " EndpointService");
                     mBeanServer.registerMBean(mBean, on);
                     registeredMBeans.add(on);
@@ -338,7 +341,27 @@ public class JmxAgent implements UMOAgent
             }
 
         }
+    }
 
+    protected void registerConnectorServices() throws
+                                                MalformedObjectNameException,
+                                                NotCompliantMBeanException,
+                                                MBeanRegistrationException,
+                                                InstanceAlreadyExistsException
+    {
+        Iterator iter = MuleManager.getInstance().getConnectors().values().iterator();
+        while (iter.hasNext()) {
+            UMOConnector connector = (UMOConnector) iter.next();
+            ConnectorServiceMBean mBean = new ConnectorService(connector);
+            final String stringName = getDomainName() + ":type=control,name=" + mBean.getName() + "Service";
+            if (logger.isDebugEnabled()) {
+                logger.debug("Attempting to register service with name: " + stringName);
+            }
+            ObjectName oName = ObjectName.getInstance(stringName);
+            mBeanServer.registerMBean(mBean, oName);
+            registeredMBeans.add(oName);
+            logger.info("Registered Connector Service with name " + oName);
+        }
     }
 
     /**

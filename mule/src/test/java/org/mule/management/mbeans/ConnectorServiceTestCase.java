@@ -13,9 +13,11 @@
  */
 package org.mule.management.mbeans;
 
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.management.stats.RouterStatistics;
+import org.mule.config.MuleProperties;
+import org.mule.management.agents.JmxAgent;
 import org.mule.tck.AbstractMuleJmxTestCase;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.provider.UMOConnector;
 
 import javax.management.ObjectName;
 import java.util.Set;
@@ -25,30 +27,30 @@ import java.util.Set;
  *
  * $Id$$
  */
-public class ComponentStatsTestCase extends AbstractMuleJmxTestCase
+public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
     public void testUndeploy() throws Exception
     {
         final String domainOriginal = "TEST_DOMAIN_1";
 
-        // inbound/outbound router statistics are required
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
+        final UMOManager manager = getManager();
+        final UMOConnector connector = getTestConnector();
+        connector.setName("TEST_CONNECTOR");
+        final JmxAgent jmxAgent = new JmxAgent();
+        jmxAgent.setDomain(domainOriginal);
+        manager.registerConnector(connector);
+        manager.registerAgent(jmxAgent);
 
-        final ComponentStatistics statistics = new ComponentStatistics("TEST_IN", 0, 0);
-        statistics.setInboundRouterStat(new RouterStatistics(RouterStatistics.TYPE_INBOUND));
-        statistics.setOutboundRouterStat(new RouterStatistics(RouterStatistics.TYPE_OUTBOUND));
-        ComponentStats stats = new ComponentStats(statistics);
-
-        final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_NAME");
-        mBeanServer.registerMBean(stats, name);
+        manager.start();
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
 
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
+        assertEquals("Unexpected number of components registered in the domain.", 4, mbeans.size());
 
-        assertEquals("Unexpected components registered in the domain.", 3, mbeans.size());
-
-        mBeanServer.unregisterMBean(name);
+        manager.dispose();
 
         mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
-
         assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());
     }
 }
