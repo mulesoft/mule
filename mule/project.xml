@@ -366,6 +366,17 @@
                 <war.bundle>true</war.bundle>
             </properties>
         </dependency>
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>${ognl_version}</version>
+            <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>false</mule.mini>
+            </properties>
+        </dependency>
     </dependencies>
 
     <build>
