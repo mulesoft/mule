@@ -47,7 +47,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private Map responseEvents = new ConcurrentHashMap();
+    protected Map responseEvents = new ConcurrentHashMap();
     private Map locks = new ConcurrentHashMap();
 
     protected long timeout = 5000;
@@ -151,7 +151,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                                                            messageId), message, null);
         }
 
-        UMOMessage result = (UMOMessage) responseEvents.get(messageId);
+        UMOMessage result = (UMOMessage) responseEvents.remove(messageId);
         locks.remove(messageId);
         if (result == null) {
             // this should never happen ,just using it as a safe gaurd for now

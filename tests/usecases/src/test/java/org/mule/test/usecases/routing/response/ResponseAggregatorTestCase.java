@@ -16,14 +16,19 @@ package org.mule.test.usecases.routing.response;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.test.usecases.service.DummyResponseAggregator;
+import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
-public class ResponseAggregatorTestCase extends NamedTestCase {
+public class ResponseAggregatorTestCase extends AbstractMuleTestCase {
 
     protected void setUp() throws Exception
     {
@@ -38,5 +43,33 @@ public class ResponseAggregatorTestCase extends NamedTestCase {
         UMOMessage message = client.send("http://localhost:8081", "request", null);
         assertNotNull(message);
         assertEquals("Received: request", new String(message.getPayloadAsBytes()));
+    }
+
+    public void testResponseEventsCleanedUp() throws Exception
+    {
+        // relax access to get to the responseEvents
+        RelaxedResponseAggregator aggregator = new RelaxedResponseAggregator();
+
+        UMOEvent event = getTestEvent("message1");
+        final UMOMessage message = event.getMessage();
+        final String id = message.getUniqueId();
+        message.setCorrelationId(id);
+        aggregator.process(event);
+
+        aggregator.getResponse(message);
+
+        Map responseEvents = aggregator.getResponseEvents();
+        assertTrue("Response events should be cleaned up.", responseEvents.isEmpty());
+    }
+
+    /**
+     * This class opens up the access to responseEvents map for testing
+     */
+    private static final class RelaxedResponseAggregator extends DummyResponseAggregator
+    {
+        public Map getResponseEvents()
+        {
+            return this.responseEvents;
+        }
     }
 }
