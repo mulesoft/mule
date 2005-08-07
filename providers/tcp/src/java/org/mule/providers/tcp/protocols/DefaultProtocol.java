@@ -50,8 +50,11 @@ public class DefaultProtocol implements TcpProtocol
             while ((len = is.read(buffer)) == 0) {
             }
         } catch (SocketException e) {
+            // do not pollute the log with a stacktrace, log only the message
+            logger.debug("Socket exception occured: " + e.getMessage());
             return null;
         } catch (SocketTimeoutException e) {
+            logger.debug("Socket timeout, returning null.");
             return null;
         }
         if (len == -1) {
