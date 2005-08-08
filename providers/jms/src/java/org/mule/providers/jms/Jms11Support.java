@@ -91,11 +91,15 @@ public class Jms11Support implements JmsSupport
                                           String durableName) throws JMSException
     {
         if (durableName == null) {
-            return session.createConsumer(destination, messageSelector, noLocal);
+            if (destination instanceof Topic) {
+                return session.createConsumer(destination, messageSelector, noLocal);
+            } else {
+                return session.createConsumer(destination, messageSelector);
+            }
         } else if (destination instanceof Topic) {
             return session.createDurableSubscriber((Topic) destination, durableName, messageSelector, noLocal);
         } else {
-            throw new JMSException("adurable subscriber name was set but the destination was not a Topic");
+            throw new JMSException("A durable subscriber name was set but the destination was not a Topic");
         }
     }
 
