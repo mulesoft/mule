@@ -107,11 +107,9 @@ public class MuleManagerComponent implements Callable, Initialisable
         if (destComponent != null) {
             UMOSession session = MuleManager.getInstance().getModel().getComponentSession(destComponent);
             RequestContext.rewriteEvent(action.getMessage());
-            // Need to do this otherise when the evne tis invoked the
-            // transformer
-            // Associated with the Mule Admin queue will be invoked, btu the
-            // message
-            // will not be of expected type
+            // Need to do this otherise when the event is invoked the
+            // transformer associated with the Mule Admin queue will be invoked, but the
+            // message will not be of expected type
             UMOEvent event = RequestContext.getEvent();
             event.getEndpoint().setTransformer(null);
             if (context.isSynchronous()) {
