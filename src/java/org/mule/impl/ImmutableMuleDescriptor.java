@@ -157,7 +157,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * Determines the initial state of this component when the model
      * starts. Can be 'stopped' or 'started' (default)
      */
-    protected String initialState;
+    protected String initialState = INITIAL_STATE_STARTED;
 
     /**
      * Determines if this component is a singleton
