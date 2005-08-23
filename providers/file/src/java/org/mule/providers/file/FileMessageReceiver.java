@@ -137,7 +137,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
                                                             file.getAbsolutePath(),
                                                             destinationFile.getAbsolutePath()));
                     }
-                    file = destinationFile;
+                    msgAdapter = connector.getMessageAdapter(destinationFile);                    
                 }
 
                 if (((FileConnector) connector).isAutoDelete()) {
