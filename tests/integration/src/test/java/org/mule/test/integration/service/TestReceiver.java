@@ -13,6 +13,8 @@
  */
 package org.mule.test.integration.service;
 
+import org.mule.util.StringMessageHelper;
+
 import javax.jms.TextMessage;
 
 /**
@@ -25,8 +27,8 @@ public class TestReceiver
 
     public String receive(String message) throws Exception
     {
-        System.out.println("Received: " + message + " Number: " + inc() + " in thread: "
-                + Thread.currentThread().getName());
+        System.out.println(StringMessageHelper.getBoilerPlate("Received: " + message + " Number: " + inc() + " in thread: "
+                + Thread.currentThread().getName()));
         return "Received: " + message;
     }
 

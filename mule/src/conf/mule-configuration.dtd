@@ -985,18 +985,17 @@ Whether every configured router will be matched
    This attibute defines the response transformers (if any) that will be applied
    to the response message before returning to the client. Developers can define
    a response-router with only a transformer and no actual routers to configure a
-   response transformer
+   response transformer.  Note that the connector can have a default Response transformer
+   associated with it meaning that marshaling from transport specific MEssage types such as
+   Jms will be done automatically.
 -->
 <!ATTLIST response-router transformers              IDREFS           #IMPLIED>
 
 <!--
-	This attribute can be used to change the default behavior of the respone router
-	regarding the processing of the received event. If set to false, the message
-	will be routed in the outbound router instead of being sent back to the
-	inbound router.
+	Defines the timeout for routers configure on this response-router
 -->
-<!ATTLIST response-router stopProcessing        (true | false)           "true">
-	
+<!ATTLIST response-router timeout        CDATA         #IMPLIED>
+
 <!--
 A catch-all-strategy is invoked to route an event when an event is not accepted by any of the configured
 routers.

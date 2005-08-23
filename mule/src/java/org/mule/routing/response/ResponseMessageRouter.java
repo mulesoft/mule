@@ -13,13 +13,13 @@
  */
 package org.mule.routing.response;
 
-import java.util.Iterator;
-import java.util.List;
-
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.config.MuleConfiguration;
 import org.mule.impl.MuleMessage;
 import org.mule.management.stats.RouterStatistics;
+import org.mule.providers.AbstractConnector;
 import org.mule.routing.AbstractRouterCollection;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -30,7 +30,8 @@ import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>ResponseMessageRouter</code> is a router that can be used to control
@@ -51,7 +52,9 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
 
     private UMOTransformer transformer;
 
-    private boolean stopProcessing = true;
+    private boolean transExplicitlySet = false;
+
+    private int timeout = MuleConfiguration.DEFAULT_TIMEOUT;
 
     public ResponseMessageRouter()
     {
@@ -61,6 +64,9 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public void route(UMOEvent event) throws RoutingException
     {
         UMOResponseRouter router = null;
+        if(!transExplicitlySet) {
+            transformer = ((AbstractConnector)event.getEndpoint().getConnector()).getDefaultResponseTransformer();
+        }
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
             router = (UMOResponseRouter) iterator.next();
             router.process(event);
@@ -104,6 +110,7 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
 
     public void addRouter(UMOResponseRouter router)
     {
+        router.setTimeout(getTimeout());
         routers.add(router);
     }
 
@@ -169,16 +176,15 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public void setTransformer(UMOTransformer transformer)
     {
         this.transformer = transformer;
+        transExplicitlySet = true;
     }
 
-    public boolean isStopProcessing()
-    {
-        return stopProcessing;
+    public int getTimeout() {
+        return timeout;
     }
 
-    public void setStopProcessing(boolean stopProcessing)
-    {
-        this.stopProcessing = stopProcessing;
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
 }

@@ -28,4 +28,8 @@ public interface UMOResponseRouter extends UMORouter
     void process(UMOEvent event) throws RoutingException;
 
     UMOMessage getResponse(UMOMessage message) throws RoutingException;
+
+    void setTimeout(int timeout);
+
+    int getTimeout();
 }

@@ -15,8 +15,6 @@
 
 package org.mule.impl;
 
-import java.lang.reflect.Method;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -39,6 +37,8 @@ import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.util.ClassHelper;
+
+import java.lang.reflect.Method;
 
 /**
  * <code>DefaultLifecycleAdapter</code> provides lifecycle methods for all
@@ -188,16 +188,14 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     resultMessage = new MuleMessage(result, event.getProperties());
                 }
             }
-            boolean stopProcessing = false;
-            if (descriptor.getResponseRouter() != null) {
-                stopProcessing = descriptor.getResponseRouter().isStopProcessing();
-            } else {
-                stopProcessing = event.isStopFurtherProcessing();
-            }
+            //If we have an outbound router we need to invoke it with the current message
+            //then block for a response
+            boolean stopProcessing = !descriptor.getOutboundRouter().hasEndpoints();
 
             // Need to find a cleaner solution for handling response messages
-            // Right now routing is split between here a nd the proxy
+            // Right now routing is split between here and the proxy
             if (descriptor.getResponseRouter() != null) {
+                //If the event is not synchronous, there will be no replyTo channel anyway
                 if (event.isSynchronous() && !stopProcessing) {
                     // we need to do the outbound first but we dispatch
                     // aynshonously as
@@ -206,16 +204,14 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     descriptor.getOutboundRouter().route(resultMessage, event.getSession(), false);
                 }
                 logger.debug("Waiting for response router message");
-                result = descriptor.getResponseRouter().getResponse(resultMessage);
+                resultMessage = descriptor.getResponseRouter().getResponse(resultMessage);
 
                 if (stopProcessing) {
                     logger.debug("Setting stop oubound processing according to response router");
                     RequestContext.getEvent().setStopFurtherProcessing(true);
                 }
-                return result;
-            } else {
-                return resultMessage;
             }
+            return resultMessage;
         } catch (Exception e) {
             throw new MessagingException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: "
                     + descriptor.getName()), event.getMessage(), e);

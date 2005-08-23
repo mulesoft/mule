@@ -63,11 +63,15 @@ public class DefaultPropertiesExtractor implements PropertyExtractor
 
     public String getCorrelationId(UMOMessage message)
     {
+        String id = message.getCorrelationId();
         try {
-            return getMessageId(message);
+            if(id==null) {
+                id = message.getUniqueId();
+            }
         } catch (UniqueIdNotSupportedException e) {
-            return new UUID().getUUID();
+            id = new UUID().getUUID();
         }
+        return id;
     }
 
     // public String getCorrelationGroupSize(UMOMessage message) {

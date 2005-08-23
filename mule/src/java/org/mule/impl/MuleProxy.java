@@ -292,7 +292,7 @@ public class MuleProxy implements Work, Lifecycle
     protected UMOMessage processResponse(UMOMessage message, Object replyTo, ReplyToHandler replyToHandler)
             throws UMOException
     {
-        // boolean stopProcessing = false;
+        boolean stopProcessing = !descriptor.getOutboundRouter().hasEndpoints();
         // if(descriptor.getResponseRouter()!=null) {
         // stopProcessing = descriptor.getResponseRouter().isStopProcessing();
         // } else {
@@ -302,7 +302,7 @@ public class MuleProxy implements Work, Lifecycle
         // Need to find a cleaner solution for handling response messages
         // Right now routing is split between here a nd the proxy
         if (descriptor.getResponseRouter() != null) {
-            if (event.isSynchronous() && !descriptor.getResponseRouter().isStopProcessing()) {
+            if (event.isSynchronous() && !stopProcessing) {
                 // we need to do the outbound first but we dispatch aynshonously
                 // as
                 // we are waiting for a response on another resource
@@ -311,10 +311,10 @@ public class MuleProxy implements Work, Lifecycle
             logger.debug("Waiting for response router message");
             message = descriptor.getResponseRouter().getResponse(message);
 
-            if (descriptor.getResponseRouter().isStopProcessing()) {
-                logger.debug("Setting stop oubound processing according to response router");
-                RequestContext.getEvent().setStopFurtherProcessing(true);
-            }
+//            if (descriptor.getResponseRouter().isStopProcessing()) {
+//                logger.debug("Setting stop oubound processing according to response router");
+//                RequestContext.getEvent().setStopFurtherProcessing(true);
+//            }
         }
         // return message;
         // }
