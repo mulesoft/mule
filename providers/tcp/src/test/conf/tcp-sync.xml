@@ -17,15 +17,11 @@
 		</properties>
 	</connector>
 	
-	<transformers>
-		<transformer name="Default" className="org.mule.transformers.DefaultTransformer"/>
-	</transformers>
-	
 	<model name="model">
-		<mule-descriptor name="TcpReceiver" 
-			implementation="org.mule.components.simple.EchoComponent"
-			inboundTransformer="Default"
-			inboundEndpoint="tcp://localhost:4544/?synchronous=true">
+		<mule-descriptor name="TcpReceiver" implementation="org.mule.components.simple.EchoComponent">
+			<inbound-router>
+                <endpoint address="tcp://localhost:4544" synchronous="true"/>
+			</inbound-router>
 		</mule-descriptor>
 
 	</model>

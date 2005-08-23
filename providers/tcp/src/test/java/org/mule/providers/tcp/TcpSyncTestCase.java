@@ -28,8 +28,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import java.util.Arrays;
 
 /**
- * TODO: document this class
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
@@ -52,7 +50,6 @@ public class TcpSyncTestCase extends NamedTestCase
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(new MuleEndpointURI(endpointUri),
                                                                       UMOEndpoint.ENDPOINT_TYPE_SENDER);
         MuleSession session = new MuleSession();
-        endpoint.setRemoteSync(true);
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(60000);
         return event.getSession().sendEvent(event);
