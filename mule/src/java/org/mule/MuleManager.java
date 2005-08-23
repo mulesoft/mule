@@ -930,7 +930,7 @@ public class MuleManager implements UMOManager
         } else {
             message.add(new Message(Messages.AGENTS_RUNNING).getMessage());
             UMOAgent umoAgent;
-            for (Iterator iterator = agents.iterator(); iterator.hasNext();) {
+            for (Iterator iterator = agents.values().iterator(); iterator.hasNext();) {
                 umoAgent = (UMOAgent) iterator.next();
                 message.add("  " + umoAgent.getDescription());
             }
@@ -957,7 +957,7 @@ public class MuleManager implements UMOManager
      */
     public void registerAgent(UMOAgent agent) throws UMOException
     {
-        agents.add(agent);
+        agents.put(agent.getName(), agent);
         agent.registered();
     }
 
@@ -966,7 +966,7 @@ public class MuleManager implements UMOManager
      */
     public UMOAgent removeAgent(String name) throws UMOException
     {
-        for (Iterator iterator = agents.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();) {
             UMOAgent agent = (UMOAgent) iterator.next();
             if(agent.getName().equals(name)) {
                 agents.remove(agent);
@@ -987,7 +987,7 @@ public class MuleManager implements UMOManager
     {
         UMOAgent umoAgent;
         logger.info("Initialising agents...");
-        for (Iterator iterator = agents.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();) {
             umoAgent = (UMOAgent) iterator.next();
             logger.debug("Initialising agent: " + umoAgent.getName());
             umoAgent.initialise();
@@ -1002,7 +1002,7 @@ public class MuleManager implements UMOManager
     {
         UMOAgent umoAgent;
         logger.info("Starting agents...");
-        for (Iterator iterator = agents.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();) {
             umoAgent = (UMOAgent) iterator.next();
             logger.info("Starting agent: " + umoAgent.getDescription());
             umoAgent.start();
@@ -1018,7 +1018,7 @@ public class MuleManager implements UMOManager
     {
         UMOAgent umoAgent;
         logger.info("Stopping agents...");
-        for (Iterator iterator = agents.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();) {
             umoAgent = (UMOAgent) iterator.next();
             logger.debug("Stopping agent: " + umoAgent.getName());
             umoAgent.stop();
@@ -1033,7 +1033,7 @@ public class MuleManager implements UMOManager
     {
         UMOAgent umoAgent;
         logger.info("disposing agents...");
-        for (Iterator iterator = agents.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();) {
             umoAgent = (UMOAgent) iterator.next();
             logger.debug("Disposing agent: " + umoAgent.getName());
             umoAgent.dispose();
