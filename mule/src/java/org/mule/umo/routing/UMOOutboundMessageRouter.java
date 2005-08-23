@@ -46,4 +46,10 @@ public interface UMOOutboundMessageRouter extends UMORouterCollection
      * @throws RoutingException if there is a filter exception
      */
     UMOEndpoint[] getEndpointsForMessage(UMOMessage message) throws MessagingException;
+
+    /**
+     * Determines if any endpoints have been set on this router
+     * @return
+     */
+    public boolean hasEndpoints();
 }

@@ -15,15 +15,15 @@
 
 package org.mule.umo.endpoint;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * <code>UMOImmutableEndpoint</code> describes a Message endpoint where data
@@ -35,17 +35,20 @@ import org.mule.umo.transformer.UMOTransformer;
  */
 public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialisable
 {
+    public static final String INITIAL_STATE_STARTED = "started";
+    public static final String INITIAL_STATE_STOPPED = "stopped";
+
     /** The endpoint is outbound */
-    String ENDPOINT_TYPE_SENDER = "sender";
+    public static final String ENDPOINT_TYPE_SENDER = "sender";
 
     /** The endpoint is indound */
-    String ENDPOINT_TYPE_RECEIVER = "receiver";
+     public static final String ENDPOINT_TYPE_RECEIVER = "receiver";
 
     /** The endpoint is either and will be set depending on how it is used */
-    String ENDPOINT_TYPE_SENDER_AND_RECEIVER = "senderAndReceiver";
+     public static final String ENDPOINT_TYPE_SENDER_AND_RECEIVER = "senderAndReceiver";
 
     /** The endpoint is a receive endpoint set on a response router */
-    String ENDPOINT_TYPE_RESPONSE = "response";
+     public static final String ENDPOINT_TYPE_RESPONSE = "response";
 
     /**
      * This specifes the communication endpointUri. This will have a different
@@ -202,6 +205,31 @@ public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialis
      *         'receiver'
      */
     boolean isSynchronous();
+    /**
+     * For certain providers that support the notion of a backchannel such as sockets (outputStream) or
+     * Jms (ReplyTo) Mule can automatically wait for a response from a backchannel when dispatching
+     * over these protocols.  This is different for synchronous as synchronous behavior only applies to in
+     * @return
+     */
+    boolean isRemoteSync();
 
+    /**
+     * The timeout value for remoteSync invocations
+     * @return the timeout in milliseconds
+     */
+    int getRemoteSyncTimeout();
+
+    /**
+     * Determines if a new connector is created for this endpoint or an exising one must
+     * already be present
+     * @return
+     */
     int getCreateConnector();
+
+    /**
+     * Sets the state the endpoint will be loaded in.  The States are
+     * 'stopped' and 'started' (default)
+     * @return the endpoint starting state
+     */
+    String getInitialState();
 }

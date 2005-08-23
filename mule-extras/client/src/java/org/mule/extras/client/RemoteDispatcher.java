@@ -192,7 +192,7 @@ public class RemoteDispatcher implements Disposable
     public UMOMessage receiveRemote(String endpoint, int timeout) throws UMOException
     {
         AdminEvent action = new AdminEvent(null, AdminEvent.ACTION_RECEIVE, endpoint);
-        action.setProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "true");
+        action.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
         action.setProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, new Long(timeout));
         UMOMessage result = dispatchAction(action, true, timeout);
         return result;
@@ -220,7 +220,7 @@ public class RemoteDispatcher implements Disposable
                                              boolean synchronous) throws UMOException
     {
         UMOMessage message = new MuleMessage(payload, messageProperties);
-        message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, synchronous);
+        message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, synchronous);
         setCredentials(message);
         AdminEvent action = new AdminEvent(message, AdminEvent.ACTION_INVOKE, "mule://" + component);
         UMOMessage result = dispatchAction(action, synchronous, MuleManager.getConfiguration()
@@ -232,7 +232,7 @@ public class RemoteDispatcher implements Disposable
             throws UMOException
     {
         UMOMessage message = new MuleMessage(payload, messageProperties);
-        message.setProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, String.valueOf(synchronous));
+        message.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, String.valueOf(synchronous));
         setCredentials(message);
         AdminEvent action = new AdminEvent(message,
                                            (synchronous ? AdminEvent.ACTION_SEND : AdminEvent.ACTION_DISPATCH),

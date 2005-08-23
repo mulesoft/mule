@@ -762,6 +762,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         addMulePropertiesRule(path, digester);
         if ("outbound".equals(type)) {
             addEndpointRules(digester, path, "addEndpoint");
+            addReplyToRules(digester, path);
             addGlobalReferenceEndpointRules(digester, path, "addEndpoint");
             addTransactionConfigRules(path, digester);
         }
@@ -769,6 +770,18 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
         // Set the router on the to the message router
         digester.addSetNext(path, "addRouter");
+    }
+
+    protected void addReplyToRules(Digester digester, String path) throws ConfigurationException
+    {
+        // Set message endpoint
+        path += "/reply-to";
+        digester.addRule(path, new Rule() {
+            public void begin(String s, String s1, Attributes attributes) throws Exception {
+                String replyTo = attributes.getValue("address");
+                ((UMOOutboundRouter)digester.peek()).setReplyTo(replyTo);
+            }
+        });
     }
 
     protected void addEndpointRules(Digester digester, String path, String method) throws ConfigurationException

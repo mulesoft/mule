@@ -533,6 +533,26 @@ a connection to the underlying resource
 <!ATTLIST endpoint synchronous	(true|false)			#IMPLIED>
 
 <!--
+    remoteSync
+    Determines whether when running synchronously, return events are received before
+    returning the call. i.e. in jms wait for a replyTo or tcp/http reply on the outputStream.
+    Vm queues do this automatically
+-->
+<!ATTLIST endpoint remoteSync	(true|false)			#IMPLIED>
+
+<!--
+    remoteSyncTimeout
+    How long to block for a remote sync operation
+-->
+<!ATTLIST endpoint remoteSyncTimeout	NMTOKEN			#IMPLIED>
+
+
+<!--
+    Determines the running state of an endpoint when the model starts up
+-->
+<!ATTLIST endpoint initialState			(started | stopped )			"started">
+
+<!--
 	Deterimes how mule will allocate a connector for this endpoint.  By default
     Mule will look for a connector with a protocol matching the protocol of the address
     of this endpoint.  If a match is found that connector will be used, otherwise a new
@@ -570,6 +590,26 @@ a connection to the underlying resource
     if not set the MuleManager synchronous property will be used
 -->
 <!ATTLIST global-endpoint synchronous	(true|false)			#IMPLIED>
+
+<!--
+    remote-sync
+    Determines whether when running synchronously, return events are received before
+    returning the call. i.e. in jms wait for a replyTo or tcp/http reply on the outputStream.
+    Vm queues do this automatically
+-->
+<!ATTLIST global-endpoint remote-sync	(true|false)			#IMPLIED>
+
+<!--
+    remote-sync-timeout
+    How long to block for a remote sync operation
+-->
+<!ATTLIST global-endpoint remote-sync-timeout	NMTOKEN			#IMPLIED>
+
+
+<!--
+    Determines the running state of an endpoint when the model starts up
+-->
+<!ATTLIST global-endpoint initialState			(started | stopped )			"started">
 
 <!--
 A security filter ensures that all requestsmade via an endpoint will be authenticated
@@ -854,6 +894,18 @@ Can be null if fragment is not Xml.  If not set UTF-8 will be used.
 <!ATTLIST mule-descriptor containerManaged			(true | false)			#IMPLIED>
 
 <!--
+    Determines if only a single instance of this component is created.  This is useful when a
+    component hands off event processing to another engine such as Rules processing or Bpel
+    and the processing engine allocates and manages its own threads.
+-->
+<!ATTLIST mule-descriptor singleton			(true | false)			"false">
+
+<!--
+    Determines the running state of a component when the model starts up
+-->
+<!ATTLIST mule-descriptor initialState			(started | stopped )			"started">
+
+<!--
     A message router configures different routing paths for events that are dispatched for a UMO
     component. An outbound router is concerned with messages/events being sent out from a UMO component.
     You can specify diferent routing rules for different providers configured on the
@@ -918,7 +970,7 @@ Is a fully qualified class name of the catch all strategy class
     event.  to chain routers you must define once router inside another.
 -->
 
-<!ELEMENT router ((endpoint)*,(global-endpoint)*,(filter)?,(properties)?)>
+<!ELEMENT router ((endpoint)*,(global-endpoint)*, reply-to?, (filter)?,(properties)?)>
 
 <!--
     className
@@ -946,6 +998,15 @@ Is a fully qualified class name of the catch all strategy class
 <!ATTLIST router propertyExtractor           NMTOKEN           #IMPLIED>
 
 
+<!ELEMENT reply-to EMPTY>
+
+<!--
+    address
+    A replyTo address that should be used once a message has been processed.  This
+    property only applies to outbound-routers.
+-->
+
+<!ATTLIST reply-to address                   CDATA           #REQUIRED>
 <!--
     filters are used to determine whether the router should accept the current
     message.

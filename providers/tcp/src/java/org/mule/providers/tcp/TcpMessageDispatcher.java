@@ -13,6 +13,17 @@
  */
 package org.mule.providers.tcp;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.util.Utility;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -22,19 +33,6 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.util.Utility;
 
 /**
  * <code>TcpMessageDispatcher</code> will send transformed mule events over
@@ -114,14 +112,13 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
             Object payload = event.getTransformedMessage();
             socket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
 
-            boolean syncReceive = event.getBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY,
-                                                           MuleManager.getConfiguration().isSynchronousReceive());
+            boolean syncReceive = event.getEndpoint().isRemoteSync();
 
             write(socket, payload);
             // If we're doing sync receive try and read return info from socket
             if (syncReceive) {
                 try {
-                    byte[] result = receive(socket, event.getTimeout());
+                    byte[] result = receive(socket, event.getEndpoint().getRemoteSyncTimeout());
                     if (result == null) {
                         return null;
                     }

@@ -453,8 +453,8 @@ public class MuleClient implements Disposable
         if (messageProperties == null) {
             messageProperties = new HashMap();
         }
-        if (messageProperties.get(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY) == null) {
-            messageProperties.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "true");
+        if (messageProperties.get(MuleProperties.MULE_REMOTE_SYNC_PROPERTY) == null) {
+            messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
         }
         UMOMessage message = new MuleMessage(payload, messageProperties);
         UMOEvent event = getEvent(message, url, true);
@@ -590,7 +590,6 @@ public class MuleClient implements Disposable
             UMOConnector connector = null;
             UMOEndpointURI defaultEndpointUri = new MuleEndpointURI("vm://localhost/mule.client");
             connector = ConnectorFactory.createConnector(defaultEndpointUri);
-            connector.initialise();
             manager.registerConnector(connector);
             connector.startConnector();
             endpoint = new MuleEndpoint("muleClientProvider",
@@ -624,7 +623,7 @@ public class MuleClient implements Disposable
         if (messageProperties == null) {
             messageProperties = new HashMap();
         }
-        messageProperties.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
+        messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         UMOMessage message = new MuleMessage(payload, messageProperties);
         UMOEvent event = getEvent(message, url, true);
         try {
@@ -659,7 +658,7 @@ public class MuleClient implements Disposable
      * @param listenerEndpoint The url endpointUri to listen to
      * @throws UMOException
      */
-    public void registerComponent(Object component, String name, MuleEndpointURI listenerEndpoint) throws UMOException
+    public void registerComponent(Object component, String name, UMOEndpointURI listenerEndpoint) throws UMOException
     {
         builder.registerComponentInstance(component, name, listenerEndpoint, null);
     }

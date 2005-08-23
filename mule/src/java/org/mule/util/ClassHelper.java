@@ -14,6 +14,9 @@
 
 package org.mule.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -23,11 +26,9 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is extremely useful for loading resources and classes in a fault
@@ -85,6 +86,34 @@ public class ClassHelper
         }
 
         return url;
+    }
+
+    public static Enumeration getResources(String resourceName, Class callingClass) {
+        Enumeration enumeration = null;
+
+        try {
+            enumeration = Thread.currentThread().getContextClassLoader().getResources(resourceName);
+        } catch (IOException e) {
+
+        }
+
+        if (enumeration == null) {
+            try {
+                enumeration = ClassHelper.class.getClassLoader().getResources(resourceName);
+            } catch (IOException e) {
+
+            }
+        }
+
+        if (enumeration == null) {
+            try {
+                enumeration = callingClass.getClassLoader().getResources(resourceName);
+            } catch (IOException e) {
+
+            }
+        }
+
+        return enumeration;
     }
 
     /**

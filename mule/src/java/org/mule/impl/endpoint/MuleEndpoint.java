@@ -14,9 +14,6 @@
  */
 package org.mule.impl.endpoint;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOException;
@@ -29,6 +26,9 @@ import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>MuleEndpoint</code> describes a Provider in the Mule Server. A
@@ -241,5 +241,38 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
         } else {
             createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
         }
+    }
+
+    /**
+     * For certain providers that support the notion of a backchannel such as sockets (outputStream) or
+     * Jms (ReplyTo) Mule can automatically wait for a response from a backchannel when dispatching
+     * over these protocols.  This is different for synchronous as synchronous behavior only applies to in
+     *
+     * @param value whether the endpoint should perfrom sync receives
+     */
+    public void setRemoteSync(boolean value) {
+        this.remoteSync = Boolean.valueOf(value);
+        if(value) {
+            this.synchronous = Boolean.TRUE;
+        }
+    }
+
+    /**
+     * The timeout value for remoteSync invocations
+     *
+     * @param timeout the timeout in milliseconds
+     */
+    public void setRemoteSyncTimeout(int timeout) {
+        this.remoteSyncTimeout = new Integer(timeout);
+    }
+
+    /**
+     * Sets the state the endpoint will be loaded in.  The States are
+     * 'stopped' and 'started' (default)
+     *
+     * @param state
+     */
+    public void setInitialState(String state) {
+        this.initialState = state;
     }
 }

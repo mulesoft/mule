@@ -13,15 +13,14 @@
  */
 package org.mule.routing;
 
-import java.util.Iterator;
-import java.util.List;
-
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.umo.routing.UMORouter;
 import org.mule.umo.routing.UMORouterCatchAllStrategy;
 import org.mule.umo.routing.UMORouterCollection;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>AbstractRouterCollection</code> provides common method
@@ -105,5 +104,4 @@ public abstract class AbstractRouterCollection implements UMORouterCollection
     {
         this.statistics = stat;
     }
-
 }

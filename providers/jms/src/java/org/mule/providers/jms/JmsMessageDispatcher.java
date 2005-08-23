@@ -14,16 +14,7 @@
  */
 package org.mule.providers.jms;
 
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-
 import org.mule.MuleException;
-import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -34,6 +25,13 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
+
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching messages
@@ -89,8 +87,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             // If a transaction is running, we can not receive any messages
             // in the same transaction
-            boolean syncReceive = event.getBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY,
-                                                           MuleManager.getConfiguration().isSynchronousReceive());
+            boolean syncReceive = event.getEndpoint().isRemoteSync();
             if (txSession != null && syncReceive) {
                 throw new IllegalTransactionStateException(new org.mule.config.i18n.Message("jms", 2));
             }
@@ -175,7 +172,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
 
             if (consumer != null) {
-                int timeout = event.getTimeout();
+                int timeout = event.getEndpoint().getRemoteSyncTimeout();
                 logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
                 Message result = consumer.receive(timeout);
                 if (result == null) {

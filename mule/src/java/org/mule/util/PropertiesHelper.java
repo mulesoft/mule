@@ -275,7 +275,8 @@ public class PropertiesHelper
             if (!newline) {
                 buf.append(", ");
             }
-            buf.append(entry.getKey()).append("=").append(entry.getValue());
+            buf.append(entry.getKey()).append("=").append((
+                    entry.getKey().toString().equalsIgnoreCase("password") ? "*****" : entry.getValue()));
             if (newline) {
                 buf.append("\n");
             }

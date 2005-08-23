@@ -14,16 +14,16 @@
  */
 package org.mule.umo;
 
-import java.beans.ExceptionListener;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.beans.ExceptionListener;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>UMODescriptor</code> describes all the properties for a Mule UMO. New
@@ -160,5 +160,20 @@ public interface UMODescriptor extends UMOImmutableDescriptor
      * @see org.mule.transformers.AbstractTransformer
      */
     void setOutboundTransformer(UMOTransformer transformer);
+
+    /**
+     * Determines if only a single instance of this component is created.  This is useful when a
+     * component hands off event processing to another engine such as Rules processing or Bpel
+     * and the processing engine allocates and manages its own threads.
+     *
+     * @param singleton true if this component is a singleton
+     */
+    void setSingleton(boolean singleton);
+
+    /**
+     * Sets the initial state of this component
+     * @param state the initial state of this component
+     */
+    void setInitialState(String state);
 
 }

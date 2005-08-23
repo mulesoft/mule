@@ -13,9 +13,6 @@
  */
 package org.mule.test.integration.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
@@ -29,6 +26,9 @@ import org.mule.transaction.TransactionTemplate;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -52,7 +52,7 @@ public class MuleClientTransactionTestCase extends NamedTestCase
         final MuleClient client = new MuleClient();
         final Map props = new HashMap();
         props.put("JMSReplyTo", "replyTo.queue");
-        props.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
+        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         
         // Empty reply queue
         while (client.receive("jms://replyTo.queue", 2000) != null) {
@@ -85,7 +85,7 @@ public class MuleClientTransactionTestCase extends NamedTestCase
         final MuleClient client = new MuleClient();
         final Map props = new HashMap();
         props.put("JMSReplyTo", "replyTo.queue");
-        props.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
+        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         
         // Empty reply queue
         while (client.receive("jms://replyTo.queue", 2000) != null) {
@@ -120,7 +120,7 @@ public class MuleClientTransactionTestCase extends NamedTestCase
         final MuleClient client = new MuleClient();
         final Map props = new HashMap();
         props.put("JMSReplyTo", "replyTo.queue");
-        props.put(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, "false");
+        props.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         
         // Empty reply queue
         while (client.receive("jms://replyTo.queue", 2000) != null) {

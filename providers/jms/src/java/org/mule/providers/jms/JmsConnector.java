@@ -686,4 +686,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
     {
         this.redeliveryHandler = redeliveryHandler;
     }
+
+    public boolean isRemoteSyncEnabled() {
+        return true;
+    }
 }

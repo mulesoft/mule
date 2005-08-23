@@ -79,7 +79,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
      */
     public void doDispatch(UMOEvent event) throws Exception
     {
-        send(event);
+        HttpMethod httpMethod = execute(event);
+        if(httpMethod!=null) {
+            httpMethod.releaseConnection();
+        }
     }
 
     /*
@@ -149,12 +152,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
-     */
-    public UMOMessage doSend(UMOEvent event) throws Exception
+    protected HttpMethod execute(UMOEvent event) throws Exception
     {
         String method = (String) event.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
         URI uri = event.getEndpoint().getEndpointURI().getUri();
@@ -203,7 +201,22 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
 
             httpMethod.execute(state, connection);
-
+            return httpMethod;
+        } catch (Exception e) {
+            if (httpMethod != null)
+                httpMethod.releaseConnection();
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
+        }
+    }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
+     */
+    public UMOMessage doSend(UMOEvent event) throws Exception
+    {
+        HttpMethod httpMethod = execute(event);
+        try {
             Properties h = new Properties();
             Header[] headers = httpMethod.getRequestHeaders();
             for (int i = 0; i < headers.length; i++) {

@@ -117,4 +117,8 @@ public class TcpConnector extends AbstractServiceEnabledConnector
         this.tcpProtocolClassName = protocolClassName;
     }
 
+    public boolean isRemoteSyncEnabled() {
+        return true;
+    }
+
 }

@@ -4,13 +4,16 @@
 
 <mule-configuration id="test" version="1.0">
 
+	<!-- Mule properties -->
+	<mule-environment-properties/>
+	
 	<!-- Connectors -->
 	<connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
             <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
             <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
-		    <map name="connectionFactoryProperties">
-                <property name="useEmbeddedBroker" value="true"/>
+		    <map name="jndiProviderProperties">
+                <property name="brokerUrl" value="tcp://localhost:61626"/>
 		    </map>
         </properties>
     </connector>
@@ -23,14 +26,9 @@
             </inbound-router>
 			<outbound-router>
 				<router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-					<endpoint address="jms://queue_in" />
-                    <reply-to address="jms://queue_out"/>
+					<endpoint address="jms://queue_in"/>
 				</router>
 			</outbound-router>
-			<response-router stopProcessing="false" >
-				<endpoint address="jms://queue_out"/>
-				<router className="org.mule.test.usecases.service.DummyResponseAggregator"/>
-			</response-router>
 		</mule-descriptor>
 
 		<mule-descriptor name="JMSReplyProvider" 

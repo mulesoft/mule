@@ -14,10 +14,7 @@
 
 package org.mule.providers.tcp;
 
-import java.util.Arrays;
-
 import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -27,6 +24,8 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import java.util.Arrays;
 
 /**
  * TODO: document this class
@@ -53,8 +52,8 @@ public class TcpSyncTestCase extends NamedTestCase
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(new MuleEndpointURI(endpointUri),
                                                                       UMOEndpoint.ENDPOINT_TYPE_SENDER);
         MuleSession session = new MuleSession();
+        endpoint.setRemoteSync(true);
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
-        event.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
         event.setTimeout(60000);
         return event.getSession().sendEvent(event);
     }

@@ -13,14 +13,7 @@
  */
 package org.mule.providers.udp;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.mule.MuleManager;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
@@ -29,10 +22,16 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
- * <code>UdpMessageDispatcher</code> TODO
+ * <code>UdpMessageDispatcher</code> is responsible for dispatching MuleEvents as
+ * UDP packets on the network
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -83,7 +82,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         DatagramPacket packet = new DatagramPacket(data, data.length);
         if (port >= 0) {
             packet.setPort(port);
-        }
+       }
         packet.setAddress(inetAddress);
         socket.send(packet);
     }
@@ -92,8 +91,8 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     {
         doDispatch(event);
         // If we're doing sync receive try and read return info from socket
-        if (MuleManager.getConfiguration().isSynchronousReceive()) {
-            DatagramPacket result = receive(socket, connector.getTimeout());
+        if (event.getEndpoint().isRemoteSync()) {
+            DatagramPacket result = receive(socket, event.getEndpoint().getRemoteSyncTimeout());
             if (result == null)
                 return null;
             UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));

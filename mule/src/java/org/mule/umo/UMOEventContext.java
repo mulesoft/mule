@@ -13,12 +13,12 @@
  */
 package org.mule.umo;
 
-import java.io.OutputStream;
-import java.util.Map;
-
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
+
+import java.io.OutputStream;
+import java.util.Map;
 
 /**
  * <code>UMOEventContext</code> is the context object for the current request.
@@ -57,6 +57,21 @@ public interface UMOEventContext
      * @see org.mule.umo.transformer.UMOTransformer
      */
     Object getTransformedMessage() throws TransformerException;
+
+    /**
+     * Returns the message transformed into it's recognised or expected format.
+     * The transformer used is the one configured on the endpoint through which
+     * this event was received.
+     *
+     * @param expectedType The class type required for the return object.  This param
+     * just provides a convienient way to manage type casting of transformed objects
+     * @return the message transformed into it's recognised or expected format.
+     * @throws org.mule.umo.transformer.TransformerException if a failure occurs or if
+     * the return type is not the same as the expected type
+     *             in the transformer
+     * @see org.mule.umo.transformer.UMOTransformer
+     */
+    Object getTransformedMessage(Class expectedType) throws TransformerException;
 
     /**
      * Returns the message transformed into it's recognised or expected format
@@ -534,5 +549,11 @@ public interface UMOEventContext
      *         transaction in progresss
      */
     UMOTransaction getTransaction();
+
+    /**
+     * Get the timeout value associated with the event
+     * @return the timeout for the event
+     */
+    int getTimeout();
 
 }
