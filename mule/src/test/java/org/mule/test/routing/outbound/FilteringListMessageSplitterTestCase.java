@@ -29,6 +29,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
+import org.mule.umo.routing.RoutingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,11 +94,16 @@ public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
 
             public void doDispatch(UMOEvent event) throws Exception
             {
-
+                if(event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail")) {
+                    throw new RoutingException(event.getMessage(), event.getEndpoint());
+                }
             }
 
             public UMOMessage doSend(UMOEvent event) throws Exception
             {
+                if(event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail")) {
+                    throw new RoutingException(event.getMessage(), event.getEndpoint());
+                }
                 return event.getMessage();
             }
 
