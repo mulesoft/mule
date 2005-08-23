@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+
+<mule-configuration id="PXE_TEST" version="1.0">
+
+    <transaction-manager factory="org.mule.extras.jotm.JotmTransactionManagerFactory"/>
+
+    <agents>
+        <agent name="RMI" className="org.mule.management.agents.RmiRegistryAgent"/>
+        <agent name="Jmx" className="org.mule.management.agents.JmxAgent">
+            <properties>
+                <property name="connectorServerUrl" value="service:jmx:rmi:///jndi/rmi://localhost:1099/server"/>
+                <map name="connectorServerProperties">
+                    <property name="jmx.remote.jndi.rebind" value="true"/>
+                </map>
+            </properties>
+        </agent>
+    </agents>
+
+    <model name="test">
+        <mule-descriptor name="pxe"
+            implementation="org.mule.extras.pxe.PxeComponent">
+            <inbound-router>
+                <endpoint address="test://pxe.in"/>
+            </inbound-router>
+            <properties>
+                <property name="pxeEndpoint" value="com.bptest.process:ProcessSVC/ProcessPORT"/>
+                <property name="defaultOperation" value="com.bptest.process:Run"/>
+                <property name="configuration" value="async-pxe-sdb/"/>
+            </properties>
+        </mule-descriptor>
+    </model>
+
+</mule-configuration>
