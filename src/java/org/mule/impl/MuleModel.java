@@ -13,12 +13,8 @@
  */
 package org.mule.impl;
 
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.List;
-
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -42,8 +38,11 @@ import org.mule.umo.model.UMOComponentFactory;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>MuleModel</code> is the default implementation of the UMOModel. The
@@ -283,9 +282,8 @@ public class MuleModel implements UMOModel
     }
 
     /**
-     * Destroys any current components <p/> //*
+     * Destroys any current components
      * 
-     * @throws UMOException if the components don't destroy gracefully
      */
     public void dispose()
     {
@@ -301,13 +299,16 @@ public class MuleModel implements UMOModel
                 } catch (Exception e1) {
                     logger.warn("Failed to dispose component: " + e1.getMessage());
                 }
-                components.remove(temp.getDescriptor());
                 logger.info(temp + " has been destroyed successfully");
             } catch (ConcurrentModificationException e) {
                 logger.warn("cannot dispose calling component");
-                return;
+                //return;
             }
         }
+        components.clear();
+        descriptors.clear();
+        components = null;
+        descriptors = null;
         fireEvent(new ModelEvent(this, ModelEvent.MODEL_DISPOSED));
     }
 
@@ -361,9 +362,19 @@ public class MuleModel implements UMOModel
             for (Iterator i = components.values().iterator(); i.hasNext();) {
                 UMOComponent temp = (UMOComponent) i.next();
                 registerListeners(temp);
-                temp.start();
+                if(temp.getDescriptor().getInitialState().equals(ImmutableMuleDescriptor.INITIAL_STATE_STARTED)) {
+                    temp.start();
+                    logger.info("Component " + temp + " has been started successfully");
+                } else if(temp.getDescriptor().getInitialState().equals(ImmutableMuleDescriptor.INITIAL_STATE_PAUSED)) {
+                    temp.start();
+                    temp.pause();
+                    logger.info("Component " + temp + " has an initial state of 'paused'");
 
-                logger.info("Component " + temp + " has been started successfully");
+                } else {
+                    logger.info("Component " + temp + " has an initial state of 'stopped'");
+                }
+
+
             }
             started.set(true);
             fireEvent(new ModelEvent(this, ModelEvent.MODEL_STARTED));

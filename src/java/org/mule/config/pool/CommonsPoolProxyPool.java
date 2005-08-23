@@ -14,9 +14,6 @@
  */
 package org.mule.config.pool;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
@@ -26,6 +23,9 @@ import org.mule.impl.MuleProxy;
 import org.mule.umo.UMOException;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <code>CommonsPoolProxyPool</code> is pool used to store MuleProxy objects.
@@ -62,8 +62,14 @@ public class CommonsPoolProxyPool implements ObjectPool
     public CommonsPoolProxyPool(MuleDescriptor descriptor)
     {
         GenericObjectPool.Config config = new GenericObjectPool.Config();
-        config.maxIdle = descriptor.getPoolingProfile().getMaxIdle();
-        config.maxActive = descriptor.getPoolingProfile().getMaxActive();
+
+       // if(descriptor.isSingleton()) {
+            //config.maxIdle = 1;
+            //config.maxActive = 1;
+        //} else {
+            config.maxIdle = descriptor.getPoolingProfile().getMaxIdle();
+            config.maxActive = descriptor.getPoolingProfile().getMaxActive();
+        //}
         config.maxWait = descriptor.getPoolingProfile().getMaxWait();
         config.whenExhaustedAction = (byte) descriptor.getPoolingProfile().getExhaustedAction();
 

@@ -87,7 +87,7 @@ public class MuleConfiguration
      */
     public static final int DEFAULT_MAX_OUTSTANDING_MESSAGES = 1000;
 
-    public static final int DEFAULT_SYNCHRONOUS_EVENT_TIMEOUT = 5000;
+    public static final int DEFAULT_SYNCHRONOUS_EVENT_TIMEOUT = 10000;
 
     public static final int DEFAULT_TRANSACTION_TIMEOUT = 30000;
 

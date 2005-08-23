@@ -13,10 +13,6 @@
  */
 package org.mule.routing.outbound;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.RouterStatistics;
@@ -30,6 +26,10 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>OutboundMessageRouter</code> is a container of routers. An
@@ -137,4 +137,13 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements U
 
         return getCatchAllStrategy().catchMessage(message, null, false);
     }
+
+    public boolean hasEndpoints() {
+        for (Iterator iterator = routers.iterator(); iterator.hasNext();) {
+            UMOOutboundRouter router = (UMOOutboundRouter) iterator.next();
+            if(router.getEndpoints().size() > 0) return true;
+        }
+        return false;
+    }
+
 }

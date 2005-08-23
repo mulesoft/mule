@@ -13,13 +13,13 @@
  */
 package org.mule.impl;
 
-import java.io.OutputStream;
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.FutureMessageResult;
@@ -35,7 +35,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
 
-import EDU.oswego.cs.dl.util.concurrent.Callable;
+import java.io.OutputStream;
+import java.util.Map;
 
 /**
  * <code>MuleEventContext</code> is the context object for the current
@@ -96,6 +97,30 @@ public class MuleEventContext implements UMOEventContext
     public Object getTransformedMessage() throws TransformerException
     {
         return event.getTransformedMessage();
+    }
+
+    /**
+     * Returns the message transformed into it's recognised or expected format.
+     * The transformer used is the one configured on the endpoint through which
+     * this event was received.
+     *
+     * @param expectedType The class type required for the return object.  This param
+     *                     just provides a convienient way to manage type casting of transformed objects
+     * @return the message transformed into it's recognised or expected format.
+     * @throws org.mule.umo.transformer.TransformerException
+     *          if a failure occurs or if
+     *          the return type is not the same as the expected type
+     *          in the transformer
+     * @see org.mule.umo.transformer.UMOTransformer
+     */
+    public Object getTransformedMessage(Class expectedType) throws TransformerException {
+        Object message = getTransformedMessage();
+        if(expectedType!=null && expectedType.isAssignableFrom(message.getClass())) {
+            return message;
+        } else {
+            throw new TransformerException(new Message(Messages.TRANSFORM_ON_X_NOT_OF_SPECIFIED_TYPE_X,
+                    this.getComponentDescriptor().getName(), expectedType), this.event.getEndpoint().getTransformer());
+        }
     }
 
     /**
@@ -190,10 +215,7 @@ public class MuleEventContext implements UMOEventContext
     {
         // If synchronous receive has not been explicitly set, default it to
         // true
-        Object temp = message.getProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY);
-        if (temp == null && getTransaction() == null) {
-            message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
-        }
+        setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
 
@@ -211,10 +233,7 @@ public class MuleEventContext implements UMOEventContext
     {
         // If synchronous receive has not been explicitly set, default it to
         // true
-        Object temp = message.getProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY);
-        if (temp == null) {
-            message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
-        }
+        setRemoteSync(message, event.getEndpoint());
         return session.sendEvent(message);
     }
 
@@ -235,10 +254,7 @@ public class MuleEventContext implements UMOEventContext
 
         // If synchronous receive has not been explicitly set, default it to
         // true
-        Object temp = message.getProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY);
-        if (temp == null) {
-            message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
-        }
+        setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
 
@@ -266,7 +282,7 @@ public class MuleEventContext implements UMOEventContext
             public Object call() throws Exception
             {
                 UMOMessage umoMessage = new MuleMessage(message, event.getProperties());
-                umoMessage.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
+                umoMessage.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 umoMessage.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(umoMessage);
             }
@@ -299,7 +315,7 @@ public class MuleEventContext implements UMOEventContext
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
-                message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
+                message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 message.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(message);
             }
@@ -335,7 +351,7 @@ public class MuleEventContext implements UMOEventContext
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
-                message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
+                message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 message.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(message, endpointUri);
             }
@@ -372,7 +388,7 @@ public class MuleEventContext implements UMOEventContext
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
-                message.setBooleanProperty(MuleProperties.MULE_SYNCHRONOUS_RECEIVE_PROPERTY, true);
+                message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
                 message.setIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, timeout);
                 return sendEvent(message, endpointName);
             }
@@ -398,6 +414,7 @@ public class MuleEventContext implements UMOEventContext
     public UMOMessage sendEvent(UMOMessage message, String endpointName) throws UMOException
     {
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint(endpointName);
+        setRemoteSync(message, endpoint);
         return session.sendEvent(message, endpoint);
     }
 
@@ -771,5 +788,24 @@ public class MuleEventContext implements UMOEventContext
     public UMOTransaction getTransaction()
     {
         return TransactionCoordination.getInstance().getTransaction();
+    }
+
+    /**
+     * Get the timeout value associated with the event
+     *
+     * @return the timeout for the event
+     */
+    public int getTimeout() {
+        return event.getTimeout();
+    }
+
+    private void setRemoteSync(UMOMessage message, UMOEndpoint endpoint) {
+        if(endpoint.isRemoteSync()) {
+            if (getTransaction() == null) {
+                message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
+            }
+        } else {
+            throw new IllegalStateException(new Message(Messages.CANNOT_USE_TX_AND_REMOTE_SYNC).getMessage());
+        }
     }
 }

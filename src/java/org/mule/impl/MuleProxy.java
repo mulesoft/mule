@@ -14,13 +14,6 @@
  */
 package org.mule.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.resource.spi.work.Work;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -50,6 +43,12 @@ import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
+
+import javax.resource.spi.work.Work;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that
@@ -104,7 +103,6 @@ public class MuleProxy implements Work, Lifecycle
      */
     public MuleProxy(Object component, MuleDescriptor descriptor, ObjectPool proxyPool) throws UMOException
     {
-
         this.descriptor = new ImmutableMuleDescriptor(descriptor);
         this.proxyPool = proxyPool;
 
@@ -251,9 +249,11 @@ public class MuleProxy implements Work, Lifecycle
                     if (context != null) {
                         result.addProperties(context);
                     }
-                    returnMessage = descriptor.getOutboundRouter().route(result,
-                                                                         event.getSession(),
-                                                                         event.isSynchronous());
+                    if(descriptor.getOutboundRouter().hasEndpoints()) {
+                        returnMessage = descriptor.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
+                    } else {
+                        logger.debug("Outbound router on component '" + descriptor.getName() + "' doesn't have any endpoints configured. Event is not being dispatched");
+                    }
                 } else {
                     returnMessage = result;
                 }

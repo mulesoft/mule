@@ -146,4 +146,6 @@ public interface UMOConnector extends Disposable, Initialisable
     public void startConnector() throws UMOException;
 
     public void stopConnector() throws UMOException;
+
+    public boolean isRemoteSyncEnabled();
 }

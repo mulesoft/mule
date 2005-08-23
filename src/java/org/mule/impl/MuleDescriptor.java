@@ -15,14 +15,6 @@
 
 package org.mule.impl;
 
-import java.beans.ExceptionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -46,6 +38,14 @@ import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.beans.ExceptionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO.
@@ -389,5 +389,25 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setResponseRouter(UMOResponseMessageRouter router)
     {
         this.responseRouter = router;
+    }
+
+    /**
+     * Determines if only a single instance of this component is created.  This is useful when a
+     * component hands off event processing to another engine such as Rules processing or Bpel
+     * and the processing engine allocates and manages its own threads.
+     *
+     * @param singleton true if this component is a singleton
+     */
+    public void setSingleton(boolean singleton) {
+        this.singleton = singleton;
+    }
+
+    /**
+     * Sets the initial state of this component
+     *
+     * @param state the initial state of this component
+     */
+    public void setInitialState(String state) {
+        this.initialState = state;
     }
 }

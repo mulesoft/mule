@@ -466,7 +466,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             receiver = createReceiver(component, endpoint);
             receivers.put(getReceiverKey(component, endpoint), receiver);
         }
-        if (started.get()) {
+        if (started.get() && endpoint.getInitialState().equals(UMOEndpoint.INITIAL_STATE_STARTED)) {
             ((AbstractMessageReceiver) receiver).start();
         }
         return receiver;
@@ -700,5 +700,9 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     public boolean isDisposing() {
         return disposing.get();
+    }
+
+    public boolean isRemoteSyncEnabled() {
+        return false;
     }
 }

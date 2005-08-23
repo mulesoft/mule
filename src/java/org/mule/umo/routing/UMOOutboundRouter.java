@@ -14,13 +14,13 @@
 
 package org.mule.umo.routing;
 
-import java.util.List;
-
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import java.util.List;
 
 /**
  * <code>UMOOutboundRouter</code> is used to control outbound routing
@@ -51,5 +51,9 @@ public interface UMOOutboundRouter extends UMORouter
     UMOTransactionConfig getTransactionConfig();
 
     void setTransactionConfig(UMOTransactionConfig transactionConfig);
+
+    public String getReplyTo();
+
+    public void setReplyTo(String replyTo);
 
 }

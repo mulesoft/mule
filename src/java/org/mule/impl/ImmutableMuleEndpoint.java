@@ -15,9 +15,7 @@
 
 package org.mule.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -41,7 +39,8 @@ import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server.
@@ -119,6 +118,12 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      * thread
      */
     protected Boolean synchronous = null;
+
+    protected Boolean remoteSync = null;
+
+    protected Integer remoteSyncTimeout = null;
+
+    protected String initialState = INITIAL_STATE_STARTED;
 
     /**
      * determines if a new connector should be created for this endpoint
@@ -574,4 +579,43 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return createConnector;
     }
 
+    /**
+     * For certain providers that support the notion of a backchannel such as sockets (outputStream) or
+     * Jms (ReplyTo) Mule can automatically wait for a response from a backchannel when dispatching
+     * over these protocols.  This is different for synchronous as synchronous behavior only applies to in
+     *
+     * @return
+     */
+    public boolean isRemoteSync() {
+        if(remoteSync==null) {
+            if(connector.isRemoteSyncEnabled()) {
+                remoteSync = new Boolean(MuleManager.getConfiguration().isSynchronousReceive());
+            } else {
+                remoteSync = Boolean.FALSE;
+            }
+        }
+        return remoteSync.booleanValue();
+    }
+
+    /**
+     * The timeout value for remoteSync invocations
+     *
+     * @return the timeout in milliseconds
+     */
+    public int getRemoteSyncTimeout() {
+        if(remoteSyncTimeout==null) {
+            remoteSyncTimeout = new Integer(MuleManager.getConfiguration().getSynchronousEventTimeout());
+        }
+        return remoteSyncTimeout.intValue();
+    }
+
+    /**
+     * Sets the state the endpoint will be loaded in.  The States are
+     * 'stopped' and 'started' (default)
+     *
+     * @return the endpoint starting state
+     */
+    public String getInitialState() {
+        return initialState;
+    }
 }

@@ -13,9 +13,32 @@
  */
 package org.mule.management.agents;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.impl.internal.events.ModelEvent;
+import org.mule.impl.internal.events.ModelEventListener;
+import org.mule.management.mbeans.ComponentService;
+import org.mule.management.mbeans.ComponentServiceMBean;
+import org.mule.management.mbeans.ConnectorService;
+import org.mule.management.mbeans.ConnectorServiceMBean;
+import org.mule.management.mbeans.EndpointServiceMBean;
+import org.mule.management.mbeans.ModelService;
+import org.mule.management.mbeans.ModelServiceMBean;
+import org.mule.management.mbeans.MuleConfigurationService;
+import org.mule.management.mbeans.MuleConfigurationServiceMBean;
+import org.mule.management.mbeans.MuleService;
+import org.mule.management.mbeans.MuleServiceMBean;
+import org.mule.management.mbeans.StatisticsService;
+import org.mule.providers.AbstractConnector;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.provider.UMOConnector;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistrationException;
@@ -27,33 +50,10 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.impl.internal.events.ModelEvent;
-import org.mule.impl.internal.events.ModelEventListener;
-import org.mule.management.mbeans.ComponentService;
-import org.mule.management.mbeans.ComponentServiceMBean;
-import org.mule.management.mbeans.EndpointServiceMBean;
-import org.mule.management.mbeans.ModelService;
-import org.mule.management.mbeans.ModelServiceMBean;
-import org.mule.management.mbeans.MuleConfigurationService;
-import org.mule.management.mbeans.MuleConfigurationServiceMBean;
-import org.mule.management.mbeans.MuleService;
-import org.mule.management.mbeans.MuleServiceMBean;
-import org.mule.management.mbeans.StatisticsService;
-import org.mule.management.mbeans.ConnectorServiceMBean;
-import org.mule.management.mbeans.ConnectorService;
-import org.mule.providers.AbstractConnector;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOServerEvent;
-import org.mule.umo.provider.UMOConnector;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>JmxAgent</code> registers MUle Jmx management beans with an MBean
@@ -75,6 +75,7 @@ public class JmxAgent implements UMOAgent
     private String connectorServerUrl;
     private MBeanServer mBeanServer;
     private JMXConnectorServer connectorServer;
+    private Map connectorServerProperties = null;
     private boolean enableStatistics = true;
     private List registeredMBeans = new ArrayList();
     private boolean serverCreated = false;
@@ -144,7 +145,7 @@ public class JmxAgent implements UMOAgent
         if (connectorServerUrl != null) {
             try {
                 JMXServiceURL url = new JMXServiceURL(connectorServerUrl);
-                connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mBeanServer);
+                connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, connectorServerProperties, mBeanServer);
             } catch (Exception e) {
                 throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jmx Connector"), e, this);
             }
@@ -181,6 +182,7 @@ public class JmxAgent implements UMOAgent
     {
         if (connectorServer != null) {
             try {
+                logger.info("Starting JMX agent connector Server");
                 connectorServer.start();
             } catch (Exception e) {
                 throw new JmxManagementException(new Message(Messages.FAILED_TO_START_X, "Jmx Connector"), e);
@@ -452,5 +454,13 @@ public class JmxAgent implements UMOAgent
     public void setDomain(String domain)
     {
         this.domain = domain;
+    }
+
+    public Map getConnectorServerProperties() {
+        return connectorServerProperties;
+    }
+
+    public void setConnectorServerProperties(Map connectorServerProperties) {
+        this.connectorServerProperties = connectorServerProperties;
     }
 }

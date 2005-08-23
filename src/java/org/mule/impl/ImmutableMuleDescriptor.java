@@ -15,13 +15,7 @@
 
 package org.mule.impl;
 
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
@@ -42,7 +36,12 @@ import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO.
@@ -54,7 +53,12 @@ import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 
 public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 {
-
+    /**
+     * The initial states that the component can be started in
+     */
+    public static final String INITIAL_STATE_STOPPED = "stopped";
+    public static final String INITIAL_STATE_STARTED = "started";
+    public static final String INITIAL_STATE_PAUSED = "paused";
     /**
      * Implementation type can be prepended to the implementation string to
      * control how the implementation is loaded. Local mean that the
@@ -148,6 +152,17 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
      * Mule
      */
     protected boolean containerManaged = true;
+
+    /**
+     * Determines the initial state of this component when the model
+     * starts. Can be 'stopped' or 'started' (default)
+     */
+    protected String initialState;
+
+    /**
+     * Determines if this component is a singleton
+     */
+    protected boolean singleton = false;
 
     protected List initialisationCallbacks = new ArrayList();
 
@@ -417,5 +432,13 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     public UMOResponseMessageRouter getResponseRouter()
     {
         return responseRouter;
+    }
+
+    public boolean isSingleton() {
+        return singleton;
+    }
+
+    public String getInitialState() {
+        return initialState;
     }
 }
