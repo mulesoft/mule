@@ -13,8 +13,10 @@
  */
 package org.mule.routing.response;
 
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import EDU.oswego.cs.dl.util.concurrent.Latch;
+import EDU.oswego.cs.dl.util.concurrent.Sync;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -26,10 +28,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.Latch;
-import EDU.oswego.cs.dl.util.concurrent.Sync;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.util.Map;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for
@@ -49,8 +48,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     protected Map responseEvents = new ConcurrentHashMap();
     private Map locks = new ConcurrentHashMap();
-
-    protected long timeout = 5000;
 
     protected Map eventGroups = new ConcurrentHashMap();
     private Object lock = new Object();
@@ -136,18 +133,18 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         boolean b = false;
         try {
             logger.debug("Waiting for response to message: " + messageId);
-            if (timeout <= 0) {
+            if (getTimeout() <= 0) {
                 s.acquire();
                 b = true;
             } else {
-                b = s.attempt(timeout);
+                b = s.attempt(getTimeout());
             }
         } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
         }
         if (!b) {
             throw new ResponseTimeoutException(new Message(Messages.RESPONSE_TIMED_OUT_X_WAITING_FOR_ID_X,
-                                                           String.valueOf(timeout),
+                                                           String.valueOf(getTimeout()),
                                                            messageId), message, null);
         }
 
@@ -158,16 +155,6 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             throw new IllegalStateException("Response Message is null");
         }
         return result;
-    }
-
-    public long getTimeout()
-    {
-        return timeout;
-    }
-
-    public void setTimeout(long timeout)
-    {
-        this.timeout = timeout;
     }
 
     /**

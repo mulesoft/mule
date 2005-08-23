@@ -87,7 +87,7 @@ public class MuleConfiguration
      */
     public static final int DEFAULT_MAX_OUTSTANDING_MESSAGES = 1000;
 
-    public static final int DEFAULT_SYNCHRONOUS_EVENT_TIMEOUT = 10000;
+    public static final int DEFAULT_TIMEOUT = 10000;
 
     public static final int DEFAULT_TRANSACTION_TIMEOUT = 30000;
 
@@ -137,7 +137,7 @@ public class MuleConfiguration
      * that support ack or replyTo This property determines how long to wait for
      * a receive
      */
-    private int synchronousEventTimeout = DEFAULT_SYNCHRONOUS_EVENT_TIMEOUT;
+    private int synchronousEventTimeout = DEFAULT_TIMEOUT;
 
     /**
      * The default transaction timeout value used if no specific transaction
