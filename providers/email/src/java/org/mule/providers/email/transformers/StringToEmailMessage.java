@@ -51,6 +51,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
     public StringToEmailMessage()
     {
         registerSourceType(String.class);
+        setReturnClass(Message.class);
     }
 
     /*
@@ -78,12 +79,16 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
 
             msg.setSubject(getSubject());
 
-            // attachments TODO
-            msg.setContent(src, contentType);
+            setContent(src, msg, contentType, context);
+
             return msg;
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
+    }
+
+    protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context) throws Exception {
+        msg.setContent(payload, contentType);
     }
 
     /**
