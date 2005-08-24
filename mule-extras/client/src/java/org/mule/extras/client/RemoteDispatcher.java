@@ -251,6 +251,7 @@ public class RemoteDispatcher implements Disposable
 
         message.addProperties(action.getProperties());
         UMOEndpoint endpoint = ConnectorFactory.createEndpoint(serverEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint.setRemoteSync(synchronous);
         UMOSession session = new MuleSession();
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(timeout);
@@ -275,7 +276,12 @@ public class RemoteDispatcher implements Disposable
                 if (resultXml != null && resultXml.length() > 0) {
                     // System.out.println("Remote dispatcher received result:\n"
                     // + resultXml);
-                    result = (UMOMessage) xstream.fromXML(resultXml);
+                    Object obj = xstream.fromXML(resultXml);
+                    if(obj instanceof AdminEvent) {
+                        result = ((AdminEvent)obj).getMessage();
+                    } else {
+                        result = (UMOMessage)obj;
+                    }
                 } else {
                     return null;
                 }

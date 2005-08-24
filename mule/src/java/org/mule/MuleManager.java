@@ -457,7 +457,7 @@ public class MuleManager implements UMOManager
                 return (UMOTransformer) trans.clone();
             } catch (Exception e) {
                 throw new MuleRuntimeException(new Message(Messages.FAILED_TO_CLONE_X, "Transformer: "
-                        + trans.getName()));
+                        + trans.getName()), e);
             }
         }
         return null;

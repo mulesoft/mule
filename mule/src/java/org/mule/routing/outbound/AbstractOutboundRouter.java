@@ -13,8 +13,7 @@
  */
 package org.mule.routing.outbound;
 
-import java.util.List;
-
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -29,7 +28,7 @@ import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks
@@ -258,5 +257,9 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     public void setTransactionConfig(UMOTransactionConfig transactionConfig)
     {
         this.transactionConfig = transactionConfig;
+    }
+
+    public boolean isDynamicEndpoints() {
+        return false;
     }
 }

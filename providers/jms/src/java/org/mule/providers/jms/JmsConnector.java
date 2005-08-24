@@ -626,7 +626,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
 
     public ReplyToHandler getReplyToHandler()
     {
-        return new JmsReplyToHandler(this, defaultResponseTransformer);
+        return new JmsReplyToHandler(this, defaultOutboundTransformer);
     }
 
     public String getUsername()

@@ -13,11 +13,8 @@
  */
 package org.mule.routing.outbound;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
@@ -31,8 +28,10 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutingException;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AbstractRecipientList</code> is used to dispatch a single event to
@@ -121,4 +120,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
     protected abstract CopyOnWriteArrayList getRecipients(UMOMessage message);
 
+    public boolean isDynamicEndpoints() {
+        return true;
+    }
 }

@@ -14,19 +14,18 @@
  */
 package org.mule.providers.email.transformers;
 
-import java.util.Calendar;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.transformers.AbstractEventAwareTransformer;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.transformer.TransformerException;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.transformer.TransformerException;
+import java.util.Calendar;
 
 /**
  * <code>StringToEmailMessage</code> will convert a string to a java mail

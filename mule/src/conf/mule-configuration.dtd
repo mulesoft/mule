@@ -1079,10 +1079,13 @@ Is a fully qualified class name of the catch all strategy class
 
 <!ATTLIST filter className                   NMTOKEN           #REQUIRED>
 
-<!-- 
-because I can't find a way of allowing arbitary attributes on an element, 
+<!--
+because I can't find a way of allowing arbitary attributes on an element,
 I am going to define a common set of attributes for filters but users can add their own
 or relax dtd validation on their parser
+Since Mule 1.1: Arbitary bean properties can be set on a filter using the
+<properties> element. The parameters listed below on the filter still work and provider a
+short hand way of setting these properties
 -->
 <!ATTLIST filter pattern                   CDATA           #IMPLIED>
 <!ATTLIST filter expression                CDATA           #IMPLIED>
@@ -1332,7 +1335,7 @@ The system property key to use when lookin up the property
 <!ATTLIST file-properties location					NMTOKEN		#REQUIRED>
 
 <!--
-Whether the properties in the file override properties already set on this object
+Whether the properties in the properties file override properties already set on this object
 -->
 <!ATTLIST file-properties override					(true | false)		"true">
 

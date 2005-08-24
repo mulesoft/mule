@@ -13,22 +13,22 @@
  */
 package org.mule.test.integration.routing;
 
-import java.util.Iterator;
-
 import org.mule.impl.MuleMessage;
-import org.mule.routing.inbound.CorrelationAggregator;
 import org.mule.routing.inbound.EventGroup;
+import org.mule.routing.response.ResponseCorrelationAggregator;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.Iterator;
 
 /**
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class TestAggregator extends CorrelationAggregator
+public class TestAggregator extends ResponseCorrelationAggregator
 {
     /**
      * This method is invoked if the shouldAggregate method is called and
