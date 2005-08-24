@@ -56,4 +56,6 @@ public interface UMOOutboundRouter extends UMORouter
 
     public void setReplyTo(String replyTo);
 
+    public boolean isDynamicEndpoints();
+
 }

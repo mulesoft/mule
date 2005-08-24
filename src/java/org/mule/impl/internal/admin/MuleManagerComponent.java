@@ -13,6 +13,8 @@
  */
 package org.mule.impl.internal.admin;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -46,12 +48,10 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.PropertiesHelper;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.XppDriver;
-
 /**
  * <code>MuleManagerComponent</code> is a MuleManager interal server component
- * responsible for receiving remote requests as dispatching them locally
+ * responsible for receiving remote requests and dispatching them locally.  This allows
+ * developer to tunnel requests through http ssl to a Mule instance behind a firewall
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -79,19 +79,22 @@ public class MuleManagerComponent implements Callable, Initialisable
 
     public Object onCall(UMOEventContext context) throws Exception
     {
+        Object result = null;
         String xml = context.getMessageAsString();
         logger.debug("Message received by MuleManagerComponent");
         AdminEvent action = (AdminEvent) remoteTransformer.transform(xml);
         if (AdminEvent.ACTION_INVOKE == action.getAction()) {
-            return invokeAction(action, context);
+            result = invokeAction(action, context);
         } else if (AdminEvent.ACTION_SEND == action.getAction()) {
-            return sendAction(action, context);
+            result = sendAction(action, context);
         } else if (AdminEvent.ACTION_DISPATCH == action.getAction()) {
-            return sendAction(action, context);
+            result = sendAction(action, context);
         } else if (AdminEvent.ACTION_RECEIVE == action.getAction()) {
-            return receiveAction(action, context);
+            result = receiveAction(action, context);
+        } else {
+            logger.error(new MuleException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, "AdminEvent:" + action.getAction())));
         }
-        return null;
+        return result;
     }
 
     protected Object invokeAction(AdminEvent action, UMOEventContext context) throws UMOException

@@ -141,7 +141,7 @@ public class OutboundMessageRouter extends AbstractRouterCollection implements U
     public boolean hasEndpoints() {
         for (Iterator iterator = routers.iterator(); iterator.hasNext();) {
             UMOOutboundRouter router = (UMOOutboundRouter) iterator.next();
-            if(router.getEndpoints().size() > 0) return true;
+            if(router.getEndpoints().size() > 0 || router.isDynamicEndpoints()) return true;
         }
         return false;
     }

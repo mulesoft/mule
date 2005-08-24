@@ -407,7 +407,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         if (uri.getEndpointName() != null) {
             endpoint.setName(uri.getEndpointName());
         }
-        endpoint.initialise();
         return endpoint;
     }
 

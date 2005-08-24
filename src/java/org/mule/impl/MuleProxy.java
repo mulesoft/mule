@@ -231,7 +231,7 @@ public class MuleProxy implements Work, Lifecycle
                 if (stat.isEnabled()) {
                     startTime = System.currentTimeMillis();
                 }
-                UMOMessage result = invoker.execute();
+                returnMessage = invoker.execute();
                 // stats
                 if (stat.isEnabled()) {
                     stat.addExecutionTime(System.currentTimeMillis() - startTime);
@@ -244,25 +244,23 @@ public class MuleProxy implements Work, Lifecycle
                 if (event.isStopFurtherProcessing()) {
                     logger.debug("Event stop further processing has been set, no outbound routing will be performed.");
                 }
-                if (result != null && !event.isStopFurtherProcessing()) {
+                if (returnMessage != null && !event.isStopFurtherProcessing()) {
                     Map context = RequestContext.clearProperties();
                     if (context != null) {
-                        result.addProperties(context);
+                        returnMessage.addProperties(context);
                     }
                     if(descriptor.getOutboundRouter().hasEndpoints()) {
-                        returnMessage = descriptor.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
+                        returnMessage = descriptor.getOutboundRouter().route(returnMessage, event.getSession(), event.isSynchronous());
                     } else {
                         logger.debug("Outbound router on component '" + descriptor.getName() + "' doesn't have any endpoints configured. Event is not being dispatched");
                     }
-                } else {
-                    returnMessage = result;
                 }
 
                 // process repltyTo if there is one
-                if (result != null && replyToHandler != null) {
-                    String requestor = (String) result.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
+                if (returnMessage != null && replyToHandler != null) {
+                    String requestor = (String) returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
                     if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null) {
-                        replyToHandler.processReplyTo(event, result, replyTo);
+                        replyToHandler.processReplyTo(event, returnMessage, replyTo);
                     }
                 }
             } else {
