@@ -13,12 +13,11 @@
  */
 package org.mule.extras.spring.events;
 
+import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
 /**
  * <code>AsynchronousEventListener</code> will spawn a thread for each Event
@@ -29,7 +28,7 @@ import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
  * @version $Revision$
  */
 
-public class AsynchronousEventListener implements ApplicationListener
+public class AsynchronousEventListener implements MuleEventListener
 {
     /**
      * logger used by this class
@@ -74,5 +73,9 @@ public class AsynchronousEventListener implements ApplicationListener
         {
             listener.onApplicationEvent(event);
         }
+    }
+
+    public ApplicationListener getListener() {
+        return listener;
     }
 }

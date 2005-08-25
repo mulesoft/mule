@@ -13,14 +13,6 @@
  */
 package org.mule.extras.spring.events;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -61,6 +53,14 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <code>MuleEventMulticaster</code> is an implementation of a Spring
@@ -181,7 +181,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     public void addApplicationListener(ApplicationListener listener)
     {
         if (asynchronous) {
-            AsynchronousEventListener aListener = new AsynchronousEventListener((((MuleDescriptor) descriptor).getThreadingProfile()).createPool("spring-events"),
+            AsynchronousEventListener aListener = new AsynchronousEventListener(MuleManager.getConfiguration().getDefaultThreadingProfile().createPool("spring-events"),
                                                                                 listener);
             listeners.add(aListener);
         } else {
@@ -196,6 +196,20 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
      */
     public void removeApplicationListener(ApplicationListener listener)
     {
+        for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+            ApplicationListener applicationListener = (ApplicationListener) iterator.next();
+            if(applicationListener instanceof AsynchronousEventListener) {
+                if(((AsynchronousEventListener)applicationListener).getListener().equals(listener)) {
+                    listeners.remove(applicationListener);
+                    return;
+                }
+            } else {
+                if(applicationListener.equals(listener)) {
+                    listeners.remove(applicationListener);
+                    return;
+                }
+            }
+        }
         listeners.remove(listener);
     }
 
@@ -259,7 +273,22 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
             listener = (ApplicationListener) iterator.next();
             if (muleEvent != null) {
-                if (listener instanceof MuleSubscriptionEventListener) {
+                //As the asynchronous listener wraps the real listener we need to check the
+                //type of the wrapped listener, but invoke the Async listener
+                if(listener instanceof AsynchronousEventListener) {
+                    AsynchronousEventListener asyncListener = (AsynchronousEventListener)listener;
+                    if (asyncListener.getListener() instanceof MuleSubscriptionEventListener) {
+                        if (isSubscriptionMatch(muleEvent.getEndpoint().getAddress(),
+                                                ((MuleSubscriptionEventListener) asyncListener.getListener()).getSubscriptions())) {
+                            asyncListener.onApplicationEvent(muleEvent);
+                        }
+                    } else if (asyncListener.getListener() instanceof MuleEventListener) {
+                        asyncListener.onApplicationEvent(muleEvent);
+                    } else if (!(asyncListener.getListener() instanceof MuleEventListener)) {
+                        asyncListener.onApplicationEvent(e);
+                    }
+                    //Synchronous Event listener Checks
+                } else if (listener instanceof MuleSubscriptionEventListener) {
                     if (isSubscriptionMatch(muleEvent.getEndpoint().getAddress(),
                                             ((MuleSubscriptionEventListener) listener).getSubscriptions())) {
                         listener.onApplicationEvent(muleEvent);
@@ -267,8 +296,12 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 } else if (listener instanceof MuleEventListener) {
                     listener.onApplicationEvent(muleEvent);
                 }
+            } else if (listener instanceof AsynchronousEventListener &&
+                !(((AsynchronousEventListener)listener).getListener() instanceof MuleEventListener)) {
+                listener.onApplicationEvent(e);
             } else if (!(listener instanceof MuleEventListener)) {
                 listener.onApplicationEvent(e);
+
             }
         }
     }

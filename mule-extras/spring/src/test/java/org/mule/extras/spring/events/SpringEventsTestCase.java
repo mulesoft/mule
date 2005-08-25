@@ -72,23 +72,24 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         };
         subscriptionBean.setEventCallback(callback);
 
-        assertTrue(!multicaster.isAsynchronous());
         multicaster.removeApplicationListener(subscriptionBean);
         MuleClient client = new MuleClient();
         client.send("vm://event.multicaster", "Test Spring Event", null);
 
+        afterPublishEvent();
         assertEquals(0, eventCount);
 
         multicaster.addApplicationListener(subscriptionBean);
         client.send("vm://event.multicaster", "Test Spring Event", null);
 
-        Thread.sleep(100);
+        afterPublishEvent();
         assertEquals(1, eventCount);
         eventCount = 0;
 
         multicaster.removeAllListeners();
         client.send("vm://event.multicaster", "Test Spring Event", null);
 
+        afterPublishEvent();
         assertEquals(0, eventCount);
         multicaster.addApplicationListener(subscriptionBean);
         context.refresh();
@@ -111,6 +112,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
         client.send("vm://event.multicaster", "Test Spring Event", null);
 
+        afterPublishEvent();
         assertEquals(1, eventCount);
     }
 
@@ -130,6 +132,8 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         };
         bean.setEventCallback(callback);
         context.publishEvent(new ContextRefreshedEvent(context));
+        afterPublishEvent();
+        afterPublishEvent();
         assertEquals(1, eventCount);
     }
 
@@ -148,6 +152,7 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         subscriptionBean.setEventCallback(callback);
         MuleClient client = new MuleClient();
         client.send("vm://event.multicaster", "Test Spring Event", null);
+        afterPublishEvent();
         assertEquals(1, eventCount);
     }
 
@@ -214,5 +219,13 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
             lock.wait(3000);
         }
         assertEquals(1, eventCount);
+    }
+
+    protected void afterPublishEvent() {
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            
+        }
     }
 }
