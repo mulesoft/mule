@@ -14,13 +14,6 @@
  */
 package org.mule.providers.jms.transformers;
 
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.jms.BytesMessage;
-import javax.jms.Message;
-import javax.jms.Session;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -32,6 +25,12 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.compression.CompressionHelper;
+
+import javax.jms.BytesMessage;
+import javax.jms.Message;
+import javax.jms.Session;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>AbstractJmsTransformer</code> is an abstract class the should be used

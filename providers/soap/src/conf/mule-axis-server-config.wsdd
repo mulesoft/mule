@@ -31,6 +31,13 @@
         <parameter name="allowedMethods" value="getVersion"/>
         <parameter name="className" value="org.apache.axis.Version"/>
     </service>
+
+    <transport name="MuleTransport">
+        <requestFlow>
+            <!--handler type="URLMapper"/>
+            <handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/-->
+        </requestFlow>
+    </transport>
     <transport name="http">
         <requestFlow>
             <handler type="URLMapper"/>

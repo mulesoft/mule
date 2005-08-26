@@ -15,6 +15,7 @@
 package org.mule.providers.jms;
 
 import org.mule.MuleException;
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -87,7 +88,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             // If a transaction is running, we can not receive any messages
             // in the same transaction
-            boolean syncReceive = event.getEndpoint().isRemoteSync();
+            boolean syncReceive = event.getEndpoint().isRemoteSync() ||
+                    event.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
             if (txSession != null && syncReceive) {
                 throw new IllegalTransactionStateException(new org.mule.config.i18n.Message("jms", 2));
             }

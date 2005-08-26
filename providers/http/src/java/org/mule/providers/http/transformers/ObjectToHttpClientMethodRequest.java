@@ -93,7 +93,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
 
     public Object transform(Object src, UMOEventContext context) throws TransformerException
     {
-        boolean setContentLengthHeader = true;
         String endpoint = (String) context.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
         if (endpoint == null) {
             throw new TransformerException(new Message(Messages.EVENT_PROPERTY_X_NOT_SET_CANT_PROCESS_REQUEST,
@@ -107,6 +106,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
 
             if (HttpConstants.METHOD_GET.equals(method)) {
                 httpMethod = new GetMethod(uri.toString());
+                setHeaders(httpMethod, context);
                 String paramName = (String) context.getProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
                                                                 HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
 
@@ -120,28 +120,36 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
 
             } else {
                 PostMethod postMethod = new PostMethod(uri.toString());
+                setHeaders(postMethod, context);
                 String paramName = (String) context.getProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
                 if (paramName == null) {
-                    setContentLengthHeader = false;
+                    //Call method to manage the parameter array
+                    addParameters(uri.getQuery(), postMethod);
                     if (src instanceof String) {
-                        postMethod.setRequestBody(src.toString());
+                        postMethod.setRequestBody(new ByteArrayInputStream(src.toString().getBytes()));
                         postMethod.setRequestContentLength(src.toString().length());
-                        postMethod.setRequestHeader("Content-Length", String.valueOf(src.toString().length()));
                     } else {
                         byte[] buffer = Utility.objectToByteArray(src);
                         postMethod.setRequestBody(new ByteArrayInputStream(buffer));
                         postMethod.setRequestContentLength(buffer.length);
-                        postMethod.setRequestHeader("Content-Length", String.valueOf(buffer.length));
                     }
-                    //Call method to manage the parameter array
-                    addParameters(uri.getQuery(), postMethod);
+
                 } else {
                     postMethod.addParameter(paramName, src.toString());
                 }
+
                 httpMethod = postMethod;
 
             }
-            // Standard requestHeaders
+
+            return httpMethod;
+        } catch (Exception e) {
+            throw new TransformerException(this, e);
+        }
+    }
+
+    protected void setHeaders(HttpMethod httpMethod, UMOEventContext context) {
+        // Standard requestHeaders
             Map.Entry header;
             String headerName;
             Map p = context.getProperties();
@@ -153,19 +161,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                         headerName = "X-" + headerName;
                     }
                     //Make sure we have a valid header name otherwise we will corrupt the request
-                    if (headerName.startsWith("Content-Length")) {
-                        if(setContentLengthHeader) {
-                            httpMethod.addRequestHeader(headerName, (String) header.getValue());
-                        }
+                    if (headerName.startsWith("Content-Length") && httpMethod.getResponseHeader("Content-Length")==null) {
+                        httpMethod.addRequestHeader(headerName, (String) header.getValue());
                     }else {
                         httpMethod.addRequestHeader(headerName, (String) header.getValue());
                     }
                 }
             }
-
-            return httpMethod;
-        } catch (Exception e) {
-            throw new TransformerException(this, e);
-        }
     }
 }

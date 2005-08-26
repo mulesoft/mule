@@ -124,7 +124,7 @@ public class AxisServiceComponent implements Initialisable, Callable
      */
     public Object onCall(UMOEventContext context) throws Exception
     {
-        String method = (String) context.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        String method = (String) context.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
         WriterMessageAdapter response = new WriterMessageAdapter(new StringWriter());
         if ("GET".equals(method.toUpperCase())) {
             doGet(context, response);
@@ -649,7 +649,11 @@ public class AxisServiceComponent implements Initialisable, Callable
         // Component Name is set by Mule so if its null we can skip this check
         if (service.getOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME) != null) {
             String servicePath = (String) service.getOption("servicePath");
-            if (!endpointUri.getPath().startsWith(servicePath + serviceName)) {
+            if("".equals(endpointUri.getPath())) {
+                if(!("/" + endpointUri.getAddress()).startsWith(servicePath + serviceName)) {
+                    throw new AxisFault("Failed to find service: " + "/" + endpointUri.getAddress());                    
+                }
+            } else if (!endpointUri.getPath().startsWith(servicePath + serviceName)) {
                 throw new AxisFault("Failed to find service: " + endpointUri.getPath());
             }
         }

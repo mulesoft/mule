@@ -19,45 +19,45 @@ package org.mule.test.integration.providers.soap;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AxisConnectorVMFunctionalTestCase extends AbstractAxisConnectorFunctionalTestCase
+public class AxisConnectorJmsFunctionalTestCase extends AbstractAxisConnectorFunctionalTestCase
  {
     public String getConfigResource() {
-        return "org/mule/test/integration/providers/soap/axis-vm-mule-config.xml";
+        return "org/mule/test/integration/providers/soap/axis-jms-mule-config.xml";
     }
 
     protected String getRequestResponseEndpoint() {
-        return "vm://mycomponent?method=echo";
+        return "jms://mycomponent?method=echo";
     }
 
     protected String getReceiveEndpoint() {
-        return "vm://mycomponent2?method=getDate";
+        return "jms://mycomponent2?method=getDate";
     }
 
     protected String getReceiveComplexEndpoint() {
-        return "vm://mycomponent3?method=getPerson&param=Fred";
+        return "jms://mycomponent3?method=getPerson&param=Fred";
     }
 
     protected String getSendReceiveComplexEndpoint1() {
-        return "vm://mycomponent3?method=addPerson";
+        return "jms://mycomponent3?method=addPerson";
     }
 
     protected String getSendReceiveComplexEndpoint2() {
-        return "vm://mycomponent3?method=getPerson&param=Ross";
+        return "jms://mycomponent3?method=getPerson&param=Ross";
     }
 
     protected String getReceiveComplexCollectionEndpoint() {
-        return "vm://mycomponent3?method=getPeople";
+        return "jms://mycomponent3?method=getPeople";
     }
 
     protected String getDispatchAsyncComplexEndpoint1() {
-        return "vm://mycomponent4?method=addPerson";
+        return "jms://mycomponent4?method=addPerson";
     }
 
     protected String getDispatchAsyncComplexEndpoint2() {
-        return "vm://mycomponent3?method=getPerson&param=Joe";
+        return "jms://mycomponent3?method=getPerson&param=Joe";
     }
 
     protected String getTestExceptionEndpoint() {
-        return "vm://mycomponent3?method=addPerson";
+        return "jms://mycomponent3?method=addPerson";
     }
 }

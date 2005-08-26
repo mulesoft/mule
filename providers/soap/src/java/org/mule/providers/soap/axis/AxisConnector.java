@@ -13,6 +13,7 @@
  */
 package org.mule.providers.soap.axis;
 
+import org.apache.axis.client.Call;
 import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.deployment.wsdd.WSDDConstants;
@@ -28,6 +29,7 @@ import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ModelEventListener;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
+import org.mule.providers.soap.axis.extensions.MuleTransport;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -51,15 +53,14 @@ import java.util.Map;
 /**
  * <code>AxisConnector</code> is used to maintain one or more Services for
  * Axis server instance.
- * 
+ * <p/>
  * Some of the Axis specific service initialisation code was adapted from the
  * Ivory project (http://ivory.codehaus.org). Thanks guys :)
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AxisConnector extends AbstractServiceEnabledConnector implements ModelEventListener
-{
+public class AxisConnector extends AbstractServiceEnabledConnector implements ModelEventListener {
     public static final QName QNAME_MULERPC_PROVIDER = new QName(WSDDConstants.URI_WSDD_JAVA, "Mule");
     public static final QName QNAME_MULE_TYPE_MAPPINGS = new QName("http://www.muleumo.org/ws/mappings", "Mule");
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
@@ -86,14 +87,29 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     private List beanTypes;
     private MuleDescriptor axisDescriptor;
+    /**
+     * These protocols will be set on client invocations.  by default Mule uses it's own transports
+     * rather that Axis's.  This is only because it gives us more flexibility inside Mule and
+     * simplifies the code
+     */
+    private Map axisTransportProtocols;
 
-    public AxisConnector()
-    {
+    public AxisConnector() {
         super();
+        //Overload the UrlHandlers provided by Axis so Mule can use its transports to move
+        //Soap messages around
+        System.setProperty("java.protocol.handler.pkgs", "org.mule.providers.soap.axis.transport|");
+
+        axisTransportProtocols = new HashMap();
+        axisTransportProtocols.put("https", MuleTransport.class);
+        axisTransportProtocols.put("http", MuleTransport.class);
+        axisTransportProtocols.put("smtp", MuleTransport.class);
+        axisTransportProtocols.put("pop3", MuleTransport.class);
+        axisTransportProtocols.put("jms", MuleTransport.class);
+        axisTransportProtocols.put("vm", MuleTransport.class);
     }
 
-    public void doInitialise() throws InitialisationException
-    {
+    public void doInitialise() throws InitialisationException {
         super.doInitialise();
         MuleManager.getInstance().registerListener(this);
 
@@ -109,10 +125,32 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         // Register the Mule service serverProvider
         WSDDProvider.registerProvider(QNAME_MULERPC_PROVIDER, new WSDDJavaMuleProvider(this));
+
+        try {
+            registerTransportTypes();
+        } catch (ClassNotFoundException e) {
+            throw new InitialisationException(new org.mule.config.i18n.Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, e.getMessage()), e, this);
+        }
     }
 
-    protected SimpleProvider createAxisProvider(String config) throws InitialisationException
-    {
+    protected void registerTransportTypes() throws ClassNotFoundException {
+        //Register Transport handlers
+        //By default these will alll be handled by Mule, however some companies may have
+        //their own they wish to use
+        for (Iterator iterator = getAxisTransportProtocols().keySet().iterator(); iterator.hasNext();) {
+            String protocol = (String) iterator.next();
+            Object temp = getAxisTransportProtocols().get(protocol);
+            Class clazz = null;
+            if (temp instanceof String) {
+                clazz = ClassHelper.loadClass(temp.toString(), getClass());
+            } else {
+                clazz = (Class) temp;
+            }
+            Call.setTransportForProtocol(protocol, clazz);
+        }
+    }
+
+    protected SimpleProvider createAxisProvider(String config) throws InitialisationException {
         InputStream is = null;
         File f = new File(config);
         if (f.exists()) {
@@ -129,7 +167,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             fileProvider.setInputStream(is);
         } else {
             throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Axis Configuration: " + config),
-                                              this);
+                    this);
         }
         /*
          * Wrap the FileProvider with a SimpleProvider so we can prgrammatically
@@ -139,32 +177,28 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         return new MuleConfigProvider(fileProvider);
     }
 
-    public String getProtocol()
-    {
+    public String getProtocol() {
         return "axis";
     }
 
-    public AxisMessageReceiver getReceiver(String name)
-    {
+    public AxisMessageReceiver getReceiver(String name) {
         return (AxisMessageReceiver) receivers.get(name);
     }
 
     /**
      * The method determines the key used to store the receiver against.
-     * 
+     *
      * @param component the component for which the endpoint is being registered
-     * @param endpoint the endpoint being registered for the component
+     * @param endpoint  the endpoint being registered for the component
      * @return the key to store the newly created receiver against. In this case
      *         it is the component name, which is equivilent to the Axis service
      *         name.
      */
-    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint)
-    {
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
         return component.getDescriptor().getName();
     }
 
-    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
-    {
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception {
         // this is always initialisaed as synchronous as ws invocations should
         // always execute in a single thread unless the endpont has explicitly
         // been set to run asynchronously
@@ -182,8 +216,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     }
 
     protected void unregisterReceiverWithMuleService(UMOMessageReceiver receiver, UMOEndpointURI ep)
-            throws UMOException
-    {
+            throws UMOException {
         String endpointKey = getCounterEndpointKey(receiver.getEndpointURI());
 
         Map endpointCounters = (Map) axisDescriptor.getProperties().get(ENDPOINT_COUNTERS_PROPERTY);
@@ -223,8 +256,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         }
     }
 
-    protected void registerReceiverWithMuleService(UMOMessageReceiver receiver, UMOEndpointURI ep) throws UMOException
-    {
+    protected void registerReceiverWithMuleService(UMOMessageReceiver receiver, UMOEndpointURI ep) throws UMOException {
         // If this is the first receiver we need to create the Axis service
         // component
         // this will be registered with Mule when the Connector starts
@@ -233,8 +265,8 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             // developers to override the default configuration, say to increase
             // the threadpool
             axisDescriptor = (MuleDescriptor) MuleManager.getInstance()
-                                                         .getModel()
-                                                         .getDescriptor(AXIS_SERVICE_COMPONENT_NAME);
+                    .getModel()
+                    .getDescriptor(AXIS_SERVICE_COMPONENT_NAME);
             if (axisDescriptor == null) {
                 axisDescriptor = new MuleDescriptor(AXIS_SERVICE_COMPONENT_NAME);
                 axisDescriptor.setImplementation(AxisServiceComponent.class.getName());
@@ -293,8 +325,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         axisDescriptor.getProperties().put(ENDPOINT_COUNTERS_PROPERTY, endpointCounters);
     }
 
-    private String getCounterEndpointKey(UMOEndpointURI endpointURI)
-    {
+    private String getCounterEndpointKey(UMOEndpointURI endpointURI) {
         StringBuffer endpointKey = new StringBuffer();
 
         endpointKey.append(endpointURI.getScheme());
@@ -309,48 +340,41 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     /**
      * Template method to perform any work when starting the connectoe
-     * 
+     *
      * @throws org.mule.umo.UMOException if the method fails
      */
-    protected void doStart() throws UMOException
-    {
+    protected void doStart() throws UMOException {
         axisServer.start();
     }
 
     /**
      * Template method to perform any work when stopping the connectoe
-     * 
+     *
      * @throws org.mule.umo.UMOException if the method fails
      */
-    protected void doStop() throws UMOException
-    {
+    protected void doStop() throws UMOException {
         axisServer.stop();
         // UMOModel model = MuleManager.getInstance().getModel();
         // model.unregisterComponent(model.getDescriptor(AXIS_SERVICE_COMPONENT_NAME));
     }
 
-    public String getServerConfig()
-    {
+    public String getServerConfig() {
         return serverConfig;
     }
 
-    public void setServerConfig(String serverConfig)
-    {
+    public void setServerConfig(String serverConfig) {
         this.serverConfig = serverConfig;
     }
 
-    public List getBeanTypes()
-    {
+    public List getBeanTypes() {
         return beanTypes;
     }
 
-    public void setBeanTypes(List beanTypes)
-    {
+    public void setBeanTypes(List beanTypes) {
         this.beanTypes = beanTypes;
     }
 
-    public void onEvent(UMOServerEvent event)
-    {
+    public void onEvent(UMOServerEvent event) {
         if (event.getAction() == ModelEvent.MODEL_STARTED) {
             // We need to register the Axis service component once the model
             // starts because
@@ -372,43 +396,43 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         }
     }
 
-    public String getClientConfig()
-    {
+    public String getClientConfig() {
         return clientConfig;
     }
 
-    public void setClientConfig(String clientConfig)
-    {
+    public void setClientConfig(String clientConfig) {
         this.clientConfig = clientConfig;
     }
 
-    public AxisServer getAxisServer()
-    {
+    public AxisServer getAxisServer() {
         return axisServer;
     }
 
-    public void setAxisServer(AxisServer axisServer)
-    {
+    public void setAxisServer(AxisServer axisServer) {
         this.axisServer = axisServer;
     }
 
-    public SimpleProvider getServerProvider()
-    {
+    public SimpleProvider getServerProvider() {
         return serverProvider;
     }
 
-    public void setServerProvider(SimpleProvider serverProvider)
-    {
+    public void setServerProvider(SimpleProvider serverProvider) {
         this.serverProvider = serverProvider;
     }
 
-    public SimpleProvider getClientProvider()
-    {
+    public SimpleProvider getClientProvider() {
         return clientProvider;
     }
 
-    public void setClientProvider(SimpleProvider clientProvider)
-    {
+    public void setClientProvider(SimpleProvider clientProvider) {
         this.clientProvider = clientProvider;
+    }
+
+    public Map getAxisTransportProtocols() {
+        return axisTransportProtocols;
+    }
+
+    public void setAxisTransportProtocols(Map axisTransportProtocols) {
+        this.axisTransportProtocols.putAll(axisTransportProtocols);
     }
 }

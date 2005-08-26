@@ -13,13 +13,6 @@
  */
 package org.mule.providers.jms;
 
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.Topic;
-
 import org.mule.impl.MuleComponent;
 import org.mule.providers.DefaultReplyToHandler;
 import org.mule.umo.UMOEvent;
@@ -27,6 +20,13 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
+
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.Topic;
 
 /**
  * <code>JmsReplyToHandler</code> will process a Jms replyTo or hand off to
@@ -61,6 +61,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             }
             Object payload = returnMessage.getPayload();
             if (getTransformer() != null) {
+                getTransformer().setEndpoint(getEndpoint(event, "jms://temporary"));
                 payload = getTransformer().transform(payload);
             }
             session = connector.getSession(false, replyToDestination instanceof Topic);
@@ -101,7 +102,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         } catch (Exception e) {
             throw new DispatchException(new org.mule.config.i18n.Message("jms", 8, replyToDestination),
                                         returnMessage,
-                                        null);
+                                        null, e);
         } finally {
             JmsUtils.closeQuietly(replyToProducer);
             JmsUtils.closeQuietly(session);

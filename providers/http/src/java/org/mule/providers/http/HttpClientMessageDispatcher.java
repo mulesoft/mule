@@ -42,6 +42,7 @@ import org.mule.umo.transformer.UMOTransformer;
 import sun.misc.BASE64Encoder;
 
 import java.io.ByteArrayInputStream;
+import java.net.BindException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
@@ -200,7 +201,13 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
             }
 
-            httpMethod.execute(state, connection);
+            try {
+                httpMethod.execute(state, connection);
+            } catch (BindException e) {
+                //retry
+                Thread.sleep(100);
+                httpMethod.execute(state, connection);
+            }
             return httpMethod;
         } catch (Exception e) {
             if (httpMethod != null)

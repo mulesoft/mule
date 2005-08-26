@@ -27,21 +27,6 @@
  */
 package org.mule.providers.http;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.util.Properties;
-
-import javax.resource.spi.work.Work;
-
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
 import org.mule.config.MuleProperties;
@@ -59,6 +44,19 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
+
+import javax.resource.spi.work.Work;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.util.Properties;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used
@@ -218,7 +216,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
     }
 
-    protected byte[] parseRequest(InputStream is, Properties p) throws IOException
+    protected byte[] parseRequest(DataInputStream is, Properties p) throws IOException
     {
         byte[] payload;
 
@@ -272,18 +270,25 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // Ensure we read all bytes, http connections may be slow
             // to send all bytes in consistent stream. I've only seen
             // this when using Axis...
-            while (bytesWritten != contentLength) {
-                len = is.read(buffer);
-                if (len != -1) {
-                    baos.write(buffer, 0, len);
-                    bytesWritten += len;
-                    if (contentLengthNotSet) {
-                        contentLength = bytesWritten;
+            if(contentLengthNotSet) {
+                //maybe we should error here??
+                logger.error("Header Content-Length not set on http request. Will still read content until end of stream.");
+                while (bytesWritten != contentLength) {
+                    len = is.read(buffer);
+                    if (len != -1) {
+                        baos.write(buffer, 0, len);
+                        bytesWritten += len;
+                        if (contentLengthNotSet) {
+                            contentLength = bytesWritten;
+                        }
                     }
                 }
+                payload = baos.toByteArray();
+                baos.close();
+            } else {
+                is.readFully(buffer);
+                payload = buffer;
             }
-            payload = baos.toByteArray();
-            baos.close();
         }
         return payload;
     }

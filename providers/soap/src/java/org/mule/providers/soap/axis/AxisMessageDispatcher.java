@@ -27,7 +27,6 @@ import org.apache.axis.client.Service;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
-import org.apache.axis.transport.http.HTTPTransport;
 import org.apache.axis.wsdl.gen.Parser;
 import org.apache.axis.wsdl.symbolTable.ServiceEntry;
 import org.apache.axis.wsdl.symbolTable.SymTabEntry;
@@ -39,8 +38,8 @@ import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
-import org.mule.providers.soap.axis.extensions.MuleHttpSender;
 import org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler;
+import org.mule.providers.soap.axis.extensions.UniversalSender;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -72,10 +71,13 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     private Map callParameters;
 
-    public AxisMessageDispatcher(AxisConnector connector)
-    {
+    protected SimpleProvider clientConfig;
+
+    public AxisMessageDispatcher(AxisConnector connector) throws UMOException {
         super(connector);
         services = new HashMap();
+        //Should be loading this from a WSDD but for some reason it is not working for me??
+        createClientConfig();
     }
 
     public void doDispose()
@@ -93,18 +95,20 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         return service;
     }
 
-    protected Service createService(UMOEvent event) throws Exception
-    {
-        SimpleProvider clientConfig = new SimpleProvider();
+    protected void createClientConfig() {
+        clientConfig = new SimpleProvider();
         Handler muleHandler = new MuleSoapHeadersHandler();
         SimpleChain reqHandler = new SimpleChain();
         SimpleChain respHandler = new SimpleChain();
         reqHandler.addHandler(muleHandler);
         respHandler.addHandler(muleHandler);
-        Handler pivot = new MuleHttpSender();
+        Handler pivot = new UniversalSender();
         Handler transport = new SimpleTargetedChain(reqHandler, pivot, respHandler);
-        clientConfig.deployTransport(HTTPTransport.DEFAULT_TRANSPORT_NAME, transport);
+        clientConfig.deployTransport("MuleTransport", transport);
+    }
 
+    protected Service createService(UMOEvent event) throws Exception
+    {
         String wsdlUrl = getWsdlUrl(event);
         // If an wsdl url is given use it 
         if (wsdlUrl.length() > 0) {
@@ -197,6 +201,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
 
         Call call = (Call) getService(event).createCall();
+
+
         String style = (String) event.getProperties().get("style");
         String use = (String) event.getProperties().get("use");
 
@@ -223,8 +229,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
         // set properties on the call from the endpoint properties
         BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
-
-        call.setTargetEndpointAddress(endpointUri.getAddress());
+        call.setTargetEndpointAddress(endpointUri.toString());
 
         //Set custom soap action if set on the event or endpoint
         String soapAction = (String)event.getProperty("soapAction");
@@ -291,10 +296,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
-        String address = endpointUri.getAddress();
-        Call call = new Call(address);
-        call.setSOAPActionURI(address);
-        call.setTargetEndpointAddress(address);
+        Service service = new Service();
+        service.setEngineConfiguration(clientConfig);
+        service.setEngine(new AxisClient(clientConfig));
+        Call call = new Call(service);
+        call.setSOAPActionURI(endpointUri.toString());
+        call.setTargetEndpointAddress(endpointUri.toString());
 
         String method = (String) endpointUri.getParams().remove("method");
         call.setOperationName(method);
@@ -312,7 +319,11 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage receive(String endpoint, Object[] args) throws Exception
     {
-        Call call = new Call(endpoint);
+        Service service = new Service();
+        service.setEngineConfiguration(clientConfig);
+        service.setEngine(new AxisClient(clientConfig));
+        Call call = new Call(service);
+
         call.setSOAPActionURI(endpoint);
         call.setTargetEndpointAddress(endpoint);
 
@@ -330,7 +341,11 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage receive(String endpoint, SOAPEnvelope envelope) throws Exception
     {
-        Call call = new Call(endpoint);
+        Service service = new Service();
+        service.setEngineConfiguration(clientConfig);
+        service.setEngine(new AxisClient(clientConfig));
+        Call call = new Call(service);
+
         call.setSOAPActionURI(endpoint);
         call.setTargetEndpointAddress(endpoint);
         Object result = call.invoke(new Message(envelope));
