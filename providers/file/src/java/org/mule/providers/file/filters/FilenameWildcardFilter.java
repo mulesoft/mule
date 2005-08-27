@@ -15,6 +15,7 @@ package org.mule.providers.file.filters;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.providers.file.FileConnector;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOMessage;
 
@@ -66,6 +67,6 @@ public class FilenameWildcardFilter extends WildcardFilter implements FilenameFi
     
     public boolean accept(UMOMessage message)
     {
-        return accept(message.getPayload());
+        return accept(message.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
     }
 }
