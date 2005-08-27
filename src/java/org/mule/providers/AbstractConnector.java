@@ -25,6 +25,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.management.mbeans.EndpointService;
+import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -459,7 +460,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         logger.info("registering listener: " + component.getDescriptor().getName() + " on endpointUri: "
                 + endpointUri.toString());
 
-        UMOMessageReceiver receiver = (UMOMessageReceiver) receivers.get(getReceiverKey(component, endpoint));
+        UMOMessageReceiver receiver = getReciever(component, endpoint);
         if (receiver != null) {
             throw new ConnectorException(new Message(Messages.LISTENER_ALREADY_REGISTERED, endpointUri), this);
         } else {
@@ -704,5 +705,27 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     public boolean isRemoteSyncEnabled() {
         return false;
+    }
+
+    public AbstractMessageReceiver getReciever(UMOComponent component, UMOEndpoint endpoint) {
+        return (AbstractMessageReceiver) receivers.get(getReceiverKey(component, endpoint));
+    }
+
+    public AbstractMessageReceiver getReciever(String key) {
+        return (AbstractMessageReceiver) receivers.get(key);
+    }
+
+    public AbstractMessageReceiver[] getRecievers(String wildcardExpression) {
+
+        List temp = new ArrayList();
+        WildcardFilter filter = new WildcardFilter(wildcardExpression);
+        for (Iterator iterator = receivers.keySet().iterator(); iterator.hasNext();) {
+            Object o =  iterator.next();
+            if(filter.accept(o)) {
+                temp.add(receivers.get(o));
+            }
+        }
+        AbstractMessageReceiver[] result = new AbstractMessageReceiver[temp.size()];
+        return (AbstractMessageReceiver[])temp.toArray(result);
     }
 }

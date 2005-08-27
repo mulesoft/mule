@@ -35,6 +35,7 @@ public class FunctionalTestComponent implements Callable
     private static transient Log logger = LogFactory.getLog(FunctionalTestComponent.class);
 
     private EventCallback eventCallback;
+    private String returnMessage = null;
 
     public Object onCall(UMOEventContext context) throws Exception
     {
@@ -45,11 +46,16 @@ public class FunctionalTestComponent implements Callable
                 + StringMessageHelper.truncate(contents, 100, true), '*', 80);
         logger.info(msg);
 
-        contents += " Received";
+
         if (eventCallback != null) {
             eventCallback.eventReceived(context, this);
         }
-        return contents;
+        if(returnMessage!=null) {
+            return returnMessage;
+        } else {
+            contents += " Received";
+            return contents;
+        }
     }
 
     public EventCallback getEventCallback()
@@ -60,5 +66,13 @@ public class FunctionalTestComponent implements Callable
     public void setEventCallback(EventCallback eventCallback)
     {
         this.eventCallback = eventCallback;
+    }
+
+    public String getReturnMessage() {
+        return returnMessage;
+    }
+
+    public void setReturnMessage(String returnMessage) {
+        this.returnMessage = returnMessage;
     }
 }
