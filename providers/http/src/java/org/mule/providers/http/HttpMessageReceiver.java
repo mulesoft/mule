@@ -34,6 +34,8 @@ import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
+import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.ConnectException;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
@@ -94,6 +96,32 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     protected Work createWork(Socket socket)
     {
         return new HttpWorker(socket);
+    }
+
+    public void doConnect() throws ConnectException
+    {
+        //If we already have an endpoint listening on this socket don't try and
+        //start another serversocket
+        if(shouldConnect()) {
+            super.doConnect();
+        }
+    }
+
+    protected boolean shouldConnect()
+    {
+        StringBuffer requestUri = new StringBuffer();
+        requestUri.append(endpoint.getProtocol()).append("://");
+        requestUri.append(endpoint.getEndpointURI().getHost());
+        requestUri.append(":").append(endpoint.getEndpointURI().getPort());
+        requestUri.append("*");
+        AbstractMessageReceiver[] temp = connector.getRecievers(requestUri.toString());
+        for (int i = 0; i < temp.length; i++) {
+            AbstractMessageReceiver abstractMessageReceiver = temp[i];
+            if(abstractMessageReceiver.isConnected()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void doDispose()
@@ -167,7 +195,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
                         }
                         OutputStream os = new ResponseOutputStream(dataOut, socket);
-                        UMOMessage returnMessage = routeMessage(message, endpoint.isSynchronous(), os);
+
+                        //determine if the request path on this request denotes a different receiver
+                        AbstractMessageReceiver receiver = getTargetReceiver(message, endpoint);
+                        UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), os);
+
                         if (returnMessage == null) {
                             returnMessage = new MuleMessage("", null);
                         }
@@ -214,6 +246,22 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             logger.debug("Keep alive timed out");
             dispose();
         }
+    }
+
+    protected AbstractMessageReceiver getTargetReceiver(UMOMessage message, UMOEndpoint endpoint) {
+
+    String path = (String)message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        StringBuffer requestUri = new StringBuffer();
+        requestUri.append(endpoint.getProtocol()).append("://");
+        requestUri.append(endpoint.getEndpointURI().getHost());
+        requestUri.append(":").append(endpoint.getEndpointURI().getPort());
+        requestUri.append(path);
+        AbstractMessageReceiver receiver = connector.getReciever(requestUri.toString());
+        if(receiver==null) {
+            //this shouldn't be null unless the path in the request is incorrect
+            receiver = this;
+        }
+        return receiver;
     }
 
     protected byte[] parseRequest(DataInputStream is, Properties p) throws IOException

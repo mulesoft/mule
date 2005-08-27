@@ -120,5 +120,4 @@ public class TcpConnector extends AbstractServiceEnabledConnector
     public boolean isRemoteSyncEnabled() {
         return true;
     }
-
 }

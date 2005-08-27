@@ -27,21 +27,7 @@
  */
 package org.mule.providers.tcp;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.URI;
-
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -58,7 +44,19 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.transformer.UMOTransformer;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URI;
 
 /**
  * <code>TcpMessageReceiver</code> acts like a tcp server to receive socket
@@ -69,7 +67,7 @@ import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
  */
 public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 {
-    private ServerSocket serverSocket = null;
+    protected ServerSocket serverSocket = null;
     protected UMOTransformer responseTransformer = null;
 
     public TcpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
