@@ -1,0 +1,5 @@
+connector=org.mule.providers.ejb.EjbConnector
+dispatcher.factory=org.mule.providers.ejb.EjbMessageDispatcherFactory
+message.receiver=
+message.adapter=org.mule.providers.ejb.EjbMessageAdapter
+endpoint.builder=org.mule.impl.endpoint.SocketEndpointBuilder

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-ejb-provider</artifactId>
+    <name>Mule Ejb Provider</name>
+    <description>A Mule provider for Ejb Connectivity that allows you to invoke an ejb object using an endpoint. For more information see
+        the <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
+    </description>
+    <shortDescription>ejb</shortDescription>
+    <url>http://www.muleumo.org/doc/providers/ejb/</url>
+    <dependencies>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-rmi-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+    </dependencies>
+</project>
