@@ -134,7 +134,6 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
         bean.setEventCallback(callback);
         context.publishEvent(new ContextRefreshedEvent(context));
         afterPublishEvent();
-        afterPublishEvent();
         assertEquals(1, eventCount);
     }
 
