@@ -13,10 +13,10 @@
  */
 package org.mule.impl.endpoint;
 
+import org.mule.umo.endpoint.MalformedEndpointException;
+
 import java.net.URI;
 import java.util.Properties;
-
-import org.mule.umo.endpoint.MalformedEndpointException;
 
 /**
  * <code>UserInfoEndpointBuilder</code> builds an endpoint with the userinfo
@@ -58,8 +58,8 @@ public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
         } else {
             throw new MalformedEndpointException(uri.toString(), new Exception("User info is not set"));
         }
-        if (uri.getPath() != null && !"".equals(uri.getPath())) {
-            props.put("folder", uri.getPath().substring(1));
-        }
+//        if (uri.getPath() != null && !"".equals(uri.getPath())) {
+//            props.put("folder", uri.getPath().substring(1));
+//        }
     }
 }

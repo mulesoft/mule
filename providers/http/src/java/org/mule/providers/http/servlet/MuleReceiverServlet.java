@@ -37,7 +37,6 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
-import org.mule.umo.provider.UMOConnector;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -54,11 +53,11 @@ import java.util.Map;
 
 public class MuleReceiverServlet extends AbstractReceiverServlet
 {
-    protected UMOConnector connector = null;
+    protected ServletConnector connector = null;
 
     protected void doInit(ServletConfig servletConfig) throws ServletException {
 
-        connector = ConnectorFactory.getConnectorByProtocol("servlet");
+        connector = (ServletConnector)ConnectorFactory.getConnectorByProtocol("servlet");
         if (connector == null) {
             throw new ServletException("No servlet connector found using protocol: servlet");
         }
@@ -138,12 +137,6 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     }
 
     protected Map getReceivers() {
-        Map receivers = null;
-        if(connector instanceof HttpConnector) {
-            receivers = ((HttpConnector) connector).getReceivers();
-        } else {
-            receivers = ((ServletConnector) connector).getReceivers();
-        }
-        return receivers;
+        return connector.getReceivers();
     }
 }

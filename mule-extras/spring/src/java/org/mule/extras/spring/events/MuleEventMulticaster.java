@@ -24,14 +24,16 @@ import org.mule.extras.spring.SpringContainerContext;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
+import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -158,6 +160,11 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
     private UMODescriptor descriptor;
 
     /**
+     * The mule instance compoennt for the Multicaster
+     */
+    private UMOComponent component;
+
+    /**
      * The filter used to match subscriptions
      */
     private Class subscriptionFilter = WildcardFilter.class;
@@ -259,11 +266,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             // so its an outbound event
             if (muleEvent.getMuleEventContext() == null) {
                 try {
-                    dispatchEvent(RequestContext.getEventContext(), muleEvent);
+                    dispatchEvent(muleEvent);
                 } catch (ApplicationEventException e1) {
                     logger.error("failed to dispatch event: " + e.toString(), e1);
-                } finally {
-                    // RequestContext.clear();
                 }
                 return;
             }
@@ -379,13 +384,12 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 
     /**
      * Will dispatch an application event through Mule
-     * 
-     * @param eventContext the event received before dispatching
+     *
      * @param applicationEvent the Spring event to be dispatched
      * @throws ApplicationEventException if the event cannot be dispatched i.e.
      *             if the underlying transport throws an exception
      */
-    protected void dispatchEvent(UMOEventContext eventContext, MuleApplicationEvent applicationEvent)
+    protected void dispatchEvent(MuleApplicationEvent applicationEvent)
             throws ApplicationEventException
     {
         UMOEndpoint endpoint = null;
@@ -404,21 +408,20 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
 
                 MuleMessage message = new MuleMessage(applicationEvent.getSource(), applicationEvent.getProperties());
                 // has dispatch been triggered using beanFactory.publish()
-                // without
-                // a current event?
-                if (RequestContext.getEvent() != null) {
+                // without a current event
+                if (applicationEvent.getMuleEventContext() != null) {
                     // tell mule not to try and route this event itself
-                    eventContext.setStopFurtherProcessing(true);
-                    eventContext.dispatchEvent(message, endpoint);
+                    applicationEvent.getMuleEventContext().setStopFurtherProcessing(true);
+                    applicationEvent.getMuleEventContext().dispatchEvent(message, endpoint);
                 } else {
                     // transform if necessary
                     if (endpoint.getTransformer() != null) {
                         message = new MuleMessage(endpoint.getTransformer().transform(applicationEvent.getSource()),
                                                   applicationEvent.getProperties());
                     }
-                    UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint.getEndpointURI()
-                                                                                                    .getAddress());
-                    dispatcher.dispatch(new MuleEvent(message, endpoint, null, false));
+                    UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint.getEndpointURI().getAddress());
+                    UMOSession session = new MuleSession(component, null);
+                    dispatcher.dispatch(new MuleEvent(message, endpoint, session, false));
                 }
             } catch (Exception e1) {
                 throw new ApplicationEventException("Failed to dispatch event: " + e1.getMessage(), e1);
@@ -488,7 +491,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         if (descriptor == null) {
             descriptor = getDefaultDescriptor();
             setSubscriptionsOnDescriptor((MuleDescriptor) descriptor);
-            MuleManager.getInstance().getModel().registerComponent(descriptor);
+            component = MuleManager.getInstance().getModel().registerComponent(descriptor);
         }
     }
 

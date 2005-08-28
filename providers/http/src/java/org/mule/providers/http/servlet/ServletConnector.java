@@ -27,6 +27,10 @@ import java.util.Map;
 
 public class ServletConnector extends AbstractServiceEnabledConnector
 {
+    //The real url that the servlet container is bound on.
+    //If this is not set the wsdl may not be generated correctly
+    protected String servletUrl;
+
     public String getProtocol()
     {
         return "servlet";
@@ -37,5 +41,11 @@ public class ServletConnector extends AbstractServiceEnabledConnector
         return receivers;
     }
 
-    
+    public String getServletUrl() {
+        return servletUrl;
+    }
+
+    public void setServletUrl(String servletUrl) {
+        this.servletUrl = servletUrl;
+    }
 }

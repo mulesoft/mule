@@ -18,6 +18,7 @@ import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.deployment.wsdd.WSDDConstants;
 import org.apache.axis.deployment.wsdd.WSDDProvider;
+import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.server.AxisServer;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
@@ -28,6 +29,8 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ModelEventListener;
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.http.servlet.ServletConnector;
+import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.providers.soap.axis.extensions.MuleTransport;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
@@ -45,6 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -93,6 +97,14 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
      * simplifies the code
      */
     private Map axisTransportProtocols;
+
+    /**
+     * A store of registered servlet services that need to have their endpoints re-written
+     * with the 'real' http url instead of the servlet:// one. This is only required to ensure
+     * wsdl is generated correctly. I would like a clearer way of doing this so I can remove this
+     * workaround
+     */
+    private List servletServices = new ArrayList();
 
     public AxisConnector() {
         super();
@@ -179,10 +191,6 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public String getProtocol() {
         return "axis";
-    }
-
-    public AxisMessageReceiver getReceiver(String name) {
-        return (AxisMessageReceiver) receivers.get(name);
     }
 
     /**
@@ -389,6 +397,22 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             if (!MuleManager.getInstance().getModel().isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME)) {
                 try {
                     MuleManager.getInstance().getModel().registerComponent(axisDescriptor);
+                    //We have to perform a small hack here to rewrite servlet:// endpoints with the
+                    //real http:// address
+                    for (Iterator iterator = servletServices.iterator(); iterator.hasNext();) {
+                        SOAPService service = (SOAPService) iterator.next();
+                        ServletConnector servletConnector = (ServletConnector)ConnectorFactory.getConnectorByProtocol("servlet");
+                        String url = servletConnector.getServletUrl();
+                        if(url!=null) {
+                            service.getServiceDescription().setEndpointURL(url + "/" + service.getName());
+                        } else {
+                            logger.error("The servletUrl property on the ServletConntector has not been set this means that wsdl generation for service '" + service.getName() + "' may be incorrect");
+                        }
+                    }
+                    servletServices.clear();
+                    servletServices = null;
+
+
                 } catch (UMOException e) {
                     handleException(e);
                 }
@@ -434,5 +458,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public void setAxisTransportProtocols(Map axisTransportProtocols) {
         this.axisTransportProtocols.putAll(axisTransportProtocols);
+    }
+
+    void addServletService(SOAPService service) {
+        servletServices.add(service);
     }
 }

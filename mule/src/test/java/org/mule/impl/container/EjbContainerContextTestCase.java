@@ -57,6 +57,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
         Map env = new HashMap();
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         context.setEnvironment(env);
+        //context.setSecurityPolicy("open-security.policy");
         context.initialise();
         InitialContext ic = context.getContext();
         ic.bind(EJB_NAME, new DummyEjbHomeProxy());
@@ -66,7 +67,6 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
     public void testContainerContext() throws Exception
     {
         UMOContainerContext container = getContainerContext();
-        container.initialise();
         assertNotNull(container);
 
         Object result = null;

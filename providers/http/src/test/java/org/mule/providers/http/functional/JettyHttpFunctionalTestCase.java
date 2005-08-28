@@ -75,9 +75,9 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 //
     protected void receiveAndTestResults() throws Exception
     {
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         byte[] buf = new byte[1024 * 4];
-        assertTrue(cnn.isResponseAvailable());
+
         int len = cnn.getResponseInputStream().read(buf);
         if (len < 1) {
             fail("Nothing was sent back in the response");

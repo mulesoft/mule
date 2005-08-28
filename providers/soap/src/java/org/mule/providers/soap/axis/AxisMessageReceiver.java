@@ -158,6 +158,9 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
          */
         ServiceDesc sd = service.getInitializedServiceDesc(null);
         sd.setName(serviceName);
+        if(uri.getScheme().equalsIgnoreCase("servlet")) {
+            connector.addServletService(service);
+        }
         sd.setEndpointURL(uri.getAddress() + "/" + serviceName);
 
         String style = (String) descriptor.getProperties().get("style");
@@ -263,4 +266,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         }
     }
 
+    SOAPService getService() {
+        return service;
+    }
 }

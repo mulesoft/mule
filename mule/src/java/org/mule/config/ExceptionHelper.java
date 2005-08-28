@@ -13,15 +13,6 @@
  */
 package org.mule.config;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
@@ -31,6 +22,15 @@ import org.mule.util.ClassHelper;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.SpiHelper;
 import org.mule.util.Utility;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>ExceptionHelper</code> provides a number of helper functions that can

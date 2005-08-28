@@ -13,8 +13,6 @@
  */
 package org.mule.providers.soap.axis.extensions;
 
-import java.lang.reflect.Proxy;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.Constants;
 import org.apache.axis.MessageContext;
@@ -26,6 +24,8 @@ import org.mule.providers.soap.ServiceProxy;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageReceiver;
 import org.mule.umo.UMOSession;
+
+import java.lang.reflect.Proxy;
 
 /**
  * <code>MuleProvider</code> Is an Axis service endpoint that builds services
@@ -45,7 +45,7 @@ public class MuleProvider extends RPCProvider
 
     protected Object makeNewServiceObject(MessageContext messageContext, String s) throws Exception
     {
-        AxisMessageReceiver receiver = connector.getReceiver(messageContext.getTargetService());
+        AxisMessageReceiver receiver = (AxisMessageReceiver)connector.getReceiver(messageContext.getTargetService());
         if (receiver == null) {
             throw new AxisFault("Could not find Mule registered service: " + s);
         }

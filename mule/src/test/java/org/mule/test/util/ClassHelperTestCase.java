@@ -16,32 +16,26 @@
 package org.mule.test.util;
 
 import junit.framework.TestCase;
-
 import org.mule.tck.testmodels.fruit.AbstractFruit;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.ClassHelper;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.List;
+
 /**
- * <code>ReflectionHelperTestCase</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class ClassHelperTestCase extends TestCase
 {
-
-    /**
-     * 
-     */
-    public ClassHelperTestCase()
-    {
-        super();
-    }
-
     public void testIsConcrete() throws Exception
     {
         assertTrue(ClassHelper.isConcrete(Orange.class));
@@ -109,5 +103,50 @@ public class ClassHelperTestCase extends TestCase
         classes = ClassHelper.getParameterTypes(bowl, "invalid");
         assertNotNull(classes);
         assertEquals(0, classes.length);
+    }
+
+    public void testLoadingResources() throws Exception
+    {
+        URL resource = ClassHelper.getResource("log4j.properties", getClass());
+        assertNotNull(resource);
+
+        resource = ClassHelper.getResource("log4j.Xproperties", getClass());
+        assertNull(resource);
+    }
+
+    public void testLoadingResourcesAsStream() throws Exception
+    {
+        InputStream is = ClassHelper.getResourceAsStream("log4j.properties", getClass());
+        assertNotNull(is);
+
+        is = ClassHelper.getResourceAsStream("log4j.Xproperties", getClass());
+        assertNull(is);
+    }
+
+    public void testLoadingResourceEnumeration() throws Exception
+    {
+
+        Enumeration enumeration = ClassHelper.getResources("log4j.properties", getClass());
+        assertNotNull(enumeration);
+        assertTrue(enumeration.hasMoreElements());
+
+        enumeration = ClassHelper.getResources("log4j.Xproperties", getClass());
+        assertNotNull(enumeration);
+        assertTrue(!enumeration.hasMoreElements());
+    }
+
+    public void testGetSatisfiableMethods() throws Exception
+    {
+        List methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true, true);
+        assertNotNull(methods);
+        assertEquals(1, methods.size());
+
+        methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true);
+        assertNotNull(methods);
+        assertEquals(0, methods.size());
+
+        methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{WaterMelon.class}, true, true);
+        assertNotNull(methods);
+        assertEquals(0, methods.size());
     }
 }

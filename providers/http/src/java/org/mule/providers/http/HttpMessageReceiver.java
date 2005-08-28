@@ -114,7 +114,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         requestUri.append(endpoint.getEndpointURI().getHost());
         requestUri.append(":").append(endpoint.getEndpointURI().getPort());
         requestUri.append("*");
-        AbstractMessageReceiver[] temp = connector.getRecievers(requestUri.toString());
+        AbstractMessageReceiver[] temp = connector.getReceivers(requestUri.toString());
         for (int i = 0; i < temp.length; i++) {
             AbstractMessageReceiver abstractMessageReceiver = temp[i];
             if(abstractMessageReceiver.isConnected()) {
@@ -256,7 +256,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         requestUri.append(endpoint.getEndpointURI().getHost());
         requestUri.append(":").append(endpoint.getEndpointURI().getPort());
         requestUri.append(path);
-        AbstractMessageReceiver receiver = connector.getReciever(requestUri.toString());
+        AbstractMessageReceiver receiver = connector.getReceiver(requestUri.toString());
         if(receiver==null) {
             //this shouldn't be null unless the path in the request is incorrect
             receiver = this;

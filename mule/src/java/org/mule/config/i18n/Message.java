@@ -166,9 +166,10 @@ public class Message implements Serializable
         return message + (nextMessage != null ? ". " + nextMessage.getMessage() : "");
     }
 
-    public void setNextMessage(Message nextMessage)
+    public Message setNextMessage(Message nextMessage)
     {
         this.nextMessage = nextMessage;
+        return this;
     }
 
     public Message getNextMessage()

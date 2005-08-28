@@ -29,6 +29,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringEventsTestCase extends AbstractMuleTestCase
 {
+    private static final int NUMBER_OF_MESSAGES = 10;
     private static int eventCount = 0;
     private static int eventCount2 = 0;
     private static ClassPathXmlApplicationContext context;
@@ -178,26 +179,29 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
             public void eventReceived(UMOEventContext context, Object o) throws Exception
             {
                 eventCount2++;
-                synchronized (lock) {
-                    lock.notifyAll();
+                if(eventCount2==NUMBER_OF_MESSAGES) {
+                    synchronized (lock) {
+                        lock.notifyAll();
+                    }
                 }
             }
         };
         bean2.setEventCallback(callback2);
 
         MuleClient client = new MuleClient();
-        client.send("vm://event.multicaster", "Test Spring Event", null);
+        for(int i = 0;i < NUMBER_OF_MESSAGES;i++) {
+            client.send("vm://event.multicaster", "Test Spring Event", null);
+        }
         // give it a second for the event to process
         synchronized (lock) {
             lock.wait(3000);
         }
-        assertEquals(1, eventCount);
-        assertEquals(1, eventCount2);
+        assertEquals(NUMBER_OF_MESSAGES, eventCount);
+        assertEquals(NUMBER_OF_MESSAGES, eventCount2);
     }
 
     public void testPublishOnly() throws Exception
     {
-
         MuleApplicationEvent event = new MuleApplicationEvent("Event from a spring bean", "vm://testBean2");
 
         TestSubscriptionEventBean bean2 = (TestSubscriptionEventBean) context.getBean("testSubscribingEventBean2");
@@ -206,26 +210,30 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
             public void eventReceived(UMOEventContext context, Object o) throws Exception
             {
                 eventCount++;
-                synchronized (lock) {
-                    lock.notifyAll();
+                if(eventCount==NUMBER_OF_MESSAGES) {
+                    synchronized (lock) {
+                        lock.notifyAll();
+                    }
                 }
             }
         };
         bean2.setEventCallback(callback);
 
-        context.publishEvent(event);
+        for(int i = 0;i < NUMBER_OF_MESSAGES;i++) {
+            context.publishEvent(event);
+        }
         // give it some time for the event to process
         synchronized (lock) {
-            lock.wait(3000);
+            lock.wait(5000);
         }
-        assertEquals(1, eventCount);
+        assertEquals(NUMBER_OF_MESSAGES, eventCount);
     }
 
     protected void afterPublishEvent() {
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {
-            
+
         }
     }
 }

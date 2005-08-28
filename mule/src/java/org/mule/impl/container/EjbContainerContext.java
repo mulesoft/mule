@@ -29,11 +29,16 @@ import java.lang.reflect.Method;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EjbContainerContext extends JndiContainerContext
+public class EjbContainerContext extends RmiContainerContext
 {
     public EjbContainerContext()
     {
         super("ejb");
+    }
+
+    protected EjbContainerContext(String name)
+    {
+        super(name);
     }
 
     public Object getComponent(Object key) throws ObjectNotFoundException {

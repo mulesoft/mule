@@ -236,9 +236,6 @@ public class MuleProxy implements Work, Lifecycle
                 if (stat.isEnabled()) {
                     stat.addExecutionTime(System.currentTimeMillis() - startTime);
                 }
-                // returnMessage = processResponse(result, replyTo,
-                // ((AbstractConnector)
-                // event.getEndpoint().getConnector()).getReplyToHandler());
                 // this is the request event
                 event = RequestContext.getEvent();
                 if (event.isStopFurtherProcessing()) {
@@ -291,11 +288,7 @@ public class MuleProxy implements Work, Lifecycle
             throws UMOException
     {
         boolean stopProcessing = !descriptor.getOutboundRouter().hasEndpoints();
-        // if(descriptor.getResponseRouter()!=null) {
-        // stopProcessing = descriptor.getResponseRouter().isStopProcessing();
-        // } else {
-        // stopProcessing = event.isStopFurtherProcessing();
-        // }
+
         UMOMessage returnMessage = null;
         // Need to find a cleaner solution for handling response messages
         // Right now routing is split between here a nd the proxy
@@ -308,14 +301,7 @@ public class MuleProxy implements Work, Lifecycle
             }
             logger.debug("Waiting for response router message");
             message = descriptor.getResponseRouter().getResponse(message);
-
-//            if (descriptor.getResponseRouter().isStopProcessing()) {
-//                logger.debug("Setting stop oubound processing according to response router");
-//                RequestContext.getEvent().setStopFurtherProcessing(true);
-//            }
         }
-        // return message;
-        // }
 
         // this is the request event
         UMOEvent event = RequestContext.getEvent();
@@ -336,8 +322,6 @@ public class MuleProxy implements Work, Lifecycle
         if (message != null && replyTo != null) {
             String requestor = (String) message.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
 
-            // ReplyToHandler replyToHandler = ((AbstractConnector)
-            // event.getEndpoint().getConnector()).getReplyToHandler();
             if (replyToHandler != null) {
                 if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null) {
                     replyToHandler.processReplyTo(event, message, replyTo);
@@ -485,11 +469,7 @@ public class MuleProxy implements Work, Lifecycle
                                                                    descriptor.getName()), event.getMessage(), e));
             }
         } finally {
-            /*
-             * try { queueSession.commit(); } catch (Exception e2) {
-             * logger.error("Error when commiting event queue: " +
-             * e2.getMessage(), e2); }
-             */
+
             try {
                 proxyPool.returnObject(this);
             } catch (Exception e2) {
@@ -501,11 +481,7 @@ public class MuleProxy implements Work, Lifecycle
 
     public void release()
     {
-        // try {
-        // proxyPool.returnObject(this);
-        // } catch (Exception e) {
-        // logger.error("Failed to return proxy: " + e.getMessage(), e);
-        // }
+
     }
 
     /*

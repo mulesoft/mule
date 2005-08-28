@@ -6,14 +6,16 @@
  */
 package org.mule.util;
 
-import java.io.InputStream;
-import java.util.Properties;
-
 import org.apache.commons.discovery.DiscoveryException;
 import org.apache.commons.discovery.resource.ClassLoaders;
 import org.apache.commons.discovery.tools.DiscoverClass;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.InputStream;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Properties;
 
 public class SpiHelper
 {
@@ -58,9 +60,13 @@ public class SpiHelper
      * @return Class implementing the SPI or the default implementation class if
      *         nothing has been found
      */
-    public static Class findService(Class spi, String defaultImpl, Class currentClass)
+    public static Class findService(final Class spi, final String defaultImpl, final Class currentClass)
     {
-        ClassLoaders loaders = ClassLoaders.getAppLoaders(spi, currentClass, false);
+        ClassLoaders loaders = (ClassLoaders) AccessController.doPrivileged(new PrivilegedAction() {
+            public Object run() {
+                return ClassLoaders.getAppLoaders(spi, currentClass, false);
+            }
+        });
         DiscoverClass discover = new DiscoverClass(loaders);
         try {
             return discover.find(spi, System.getProperties(), defaultImpl);

@@ -5,6 +5,12 @@
 
 <mule-configuration id="axis_test" version="1.0">
 
+    <connector name="servlet" className="org.mule.providers.http.servlet.ServletConnector">
+        <properties>
+            <property name="servletUrl" value="http://localhost:8081/services"/>
+        </properties>
+    </connector>
+
     <model name="test">
         <mule-descriptor name="mycomponent"
             implementation="org.mule.providers.soap.TestServiceComponent"

@@ -120,13 +120,12 @@ public abstract class AbstractReceiverServlet extends HttpServlet
                 response.getWriter().write("Action was processed successfully. There was no result");
             }
         } else {
-            String contentType = (String) message.getProperty("contentType");
+            String contentType = (String) message.getProperty("Content-Type");
             if (contentType == null)
                 contentType = defaultContentType;
             if (!contentType.startsWith("text")) {
                 response.setContentType(contentType);
                 response.getOutputStream().write(message.getPayloadAsBytes());
-
             } else {
                 response.setContentType(contentType);
                 response.getWriter().write(message.getPayloadAsString());

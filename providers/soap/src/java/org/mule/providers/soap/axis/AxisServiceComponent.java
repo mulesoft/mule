@@ -144,8 +144,13 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         try {
 //            UMOEndpointURI endpointUri = context.getEndpointURI();
-            UMOEndpointURI endpointUri = new MuleEndpointURI("soap:" + context.getEndpointURI().getAddress()
-                    + context.getMessageAsString());
+            String uri = "soap:" + context.getEndpointURI().toString();
+//            int i = uri.indexOf("?");
+//            if(i > -1) {
+//                uri = uri.substring(0, i);
+//            }
+            uri += context.getMessageAsString();
+            UMOEndpointURI endpointUri = new MuleEndpointURI(uri);
             AxisEngine engine = getAxisServer();
             String pathInfo = endpointUri.getPath();
             // String realpath =

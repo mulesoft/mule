@@ -13,12 +13,14 @@
  */
 package org.mule.providers.rmi;
 
-import java.net.URL;
-import java.util.ArrayList;
-
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
+
+import java.net.URL;
+import java.rmi.RMISecurityManager;
+import java.util.ArrayList;
 
 /**
  * <code>RmiConnector</code> can bind or sent to a given rmi port on a given
@@ -192,5 +194,19 @@ public class RmiConnector extends AbstractServiceEnabledConnector
     public void setArgumentClasses(Class[] argumentClasses)
     {
         this.argumentClasses = argumentClasses;
+    }
+
+    public void doInitialise() throws InitialisationException
+    {
+        super.doInitialise();
+
+        if(securityPolicy!=null) {
+            System.setProperty("java.security.policy", securityPolicy);
+        }
+
+        // Set security manager
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new RMISecurityManager());
+        }
     }
 }

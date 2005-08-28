@@ -38,6 +38,14 @@ public class MalformedEndpointException extends EndpointException
 
     /**
      * @param endpoint the endpoint that could not be parsed
+     */
+    public MalformedEndpointException(Message message, String endpoint)
+    {
+        super(new Message(Messages.ENPOINT_X_IS_MALFORMED, endpoint).setNextMessage(message));
+    }
+
+    /**
+     * @param endpoint the endpoint that could not be parsed
      * @param cause the exception that cause this exception to be thrown
      */
     public MalformedEndpointException(String endpoint, Throwable cause)
