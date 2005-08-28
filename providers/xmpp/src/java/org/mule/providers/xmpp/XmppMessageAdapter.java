@@ -13,34 +13,37 @@
  */
 package org.mule.providers.xmpp;
 
-import java.util.Iterator;
-
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
+import java.util.Iterator;
+
 /**
- * <code>XmppMessageAdapter</code> TODO
+ * <code>XmppMessageAdapter</code> wraps an Smack XMPP packet
  * 
  * @author Peter Braswell
  * @version $Revision$
  */
 public class XmppMessageAdapter extends AbstractMessageAdapter
 {
-    private Message message;
+    private Packet message;
 
     public XmppMessageAdapter(Object message) throws MessagingException
     {
-        if (message instanceof Message) {
-            this.message = (Message) message;
+        if (message instanceof Packet) {
+            this.message = (Packet) message;
             for (Iterator iter = this.message.getPropertyNames(); iter.hasNext();) {
                 String name = (String) iter.next();
                 setProperty(name, this.message.getProperty(name));
             }
-            setProperty("subject", this.message.getSubject());
-            setProperty("thread", this.message.getThread());
+            if(this.message instanceof Message) {
+                setProperty("subject", ((Message)this.message).getSubject());
+                setProperty("thread", ((Message)this.message).getThread());
+            }
         } else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
@@ -48,12 +51,20 @@ public class XmppMessageAdapter extends AbstractMessageAdapter
 
     public String getPayloadAsString() throws Exception
     {
-        return message.getBody();
+        if(message instanceof Message) {
+            return ((Message)message).getBody();
+        } else {
+            return message.toString();
+        }
     }
 
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return message.getBody().getBytes();
+        if(message instanceof Message) {
+            return ((Message)message).getBody().getBytes();
+        } else {
+            return message.toString().getBytes();
+        }
     }
 
     public Object getPayload()

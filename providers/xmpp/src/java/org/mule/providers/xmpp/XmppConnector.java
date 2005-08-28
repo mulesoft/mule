@@ -13,15 +13,15 @@
  */
 package org.mule.providers.xmpp;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.endpoint.UMOEndpointURI;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>XmppConnector</code> TODO
@@ -32,7 +32,13 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  */
 public class XmppConnector extends AbstractServiceEnabledConnector
 {
-    private static final String DEFAULT_RESOURCE = "mule";
+    public static final String XMPP_PROPERTY_PREFIX = "";
+    public static final String XMPP_SUBJECT = XMPP_PROPERTY_PREFIX + "subject";
+    public static final String XMPP_THREAD = XMPP_PROPERTY_PREFIX + "thread";
+    public static final String XMPP_TO = XMPP_PROPERTY_PREFIX + "to";
+    public static final String XMPP_FROM = XMPP_PROPERTY_PREFIX + "from";
+    public static final String XMPP_GROUP_CHAT = XMPP_PROPERTY_PREFIX + "groupChat";
+    public static final String XMPP_NICKNAME = XMPP_PROPERTY_PREFIX + "nickname";
 
     private Map connCache = new HashMap();
 
@@ -49,13 +55,7 @@ public class XmppConnector extends AbstractServiceEnabledConnector
         String username = endpointURI.getUsername();
         String hostname = endpointURI.getHost();
         String password = endpointURI.getPassword();
-        String resource = endpointURI.getPath();
-
-        if (resource == null || "".equals(resource)) {
-            resource = DEFAULT_RESOURCE;
-        } else {
-            resource = resource.substring(1);
-        }
+        String resource = (String)endpointURI.getParams().get("resource");
 
         xmppConnection = findOrCreateConnection(endpointURI);
 
@@ -77,7 +77,11 @@ public class XmppConnector extends AbstractServiceEnabledConnector
             logger.info("pw is        : " + password);
             logger.info("server       : " + hostname);
             logger.info("resource     : " + resource);
-            xmppConnection.login(username, password, resource);
+            if(resource != null) {
+                xmppConnection.login(username, password);
+            } else {
+                xmppConnection.login(username, password, resource);
+            }
         } else {
             logger.info("Already authenticated on this connection, no need to log in again.");
         }
@@ -91,7 +95,11 @@ public class XmppConnector extends AbstractServiceEnabledConnector
     {
         XMPPConnection conn = (XMPPConnection) connCache.get(uri);
         if (null == conn) {
-            conn = new XMPPConnection(uri.getHost());
+            if(uri.getPort() != -1) {
+                conn = new XMPPConnection(uri.getHost(), uri.getPort());
+            } else {
+                conn = new XMPPConnection(uri.getHost());
+            }
             connCache.put(uri, conn);
         }
         return conn;
@@ -107,5 +115,9 @@ public class XmppConnector extends AbstractServiceEnabledConnector
             XMPPConnection conn = (XMPPConnection) connCache.remove(uri);
             conn.close();
         }
+    }
+
+    public boolean isRemoteSyncEnabled() {
+        return true;
     }
 }

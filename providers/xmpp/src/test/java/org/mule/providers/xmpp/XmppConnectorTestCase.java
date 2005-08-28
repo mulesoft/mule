@@ -38,6 +38,6 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
 
     public String getTestEndpointURI()
     {
-        return "xmpp://mule1:mule@jabber.org.au";
+        return "xmpp://mule1:mule@jabber.org.au/ross@jabber.org";
     }
 }

@@ -13,10 +13,6 @@
  */
 package org.mule.providers.xmpp;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -26,6 +22,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.RequestContext;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
@@ -35,11 +32,16 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
 
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+
 /**
- * <code>XmppMessageReceiver</code> TODO
+ * <code>XmppMessageReceiver</code> is responsible for receiving Mule events over xmpp
  * 
  * @author Peter Braswell
  * @author John Evans
+ * @author Ross Mason
  * @version $Revision$
  */
 public class XmppMessageReceiver extends AbstractMessageReceiver implements PacketListener
@@ -83,7 +85,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         logger.info("Closed Xmpp Listener");
     }
 
-    protected Work createWork(Message message)
+    protected Work createWork(Packet message)
     {
         return new XMPPWorker(message);
     }
@@ -94,8 +96,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
     public void processPacket(Packet packet)
     {
         logger.debug("processing packet: " + packet.toXML());
-        Message msg = (Message) packet;
-        Work work = createWork(msg);
+        Work work = createWork(packet);
         try {
             getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, null);
         } catch (WorkException e) {
@@ -105,11 +106,11 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
 
     private class XMPPWorker implements Work
     {
-        Message message = null;
+        Packet packet = null;
 
-        public XMPPWorker(Message message)
+        public XMPPWorker(Packet message)
         {
-            this.message = message;
+            this.packet = message;
         }
 
         /**
@@ -118,13 +119,15 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
         public void run()
         {
             try {
-                logger.info("processing xmpp message from: " + message.getFrom());
-                UMOMessageAdapter adapter = connector.getMessageAdapter(message);
+                logger.info("processing xmpp packet from: " + packet.getFrom());
+                UMOMessageAdapter adapter = connector.getMessageAdapter(packet);
                 logger.info("UMOMessageAdapter is a: " + adapter.getClass().getName());
                 UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous());
 
-                if (returnMessage != null) {
-                    xmppConnection.sendPacket(new Message(returnMessage.getPayloadAsString()));
+                if (returnMessage != null && packet instanceof Message) {
+                    RequestContext.rewriteEvent(returnMessage);
+                    Packet result = (Packet)connector.getDefaultResponseTransformer().transform(returnMessage.getPayload());
+                    xmppConnection.sendPacket(result);
                 }
             } catch (Exception e) {
                 handleException(e);
