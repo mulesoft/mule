@@ -43,6 +43,7 @@ import org.mule.umo.transformer.UMOTransformer;
 
 import java.beans.ExceptionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -711,11 +712,15 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         return (AbstractMessageReceiver) receivers.get(getReceiverKey(component, endpoint));
     }
 
-    public AbstractMessageReceiver getReciever(String key) {
+    public Map getReceivers() {
+        return Collections.unmodifiableMap(receivers);
+    }
+
+    public AbstractMessageReceiver getReceiver(String key) {
         return (AbstractMessageReceiver) receivers.get(key);
     }
 
-    public AbstractMessageReceiver[] getRecievers(String wildcardExpression) {
+    public AbstractMessageReceiver[] getReceivers(String wildcardExpression) {
 
         List temp = new ArrayList();
         WildcardFilter filter = new WildcardFilter(wildcardExpression);
