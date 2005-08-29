@@ -15,7 +15,6 @@ package org.mule.test.integration.spring.events;
 
 import org.mule.extras.spring.events.MuleApplicationEvent;
 import org.mule.extras.spring.events.MuleSubscriptionEventListener;
-import org.mule.extras.spring.events.TestMuleEventBean;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.springframework.context.ApplicationEvent;
 

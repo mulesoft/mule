@@ -17,14 +17,13 @@ package org.mule.test.integration.providers.soap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.RequestContext;
-import org.mule.providers.soap.DateService;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.test.integration.service.DateService;
 import org.mule.umo.UMOEventContext;
 
 import java.util.Date;
 
 /**
- * todo document
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
