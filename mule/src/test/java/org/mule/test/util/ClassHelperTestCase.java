@@ -107,30 +107,30 @@ public class ClassHelperTestCase extends TestCase
 
     public void testLoadingResources() throws Exception
     {
-        URL resource = ClassHelper.getResource("log4j.properties", getClass());
+        URL resource = ClassHelper.getResource("test-dummy.properties", getClass());
         assertNotNull(resource);
 
-        resource = ClassHelper.getResource("log4j.Xproperties", getClass());
+        resource = ClassHelper.getResource("test-dummyX.properties", getClass());
         assertNull(resource);
     }
 
     public void testLoadingResourcesAsStream() throws Exception
     {
-        InputStream is = ClassHelper.getResourceAsStream("log4j.properties", getClass());
+        InputStream is = ClassHelper.getResourceAsStream("test-dummy.properties", getClass());
         assertNotNull(is);
 
-        is = ClassHelper.getResourceAsStream("log4j.Xproperties", getClass());
+        is = ClassHelper.getResourceAsStream("test-dummyX.properties", getClass());
         assertNull(is);
     }
 
     public void testLoadingResourceEnumeration() throws Exception
     {
 
-        Enumeration enumeration = ClassHelper.getResources("log4j.properties", getClass());
+        Enumeration enumeration = ClassHelper.getResources("test-dummy.properties", getClass());
         assertNotNull(enumeration);
         assertTrue(enumeration.hasMoreElements());
 
-        enumeration = ClassHelper.getResources("log4j.Xproperties", getClass());
+        enumeration = ClassHelper.getResources("test-dummyX.properties", getClass());
         assertNotNull(enumeration);
         assertTrue(!enumeration.hasMoreElements());
     }

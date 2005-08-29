@@ -30,4 +30,9 @@ public class AsyncSpringEventsTestCase extends SpringEventsTestCase
     public void testReceiveAndPublishEvent() throws Exception {
         //todo fix synchronisation issue
     }
+    
+    public void testReceivingASpringEvent() throws Exception
+    {
+    	//todo fix synchronisation issue
+    }
 }

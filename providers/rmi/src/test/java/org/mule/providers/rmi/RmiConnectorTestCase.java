@@ -13,11 +13,11 @@
  */
 package org.mule.providers.rmi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
@@ -30,6 +30,7 @@ public class RmiConnectorTestCase extends AbstractConnectorTestCase
     {
         RmiConnector c = new RmiConnector();
         c.setName("RmiConnector");
+        c.setSecurityManager(null);
         c.initialise();
         return c;
     }

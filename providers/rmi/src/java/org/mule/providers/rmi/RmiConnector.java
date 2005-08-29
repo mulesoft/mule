@@ -57,6 +57,8 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     private Class[] argumentClasses = null;
 
+    private SecurityManager securityManager = new RMISecurityManager();
+
     public String getProtocol()
     {
         return "RMI";
@@ -205,8 +207,16 @@ public class RmiConnector extends AbstractServiceEnabledConnector
         }
 
         // Set security manager
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new RMISecurityManager());
+        if (securityManager != null) {
+            System.setSecurityManager(securityManager);
         }
+    }
+
+    public SecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    public void setSecurityManager(SecurityManager securityManager) {
+        this.securityManager = securityManager;
     }
 }

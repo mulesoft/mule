@@ -26,6 +26,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,15 +36,13 @@ import java.util.StringTokenizer;
 /**
  * <code>Utility</code> is a singleton grouping common functionality like
  * converting java.lang.String to different data types, reading files, etc
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class Utility
-{
-    public static File createFile(String filename) throws IOException
-    {
+public class Utility {
+    public static File createFile(String filename) throws IOException {
         File file = new File(filename);
         if (!file.canWrite()) {
             String dirName = file.getPath();
@@ -57,16 +57,14 @@ public class Utility
         return file;
     }
 
-    public static String prepareWinFilename(String filename)
-    {
+    public static String prepareWinFilename(String filename) {
         filename = filename.replaceAll("<", "(");
         filename = filename.replaceAll(">", ")");
         filename = filename.replaceAll("[/\\*?|:;]", "-");
         return filename;
     }
 
-    public static File openDirectory(String directory) throws IOException
-    {
+    public static File openDirectory(String directory) throws IOException {
         File dir = new File(directory);
         if (!dir.exists()) {
             dir.mkdirs();
@@ -82,8 +80,7 @@ public class Utility
      * argument is not null and is equal, ignoring case, to the string "true".
      * Otherwise, throws an exception.
      */
-    public static boolean getBooleanValue(String s) throws Exception
-    {
+    public static boolean getBooleanValue(String s) throws Exception {
         boolean result;
         s = s.trim();
         if (s.equalsIgnoreCase("true")) {
@@ -94,8 +91,7 @@ public class Utility
         return result;
     }
 
-    public static String getTimeStamp(String format)
-    {
+    public static String getTimeStamp(String format) {
 
         // Format the current time.
         SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -103,8 +99,7 @@ public class Utility
         return formatter.format(currentTime);
     }
 
-    public static String formatTimeStamp(Date dateTime, String format)
-    {
+    public static String formatTimeStamp(Date dateTime, String format) {
         // Format the current time.
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(dateTime);
@@ -113,8 +108,7 @@ public class Utility
     /**
      * Reads the incoming file and returns the content as a String object.
      */
-    public static synchronized String fileToString(String fileName) throws IOException
-    {
+    public static synchronized String fileToString(String fileName) throws IOException {
         StringBuffer sb = new StringBuffer();
         char[] buf = new char[1024 * 8];
 
@@ -129,25 +123,22 @@ public class Utility
 
     /**
      * Reads the incoming String into a file at at the given destination.
-     * 
+     *
      * @param filename name and path of the file to create
-     * @param data the contents of the file
+     * @param data     the contents of the file
      * @return the new file.
      * @throws IOException If the creating or writing to the file stream fails
      */
-    public static File stringToFile(String filename, String data) throws IOException
-    {
+    public static File stringToFile(String filename, String data) throws IOException {
         return stringToFile(filename, data, false);
     }
 
-    public static synchronized File stringToFile(String filename, String data, boolean append) throws IOException
-    {
+    public static synchronized File stringToFile(String filename, String data, boolean append) throws IOException {
         return stringToFile(filename, data, append, false);
     }
 
     public static synchronized File stringToFile(String filename, String data, boolean append, boolean newLine)
-            throws IOException
-    {
+            throws IOException {
         File f = createFile(filename);
         BufferedWriter writer = null;
         try {
@@ -164,16 +155,14 @@ public class Utility
         return f;
     }
 
-    public static String getStringFromDate(Date date, String format)
-    {
+    public static String getStringFromDate(Date date, String format) {
         // converts from date to strin using the standard TIME_STAMP_FORMAT
         // pattern
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(date);
     }
 
-    public static Date getDateFromString(String date, String format)
-    {
+    public static Date getDateFromString(String date, String format) {
         // The date must always be in the format of TIME_STAMP_FORMAT
         // i.e. JAN 29 2001 22:50:40 GMT
         SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -183,8 +172,7 @@ public class Utility
         return formatter.parse(date, pos);
     }
 
-    public static File loadFile(String filename) throws IOException
-    {
+    public static File loadFile(String filename) throws IOException {
         File file = new File(filename);
         if (file.canRead()) {
             return file;
@@ -193,8 +181,7 @@ public class Utility
         }
     }
 
-    public static byte[] objectToByteArray(Object src) throws IOException
-    {
+    public static byte[] objectToByteArray(Object src) throws IOException {
         if (src instanceof byte[]) {
             return (byte[]) src;
         } else if (src instanceof String) {
@@ -218,8 +205,7 @@ public class Utility
         return dest;
     }
 
-    public static Object byteArrayToObject(byte[] src) throws IOException, ClassNotFoundException
-    {
+    public static Object byteArrayToObject(byte[] src) throws IOException, ClassNotFoundException {
         Object dest = null;
         ByteArrayInputStream bais = new ByteArrayInputStream(src);
         ObjectInputStream ois = new ObjectInputStream(bais);
@@ -230,39 +216,33 @@ public class Utility
 
     /**
      * Load a given resource. Trying broader class loaders each time.
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
-    public static URL getResource(String resourceName, Class callingClass)
-    {
-        URL url = null;
+    public static URL getResource(final String resourceName, final Class callingClass) {
+        URL url = ClassHelper.getResource(resourceName, callingClass);
 
-        url = Thread.currentThread().getContextClassLoader().getResource(resourceName);
 
         if (url == null) {
-            url = Utility.class.getClassLoader().getResource(resourceName);
-        }
-
-        if (url == null) {
-            url = callingClass.getClassLoader().getResource(resourceName);
-        }
-
-        if (url == null) {
-            File f = new File(resourceName);
-            if (f.exists()) {
-                try {
-                    url = f.toURL();
-                } catch (MalformedURLException e) {
+            url = (URL) AccessController.doPrivileged(new PrivilegedAction() {
+                public Object run() {
+                    File f = new File(resourceName);
+                    if (f.exists()) {
+                        try {
+                            return f.toURL();
+                        } catch (MalformedURLException e) {
+                            return null;
+                        }
+                    }
                     return null;
                 }
-            }
+            });
         }
         return url;
     }
 
-    public static String loadResourceAsString(String resourceName, Class callingClass) throws IOException
-    {
+    public static String loadResourceAsString(String resourceName, Class callingClass) throws IOException {
         URL url = getResource(resourceName, callingClass);
         String resource = null;
         if (url == null) {
@@ -273,8 +253,7 @@ public class Utility
         return resource;
     }
 
-    public static InputStream loadResource(String resourceName, Class callingClass) throws IOException
-    {
+    public static InputStream loadResource(String resourceName, Class callingClass) throws IOException {
         URL url = getResource(resourceName, callingClass);
         InputStream resource = null;
         if (url == null) {
@@ -288,8 +267,7 @@ public class Utility
         return resource;
     }
 
-    public static String getResourcePath(String resourceName, Class callingClass) throws IOException
-    {
+    public static String getResourcePath(String resourceName, Class callingClass) throws IOException {
         if (resourceName == null) {
             return null;
         }
@@ -315,8 +293,7 @@ public class Utility
         return resource;
     }
 
-    public static boolean deleteTree(File dir)
-    {
+    public static boolean deleteTree(File dir) {
         if (dir == null) {
             return true;
         }
@@ -335,8 +312,7 @@ public class Utility
         return dir.delete();
     }
 
-    public static String[] split(String string, String delim)
-    {
+    public static String[] split(String string, String delim) {
         StringTokenizer st = new StringTokenizer(string, delim);
         String[] results = new String[st.countTokens()];
         int i = 0;
@@ -346,8 +322,7 @@ public class Utility
         return results;
     }
 
-    public static String getFormattedDuration(long mills)
-    {
+    public static String getFormattedDuration(long mills) {
         long days = mills / 86400000;
         mills = mills - (days * 86400000);
         long hours = mills / 3600000;

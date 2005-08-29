@@ -71,8 +71,8 @@ public class EmailEndpointsTestCase extends NamedTestCase
         assertEquals("pop3.muleumo.org", endpointUri.getHost());
         assertEquals("username:password", endpointUri.getUserInfo());
         assertEquals("pop3://username:password@pop3.muleumo.org/INBOX", endpointUri.toString());
-        assertEquals(1, endpointUri.getParams().size());
-        assertEquals("INBOX", endpointUri.getParams().get("folder"));
+        assertEquals(0, endpointUri.getParams().size());
+        assertEquals("/INBOX", endpointUri.getPath());
 
     }
 }

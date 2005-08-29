@@ -14,22 +14,6 @@
  */
 package org.mule.providers.email;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.URLName;
-import javax.mail.event.MessageCountEvent;
-import javax.mail.event.MessageCountListener;
-import javax.mail.internet.MimeMessage;
-
 import org.mule.MuleManager;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -45,6 +29,21 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.UUID;
 import org.mule.util.Utility;
+
+import javax.mail.Flags;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.URLName;
+import javax.mail.event.MessageCountEvent;
+import javax.mail.event.MessageCountListener;
+import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * <code>Pop3MessageReceiver</code> polls a pop3 mailbox for messages removes
@@ -83,8 +82,13 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     public void doConnect() throws Exception
     {
         String inbox = null;
-        if (connector.getProtocol().equals("imap") && endpoint.getEndpointURI().getParams().get("folder") != null) {
-            inbox = (String) endpoint.getEndpointURI().getParams().get("folder");
+        if (connector.getProtocol().equals("imap")) {
+            inbox = (String) endpoint.getEndpointURI().getPath();
+            if(inbox.length()==0) {
+                inbox = Pop3Connector.MAILBOX;
+            } else {
+            	inbox = inbox.substring(1);	
+            }
         } else {
             inbox = Pop3Connector.MAILBOX;
         }
