@@ -13,12 +13,10 @@
  */
 package org.mule.providers.jdbc;
 
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapHandler;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.transaction.TransactionCoordination;
@@ -28,7 +26,12 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Guillaume Nodet
@@ -82,7 +85,7 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
         }
         List paramNames = new ArrayList();
         writeStmt = JdbcUtils.parseStatement(writeStmt, paramNames);
-        Object[] paramValues = JdbcUtils.getParams(endpointURI, paramNames, event.getMessage());
+        Object[] paramValues = JdbcUtils.getParams(endpointURI, paramNames, event.getTransformedMessage());
 
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         Connection con = null;
@@ -190,8 +193,11 @@ public class JdbcMessageDispatcher extends AbstractMessageDispatcher
      */
     public Object getDelegateSession() throws UMOException
     {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            return connector.getConnection();
+        } catch (Exception e) {
+            throw new ConnectorException(new Message(Messages.FAILED_TO_CREATE_X, "Jdbc Connection"), connector, e);
+        }
     }
 
 }
