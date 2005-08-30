@@ -249,7 +249,7 @@ public class MuleProxy implements Work, Lifecycle
                     if(descriptor.getOutboundRouter().hasEndpoints()) {
                         returnMessage = descriptor.getOutboundRouter().route(returnMessage, event.getSession(), event.isSynchronous());
                     } else {
-                        logger.debug("Outbound router on component '" + descriptor.getName() + "' doesn't have any endpoints configured. Event is not being dispatched");
+                        logger.debug("Outbound router on component '" + descriptor.getName() + "' doesn't have any endpoints configured.");
                     }
                 }
 
