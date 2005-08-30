@@ -803,9 +803,9 @@ public class MuleEventContext implements UMOEventContext
         if(endpoint.isRemoteSync()) {
             if (getTransaction() == null) {
                 message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, true);
+            } else {
+                throw new IllegalStateException(new Message(Messages.CANNOT_USE_TX_AND_REMOTE_SYNC).getMessage());
             }
-        } else {
-            throw new IllegalStateException(new Message(Messages.CANNOT_USE_TX_AND_REMOTE_SYNC).getMessage());
         }
     }
 }

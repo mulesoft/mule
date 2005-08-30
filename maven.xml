@@ -279,6 +279,10 @@
         <!-- copies artifact and deps -->
         <j:set var="goal" value="mule:libs-copy"/>
         <attainGoal name="multiproject:goal"/>
+        <!-- delete any mule artifacts in the lib dir as thse will be included in the dist dir -->
+        <ant:delete>
+            <ant:fileset dir="${mule.release.lib.dir}" includes="*mule-*"/>
+        </ant:delete>
     </goal>
 
     <goal name="mule:libs-copy">
