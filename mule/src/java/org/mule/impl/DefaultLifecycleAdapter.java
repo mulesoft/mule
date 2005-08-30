@@ -190,7 +190,10 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
             }
             //If we have an outbound router we need to invoke it with the current message
             //then block for a response
-            boolean stopProcessing = !descriptor.getOutboundRouter().hasEndpoints();
+            //Unless the current component explicitly requested that no further event processing
+            //should occur
+            boolean stopProcessing = !descriptor.getOutboundRouter().hasEndpoints() ||
+                    event.isStopFurtherProcessing();
 
             // Need to find a cleaner solution for handling response messages
             // Right now routing is split between here and the proxy
