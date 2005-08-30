@@ -117,9 +117,7 @@ the different components are made from the loan broker component (a la hub and s
             <outbound-router>
                 <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
                 <router className="org.mule.routing.outbound.StaticRecipientList">
-                    <properties>
-                        <property name="replyTo" value="LoanBroker"/>
-                    </properties>
+                    <reply-to address="LoanBroker"/>
                 </router>
             </outbound-router>
         </mule-descriptor>

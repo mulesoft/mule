@@ -46,23 +46,28 @@
             </inbound-router>
 
             <outbound-router>
+                <!-- The router used to go to the CrewditAgency Sevice to obtain a credit profile -->
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="CreditAgency"/>
                     <filter expectedType="org.mule.samples.loanbroker.Customer" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
+
+                <!-- router used to send requests to each of the banks -->
                 <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <reply-to address="LoanQuotes"/>
                     <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
-                    <properties>
-                        <property name="replyTo" value="LoanQuotes"/>
-                    </properties>
+<!--                    <properties>-->
+<!--                        <property name="replyTo" value="LoanQuotes"/>-->
+<!--                    </properties>-->
                 </router>
+                <!-- The router used to obtain a list of the banks to send requests to (from the LenderService) -->
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="LenderService"/>
                     <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </outbound-router>
 
-            <response-router>
+            <response-router timeout="99999999" >
                 <endpoint address="LoanQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
             </response-router>
