@@ -20,11 +20,6 @@ import org.mule.impl.RequestContext;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * <code>SyncLoanBroker</code> is a synchronous Loan Broker that
  * makes the calls to various components through the event context
@@ -51,17 +46,6 @@ public class SyncLoanBroker
         UMOMessage result = context.sendEvent(request.getCustomer());
         bqr.getLoanRequest().setCreditProfile((CreditProfile)result.getPayload());
 
-        //get the lenders
-        result = context.sendEvent(bqr);
-
-        Bank[] lenders = ((BankQuoteRequest)result.getPayload()).getLenders();
-        List recipients = new ArrayList(lenders.length);
-        for (int i = 0; i < lenders.length; i++)
-        {
-            recipients.add(lenders[i].getEndpoint());
-
-        }
-
         //This asynchronous dispatch will invoke all the bank services concurrently
         //The response of the Banks is handled by the response-router on this component
         //that will block until the requests are received, then aggregate them and
@@ -76,10 +60,8 @@ public class SyncLoanBroker
         //3. Must return the dispatched message from this call so that the response transformer can get
         //the message id of the dispatched message. Of course custom implementations can ignore these requirements
         //and implement a custom router that aggregates using something other than the UMOMessage.getUniqueId()
-        Map props = new HashMap();
-        props.put("recipients", recipients);
-        UMOMessage msg = new MuleMessage(bqr, props);
 
+        UMOMessage msg = new MuleMessage(bqr, null);
         //dispatch the message using the default outbound router settings
         context.dispatchEvent(msg);
         context.setStopFurtherProcessing(true);

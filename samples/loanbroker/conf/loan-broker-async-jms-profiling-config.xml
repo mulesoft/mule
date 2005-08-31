@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+        "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <!--
 This loan broker example is modeled on the Enterprise integration Patterns book
@@ -16,9 +16,10 @@ the different components are made from the loan broker component (a la hub and s
 <mule-configuration id="Loan_broker_Async" version="1.0">
 
     <mule-environment-properties serverUrl="">
-        <threading-profile maxThreadsActive="20" maxThreadsIdle="20" maxBufferSize="500" poolExhaustedAction="WAIT"/>
-        <pooling-profile exhaustedAction="GROW" maxActive="20" maxIdle="20" maxWait="-1" initialisationPolicy="INITIALISE_ALL"/>
-        <queue-profile maxOutstandingMessages="5000"/>
+        <threading-profile maxThreadsActive="20" maxThreadsIdle="20" maxBufferSize="0" poolExhaustedAction="WAIT"/>
+        <pooling-profile exhaustedAction="GROW" maxActive="20" maxIdle="20" maxWait="-1"
+                         initialisationPolicy="INITIALISE_ALL"/>
+        <queue-profile maxOutstandingMessages="500"/>
     </mule-environment-properties>
 
     <agents>
@@ -28,22 +29,26 @@ the different components are made from the loan broker component (a la hub and s
 
 
     <!-- Testing with ActiveMq -->
-    <!--    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
-    <!--        <properties>-->
-    <!--            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>-->
-    <!--            <property name="jndiInitialFactory" value="org.codehaus.activemq.jndi.ActiveMQInitialContextFactory"/>-->
-    <!--            <property name="specification" value="1.1"/>-->
-    <!--        </properties>-->
-    <!--    </connector>-->
-
-    <!-- testing with OpenJms -->
     <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
-            <property name="connectionFactoryJndiName" value="JmsQueueConnectionFactory"/>
-            <property name="jndiInitialFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>
-            <property name="jndiProviderUrl" value="tcp://localhost:3035"/>
+            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
+            <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <property name="specification" value="1.1"/>
+            <map name="jndiProviderProperties">
+                <property name="brokerURL" value="tcp://localhost:61616"/>
+            </map>
         </properties>
     </connector>
+
+
+    <!-- testing with OpenJms -->
+    <!--<connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
+    <!--<properties>-->
+    <!--<property name="connectionFactoryJndiName" value="JmsQueueConnectionFactory"/>-->
+    <!--<property name="jndiInitialFactory" value="org.exolab.jms.jndi.InitialContextFactory"/>-->
+    <!--<property name="jndiProviderUrl" value="tcp://localhost:3035"/>-->
+    <!--</properties>-->
+    <!--</connector>-->
 
     <!--
     Setting global endpoints can help simplify configuration by defining an actual
@@ -51,7 +56,7 @@ the different components are made from the loan broker component (a la hub and s
     -->
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
-        <endpoint-identifier name="LoanBroker" value="jms://loanBroker.Quotes"/>
+        <endpoint-identifier name="LoanBrokerQuotes" value="jms://loanBroker.Quotes"/>
         <endpoint-identifier name="CreditAgency" value="jms://creditAgencyService"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="jms://creditAgencyService"/>
         <endpoint-identifier name="LenderService" value="jms://lenderService"/>
@@ -66,41 +71,53 @@ the different components are made from the loan broker component (a la hub and s
        The Mule model initialises and manages your UMO components
    -->
     <model name="loan-broker">
+        <!-- by declaring the Axis service component we can overload its default
+        configuration to add more threads or pooled resources -->
+        <mule-descriptor name="_axisServiceComponent"
+                         implementation="org.mule.providers.soap.axis.AxisServiceComponent">
+            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20"/>
+            <pooling-profile exhaustedAction="WAIT" maxActive="20" maxIdle="20" maxWait="20000"/>
+        </mule-descriptor>
         <!--
         The loan broker is used to receive loan requests
         -->
         <mule-descriptor name="LoanBroker"
-            outboundEndpoint="CreditAgency"
-            implementation="org.mule.samples.loanbroker.AsyncLoanBroker">
+                         outboundEndpoint="CreditAgency"
+                         implementation="org.mule.samples.loanbroker.AsyncLoanBroker">
+
             <!--
             This router uses the BankQuoteAggregator for events of type BankQuote, for all other
             types the catch all strategy is invoked, which simply passes the event to the component
             -->
             <inbound-router>
+                <catch-all-strategy className="org.mule.routing.ComponentCatchAllStrategy"/>
                 <endpoint address="LoanBrokerRequests"/>
-                <endpoint address="LoanBroker"/>
+                <endpoint address="LoanBrokerQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesAggregator">
-                    <filter expectedType="org.mule.samples.loanbroker.LoanQuote" className="org.mule.routing.filters.PayloadTypeFilter"/>
+                    <filter expectedType="org.mule.samples.loanbroker.LoanQuote"
+                            className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
-                <router className="org.mule.routing.inbound.InboundPassThroughRouter"/>
             </inbound-router>
+            <!--            <queue-profile maxOutstandingMessages="150" blockWait="3000" />-->
+            <!--            <pooling-profile maxActive="20" maxIdle="10" exhaustedAction="GROW" maxWait="10000" />-->
+            <!--            <threading-profile maxBufferSize="100" maxThreadsActive="20" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="60000" />-->
         </mule-descriptor>
 
         <!--
         The credit agency service will get the credit profile for a customer
         -->
         <mule-descriptor name="CreditAgencyService"
-            inboundEndpoint="CreditAgencyReceiver"
-            outboundEndpoint="LenderService"
-            implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
+                         inboundEndpoint="CreditAgencyReceiver"
+                         outboundEndpoint="LenderService"
+                         implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
         </mule-descriptor>
 
         <!--
         The Lender service is used to determine which banks to contact for a quote
         -->
         <mule-descriptor name="LenderService"
-            inboundEndpoint="LenderService"
-            implementation="org.mule.samples.loanbroker.DefaultLenderService">
+                         inboundEndpoint="LenderService"
+                         implementation="org.mule.samples.loanbroker.DefaultLenderService">
             <!--
             this router will send an outbound event to none or more recipients which
             are set as a property on the event itelf.  A replyTo property is also set
@@ -109,9 +126,7 @@ the different components are made from the loan broker component (a la hub and s
             <outbound-router>
                 <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
                 <router className="org.mule.routing.outbound.StaticRecipientList">
-                    <properties>
-                        <property name="replyTo" value="LoanBroker"/>
-                    </properties>
+                    <reply-to address="LoanBrokerQuotes"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -121,31 +136,31 @@ the different components are made from the loan broker component (a la hub and s
         One or more of these are selected by the LenderService and a request
         is routed to them.   The lenderService outbound router also defines a
         replyTo property which will be used by Mule to route the responses back
-        to the LoanBroker
+        to the LoanBrokerQuotes destination
         -->
         <mule-descriptor name="Bank1"
-            inboundEndpoint="Bank1"
-            implementation="org.mule.samples.loanbroker.Bank">
+                         inboundEndpoint="Bank1"
+                         implementation="org.mule.samples.loanbroker.Bank">
         </mule-descriptor>
 
         <mule-descriptor name="Bank2"
-            inboundEndpoint="Bank2"
-            implementation="org.mule.samples.loanbroker.Bank">
+                         inboundEndpoint="Bank2"
+                         implementation="org.mule.samples.loanbroker.Bank">
         </mule-descriptor>
 
         <mule-descriptor name="Bank3"
-            inboundEndpoint="Bank3"
-            implementation="org.mule.samples.loanbroker.Bank">
+                         inboundEndpoint="Bank3"
+                         implementation="org.mule.samples.loanbroker.Bank">
         </mule-descriptor>
 
         <mule-descriptor name="Bank4"
-            inboundEndpoint="Bank4"
-            implementation="org.mule.samples.loanbroker.Bank">
+                         inboundEndpoint="Bank4"
+                         implementation="org.mule.samples.loanbroker.Bank">
         </mule-descriptor>
 
         <mule-descriptor name="Bank5"
-            inboundEndpoint="Bank5"
-            implementation="org.mule.samples.loanbroker.Bank">
+                         inboundEndpoint="Bank5"
+                         implementation="org.mule.samples.loanbroker.Bank">
         </mule-descriptor>
     </model>
 </mule-configuration>

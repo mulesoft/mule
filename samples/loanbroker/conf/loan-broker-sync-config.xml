@@ -14,10 +14,12 @@
 
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
-        <endpoint-identifier name="LoanQuotes" value="vm://LoanQuotes"/>
+        <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanQuotes"/>
         <endpoint-identifier name="CreditAgency" value="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="axis:http://localhost:18080/mule"/>
         <endpoint-identifier name="LenderService" value="vm://localhost/LenderService?method=setLenderList"/>
+        <!-- The method parameter for the bank endpoints is added programmitcally when the bank objects are
+        created -->
         <endpoint-identifier name="Bank1" value="axis:http://localhost:10080/mule"/>
         <endpoint-identifier name="Bank2" value="axis:http://localhost:20080/mule"/>
         <endpoint-identifier name="Bank3" value="axis:http://localhost:30080/mule"/>
@@ -39,36 +41,24 @@
 <!--    </endpoint-identifiers>-->
 
     <model name="loan-broker">
-        <mule-descriptor name="LoanBroker" 
+        <mule-descriptor name="LoanBroker"
             implementation="org.mule.samples.loanbroker.SyncLoanBroker">
             <inbound-router>
                 <endpoint address="LoanBrokerRequests"/>
             </inbound-router>
 
             <outbound-router>
-                <!-- The router used to go to the CrewditAgency Sevice to obtain a credit profile -->
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="CreditAgency"/>
                     <filter expectedType="org.mule.samples.loanbroker.Customer" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
-
-                <!-- router used to send requests to each of the banks -->
-                <router className="org.mule.routing.outbound.StaticRecipientList">
-                    <reply-to address="LoanQuotes"/>
-                    <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
-<!--                    <properties>-->
-<!--                        <property name="replyTo" value="LoanQuotes"/>-->
-<!--                    </properties>-->
-                </router>
-                <!-- The router used to obtain a list of the banks to send requests to (from the LenderService) -->
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="LenderService"/>
                     <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </outbound-router>
-
-            <response-router timeout="99999999" >
-                <endpoint address="LoanQuotes"/>
+            <response-router timeout="999999999">
+                <endpoint address="LoanBrokerQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
             </response-router>
         </mule-descriptor>
@@ -81,6 +71,12 @@
         <mule-descriptor name="LenderService"
             inboundEndpoint="LenderService"
             implementation="org.mule.samples.loanbroker.DefaultLenderService">
+            <outbound-router>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <reply-to address="LoanBrokerQuotes"/>
+                    <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
+                </router>
+            </outbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="Bank1"

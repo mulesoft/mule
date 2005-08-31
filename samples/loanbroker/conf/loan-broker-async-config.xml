@@ -17,10 +17,11 @@ the different components are made from the loan broker component (a la hub and s
 
 
     <mule-environment-properties serverUrl="">
-        <threading-profile maxBufferSize="0" maxThreadsActive="5" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="300000"/>
-        <pooling-profile maxActive="5" maxIdle="5" exhaustedAction="GROW" maxWait="1000"/>
+        <threading-profile maxBufferSize="0" maxThreadsActive="10" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="3000000"/>
+        <pooling-profile maxActive="10" maxIdle="5" exhaustedAction="GROW" maxWait="1000"/>
         <queue-profile maxOutstandingMessages="500"/>
     </mule-environment-properties>
+
 
     <agents>
         <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
@@ -35,7 +36,7 @@ the different components are made from the loan broker component (a la hub and s
     -->
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
-        <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerQuotes"/>
+        <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>
         <endpoint-identifier name="CreditAgency" value="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="axis:http://localhost:18080/mule"/>
         <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>
@@ -48,7 +49,7 @@ the different components are made from the loan broker component (a la hub and s
 
     <!--    <endpoint-identifiers>-->
     <!--        <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>-->
-    <!--        <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerQuotes"/>-->
+    <!--        <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>-->
     <!--        <endpoint-identifier name="CreditAgency" value="glue:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>-->
     <!--        <endpoint-identifier name="CreditAgencyReceiver" value="glue:http://localhost:18080/mule"/>-->
     <!--        <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>-->
@@ -84,7 +85,7 @@ the different components are made from the loan broker component (a la hub and s
             <inbound-router>
                 <catch-all-strategy className="org.mule.routing.ComponentCatchAllStrategy"/>
                 <endpoint address="LoanBrokerRequests"/>
-                <endpoint address="LoanBroker"/>
+                <endpoint address="LoanBrokerQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesAggregator">
                     <filter expectedType="org.mule.samples.loanbroker.LoanQuote" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
@@ -117,7 +118,7 @@ the different components are made from the loan broker component (a la hub and s
             <outbound-router>
                 <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
                 <router className="org.mule.routing.outbound.StaticRecipientList">
-                    <reply-to address="LoanBroker"/>
+                    <reply-to address="LoanBrokerQuotes"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -127,7 +128,7 @@ the different components are made from the loan broker component (a la hub and s
         One or more of these are selected by the LenderService and a request
         is routed to them.   The lenderService outbound router also defines a
         replyTo property which will be used by Mule to route the responses back
-        to the LoanBroker
+        to the LoanBrokerQuotes destination
         -->
         <mule-descriptor name="Bank1"
             inboundEndpoint="Bank1"
