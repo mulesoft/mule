@@ -15,12 +15,7 @@
  */
 package org.mule.providers.soap.axis;
 
-import org.apache.axis.AxisProperties;
-import org.apache.axis.Handler;
-import org.apache.axis.Message;
-import org.apache.axis.MessageContext;
-import org.apache.axis.SimpleChain;
-import org.apache.axis.SimpleTargetedChain;
+import org.apache.axis.*;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
@@ -50,13 +45,7 @@ import org.mule.util.BeanUtils;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPEnvelope;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the
@@ -166,6 +155,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         //the axis.one.way property is set
         Object[] args = getArgs(event);
         call.setProperty("axis.one.way", Boolean.TRUE);
+        call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         call.invoke(args);
 
     }
