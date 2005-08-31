@@ -72,6 +72,7 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
 
     protected void defaultHandler(Throwable t)
     {
+        logException(t);
         // Lazzy initialisation of the component
         // This strategy should be associated with only one component
         // and thus there is no concurrency problem
