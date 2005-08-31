@@ -48,13 +48,7 @@ import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
 import javax.resource.spi.work.Work;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -93,8 +87,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         return transformer;
     }
 
-    protected Work createWork(Socket socket)
-    {
+    protected Work createWork(Socket socket) throws SocketException {
         return new HttpWorker(socket);
     }
 
@@ -137,9 +130,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         private boolean keepAlive = false;
         private boolean keepAliveRegistered = false;
 
-        public HttpWorker(Socket socket)
-        {
+        public HttpWorker(Socket socket) throws SocketException {
             super(socket);
+            keepAlive = ((HttpConnector)connector).isKeepAlive();
+            if(keepAlive) {
+                socket.setKeepAlive(true);
+            }
         }
 
         public void run()
@@ -149,7 +145,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                 do {
-                    // useful if keep alive is implemented
+                    // useful if keep alive is used
                     if (isServerSide() && ++counter > 500) {
                         counter = 0;
                         Thread.yield();
@@ -229,7 +225,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                             keepAliveMonitor.resetExpirable(this);
                         }
                     }
-                } while (!socket.isClosed() && keepAlive);
+                } while (socket.isConnected() && keepAlive);
+                System.out.println("");
             } catch (Exception e) {
                 keepAlive = false;
                 handleException(e);
@@ -267,15 +264,19 @@ public class HttpMessageReceiver extends TcpMessageReceiver
     protected byte[] parseRequest(DataInputStream is, Properties p) throws IOException
     {
         byte[] payload;
-
+//        if(is.available()==0) {
+//            return null;
+//        }
         String line = null;
         try {
             line = HttpParser.readLine(is);
         } catch (SocketException e) {
             return null;
         } catch (SocketTimeoutException e) {
+            if(logger.isTraceEnabled()) logger.trace("Socket timeout on: " + this.getEndpoint().getEndpointURI().getAddress());
             return null;
         }
+
         if (line == null) {
             return null;
         }

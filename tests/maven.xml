@@ -1,14 +1,10 @@
-<project default="test:test"
+<project default="test"
     xmlns:j="jelly:core"
     xmlns:u="jelly:util"
     xmlns:ant="jelly:ant"
     xmlns:maven="jelly:maven">
 
-    <preGoal name="test">
-        <attainGoal name="runActiveMQ"/>
-    </preGoal>
-
-    <goal name="runActiveMQ" prereqs="setClasspath">
+    <goal name="startJms" prereqs="setClasspath">
         <!--Runs the ActiveMQ server"-->
         <j:set var="url" value="tcp://localhost:61616"/>
 
@@ -28,7 +24,7 @@
             </j:if>
             <sysproperty key="derby.system.home" value="target/derby"/>
             <sysproperty key="derby.storage.fileSyncTransactionLog" value="true"/>
-            <sysproperty key="activemq.persistenceAdapterFactory" value="${activemq.persistenceAdapterFactory}"/>
+            <!--<sysproperty key="activemq.persistenceAdapterFactory" value="${activemq.persistenceAdapterFactory}"/>-->
         </java>
     </goal>
 
@@ -41,5 +37,4 @@
             <path refid="maven.dependency.classpath"/>
         </path>
     </goal>
-    <echo>Test classpath is: ${test.classpath}</echo>
 </project>

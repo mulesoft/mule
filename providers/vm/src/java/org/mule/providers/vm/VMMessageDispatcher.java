@@ -31,7 +31,8 @@ import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
 /**
- * <code>VMMessageDispatcher</code> TODO
+ * <code>VMMessageDispatcher</code> is used for providing in memory interaction between
+ * components.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

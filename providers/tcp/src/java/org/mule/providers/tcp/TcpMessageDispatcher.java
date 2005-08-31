@@ -28,11 +28,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 
 /**
  * <code>TcpMessageDispatcher</code> will send transformed mule events over
@@ -112,18 +108,15 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
             Object payload = event.getTransformedMessage();
             socket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
 
-            boolean syncReceive = event.getEndpoint().isRemoteSync();
-
             write(socket, payload);
             // If we're doing sync receive try and read return info from socket
-            if (syncReceive) {
+            if (useRemoteSync(event)) {
                 try {
                     byte[] result = receive(socket, event.getEndpoint().getRemoteSyncTimeout());
                     if (result == null) {
                         return null;
                     }
-                    UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
-                    return message;
+                    return (UMOMessage)new MuleMessage(connector.getMessageAdapter(result));
                 } catch (SocketTimeoutException e) {
                     // we dont necesarily expect to receive a resonse here
                     logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "

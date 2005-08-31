@@ -25,12 +25,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.ReplyToHandler;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOImmutableDescriptor;
-import org.mule.umo.UMOInterceptor;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Disposable;
@@ -53,7 +48,7 @@ import java.util.Map;
 /**
  * <code>MuleProxy</code> is a proxy to a UMO. It is a poolable object that
  * that can be executed in it's own thread.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -96,7 +91,7 @@ public class MuleProxy implements Work, Lifecycle
     /**
      * Constructs a Proxy using the UMO's AbstractMessageDispatcher and the UMO
      * itself
-     * 
+     *
      * @param component the underlying object that with receive events
      * @param descriptor the UMOComponent descriptor associated with the
      *            component
@@ -185,7 +180,7 @@ public class MuleProxy implements Work, Lifecycle
 
     /**
      * Sets the current event being processed
-     * 
+     *
      * @param event the event being processed
      */
     public void onEvent(QueueSession session, UMOEvent event)
@@ -206,7 +201,7 @@ public class MuleProxy implements Work, Lifecycle
 
     /**
      * Makes a synchronous call on the UMO
-     * 
+     *
      * @param event the event to pass to the UMO
      * @return the return event from the UMO
      * @throws UMOException if the call fails
@@ -232,6 +227,7 @@ public class MuleProxy implements Work, Lifecycle
                     startTime = System.currentTimeMillis();
                 }
                 returnMessage = invoker.execute();
+
                 // stats
                 if (stat.isEnabled()) {
                     stat.addExecutionTime(System.currentTimeMillis() - startTime);
@@ -247,7 +243,10 @@ public class MuleProxy implements Work, Lifecycle
                         returnMessage.addProperties(context);
                     }
                     if(descriptor.getOutboundRouter().hasEndpoints()) {
-                        returnMessage = descriptor.getOutboundRouter().route(returnMessage, event.getSession(), event.isSynchronous());
+                        UMOMessage outboundReturnMessage = descriptor.getOutboundRouter().route(returnMessage, event.getSession(), event.isSynchronous());
+                        if(outboundReturnMessage!=null) {
+                            returnMessage = outboundReturnMessage;
+                        }
                     } else {
                         logger.debug("Outbound router on component '" + descriptor.getName() + "' doesn't have any endpoints configured.");
                     }
@@ -259,6 +258,14 @@ public class MuleProxy implements Work, Lifecycle
                     if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null) {
                         replyToHandler.processReplyTo(event, returnMessage, replyTo);
                     }
+                }
+
+                //Process Response Router
+                if (returnMessage != null && descriptor.getResponseRouter() != null) {
+                    logger.debug("Waiting for response router message");
+                    returnMessage = descriptor.getResponseRouter().getResponse(returnMessage);
+                } else {
+                    System.out.println("");
                 }
             } else {
                 returnMessage = event.getSession().sendEvent(event);
@@ -278,8 +285,11 @@ public class MuleProxy implements Work, Lifecycle
                                                                    descriptor.getName()), event.getMessage(), e));
             }
         } finally {
-            // Finalise the event for this component
-            ((MuleComponent) event.getComponent()).finaliseEvent(event);
+            //Component can be null if a remoting call was made for the client using the remote dispatcher
+            if(event.getComponent()!=null) {
+                // Finalise the event for this component
+                ((MuleComponent) event.getComponent()).finaliseEvent(event);
+            }
         }
         return returnMessage;
     }

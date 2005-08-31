@@ -15,13 +15,7 @@
 
 package org.mule.providers.http;
 
-import org.apache.commons.httpclient.ConnectMethod;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpConnection;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -75,12 +69,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.providers.AbstractConnectorSession#doDispatch(org.mule.umo.UMOEvent)
      */
     public void doDispatch(UMOEvent event) throws Exception
     {
-        HttpMethod httpMethod = execute(event);
+        HttpMethod httpMethod = execute(event, true);
         if(httpMethod!=null) {
             httpMethod.releaseConnection();
         }
@@ -88,7 +82,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
     public UMOConnector getConnector()
@@ -98,7 +92,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#getDelegateSession()
      */
     public Object getDelegateSession() throws UMOException
@@ -108,7 +102,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnectorSession#receive(java.lang.String,
      *      org.mule.umo.UMOEvent)
      */
@@ -153,7 +147,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected HttpMethod execute(UMOEvent event) throws Exception
+    protected HttpMethod execute(UMOEvent event, boolean closeConnection) throws Exception
     {
         String method = (String) event.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
         URI uri = event.getEndpoint().getEndpointURI().getUri();
@@ -212,17 +206,22 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         } catch (Exception e) {
             if (httpMethod != null)
                 httpMethod.releaseConnection();
+                connection.close();
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
+        } finally {
+            if(connection!=null && closeConnection) {
+                connection.close();
+            }
         }
     }
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.provider.UMOConnector#send(org.mule.umo.UMOEvent)
      */
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
-        HttpMethod httpMethod = execute(event);
+        HttpMethod httpMethod = execute(event, false);
         try {
             Properties h = new Properties();
             Header[] headers = httpMethod.getRequestHeaders();

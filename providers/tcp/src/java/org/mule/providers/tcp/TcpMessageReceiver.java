@@ -47,16 +47,8 @@ import org.mule.umo.transformer.UMOTransformer;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.URI;
+import java.io.*;
+import java.net.*;
 
 /**
  * <code>TcpMessageReceiver</code> acts like a tcp server to receive socket
@@ -160,12 +152,18 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                     }
                 }
                 if (socket != null) {
-                    Work work = createWork(socket);
+                    Work work = null;
                     try {
-                        getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, null);
-                    } catch (WorkException e) {
-                        logger.error("Tcp Server receiver Work was not processed: " + e.getMessage(), e);
+                        work = createWork(socket);
+                        try {
+                            getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, null);
+                        } catch (WorkException e) {
+                            logger.error("Tcp Server receiver Work was not processed: " + e.getMessage(), e);
+                        }
+                    } catch (SocketException e) {
+                        handleException(e);
                     }
+
                 }
             }
         }
@@ -188,8 +186,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         logger.info("Closed Tcp port");
     }
 
-    protected Work createWork(Socket socket)
-    {
+    protected Work createWork(Socket socket) throws SocketException {
         return new TcpWorker(socket);
     }
 
@@ -235,11 +232,6 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                 dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                 int counter = 0;
                 while (!socket.isClosed() && !disposing.get()) {
-                    // TODO: is this loop necessary ?
-                    if (isServerSide() && ++counter > 500) {
-                        counter = 0;
-                        Thread.yield();
-                    }
 
                     byte[] b = protocol.read(dataIn);
                     // end of stream

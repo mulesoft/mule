@@ -13,8 +13,8 @@
  */
 package org.mule.routing.inbound;
 
-import java.util.Map;
-
+import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.MessagingException;
@@ -23,8 +23,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.util.Map;
 
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into
@@ -92,7 +91,7 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
         return eg;
     }
 
-    protected void removeGroup(String id)
+    protected void removeGroup(Object id)
     {
         // synchronized (eventGroups)
         // {

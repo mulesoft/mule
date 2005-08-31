@@ -14,8 +14,6 @@
  */
 package org.mule.providers.vm;
 
-import java.util.List;
-
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -24,11 +22,14 @@ import org.mule.providers.TransactedPollingMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
+
+import java.util.List;
 
 /**
  * <code>VMMessageReceiver</code> is a listener of events from a mule
@@ -42,6 +43,7 @@ import org.mule.util.queue.QueueSession;
 public class VMMessageReceiver extends TransactedPollingMessageReceiver
 {
     private VMConnector connector;
+    private Object lock = new Object();
 
     public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException
@@ -81,7 +83,10 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
                                                     this.endpoint.getEndpointURI()), e);
             }
         } else {
-            routeMessage(new MuleMessage(event.getTransformedMessage(), event.getProperties()));
+            UMOMessage msg = new MuleMessage(event.getTransformedMessage(), event.getProperties());
+            synchronized(lock) {
+                routeMessage(msg);
+            }
         }
     }
 

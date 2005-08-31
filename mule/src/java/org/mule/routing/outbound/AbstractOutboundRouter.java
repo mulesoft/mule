@@ -72,11 +72,13 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     public UMOMessage send(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
-        setMessageProperties(session, message, endpoint);
+
         if (replyTo != null) {
+            logger.debug("event was dispatched synchronously, but there is a ReplyTo endpoint set, so using ");
             dispatch(session, message, endpoint);
             return null;
         }
+        setMessageProperties(session, message, endpoint);
 
         UMOMessage result = session.sendEvent(message, endpoint);
         if (routerStatistics != null) {

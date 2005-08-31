@@ -21,7 +21,6 @@ import org.jivesoftware.smack.GroupChat;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractConnector;
@@ -104,7 +103,7 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
         sendMessage(event);
-        if(event.getEndpoint().isRemoteSync() || event.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false)) {
+        if(useRemoteSync(event)) {
             Message response=null;
             if(groupChat!=null) {
                 response = groupChat.nextMessage(event.getEndpoint().getRemoteSyncTimeout());

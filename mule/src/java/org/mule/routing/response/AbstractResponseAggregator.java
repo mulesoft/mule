@@ -61,7 +61,7 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         if (doAggregate.get()) {
             synchronized (lock) {
                 UMOMessage returnMessage = aggregateEvents(eg);
-                String id = eg.getGroupId();
+                Object id = eg.getGroupId();
                 removeGroup(id);
                 responseEvents.put(id, returnMessage);
                 Sync s = (Sync) locks.get(id);
@@ -84,21 +84,23 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
      * correlationId one will be created and added to the router.
      * 
      * @param event
-     * @return
+     * @return The event group for the current event or a new group if the current event
+     * doesn't belong to an existing group
      */
     protected EventGroup addEvent(UMOEvent event) throws RoutingException
     {
-        String cId = (String) correlationExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
-                                                               event.getMessage());
+        Object cId = getAggregateIdentifier(event);
+
         if (cId == null) {
             throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event.getEndpoint());
         }
+
         EventGroup eg = (EventGroup) eventGroups.get(cId);
         if (logger.isDebugEnabled()) {
             logger.debug("Adding event to response aggregator group: " + cId);
         }
         if (eg == null) {
-            eg = new EventGroup(cId);
+            eg = createEventGroup(cId, event);
             eg.addEvent(event);
             eventGroups.put(eg.getGroupId(), eg);
         } else {
@@ -107,7 +109,30 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         return eg;
     }
 
-    protected void removeGroup(String id)
+    /**
+     * Creates a new event group with the given Id and can use other properties on the event
+     * Custom implementations can even overload the eventGroup object here
+     * @param id The Event group Id for the new Group
+     * @param event the current event
+     * @return a New event group for the incoming event
+     */
+    protected EventGroup createEventGroup(Object id, UMOEvent event) {
+        return new EventGroup(id);
+    }
+
+    /**
+     * Extracts a Group identifier from the current event.  When an event is recieved with a group identifier
+     * not registered with this router, a new group is created.  The id returned here can be a correlationId or
+     * some custom aggregation Id.
+     * @param event the current event
+     * @return an aggregation Id for this event
+     */
+    protected Object getAggregateIdentifier(UMOEvent event) {
+        return correlationExtractor.getProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
+                                                               event.getMessage());
+    }
+
+    protected void removeGroup(Object id)
     {
         eventGroups.remove(id);
     }

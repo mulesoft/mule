@@ -13,14 +13,13 @@
  */
 package org.mule.routing.inbound;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
-
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>EventGroup</code> is a holder over events grouped by a common group
@@ -31,25 +30,25 @@ import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
  */
 public class EventGroup implements Serializable
 {
-    private String groupId;
+    private Object groupId;
     private List events;
     private long created;
     private int expectedSize = -1;
 
-    public EventGroup(String groupId, int expectedSize)
+    public EventGroup(Object groupId, int expectedSize)
     {
         this(groupId);
         this.expectedSize = expectedSize;
     }
 
-    public EventGroup(String groupId)
+    public EventGroup(Object groupId)
     {
         this.groupId = groupId;
         events = new CopyOnWriteArrayList();
         created = System.currentTimeMillis();
     }
 
-    public String getGroupId()
+    public Object getGroupId()
     {
         return groupId;
     }

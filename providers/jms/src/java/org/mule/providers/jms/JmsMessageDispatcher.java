@@ -15,7 +15,6 @@
 package org.mule.providers.jms;
 
 import org.mule.MuleException;
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
@@ -27,12 +26,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import javax.jms.*;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching messages
@@ -88,9 +82,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
             // If a transaction is running, we can not receive any messages
             // in the same transaction
-            boolean syncReceive = event.getEndpoint().isRemoteSync() ||
-                    event.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
-            if (txSession != null && syncReceive) {
+            boolean remoteSync = useRemoteSync(event);
+            if (txSession != null && remoteSync) {
                 throw new IllegalTransactionStateException(new org.mule.config.i18n.Message("jms", 2));
             }
 
@@ -136,7 +129,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
             // Are we going to wait for a return event ?
-            if (syncReceive && replyTo == null) {
+            if (remoteSync && replyTo == null) {
                 replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
             }
             // Set the replyTo property
@@ -145,7 +138,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
             
             // Are we going to wait for a return event ?
-            if (syncReceive) {
+            if (remoteSync) {
                 consumer = connector.getJmsSupport().createConsumer(session, replyTo);
             }
 

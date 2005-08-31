@@ -82,7 +82,7 @@ public class HttpConnector extends TcpConnector
 
     private long keepAliveTimeout = 120000;
 
-    private boolean keepAlive = true;
+    private boolean keepAlive = false;
 
     /*
      * (non-Javadoc)
