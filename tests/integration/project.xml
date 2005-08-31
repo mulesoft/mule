@@ -30,8 +30,4 @@
             </properties>
         </dependency>
    </dependencies>
-    <build>
-        <sourceDirectory>${basedir}/src/test/java</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
-    </build>
 </project>

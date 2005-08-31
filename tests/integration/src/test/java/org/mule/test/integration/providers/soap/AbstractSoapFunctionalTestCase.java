@@ -13,7 +13,6 @@
  */
 package org.mule.test.integration.providers.soap;
 
-import org.apache.axis.AxisFault;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
@@ -36,7 +35,7 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMuleTestCase
+public abstract class AbstractSoapFunctionalTestCase extends AbstractMuleTestCase
 {
     protected void setUp() throws Exception
     {
@@ -67,6 +66,10 @@ public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMu
 
     protected abstract String getTestExceptionEndpoint();
 
+    protected String getProtocol() {
+        return "axis";
+    }
+
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient();
@@ -74,7 +77,7 @@ public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMu
         List results = new ArrayList();
         int number = 100;
         for (int i = 0; i < number; i++) {
-            results.add(client.send("axis:" + getRequestResponseEndpoint(), "Message " + i, null).getPayload());
+            results.add(client.send(getProtocol() + ":" + getRequestResponseEndpoint(), "Message " + i, null).getPayload());
         }
 
         assertEquals(number, results.size());
@@ -85,7 +88,7 @@ public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMu
 
     public void testReceive() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol("axis");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOMessage result = dispatcher.receive(new MuleEndpointURI(getReceiveEndpoint()),
@@ -97,7 +100,7 @@ public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMu
 
     public void testReceiveComplex() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol("axis");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOMessage result = dispatcher.receive(new MuleEndpointURI(getReceiveComplexEndpoint()),
@@ -110,7 +113,7 @@ public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMu
 
     public void testSendComplex() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol("axis");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOEndpoint endpoint = new MuleEndpoint("test",
@@ -136,7 +139,7 @@ public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMu
 
     public void testReceiveComplexCollection() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol("axis");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOMessage result = dispatcher.receive(new MuleEndpointURI(getReceiveComplexCollectionEndpoint()),
@@ -148,7 +151,7 @@ public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMu
 
     public void testDispatchAsyncComplex() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol("axis");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOEndpoint endpoint = new MuleEndpoint("test",
@@ -173,7 +176,7 @@ public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMu
 
     public void testException() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol("axis");
+        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
         UMOEndpoint endpoint = new MuleEndpoint("test",
@@ -186,8 +189,8 @@ public abstract class AbstractAxisConnectorFunctionalTestCase extends AbstractMu
         UMOEvent event = getTestEvent(new Person("Nodet", "Guillaume"), endpoint);
         try {
             dispatcher.send(event);
-            fail("An AxisFault should have been raised");
-        } catch (AxisFault f) {
+            fail("An Fault should have been raised");
+        } catch (Exception f) {
             // This is ok
         }
     }

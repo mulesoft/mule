@@ -13,14 +13,16 @@
  */
 package org.mule.test.integration.service;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.components.simple.EchoService;
+import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.umo.lifecycle.Disposable;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.tck.functional.FunctionalTestComponent;
 
 /**
  * <code>TestServiceComponent</code> is a test WebServices component
@@ -28,12 +30,12 @@ import org.mule.tck.functional.FunctionalTestComponent;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class TestServiceComponent extends FunctionalTestComponent implements org.mule.components.simple.EchoService,
-        DateService, PeopleService
+public class TestServiceComponent extends FunctionalTestComponent implements EchoService,
+        DateService, PeopleService, Disposable
 {
     private static transient Log logger = LogFactory.getLog(FunctionalTestComponent.class);
 
-    private Map people = new HashMap();
+    private static Map people = new HashMap();
 
     public TestServiceComponent()
     {
@@ -68,15 +70,33 @@ public class TestServiceComponent extends FunctionalTestComponent implements org
         return p;
     }
 
-    public void addPerson(Person person)
+    public void addPerson(Person person) throws Exception
     {
+        if (person == null || person.getFirstName() == null || person.getLastName() == null) {
+            throw new IllegalArgumentException("null person, first name or last name");
+        }
+        if (person.getFirstName().equals("Nodet")) {
+            throw new Exception("Nodet is banned");
+        }
         people.put(person.getFirstName(), person);
+        logger.info("Added Person: " + person);
     }
 
-    public Person addPerson(String firstname, String surname)
+    public Person addPerson(String firstname, String surname) throws Exception
     {
         Person p = new Person(firstname, surname);
         addPerson(p);
+        logger.info("Added Person: " + p);
         return p;
+    }
+
+    /**
+     * A lifecycle method where implementor should free up any resources If an
+     * exception is thrown it should just be logged and processing should
+     * continue. This method should not throw Runtime exceptions
+     */
+    public void dispose()
+    {
+        people.clear();
     }
 }

@@ -13,10 +13,10 @@
  */
 package org.mule.test.integration.client;
 
-import java.util.Properties;
-
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.NamedTestCase;
+
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -32,10 +32,10 @@ public class MultipleJmsConnectorsTestCase extends NamedTestCase
         client.setProperty("jms.specification", "1.1");
         Properties props = new Properties();
         props.put("brokerURL", "tcp://localhost:61616");
-        client.setProperty("jms.providerProperties", props);
+        client.setProperty("jms.jndiProviderProperties", props);
 
-        client.dispatch("jms://admin:admin@admin.queue?createConnector=ALWAYS", "admin", null);
-        client.dispatch("jms://ross:ross@ross.queue?createConnector=ALWAYS", "admin", null);
+        client.dispatch("jms://admin:admin@admin.queue?createConnector=ALWAYS", "testing", null);
+        client.dispatch("jms://ross:ross@ross.queue?createConnector=ALWAYS", "testing", null);
 
         assertEquals(2, client.getManager().getConnectors().size());
     }

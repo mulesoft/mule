@@ -31,7 +31,7 @@
                 </router>
             </outbound-router>
 
-            <response-router timeout="10000000">
+            <response-router timeout="10000">
                 <endpoint address="jms://response"/>
                 <router className="org.mule.routing.response.SingleResponseRouter"/>
             </response-router>

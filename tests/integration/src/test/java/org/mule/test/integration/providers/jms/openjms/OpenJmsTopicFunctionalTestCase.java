@@ -13,15 +13,14 @@
  */
 package org.mule.test.integration.providers.jms.openjms;
 
-import java.util.HashMap;
-import java.util.Properties;
-
-import javax.jms.Connection;
-
 import org.mule.providers.jms.JmsConnector;
 import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.provider.UMOConnector;
+
+import javax.jms.Connection;
+import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -42,7 +41,7 @@ public class OpenJmsTopicFunctionalTestCase extends AbstractJmsQueueFunctionalTe
         Properties props = JmsTestUtils.getJmsProperties(JmsTestUtils.OPEN_JMS_PROPERTIES);
 
         connector.setConnectionFactoryJndiName("JmsTopicConnectionFactory");
-        connector.setProviderProperties(props);
+        connector.setJndiProviderProperties(props);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
 

@@ -26,7 +26,7 @@ public interface PeopleService
 
     public Person[] getPeople();
 
-    public void addPerson(Person person);
+    public void addPerson(Person person) throws Exception;
 
-    public Person addPerson(String firstname, String surname);
+    public Person addPerson(String firstname, String surname) throws Exception;
 }

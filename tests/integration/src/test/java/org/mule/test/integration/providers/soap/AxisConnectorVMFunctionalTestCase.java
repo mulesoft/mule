@@ -19,7 +19,7 @@ package org.mule.test.integration.providers.soap;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AxisConnectorVMFunctionalTestCase extends AbstractAxisConnectorFunctionalTestCase
+public class AxisConnectorVMFunctionalTestCase extends AbstractSoapFunctionalTestCase
  {
     public String getConfigResource() {
         return "org/mule/test/integration/providers/soap/axis-vm-mule-config.xml";

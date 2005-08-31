@@ -28,7 +28,7 @@ import org.mule.providers.http.servlet.MuleReceiverServlet;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AxisServletBindingTestCase extends AbstractAxisConnectorFunctionalTestCase
+public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {
     private Server httpServer;
     public static final int HTTP_PORT = 8081;

@@ -13,20 +13,7 @@
  */
 package org.mule.test.integration.providers.jms.activemq;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Properties;
-
-import javax.jms.Connection;
-
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.DefaultLogger;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.taskdefs.ExecuteWatchdog;
-import org.apache.tools.ant.taskdefs.Java;
-import org.apache.tools.ant.types.Environment;
-import org.apache.tools.ant.types.Path;
-import org.apache.tools.ant.util.Watchdog;
+import EDU.oswego.cs.dl.util.concurrent.LinkedQueue;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.MuleDescriptor;
@@ -36,9 +23,9 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.events.ConnectionEvent;
 import org.mule.impl.internal.events.ConnectionEventListener;
 import org.mule.providers.SimpleRetryConnectionStrategy;
-import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.test.integration.ServerTools;
 import org.mule.test.integration.providers.jms.AbstractJmsFunctionalTestCase;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOComponent;
@@ -46,7 +33,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.provider.UMOConnector;
 
-import EDU.oswego.cs.dl.util.concurrent.LinkedQueue;
+import javax.jms.Connection;
+import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * 
@@ -57,10 +46,7 @@ import EDU.oswego.cs.dl.util.concurrent.LinkedQueue;
  */
 public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase implements ConnectionEventListener {
 
-	private static final String ACTIVEMQ_HOME = "c:\\java\\activemq-3.0";
-	
 	private JmsConnector connector;
-	private KillableWatchdog activemq;
 	private LinkedQueue events = new LinkedQueue();
 	
     protected void setUp() throws Exception
@@ -86,7 +72,7 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
     
     protected void tearDown() throws Exception
     {
-    	killActiveMq();
+    	ServerTools.killActiveMq();
     }
     
     public UMOConnector createConnector() throws Exception
@@ -96,7 +82,7 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
         Properties props = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
 
         connector.setConnectionFactoryJndiName("JmsQueueConnectionFactory");
-        connector.setProviderProperties(props);
+        connector.setJndiProviderProperties(props);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
 
@@ -147,7 +133,7 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
         }
         
         // Launch activemq
-        launchActiveMq();
+        ServerTools.launchActiveMq();
         // Check that connection succeed
         t0 = System.currentTimeMillis();
         while (true) {
@@ -160,7 +146,7 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
         	}
         }
         // Kill activemq
-        killActiveMq();
+        ServerTools.killActiveMq();
         // Check that the connection is lost
         t0 = System.currentTimeMillis();
         while (true) {
@@ -173,7 +159,7 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
         	}
         }
         // Restart activemq
-        launchActiveMq();
+        ServerTools.launchActiveMq();
         // Check that connection succeed
         t0 = System.currentTimeMillis();
         while (true) {
@@ -185,88 +171,11 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
         		fail("Connection should have succeeded");
         	}
         }
-        killActiveMq();
+        ServerTools.killActiveMq();
 
 	}
 	
-	protected void launchActiveMq() {
-		Project project = new Project();
-		DefaultLogger consoleLogger = new DefaultLogger();
-		consoleLogger.setErrorPrintStream(System.err);
-		consoleLogger.setOutputPrintStream(System.out);
-		consoleLogger.setMessageOutputLevel(Project.MSG_INFO);
-		project.addBuildListener(consoleLogger);
-		Path path = new Path(project);
-		File[] jars = new File(ACTIVEMQ_HOME + "\\lib").listFiles(new FilenameWildcardFilter("*.jar"));
-		path.add(new Path(project, new File(ACTIVEMQ_HOME, "\\conf").getAbsolutePath()));
-		for (int i = 0; i < jars.length; i++) {
-			path.add(new Path(project, jars[i].getAbsolutePath()));
-		}
-		jars = new File(ACTIVEMQ_HOME + "\\lib\\optional").listFiles(new FilenameWildcardFilter("*.jar"));
-		for (int i = 0; i < jars.length; i++) {
-			path.add(new Path(project, jars[i].getAbsolutePath()));
-		}
-		final JavaTask java = new JavaTask();
-		java.setProject(project);
-		java.setClasspath(path);
-		java.setClassname("org.activemq.spring.Main");
-		java.setFork(true);
-		java.setDir(new File(ACTIVEMQ_HOME));
-		java.addSysproperty(createVar("activemq.home", new File(ACTIVEMQ_HOME).getAbsolutePath()));
-		java.addSysproperty(createVar("derby.system.home", new File(ACTIVEMQ_HOME, "\\var").getAbsolutePath()));
-		java.createWatchdog();
-		new Thread() {
-			public void run() {
-				java.execute();
-			}
-		}.start();
-		activemq = java.watchDog;
-	}
-	
-	private static class JavaTask extends Java {
-		public KillableWatchdog watchDog;
-		private Long timeout = new Long(Long.MAX_VALUE);
-		public void setTimeout(Long value) {
-			this.timeout = value;
-			super.setTimeout(value);
-		}
-	    protected ExecuteWatchdog createWatchdog() throws BuildException {
-	    	if (watchDog == null) {
-	    		watchDog = new KillableWatchdog(timeout != null ? timeout.longValue() : 0);
-	    	}
-	    	return watchDog;
-	    }
 
-	}
-	
-	private static class KillableWatchdog extends ExecuteWatchdog {
-		private Process process;
-		public KillableWatchdog(long timeout) {
-			super(timeout);
-		}
-		public void timeoutOccured(Watchdog w) {
-		}
-		public synchronized void start(Process process) {
-			this.process = process;
-			super.start(process);
-		}
-		public void kill() {
-			super.timeoutOccured(null);
-		}
-	}
-	
-	private static Environment.Variable createVar(String name, String value) {
-		Environment.Variable var = new Environment.Variable();
-		var.setKey(name);
-		var.setValue(value);
-		return var;
-	}
-	
-	protected void killActiveMq() {
-		if (activemq != null ) {
-			activemq.kill();
-		}
-	}
 
 	public void onEvent(UMOServerEvent event) {
 		try {

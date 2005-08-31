@@ -11,15 +11,24 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.providers.soap;
+package org.mule.test.integration.providers.soap;
 
 /**
- * <code>DateService</code> defines a getDate service
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface DateService
+public class GlueConnectorHttpFunctionalTestCase extends AxisConnectorHttpFunctionalTestCase
 {
-    public String getDate();
+    static public class ComponentWithoutInterfaces
+    {
+        public String echo(String msg)
+        {
+            return msg;
+        }
+    }
+
+    protected String getProtocol() {
+        return "glue";
+    }
 }

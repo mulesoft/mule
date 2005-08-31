@@ -12,40 +12,18 @@
 
 package org.mule.test.integration.providers.jms.tools;
 
+import org.mule.util.ClassHelper;
+import org.mule.util.Utility;
+
+import javax.jms.*;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.naming.Reference;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueReceiver;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.Topic;
-import javax.jms.TopicConnection;
-import javax.jms.TopicConnectionFactory;
-import javax.jms.TopicPublisher;
-import javax.jms.TopicSession;
-import javax.jms.TopicSubscriber;
-import javax.jms.XAConnection;
-import javax.jms.XAQueueConnection;
-import javax.jms.XAQueueConnectionFactory;
-import javax.jms.XASession;
-import javax.jms.XATopicConnection;
-import javax.jms.XATopicConnectionFactory;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.mule.util.ClassHelper;
-import org.mule.util.Utility;
 
 /**
  * <code>JmsTestUtils</code> TODO (document class)
@@ -125,7 +103,7 @@ public class JmsTestUtils
                     + "in the JNDI property file");
         }
         Context ctx = new InitialContext(props);
-        XAQueueConnectionFactory qcf = (XAQueueConnectionFactory) ctx.lookup(cnnFactoryName);
+        XAQueueConnectionFactory qcf = (XAQueueConnectionFactory) lookupObject(ctx, cnnFactoryName);
         XAQueueConnection cnn;
         String username = (String) props.get("username");
 
@@ -149,7 +127,7 @@ public class JmsTestUtils
                     + "in the JNDI property file");
         }
         Context ctx = new InitialContext(props);
-        Object obj = ctx.lookup(cnnFactoryName);
+        Object obj = lookupObject(ctx, cnnFactoryName);
         QueueConnectionFactory qcf = (QueueConnectionFactory) obj;
         QueueConnection cnn;
         String username = (String) props.get("username");
@@ -179,7 +157,8 @@ public class JmsTestUtils
                     + "in the JNDI property file");
         }
         Context ctx = new InitialContext(props);
-        TopicConnectionFactory tcf = (TopicConnectionFactory) ctx.lookup(cnnFactoryName);
+
+        TopicConnectionFactory tcf = (TopicConnectionFactory) lookupObject(ctx, cnnFactoryName);
         TopicConnection cnn;
         String username = (String) props.get("username");
 
@@ -193,6 +172,20 @@ public class JmsTestUtils
         return cnn;
     }
 
+    public static Object lookupObject(Context context, String reference) throws NamingException {
+        Object ref = context.lookup(reference);
+        if(ref instanceof Reference) {
+            String className = ((Reference)ref).getClassName();
+            try {
+
+                ref = ClassHelper.loadClass(className, JmsTestUtils.class).newInstance();
+            } catch (Exception e) {
+                throw new NamingException("Failed to instanciate class: " + className + ". Exception was: " + e.toString());
+            }
+        }
+        return ref;
+    }
+
     public static XATopicConnection getXATopicConnection() throws IOException, NamingException, JMSException
     {
         Properties props = getJmsProperties();
@@ -202,7 +195,7 @@ public class JmsTestUtils
                     + "in the JNDI property file");
         }
         Context ctx = new InitialContext(props);
-        XATopicConnectionFactory tcf = (XATopicConnectionFactory) ctx.lookup(cnnFactoryName);
+        XATopicConnectionFactory tcf = (XATopicConnectionFactory) lookupObject(ctx, cnnFactoryName);
         XATopicConnection cnn;
         String username = (String) props.get("username");
 

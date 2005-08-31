@@ -30,7 +30,7 @@ import org.mule.umo.provider.UMOConnector;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AxisConnectorHttpFunctionalTestCase extends AbstractAxisConnectorFunctionalTestCase
+public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapFunctionalTestCase
 {
     static public class ComponentWithoutInterfaces
     {
@@ -41,7 +41,7 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractAxisConnectorFu
     }
 
     public String getConfigResource() {
-        return "axis-test-mule-config.xml";
+        return "org/mule/test/integration/providers/soap/axis-http-mule-config.xml";
     }
 
     protected String getComponentWithoutInterfacesEndpoint() {
@@ -86,13 +86,13 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractAxisConnectorFu
     public void testComponentWithoutInterfaces() throws Throwable
     {
         try {
-            UMOConnector c = ConnectorFactory.getConnectorByProtocol("axis");
+            UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
             UMODescriptor descriptor = new MuleDescriptor();
             descriptor.setExceptionListener(new DefaultExceptionStrategy());
             descriptor.setName("testComponentWithoutInterfaces");
             descriptor.setImplementation(ComponentWithoutInterfaces.class.getName());
             UMOEndpoint endpoint = new MuleEndpoint("testIn",
-                                                    new MuleEndpointURI("axis:" + getComponentWithoutInterfacesEndpoint()),
+                                                    new MuleEndpointURI(getProtocol() + ":" + getComponentWithoutInterfacesEndpoint()),
                                                     c,
                                                     null,
                                                     UMOEndpoint.ENDPOINT_TYPE_RECEIVER,

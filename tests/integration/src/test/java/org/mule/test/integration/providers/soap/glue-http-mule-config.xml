@@ -4,15 +4,16 @@
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <mule-configuration id="axis_test" version="1.0">
+
     <model name="test">
         <mule-descriptor name="mycomponent"
             implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="axis:vm://mycomponent">
+            inboundEndpoint="glue:http://localhost:38008/mule">
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent2"
             implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="axis:vm://mycomponent2">
+            inboundEndpoint="glue:http://localhost:38009/axis/services">
             <properties>
                 <list name="serviceInterfaces">
                     <entry value="org.mule.components.simple.EchoService"/>
@@ -23,13 +24,13 @@
 
         <mule-descriptor name="mycomponent3"
             implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="axis:vm://mycomponent3">
+            inboundEndpoint="glue:http://localhost:38009">
         </mule-descriptor>
 
         <mule-descriptor name="mycomponent4"
             implementation="org.mule.test.integration.service.TestServiceComponent">
             <inbound-router>
-                <endpoint address="axis:vm://mycomponent4" synchronous="false"/>
+                <endpoint address="glue:http://localhost:38010" synchronous="false"/>
             </inbound-router>
         </mule-descriptor>
     </model>

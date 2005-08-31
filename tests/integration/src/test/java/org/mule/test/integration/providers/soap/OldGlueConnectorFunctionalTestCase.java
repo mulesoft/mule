@@ -11,33 +11,32 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.providers.soap.glue;
+package org.mule.test.integration.providers.soap;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import electric.proxy.IProxy;
+import electric.registry.Registry;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.providers.soap.Person;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.test.integration.service.Person;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
-import electric.proxy.IProxy;
-import electric.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class GlueConnectorFunctionalTestCase extends AbstractMuleTestCase
+public class OldGlueConnectorFunctionalTestCase extends AbstractMuleTestCase
 {
     protected void setUp() throws Exception
     {
