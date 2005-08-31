@@ -22,12 +22,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.UMOTransaction;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.DispatchException;
@@ -141,7 +136,7 @@ public final class MuleSession implements UMOSession
      * 
      * @see org.mule.umo.UMOSession#dispatchEvent(org.mule.umo.UMOEvent)
      */
-    public synchronized void dispatchEvent(UMOEvent event) throws UMOException
+    public void dispatchEvent(UMOEvent event) throws UMOException
     {
         if (event.getEndpoint().canSend()) {
             try {

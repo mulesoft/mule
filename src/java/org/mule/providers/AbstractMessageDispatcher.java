@@ -12,10 +12,6 @@
 
 package org.mule.providers;
 
-import java.beans.ExceptionListener;
-
-import javax.resource.spi.work.Work;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
@@ -34,8 +30,12 @@ import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
+import javax.resource.spi.work.Work;
+import java.beans.ExceptionListener;
+
 /**
- * <p/> <code>AbstractMessageDispatcher</code> TODO (document class)
+ * <p/> <code>AbstractMessageDispatcher</code> provides a default dispatch (client) support for handling threads
+ * lifecycle and validation.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -221,5 +221,39 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         public void release()
         {
         }
+    }
+
+    /**
+     * RemoteSync causes the message dispatch to wait for a response to an event on a response channel
+     * after it sends the event.  The following rules apply to RemoteSync
+     * 1.  The connector has to support remoteSync. Some transports do not have the notion of a response channel
+     * 2. Check if the endpoint has been configured for remoteSync
+     * 3. Check if the REMOTE_SYNC message header has been set
+     * 4. Finally, if the current component has a response router configured, that the router will handle the
+     * response channel event and we should not try and receive a response in the Message dispatcher
+     *
+     * If remotesync should not be used we must remove the REMOTE_SYNC header
+     *
+     * Note the MuleClient will automatically set the REMOTE_SYNC header when client.send(..) is called so that
+     * results are returned from remote invocations too.
+     * @param event the current event
+     * @return true if a response channel should be used to get a resposne from the event dispatch.
+     */
+    protected boolean useRemoteSync(UMOEvent event) {
+        boolean remoteSync = false;
+        if(event.getEndpoint().getConnector().isRemoteSyncEnabled()) {
+            remoteSync = event.getEndpoint().isRemoteSync() ||
+                    event.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
+            if(remoteSync) {
+                //component will be null for client calls
+                if(event.getComponent()!=null) {
+                    remoteSync = event.getComponent().getDescriptor().getResponseRouter() == null;
+                }
+            }
+        }
+        if(!remoteSync) {
+            event.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+        }
+        return remoteSync;
     }
 }

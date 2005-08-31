@@ -37,11 +37,7 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 
 import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO.
@@ -176,6 +172,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     {
         inboundRouter = descriptor.getInboundRouter();
         outboundRouter = descriptor.getOutboundRouter();
+        responseRouter = descriptor.getResponseRouter();
         inboundTransformer = descriptor.getInboundTransformer();
         outboundTransformer = descriptor.getOutboundTransformer();
         responseTransformer = descriptor.getResponseTransformer();
@@ -189,6 +186,9 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         poolingProfile = descriptor.getPoolingProfile();
         queueProfile = descriptor.getQueueProfile();
         exceptionListener = descriptor.getExceptionListener();
+        initialState = descriptor.getInitialState();
+        singleton = descriptor.isSingleton();
+        containerManaged = descriptor.isContainerManaged();
     }
 
     /**

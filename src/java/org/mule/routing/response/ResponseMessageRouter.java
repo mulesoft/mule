@@ -81,6 +81,7 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     {
         UMOMessage result = null;
         if (routers.size() == 0) {
+            logger.warn("There are no routers configured on the response router. Returning the current message");
             result = message;
         } else {
             UMOResponseRouter router = null;

@@ -13,11 +13,8 @@
  */
 package org.mule.routing.response;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.routing.RoutingException;
 
 /**
  * <code>ResponseCorrelationAggregator</code> Correlates one or more events on
@@ -36,7 +33,7 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
      * on the last event received)
      * 
      * @param events
-     * @return
+     * @return true if the event group is ready of aggregation
      */
     protected boolean shouldAggregate(EventGroup events)
     {
@@ -52,30 +49,16 @@ public abstract class ResponseCorrelationAggregator extends AbstractResponseAggr
         return size == events.getSize();
     }
 
+
     /**
-     * Adds the event to an event group. Groups are defined by the correlationId
-     * on the message. If no correlationId is set a default group is created for
-     * all events without a correlationId. If there is no group for the current
-     * correlationId one will be created and added to the router.
-     * 
-     * @param event
-     * @return
+     * Creates the event group with a specific correlation size based on the Mule
+     * Correlation support
+     * @param id  The group id
+     * @param event the current event
+     * @return a new event group of a fixed size
      */
-    protected EventGroup addEvent(UMOEvent event) throws RoutingException
-    {
-        String cId = event.getMessage().getCorrelationId();
+    protected EventGroup createEventGroup(Object id, UMOEvent event) {
         int groupSize = event.getMessage().getCorrelationGroupSize();
-        if (cId == null) {
-            throw new RoutingException(new Message(Messages.NO_CORRELATION_ID), event.getMessage(), event.getEndpoint());
-        }
-        EventGroup eg = (EventGroup) eventGroups.get(cId);
-        if (eg == null) {
-            eg = new EventGroup(cId, groupSize);
-            eg.addEvent(event);
-            eventGroups.put(eg.getGroupId(), eg);
-        } else {
-            eg.addEvent(event);
-        }
-        return eg;
+        return new EventGroup(id, groupSize);
     }
 }
