@@ -14,6 +14,7 @@ package org.mule.providers;
 
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +25,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.impl.internal.events.ConnectionEvent;
 import org.mule.management.mbeans.EndpointService;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOComponent;
@@ -34,19 +36,11 @@ import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerEvent;
-import org.mule.umo.provider.ConnectorException;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
-import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.*;
 import org.mule.umo.transformer.UMOTransformer;
 
 import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all
@@ -62,7 +56,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractConnector implements UMOConnector, ExceptionListener
+public abstract class AbstractConnector implements UMOConnector, ExceptionListener, UMOConnectable
 {
     /**
      * logger used by this class
@@ -151,6 +145,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     private ConnectionStrategy connectionStrategy;
 
+    protected WaitableBoolean connected = new WaitableBoolean(false);
+
+    protected WaitableBoolean connecting = new WaitableBoolean(false);
+
     public AbstractConnector()
     {
         // make sure we always have an exception strategy
@@ -220,6 +218,9 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             throw new ConnectorException(new Message(Messages.CANT_START_DISPOSED_CONNECTOR), this);
         }
         if (!started.get()) {
+            if(!isConnected()) {
+                getConnectionStrategy().connect(this);
+            }
             if (logger.isInfoEnabled()) {
                 logger.info("Starting Connector: " + getClass().getName());
             }
@@ -260,6 +261,13 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             // has been disposing");
         }
         if (started.get()) {
+            if(isConnected()) {
+                try {
+                    disconnect();
+                } catch (Exception e) {
+                    logger.error("Failed to disconnect: " + e.getMessage(), e);
+                }
+            }
             if (logger.isInfoEnabled()) {
                 logger.info("Stopping Connector: " + getClass().getName());
             }
@@ -674,7 +682,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     {
         // not happy with this but each receiver needs its own instance
         // of the connection strategy and using a factory just introduces extra
-        // complexity
+        // implementation
         try {
             return (ConnectionStrategy) BeanUtils.cloneBean(connectionStrategy);
         } catch (Exception e) {
@@ -733,4 +741,63 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         AbstractMessageReceiver[] result = new AbstractMessageReceiver[temp.size()];
         return (AbstractMessageReceiver[])temp.toArray(result);
     }
+
+    public void connect() throws Exception {
+        if (connected.get()) {
+            return;
+        }
+
+        if (connecting.commit(false, true)) {
+            connectionStrategy.connect(this);
+            logger.info("Connected: " + getConnectionDescription());
+            return;
+        }
+
+        try {
+            doConnect();
+            fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_CONNECTED));
+        } catch (Exception e) {
+            fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_FAILED));
+            if (e instanceof ConnectException) {
+                throw (ConnectException) e;
+            } else {
+                throw new ConnectException(e, this);
+            }
+        }
+        connected.set(true);
+        connecting.set(false);
+    }
+
+    public void disconnect() throws Exception {
+        fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_DISCONNECTED));
+        connected.set(false);
+        doDisconnect();
+        logger.info("Disconnected: " + getConnectionDescription());
+    }
+
+    public String getConnectionDescription() {
+        return toString();
+    }
+
+    public boolean isConnected() {
+       return connected.get();
+    }
+
+    /**
+     * Template method where any connections should be made for the connector
+     * @throws Exception
+     */
+    public void doConnect() throws Exception {
+
+    }
+
+    /**
+     * Template method where any connected resources used by the connector should
+     * be disconnected
+     * @throws Exception
+     */
+    public void doDisconnect() throws Exception {
+
+    }
+
 }

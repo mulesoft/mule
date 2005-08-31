@@ -15,12 +15,10 @@
 package org.mule.providers.jms;
 
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.internal.events.ConnectionEvent;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.ConnectException;
 import org.mule.providers.ReplyToHandler;
@@ -33,15 +31,10 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
-import org.mule.umo.provider.UMOConnectable;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassHelper;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import javax.jms.XAConnectionFactory;
+import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -60,7 +53,7 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class JmsConnector extends AbstractServiceEnabledConnector implements UMOConnectable
+public class JmsConnector extends AbstractServiceEnabledConnector
 {
 
     public static final String JMS_SELECTOR_PROPERTY = "selector";
@@ -108,8 +101,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
     private int maxRedelivery = 0;
 
     private String redeliveryHandler = DefaultRedeliveryHandler.class.getName();
-
-    protected WaitableBoolean connected = new WaitableBoolean(false);
 
     public JmsConnector()
     {
@@ -218,47 +209,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
         return connection;
     }
 
-    public void connect() throws Exception
-    {
-        if (connected.get()) {
-            return;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Attempting to connect");
-        }
-        try {
-            doConnect();
-            fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_CONNECTED));
-        } catch (Exception e) {
-            fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_FAILED));
-            if (e instanceof ConnectException) {
-                throw (ConnectException) e;
-            } else {
-                throw new ConnectException(e, this);
-            }
-        }
-        connected.set(true);
-    }
-
-    public void disconnect() throws Exception
-    {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Disconnecting");
-        }
-        fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_DISCONNECTED));
-        connected.set(false);
-        doDisconnect();
-        logger.info("Disconnected");
-    }
-    
-    public boolean isConnected()
-    {
-    	return (connection != null);
-    }
-    
-    public String getConnectionDescription() {
-    	return toString();
-    }
 
     public void doConnect() throws ConnectException 
     {
@@ -318,6 +268,9 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
 
     public Session getSession(boolean transacted, boolean topic) throws JMSException
     {
+        if(!isConnected()) {
+
+        }
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         Session session = getCurrentSession();
         if (session != null) {
@@ -350,7 +303,10 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements UMO
 
     public void doStart() throws UMOException
     {
-    	if (connection != null) {
+        if(!isConnected()) {
+            getConnectionStrategy().connect(this);
+        }
+        if (connection != null) {
 	        try {
         		connection.start();
 	        } catch (JMSException e) {
