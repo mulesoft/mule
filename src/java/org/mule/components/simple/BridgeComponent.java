@@ -19,6 +19,9 @@ import org.mule.routing.inbound.ForwardingConsumer;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.routing.UMOInboundRouter;
+
+import java.util.Iterator;
 
 /**
  * Han be used to bridge inbound requests to an outbound router without any processing
@@ -32,8 +35,20 @@ public class BridgeComponent implements UMODescriptorAware, Callable {
     public void setDescriptor(UMODescriptor descriptor) {
         //Adding a forwarding consumer will cause the inbound routing to
         //directly invoke the outbound router, bypassing the component
-        descriptor.getInboundRouter().addRouter(new ForwardingConsumer());
-        //Make sure if other routers on the inbound router are honoured
+
+        //first check there isn't one already registered
+        boolean registered=false;
+        for (Iterator iterator = descriptor.getInboundRouter().getRouters().iterator(); iterator.hasNext();) {
+            UMOInboundRouter router = (UMOInboundRouter)iterator.next();
+            if(router instanceof ForwardingConsumer) {
+                registered=true;
+            }
+
+        }
+        if(!registered) {
+            descriptor.getInboundRouter().addRouter(new ForwardingConsumer());
+        }
+        //Make sure if other routers on the inbound router, they are honoured
         descriptor.getInboundRouter().setMatchAll(true);
     }
 
