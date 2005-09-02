@@ -3,3 +3,4 @@ target
 .project
 bin
 junit*.properties
+mule-tcp-provider.iml

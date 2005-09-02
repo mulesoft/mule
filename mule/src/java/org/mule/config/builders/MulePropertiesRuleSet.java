@@ -15,12 +15,7 @@
 package org.mule.config.builders;
 
 import org.apache.commons.beanutils.MethodUtils;
-import org.apache.commons.digester.CallMethodRule;
-import org.apache.commons.digester.CallParamRule;
-import org.apache.commons.digester.Digester;
-import org.apache.commons.digester.ObjectCreateRule;
-import org.apache.commons.digester.Rule;
-import org.apache.commons.digester.RuleSetBase;
+import org.apache.commons.digester.*;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PropertyFactory;
@@ -30,12 +25,7 @@ import org.xml.sax.Attributes;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * A digester rule set that loads rules for <properties> tags and its child tags;
@@ -111,6 +101,9 @@ public class MulePropertiesRuleSet extends RuleSetBase
 
         addMapPropertyRules(digester, path);
         addListPropertyRules(digester, path);
+
+        addMapPropertyRules(digester, path + "/map");
+        addListPropertyRules(digester, path + "/map");
     }
 
     protected void addMapPropertyRules(Digester digester, String path)

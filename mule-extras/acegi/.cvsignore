@@ -4,3 +4,5 @@ classes
 target
 acegi.iml
 bin
+.mule
+mule-extras-acegi.iml

@@ -14,6 +14,7 @@
 package org.mule.tck;
 
 import org.mule.config.ConfigurationBuilder;
+import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 
 /**
@@ -25,6 +26,7 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
 public abstract class IntegrationTestCase extends AbstractMuleTestCase
 {
     protected final void doSetUp() throws Exception {
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
         ConfigurationBuilder builder = getBuilder();
         builder.configure(getConfigResources());
         doIntegrationSetUp();

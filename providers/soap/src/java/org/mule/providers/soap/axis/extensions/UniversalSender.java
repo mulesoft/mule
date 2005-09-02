@@ -85,6 +85,7 @@ public class UniversalSender extends BasicHandler {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 msgContext.getRequestMessage().writeTo(baos);
+            
             Map props = new HashMap();
            // props.putAll(event.getProperties());
             for (Iterator iterator = msgContext.getPropertyNames(); iterator.hasNext();) {
@@ -98,6 +99,9 @@ public class UniversalSender extends BasicHandler {
             UMOSession session = new MuleSession();
             UMOEvent dispatchEvent = new MuleEvent(new MuleMessage(baos.toByteArray(), props), endpoint, session, sync);
             logger.info("Making Axis soap request on: " + uri);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Soap request is:\n" + baos.toString());
+            }
             if(sync) {
                 dispatchEvent.getEndpoint().setRemoteSync(true);
                 UMOMessage result = session.sendEvent(dispatchEvent);

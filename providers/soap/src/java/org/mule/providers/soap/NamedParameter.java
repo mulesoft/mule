@@ -93,30 +93,25 @@ public class NamedParameter {
     public static final QName XSD_ID = new QName(URI_DEFAULT_SCHEMA_XSD, "ID");
     public static final QName XSD_SCHEMA = new QName(URI_DEFAULT_SCHEMA_XSD, "schema");
 
-    private String name;
+    private QName name;
     private QName type;
     private ParameterMode mode;
 
-    public NamedParameter(String name, QName type, String mode) {
+    public NamedParameter(QName name, QName type, String mode) {
         this.name = name;
         this.type = type;
         setMode(mode);
     }
 
-    public NamedParameter(String name, String mode) {
-        this.name = name;
-        this.type = createQName(name);
-        setMode(mode);
-    }
 
-    public NamedParameter(String name, QName type, ParameterMode mode) {
+    public NamedParameter(QName name, QName type, ParameterMode mode) {
         this.name = name;
         this.type = type;
         this.mode = mode;
     }
 
-    public NamedParameter(String name, ParameterMode mode) {
-        this.name = name;
+    public NamedParameter(String name, String type, ParameterMode mode) {
+        this.name = new QName(name);
         this.type = createQName(name);
         this.mode = mode;
     }
@@ -134,7 +129,7 @@ public class NamedParameter {
             throw new IllegalArgumentException(new Message(Messages.X_IS_INVALID, "mode=" + mode).toString());
         }
     }
-    public String getName() {
+    public QName getName() {
         return name;
     }
 

@@ -9,3 +9,5 @@ velocity.log
 _root.iml
 build.properties
 workspace
+.mule
+ActiveMQ

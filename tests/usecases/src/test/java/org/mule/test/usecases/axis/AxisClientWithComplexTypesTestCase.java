@@ -23,6 +23,7 @@ import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.NamedTestCase;
 import org.mule.umo.UMOMessage;
 
+import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,8 +65,8 @@ public class AxisClientWithComplexTypesTestCase extends NamedTestCase
 		submittrade.setArg0(trade);
 
         //We need to name the parameters weh using Doc/Lit
-        SoapMethod method = new SoapMethod("submitTrade", SubmitTradeResponse.class);
-        method.addNamedParameter(new NamedParameter("submitTrade", ParameterMode.IN));
+        SoapMethod method = new SoapMethod(new QName("submitTrade"), SubmitTradeResponse.class);
+        method.addNamedParameter(new NamedParameter(new QName("submitTrade"), NamedParameter.createQName("Object"), ParameterMode.IN));
         props.put(MuleProperties.MULE_SOAP_METHOD, method);
         UMOMessage result = client.send(uri, submittrade, props);
         assertNotNull(result);

@@ -228,6 +228,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             call.setSOAPActionURI(soapAction);
             call.setUseSOAPAction(Boolean.TRUE.booleanValue());
         }
+
+        //Set a custome method namespace if one is set.  This will be used forthe parameters too
         String methodNamespace = (String)event.getProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY);
         if(methodNamespace!=null) {
             call.setOperationName(new QName(methodNamespace, method));
@@ -248,7 +250,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             call.setPassword(endpointUri.getPassword());
         }
 
-        setCallParams(call, event, method);
+        setCallParams(call, event, call.getOperationName());
         return call;
     }
 
@@ -383,9 +385,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         return soapAction;
     }
 
-    private void setCallParams(Call call, UMOEvent event, String method) throws ClassNotFoundException {
+    private void setCallParams(Call call, UMOEvent event, QName method) throws ClassNotFoundException {
         if(callParameters==null) {
-            loadCallParams(event);
+            loadCallParams(event, method.getNamespaceURI());
         }
 
         SoapMethod soapMethod;
@@ -407,7 +409,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    private void loadCallParams(UMOEvent event) throws ClassNotFoundException {
+    private void loadCallParams(UMOEvent event, String namespace) throws ClassNotFoundException {
         callParameters = new HashMap();
         Map methodCalls = (Map)event.getProperty("soapMethods");
         if(methodCalls==null) return;
@@ -416,7 +418,20 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         SoapMethod soapMethod;
         for (Iterator iterator = methodCalls.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry)iterator.next();
-            soapMethod = new SoapMethod(entry.getKey().toString(), entry.getValue().toString());
+
+            if("".equals(namespace) || namespace==null) {
+                if(entry.getValue() instanceof List) {
+                    soapMethod = new SoapMethod(entry.getKey().toString(), (List)entry.getValue());
+                } else {
+                    soapMethod = new SoapMethod(entry.getKey().toString(), entry.getValue().toString());
+                }
+            } else {
+                if(entry.getValue() instanceof List) {
+                    soapMethod = new SoapMethod(new QName(namespace, entry.getKey().toString()), (List)entry.getValue());
+                } else {
+                    soapMethod = new SoapMethod(new QName(namespace, entry.getKey().toString()), entry.getValue().toString());
+                }
+            }
             callParameters.put(soapMethod.getName(), soapMethod);
         }
     }

@@ -21,6 +21,7 @@ import org.mule.providers.soap.SoapMethod;
 import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOMessage;
 
+import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,9 +51,9 @@ public class AxisNamedParametersTestCase extends IntegrationTestCase
         MuleClient client = new MuleClient();
         Map props = new HashMap();
         //create the soap method passing in the method name and return type
-        SoapMethod soapMethod = new SoapMethod("echo", NamedParameter.XSD_STRING);
+        SoapMethod soapMethod = new SoapMethod(new QName("echo"), NamedParameter.XSD_STRING);
         //add one or more parameters
-        soapMethod.addNamedParameter("value", NamedParameter.XSD_STRING, ParameterMode.IN);
+        soapMethod.addNamedParameter(new QName("value"), NamedParameter.XSD_STRING, ParameterMode.IN);
         //set the soap method as a property and pass the properties
         //when making the call
         props.put(MuleProperties.MULE_SOAP_METHOD, soapMethod);

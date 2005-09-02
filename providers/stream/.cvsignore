@@ -2,3 +2,5 @@
 .project
 target
 bin
+.mule
+mule-stream-provider.iml

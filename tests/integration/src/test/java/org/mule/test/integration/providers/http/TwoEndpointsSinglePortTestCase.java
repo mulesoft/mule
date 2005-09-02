@@ -33,8 +33,8 @@ public class TwoEndpointsSinglePortTestCase extends IntegrationTestCase
 
      public void testSendToEach() throws Exception {
 
-        sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 10);
-        sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 10);
+        sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 50);
+        sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 50);
     }
 
     protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages) throws UMOException {

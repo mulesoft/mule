@@ -8,19 +8,19 @@
 
  * ------------------------------------------------------------------------------------------------------
 
- * 
+ *
 
  * Copyright (c) SymphonySoft Limited. All rights reserved.
 
  * http://www.symphonysoft.com
 
- * 
+ *
 
  * The software in this package is published under the terms of the BSD
 
  * style license a copy of which has been included with this distribution in
 
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
 
  *
 
@@ -58,7 +58,7 @@ import java.util.Properties;
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used
  * to listen for http requests on a particular port
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -256,9 +256,22 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         requestUri.append(endpoint.getProtocol()).append("://");
         requestUri.append(endpoint.getEndpointURI().getHost());
         requestUri.append(":").append(endpoint.getEndpointURI().getPort());
-        requestUri.append(path);
+        //first check there is a receive on the root address
         AbstractMessageReceiver receiver = connector.getReceiver(requestUri.toString());
+        //If no receiver on the root and there is a request path, look up the received based on the
+        //root plus request path
+        if(receiver==null && !"/".equals(path)) {
+            //remove anything after the last '/'
+            int x = path.lastIndexOf("/");
+            if(x > 1 && path.indexOf(".") > x) {
+                requestUri.append(path.substring(0, x));
+            } else {
+                requestUri.append(path);
+            }
+            receiver = connector.getReceiver(requestUri.toString());
+        }
         if(receiver==null) {
+
             throw new ConnectException(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, requestUri.toString()), this);
         }
         return receiver;

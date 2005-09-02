@@ -4,3 +4,5 @@ target
 test
 bin
 .mule
+ActiveMQ
+mule-integration-tests.iml

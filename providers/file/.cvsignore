@@ -5,3 +5,4 @@ test
 .project
 target
 bin
+mule-file-provider.iml
