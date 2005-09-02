@@ -1,0 +1,65 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+package org.mule.test.config;
+
+import org.mule.config.converters.QNameConverter;
+import org.mule.tck.NamedTestCase;
+
+import javax.xml.namespace.QName;
+
+/**
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @version $Revision$
+ */
+
+public class QNameConverterTestCase extends NamedTestCase
+{
+    protected QNameConverter converter = new QNameConverter();
+
+    public void testFullQNameString()
+    {
+        QName name = (QName)converter.convert(QName.class, "qname{e:echo:http://muleumo.org/echo}");
+        assertNotNull(name);
+        assertEquals("e", name.getPrefix());
+        assertEquals("echo", name.getLocalPart());
+        assertEquals("http://muleumo.org/echo", name.getNamespaceURI());
+    }
+
+     public void testNameAndNamespace()
+    {
+        QName name = (QName)converter.convert(QName.class, "qname{echo:http://muleumo.org/echo}");
+        assertNotNull(name);
+        assertEquals("http://muleumo.org/echo", name.getNamespaceURI());
+        assertEquals("echo", name.getLocalPart());
+        assertEquals("", name.getPrefix());
+    }
+
+    public void testNameOnly()
+    {
+        QName name = (QName)converter.convert(QName.class, "qname{echo}");
+        assertNotNull(name);
+        assertEquals("", name.getNamespaceURI());
+        assertEquals("echo", name.getLocalPart());
+        assertEquals("", name.getPrefix());
+    }
+
+    public void testNameOnlyWithoutBraces()
+    {
+        QName name = (QName)converter.convert(QName.class, "echo");
+        assertNotNull(name);
+        assertEquals("", name.getNamespaceURI());
+        assertEquals("echo", name.getLocalPart());
+        assertEquals("", name.getPrefix());
+    }
+}

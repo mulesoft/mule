@@ -73,6 +73,18 @@
             </properties>
         </dependency>
 
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-jaxrpc</artifactId>
+            <version>${axis_jaxrpc_version}</version>
+            <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>true</mule.mini>
+            </properties>
+        </dependency>
+
         <!-- Optional: used by mules default component pooling mechanism -->
         <dependency>
             <groupId>commons-pool</groupId>
