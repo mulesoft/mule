@@ -20,6 +20,7 @@ import java.util.Map;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transformers.AbstractTransformer;
+import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassHelper;
 
@@ -37,7 +38,7 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
  * @version $Revision$
  */
 
-public abstract class AbstractXStreamTransformer extends AbstractTransformer
+public abstract class AbstractXStreamTransformer extends AbstractEventAwareTransformer
 {
     private XStream xstream = null;
     private boolean useJaxpDom = false;
