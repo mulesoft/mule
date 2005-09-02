@@ -14,6 +14,8 @@
 package org.mule.transformers.xml;
 
 import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
 
 /**
  * <code>ObjectToXml</code> converts any object to xml using Xstream. Xstream
@@ -32,8 +34,15 @@ public class ObjectToXml extends AbstractXStreamTransformer
         registerSourceType(Object.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
-    {
-        return getXStream().toXML(src);
+    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+        //If the UMOMessage source type has been registered that we can assume that the
+        //whole message is to be serialised to Xml, nit just the payload.  This can be useful
+        //for protocols such as tcp where the protocol does not support headers, thus the whole messgae
+        //needs to be serialized
+        if(isSourceTypeSupported(UMOMessage.class, true)) {
+            return getXStream().toXML(context.getMessage());
+        } else {
+            return getXStream().toXML(src);
+        }
     }
 }

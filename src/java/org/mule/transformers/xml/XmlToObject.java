@@ -14,6 +14,9 @@
 package org.mule.transformers.xml;
 
 import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOMessage;
+import org.w3c.dom.Document;
 
 /**
  * <code>XmlToObject</code> converts xml created by the ObjectToXml
@@ -29,18 +32,24 @@ import org.mule.umo.transformer.TransformerException;
 
 public class XmlToObject extends AbstractXStreamTransformer
 {
+    private DomDocumentToXml domTransformer = new DomDocumentToXml();
+
     public XmlToObject()
     {
         registerSourceType(String.class);
         registerSourceType(byte[].class);
+        registerSourceType(org.w3c.dom.Document.class);
+        registerSourceType(org.dom4j.Document.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
-    {
+    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+
         if(src instanceof byte[]) {
-            return getXStream().fromXML(new String((byte[])src));            
-        } else {
+            return getXStream().fromXML(new String((byte[])src));
+        } else if(src instanceof String) {
             return getXStream().fromXML(src.toString());
+        } else {
+            return getXStream().fromXML((String)domTransformer.transform(src));
         }
     }
 }

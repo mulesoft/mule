@@ -29,15 +29,21 @@ public class DomDocumentToXml extends AbstractTransformer
     public DomDocumentToXml()
     {
         registerSourceType(org.w3c.dom.Document.class);
+        registerSourceType(org.dom4j.Document.class);
+        setReturnClass(String.class);
     }
 
     public Object doTransform(Object src) throws TransformerException
     {
 
         try {
-            org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document) src;
-            org.dom4j.Document dom4jDoc = new DOMReader().read(x3cDoc);
-
+            org.dom4j.Document dom4jDoc = null;
+            if(src instanceof org.w3c.dom.Document) {
+                org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document) src;
+                dom4jDoc = new DOMReader().read(x3cDoc);
+            } else {
+                dom4jDoc = (org.dom4j.Document)src;
+            }
             return dom4jDoc.asXML();
         } catch (Exception e) {
             throw new TransformerException(this, e);

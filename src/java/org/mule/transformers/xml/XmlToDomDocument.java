@@ -35,12 +35,14 @@ public class XmlToDomDocument extends AbstractTransformer
 
     public Object doTransform(Object src) throws TransformerException
     {
-
         try {
             String xml = (String) src;
             org.dom4j.Document dom4jDoc = DocumentHelper.parseText(xml);
-            org.w3c.dom.Document x3cDoc = new DOMWriter().write(dom4jDoc);
-            return x3cDoc;
+            if(org.dom4j.Document.class.equals(getReturnClass())) {
+                return dom4jDoc;
+            } else {
+                return new DOMWriter().write(dom4jDoc);
+            }
         } catch (Exception e) {
             throw new TransformerException(this, e);
         }
