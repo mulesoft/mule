@@ -13,16 +13,20 @@
  */
 package org.mule.transformers.xml;
 
-import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>ObjectToXml</code> converts any object to xml using Xstream. Xstream
  * uses some cleaver tricks so objects that get marshalled to xml do not need to
  * implement any interfaces including Serializable and you don't even need to
  * specify a default constructor.
- * 
+ *
+ * If <code>UMOMessage</code> is added as a source type on
+ * this transformer then the UMOMessage will be serialised.  This is useful for transports
+ * such as tcp where the message headers would normally be lost. 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
