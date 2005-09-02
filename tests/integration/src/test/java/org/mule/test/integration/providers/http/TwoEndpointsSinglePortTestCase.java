@@ -14,11 +14,8 @@
 */
 package org.mule.test.integration.providers.http;
 
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOException;
 
 import java.util.ArrayList;
@@ -28,18 +25,13 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class TwoEndpointsSinglePortTestCase extends NamedTestCase
+public class TwoEndpointsSinglePortTestCase extends IntegrationTestCase
  {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/providers/http/two-endpoints-single-port.xml");
-    }
+     protected String getConfigResources() {
+         return "org/mule/test/integration/providers/http/two-endpoints-single-port.xml";
+     }
 
-    public void testSendToEach() throws Exception {
+     public void testSendToEach() throws Exception {
 
         sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 10);
         sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 10);

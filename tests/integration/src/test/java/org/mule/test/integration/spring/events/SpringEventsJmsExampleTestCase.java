@@ -13,8 +13,6 @@
  */
 package org.mule.test.integration.spring.events;
 
-import javax.jms.TextMessage;
-
 import org.mule.MuleManager;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
@@ -22,6 +20,8 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import javax.jms.TextMessage;
 
 /**
  * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the
@@ -36,11 +36,8 @@ public class SpringEventsJmsExampleTestCase extends AbstractMuleTestCase
     private static int eventCount = 0;
     private static ClassPathXmlApplicationContext context;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
         if (context == null) {
             context = new ClassPathXmlApplicationContext("org/mule/test/integration/spring/events/mule-events-example-app-context.xml");
         } else {

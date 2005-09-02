@@ -32,9 +32,8 @@ public class MuleManagerTestCase extends AbstractMuleTestCase
     /**
      * Print the name of this test to standard output
      */
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         manager = getManager();
     }
 

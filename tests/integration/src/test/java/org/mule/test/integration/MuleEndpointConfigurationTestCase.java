@@ -14,9 +14,7 @@
 package org.mule.test.integration;
 
 import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.transformers.simple.StringToByteArray;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToObject;
@@ -29,30 +27,9 @@ import org.mule.umo.routing.UMOOutboundRouter;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleEndpointConfigurationTestCase extends NamedTestCase
+public class MuleEndpointConfigurationTestCase extends IntegrationTestCase
 {
-    private static boolean initialised = false;
-
-    public MuleEndpointConfigurationTestCase()
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-    }
-
-    protected void setUp() throws Exception
-    {
-        if (!initialised) {
-            System.setProperty("org.mule.disable.server.connections", "true");
-
-            if (MuleManager.isInstanciated())
-                MuleManager.getInstance().dispose();
-            ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-            configBuilder.configure(getConfigResource());
-            initialised = true;
-        }
-    }
-
-    protected String getConfigResource()
+    protected String getConfigResources()
     {
         return "org/mule/test/integration/test-endpoints-config.xml";
     }

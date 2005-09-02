@@ -14,17 +14,7 @@
 
 package org.mule.test.integration.providers.jms;
 
-import java.util.HashMap;
-
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.QueueConnection;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
-
+import EDU.oswego.cs.dl.util.concurrent.CountDown;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -40,21 +30,15 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionConfig;
-import org.mule.umo.UMOTransactionFactory;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
-import EDU.oswego.cs.dl.util.concurrent.CountDown;
+import javax.jms.*;
+import java.util.HashMap;
 
 /**
  * <code>AbstractJmsTransactionFunctionalTest</code> is a base class for all
@@ -70,16 +54,16 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
     protected UMOTransaction currentTx;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
+        super.doSetUp();
         currentTx = null;
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         TransactionCoordination.getInstance().unbindTransaction(TransactionCoordination.getInstance().getTransaction());
-        super.tearDown();
+        super.doTearDown();
     }
 
     public void testSendNotTransacted() throws Exception

@@ -48,11 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <code>AxisConnector</code> is used to maintain one or more Services for
@@ -292,12 +288,13 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             }
             axisDescriptor.setContainerManaged(false);
         }
+        String serviceName = receiver.getComponent().getDescriptor().getName();
         // No determine if the endpointUri requires a new connector to be
         // registed
         // in the case of http we only need to register the new endpointUri if
         // the
         // port is different
-        String endpoint = receiver.getEndpointURI().getAddress();
+        String endpoint = receiver.getEndpointURI().getAddress() + "/" + serviceName;
 
         String scheme = ep.getScheme().toLowerCase();
         boolean sync = receiver.getEndpoint().isSynchronous();
@@ -312,16 +309,17 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             endpointCounters = new HashMap();
         }
 
-        String endpointKey = getCounterEndpointKey(receiver.getEndpointURI());
+        //String endpointKey = getCounterEndpointKey(receiver.getEndpointURI());
+        //String endpointKey = receiver.getEndpointURI().toString() + "/" + serviceName;
 
-        Integer count = (Integer) endpointCounters.get(endpointKey.toString());
+        Integer count = (Integer) endpointCounters.get(endpoint);
         if (count == null)
             count = new Integer(0);
 
         if (count.intValue() == 0) {
             UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
             serviceEndpoint.setSynchronous(sync);
-            serviceEndpoint.setName(ep.getScheme() + ":" + receiver.getComponent().getDescriptor().getName());
+            serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
             // set the filter on the axis endpoint on the real receiver endpoint
             serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
             axisDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
@@ -329,7 +327,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         // Update the counter for this endpoint
         count = new Integer(count.intValue() + 1);
-        endpointCounters.put(endpointKey.toString(), count);
+        endpointCounters.put(endpoint, count);
         axisDescriptor.getProperties().put(ENDPOINT_COUNTERS_PROPERTY, endpointCounters);
     }
 

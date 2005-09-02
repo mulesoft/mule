@@ -47,7 +47,7 @@ import java.util.Map;
  * used by a Mule endpoint. The connector supports all Jms functionality
  * including, topics and queues, durable subscribers, acknowledgement modes,
  * loacal transactions
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
@@ -290,22 +290,10 @@ public class JmsConnector extends AbstractServiceEnabledConnector
         return session;
     }
 
-    public void doStop() throws UMOException
-    {
-        if (connection != null) {
-            try {
-                connection.stop();
-            } catch (JMSException e) {
-                throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jms Connection"), e);
-            }
-        }
-    }
+
 
     public void doStart() throws UMOException
     {
-        if(!isConnected()) {
-            getConnectionStrategy().connect(this);
-        }
         if (connection != null) {
 	        try {
         		connection.start();

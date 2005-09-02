@@ -13,11 +13,10 @@
  */
 package org.mule.test.integration.routing.replyto;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
@@ -29,12 +28,10 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class ReplytoChainIntegrationTestCase extends AbstractMuleTestCase
+public class ReplytoChainIntegrationTestCase extends IntegrationTestCase
 {
-    protected void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
+    protected String getConfigResources() {
+        return "org/mule/test/integration/routing/replyto/injection-test.xml";
     }
 
     public void testReplyToChain() throws UMOException

@@ -1,10 +1,15 @@
-<project default="test"
+<project default="test:test"
     xmlns:j="jelly:core"
     xmlns:u="jelly:util"
     xmlns:ant="jelly:ant"
     xmlns:maven="jelly:maven">
 
-    <goal name="startJms" prereqs="setClasspath">
+    <preGoal name="test:test">
+        <sysproperty key="org.activemq.home" value="${org.activemq.home}"/>
+        <echo>ActiveMQ home is at ${org.activemq.home}</echo>
+    </preGoal>
+
+    <goal name="startActiveMQ" prereqs="setClasspath">
         <!--Runs the ActiveMQ server"-->
         <j:set var="url" value="tcp://localhost:61616"/>
 

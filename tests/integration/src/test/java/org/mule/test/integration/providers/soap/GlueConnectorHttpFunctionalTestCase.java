@@ -31,4 +31,8 @@ public class GlueConnectorHttpFunctionalTestCase extends AxisConnectorHttpFuncti
     protected String getProtocol() {
         return "glue";
     }
+
+    public String getConfigResources() {
+        return "org/mule/test/integration/providers/soap/glue-http-mule-config.xml";
+    }
 }

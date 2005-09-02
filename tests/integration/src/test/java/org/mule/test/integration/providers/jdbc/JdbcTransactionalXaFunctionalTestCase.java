@@ -13,15 +13,15 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
-
 import org.enhydra.jdbc.standard.StandardXADataSource;
 import org.mule.providers.jdbc.xa.DataSourceWrapper;
 import org.mule.transaction.XaTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
+
+import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
 
 /**
  * @author Guillaume Nodet
@@ -32,8 +32,9 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
 
     private TransactionManager txManager;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
+        super.doSetUp();
         // check for already active JOTM instance
         txManager = Current.getCurrent();
         // if none found, create new local JOTM instance

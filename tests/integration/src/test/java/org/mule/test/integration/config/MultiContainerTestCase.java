@@ -14,10 +14,8 @@
 package org.mule.test.integration.config;
 
 import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.container.ContainerKeyPair;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
@@ -26,16 +24,10 @@ import org.mule.umo.manager.UMOContainerContext;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MultiContainerTestCase extends NamedTestCase
+public class MultiContainerTestCase extends IntegrationTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/config/multi-container-test.xml");
+    protected String getConfigResources() {
+        return "org/mule/test/integration/config/multi-container-test.xml";
     }
 
     public void testContainer() throws Exception

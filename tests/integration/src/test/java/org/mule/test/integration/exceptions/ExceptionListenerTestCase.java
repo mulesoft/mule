@@ -13,27 +13,19 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.message.ExceptionMessage;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ExceptionListenerTestCase extends NamedTestCase
+public class ExceptionListenerTestCase extends IntegrationTestCase
 {
-    public void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/integration/exceptions/exception-listener-config.xml");
+    protected String getConfigResources() {
+        return "org/mule/test/integration/exceptions/exception-listener-config.xml";
     }
 
     public void testExceptionStrategy() throws Exception

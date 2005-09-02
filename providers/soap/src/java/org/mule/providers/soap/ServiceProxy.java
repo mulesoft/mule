@@ -13,13 +13,7 @@
  */
 package org.mule.providers.soap;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import electric.service.IService;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
@@ -31,7 +25,12 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.ClassHelper;
 
-import electric.service.IService;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * <code>ServiceProxy</code> is a proxy that wraps a soap endpointUri to look
@@ -179,6 +178,9 @@ public class ServiceProxy
             messageAdapter.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method);
 
             UMOMessage message = receiver.routeMessage(new MuleMessage(messageAdapter), synchronous);
+            if(message.getExceptionPayload()!=null) {
+                throw message.getExceptionPayload().getException();
+            }
             if (message != null) {
                 return message.getPayload();
             } else {

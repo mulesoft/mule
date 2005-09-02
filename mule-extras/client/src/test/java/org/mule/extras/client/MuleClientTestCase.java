@@ -14,22 +14,18 @@
 package org.mule.extras.client;
 
 import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleClientTestCase extends AbstractMuleTestCase
+public class MuleClientTestCase extends IntegrationTestCase
 {
-    public void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("test-client-mule-config.xml");
+
+    protected String getConfigResources() {
+        return "test-client-mule-config.xml";
     }
 
     public void testClientSendDirect() throws Exception

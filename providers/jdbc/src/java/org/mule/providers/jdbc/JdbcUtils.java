@@ -13,6 +13,11 @@
  */
 package org.mule.providers.jdbc;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.umo.endpoint.UMOEndpointURI;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -20,11 +25,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -94,7 +94,7 @@ public abstract class JdbcUtils
             String param = (String) paramNames.get(i);
             String name = param.substring(2, param.length() - 1);
             Object value = null;
-            if ("NOW".equals(name)) {
+            if ("NOW".equalsIgnoreCase(name)) {
                 value = new Timestamp(Calendar.getInstance().getTimeInMillis());
             } else {
                 try {
@@ -105,6 +105,10 @@ public abstract class JdbcUtils
             if (value == null) {
                 value = uri.getParams().getProperty(name);
             }
+            if(name.equals("payload")) {
+                value = root;
+            }
+
             if (value == null) {
                 throw new IllegalArgumentException("Can not retrieve argument " + name);
             }

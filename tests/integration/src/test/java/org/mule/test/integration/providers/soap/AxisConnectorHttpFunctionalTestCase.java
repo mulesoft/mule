@@ -14,6 +14,7 @@
 package org.mule.test.integration.providers.soap;
 
 import org.mule.MuleManager;
+import org.mule.config.ExceptionHelper;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -40,7 +41,7 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapFunctionalT
         }
     }
 
-    public String getConfigResource() {
+    public String getConfigResources() {
         return "org/mule/test/integration/providers/soap/axis-http-mule-config.xml";
     }
 
@@ -48,11 +49,11 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapFunctionalT
         return "http://localhost:38011/mule/test";
     }
     protected String getRequestResponseEndpoint() {
-        return "http://localhost:38009/mule/mycomponent?method=echo";
+        return "http://localhost:38008/mule/mycomponent?method=echo";
     }
 
     protected String getReceiveEndpoint() {
-        return "http://localhost:38009/axis/services/mycomponent2?method=getDate";
+        return "http://localhost:38009/mule/services/mycomponent2?method=getDate";
     }
 
     protected String getReceiveComplexEndpoint() {
@@ -102,9 +103,8 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapFunctionalT
             MuleManager.getInstance().getModel().registerComponent(descriptor);
             fail();
         } catch (UMOException e) {
-            assertTrue(e.getCause() instanceof InitialisationException);
-            // assertEquals(Messages.X_MUST_IMPLEMENT_AN_INTERFACE,
-            // ((InitialisationException)e.getCause()).getMessageCode());
+            e = ExceptionHelper.getRootMuleException(e);
+            assertTrue(e instanceof InitialisationException);
         }
     }
 }

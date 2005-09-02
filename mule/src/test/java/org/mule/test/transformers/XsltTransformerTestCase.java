@@ -28,10 +28,8 @@ public class XsltTransformerTestCase extends AbstractTransformerTestCase
     private String srcData;
     private String resultData;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
-
         srcData = Utility.loadResourceAsString("cdcatalog.xml", getClass());
         resultData = Utility.loadResourceAsString("cdcatalog.html", getClass());
     }

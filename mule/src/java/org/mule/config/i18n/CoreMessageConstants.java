@@ -197,5 +197,7 @@ public interface CoreMessageConstants
     int TX_MANAGER_NOT_SET = 176;
     int TRANSFORM_ON_X_NOT_OF_SPECIFIED_TYPE_X = 177;
     int CANNOT_USE_TX_AND_REMOTE_SYNC = 178;
+    int CANNOT_BIND_TO_ADDRESS_X = 179;
+
 
 }

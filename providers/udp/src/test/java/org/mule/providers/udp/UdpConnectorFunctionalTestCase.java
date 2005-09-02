@@ -13,11 +13,6 @@
  */
 package org.mule.providers.udp;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.URI;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.endpoint.MuleEndpointURI;
@@ -25,6 +20,11 @@ import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.URI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -41,14 +41,13 @@ public class UdpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
     DatagramSocket s = null;
     URI serverUri = null;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         serverUri = getInDest().getUri();
 
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         try {
             s.close();

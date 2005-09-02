@@ -15,8 +15,7 @@
 package org.mule.impl;
 
 import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOSession;
 
@@ -24,16 +23,11 @@ import org.mule.umo.UMOSession;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class MuleComponentTestCase extends AbstractMuleTestCase
+public class MuleComponentTestCase extends IntegrationTestCase
 {
 
-    public void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("test-xml-mule-config.xml");
+    protected String getConfigResources() {
+        return "test-xml-mule-config.xml";
     }
 
     public void testSendToPausedComponent() throws Exception

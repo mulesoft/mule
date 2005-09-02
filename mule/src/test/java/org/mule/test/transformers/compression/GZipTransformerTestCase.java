@@ -15,14 +15,14 @@
 
 package org.mule.test.transformers.compression;
 
-import java.util.Arrays;
-
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.transformers.compression.GZipCompressTransformer;
 import org.mule.transformers.compression.GZipUncompressTransformer;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.compression.GZipCompression;
+
+import java.util.Arrays;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -32,9 +32,8 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
 {
     private GZipCompression strat;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         strat = new GZipCompression();
     }
 

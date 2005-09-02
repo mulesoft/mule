@@ -14,16 +14,17 @@
  */
 package org.mule.test.providers.file;
 
-import java.io.File;
-
 import org.mule.providers.file.FileMessageAdapter;
+import org.mule.tck.providers.AbstractMessageAdapterTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import java.io.File;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class FileMessageAdapterTestCase extends org.mule.tck.providers.AbstractMessageAdapterTestCase
+public class FileMessageAdapterTestCase extends AbstractMessageAdapterTestCase
 {
     private File message;
 
@@ -32,9 +33,9 @@ public class FileMessageAdapterTestCase extends org.mule.tck.providers.AbstractM
      * 
      * @see junit.framework.TestCase#setUp()
      */
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
+
         message = File.createTempFile("simple", ".mule");
     }
 

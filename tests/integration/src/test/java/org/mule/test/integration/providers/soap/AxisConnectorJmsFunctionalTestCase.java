@@ -21,7 +21,7 @@ package org.mule.test.integration.providers.soap;
  */
 public class AxisConnectorJmsFunctionalTestCase extends AbstractSoapFunctionalTestCase
  {
-    public String getConfigResource() {
+    public String getConfigResources() {
         return "org/mule/test/integration/providers/soap/axis-jms-mule-config.xml";
     }
 

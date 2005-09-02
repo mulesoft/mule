@@ -14,7 +14,6 @@
  */
 package org.mule.impl;
 
-import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOModel;
@@ -27,13 +26,6 @@ import java.util.Iterator;
  */
 public class MuleModelTestCase extends AbstractMuleTestCase
 {
-
-    public void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-    }
 
     public void testDescriptorAlreadyDefinedThrowsException() throws Exception
     {

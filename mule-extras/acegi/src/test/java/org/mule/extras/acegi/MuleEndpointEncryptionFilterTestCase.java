@@ -16,12 +16,11 @@ package org.mule.extras.acegi;
 import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.MuleProperties;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.security.CredentialsNotSetException;
@@ -34,21 +33,10 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleEndpointEncryptionFilterTestCase extends NamedTestCase
+public class MuleEndpointEncryptionFilterTestCase extends IntegrationTestCase
 {
-    public void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("test-acegi-encrypt-config.xml");
-    }
-
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
+    protected String getConfigResources() {
+        return "test-acegi-encrypt-config.xml";
     }
 
     public void testAuthenticationFailureNoContext() throws Exception

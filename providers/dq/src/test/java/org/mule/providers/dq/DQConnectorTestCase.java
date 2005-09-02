@@ -13,7 +13,6 @@
  */
 package org.mule.providers.dq;
 
-import org.mule.MuleManager;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
@@ -23,13 +22,6 @@ import org.mule.umo.provider.UMOConnector;
  */
 public class DQConnectorTestCase extends AbstractConnectorTestCase
 {
-    public void setUp() throws Exception
-    {
-        super.setUp();
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-    }
     
     public UMOConnector getConnector() throws Exception
     {

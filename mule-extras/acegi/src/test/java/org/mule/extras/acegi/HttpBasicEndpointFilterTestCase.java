@@ -20,16 +20,16 @@ import net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider;
 import net.sf.acegisecurity.providers.dao.User;
 import net.sf.acegisecurity.providers.dao.memory.InMemoryDaoImpl;
 import net.sf.acegisecurity.providers.dao.memory.UserMap;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.mule.components.simple.EchoComponent;
+import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.providers.http.HttpConstants;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.security.UMOSecurityProvider;
@@ -38,8 +38,31 @@ import org.mule.umo.security.UMOSecurityProvider;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpBasicEndpointFilterTestCase extends NamedTestCase
+public class HttpBasicEndpointFilterTestCase extends IntegrationTestCase
 {
+
+    protected String getConfigResources() {
+        return "";
+    }
+
+    protected ConfigurationBuilder getBuilder() throws Exception {
+        MuleSecurityManager sm = new MuleSecurityManager();
+        UMOSecurityProvider provider = new AcegiProviderAdapter(getTestProvider(), "testProvider");
+        sm.addProvider(provider);
+        QuickConfigurationBuilder builder = null;
+        builder = new QuickConfigurationBuilder(true);
+        UMOManager manager = builder.createStartedManager(true, "");
+        manager.setSecurityManager(sm);
+        UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(),
+                                                   "echo",
+                                                   "http://localhost:4567",
+                                                   null,
+                                                   null);
+        d.getInboundEndpoint().setSecurityFilter(new HttpBasicAuthenticationFilter("mule-realm"));
+        builder.registerComponent(d);
+
+        return builder;
+    }
 
     public AuthenticationProvider getTestProvider() throws Exception
     {
@@ -64,22 +87,6 @@ public class HttpBasicEndpointFilterTestCase extends NamedTestCase
         return provider;
     }
 
-    public void setUp() throws Exception
-    {
-        MuleSecurityManager sm = new MuleSecurityManager();
-        UMOSecurityProvider provider = new AcegiProviderAdapter(getTestProvider(), "testProvider");
-        sm.addProvider(provider);
-        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
-        UMOManager manager = builder.createStartedManager(true, "");
-        manager.setSecurityManager(sm);
-        UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(),
-                                                   "echo",
-                                                   "http://localhost:4567",
-                                                   null,
-                                                   null);
-        d.getInboundEndpoint().setSecurityFilter(new HttpBasicAuthenticationFilter("mule-realm"));
-        builder.registerComponent(d);
-    }
 
     public void testAuthenticationFailureNoContext() throws Exception
     {

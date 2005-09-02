@@ -26,17 +26,15 @@ import org.mule.umo.transformer.UMOTransformer;
  */
 public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
 {
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         // setup a dummy context for transformers that are event aware
         RequestContext.setEvent(getTestEvent("test"));
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         RequestContext.setEvent(null);
-        super.tearDown();
     }
 
     public void testTransform() throws Exception

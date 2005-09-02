@@ -14,7 +14,7 @@
 package org.mule.test.integration.client;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.Properties;
 
@@ -22,7 +22,7 @@ import java.util.Properties;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class MultipleJmsConnectorsTestCase extends NamedTestCase
+public class MultipleJmsConnectorsTestCase extends AbstractMuleTestCase
 {
     public void testMultipleJmsClientConnections() throws Exception
     {

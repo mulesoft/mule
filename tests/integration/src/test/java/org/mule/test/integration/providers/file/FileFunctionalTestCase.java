@@ -13,26 +13,18 @@
  */
 package org.mule.test.integration.providers.file;
 
-import java.io.File;
+import org.mule.tck.IntegrationTestCase;
 
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.tck.AbstractMuleTestCase;
+import java.io.File;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class FileFunctionalTestCase extends AbstractMuleTestCase
+public class FileFunctionalTestCase extends IntegrationTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/providers/file/file-config.xml");
+    protected String getConfigResources() {
+        return "org/mule/test/integration/providers/file/file-config.xml";
     }
 
     public void testRelative() throws Exception

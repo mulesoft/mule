@@ -19,9 +19,6 @@ import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.util.InetAddrPort;
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.providers.http.servlet.MuleReceiverServlet;
 
 /**
@@ -33,13 +30,8 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     private Server httpServer;
     public static final int HTTP_PORT = 8081;
 
-    protected void setUp() throws Exception
+    protected void doIntegrationSetUp() throws Exception
     {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure(getConfigResource());
-
         httpServer = new Server();
         SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
         httpServer.addListener(socketListener);
@@ -54,11 +46,11 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
         httpServer.start();
     }
 
-    protected void tearDown() throws Exception {
+    protected void doIntegrationTearDown() throws Exception {
         httpServer.stop();
     }
 
-    public String getConfigResource() {
+    public String getConfigResources() {
         return "org/mule/test/integration/providers/soap/axis-test-servlet-mule-config.xml";
     }
 

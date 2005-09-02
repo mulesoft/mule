@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.ResponseOutputStream;
@@ -245,9 +246,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
     }
 
-    protected AbstractMessageReceiver getTargetReceiver(UMOMessage message, UMOEndpoint endpoint) {
+    protected AbstractMessageReceiver getTargetReceiver(UMOMessage message, UMOEndpoint endpoint) throws ConnectException {
 
     String path = (String)message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        int i = path.indexOf("?");
+        if(i > -1) path = path.substring(0, i);
+
         StringBuffer requestUri = new StringBuffer();
         requestUri.append(endpoint.getProtocol()).append("://");
         requestUri.append(endpoint.getEndpointURI().getHost());
@@ -255,8 +259,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         requestUri.append(path);
         AbstractMessageReceiver receiver = connector.getReceiver(requestUri.toString());
         if(receiver==null) {
-            //this shouldn't be null unless the path in the request is incorrect
-            receiver = this;
+            throw new ConnectException(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, requestUri.toString()), this);
         }
         return receiver;
     }

@@ -13,33 +13,20 @@
  */
 package org.mule.extras.acegi;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleEndpointPlainTextFilterTestCase extends NamedTestCase
+public class MuleEndpointPlainTextFilterTestCase extends IntegrationTestCase
 {
-    public void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("test-acegi-encrypt-config.xml");
-    }
-
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
+    protected String getConfigResources() {
+        return "test-acegi-encrypt-config.xml";
     }
 
     public void testAuthenticationFailureNoContext() throws Exception

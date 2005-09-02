@@ -13,13 +13,9 @@
  */
 package org.mule.test.integration.client;
 
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.MuleProperties;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.test.integration.service.Person;
 import org.mule.umo.UMOMessage;
 
@@ -27,20 +23,10 @@ import org.mule.umo.UMOMessage;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleClientRemotingAxisTestCase extends NamedTestCase
+public class MuleClientRemotingAxisTestCase extends IntegrationTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/client/axis-test-mule-config.xml");
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
-        // Be sure the manager is fully started
-        Thread.sleep(1000);
+    protected String getConfigResources() {
+        return "org/mule/test/integration/client/axis-test-mule-config.xml";
     }
 
     public void testRequestResponse() throws Throwable

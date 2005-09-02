@@ -14,19 +14,18 @@
 package org.mule.test.integration.spring.transaction;
 
 import net.sf.hibernate.SessionFactory;
-
 import org.mule.extras.spring.transaction.SpringTransactionFactory;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOTransaction;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate.HibernateTransactionManager;
 import org.springframework.orm.hibernate.LocalSessionFactoryBean;
 
-public class SpringTransactionFactoryTestCase extends NamedTestCase
+public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
 {
 
-    protected void tearDown() throws Exception
+    protected void dotearDown() throws Exception
     {
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null) {
@@ -34,7 +33,7 @@ public class SpringTransactionFactoryTestCase extends NamedTestCase
         }
     }
 
-    public void test() throws Exception
+    public void testTransactionFactoryBinding() throws Exception
     {
         // Init a data source
         DriverManagerDataSource ds = new DriverManagerDataSource();

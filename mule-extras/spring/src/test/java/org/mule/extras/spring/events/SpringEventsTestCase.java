@@ -13,7 +13,6 @@
  */
 package org.mule.extras.spring.events;
 
-import org.mule.MuleManager;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
@@ -35,21 +34,11 @@ public class SpringEventsTestCase extends AbstractMuleTestCase
     private static ClassPathXmlApplicationContext context;
     public Object lock = new Object();
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-
         context = new ClassPathXmlApplicationContext(getConfigResources());
         eventCount = 0;
         eventCount2 = 0;
-    }
-
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
-        super.tearDown();
     }
 
     protected String getConfigResources()

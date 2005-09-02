@@ -13,8 +13,6 @@
  */
 package org.mule.tck.functional;
 
-import java.util.HashMap;
-
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -31,6 +29,8 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
+import java.util.HashMap;
+
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -44,11 +44,8 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     protected int callbackCount = 0;
     protected MuleDescriptor descriptor;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
         manager = MuleManager.getInstance();
         // Make sure we are running synchronously
         MuleManager.getConfiguration().setSynchronous(true);
@@ -62,7 +59,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         connector = createConnector();
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         connector.dispose();
     }

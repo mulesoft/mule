@@ -14,30 +14,18 @@
 package org.mule.extras.client;
 
 import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleClientRemotingTestCase extends AbstractMuleTestCase
+public class MuleClientRemotingTestCase extends IntegrationTestCase
 {
-    public void setUp() throws Exception
-    {
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("test-client-mule-config-remoting-tcp.xml");
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
-    }
 
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
+    protected String getConfigResources() {
+        return "test-client-mule-config-remoting-tcp.xml";
     }
 
     public String getServerUrl()

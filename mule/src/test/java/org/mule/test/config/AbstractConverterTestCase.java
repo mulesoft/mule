@@ -13,20 +13,19 @@
  */
 package org.mule.test.config;
 
-import org.apache.commons.beanutils.Converter;
-import org.mule.MuleManager;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.manager.UMOManager;
-
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+import org.apache.commons.beanutils.Converter;
+import org.mule.MuleManager;
+import org.mule.tck.NamedTestCase;
+import org.mule.umo.manager.UMOManager;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
+public abstract class AbstractConverterTestCase extends NamedTestCase
 {
     protected Mock mockManager = new Mock(UMOManager.class);
 
@@ -55,7 +54,6 @@ public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
         MuleManager.setInstance((UMOManager) mockManager.proxy());
         Object obj = getValidConvertedType();
         mockManager.expectAndReturn(getLookupMethod(), C.eq("test://Test"), obj);
-
         Object result = getConverter().convert(obj.getClass(), "test://Test");
 
         assertNotNull(result);
@@ -75,11 +73,6 @@ public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
             mockManager.verify();
         }
 
-    }
-
-    protected void tearDown() throws Exception
-    {
-        MuleManager.setInstance(null);
     }
 
     public abstract Converter getConverter();

@@ -43,9 +43,8 @@ public class SpringContainerContextTestCase extends AbstractContainerContextTest
      * 
      * @see junit.framework.TestCase#setUp()
      */
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         context = new SpringContainerContext();
         context.setConfigFile("test-application-context.xml");
     }

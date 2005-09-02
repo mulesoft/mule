@@ -11,14 +11,14 @@
     <url>http://www.muleumo.org/</url>
     <dependencies>
         <dependency>
-        	<groupId>cglib</groupId>
-        	<artifactId>cglib-full</artifactId>
-        	<version>${cglib_full_version}</version>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-full</artifactId>
+            <version>${cglib_full_version}</version>
         </dependency>
         <dependency>
-        	<groupId>ant</groupId>
-        	<artifactId>ant</artifactId>
-        	<version>${ant_version}</version>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>${ant_version}</version>
         </dependency>
         <dependency>
             <artifactId>org.mortbay.jetty</artifactId>
@@ -29,5 +29,14 @@
                 <war.bundle.jar>false</war.bundle.jar>
             </properties>
         </dependency>
-   </dependencies>
+    </dependencies>
+    <build>
+        <unitTest>
+            <excludes>
+                <exclude>**/Abstract*.*</exclude>
+                <exclude>**/EmailFunctionalTestCase.*</exclude>
+                <exclude>**/MuleClientAxisExternalTestCase.*</exclude>
+            </excludes>
+        </unitTest>
+    </build>
 </project>

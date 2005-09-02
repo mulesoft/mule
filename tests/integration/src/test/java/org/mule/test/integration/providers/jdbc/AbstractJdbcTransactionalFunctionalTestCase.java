@@ -13,23 +13,17 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import java.util.HashMap;
-
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.mule.MuleManager;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.functional.EventCallback;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionConfig;
-import org.mule.umo.UMOTransactionFactory;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.util.HashMap;
 
 /**
  * @author Guillaume Nodet
@@ -40,9 +34,8 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
 
     private UMOTransaction currentTx;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         currentTx = null;
     }
 

@@ -15,9 +15,6 @@ package org.mule.test.integration.providers.soap;
 
 import electric.proxy.IProxy;
 import electric.registry.Registry;
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
@@ -38,20 +35,7 @@ import java.util.List;
  */
 public class OldGlueConnectorFunctionalTestCase extends AbstractMuleTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("glue-test-mule-config.xml");
-    }
-
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
-        super.tearDown();
-    }
+   
 
     public void testRequestResponse() throws Throwable
     {

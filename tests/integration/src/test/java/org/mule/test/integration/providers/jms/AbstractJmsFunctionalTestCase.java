@@ -13,14 +13,6 @@
  */
 package org.mule.test.integration.providers.jms;
 
-import java.util.HashMap;
-
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.QueueConnection;
-import javax.jms.TopicConnection;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -35,6 +27,9 @@ import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+
+import javax.jms.*;
+import java.util.HashMap;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -62,11 +57,8 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
     protected final transient Log logger = LogFactory.getLog(getClass());
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
         // By default the JmsTestUtils use the openjms config, though you can
         // pass
         // in other configs using the property below
@@ -88,6 +80,14 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         eventCount = 0;
     }
 
+    protected void doTearDown() throws Exception
+    {
+        try {
+            cnn.close();
+        } catch (JMSException e) {
+        }
+    }
+
     protected void drainDestinations() throws Exception
     {
         if (!useTopics()) {
@@ -101,15 +101,6 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
     }
 
     public abstract Connection getConnection() throws Exception;
-
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
-        try {
-            cnn.close();
-        } catch (JMSException e) {
-        }
-    }
 
     public void initialiseComponent(EventCallback callback) throws Exception
     {

@@ -13,37 +13,35 @@
  */
 package org.mule.test.integration;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.MuleManager;
+import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.AbstractEventAwareTransformer;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
+import org.mule.umo.*;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EventMetaDataProporgationTestCase extends AbstractMuleTestCase implements Callable
+public class EventMetaDataProporgationTestCase extends IntegrationTestCase implements Callable
 {
     private Apple testObjectProperty = new Apple();
 
-    protected void setUp() throws Exception
-    {
-        super.setUp();
+    protected String getConfigResources() {
+        return "";
+    }
+
+    protected ConfigurationBuilder getBuilder() throws Exception {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         builder.createStartedManager(true, null);
         UMODescriptor c1 = builder.registerComponentInstance(this,
@@ -53,13 +51,9 @@ public class EventMetaDataProporgationTestCase extends AbstractMuleTestCase impl
         c1.getOutboundEndpoint().setTransformer(new DummyTransformer());
 
         builder.registerComponentInstance(this, "component2", new MuleEndpointURI("vm://component2"));
+        return builder;
     }
 
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        MuleManager.getInstance().dispose();
-    }
 
     public void testEventMetaDataProporgation() throws UMOException
     {

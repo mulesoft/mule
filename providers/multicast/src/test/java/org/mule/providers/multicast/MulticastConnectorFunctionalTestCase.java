@@ -13,17 +13,17 @@
  */
 package org.mule.providers.multicast;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.URI;
-
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.udp.UdpMessageAdapter;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.URI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -37,15 +37,14 @@ public class MulticastConnectorFunctionalTestCase extends AbstractProviderFuncti
     private InetAddress inet = null;
     private URI uri;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         uri = getInDest().getUri();
         inet = InetAddress.getByName(uri.getHost());
 
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         try {
             s1.close();

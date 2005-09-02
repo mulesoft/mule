@@ -13,9 +13,6 @@
  */
 package org.mule.tck;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mule.MuleManager;
 import org.mule.impl.MuleModel;
 import org.mule.interceptors.InterceptorStack;
@@ -26,6 +23,9 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -35,7 +35,7 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
 {
     private static boolean initialised = false;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         if (!initialised) {
             getUMOManager();

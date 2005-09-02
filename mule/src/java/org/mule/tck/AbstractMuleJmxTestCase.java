@@ -34,9 +34,8 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
 {
     protected MBeanServer mBeanServer;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         // simulate a running environment with Log4j MBean already registered
         List servers = MBeanServerFactory.findMBeanServer(null);
         if (servers.size() == 0) {
@@ -46,9 +45,8 @@ public class AbstractMuleJmxTestCase extends AbstractMuleTestCase
 
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
-        super.tearDown();
         // unregister all MBeans
         Set objectInstances = mBeanServer.queryMBeans(ObjectName.getInstance("*.*:*"), null);
         for (Iterator it = objectInstances.iterator(); it.hasNext();)

@@ -14,8 +14,6 @@
 
 package org.mule.test.integration.providers.jms.activemq;
 
-import javax.transaction.TransactionManager;
-
 import org.mule.MuleManager;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.transaction.XaTransactionFactory;
@@ -23,6 +21,8 @@ import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.provider.UMOConnector;
 import org.objectweb.jotm.Current;
 import org.objectweb.jotm.Jotm;
+
+import javax.transaction.TransactionManager;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -33,7 +33,7 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
 {
     private TransactionManager txManager;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         // check for already active JOTM instance
         txManager = Current.getCurrent();

@@ -13,15 +13,14 @@
  */
 package org.mule.test.transaction;
 
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
-
+import com.mockobjects.dynamic.Mock;
 import org.mule.MuleManager;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.XaTransaction;
 import org.mule.umo.UMOTransaction;
 
-import com.mockobjects.dynamic.Mock;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 
 /**
  * <code>XATransactionTestCase</code> TODO
@@ -35,18 +34,10 @@ public class XaTransactionTestCase extends AbstractMuleTestCase
 {
     protected Mock mockTm = new Mock(TransactionManager.class);
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         TransactionManager tm = (TransactionManager) mockTm.proxy();
         MuleManager.getInstance().setTransactionManager(tm);
-    }
-
-    protected void tearDown() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
     }
 
     public void testBeginCommit() throws Exception

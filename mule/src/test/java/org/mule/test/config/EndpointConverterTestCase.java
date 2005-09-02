@@ -15,6 +15,8 @@ package org.mule.test.config;
 
 import org.apache.commons.beanutils.Converter;
 import org.mule.config.converters.EndpointConverter;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.NamedTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
@@ -22,7 +24,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
  * @version $Revision$
  */
 
-public class EndpointConverterTestCase extends AbstractConverterTestCase
+public class EndpointConverterTestCase extends NamedTestCase
 {
     public Converter getConverter()
     {
@@ -32,7 +34,7 @@ public class EndpointConverterTestCase extends AbstractConverterTestCase
     public Object getValidConvertedType()
     {
         try {
-            return getTestEndpoint("test://Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+            return MuleTestUtils.getTestEndpoint("test://Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());

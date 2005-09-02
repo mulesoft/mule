@@ -13,6 +13,7 @@
  */
 package org.mule.test.integration;
 
+import org.activemq.ActiveMQConnection;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -26,7 +27,7 @@ import org.mule.providers.file.filters.FilenameWildcardFilter;
 import java.io.File;
 
 /**
- * Todo Document class
+ * Will start external test servers needed for the integration tests
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -39,7 +40,11 @@ public class ServerTools
 
     private static KillableWatchdog activemq;
 
-    public static void launchActiveMq() {
+    public static void launchActiveMq()  {
+        launchActiveMq(ActiveMQConnection.DEFAULT_BROKER_URL);
+    }
+    
+    public static void launchActiveMq(String brokerUrl) {
         String activeMqHome = System.getProperty(ACTIVEMQ_HOME);
         if(activeMqHome == null) {
             throw new NullPointerException("You must set the " + ACTIVEMQ_HOME + " system property to the root path of an ActiveMq distribution (v3.0 and greater) before running these tests");
@@ -63,7 +68,8 @@ public class ServerTools
         final JavaTask java = new JavaTask();
         java.setProject(project);
         java.setClasspath(path);
-        java.setClassname("org.activemq.spring.Main");
+        java.setClassname("org.activemq.broker.impl.Main");
+        java.setArgs(brokerUrl);
         java.setFork(true);
         java.setDir(new File(activeMqHome));
         java.addSysproperty(createVar("activemq.home", new File(activeMqHome).getAbsolutePath()));

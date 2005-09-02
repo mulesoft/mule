@@ -13,11 +13,11 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import javax.sql.DataSource;
-
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.mule.providers.jdbc.JdbcTransactionFactory;
 import org.mule.umo.UMOTransactionFactory;
+
+import javax.sql.DataSource;
 
 /**
  * @author Guillaume Nodet
@@ -25,11 +25,6 @@ import org.mule.umo.UMOTransactionFactory;
  */
 public class JdbcTransactionalJdbcFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase
 {
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
 
     protected UMOTransactionFactory getTransactionFactory()
     {

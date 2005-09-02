@@ -15,9 +15,6 @@
 
 package org.mule.test.mule;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.mule.impl.InterceptorsInvoker;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
@@ -26,13 +23,16 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMODescriptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class InterceptorsTestCase extends AbstractMuleTestCase
 {
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         // Make sure there is no current event
         RequestContext.setEvent(null);

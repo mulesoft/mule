@@ -14,12 +14,11 @@
 package org.mule.test.providers.file;
 
 import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.file.FileConnector;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOException;
@@ -30,15 +29,10 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ConnectorServiceOverridesTestCase extends AbstractMuleTestCase
+public class ConnectorServiceOverridesTestCase extends IntegrationTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("test-connector-config.xml");
+    protected String getConfigResources() {
+        return "test-connector-config.xml";
     }
 
     public void testServiceOverrides() throws InterruptedException

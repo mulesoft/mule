@@ -46,13 +46,14 @@ import java.util.Properties;
  */
 public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase implements ConnectionEventListener {
 
-	private JmsConnector connector;
-	private LinkedQueue events = new LinkedQueue();
-	
-    protected void setUp() throws Exception
+    private JmsConnector connector;
+    private LinkedQueue events = new LinkedQueue();
+
+    private long TIME_OUT = 10000L;
+    public static final String BROKER_URL = "tcp://localhost:56312";
+
+    protected void doSetUp() throws Exception
     {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
         // By default the JmsTestUtils use the openjms config, though you can
         // pass
         // in other configs using the property below
@@ -69,20 +70,22 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
         currentMsg = null;
         eventCount = 0;
     }
-    
-    protected void tearDown() throws Exception
+
+    protected void doTearDown() throws Exception
     {
-    	ServerTools.killActiveMq();
+        ServerTools.killActiveMq();
     }
-    
+
     public UMOConnector createConnector() throws Exception
     {
         connector = new JmsConnector();
         connector.setSpecification(JmsConnector.JMS_SPECIFICATION_11);
         Properties props = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
-
         connector.setConnectionFactoryJndiName("JmsQueueConnectionFactory");
+        Properties factoryProps = new Properties();
+        factoryProps.setProperty("brokerURL", BROKER_URL);
         connector.setJndiProviderProperties(props);
+        connector.setConnectionFactoryProperties(factoryProps);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
 
@@ -91,7 +94,7 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
         strategy.setFrequency(5000);
         strategy.setDoThreading(true);
         connector.setConnectionStrategy(strategy);
-        
+
         return connector;
     }
 
@@ -99,10 +102,11 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
     {
         // default to ActiveMq for Jms 1.1 support
         Properties p = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
+        p.setProperty("brokerURL", BROKER_URL);
         return JmsTestUtils.getQueueConnection(p);
     }
 
-	public void testReconnection() throws Exception {
+    public void testReconnection() throws Exception {
 
         MuleDescriptor d = getTestDescriptor("anOrange", Orange.class.getName());
 
@@ -119,69 +123,73 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
         connector.registerListener(component, endpoint);
 
         // Start time
-        long t0;
+        long t0, t1;
         // Check that connection fails
         t0 = System.currentTimeMillis();
         while (true) {
-        	ConnectionEvent event = (ConnectionEvent) events.take();
-        	if (event.getAction() == ConnectionEvent.CONNECTION_FAILED) {
-        		break;
-        	}
-        	if (System.currentTimeMillis() - t0 < 10000) {
-        		fail("No connection attempt");
-        	}
+            ConnectionEvent event = (ConnectionEvent) events.take();
+            if (event.getAction() == ConnectionEvent.CONNECTION_FAILED) {
+                break;
+            }
+            t1 = System.currentTimeMillis() -t0;
+            if (t1 > TIME_OUT) {
+                fail("No connection attempt");
+            }
         }
-        
+
         // Launch activemq
-        ServerTools.launchActiveMq();
+        ServerTools.launchActiveMq(BROKER_URL);
         // Check that connection succeed
         t0 = System.currentTimeMillis();
         while (true) {
-        	ConnectionEvent event = (ConnectionEvent) events.take();
-        	if (event.getAction() == ConnectionEvent.CONNECTION_CONNECTED) {
-        		break;
-        	}
-        	if (System.currentTimeMillis() - t0 < 10000) {
-        		fail("Connection should have succeeded");
-        	}
+            ConnectionEvent event = (ConnectionEvent) events.take();
+            if (event.getAction() == ConnectionEvent.CONNECTION_CONNECTED) {
+                break;
+            }
+            t1 = System.currentTimeMillis() -t0;
+            if (t1 > TIME_OUT) {
+                fail("Connection should have succeeded");
+            }
         }
         // Kill activemq
         ServerTools.killActiveMq();
         // Check that the connection is lost
         t0 = System.currentTimeMillis();
         while (true) {
-        	ConnectionEvent event = (ConnectionEvent) events.take();
-        	if (event.getAction() == ConnectionEvent.CONNECTION_DISCONNECTED) {
-        		break;
-        	}
-        	if (System.currentTimeMillis() - t0 < 10000) {
-        		fail("Connection should have been lost");
-        	}
+            ConnectionEvent event = (ConnectionEvent) events.take();
+            if (event.getAction() == ConnectionEvent.CONNECTION_DISCONNECTED) {
+                break;
+            }
+            t1 = System.currentTimeMillis() -t0;
+            if (t1 > TIME_OUT) {
+                fail("Connection should have been lost");
+            }
         }
         // Restart activemq
-        ServerTools.launchActiveMq();
+        ServerTools.launchActiveMq(BROKER_URL);
         // Check that connection succeed
         t0 = System.currentTimeMillis();
         while (true) {
-        	ConnectionEvent event = (ConnectionEvent) events.take();
-        	if (event.getAction() == ConnectionEvent.CONNECTION_CONNECTED) {
-        		break;
-        	}
-        	if (System.currentTimeMillis() - t0 < 10000) {
-        		fail("Connection should have succeeded");
-        	}
+            ConnectionEvent event = (ConnectionEvent) events.take();
+            if (event.getAction() == ConnectionEvent.CONNECTION_CONNECTED) {
+                break;
+            }
+            t1 = System.currentTimeMillis() -t0;
+            if (t1 > TIME_OUT) {
+                fail("Connection should have succeeded");
+            }
         }
         ServerTools.killActiveMq();
 
-	}
-	
+    }
 
 
-	public void onEvent(UMOServerEvent event) {
-		try {
-			events.put(event);
-		} catch (InterruptedException e) {
-		}
-	}
+
+    public void onEvent(UMOServerEvent event) {
+        try {
+            events.put(event);
+        } catch (InterruptedException e) {
+        }
+    }
 
 }

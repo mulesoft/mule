@@ -50,9 +50,8 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
      * (non-Javadoc)
      * @see junit.framework.TestCase#setUp()
      */
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         context = new EjbContainerContext();
         Map env = new HashMap();
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());

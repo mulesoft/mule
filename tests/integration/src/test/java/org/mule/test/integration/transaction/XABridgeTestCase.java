@@ -13,29 +13,34 @@
  */
 package org.mule.test.integration.transaction;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.List;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.providers.jdbc.JdbcUtils;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a> $Revision$
  */
-public class XABridgeTestCase extends AbstractMuleTestCase
+public class XABridgeTestCase extends IntegrationTestCase
 {
-
     private static ClassPathXmlApplicationContext context;
 
     private static final Log logger = LogFactory.getLog(XABridgeTestCase.class);
+
+    protected String getConfigResources() {
+        return "org/mule/test/integration/transaction/xabridge-mule.xml";
+    }
+
+    protected void doIntegrationSetUp() throws Exception {
+        emptyTable();
+    }
 
     protected void emptyTable() throws Exception
     {
@@ -50,22 +55,6 @@ public class XABridgeTestCase extends AbstractMuleTestCase
     {
         Class.forName("org.hsqldb.jdbcDriver");
         return DriverManager.getConnection("jdbc:hsqldb:mem:.");
-    }
-
-    protected void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-        emptyTable();
-        new MuleXmlConfigurationBuilder().configure("org/mule/test/integration/transaction/xabridge-mule.xml");
-    }
-
-    protected void tearDown() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
     }
 
     protected List execSqlQuery(String sql) throws Exception

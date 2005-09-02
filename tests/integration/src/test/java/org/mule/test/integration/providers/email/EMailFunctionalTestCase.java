@@ -13,38 +13,21 @@
  */
 package org.mule.test.integration.providers.email;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.tck.IntegrationTestCase;
+import org.mule.umo.UMOMessage;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class EMailFunctionalTestCase extends AbstractMuleTestCase
+public class EMailFunctionalTestCase extends IntegrationTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("org/mule/test/integration/providers/email/email-config.xml");
-    }
-    
-    protected void tearDown() throws Exception 
-    {
-        super.tearDown();
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
+    protected String getConfigResources() {
+        return "org/mule/test/integration/providers/email/email-config.xml";
     }
 
     public void testRoundtrip() throws Exception

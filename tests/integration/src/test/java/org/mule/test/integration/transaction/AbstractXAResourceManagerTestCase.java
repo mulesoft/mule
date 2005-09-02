@@ -14,37 +14,36 @@
  */
 package org.mule.test.integration.transaction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.xa.AbstractTransactionContext;
+import org.mule.util.xa.AbstractXAResourceManager;
+import org.mule.util.xa.AbstractXAResourceManager.AbstractSession;
+import org.mule.util.xa.ResourceManagerException;
+import org.objectweb.jotm.Jotm;
+
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
-
-import junit.framework.TestCase;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.util.xa.AbstractTransactionContext;
-import org.mule.util.xa.AbstractXAResourceManager;
-import org.mule.util.xa.ResourceManagerException;
-import org.mule.util.xa.AbstractXAResourceManager.AbstractSession;
-import org.objectweb.jotm.Jotm;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class AbstractXAResourceManagerTestCase extends TestCase
+public class AbstractXAResourceManagerTestCase extends AbstractMuleTestCase
 {
 
     private Jotm jotm;
     private TransactionManager tm;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         jotm = new Jotm(true, false);
         tm = jotm.getTransactionManager();
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         jotm.stop();
         jotm = null;

@@ -13,28 +13,33 @@
  */
 package org.mule.test.integration.spring;
 
-import junit.framework.TestCase;
-
+import org.mule.config.ConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.extras.client.RemoteDispatcher;
 import org.mule.extras.spring.config.SpringConfigurationBuilder;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class MuleAdminTestCase extends TestCase {
-	
-	public void test() throws Exception
-	{
-		SpringConfigurationBuilder builder = new SpringConfigurationBuilder();
-        builder.configure("org/mule/test/integration/spring/mule-admin-spring.xml");
-        
+public class MuleAdminTestCase extends IntegrationTestCase {
+
+    protected String getConfigResources() {
+        return "org/mule/test/integration/spring/mule-admin-spring.xml";
+    }
+
+    protected ConfigurationBuilder getBuilder() {
+        return new SpringConfigurationBuilder();
+    }
+
+    public void testMuleAdminChannelInSpring() throws Exception
+    {
         MuleClient mc = new MuleClient();
         RemoteDispatcher rd = mc.getRemoteDispatcher("tcp://localhost:60504");
         UMOMessage result = rd.sendToRemoteComponent("appleComponent", "string", null);
         assertNotNull(result);
-	}
+    }
 
 }

@@ -13,10 +13,8 @@
  */
 package org.mule.test.integration.routing;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
@@ -25,24 +23,18 @@ import org.mule.umo.UMOMessage;
  * @version $Revision$
  */
 
-public class AggregatorIntegrationTestCase extends AbstractMuleTestCase
+public class AggregatorIntegrationTestCase extends IntegrationTestCase
 {
-    protected void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
+    protected String getConfigResources() {
+        return "org/mule/test/integration/routing/test-correlation-aggregator.xml";
     }
 
     public void testAggregator() throws UMOException
     {
         String message = "test";
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/integration/routing/test-correlation-aggregator.xml");
-
         MuleClient client = new MuleClient();
         UMOMessage result = client.send("vm://distributor.queue", message, null);
         assertNotNull(result);
-        // Te
         assertEquals(message + message, result.getPayload());
     }
 }

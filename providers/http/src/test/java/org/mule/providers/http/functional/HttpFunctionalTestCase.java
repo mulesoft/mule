@@ -87,8 +87,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
         assertEquals(TEST_MESSAGE + " Received", msg);
     }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    protected void doTearDown() throws Exception {
         try {
             cnn.close();
         } catch (Exception e) {

@@ -13,30 +13,19 @@
  */
 package org.mule.test.integration.transaction;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.IntegrationTestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class OutboundTransactionsTestCase extends AbstractMuleTestCase
+public class OutboundTransactionsTestCase extends IntegrationTestCase
 {
     private static final int TIMEOUT = 2000;
-    
-    protected void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-        new MuleXmlConfigurationBuilder().configure("org/mule/test/integration/transaction/outbound-transactions.xml");
-    }
 
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
+    protected String getConfigResources() {
+        return "org/mule/test/integration/transaction/outbound-transactions.xml";
     }
 
     public void testOutboundRouterTransactions() throws Exception
@@ -44,11 +33,11 @@ public class OutboundTransactionsTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
 
         while (client.receive("jms://my.queue1", TIMEOUT) != null) {
-        	// consume messages
+            // consume messages
         }
 
         while (client.receive("jms://my.queue2", TIMEOUT) != null) {
-        	// consume messages
+            // consume messages
         }
 
         client.sendNoReceive("vm://component1", "test", null);
@@ -64,11 +53,11 @@ public class OutboundTransactionsTestCase extends AbstractMuleTestCase
         MuleClient client = new MuleClient();
 
         while (client.receive("jms://my.queue3", TIMEOUT) != null) {
-        	// consume messages
+            // consume messages
         }
 
         while (client.receive("jms://my.queue4", TIMEOUT) != null) {
-        	// consume messages
+            // consume messages
         }
 
         client.sendNoReceive("jms://component2", "test", null);

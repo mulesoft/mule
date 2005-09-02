@@ -3,7 +3,7 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="axis_test" version="1.0">
+<mule-configuration id="glue_test" version="1.0">
 
     <model name="test">
         <mule-descriptor name="mycomponent"
@@ -13,7 +13,7 @@
 
         <mule-descriptor name="mycomponent2"
             implementation="org.mule.test.integration.service.TestServiceComponent"
-            inboundEndpoint="glue:http://localhost:38009/axis/services">
+            inboundEndpoint="glue:http://localhost:38009/mule/services">
             <properties>
                 <list name="serviceInterfaces">
                     <entry value="org.mule.components.simple.EchoService"/>

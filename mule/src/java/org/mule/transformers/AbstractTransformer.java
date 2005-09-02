@@ -145,13 +145,25 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     public boolean isSourceTypeSupported(Class aClass)
     {
+        return isSourceTypeSupported(aClass, false);
+    }
+    public boolean isSourceTypeSupported(Class aClass, boolean exactMatch)
+    {
         if (sourceTypes.isEmpty()) {
-            return true;
+            if(exactMatch) {
+                return false;
+            } else {
+                return true;
+            }
         }
         Class anotherClass = null;
         for (Iterator i = getSourceTypeClassesIterator(); i.hasNext();) {
             anotherClass = (Class) i.next();
-            if (anotherClass.isAssignableFrom(aClass)) {
+            if(exactMatch) {
+                if (anotherClass.equals(aClass)) {
+                    return true;
+                }
+            }else  if (anotherClass.isAssignableFrom(aClass)) {
                 return true;
             }
         }

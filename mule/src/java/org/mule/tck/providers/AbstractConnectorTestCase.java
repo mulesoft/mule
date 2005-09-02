@@ -55,15 +55,14 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
      * 
      * @see junit.framework.TestCase#setUp()
      */
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         descriptor = getTestDescriptor("orange", Orange.class.getName());
         MuleManager.getInstance().start();
         connector = getConnector();
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         if (!connector.isDisposed())
             connector.dispose();

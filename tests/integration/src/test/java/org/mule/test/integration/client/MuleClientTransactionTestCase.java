@@ -13,13 +13,11 @@
  */
 package org.mule.test.integration.client;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.providers.jms.JmsTransactionFactory;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.IntegrationTestCase;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
@@ -34,17 +32,11 @@ import java.util.Map;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class MuleClientTransactionTestCase extends NamedTestCase
+public class MuleClientTransactionTestCase extends IntegrationTestCase
 {
 
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/integration/client/test-client-jms-mule-config.xml");
+    protected String getConfigResources() {
+        return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
     }
     
     public void testTransactionsWithSetRollbackOnly() throws Exception 

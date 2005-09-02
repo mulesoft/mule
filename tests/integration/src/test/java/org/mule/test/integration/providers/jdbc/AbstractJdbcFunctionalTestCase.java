@@ -13,13 +13,6 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
-import javax.sql.XADataSource;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.mule.MuleManager;
@@ -35,6 +28,12 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
+
+import javax.sql.DataSource;
+import javax.sql.XADataSource;
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Guillaume Nodet
@@ -56,7 +55,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     protected static UMOManager manager;
     protected DataSource dataSource;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         // Create a new mule manager
         manager = MuleManager.getInstance();
@@ -72,11 +71,6 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
         MuleManager.getInstance().registerConnector(connector);
         // Empty table
         emptyTable();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
     }
 
     protected void emptyTable() throws Exception
