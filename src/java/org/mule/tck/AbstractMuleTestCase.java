@@ -15,35 +15,19 @@
 
 package org.mule.tck;
 
+import com.mockobjects.dynamic.Mock;
 import org.mule.MuleManager;
-import org.mule.config.PoolingProfile;
-import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.config.MuleConfiguration;
 import org.mule.impl.MuleComponent;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleModel;
-import org.mule.impl.MuleSession;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOSession;
-import org.mule.umo.UMOTransaction;
-import org.mule.umo.UMOTransactionFactory;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
-import org.mule.util.ClassHelper;
-
-import com.mockobjects.dynamic.Mock;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
@@ -60,115 +44,87 @@ public abstract class AbstractMuleTestCase extends NamedTestCase
         super();
     }
 
-    public static UMOManager getManager() throws Exception
-    {
-        UMOManager manager;
+     protected final void setUp() throws Exception {
         if (MuleManager.isInstanciated())
             MuleManager.getInstance().dispose();
-        manager = MuleManager.getInstance();
-        manager.setModel(new MuleModel());
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration()
-                   .getPoolingProfile()
-                   .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_NO_COMPONENTS);
-        return manager;
+         doSetUp();
+    }
+
+    protected final void tearDown() throws Exception {
+        doTearDown();
+        if (MuleManager.isInstanciated())
+            MuleManager.getInstance().dispose();
+
+        MuleManager.setConfiguration(new MuleConfiguration());
+    }
+
+    protected void doSetUp() throws Exception {
+
+    }
+
+    protected void doTearDown() throws Exception {
+
+    }
+
+    public static UMOManager getManager() throws Exception
+    {
+        return MuleTestUtils.getManager();
     }
 
     public static UMOEndpoint getTestEndpoint(String name, String type) throws Exception
     {
-        UMOEndpoint endpoint = new MuleEndpoint();
-        // need to build endpoint this way to avoid depenency to any endpoint
-        // jars
-        UMOConnector connector = null;
-        connector = (UMOConnector) ClassHelper.loadClass("org.mule.tck.testmodels.mule.TestConnector",
-                                                         AbstractMuleTestCase.class).newInstance();
-
-        connector.setName("testConnector");
-        endpoint.setConnector(connector);
-        endpoint.setEndpointURI(new MuleEndpointURI("test://test"));
-        endpoint.setName(name);
-        endpoint.setType(type);
-        return endpoint;
+        return MuleTestUtils.getTestEndpoint(name, type);
     }
 
     public static UMOEvent getTestEvent(Object data) throws Exception
     {
-        UMOComponent component = getTestComponent(getTestDescriptor("string", String.class.getName()));
-        UMOSession session = getTestSession(component);
-        UMOEvent event = new MuleEvent(new MuleMessage(data, null),
-                                       getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER),
-                                       session,
-                                       true);
-        return event;
+        return MuleTestUtils.getTestEvent(data);
     }
 
     public static UMOTransformer getTestTransformer()
     {
-        return new TestCompressionTransformer();
+        return MuleTestUtils.getTestTransformer();
     }
 
     public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor) throws Exception
     {
-        UMOComponent component = getTestComponent(descriptor);
-        assertNotNull(component);
- 
-        UMOSession session = getTestSession(component);
-        assertNotNull(session);
-
-        UMOEndpoint endpoint = getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        assertNotNull(endpoint);
-
-        UMOEvent event = new MuleEvent(new MuleMessage(data, null), endpoint, session, true);
-        return event;
+        return MuleTestUtils.getTestEvent(data, descriptor);
     }
 
     public static UMOEvent getTestEvent(Object data, UMOEndpoint endpoint) throws Exception
     {
-        UMOSession session = getTestSession(getTestComponent(getTestDescriptor("string", String.class.getName())));
-        UMOEvent event = new MuleEvent(new MuleMessage(data, null), endpoint, session, true);
-        return event;
+        return MuleTestUtils.getTestEvent(data, endpoint);
     }
 
     public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOEndpoint endpoint)
             throws UMOException
     {
-        UMOSession session = getTestSession(getTestComponent(descriptor));
-        UMOEvent event = new MuleEvent(new MuleMessage(data, null), endpoint, session, true);
-        return event;
+        return MuleTestUtils.getTestEvent(data, descriptor, endpoint);
     }
 
     public static UMOSession getTestSession(UMOComponent component)
     {
-        return new MuleSession(component, null);
+        return MuleTestUtils.getTestSession(component);
     }
 
     public static TestConnector getTestConnector()
     {
-        return new TestConnector();
+        return MuleTestUtils.getTestConnector();
     }
 
     public static MuleComponent getTestComponent(MuleDescriptor descriptor)
     {
-        return new MuleComponent(descriptor);
+        return MuleTestUtils.getTestComponent(descriptor);
     }
 
     public static MuleDescriptor getTestDescriptor(String name, String implementation) throws Exception
     {
-        MuleDescriptor descriptor = new MuleDescriptor();
-        descriptor.setExceptionListener(new DefaultExceptionStrategy());
-        descriptor.setName(name);
-        descriptor.setImplementation(implementation);
-        descriptor.setOutboundEndpoint(getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER));
-        descriptor.initialise();
-
-        descriptor.getPoolingProfile().setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_NO_COMPONENTS);
-
-        return descriptor;
+        return MuleTestUtils.getTestDescriptor(name, implementation);
     }
 
     public static UMOManager getTestManager()
     {
-        return MuleManager.getInstance();
+        return MuleTestUtils.getTestManager();
     }
 
     public static Mock getMockSession()

@@ -52,7 +52,7 @@ import java.util.*;
  * deriving connectors the possibility to dispatch work to separate threads.
  * This functionality is controlled with the <i> doThreading</i> property on
  * the threadingProfiles for dispachers and receivers.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -261,13 +261,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             // has been disposing");
         }
         if (started.get()) {
-            if(isConnected()) {
-                try {
-                    disconnect();
-                } catch (Exception e) {
-                    logger.error("Failed to disconnect: " + e.getMessage(), e);
-                }
-            }
             if (logger.isInfoEnabled()) {
                 logger.info("Stopping Connector: " + getClass().getName());
             }
@@ -280,6 +273,13 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
                 mr.stop();
             }
             started.set(false);
+            if(isConnected()) {
+                try {
+                    disconnect();
+                } catch (Exception e) {
+                    logger.error("Failed to disconnect: " + e.getMessage(), e);
+                }
+            }
             if (logger.isInfoEnabled()) {
                 logger.info("Connector " + getClass().getName() + " has been stopped");
             }

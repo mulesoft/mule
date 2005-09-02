@@ -13,16 +13,13 @@
  */
 package org.mule.test.transaction;
 
+import com.mockobjects.dynamic.Mock;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOTransaction;
 
-import com.mockobjects.dynamic.Mock;
-
 /**
- * <code>TransactionCoordinationTestCase</code> TODO
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -31,15 +28,13 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
 {
     TransactionCoordination tc;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         tc = TransactionCoordination.getInstance();
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
-        super.tearDown();
         tc.unbindTransaction(tc.getTransaction());
         TransactionCoordination.setInstance(null);
     }

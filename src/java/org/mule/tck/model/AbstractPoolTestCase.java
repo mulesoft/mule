@@ -41,7 +41,7 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
 
     }
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         // Initialise the manager
         getManager();

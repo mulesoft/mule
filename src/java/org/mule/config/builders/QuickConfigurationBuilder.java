@@ -13,9 +13,10 @@
  */
 package org.mule.config.builders;
 
-import java.util.Map;
-
 import org.mule.MuleManager;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.ConfigurationException;
+import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
@@ -33,6 +34,8 @@ import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 
+import java.util.Map;
+
 /**
  * <code>QuickConfigurationBuilder</code> is a configuration helper that can
  * be used by clients, configuration scripts or test cases to quickly configure
@@ -41,7 +44,7 @@ import org.mule.umo.provider.UMOConnector;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class QuickConfigurationBuilder
+public class QuickConfigurationBuilder implements ConfigurationBuilder
 {
     private UMOManager manager;
 
@@ -494,5 +497,17 @@ public class QuickConfigurationBuilder
         ep.initialise();
         manager.registerEndpoint(ep);
         return ep;
+    }
+
+    public UMOManager configure(String configResources) throws ConfigurationException {
+        return manager;
+    }
+
+    public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException {
+        return manager;
+    }
+
+    public boolean isConfigured() {
+        return manager!=null; 
     }
 }

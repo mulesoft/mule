@@ -12,17 +12,14 @@
 
 package org.mule.test.util.timer;
 
-import java.util.Timer;
-
 import junit.framework.TestCase;
-
 import org.mule.util.timer.EventTimerTask;
 import org.mule.util.timer.TimeEvent;
 import org.mule.util.timer.TimeEventListener;
 
+import java.util.Timer;
+
 /**
- * <code>TimerTestCase</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

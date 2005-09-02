@@ -15,7 +15,6 @@
 package org.mule.impl.internal.admin;
 
 import org.mule.MuleManager;
-import org.mule.config.MuleConfiguration;
 import org.mule.tck.AbstractMuleTestCase;
 
 /**
@@ -24,24 +23,13 @@ import org.mule.tck.AbstractMuleTestCase;
  */
 public class MuleAdminAgentTestCase extends AbstractMuleTestCase
 {
-    private MuleManager manager;
-
 
     /**
      * Print the name of this test to standard output.
      */
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
-        this.manager = (MuleManager) getManager();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-        this.manager.dispose();
-        // reset configuration as it is static by default
-        MuleManager.setConfiguration(new MuleConfiguration());
+        getManager();
     }
 
 

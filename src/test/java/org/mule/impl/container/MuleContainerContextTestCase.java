@@ -15,7 +15,6 @@
 
 package org.mule.impl.container;
 
-import org.mule.impl.container.MuleContainerContext;
 import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.UMODescriptor;
@@ -45,9 +44,8 @@ public class MuleContainerContextTestCase extends AbstractContainerContextTestCa
      * 
      * @see junit.framework.TestCase#setUp()
      */
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         context = new MuleContainerContext();
     }
 
