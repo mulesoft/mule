@@ -28,11 +28,7 @@ import org.mule.util.Utility;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a UMOMessage into a
@@ -127,11 +123,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     addParameters(uri.getQuery(), postMethod);
                     if (src instanceof String) {
                         postMethod.setRequestBody(new ByteArrayInputStream(src.toString().getBytes()));
-                        postMethod.setRequestContentLength(src.toString().length());
+                        postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
                     } else {
                         byte[] buffer = Utility.objectToByteArray(src);
                         postMethod.setRequestBody(new ByteArrayInputStream(buffer));
-                        postMethod.setRequestContentLength(buffer.length);
+                        postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
                     }
 
                 } else {

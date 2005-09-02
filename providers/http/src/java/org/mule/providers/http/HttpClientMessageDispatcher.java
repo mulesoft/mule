@@ -163,15 +163,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             if (body instanceof String) {
                 ObjectToHttpClientMethodRequest trans = new ObjectToHttpClientMethodRequest();
                 httpMethod = (HttpMethod) trans.transform(body.toString());
-                 postMethod.setRequestBody(body.toString());
-                 postMethod.setRequestContentLength(body.toString().length());
-                 httpMethod = postMethod;
             } else if (body instanceof HttpMethod) {
                 httpMethod = (HttpMethod) body;
             } else {
                 byte[] buffer = event.getTransformedMessageAsBytes();
                 postMethod.setRequestBody(new ByteArrayInputStream(buffer));
-                postMethod.setRequestContentLength(buffer.length);
+                postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
                 httpMethod = postMethod;
             }
 
