@@ -27,6 +27,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOWorkManager;
+import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 
@@ -85,41 +86,43 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
      * 
      * @see org.mule.umo.provider.UMOMessageDispatcher#dispatch(org.mule.umo.UMOEvent)
      */
-    public final void dispatch(UMOEvent event) throws Exception
+    public final void dispatch(UMOEvent event) throws DispatchException
     {
-        try {
-            event.setSynchronous(false);
-            event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
-            RequestContext.setEvent(event);
-            // Apply Security filter if one is set
-            UMOEndpoint endpoint = event.getEndpoint();
-            if (endpoint.getSecurityFilter() != null) {
-                try {
-                    endpoint.getSecurityFilter().authenticate(event);
-                } catch (org.mule.umo.security.SecurityException e) {
-                    logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                    connector.handleException(e);
-                    return;
-                }
+        event.setSynchronous(false);
+        event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
+        RequestContext.setEvent(event);
+        // Apply Security filter if one is set
+        UMOEndpoint endpoint = event.getEndpoint();
+        if (endpoint.getSecurityFilter() != null) {
+            try {
+                endpoint.getSecurityFilter().authenticate(event);
+            } catch (org.mule.umo.security.SecurityException e) {
+                logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
+                connector.handleException(e);
+                return;
+            } catch (UMOException e) {
+                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
-            // the security filter may update the payload so we need to get the
-            // latest event again
-            event = RequestContext.getEvent();
+        }
+        // the security filter may update the payload so we need to get the
+        // latest event again
+        event = RequestContext.getEvent();
 
+        try {
             UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
             if (doThreading && !event.isSynchronous() && tx == null) {
                 workManager.scheduleWork(new Worker(event));
             } else {
                 doDispatch(event);
             }
-        } catch (Exception e) {
-            // automatically dispose if there were failures
-            logger.info("Exception occurred while executing on this dispatcher. disposing before continuing");
+        } catch (DispatchException e) {
             throw e;
+        } catch (Exception e) {
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
     }
 
-    public final UMOMessage send(UMOEvent event) throws Exception
+    public final UMOMessage send(UMOEvent event) throws DispatchException
     {
         event.setSynchronous(true);
         event.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint().getEndpointURI().toString());
@@ -133,6 +136,8 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 connector.handleException(e);
                 return event.getMessage();
+            } catch (UMOException e) {
+                throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
             }
         }
         // the security filter may update the payload so we need to get the
@@ -141,9 +146,10 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         try {
             UMOMessage result = doSend(event);
             return result;
-        } catch (Exception e) {
-            logger.info("Exception occurred while executing on this dispatcher. disposing before continuing");
+        } catch (DispatchException e) {
             throw e;
+        } catch (Exception e) {
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
     }
 
