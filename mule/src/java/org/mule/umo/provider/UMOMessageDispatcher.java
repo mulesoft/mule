@@ -32,18 +32,18 @@ public interface UMOMessageDispatcher extends Disposable
      * Dispatches an event from the endpoint to the external system
      * 
      * @param event The event to dispatch
-     * @throws java.lang.Exception if the event fails to be dispatched
+     * @throws DispatchException if the event fails to be dispatched
      */
-    void dispatch(UMOEvent event) throws Exception;
+    void dispatch(UMOEvent event) throws DispatchException;
 
     /**
      * Sends an event from the endpoint to the external system
      * 
      * @param event The event to send
      * @return event the response form the external system wrapped in a UMOEvent
-     * @throws java.lang.Exception if the event fails to be dispatched
+     * @throws DispatchException if the event fails to be dispatched
      */
-    UMOMessage send(UMOEvent event) throws Exception;
+    UMOMessage send(UMOEvent event) throws DispatchException;
 
     UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception;
 
