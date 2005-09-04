@@ -35,8 +35,8 @@ public class MuleClientListenerTestCase extends NamedTestCase
             try {
                 client.send(urlString, "Test Client Send message", null);
                 fail("There is no receiver for this endpointUri");
-            } catch (NoReceiverForEndpointException e) {
-                // ignore
+            } catch (Exception e) {
+                assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
             }
         }
 
@@ -57,8 +57,8 @@ public class MuleClientListenerTestCase extends NamedTestCase
             try {
                 message = client.send(urlString, "Test Client Send message", null);
                 fail("There is no receiver for this endpointUri");
-            } catch (NoReceiverForEndpointException e) {
-                // ignore
+            } catch (Exception e) {
+                assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
             }
         }
     }
