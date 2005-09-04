@@ -266,6 +266,7 @@
             <artifactId>geronimo-spec-servlet</artifactId>
             <version>${geronimo_spec_servlet_version}</version>
             <properties>
+                <ignore>true</ignore>
                 <mule.core.jar>false</mule.core.jar>
                 <mule.mini>false</mule.mini>
                 <rar.bundle>false</rar.bundle>
@@ -279,7 +280,7 @@
             <artifactId>geronimo-spec-ejb</artifactId>
             <version>${geronimo_spec_ejb_version}</version>
             <properties>
-                <mule.core.jar>false</mule.core.jar>
+                <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
                 <rar.bundle>false</rar.bundle>
                 <war.bundle>false</war.bundle>
@@ -294,7 +295,7 @@
             <properties>
                 <rar.bundle>false</rar.bundle>
                 <war.bundle>true</war.bundle>
-                <mule.core.jar>true</mule.core.jar>
+                <mule.core.jar>false</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
         </dependency>
