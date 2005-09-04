@@ -1,4 +1,4 @@
-<project default="jar"
+<project default="dist-samples"
     xmlns:j="jelly:core"
     xmlns:u="jelly:util"
     xmlns:ant="jelly:ant"
@@ -24,12 +24,12 @@
     <!--                SAMPLES TARGETS                  -->
     <!--=================================================-->
 
-    <goal name="dist-samples" prereqs="setvars,test">
+    <goal name="dist-samples" prereqs="setvars">
          <maven:reactor
             basedir="${basedir}"
             postProcessing="false"
-            includes="./*/project.xml"
-            goals="dist"
+            includes="**/project.xml"
+            goals="dist-sample"
             banner="Dist Samples"
             ignoreFailures="false"/>
 
@@ -41,19 +41,19 @@
         <mkdir dir="${mule.samples.dist.dir}/src"/>
         <mkdir dir="${mule.samples.dist.dir}/conf"/>
 
-        <copy todir="${mule.samples.dist.dir}/conf" file="../mule/src/conf/log4j.properties"/>
+        <copy todir="${mule.samples.dist.dir}/conf" file="${root.dir}/../mule/src/conf/log4j.properties"/>
 
-        <echo>Looking for src in ${basedir}/${mule.sample.name}/src/java</echo>
-        <u:available file="${basedir}/${mule.sample.name}/src/java">
+        <echo>Looking for src in ${basedir}/src/java</echo>
+        <u:available file="${basedir}/src/java">
             <copy todir="${mule.samples.dist.dir}/src">
-                <fileset dir="${basedir}/${mule.sample.name}/src/java"/>
+                <fileset dir="${basedir}/src/java"/>
             </copy>
         </u:available>
 
         <mkdir dir="${mule.samples.dist.dir}/bin"/>
-        <chmod file="${mule.samples.dist.dir}/bin" perm="ugo+rx"/>
+        <chmod file="${mule.samples.dist.dir}/bin/*.sh" perm="ugo+rx"/>
         <copy todir="${mule.samples.dist.dir}/bin">
-            <fileset dir="${mule.sample.name}/bin"/>
+            <fileset dir="bin"/>
         </copy>
 
         <u:available file="${basedir}/target/classes/org/mule/samples/${mule.sample.name}">
@@ -65,13 +65,13 @@
             </copy>
         </u:available>
         <copy todir="${mule.samples.dist.dir}/conf">
-            <fileset dir="${basedir}/${mule.sample.name}/conf">
+            <fileset dir="${basedir}/conf">
                 <exclude name="test-*.*"/>
             </fileset>
         </copy>
         <j:if test="${mule.sample.testdata}">
             <copy todir="${mule.samples.dist.dir}/test-data">
-                <fileset dir="${basedir}/${mule.sample.name}/test-data"/>
+                <fileset dir="${basedir}/test-data"/>
             </copy>
         </j:if>
 

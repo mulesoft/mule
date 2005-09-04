@@ -8,12 +8,12 @@
         <attainGoal name="idea:multiproject"/>
 <!--        <copy todir="${basedir}" file="${basedir}/tools/idea/workspace/_root.iml"/>-->
     </preGoal>
-    
+
     <goal name="mule:eclipse">
         <j:set var="goal" value="eclipse"/>
         <attainGoal name="multiproject:goal"/>
     </goal>
-    
+
     <postGoal name="eclipse">
     	<mkdir dir="${basedir}/src/conf" />
     	<mkdir dir="${basedir}/src/test/conf" />
@@ -26,6 +26,14 @@
     <postGoal name="multiproject:install-snapshot">
         <attainGoal name="all-jars"/>
     </postGoal>
+
+    <goal name="cleanup">
+        <delete>
+           <fileset dir="${basedir}">
+                <include name="**/junit*.properties"/>
+            </fileset>
+        </delete>
+    </goal>
 
     <goal name="all-jars" prereqs="setvars">
 
@@ -123,8 +131,6 @@
         <j:set var="mule.release.lib.dir" value="${mule.release.dir}\lib"/>
         <j:set var="mule.release.lib.opt.dir" value="${mule.release.lib.dir}\opt"/>
         <j:set var="mule.release.dist.dir" value="${mule.release.dir}\dist"/>
-        <j:set var="mule.release.src.dir" value="${mule.release.dir}\src"/>
-        <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
         <echo>Release dir is ${mule.release.dir}</echo>
         <j:set var="mule.base.context.path" value="../../.."/>
         <j:set var="mule.samples.dist" value="${mule.release.dir}/samples"/>
@@ -140,7 +146,6 @@
         <mkdir dir="${mule.release.lib.dir}"/>
         <mkdir dir="${mule.release.lib.opt.dir}"/>
         <mkdir dir="${mule.release.lib.dir}/licenses"/>
-        <mkdir dir="${mule.release.src.dir}"/>
     </goal>
 
     <postGoal name="test:test">
@@ -157,6 +162,8 @@
 
     <goal name="mule:release" description="Creates and zips build for distribution">
         <attainGoal name="base-release"/>
+        <attainGoal name="mule:src"/>
+        <attainGoal name="mule:site"/>
         <attainGoal name="mule:tools"/>
         <attainGoal name="mule:javadoc"/>
 
@@ -185,8 +192,6 @@
         <attainGoal name="mule:release-prepare"/>
         <attainGoal name="multiproject:install"/>
         <attainGoal name="mule:libs"/>
-        <attainGoal name="mule:src"/>
-        <attainGoal name="mule:site"/>
         <attainGoal name="mule:samples"/>
         <copy todir="${mule.release.dir}/lib/licenses">
             <fileset dir="${basedir}/licenses"/>
@@ -215,9 +220,21 @@
         <property name="classpath" refid="cp"/>
     </goal>
 
-    <goal name="mule:samples" prereqs="setvars,dist-samples"/>
+    <goal name="mule:samples" prereqs="setvars">
+        <j:set var="root.dir" value="${basedir}"/>
+        <maven:reactor
+            basedir="${basedir}/samples"
+            postProcessing="false"
+            includes="project.xml"
+            goals="dist-samples"
+            banner="Dist Samples"
+            ignoreFailures="false"/>
+    </goal>
 
     <goal name="mule:tools" prereqs="setvars">
+        <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
+        <mkdir dir="${mule.release.tools.dir}"/>
+
         <mkdir dir="${mule.release.tools.dir}/benchmark"/>
         <copy todir="${mule.release.tools.dir}/benchmark">
             <fileset dir="${basedir}/tools/benchmark">
@@ -262,15 +279,18 @@
         <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-dist.tar.gz" longfile="gnu">
             <tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
         </tar>
-        <!-- tar up site -->
-        <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-site.tar.gz" longfile="gnu">
-            <tarfileset dir="${maven.build.dir}/docs" prefix="docs"/>
-        </tar>
+
+        <!-- tar up site if it is available-->
+        <u:available file="${maven.build.dir}/docs">
+	    <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-site.tar.gz" longfile="gnu">
+	        <tarfileset dir="${maven.build.dir}/docs" prefix="docs"/>
+	    </tar>
+	</u:available>
     </goal>
 
     <goal name="mule:site" prereqs="mule:dtds, multiproject:site"/>
 
-    <goal name="mule:libs">
+    <goal name="mule:libs" prereqs="setvars">
         <!-- copies artifact and deps -->
         <j:set var="goal" value="mule:libs-copy"/>
         <attainGoal name="multiproject:goal"/>
@@ -286,13 +306,14 @@
 
         <echo>Copying project dependencies for ${pom.artifactId}, package ${pom.package}</echo>
         <j:forEach var="lib" items="${pom.dependencies}">
+
             <j:if test="${lib.getProperty('ignore')!='true'}">
                 <j:if test="${lib.getProperty('mule.core.jar')!='true'}">
-                    <copy todir="${mule.release.lib.opt.dir}"
+                    <copy todir="${basedir}/../../target/release/lib/opt"
                         file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
                 </j:if>
                 <j:if test="${lib.getProperty('mule.core.jar')=='true'}">
-                    <copy todir="${mule.release.lib.dir}"
+                    <copy todir="${basedir}/../../target/release/lib"
                         file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
                 </j:if>
 <!--                <j:if test="${pom.package=='org.mule.providers' || pom.package=='org.mule.extras'}">-->
@@ -308,6 +329,9 @@
     </goal>
 
     <goal name="mule:src">
+        <j:set var="mule.release.src.dir" value="${mule.release.dir}\src"/>
+        <mkdir dir="${mule.release.src.dir}"/>
+
         <!-- copies src to one directory  -->
         <j:set var="goal" value="mule:src-copy"/>
         <attainGoal name="multiproject:goal"/>
@@ -385,17 +409,6 @@
         <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
             <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.dtd ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/dtds/"/>
         </exec>
-    </goal>
-
-    <goal name="dist-samples">
-        <j:set var="root.dir" value="${basedir}"/>
-        <maven:reactor
-            basedir="${basedir}/samples"
-            postProcessing="false"
-            includes="project.xml"
-            goals="dist-samples"
-            banner="Dist Samples"
-            ignoreFailures="false"/>
     </goal>
 
     <goal name="mini:mule">

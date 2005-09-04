@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <extend>../../project.xml</extend>
+    <extend>${basedir}/../project.xml</extend>
     <id>mule-webapp</id>
     <groupId>mule</groupId>
     <pomVersion>3</pomVersion>

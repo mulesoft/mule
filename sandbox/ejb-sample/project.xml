@@ -16,17 +16,17 @@
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
-    	<dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-ejb</artifactId>
-            <version>${geronimo_spec_ejb_version}</version>
-            <properties>
-                <rar.bundle>false</rar.bundle>
-                <war.bundle>false</war.bundle>
-                <mule.core.jar>false</mule.core.jar>
-                <mule.mini>false</mule.mini>
-            </properties>
-        </dependency>
+    	<!--<dependency>-->
+            <!--<groupId>geronimo-spec</groupId>-->
+            <!--<artifactId>geronimo-spec-ejb</artifactId>-->
+            <!--<version>${geronimo_spec_ejb_version}</version>-->
+            <!--<properties>-->
+                <!--<rar.bundle>false</rar.bundle>-->
+                <!--<war.bundle>false</war.bundle>-->
+                <!--<mule.core.jar>false</mule.core.jar>-->
+                <!--<mule.mini>false</mule.mini>-->
+            <!--</properties>-->
+        <!--</dependency>-->
     </dependencies>
 <!--    <build>-->
 <!--        <resources>-->
