@@ -44,7 +44,7 @@
         </zip>
     </goal>
 
-    <goal name="dist-sample" prereqs="setvars,test">
+    <goal name="distro" prereqs="setvars,test">
         <j:set var="mule.samples.dist.dir" value="../target/release/samples/mule-webapp"/>
         <echo>WebApp dist dir is ${mule.samples.dist.dir}</echo>
         <mkdir dir="${mule.samples.dist.dir}"/>

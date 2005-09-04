@@ -1,6 +1,6 @@
-<project default="dist-sample" xmlns:j="jelly:core">
+<project default="distro" xmlns:j="jelly:core">
 
-    <goal name="dist-sample" prereqs="setvars,java:compile">
+    <goal name="distro" prereqs="setvars,java:compile">
         <j:set var="mule.sample.name" value="echo"/>
         <j:set var="mule.sample.testdata" value="false"/>
         <j:set var="mule.sample.main" value="org.mule.MuleServer"/>
