@@ -11,3 +11,5 @@ build.properties
 workspace
 .mule
 ActiveMQ
+xdocs
+mule-event.log

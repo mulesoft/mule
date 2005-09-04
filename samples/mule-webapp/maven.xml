@@ -43,4 +43,38 @@
             <zipfileset dir="webapp"/>
         </zip>
     </goal>
+
+    <goal name="dist" prereqs="setvars,java:compile">
+        <j:set var="mule.samples.dist.dir" value="${samples.dist}/mule-webapp"/>
+        <echo>WebApp dist dir is ${mule.samples.dist.dir}</echo>
+        <mkdir dir="${mule.samples.dist.dir}"/>
+        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/lib"/>
+        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello"/>
+        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest"/>
+
+        <copy todir="${mule.samples.dist.dir}" file="mule-webapp/maven.xml"/>
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes" file="${root.dir}/mule/src/conf/log4j.properties"/>
+
+        <replace token="@VERSION@" value="${pom.currentVersion}" file="${mule.samples.dist.dir}/maven.xml"/>
+
+        <copy todir="${mule.samples.dist.dir}/webapp">
+            <fileset dir="mule-webapp/webapp">
+                <include name="**/*.xml"/>
+                <include name="**/*.jsp"/>
+                <include name="**/*.html"/>
+                <include name="**/*.gif"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello">
+            <fileset dir="${maven.build.dir}/classes/org/mule/samples/hello">
+                <include name="**/*.class"/>
+            </fileset>
+        </copy>
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest">
+            <fileset dir="${maven.build.dir}/classes/org/mule/samples/rest">
+                <include name="**/*.class"/>
+            </fileset>
+        </copy>
+    </goal>
 </project>

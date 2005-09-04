@@ -1,1 +1,1 @@
-call run-with-classpath.bat -config ../conf/hello-http-mule-config.xml
+call ..\..\..\bin\mule.bat -config ../conf/hello-http-mule-config.xml

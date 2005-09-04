@@ -1,1 +1,1 @@
-exec ./run-with-classpath.sh -builder org.mule.extras.spring.config.SpringConfigurationBuilder -config ../conf/hello-spring-config.xml
+exec ../../../bin/mule.sh -builder org.mule.extras.spring.config.SpringConfigurationBuilder -config ../conf/hello-spring-config.xml

@@ -1,0 +1,7 @@
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <name>Mule Echo Sample</name>
+    <id>mule-samples-echo</id>
+    <groupId>mule</groupId>
+    <dependencies/>
+</project>

@@ -19,29 +19,9 @@
     	<mkdir dir="${basedir}/src/test/conf" />
     </postGoal>
 
-    <!--    <goal name="mule:idea">-->
-    <!--        <maven:reactor-->
-    <!--            basedir="${basedir}/tools/idea/workspace"-->
-    <!--            postProcessing="false"-->
-    <!--            includes="project.xml"-->
-    <!--            goals="mule:idea"-->
-    <!--            banner="Creating Idea workspace"-->
-    <!--            ignoreFailures="false"/>-->
-    <!--    </goal>-->
-
-    <!--    <preGoal name="multiproject:install">-->
-    <!--        <attainGoal name="clean"/>-->
-    <!--        <attainGoal name="multiproject:clean"/>-->
-    <!--    </preGoal>-->
-
     <postGoal name="multiproject:install">
         <attainGoal name="all-jars"/>
     </postGoal>
-
-    <!--    <preGoal name="multiproject:install-snapshot">-->
-    <!--        <attainGoal name="clean"/>-->
-    <!--        <attainGoal name="multiproject:clean"/>-->
-    <!--    </preGoal>-->
 
     <postGoal name="multiproject:install-snapshot">
         <attainGoal name="all-jars"/>
@@ -141,6 +121,7 @@
     <goal name="setvars">
         <j:set var="mule.release.dir" value="${maven.build.dir}\release"/>
         <j:set var="mule.release.lib.dir" value="${mule.release.dir}\lib"/>
+        <j:set var="mule.release.lib.opt.dir" value="${mule.release.lib.dir}\opt"/>
         <j:set var="mule.release.dist.dir" value="${mule.release.dir}\dist"/>
         <j:set var="mule.release.src.dir" value="${mule.release.dir}\src"/>
         <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
@@ -154,8 +135,10 @@
         <echo>About to create lib and bin directories in ${mule.release.dir}</echo>
         <delete dir="${mule.release.dist.dir}"/>
         <mkdir dir="${mule.release.dir}"/>
+        <mkdir dir="${mule.release.dir}/bin"/>
         <mkdir dir="${mule.release.dist.dir}"/>
         <mkdir dir="${mule.release.lib.dir}"/>
+        <mkdir dir="${mule.release.lib.opt.dir}"/>
         <mkdir dir="${mule.release.lib.dir}/licenses"/>
         <mkdir dir="${mule.release.src.dir}"/>
     </goal>
@@ -173,23 +156,8 @@
     </goal>
 
     <goal name="mule:release" description="Creates and zips build for distribution">
-        <!-- for some reason the reactor is getting confused when these are set
-        as prereqs?
-        -->
-
-        <attainGoal name="mule:libs"/>
-        <attainGoal name="mule:src"/>
-        <attainGoal name="mule:site"/>
-        <attainGoal name="mule:samples"/>
+        <attainGoal name="base-release"/>
         <attainGoal name="mule:tools"/>
-
-        <copy todir="${mule.release.dir}/lib/licenses">
-            <fileset dir="${basedir}/licenses"/>
-        </copy>
-
-        <copy todir="${mule.release.dir}" file="${basedir}/LICENSE.txt"/>
-        <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
-
         <attainGoal name="mule:javadoc"/>
 
         <!-- copy the full javadocs to the site docs -->
@@ -203,6 +171,33 @@
 <!--        <ant:copy todir="${maven.build.dir}/distributions">-->
 <!--            <ant:fileset dir="${basedir}/etc/mini/target/distributions" includes="mini-mule*"/>-->
 <!--        </ant:copy>-->
+    </goal>
+
+    <goal name="mule:night-release" description="Creates and zips build for distribution">
+        <attainGoal name="base-release"/>
+        <attainGoal name="mule:zip-release"/>
+    </goal>
+
+    <goal name="base-release" description="Creates and zips build for distribution">
+        <!-- for some reason the reactor is getting confused when these are set
+        as prereqs?
+        -->
+        <attainGoal name="mule:release-prepare"/>
+        <attainGoal name="multiproject:install"/>
+        <attainGoal name="mule:libs"/>
+        <attainGoal name="mule:src"/>
+        <attainGoal name="mule:site"/>
+        <attainGoal name="mule:samples"/>
+        <copy todir="${mule.release.dir}/lib/licenses">
+            <fileset dir="${basedir}/licenses"/>
+        </copy>
+
+        <copy todir="${mule.release.dir}" file="${basedir}/LICENSE.txt"/>
+        <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
+
+        <copy todir="${mule.release.dir}/bin">
+            <fileset dir="${basedir}/bin"/>
+        </copy>
     </goal>
 
     <goal name="build-classpath" prereqs="setvars">
@@ -281,8 +276,10 @@
         <attainGoal name="multiproject:goal"/>
         <!-- delete any mule artifacts in the lib dir as thse will be included in the dist dir -->
         <ant:delete>
-            <ant:fileset dir="${mule.release.lib.dir}" includes="*mule-*"/>
+            <ant:fileset dir="${mule.release.lib.dir}" includes="mule-*"/>
         </ant:delete>
+
+        <copy todir="${mule.release.lib.dir}" file="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
     </goal>
 
     <goal name="mule:libs-copy">
@@ -290,21 +287,22 @@
         <echo>Copying project dependencies for ${pom.artifactId}, package ${pom.package}</echo>
         <j:forEach var="lib" items="${pom.dependencies}">
             <j:if test="${lib.getProperty('ignore')!='true'}">
-                <j:if test="${pom.package=='org.mule.extras'}">
-                    <j:if test="${lib.getProperty('mule.core.jar')!='true'}">
-                        <mkdir dir="${basedir}/../../target/release/lib/${pom.artifactId}"/>
-                        <copy todir="${basedir}/../../target/release/lib/${pom.artifactId}"
-                            file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
-                    </j:if>
-                </j:if>
-                <j:if test="${pom.package=='org.mule'}">
-                    <copy todir="${basedir}/../target/release/lib"
+                <j:if test="${lib.getProperty('mule.core.jar')!='true'}">
+                    <copy todir="${mule.release.lib.opt.dir}"
                         file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
                 </j:if>
-                <j:if test="${pom.package!='org.mule.extras'}">
-                    <copy todir="${basedir}/../../target/release/lib"
+                <j:if test="${lib.getProperty('mule.core.jar')=='true'}">
+                    <copy todir="${mule.release.lib.dir}"
                         file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
                 </j:if>
+<!--                <j:if test="${pom.package=='org.mule.providers' || pom.package=='org.mule.extras'}">-->
+<!--                    <copy todir="${basedir}/../../target/release/lib"-->
+<!--                        file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>-->
+<!--                </j:if>-->
+<!--                <j:if test="${pom.package!='org.mule.extras'}">-->
+<!--                    <copy todir="${basedir}/../../target/release/lib"-->
+<!--                        file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>-->
+<!--                </j:if>-->
             </j:if>
         </j:forEach>
     </goal>

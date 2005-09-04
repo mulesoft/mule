@@ -1,0 +1,7 @@
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <name>Mule Stock Quotes Sample</name>
+    <id>mule-samples-stockquotes</id>
+    <groupId>mule</groupId>
+    <dependencies/>
+</project>
