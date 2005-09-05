@@ -1,0 +1,46 @@
+#! /bin/sh
+
+#   Copyright 2001-2004 The Apache Software Foundation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRMULEIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+if [ -z "$MULE_HOME" -o ! -d "$MULE_HOME" ] ; then
+  # try to find MULE
+  if [ -d /opt/mule ] ; then
+    MULE_HOME=/opt/mule
+  fi
+
+  if [ -d "${HOME}/opt/mule" ] ; then
+    MULE_HOME="${HOME}/opt/mule"
+  fi
+
+  ## resolve links - $0 may be a link to mule's home
+  PRG="$0"
+  progname=`basename "$0"`
+
+  # need this for relative symlinks
+  while [ -h "$PRG" ] ; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+    else
+    PRG=`dirname "$PRG"`"/$link"
+    fi
+  done
+
+  MULE_HOME=`dirname "$PRG"`/..
+
+  # make it fully qualified
+  MULE_HOME=`cd "$MULE_HOME" && pwd`
+fi
