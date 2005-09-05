@@ -66,15 +66,15 @@
             </fileset>
         </copy>
 
-        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello">
-            <fileset dir="../hello/target/classes/org/mule/samples/hello">
-                <include name="**/*.class"/>
-            </fileset>
-        </copy>
-        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest">
-            <fileset dir="${maven.build.dir}/classes/org/mule/samples/rest">
-                <include name="**/*.class"/>
-            </fileset>
-        </copy>
+        <!--<copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello">-->
+            <!--<fileset dir="../hello/target/classes/org/mule/samples/hello">-->
+                <!--<include name="**/*.class"/>-->
+            <!--</fileset>-->
+        <!--</copy>-->
+        <!--<copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest">-->
+            <!--<fileset dir="${maven.build.dir}/classes/org/mule/samples/rest">-->
+                <!--<include name="**/*.class"/>-->
+            <!--</fileset>-->
+        <!--</copy>-->
     </goal>
 </project>

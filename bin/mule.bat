@@ -36,7 +36,9 @@ rem and for NT handling to skip to.
 
 :doneStart
 
-call ./sethome.bat
+if exist %CD%\sethome.bat call %CD%\sethome.bat
+
+if not exist %CD%\sethome.bat if %MULE_HOME% == "" echo Did not find sethome.bat in current directory and MULE_HOME is not set.
 
 if %MULE_HOME% == "" goto :noMuleHome
 goto checkJava

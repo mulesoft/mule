@@ -29,7 +29,7 @@
     <siteDirectory>/home/projects/mule/public_html</siteDirectory>
 
     <repository>
-        <connection>scm:cvs:pserver:anonymous@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</connection>
+        <connection>scm:cvs:ssh:rossmason@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</connection>
         <developerConnection>scm:cvs:ext:${maven.username}@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</developerConnection>
         <url>http://cvs.mule.codehaus.org/</url>
     </repository>

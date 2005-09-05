@@ -29,11 +29,13 @@
             basedir="${basedir}"
             postProcessing="false"
             includes="**/project.xml"
-            goals="dist-sample"
+            goals="distro"
             banner="Dist Samples"
             ignoreFailures="false"/>
 
     </goal>
+    
+    <goal name="distro"/>
 
     <goal name="dist-sample">
         <j:set var="mule.samples.dist.dir" value="${samples.dist}/${mule.sample.name}"/>

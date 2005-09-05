@@ -1,1 +1,10 @@
-exec ../../../bin/mule.sh -config ../conf/echo-mule-config.xml
+#! /bin/sh
+# There is no need to call this if you set the MULE_HOME in your environment
+exec ../../../bin/sethome
+
+# Set your application specific classpath like this
+export CLASSPATH=$MULE_HOME/samples/echo/conf
+
+exec ../../../bin/mule -config ../conf/mule-config.xml
+
+export CLASSPATH=
