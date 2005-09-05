@@ -5,10 +5,6 @@
 
 <mule-configuration id="Loan_broker_Sync" version="1.0">
 
-    <environment-properties>
-        <property name="http.keepAlive" value="false"/>
-    </environment-properties>
-
     <mule-environment-properties synchronous="true" serverUrl=""/>
     
     <agents>

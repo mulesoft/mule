@@ -34,7 +34,7 @@ import java.util.*;
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a UMOMessage into a
  * HttpClient HttpMethod that represents an HttpRequest.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -125,7 +125,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     addParameters(uri.getQuery(), postMethod);
                     //Dont set a POST payload if the body is a Null Payload.  This way client calls
                     //can control if a POST body is posted explicitly
-                    if(!(context.getMessage().getPayload() instanceof NullPayload)) {
+                   if(!(context.getMessage().getPayload() instanceof NullPayload)) {
                         if (src instanceof String) {
                             postMethod.setRequestBody(new ByteArrayInputStream(src.toString().getBytes()));
                         } else {

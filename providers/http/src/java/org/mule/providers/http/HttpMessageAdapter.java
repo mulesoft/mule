@@ -15,25 +15,25 @@
 
 package org.mule.providers.http;
 
-import java.util.Map;
-
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
+import java.util.Map;
+
 /**
  * <code>HttpMessageAdapter</code> Wraps an incoming Http Request making the
  * payload and heads available a standard message adapter
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpMessageAdapter extends AbstractMessageAdapter
-{
+public class HttpMessageAdapter extends AbstractMessageAdapter {
     private byte[] message = null;
 
-    public HttpMessageAdapter(Object message) throws MessagingException
-    {
+    private boolean http11 = true;
+
+    public HttpMessageAdapter(Object message) throws MessagingException {
         if (message instanceof Object[]) {
             this.message = (byte[]) ((Object[]) message)[0];
             if (((Object[]) message).length > 1) {
@@ -44,6 +44,10 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
         } else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
+        String temp = (String) properties.get(HttpConnector.HTTP_VERSION_PROPERTY);
+        if (HttpConstants.HTTP10.equalsIgnoreCase(temp)) {
+            http11 = false;
+        }
     }
 
     /*
@@ -51,13 +55,11 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayload()
      */
-    public Object getPayload()
-    {
+    public Object getPayload() {
         return message;
     }
 
-    public boolean isBinary()
-    {
+    public boolean isBinary() {
         return message != null;
     }
 
@@ -66,8 +68,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsBytes()
      */
-    public byte[] getPayloadAsBytes() throws Exception
-    {
+    public byte[] getPayloadAsBytes() throws Exception {
         return message;
     }
 
@@ -76,8 +77,29 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
      * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsString()
      */
-    public String getPayloadAsString() throws Exception
-    {
+    public String getPayloadAsString() throws Exception {
         return new String(message);
+    }
+
+    /*
+    * (non-Javadoc)
+    *
+    * @see org.mule.providers.UMOMessageAdapter#getProperty(java.lang.Object)
+    */
+    public Object getProperty(Object key) {
+        if (HttpConstants.HEADER_KEEP_ALIVE.equals(key) || HttpConstants.HEADER_CONNECTION.equals(key)) {
+            if (!http11) {
+                String connection = (String) super.getProperty(HttpConstants.HEADER_CONNECTION);
+                if (connection != null && connection.equalsIgnoreCase("close")) {
+                    return new Boolean(false);
+                } else {
+                    return new Boolean(true);
+                }
+            } else {
+                return new Boolean(super.getProperty(HttpConstants.HEADER_CONNECTION) != null);
+            }
+        } else {
+            return super.getProperty(key);
+        }
     }
 }
