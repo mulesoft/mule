@@ -266,10 +266,9 @@
             <artifactId>geronimo-spec-servlet</artifactId>
             <version>${geronimo_spec_servlet_version}</version>
             <properties>
-                <ignore>true</ignore>
-                <mule.core.jar>false</mule.core.jar>
+                <mule.core.jar>true</mule.core.jar>
                 <mule.mini>false</mule.mini>
-                <rar.bundle>false</rar.bundle>
+                <rar.bundle>true</rar.bundle>
                 <war.bundle>false</war.bundle>
             </properties>
         </dependency>
