@@ -18,7 +18,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.NullPayload;
+import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOFilter;
@@ -32,11 +35,7 @@ import org.mule.util.SgmlCodec;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * todo document
@@ -139,7 +138,9 @@ public class RestServiceWrapper implements Callable, Initialisable
 
         if(errorFilter==null) {
             if(errorExpression==null) {
-                logger.warn("No error filter has been set on this rest service");
+                //We'll set a default filter that checks the return code
+                errorFilter = new MessagePropertyFilter("http.status!=200");
+                logger.info("Setting default error filter to MessagePropertyFilter('http.status!=200')");
             } else {
                 errorFilter = new RegExFilter(errorExpression);
             }
@@ -149,6 +150,8 @@ public class RestServiceWrapper implements Callable, Initialisable
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         String tempUrl;
+        Object request = eventContext.getTransformedMessage();
+        Object requestBody = request;
         if(urlFromMessage) {
             tempUrl = (String)eventContext.getProperty(REST_SERVICE_URL);
             if(tempUrl==null) {
@@ -161,9 +164,11 @@ public class RestServiceWrapper implements Callable, Initialisable
 
         Map params = new HashMap(eventContext.getProperties());
         if(payloadParameterName!=null) {
-            params.put(payloadParameterName, eventContext.getTransformedMessageAsString());
-        } else if(eventContext.getTransformedMessage() instanceof Map) {
-            params.putAll((Map)eventContext.getTransformedMessage());
+            params.put(payloadParameterName, request);
+            requestBody = new NullPayload();
+        } else if(request instanceof Map) {
+            params.putAll((Map)request);
+            requestBody = new NullPayload();
         }
 
         setRESTParams(urlBuffer, params, reqiredParams, false);
@@ -175,7 +180,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         UMOEndpointURI endpointURI = new MuleEndpointURI(SgmlCodec.encodeString(tempUrl));
         eventContext.getMessage().setProperty("http.method", httpMethod);
 
-        UMOMessage result = eventContext.sendEvent(eventContext.getMessage(), endpointURI);
+        UMOMessage result = eventContext.sendEvent(new MuleMessage(requestBody, eventContext.getProperties()), endpointURI);
 
         if(isErrorPayload(result)) {
             handleException(new RestServiceException(

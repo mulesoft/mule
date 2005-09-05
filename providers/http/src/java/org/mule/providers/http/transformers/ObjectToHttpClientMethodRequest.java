@@ -19,6 +19,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractEventAwareTransformer;
@@ -118,18 +119,20 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 PostMethod postMethod = new PostMethod(uri.toString());
                 setHeaders(postMethod, context);
                 String paramName = (String) context.getProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
+                postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
                 if (paramName == null) {
                     //Call method to manage the parameter array
                     addParameters(uri.getQuery(), postMethod);
-                    if (src instanceof String) {
-                        postMethod.setRequestBody(new ByteArrayInputStream(src.toString().getBytes()));
-                        postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
-                    } else {
-                        byte[] buffer = Utility.objectToByteArray(src);
-                        postMethod.setRequestBody(new ByteArrayInputStream(buffer));
-                        postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
+                    //Dont set a POST payload if the body is a Null Payload.  This way client calls
+                    //can control if a POST body is posted explicitly
+                    if(!(context.getMessage().getPayload() instanceof NullPayload)) {
+                        if (src instanceof String) {
+                            postMethod.setRequestBody(new ByteArrayInputStream(src.toString().getBytes()));
+                        } else {
+                            byte[] buffer = Utility.objectToByteArray(src);
+                            postMethod.setRequestBody(new ByteArrayInputStream(buffer));
+                        }
                     }
-
                 } else {
                     postMethod.addParameter(paramName, src.toString());
                 }
