@@ -85,8 +85,11 @@ public class StreamMessageReceiver extends PollingMessageReceiver
             if (len == -1)
                 return;
             message.append(new String(buf, 0, len));
+            //remove the trailing /n
+            String read = message.toString();
+            if(read.endsWith("\n")) read = read.substring(0, message.length()-1);
 
-            UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(message.toString()));
+            UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(read));
             routeMessage(umoMessage, endpoint.isSynchronous());
 
             ((StreamConnector) endpoint.getConnector()).reinitialise();
