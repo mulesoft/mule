@@ -17,7 +17,8 @@ package org.mule.samples.stockquote;
 
 
 /**
- * todo document
+ * A stock Quote object that is crated from the xml returned from the
+ * http://www.webservicex.net/stockquote.asmx service
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -25,13 +26,13 @@ package org.mule.samples.stockquote;
 public class StockQuote
 {
     private String symbol;
-    private double last;
-    private double change;
-    private double open;
-    private double high;
-    private double low;
-    private double volume;
-    private double previousClose;
+    private String last;
+    private String change;
+    private String open;
+    private String high;
+    private String low;
+    private String volume;
+    private String previousClose;
     private String name;
     private String date;
 
@@ -43,59 +44,59 @@ public class StockQuote
         this.symbol = symbol;
     }
 
-    public double getLast() {
+    public String getLast() {
         return last;
     }
 
-    public void setLast(double last) {
+    public void setLast(String last) {
         this.last = last;
     }
 
-    public double getChange() {
+    public String getChange() {
         return change;
     }
 
-    public void setChange(double change) {
+    public void setChange(String change) {
         this.change = change;
     }
 
-    public double getOpen() {
+    public String getOpen() {
         return open;
     }
 
-    public void setOpen(double open) {
+    public void setOpen(String open) {
         this.open = open;
     }
 
-    public double getHigh() {
+    public String getHigh() {
         return high;
     }
 
-    public void setHigh(double high) {
+    public void setHigh(String high) {
         this.high = high;
     }
 
-    public double getLow() {
+    public String getLow() {
         return low;
     }
 
-    public void setLow(double low) {
+    public void setLow(String low) {
         this.low = low;
     }
 
-    public double getVolume() {
+    public String getVolume() {
         return volume;
     }
 
-    public void setVolume(double volume) {
+    public void setVolume(String volume) {
         this.volume = volume;
     }
 
-    public double getPreviousClose() {
+    public String getPreviousClose() {
         return previousClose;
     }
 
-    public void setPreviousClose(double previousClose) {
+    public void setPreviousClose(String previousClose) {
         this.previousClose = previousClose;
     }
 

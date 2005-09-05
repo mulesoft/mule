@@ -5,6 +5,6 @@ exec ../../../bin/sethome
 # Set your application specific classpath like this
 export CLASSPATH=$MULE_HOME/samples/errorhandler/conf:$MULE_HOME/samples/errorhandler/classes
 
-exec ../../../bin/mule -config ../conf/mule-config.xml
+exec $MULE_HOME/bin/mule -config ../conf/mule-config.xml
 
 export CLASSPATH=

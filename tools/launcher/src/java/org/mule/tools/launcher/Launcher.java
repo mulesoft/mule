@@ -31,52 +31,76 @@
 package org.mule.tools.launcher;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 
 /**
  * This is a launcher for Mule.  This class has been adapted from the Ant Launcher
  */
 public class Launcher {
+
+    public static final String MULE_LAUNCHER_PROPERTIES = "mule-laucher.properties";
+
     /**
      * Mule home directory
      */
     public static final String MULE_HOME_PROPERTY = "org.mule.home";
-
     /**
      * The Mule Library Directory property
      */
     public static final String MULE_LIB_DIR_PROPERTY = "org.mule.lib.dir";
 
+    /**
+     * The main class to invoke. default is org.mule.MuleServer
+     */
     public static final String MAIN_CLASS_PROPERTY = "org.mule.main.class";
+
+    /**
+     * Whether to output logging in the launcher
+     */
+    public static final String DEBUG_PROPERTY = "org.mule.debug";
+
+
+    private static final String JAVA_CLASS_PATH = "java.class.path";
     /**
      * The startup class that is to be run
      */
     public static final String MAIN_CLASS = "org.mule.MuleServer";
 
-    private static final String JAVA_CLASS_PATH = "java.class.path";
 
+    private static Properties properties = new Properties();
+
+    private boolean debug = false;
     /**
      * Entry point for starting command line Mule
      *
      * @param args commandline arguments
      */
     public static void main(String[] args) {
+        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(MULE_LAUNCHER_PROPERTIES);
+        if(is!=null) {
+            try {
+                properties.load(is);
+            } catch (Throwable e) {
+                logError("Failed to load " + MULE_LAUNCHER_PROPERTIES, e);
+            }
+        }
+
         try {
             Launcher launcher = new Launcher();
             launcher.run(args);
-        } catch (LauncherException e) {
-            System.err.println(e.getMessage());
-        } catch (Throwable t) {
-            t.printStackTrace(System.err);
+        } catch (Throwable e) {
+            logError(e.getMessage(), e);
         }
+    }
+
+    public Launcher() {
+        debug = Boolean.valueOf(getProperty(DEBUG_PROPERTY, "false")).booleanValue();
     }
 
     /**
@@ -90,7 +114,7 @@ public class Launcher {
     private void addPath(String path, boolean getJars, List libPathURLs)
             throws MalformedURLException {
         StringTokenizer myTokenizer
-                = new StringTokenizer(path, System.getProperty("path.separator"));
+                = new StringTokenizer(path, getProperty("path.separator"));
         while (myTokenizer.hasMoreElements()) {
             String elementName = myTokenizer.nextToken();
             File element = new File(elementName);
@@ -117,7 +141,7 @@ public class Launcher {
      *                               cannot be created.
      */
     private void run(String[] args) throws LauncherException, MalformedURLException {
-        String muleHomeProperty = System.getProperty(MULE_HOME_PROPERTY);
+        String muleHomeProperty = getProperty(MULE_HOME_PROPERTY);
         File muleHome = null;
 
         File sourceJar = Locator.getClassSource(getClass());
@@ -130,6 +154,7 @@ public class Launcher {
         if (muleHome == null || !muleHome.exists()) {
             muleHome = jarDir.getParentFile();
             System.setProperty(MULE_HOME_PROPERTY, muleHome.getAbsolutePath());
+            if(debug) System.out.println("Set " + MULE_HOME_PROPERTY + " to " + muleHome.getAbsolutePath());
         }
 
         if (!muleHome.exists()) {
@@ -143,6 +168,12 @@ public class Launcher {
 
         boolean noClassPath = false;
 
+        if(debug) {
+            for (int i = 0; i < args.length; ++i) {
+                System.out.println("Arg " + i + "=" + args[i]);
+            }
+        }
+        
         for (int i = 0; i < args.length; ++i) {
             if (args[i].equals("-lib")) {
                 if (i == args.length - 1) {
@@ -193,7 +224,7 @@ public class Launcher {
         // or default using location of mule-launcher.jar
         File muleLibDir = null;
         File muleLibOptDir = null;
-        String muleLibDirProperty = System.getProperty(MULE_LIB_DIR_PROPERTY);
+        String muleLibDirProperty = getProperty(MULE_LIB_DIR_PROPERTY);
         if (muleLibDirProperty != null) {
             muleLibDir = new File(muleLibDirProperty);
         }
@@ -201,11 +232,13 @@ public class Launcher {
         if ((muleLibDir == null) || !muleLibDir.exists()) {
             muleLibDir = new File(muleHome + File.separator + "lib");
             System.setProperty(MULE_LIB_DIR_PROPERTY, muleLibDir.getAbsolutePath());
+            if(debug) System.out.println("Set " + MULE_LIB_DIR_PROPERTY + " to " + muleLibDir.getAbsolutePath());
         }
 
         if ((muleLibDir == null) || !muleLibDir.exists()) {
             muleLibDir = jarDir;
             System.setProperty(MULE_LIB_DIR_PROPERTY, muleLibDir.getAbsolutePath());
+            if(debug) System.out.println("Set " + MULE_LIB_DIR_PROPERTY + " to " + muleLibDir.getAbsolutePath());
         }
 
         URL[] systemJars = Locator.getLocationURLs(muleLibDir);
@@ -230,45 +263,70 @@ public class Launcher {
 
         // now update the class.path property
         StringBuffer baseClassPath
-                = new StringBuffer(System.getProperty(JAVA_CLASS_PATH));
+                = new StringBuffer(getProperty(JAVA_CLASS_PATH));
         if (baseClassPath.charAt(baseClassPath.length() - 1)
                 == File.pathSeparatorChar) {
             baseClassPath.setLength(baseClassPath.length() - 1);
         }
 
+        String url;
         for (int i = 0; i < jars.length; ++i) {
             baseClassPath.append(File.pathSeparatorChar);
-            baseClassPath.append(Locator.fromURI(jars[i].toString()));
+            url = Locator.fromURI(jars[i].toString());
+            baseClassPath.append(url);
+            if(debug) {
+                System.out.println("Added: " + url);
+            }
+
         }
 
         System.setProperty(JAVA_CLASS_PATH, baseClassPath.toString());
 
         URLClassLoader loader = new URLClassLoader(jars);
         Thread.currentThread().setContextClassLoader(loader);
-        String tempMain = System.getProperty(MAIN_CLASS_PROPERTY, MAIN_CLASS);
+        String tempMain = getProperty(MAIN_CLASS_PROPERTY, MAIN_CLASS);
+
+        if(debug) System.out.println("Using Main class: " + tempMain);
+
         Class mainClass = null;
         try {
             mainClass = loader.loadClass(tempMain);
-        } catch (Exception ex) {
-            System.err.println("Incompatible version of org.mule.tools.laucher detected");
+        } catch (Exception e) {
             File mainJar = Locator.getClassSource(mainClass);
-            System.err.println("Location of this class is: " + mainJar);
+            logError("Incompatible version of org.mule.tools.laucher detected. Location of this class is: " + mainJar, e);
         }
         Method main = null;
         try {
             main = mainClass.getMethod("main", new Class[]{String[].class});
         } catch (NoSuchMethodException e) {
-            System.err.println("There is no main(String[] args) method on launch class: " + mainClass);
-            e.printStackTrace(System.err);
+            logError("There is no main(String[] args) method on launch class: " + mainClass, e);
         } catch (SecurityException e) {
-            System.err.println("A Security Exception blocked access to the main method of class: " + mainClass);
-            e.printStackTrace(System.err);
+            logError("A Security Exception blocked access to the main method of class: " + mainClass, e);
         }
         try {
             main.invoke(mainClass, new Object[]{newArgs});
         } catch (Exception e) {
-            System.err.println("Failed to invoke class: " + mainClass);
-            e.printStackTrace(System.err);
+            logError("Failed to invoke class: " + mainClass, e);
+
         }
+    }
+
+    protected static void logError(String msg, Throwable t) {
+        System.err.println(msg);
+        t.printStackTrace(System.err);
+    }
+
+    protected String getProperty(String key) {
+        String value = System.getProperty(key);
+        if(value==null) {
+            value = properties.getProperty(key);
+        }
+        return value;
+    }
+
+    protected String getProperty(String key, String defaultValue) {
+        String value = getProperty(key);
+        if(value==null) value = defaultValue;
+        return value;
     }
 }

@@ -53,10 +53,10 @@
         </u:available>
 
         <mkdir dir="${mule.samples.dist.dir}/bin"/>
-        <chmod file="${mule.samples.dist.dir}/bin/*.sh" perm="ugo+rx"/>
         <copy todir="${mule.samples.dist.dir}/bin">
             <fileset dir="bin"/>
         </copy>
+        <chmod dir="${mule.samples.dist.dir}/bin" perm="ugo+rx" includes="*"/>
 
         <u:available file="${basedir}/target/classes/org/mule/samples/${mule.sample.name}">
             <mkdir dir="${mule.samples.dist.dir}/classes"/>

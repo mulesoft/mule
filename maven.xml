@@ -205,9 +205,12 @@
         <copy todir="${mule.release.dir}" file="${basedir}/LICENSE.txt"/>
         <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
 
+        <!-- copy bin directory and set permissions -->
         <copy todir="${mule.release.dir}/bin">
             <fileset dir="${basedir}/bin"/>
         </copy>
+        <chmod dir="${basedir}/bin" perm="ugo+rx" includes="*"/>
+
     </goal>
 
     <goal name="build-classpath" prereqs="setvars">
@@ -216,11 +219,9 @@
             <ant:fileset dir="${mule.release.lib.dir}">
                 <ant:include name="*.jar"/>
             </ant:fileset>
-            <u:available file="${mule.release.lib.dir}/mule-extras-spring">
-                <ant:fileset dir="${mule.release.lib.dir}/mule-extras-spring">
-                    <ant:include name="*.jar"/>
-                </ant:fileset>
-            </u:available>
+            <ant:fileset dir="${mule.release.lib.dir}/opt">
+                <ant:include name="*.jar"/>
+            </ant:fileset>
         </ant:path>
         <property name="classpath" refid="cp"/>
     </goal>
@@ -234,6 +235,10 @@
             goals="dist-samples"
             banner="Dist Samples"
             ignoreFailures="false"/>
+
+        <copy todir="${mule.release.dir}/samples">
+            <fileset dir="${basedir}/samples/target/release/samples"/>
+        </copy>
     </goal>
 
     <goal name="mule:tools" prereqs="setvars">
@@ -321,14 +326,6 @@
                     <copy todir="${basedir}/../../target/release/lib"
                         file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>
                 </j:if>
-<!--                <j:if test="${pom.package=='org.mule.providers' || pom.package=='org.mule.extras'}">-->
-<!--                    <copy todir="${basedir}/../../target/release/lib"-->
-<!--                        file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>-->
-<!--                </j:if>-->
-<!--                <j:if test="${pom.package!='org.mule.extras'}">-->
-<!--                    <copy todir="${basedir}/../../target/release/lib"-->
-<!--                        file="${maven.repo.local}/${lib.artifactDirectory}/jars/${lib.getArtifact()}"/>-->
-<!--                </j:if>-->
             </j:if>
         </j:forEach>
     </goal>

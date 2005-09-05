@@ -15,13 +15,15 @@ the different components are made from the loan broker component (a la hub and s
 
 <mule-configuration id="Loan_broker_Async" version="1.0">
 
+    <environment-properties>
+        <property name="http.keepAlive" value="false"/>
+    </environment-properties>
 
     <mule-environment-properties serverUrl="">
         <threading-profile maxBufferSize="0" maxThreadsActive="10" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="3000000"/>
         <pooling-profile maxActive="10" maxIdle="5" exhaustedAction="GROW" maxWait="1000"/>
         <queue-profile maxOutstandingMessages="500"/>
     </mule-environment-properties>
-
 
     <agents>
         <agent name="JmxAgent" className="org.mule.management.agents.JmxAgent"/>
@@ -37,14 +39,14 @@ the different components are made from the loan broker component (a la hub and s
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
         <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>
-        <endpoint-identifier name="CreditAgency" value="axis:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
-        <endpoint-identifier name="CreditAgencyReceiver" value="axis:http://localhost:18080/mule"/>
+        <endpoint-identifier name="CreditAgency" value="axis:jetty:http://localhost:18080/mule/CreditAgencyService?method=getCreditProfile"/>
+        <endpoint-identifier name="CreditAgencyReceiver" value="axis:jetty:http://localhost:18080/mule"/>
         <endpoint-identifier name="LenderService" value="vm://localhost/LenderService"/>
-        <endpoint-identifier name="Bank1" value="axis:http://localhost:10080/mule"/>
-        <endpoint-identifier name="Bank2" value="axis:http://localhost:20080/mule"/>
-        <endpoint-identifier name="Bank3" value="axis:http://localhost:30080/mule"/>
-        <endpoint-identifier name="Bank4" value="axis:http://localhost:40080/mule"/>
-        <endpoint-identifier name="Bank5" value="axis:http://localhost:50080/mule"/>
+        <endpoint-identifier name="Bank1" value="axis:jetty:http://localhost:10080/mule"/>
+        <endpoint-identifier name="Bank2" value="axis:jetty:http://localhost:20080/mule"/>
+        <endpoint-identifier name="Bank3" value="axis:jetty:http://localhost:30080/mule"/>
+        <endpoint-identifier name="Bank4" value="axis:jetty:http://localhost:40080/mule"/>
+        <endpoint-identifier name="Bank5" value="axis:jetty:http://localhost:50080/mule"/>
     </endpoint-identifiers>
 
     <!--    <endpoint-identifiers>-->

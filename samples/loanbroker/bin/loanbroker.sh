@@ -8,6 +8,6 @@ export MULE_MAIN=org.mule.samples.loanbroker.LoanConsumer
 # Set your application specific classpath like this
 SET CLASSPATH=$MULE_HOME/samples/loanbroker/conf:$MULE_HOME/samples/loanbroker/classes
 
-exec ../../../bin/mule
+exec $MULE_HOME/bin/mule
 export MULE_MAIN=
 export CLASSPATH=
