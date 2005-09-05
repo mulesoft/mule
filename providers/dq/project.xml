@@ -11,6 +11,11 @@
             <artifactId>as400dq</artifactId>
             <groupId>as400dq</groupId>
             <jar>jt400-1.jar</jar>
+            <properties>
+                <!-- I don't know what the license is for this jar but I'm pretty
+                sure we can distribute it -->
+                <ignore>true</ignore>
+            </properties>
         </dependency>
     </dependencies>
 </project>
