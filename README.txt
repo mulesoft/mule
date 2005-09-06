@@ -9,14 +9,15 @@ The Distribution
 ----------------
 The distribution you have downloaded contains the following -
 
-./dist        - The Mule jars and configuration dtd.
-./docs        - API documentation for Mule and its sub-projects.
-./lib         - Jars needed by the Mule distribution
-./lib/legal   - License information about all the jars shipped with Mule.
-./samples     - Sample applications, scripts and source code
-./src         - The source code for Mule and its sub-projects.
-./LICENSE.txt - License agreement for Mule.
-./README.txt  - erm... this file!
+./bin          - Contains shell and batch scripts for running Mule
+./dist         - The Mule jars and configuration dtd (note there is a combined jar in the ./lib directory).
+./docs         - API documentation for Mule and its sub-projects.
+./lib          - Jars needed by the Mule distribution
+./lib/licences - License information about all the jars shipped with Mule.
+./samples      - Sample applications, scripts and source code
+./src          - The source code for Mule and its sub-projects.
+./LICENSE.txt  - License agreement for Mule.
+./README.txt   - erm... this file!
 
 Getting Started
 ---------------
@@ -34,6 +35,6 @@ Feedback
 We hope you enjoy using Mule. To help us make it a better product please tell
 us about any issues (no matter how small), suggestions or other comments you have.
 You can post on the mailing list - user@mule.codehaus.org or raise
-issues at http://jira.muleumo.org, , or drop in to our IRC channel on irc.codehaus.org#mule
+issues at http://jira.muleumo.org, or drop in to our IRC channel on irc.codehaus.org#mule
 
 Enjoy!

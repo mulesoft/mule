@@ -85,8 +85,8 @@
         </u:available>
 
         <!--local deploy -->
-        <copy todir="${maven.build.dir}" file="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
-        <copy todir="${maven.repo.local}/mule/jars" file="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
+        <copy todir="${maven.build.dir}" file="${mule.release.lib.dir}/mule-${pom.currentVersion}.jar"/>
+        <copy todir="${maven.repo.local}/mule/jars" file="${mule.release.lib.dir}/mule-${pom.currentVersion}.jar"/>
 
         <!-- do custom deploy -->
         <j:if test="${context.getVariable('mule.release.dist.deploy.dir')!= null}">
@@ -309,7 +309,7 @@
             <ant:fileset dir="${mule.release.lib.dir}" includes="mule-*"/>
         </ant:delete>
 
-        <copy todir="${mule.release.lib.dir}" file="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
+        <copy todir="${mule.release.lib.dir}" file="${maven.build.dir}/mule-${pom.currentVersion}.jar"/>
     </goal>
 
     <goal name="mule:libs-copy">

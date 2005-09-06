@@ -18,9 +18,6 @@
             <artifactId>javamail</artifactId>
             <version>${javamail_version}</version>
             <url>http://java.sun.com/products/javamail/</url>
-            <properties>
-                <war.bundle.jar>true</war.bundle.jar>
-            </properties>
         </dependency>
     </dependencies>
 </project>
