@@ -14,7 +14,7 @@
 package org.mule.test.usecases.routing.response;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.test.usecases.service.DummyResponseAggregator;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -26,7 +26,7 @@ import java.util.Map;
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
-public class ResponseAggregatorTestCase extends IntegrationTestCase {
+public class ResponseAggregatorTestCase extends FunctionalTestCase {
 
     protected String getConfigResources() {
         return "org/mule/test/usecases/routing/response/response-router.xml";

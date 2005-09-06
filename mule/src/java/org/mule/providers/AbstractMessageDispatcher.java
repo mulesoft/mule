@@ -249,7 +249,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         boolean remoteSync = false;
         if(event.getEndpoint().getConnector().isRemoteSyncEnabled()) {
             remoteSync = event.getEndpoint().isRemoteSync() ||
-                    event.getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
+                    event.getMessage().getBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, false);
             if(remoteSync) {
                 //component will be null for client calls
                 if(event.getComponent()!=null) {
@@ -259,6 +259,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
         }
         if(!remoteSync) {
             event.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
+            event.getMessage().removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
         }
         return remoteSync;
     }

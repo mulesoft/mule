@@ -17,7 +17,7 @@ import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.providers.jms.JmsTransactionFactory;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.TransactionCallback;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
@@ -32,7 +32,7 @@ import java.util.Map;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class MuleClientTransactionTestCase extends IntegrationTestCase
+public class MuleClientTransactionTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources() {

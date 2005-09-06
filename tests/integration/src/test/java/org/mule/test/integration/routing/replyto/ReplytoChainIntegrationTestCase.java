@@ -14,9 +14,8 @@
 package org.mule.test.integration.routing.replyto;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.test.integration.IntegrationTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 
@@ -30,6 +29,10 @@ import java.util.Map;
 
 public class ReplytoChainIntegrationTestCase extends IntegrationTestCase
 {
+    public ReplytoChainIntegrationTestCase() {
+        embbededActiveMQ=true;
+    }
+
     protected String getConfigResources() {
         return "org/mule/test/integration/routing/replyto/injection-test.xml";
     }
@@ -37,8 +40,6 @@ public class ReplytoChainIntegrationTestCase extends IntegrationTestCase
     public void testReplyToChain() throws UMOException
     {
         String message = "test";
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/integration/routing/replyto/injection-test.xml");
 
         MuleClient client = new MuleClient();
         Map props = new HashMap();

@@ -15,7 +15,7 @@ package org.mule.test.integration.client;
 
 import org.mule.MuleManager;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import javax.jms.TextMessage;
@@ -26,8 +26,9 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleClientJmsTestCase extends IntegrationTestCase
+public class MuleClientJmsTestCase extends FunctionalTestCase
 {
+
     protected String getConfigResources() {
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
     }

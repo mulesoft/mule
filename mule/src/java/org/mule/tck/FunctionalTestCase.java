@@ -23,28 +23,33 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class IntegrationTestCase extends AbstractMuleTestCase
+public abstract class FunctionalTestCase extends AbstractMuleTestCase
 {
     protected final void doSetUp() throws Exception {
+        doPreFunctionalSetUp();
         System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
         ConfigurationBuilder builder = getBuilder();
         builder.configure(getConfigResources());
-        doIntegrationSetUp();
+        doPostFunctionalSetUp();
     }
 
     protected final void doTearDown() throws Exception {
-        doIntegrationTearDown();
+        doFunctionalTearDown();
     }
 
     protected ConfigurationBuilder getBuilder() throws Exception {
         return new MuleXmlConfigurationBuilder();
     }
 
-    protected void doIntegrationSetUp() throws Exception {
+    protected void doPreFunctionalSetUp() throws Exception {
 
     }
 
-    protected void doIntegrationTearDown() throws Exception {
+    protected void doPostFunctionalSetUp() throws Exception {
+
+    }
+
+    protected void doFunctionalTearDown() throws Exception {
 
     }
 

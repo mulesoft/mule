@@ -252,6 +252,12 @@ public class MuleProxy implements Work, Lifecycle
                     }
                 }
 
+                //Process Response Router
+                if (returnMessage != null && descriptor.getResponseRouter() != null) {
+                    logger.debug("Waiting for response router message");
+                    returnMessage = descriptor.getResponseRouter().getResponse(returnMessage);
+                }
+
                 // process repltyTo if there is one
                 if (returnMessage != null && replyToHandler != null) {
                     String requestor = (String) returnMessage.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
@@ -260,13 +266,7 @@ public class MuleProxy implements Work, Lifecycle
                     }
                 }
 
-                //Process Response Router
-                if (returnMessage != null && descriptor.getResponseRouter() != null) {
-                    logger.debug("Waiting for response router message");
-                    returnMessage = descriptor.getResponseRouter().getResponse(returnMessage);
-                } else {
-                    System.out.println("");
-                }
+
             } else {
                 returnMessage = event.getSession().sendEvent(event);
                 processReplyTo(returnMessage);

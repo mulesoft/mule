@@ -18,7 +18,7 @@ import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.providers.jdbc.JdbcUtils;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.sql.Connection;
@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a> $Revision$
  */
-public class XABridgeTestCase extends IntegrationTestCase
+public class XABridgeTestCase extends FunctionalTestCase
 {
     private static ClassPathXmlApplicationContext context;
 
@@ -38,7 +38,7 @@ public class XABridgeTestCase extends IntegrationTestCase
         return "org/mule/test/integration/transaction/xabridge-mule.xml";
     }
 
-    protected void doIntegrationSetUp() throws Exception {
+    protected void doPostFunctionalSetUp() throws Exception {
         emptyTable();
     }
 

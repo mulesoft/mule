@@ -15,7 +15,7 @@
 package org.mule.test.integration.providers.http;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class TwoEndpointsSinglePortTestCase extends IntegrationTestCase
+public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
  {
      protected String getConfigResources() {
          return "org/mule/test/integration/providers/http/two-endpoints-single-port.xml";

@@ -14,6 +14,7 @@
 package org.mule.test.integration;
 
 import org.activemq.ActiveMQConnection;
+import org.activemq.ActiveMQConnectionFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -24,6 +25,7 @@ import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.util.Watchdog;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 
+import javax.jms.JMSException;
 import java.io.File;
 
 /**
@@ -39,11 +41,29 @@ public class ServerTools
     private static final String ACTIVEMQ_HOME = "org.activemq.home";
 
     private static KillableWatchdog activemq;
+    private static ActiveMQConnectionFactory embeddedFactory = null;
 
     public static void launchActiveMq()  {
         launchActiveMq(ActiveMQConnection.DEFAULT_BROKER_URL);
     }
-    
+
+    public static ActiveMQConnectionFactory launchEmbeddedActiveMq() throws JMSException {
+        embeddedFactory = new ActiveMQConnectionFactory();
+        embeddedFactory.setUseEmbeddedBroker(true);
+        embeddedFactory.start();
+        return embeddedFactory;
+    }
+
+    public static void killEmbeddedActiveMq()  {
+        if(embeddedFactory != null) {
+            try {
+                embeddedFactory.stop();
+            } catch (JMSException e) {
+                
+            }
+            embeddedFactory = null;
+        }
+    }
     public static void launchActiveMq(String brokerUrl) {
         String activeMqHome = System.getProperty(ACTIVEMQ_HOME);
         if(activeMqHome == null) {

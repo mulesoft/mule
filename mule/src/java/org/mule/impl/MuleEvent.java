@@ -21,11 +21,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleCredentials;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
@@ -188,6 +184,13 @@ public class MuleEvent extends EventObject implements UMOEvent
             properties.putAll(endpoint.getProperties());
         }
         properties.putAll(message.getProperties());
+        //Todo I think the replyTO header lingers when ther is more than one replyTo used in a single request
+        //will investigate further after 1.1
+//        Map sysProps = PropertiesHelper.getPropertiesWithPrefix(properties, MuleProperties.PROPERTY_PREFIX);
+//        for (Iterator iterator = sysProps.keySet().iterator(); iterator.hasNext();) {
+//            String s = (String) iterator.next();
+//            properties.remove(s);
+//        }
         setCredentials();
     }
 

@@ -16,14 +16,14 @@ package org.mule.extras.acegi;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleEndpointPlainTextFilterTestCase extends IntegrationTestCase
+public class MuleEndpointPlainTextFilterTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
         return "test-acegi-encrypt-config.xml";

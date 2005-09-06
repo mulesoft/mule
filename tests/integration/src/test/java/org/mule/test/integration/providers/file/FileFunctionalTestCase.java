@@ -13,7 +13,7 @@
  */
 package org.mule.test.integration.providers.file;
 
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 
 import java.io.File;
 
@@ -21,7 +21,7 @@ import java.io.File;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class FileFunctionalTestCase extends IntegrationTestCase
+public class FileFunctionalTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
         return "org/mule/test/integration/providers/file/file-config.xml";

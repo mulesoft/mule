@@ -30,7 +30,7 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     private Server httpServer;
     public static final int HTTP_PORT = 8081;
 
-    protected void doIntegrationSetUp() throws Exception
+    protected void doPostFunctionalSetUp() throws Exception
     {
         httpServer = new Server();
         SocketListener socketListener = new SocketListener(new InetAddrPort(HTTP_PORT));
@@ -46,7 +46,7 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
         httpServer.start();
     }
 
-    protected void doIntegrationTearDown() throws Exception {
+    protected void doFunctionalTearDown() throws Exception {
         httpServer.stop();
     }
 

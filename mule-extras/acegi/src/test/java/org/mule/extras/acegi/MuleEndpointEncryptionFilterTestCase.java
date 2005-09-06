@@ -20,7 +20,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.security.CredentialsNotSetException;
@@ -33,7 +33,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleEndpointEncryptionFilterTestCase extends IntegrationTestCase
+public class MuleEndpointEncryptionFilterTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
         return "test-acegi-encrypt-config.xml";

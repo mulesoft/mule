@@ -14,7 +14,7 @@
 package org.mule.test.integration;
 
 import org.mule.MuleManager;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.transformers.simple.StringToByteArray;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToObject;
@@ -27,7 +27,7 @@ import org.mule.umo.routing.UMOOutboundRouter;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleEndpointConfigurationTestCase extends IntegrationTestCase
+public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {

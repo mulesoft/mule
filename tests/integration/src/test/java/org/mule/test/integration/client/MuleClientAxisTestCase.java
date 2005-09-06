@@ -14,7 +14,7 @@
 package org.mule.test.integration.client;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.Person;
 import org.mule.umo.UMOMessage;
 
@@ -22,7 +22,7 @@ import org.mule.umo.UMOMessage;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class MuleClientAxisTestCase extends IntegrationTestCase
+public class MuleClientAxisTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
         return "org/mule/test/integration/client/axis-test-mule-config.xml";

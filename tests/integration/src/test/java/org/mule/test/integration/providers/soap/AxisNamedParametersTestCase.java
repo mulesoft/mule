@@ -18,7 +18,7 @@ import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import javax.xml.namespace.QName;
@@ -30,7 +30,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AxisNamedParametersTestCase extends IntegrationTestCase
+public class AxisNamedParametersTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
         return "org/mule/test/integration/providers/soap/axis-named-param-mule-config.xml";

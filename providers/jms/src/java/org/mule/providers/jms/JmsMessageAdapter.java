@@ -14,11 +14,6 @@
  */
 package org.mule.providers.jms;
 
-import java.util.Enumeration;
-
-import javax.jms.JMSException;
-import javax.jms.Message;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -26,6 +21,10 @@ import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import java.util.Enumeration;
 
 /**
  * <code>JmsMessageAdapter</code> allows a <code>MuleEvent</code> to access
@@ -234,11 +233,11 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#setProperty(java.lang.Object,
-     *      java.lang.Object)
-     */
+    * (non-Javadoc)
+    *
+    * @see org.mule.providers.UMOMessageAdapter#setProperty(java.lang.Object,
+    *      java.lang.Object)
+    */
     public void setProperty(Object key, Object value)
     {
         if ("JMSReplyTo".equals(key)) {

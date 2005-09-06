@@ -15,14 +15,14 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.message.ExceptionMessage;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ExceptionListenerTestCase extends IntegrationTestCase
+public class ExceptionListenerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
         return "org/mule/test/integration/exceptions/exception-listener-config.xml";

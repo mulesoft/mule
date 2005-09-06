@@ -18,7 +18,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.file.FileConnector;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOException;
@@ -29,7 +29,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ConnectorServiceOverridesTestCase extends IntegrationTestCase
+public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
         return "test-connector-config.xml";

@@ -14,7 +14,7 @@
 package org.mule.test.integration.providers.email;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import java.util.Map;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class EMailFunctionalTestCase extends IntegrationTestCase
+public class EMailFunctionalTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
         return "org/mule/test/integration/providers/email/email-config.xml";

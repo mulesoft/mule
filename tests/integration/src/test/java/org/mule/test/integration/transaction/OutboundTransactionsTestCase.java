@@ -14,13 +14,13 @@
 package org.mule.test.integration.transaction;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class OutboundTransactionsTestCase extends IntegrationTestCase
+public class OutboundTransactionsTestCase extends FunctionalTestCase
 {
     private static final int TIMEOUT = 2000;
 

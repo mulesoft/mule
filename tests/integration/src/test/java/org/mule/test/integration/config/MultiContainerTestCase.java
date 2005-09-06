@@ -15,7 +15,7 @@ package org.mule.test.integration.config;
 
 import org.mule.MuleManager;
 import org.mule.impl.container.ContainerKeyPair;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
@@ -24,7 +24,7 @@ import org.mule.umo.manager.UMOContainerContext;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MultiContainerTestCase extends IntegrationTestCase
+public class MultiContainerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
         return "org/mule/test/integration/config/multi-container-test.xml";

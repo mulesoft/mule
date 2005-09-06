@@ -19,7 +19,7 @@ import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.*;
@@ -33,7 +33,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EventMetaDataProporgationTestCase extends IntegrationTestCase implements Callable
+public class EventMetaDataProporgationTestCase extends FunctionalTestCase implements Callable
 {
     private Apple testObjectProperty = new Apple();
 

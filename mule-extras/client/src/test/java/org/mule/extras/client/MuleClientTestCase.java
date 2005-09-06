@@ -14,14 +14,14 @@
 package org.mule.extras.client;
 
 import org.mule.MuleManager;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleClientTestCase extends IntegrationTestCase
+public class MuleClientTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources() {

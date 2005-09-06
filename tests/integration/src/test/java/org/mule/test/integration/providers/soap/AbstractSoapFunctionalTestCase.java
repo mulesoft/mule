@@ -17,7 +17,7 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.Person;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -32,7 +32,7 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractSoapFunctionalTestCase extends IntegrationTestCase
+public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 {
 
     protected abstract String getRequestResponseEndpoint();

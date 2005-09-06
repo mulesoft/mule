@@ -29,7 +29,7 @@ import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.providers.http.HttpConstants;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.security.UMOSecurityProvider;
@@ -38,7 +38,7 @@ import org.mule.umo.security.UMOSecurityProvider;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpBasicEndpointFilterTestCase extends IntegrationTestCase
+public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources() {
