@@ -13,18 +13,14 @@
  */
 package org.mule.providers.jbi;
 
+import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
-import javax.jbi.messaging.ExchangeStatus;
-import javax.jbi.messaging.Fault;
-import javax.jbi.messaging.InOnly;
-import javax.jbi.messaging.MessageExchange;
-import javax.jbi.messaging.MessagingException;
-import javax.jbi.messaging.NormalizedMessage;
+import javax.jbi.messaging.*;
 
 /**
  * <code>TcpMessageDispatcher</code> will send transformed mule events over
@@ -55,13 +51,17 @@ public class JbiMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     public UMOMessage doSend(UMOEvent event) throws Exception {
-        //todo InOut
-        InOnly exchange = connector.getExchangeFactory().createInOnlyExchange();
+        InOut exchange = connector.getExchangeFactory().createInOutExchange();
         NormalizedMessage message = exchange.createMessage();
         exchange.setInMessage(message);
         JbiUtils.populateNormalizedMessage(event.getMessage(), message);
+        NormalizedMessage nm = exchange.getOutMessage();
+        UMOMessage response = null;
+        if(nm!=null) {
+            response = new MuleMessage(connector.getMessageAdapter(nm));
+        }
         done(exchange);
-        return null;
+        return response;
     }
 
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {

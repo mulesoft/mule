@@ -24,8 +24,8 @@ import javax.jbi.messaging.MessageExchangeFactory;
 import javax.management.ObjectName;
 
 /**
- * <code>TcpConnector</code> can bind or sent to a given tcp port on a given
- * host.
+ * <code>JbiConnector</code> can bind to a Jbi container allowing components to send events via
+ * Mule
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

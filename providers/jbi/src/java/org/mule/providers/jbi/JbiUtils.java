@@ -14,16 +14,21 @@
 */
 package org.mule.providers.jbi;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.jbi.messaging.MessagingException;
-import javax.jbi.messaging.NormalizedMessage;
-
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
+
+import javax.jbi.messaging.MessagingException;
+import javax.jbi.messaging.NormalizedMessage;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Useful for converting message types
@@ -33,9 +38,8 @@ import org.mule.umo.UMOMessage;
  */
 public class JbiUtils {
 
-    public static UMOMessage createMessage(NormalizedMessage message) {
-        //todo source transformer
-        Object source = message.getContent();
+    public static UMOMessage createMessage(NormalizedMessage message) throws MessagingException {
+
         Map properties = new HashMap();
         for (Iterator iterator = message.getPropertyNames().iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
@@ -44,12 +48,27 @@ public class JbiUtils {
         if (message.getSecuritySubject() != null) {
             properties.put(MuleProperties.MULE_USER_PROPERTY, message.getSecuritySubject());
         }
-        return new MuleMessage(source, properties);
+        try {
+            //todo source transformer
+            Source source = message.getContent();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            StreamResult result = new StreamResult(baos);
+            TransformerFactory.newInstance().newTransformer().transform(source, result);
+            UMOMessage msg = new MuleMessage(baos.toByteArray(), properties);
+            baos.close();
+            return msg;
+        } catch (Exception e) {
+            throw new MessagingException(e.getMessage(), e);
+        }
     }
 
     public static void populateNormalizedMessage(UMOMessage muleMessage, NormalizedMessage message) throws MessagingException {
-        //todo message.setContent();
-        //todo securitySubject
+        try {
+            message.setContent(new StreamSource(new ByteArrayInputStream(muleMessage.getPayloadAsBytes())));
+        } catch (Exception e) {
+            throw new MessagingException(e.getMessage(), e);
+        }
+
         for (Iterator iterator = muleMessage.getPropertyNames(); iterator.hasNext();) {
             String s = (String)iterator.next();
             message.setProperty(s, muleMessage.getProperty(s));
