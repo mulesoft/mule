@@ -22,12 +22,6 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -42,6 +36,12 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.Utility;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>FileConnector</code> is used for setting up listeners on a directory
@@ -78,19 +78,13 @@ public class FileConnector extends AbstractServiceEnabledConnector
      */
     private long pollingFrequency = 0;
 
-    private File moveToDirectory = null;
-
     private String moveToPattern = null;
-
-    private File writeToDirectory = null;
 
     private String writeToDirectoryName = null;
 
     private String moveToDirectoryName = null;
 
     private String outputPattern = null;
-
-    private String outputFilename = null;
 
     private boolean outputAppend = false;
 
@@ -125,22 +119,8 @@ public class FileConnector extends AbstractServiceEnabledConnector
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
         String readDir = endpoint.getEndpointURI().getAddress();
-        File dir = null;
         long polling = this.pollingFrequency;
 
-        // if (readDir != null)
-        // {
-        // dir = Utility.openDirectory(readDir);
-        // if (!(dir.canRead()))
-        // {
-        // throw new MuleException(new Message(Messages.FILE_X_DOES_NOT_EXIST,
-        // dir.getAbsolutePath()));
-        // }
-        // else
-        // {
-        // logger.debug("Listening on endpointUri: " + dir.getAbsolutePath());
-        // }
-        // }
         String moveTo = moveToDirectoryName;
         Map props = endpoint.getProperties();
         if (props != null) {
@@ -254,22 +234,6 @@ public class FileConnector extends AbstractServiceEnabledConnector
     }
 
     /**
-     * @return Returns the outputFilename.
-     */
-    public String getOutputFilename()
-    {
-        return outputFilename;
-    }
-
-    /**
-     * @param outputFilename The outputFilename to set.
-     */
-    public void setOutputFilename(String outputFilename)
-    {
-        this.outputFilename = outputFilename;
-    }
-
-    /**
      * @return Returns the outputPattern.
      */
     public String getOutputPattern()
@@ -332,7 +296,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
     {
         this.writeToDirectoryName = dir;
         if (writeToDirectoryName != null) {
-            writeToDirectory = Utility.openDirectory((writeToDirectoryName));
+            File writeToDirectory = Utility.openDirectory((writeToDirectoryName));
             if (!(writeToDirectory.canRead()) || !writeToDirectory.canWrite()) {
                 throw new IOException("Error on initialization, Write To directory does not exist or is not read/write");
             }
