@@ -32,6 +32,9 @@
             <groupId>axis</groupId>
             <version>${axis_jaxrpc_version}</version>
             <url>http://ws.apache.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
         </dependency>
         <dependency>
             <artifactId>axis-saaj</artifactId>
