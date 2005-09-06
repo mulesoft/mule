@@ -15,11 +15,14 @@
             </fileset>
         </copy>
         <copy todir="webapp/WEB-INF/lib">
-            <fileset dir="../../lib/mule-extras-spring">
-                <include name="*.jar"/>
+            <fileset dir="../../lib/opt">
+                <include name="spring*.jar"/>
+                <include name="axis*.jar"/>
+                <include name="log4j*.jar"/>
+                <include name="jmxri*.jar"/>
             </fileset>
         </copy>
-        <copy todir="webapp/WEB-INF/lib" file="../../dist/mule-@VERSION@.jar"/>
+        <copy todir="webapp/WEB-INF/lib" file="../../lib/mule-1.1.jar"/>
 
         <copy todir="webapp/WEB-INF/classes">
             <fileset dir="../hello/classes"/>
@@ -55,7 +58,7 @@
         <copy todir="${mule.samples.dist.dir}" file="maven.xml"/>
         <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes" file="../../mule/src/conf/log4j.properties"/>
 
-        <replace token="@VERSION@" value="${pom.currentVersion}" file="${mule.samples.dist.dir}/maven.xml"/>
+        <replace token="1.1" value="${pom.currentVersion}" file="${mule.samples.dist.dir}/maven.xml"/>
 
         <copy todir="${mule.samples.dist.dir}/webapp">
             <fileset dir="webapp">
