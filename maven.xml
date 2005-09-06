@@ -69,7 +69,7 @@
         <copy file="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" tofile="${mule.release.dist.dir}/temp/META-INF/Mule.mf"/>
 
         <echo>creating jar: ${mule.release.dist.dir}/mule-${pom.currentVersion}</echo>
-        <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
+        <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.lib.dir}/mule-${pom.currentVersion}.jar"/>
         <delete dir="${mule.release.dist.dir}/temp"/>
 
         <copy todir="${mule.release.dist.dir}">
