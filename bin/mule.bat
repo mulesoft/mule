@@ -84,11 +84,11 @@ goto end
 
 :runMuleWithJikes
 if not "%CLASSPATH%"=="" goto runMuleWithJikesAndClasspath
-"%_JAVACMD%" %MULE_DEBUG_OPTS% %MULE_OPTS% -classpath "%MULE_HOME%\lib\mule-launcher.jar" "-Dorg.mule.home=%MULE_HOME%" -Dorg.mule.main.class=%MULE_MAIN% "-Djikes.class.path=%JIKESPATH%" org.mule.tools.launcher.Launcher %MULE_ARGS% %MULE_CMD_LINE_ARGS%
+"%_JAVACMD%" %MULE_DEBUG_OPTS% %MULE_OPTS% -classpath "%MULE_HOME%\bin\mule-launcher.jar" "-Dorg.mule.home=%MULE_HOME%" -Dorg.mule.main.class=%MULE_MAIN% "-Djikes.class.path=%JIKESPATH%" org.mule.tools.launcher.Launcher %MULE_ARGS% %MULE_CMD_LINE_ARGS%
 goto end
 
 :runMuleWithJikesAndClasspath
-"%_JAVACMD%" %MULE_DEBUG_OPTS% %MULE_OPTS% -classpath "%MULE_HOME%\lib\mule-launcher.jar" "-Dorg.mule.home=%MULE_HOME%" -Dorg.mule.main.class=%MULE_MAIN% "-Djikes.class.path=%JIKESPATH%" org.mule.tools.launcher.Launcher %MULE_ARGS%  -lib "%CLASSPATH%" %MULE_CMD_LINE_ARGS%
+"%_JAVACMD%" %MULE_DEBUG_OPTS% %MULE_OPTS% -classpath "%MULE_HOME%\bin\mule-launcher.jar" "-Dorg.mule.home=%MULE_HOME%" -Dorg.mule.main.class=%MULE_MAIN% "-Djikes.class.path=%JIKESPATH%" org.mule.tools.launcher.Launcher %MULE_ARGS%  -lib "%CLASSPATH%" %MULE_CMD_LINE_ARGS%
 goto end
 
 :end
