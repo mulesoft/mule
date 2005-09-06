@@ -183,9 +183,6 @@
             <artifactId>log4j</artifactId>
             <version>${log4j_version}</version>
             <url>http://jakarta.apache.org/log4j/docs/index.html</url>
-            <properties>
-                <ignore>true</ignore>
-            </properties>
         </dependency>
 
         <!-- XStream for de/serialising objects -->
