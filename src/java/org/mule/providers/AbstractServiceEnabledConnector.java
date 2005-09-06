@@ -13,9 +13,7 @@
  */
 package org.mule.providers;
 
-import java.util.Map;
-import java.util.Properties;
-
+import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.service.ConnectorFactory;
@@ -29,6 +27,10 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.BeanUtils;
+import org.mule.util.PropertiesHelper;
+
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>AbstractServiceEnabledConnector</code> initialises a connector from a
@@ -106,6 +108,17 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
             defaultInboundTransformer = serviceDescriptor.createInboundTransformer();
             defaultOutboundTransformer = serviceDescriptor.createOutboundTransformer();
             defaultResponseTransformer = serviceDescriptor.createResponseTransformer();
+
+            // set any manager default properties for the connector
+            // these are set on the Manager with a protocol i.e.
+            // jms.specification=1.1
+            //This provides a really convenient way to set properties on object form unit
+            //tests
+            Map props = PropertiesHelper.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(), getProtocol().toLowerCase());
+            if (props.size() > 0) {
+                props = PropertiesHelper.removeNamspaces(props);
+                org.mule.util.BeanUtils.populateWithoutFail(this, props, true);
+            }
         } catch (Exception e) {
             throw new InitialisationException(e, this);
         }

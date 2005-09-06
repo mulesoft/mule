@@ -15,7 +15,7 @@
 package org.mule.impl;
 
 import org.mule.MuleManager;
-import org.mule.tck.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOSession;
 
@@ -23,7 +23,7 @@ import org.mule.umo.UMOSession;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class MuleComponentTestCase extends IntegrationTestCase
+public class MuleComponentTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources() {

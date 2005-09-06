@@ -248,7 +248,7 @@ public interface UMOMessageAdapter extends Serializable {
     void setReplyTo(Object replyTo);
 
     /**
-     * Sets a replyTo address for this message. This is useful in an
+     * Returns a replyTo address for this message. This is useful in an
      * asynchronous environment where the caller doesn't wait for a response and
      * the response needs to be routed somewhere for further processing. The
      * value of this field can be any valid endpointUri url.
@@ -262,7 +262,7 @@ public interface UMOMessageAdapter extends Serializable {
      * return a ErrorPayload that contains the root exception and Mule error
      * code, plus any otherr releated info
      *
-     * @return
+     * @return The exception payload (if any) attached to this message
      */
     UMOExceptionPayload getExceptionPayload();
 
