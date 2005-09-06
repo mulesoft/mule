@@ -467,5 +467,29 @@
                 <eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm</artifactId>
+            <version>${jotm_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://jotm.objectweb.org</url>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm-carol</artifactId>
+            <version>${jotm_carol_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://jotm.objectweb.org</url>
+        </dependency>
+        <dependency>
+            <groupId>jotm</groupId>
+            <artifactId>jotm-jrmp-stubs</artifactId>
+            <version>${jotm_jrmp_stubs_version}</version>
+            <type>jar</type>
+            <properties/>
+            <url>http://jotm.objectweb.org</url>
+        </dependency>
     </dependencies>
 </project>
