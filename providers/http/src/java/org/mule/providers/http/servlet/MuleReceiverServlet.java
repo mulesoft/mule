@@ -37,6 +37,7 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.provider.NoReceiverForEndpointException;
+import org.mule.util.PropertiesHelper;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -44,6 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * 
@@ -63,6 +65,9 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
     }
 
+    protected void doInit() throws ServletException {
+        super.doInit();    //To change body of overridden methods use File | Settings | File Templates.
+    }
 
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -71,7 +76,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             AbstractMessageReceiver receiver = getReceiverForURI(request);
             UMOMessage responseMessage = null;
             UMOMessage requestMessage = new MuleMessage(new HttpRequestMessageAdapter(request));
-            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");          
+            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
             responseMessage = receiver.routeMessage(requestMessage, true);
             writeResponse(response, responseMessage);
 
@@ -103,7 +108,16 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
         }
         AbstractMessageReceiver receiver = (AbstractMessageReceiver) getReceivers().get(uri);
         if (receiver == null) {
-            throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
+            //Nothing found lets try stripping the path and only use the last
+            //path element
+            int i = uri.lastIndexOf("/");
+            if(i > -1) {
+                uri = uri.substring(i+1);
+                receiver = (AbstractMessageReceiver) getReceivers().get(uri);
+            }
+            if (receiver == null) {
+                throw new NoReceiverForEndpointException("No receiver found for endpointUri: " + uri);
+            }
         }
         receiver.getEndpoint().setEndpointURI(new MuleEndpointURI(getRequestUrl(httpServletRequest)));
         return receiver;
@@ -128,12 +142,19 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     }
 
     protected String getReceiverName(HttpServletRequest httpServletRequest) {
-        String uri = httpServletRequest.getPathInfo();
-        if(uri==null) return null;
-        if (uri.startsWith("/")) {
-            uri = uri.substring(1);
+        String name = httpServletRequest.getPathInfo();
+        if(name==null) {
+            name = httpServletRequest.getParameter("endpoint");
+            if(name==null) {
+                Properties params = PropertiesHelper.getPropertiesFromQueryString(httpServletRequest.getQueryString());
+                name = params.getProperty("endpoint");
+                if(name==null) return null;
+            }
         }
-        return uri;
+        if (name.startsWith("/")) {
+            name = name.substring(1);
+        }
+        return name;
     }
 
     protected Map getReceivers() {
