@@ -66,7 +66,7 @@
 
         <mkdir dir="${mule.release.dir}/bin"/>
         <copy todir="${mule.release.dir}/bin">
-           <fileset dir="{basedir}/../../bin"/>
+           <fileset dir="${basedir}/../../bin"/>
         </copy>
     </goal>
 
