@@ -128,7 +128,7 @@
             </properties>
         </dependency>
 
-        <!-- Optional used by Xml based filters and transformers -->
+        <!-- Required used by Xml based filters and transformers -->
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
@@ -138,7 +138,7 @@
                 <rar.bundle>false</rar.bundle>
                 <war.bundle>true</war.bundle>
                 <mule.core.jar>true</mule.core.jar>
-                <mule.mini>false</mule.mini>
+                <mule.mini>true</mule.mini>
             </properties>
         </dependency>
 
