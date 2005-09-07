@@ -36,6 +36,8 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
@@ -291,55 +293,8 @@ public class MuleProxy implements Work, Lifecycle
                 ((MuleComponent) event.getComponent()).finaliseEvent(event);
             }
         }
-        return returnMessage;
-    }
-
-    protected UMOMessage processResponse(UMOMessage message, Object replyTo, ReplyToHandler replyToHandler)
-            throws UMOException
-    {
-        boolean stopProcessing = !descriptor.getOutboundRouter().hasEndpoints();
-
-        UMOMessage returnMessage = null;
-        // Need to find a cleaner solution for handling response messages
-        // Right now routing is split between here a nd the proxy
-        if (descriptor.getResponseRouter() != null) {
-            if (event.isSynchronous() && !stopProcessing) {
-                // we need to do the outbound first but we dispatch aynshonously
-                // as
-                // we are waiting for a response on another resource
-                descriptor.getOutboundRouter().route(message, event.getSession(), false);
-            }
-            logger.debug("Waiting for response router message");
-            message = descriptor.getResponseRouter().getResponse(message);
-        }
-
-        // this is the request event
-        UMOEvent event = RequestContext.getEvent();
-        if (event.isStopFurtherProcessing()) {
-            logger.debug("Event stop further processing has been set, no outbound routing will be performed.");
-        }
-        if (message != null && !event.isStopFurtherProcessing()) {
-            Map context = RequestContext.clearProperties();
-            if (context != null) {
-                message.addProperties(context);
-            }
-            returnMessage = descriptor.getOutboundRouter().route(message, event.getSession(), event.isSynchronous());
-        } else {
-            returnMessage = message;
-        }
-
-        // process repltyTo if there is one
-        if (message != null && replyTo != null) {
-            String requestor = (String) message.getProperty(MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY);
-
-            if (replyToHandler != null) {
-                if ((requestor != null && !requestor.equals(descriptor.getName())) || requestor == null) {
-                    replyToHandler.processReplyTo(event, message, replyTo);
-                }
-            }
-        }
-
-        return returnMessage;
+        //Finally apply response transformer
+        return applyResponseTransformer(returnMessage);
     }
 
     /**
@@ -502,5 +457,22 @@ public class MuleProxy implements Work, Lifecycle
     public UMOImmutableDescriptor getDescriptor()
     {
         return descriptor;
+    }
+
+    protected UMOMessage applyResponseTransformer(UMOMessage returnMessage) throws TransformerException {
+        if(returnMessage==null) return null;
+        UMOTransformer trans = descriptor.getResponseTransformer();
+        if(trans==null && descriptor.getResponseRouter()!=null) {
+            trans = descriptor.getResponseRouter().getTransformer();
+        }
+        if(trans!=null) {
+            Object result = descriptor.getResponseTransformer().transform(returnMessage.getPayload());
+            if(result instanceof UMOMessage) {
+                returnMessage = (UMOMessage)result;
+            } else {
+                returnMessage = new MuleMessage(result, returnMessage.getProperties());
+            }
+        }
+        return returnMessage;
     }
 }
