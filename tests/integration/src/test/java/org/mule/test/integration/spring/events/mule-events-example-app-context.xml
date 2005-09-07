@@ -6,7 +6,7 @@
        	<property name="connectionFactoryJndiName"><value>ConnectionFactory</value></property>
        	<property name="jndiInitialFactory"><value>org.activemq.jndi.ActiveMQInitialContextFactory</value></property>
        	<property name="specification"><value>1.1</value></property>
-		<property name="providerProperties">
+		<property name="connectionFactoryProperties">
 			<map>
 				<entry key="brokerURL" value="tcp://localhost:61616"/>
 			</map>

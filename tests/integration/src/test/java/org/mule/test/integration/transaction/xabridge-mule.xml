@@ -25,7 +25,7 @@
 	        <property name="connectionFactoryJndiName" value="XAJmsQueueConnectionFactory"/>
 	        <property name="jndiInitialFactory" value="com.sun.jndi.fscontext.RefFSContextFactory"/>
 	        <property name="jndiProviderUrl" value="file:src/test/conf/jndi/activemq"/>
-			<map name="providerProperties">
+			<map name="connectionFactoryProperties">
 				<property name="brokerURL" value="tcp://localhost:61616"/>
 			</map>
 		</properties>
