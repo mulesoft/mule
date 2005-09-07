@@ -100,16 +100,6 @@
         </dependency>
         <dependency>
             <groupId>mule</groupId>
-            <artifactId>mule-servlet-provider</artifactId>
-            <version>${pom.currentVersion}</version>
-            <type>jar</type>
-             <properties>
-                <mule.mini>true</mule.mini>
-            </properties>
-            <url>http://www.muleumo.org</url>
-        </dependency>
-        <dependency>
-            <groupId>mule</groupId>
             <artifactId>mule-extras-client</artifactId>
             <version>${pom.currentVersion}</version>
             <type>jar</type>
