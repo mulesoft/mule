@@ -16,13 +16,9 @@
         </copy>
         <copy todir="webapp/WEB-INF/lib">
             <fileset dir="../../lib/opt">
-                <include name="spring*.jar"/>
-                <include name="axis*.jar"/>
-                <include name="log4j*.jar"/>
-                <include name="jmxri*.jar"/>
+                <include name="*.jar"/>
             </fileset>
         </copy>
-        <copy todir="webapp/WEB-INF/lib" file="../../lib/mule-1.1.jar"/>
 
         <copy todir="webapp/WEB-INF/classes">
             <fileset dir="../hello/classes"/>
@@ -38,6 +34,7 @@
             <fileset dir="../stockquote/classes"/>
         </copy>
 
+
         <copy todir="webapp/WEB-INF/classes" file="../stockquote/conf/stock.xsl"/>
 
 
@@ -47,18 +44,15 @@
         </zip>
     </goal>
 
+    <!-- This is the Mule distribution build target and can be ignored by users -->
     <goal name="distro" prereqs="setvars,test">
         <j:set var="mule.samples.dist.dir" value="../target/release/samples/mule-webapp"/>
         <echo>WebApp dist dir is ${mule.samples.dist.dir}</echo>
         <mkdir dir="${mule.samples.dist.dir}"/>
         <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/lib"/>
-        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello"/>
-        <mkdir dir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest"/>
 
         <copy todir="${mule.samples.dist.dir}" file="maven.xml"/>
         <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes" file="../../mule/src/conf/log4j.properties"/>
-
-        <replace token="1.1" value="${pom.currentVersion}" file="${mule.samples.dist.dir}/maven.xml"/>
 
         <copy todir="${mule.samples.dist.dir}/webapp">
             <fileset dir="webapp">
@@ -69,15 +63,9 @@
             </fileset>
         </copy>
 
-        <!--<copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/hello">-->
-            <!--<fileset dir="../hello/target/classes/org/mule/samples/hello">-->
-                <!--<include name="**/*.class"/>-->
-            <!--</fileset>-->
-        <!--</copy>-->
-        <!--<copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes/org/mule/samples/rest">-->
-            <!--<fileset dir="${maven.build.dir}/classes/org/mule/samples/rest">-->
-                <!--<include name="**/*.class"/>-->
-            <!--</fileset>-->
-        <!--</copy>-->
+        <echo>Copying webapp classes from ${maven.build.dir}/classes to ${mule.samples.dist.dir}/webapp/WEB-INF/classes</echo>
+        <copy todir="${mule.samples.dist.dir}/webapp/WEB-INF/classes">
+            <fileset dir="${maven.build.dir}/classes"/>
+        </copy>
     </goal>
 </project>

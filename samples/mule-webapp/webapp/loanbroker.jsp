@@ -1,10 +1,10 @@
 <%@ page import="org.mule.extras.client.MuleClient,
-                 org.mule.umo.UMOMessage,
                  org.mule.samples.loanbroker.Customer,
-                 org.mule.samples.loanbroker.LoanRequest,
                  org.mule.samples.loanbroker.LoanConsumer,
-                 java.util.List,
-                 java.util.Iterator"%>
+                 org.mule.samples.loanbroker.LoanRequest,
+                 org.mule.umo.UMOMessage,
+                 java.util.Iterator,
+                 java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 
 <html>
@@ -31,7 +31,8 @@
             %><li><%=iter.next().toString()%></li><%
         }%>
         </ol>
-        <p/>You can view the statistics for these requests <a href="http://localhost:9092/InvokeAction//Samples%3Atype%3Dstatistics/action=printHtmlSummary?action=printHtmlSummary">here</a>.
+
+        <p/>You can view the statistics for these requests <a href="http://localhost:9092/InvokeAction//Mule%5FSamples%3Atype%3Dstatistics/action=printHtmlSummary?action=printHtmlSummary">here</a>.
         <%
     } else if(amountString!=null && durationString!=null && name!=null) {
         MuleClient client = new MuleClient();

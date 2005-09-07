@@ -12,17 +12,17 @@
     if(symbol!=null) {
         MuleClient client = new MuleClient();
         UMOMessage message = client.send("vm://stockquote", symbol, null);
-%>
-<% if(message!=null) { %>
-    <%if(message.getExceptionPayload()!=null) {%>
-        <h3>A Error occurred: <%=message.getExceptionPayload()%></h3>
-    <%} else {%>
-<h3><%=message.getPayload()%>!</h3>
-<%}%>
-<h3>A Error occurred: <%=message.getExceptionPayload()%></h3>
-<%} else {%>
-<h3>Message returned is null and no error information is available. Check the logs for more information. Note you need an internet connection to invoke this service.</h3>
-<%}}%>
+
+        if(message!=null) { %>
+            <%if(message.getExceptionPayload()!=null) {%>
+                <h3>A Error occurred: <%=message.getExceptionPayload()%></h3>
+           <%} else {%>
+                <h3><%=message.getPayload()%></h3>
+           <%}%>
+        <%} else {%>
+           <h3>Message returned is null and no error information is available. Check the logs for more information. Note you need an internet connection to invoke this service.</h3>
+       <%}
+   }%>
 Enter a stock symbol:
 <form method="POST" name="submitSymbol" action="">
 	<table>
@@ -33,7 +33,7 @@ Enter a stock symbol:
 </form>
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
-<tr><td>For more information about the Stock Quote example go <a target="_blank" href="http://mule.codehaus.org/Stock+Quote">here</a>.<br/>
+<tr><td>For more information about the Stock Quote example go <a target="_blank" href="http://mule.codehaus.org/Stock+Quote+Example">here</a>.<br/>
 To view the source and configuration go <a target="_blank" href="http://cvs.codehaus.org/viewrep/mule/mule/samples/stockquote/">here</a>.</td></tr>
 </table>
 </body>

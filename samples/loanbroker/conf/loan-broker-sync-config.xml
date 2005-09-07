@@ -57,7 +57,7 @@
                     <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </outbound-router>
-            <response-router timeout="999999999">
+            <response-router timeout="100000">
                 <endpoint address="LoanBrokerQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
             </response-router>

@@ -17,14 +17,13 @@
 
     <mule-descriptor name="HTTPPostSample"
             inboundEndpoint="vm://stockquote"
-            outboundTransformer="SgmlDecoder Xslt XmlToObject"
+            responseTransformer="SgmlDecoder Xslt XmlToObject"
             implementation="org.mule.components.rest.RestServiceWrapper">
 
             <properties>
                 <property name="serviceUrl" value="http://www.webservicex.net/stockquote.asmx/GetQuote"/>
                 <property name="payloadParameterName" value="symbol"/>
                 <property name="httpMethod" value="POST"/>
-                <property name="errorExpression" value="[^&lt;.*]"/>
             </properties>
 
         </mule-descriptor>
