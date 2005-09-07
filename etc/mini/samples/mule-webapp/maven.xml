@@ -14,16 +14,18 @@
                 <include name="*.jar"/>
             </fileset>
         </copy>
-        <copy todir="webapp/WEB-INF/lib" file="../../dist/mule-@VERSION@.jar"/>
 
         <copy todir="webapp/WEB-INF/classes">
             <fileset dir="../hello/classes"/>
         </copy>
-        
         <copy todir="webapp/WEB-INF/classes">
             <fileset dir="../loanbroker/classes"/>
         </copy>
-        
+
+        <copy todir="webapp/WEB-INF/classes">
+            <fileset dir="../stockquote/classes"/>
+        </copy>
+
         <j:forEach var="lib" items="${pom.dependencies}">
             <j:if test="${lib.getProperty('war.bundle')=='true'}">
                 <copy todir="webapp/WEB-INF/lib"

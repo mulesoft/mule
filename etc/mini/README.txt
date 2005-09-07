@@ -16,13 +16,14 @@ The Distribution
 ----------------
 The distribution you have downloaded contains the following -
 
-./dist        - The Mini Mule jar and configuration dtd.
-./lib         - Jars needed by the Mini Mule distribution
-./lib/legal   - License information about all the jars shipped with Mule.
-./samples     - Sample applications, scripts and source code (some samples have been adapted to
+./bin          - Scripts for running Mule
+./dist         - The Mini Mule jar and configuration dtd.
+./lib          - Jars needed by the Mini Mule distribution
+./lib/licenses - License information about all the jars shipped with Mule.
+./samples      - Sample applications, scripts and source code (some samples have been adapted to
                 only use transports included in this distribution)
-./LICENSE.txt - License agreement for Mule.
-./README.txt  - erm... this file!
+./LICENSE.txt  - License agreement for Mule.
+./README.txt   - erm... this file!
 
 Getting Started
 ---------------

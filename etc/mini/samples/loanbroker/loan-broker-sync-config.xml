@@ -20,7 +20,7 @@
     </endpoint-identifiers>
 
     <model name="loan-broker">
-        <mule-descriptor name="LoanBroker" 
+        <mule-descriptor name="LoanBroker"
             implementation="org.mule.samples.loanbroker.SyncLoanBroker">
             <inbound-router>
                 <endpoint address="LoanBrokerRequests"/>
@@ -31,34 +31,31 @@
                     <endpoint address="CreditAgency"/>
                     <filter expectedType="org.mule.samples.loanbroker.Customer" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
-                <router className="org.mule.routing.outbound.StaticRecipientList">
-                    <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
-                    <properties>
-                        <property name="replyTo" value="LoanQuotes"/>
-                    </properties>
-                </router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
                     <endpoint address="LenderService"/>
                     <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </outbound-router>
-
-            <response-router>
-                <endpoint address="LoanQuotes"/>
+            <response-router timeout="100000">
+                <endpoint address="LoanBrokerQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
             </response-router>
-
-            <pooling-profile initialisationPolicy="INITIALISE_ALL"/>
         </mule-descriptor>
 
         <mule-descriptor name="CreditAgencyService"
-            inboundEndpoint="CreditAgency"
+            inboundEndpoint="CreditAgencyReceiver"
             implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
         </mule-descriptor>
 
         <mule-descriptor name="LenderService"
             inboundEndpoint="LenderService"
             implementation="org.mule.samples.loanbroker.DefaultLenderService">
+            <outbound-router>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <reply-to address="LoanBrokerQuotes"/>
+                    <filter expression="recipients!=null" className="org.mule.routing.filters.MessagePropertyFilter"/>
+                </router>
+            </outbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="Bank1"

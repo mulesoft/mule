@@ -46,26 +46,35 @@ the different components are made from the loan broker component (a la hub and s
         The Mule model initialises and manages your UMO components
     -->
     <model name="loan-broker">
+        <!-- by declaring the Axis service component we can overload its default
+        configuration to add more threads or pooled resources -->
+        <mule-descriptor name="_axisServiceComponent"
+            implementation="org.mule.providers.soap.axis.AxisServiceComponent">
+            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20"/>
+            <pooling-profile exhaustedAction="WAIT" maxActive="20" maxIdle="20" maxWait="20000"/>
+        </mule-descriptor>
         <!--
         The loan broker is used to receive loan requests
         -->
         <mule-descriptor name="LoanBroker"
-            inboundEndpoint="LoanBroker"
             outboundEndpoint="CreditAgency"
             implementation="org.mule.samples.loanbroker.AsyncLoanBroker">
+
             <!--
             This router uses the BankQuoteAggregator for events of type BankQuote, for all other
             types the catch all strategy is invoked, which simply passes the event to the component
             -->
             <inbound-router>
+                <catch-all-strategy className="org.mule.routing.ComponentCatchAllStrategy"/>
                 <endpoint address="LoanBrokerRequests"/>
+                <endpoint address="LoanBrokerQuotes"/>
                 <router className="org.mule.samples.loanbroker.routers.BankQuotesAggregator">
                     <filter expectedType="org.mule.samples.loanbroker.LoanQuote" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
-                <router className="org.mule.routing.inbound.InboundPassThroughRouter"/>
             </inbound-router>
-
-            
+            <!--            <queue-profile maxOutstandingMessages="150" blockWait="3000" />-->
+            <!--            <pooling-profile maxActive="20" maxIdle="10" exhaustedAction="GROW" maxWait="10000" />-->
+            <!--            <threading-profile maxBufferSize="100" maxThreadsActive="20" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="60000" />-->
         </mule-descriptor>
 
         <!--
@@ -91,9 +100,7 @@ the different components are made from the loan broker component (a la hub and s
             <outbound-router>
                 <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
                 <router className="org.mule.routing.outbound.StaticRecipientList">
-                    <properties>
-                        <property name="replyTo" value="LoanBroker"/>
-                    </properties>
+                    <reply-to address="LoanBrokerQuotes"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -103,7 +110,7 @@ the different components are made from the loan broker component (a la hub and s
         One or more of these are selected by the LenderService and a request
         is routed to them.   The lenderService outbound router also defines a
         replyTo property which will be used by Mule to route the responses back
-        to the LoanBroker
+        to the LoanBrokerQuotes destination
         -->
         <mule-descriptor name="Bank1"
             inboundEndpoint="Bank1"

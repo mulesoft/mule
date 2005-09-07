@@ -53,8 +53,8 @@
         <delete>
             <fileset dir="${mule.release.dist.dir}" includes="*.jar"/>
         </delete>
-        <echo>creating jar: ${mule.release.dist.dir}/mule-${pom.currentVersion}</echo>
-        <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.dist.dir}/mule-${pom.currentVersion}.jar"/>
+        <echo>creating jar: ${mule.release.lib.dir}/mule-${pom.currentVersion}</echo>
+        <jar manifest="${mule.release.dist.dir}/temp/META-INF/MANIFEST.MF" basedir="${mule.release.dist.dir}/temp" destfile="${mule.release.lib.dir}/mule-${pom.currentVersion}.jar"/>
         <delete dir="${mule.release.dist.dir}/temp"/>
 
         <copy todir="${mule.release.dist.dir}">
@@ -63,6 +63,8 @@
 
         <copy todir="${mule.release.dir}" file="${basedir}/../../LICENSE.txt"/>
         <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
+
+        <copy todir="${mule.release.dir}" dir="${basedir}/../../bin"/>
     </goal>
 
     <!--=================================================-->
@@ -141,6 +143,7 @@
         <!--<zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dist.zip">
             <zipfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
         </zip>-->
+        <chmod dir="${mule.release.dir}" perm="ugo+rx" includes="**/bin/*"/>
         <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-dist.tar.gz" longfile="gnu">
             <tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
         </tar>
