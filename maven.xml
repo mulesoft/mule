@@ -209,7 +209,7 @@
         <copy todir="${mule.release.dir}/bin">
             <fileset dir="${basedir}/bin"/>
         </copy>
-        <chmod dir="${basedir}/bin" perm="ugo+rx" includes="*"/>
+        <chmod dir="${mule.release.dir}/bin" perm="ugo+rx" includes="*"/>
 
     </goal>
 
@@ -283,6 +283,8 @@
 
     <goal name="mule:zip-release" prereqs="setvars">
         <mkdir dir="${maven.build.dir}/distributions"/>
+        
+        <chmod dir="${mule.release.dir}" perm="ugo+rx" includes="**/bin/*"/>
         <zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dist.zip">
             <zipfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
         </zip>

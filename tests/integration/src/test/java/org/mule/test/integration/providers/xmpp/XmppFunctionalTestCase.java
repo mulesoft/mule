@@ -49,7 +49,7 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
     protected UMOEndpointURI getInDest()
     {
         try {
-            return new MuleEndpointURI("xmpp://mule1:mule@jabber.org.au");
+            return new MuleEndpointURI("xmpp://mule1:mule@jabber.org.au/foo");
         } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;
@@ -59,7 +59,7 @@ public class XmppFunctionalTestCase extends AbstractProviderFunctionalTestCase
     protected UMOEndpointURI getOutDest()
     {
         try {
-            return new MuleEndpointURI("xmpp://mule2:mule@jabber.org.au");
+            return new MuleEndpointURI("xmpp://mule2:mule@jabber.org.au/foobar");
         } catch (MalformedEndpointException e) {
             fail(e.getMessage());
             return null;

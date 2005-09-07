@@ -5,6 +5,9 @@
 
 <mule-configuration id="http_test" version="1.0">
 
+    <environment-properties>
+        <property name="http.keepAlive" value="false"/>
+    </environment-properties>
     <model name="test">
         <mule-descriptor name="mycomponent1"
             implementation="org.mule.tck.functional.FunctionalTestComponent">
