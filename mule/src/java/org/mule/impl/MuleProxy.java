@@ -466,11 +466,17 @@ public class MuleProxy implements Work, Lifecycle
             trans = descriptor.getResponseRouter().getTransformer();
         }
         if(trans!=null) {
-            Object result = descriptor.getResponseTransformer().transform(returnMessage.getPayload());
-            if(result instanceof UMOMessage) {
-                returnMessage = (UMOMessage)result;
+            if(trans.isSourceTypeSupported(returnMessage.getPayload().getClass())) {
+                Object result = trans.transform(returnMessage.getPayload());
+                if(result instanceof UMOMessage) {
+                    returnMessage = (UMOMessage)result;
+                } else {
+                    returnMessage = new MuleMessage(result, returnMessage.getProperties());
+                }
             } else {
-                returnMessage = new MuleMessage(result, returnMessage.getProperties());
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Response transformer: " + trans + " doesn't support the result payload: " + returnMessage.getPayload().getClass());
+                }
             }
         }
         return returnMessage;
