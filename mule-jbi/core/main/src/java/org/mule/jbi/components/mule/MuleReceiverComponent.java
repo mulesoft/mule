@@ -32,7 +32,8 @@ import javax.jbi.servicedesc.ServiceEndpoint;
 import java.io.OutputStream;
 
 /**
- * todo document
+ * Exposes a Mule receiver as a Jbi component allowing other Jbi components to receive
+ * events on Mule endpoints
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

@@ -18,9 +18,12 @@ import org.mule.jbi.JbiContainer;
 import org.mule.jbi.components.AbstractComponent;
 import org.mule.jbi.messaging.MessageListener;
 import org.mule.routing.inbound.InboundMessageRouter;
+import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.impl.MuleSession;
 
 import javax.jbi.messaging.InOnly;
 import javax.jbi.messaging.MessageExchange;
@@ -37,10 +40,9 @@ import java.util.Iterator;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class InboundRouterComponent extends AbstractComponent implements MessageListener
+public class OutboundRouterComponent extends AbstractComponent implements MessageListener
 {
-    private InboundMessageRouter router;
-    private QName targetService;
+    private OutboundMessageRouter router;
     private JbiContainer container;
 
     public JbiContainer getContainer() {
@@ -51,19 +53,12 @@ public class InboundRouterComponent extends AbstractComponent implements Message
         this.container = container;
     }
 
-    public QName getTargetService() {
-        return targetService;
-    }
 
-    public void setTargetService(QName targetService) {
-        this.targetService = targetService;
-    }
-
-    public InboundMessageRouter getRouter() {
+    public OutboundMessageRouter getRouter() {
         return router;
     }
 
-    public void setRouter(InboundMessageRouter router) {
+    public void setRouter(OutboundMessageRouter router) {
         this.router = router;
     }
 
@@ -71,25 +66,27 @@ public class InboundRouterComponent extends AbstractComponent implements Message
         if(router==null) {
             throw new NullPointerException("Inbound Message router must be set");
         }
-        if(targetService==null) {
-            throw new NullPointerException("Inbound Message router must be set");
-        }
+
 
         QName routerService = new QName(getName());
-        for (Iterator iterator = router.getEndpoints().iterator(); iterator.hasNext();) {
-            UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
-            endpoint.initialise();
-            if(endpoint.getEndpointURI().getScheme().equals("container")) {
-                QName name = getServiceName(endpoint);
-                context.activateEndpoint(name, endpoint.getEndpointURI().getAddress());
-            } else {
-                MuleReceiverComponent receiverComponent = new MuleReceiverComponent();
-                receiverComponent.setEndpoint(endpoint);
-                receiverComponent.setName(endpoint.getEndpointURI().getScheme() + ":" + getName());
+        for (Iterator iterator = router.getRouters().iterator(); iterator.hasNext();) {
+            UMOOutboundRouter r = (UMOOutboundRouter) iterator.next();
 
-                receiverComponent.setTargetService(routerService);
-                receiverComponent.setContainer(container);
-                container.getRegistry().addTransientEngine(receiverComponent.getName(), receiverComponent, receiverComponent.getBootstrap());
+            for (Iterator iterator1 = r.getEndpoints().iterator(); iterator1.hasNext();) {
+                UMOEndpoint endpoint = (UMOEndpoint) iterator1.next();
+                endpoint.initialise();
+                if(endpoint.getEndpointURI().getScheme().equals("container")) {
+                    QName name = getServiceName(endpoint);
+                    context.activateEndpoint(name, endpoint.getEndpointURI().getAddress());
+                } else {
+                    MuleReceiverComponent receiverComponent = new MuleReceiverComponent();
+                    receiverComponent.setEndpoint(endpoint);
+                    receiverComponent.setName(endpoint.getEndpointURI().getScheme() + ":" + getName());
+
+                    receiverComponent.setTargetService(routerService);
+                    receiverComponent.setContainer(container);
+                    container.getRegistry().addTransientEngine(receiverComponent.getName(), receiverComponent, receiverComponent.getBootstrap());
+                }
             }
         }
         getContext().activateEndpoint(routerService, routerService.getLocalPart());
@@ -115,35 +112,7 @@ public class InboundRouterComponent extends AbstractComponent implements Message
         NormalizedMessage message = me.getMessage(IN);
         UMOEvent event = JbiUtils.createEvent(message, this);
         try {
-            UMOMessage m = router.route(event);
-            if(m!=null) {
-                InOnly exchange = context.getDeliveryChannel().createExchangeFactory().createInOnlyExchange();
-                NormalizedMessage nmessage = exchange.createMessage();
-
-                ServiceEndpoint endpoint = null;
-                ServiceEndpoint[] eps = context.getEndpointsForService(targetService);
-                if(eps.length==0) {
-                    //container should handle this
-                    //throw new MessagingException("There are no endpoints registered for targetService: " + targetService);
-                } else {
-                    endpoint = eps[0];
-                }
-
-                if (endpoint != null) {
-                    exchange.setEndpoint(endpoint);
-                }
-
-                exchange.setInMessage(nmessage);
-                JbiUtils.populateNormalizedMessage(m, nmessage);
-                boolean synchronous = m.getBooleanProperty("synchronous", true);
-            if(synchronous) {
-                //todo timeout
-                getContext().getDeliveryChannel().sendSync(me);
-            } else {
-                getContext().getDeliveryChannel().send(me);
-            }
-
-            }
+            UMOMessage m = router.route(event.getMessage(), event.getSession(), event.isSynchronous());
             done(me);
         } catch (org.mule.umo.MessagingException e) {
             error(me, e);
