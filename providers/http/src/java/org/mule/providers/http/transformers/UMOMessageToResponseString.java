@@ -13,15 +13,6 @@
  */
 package org.mule.providers.http.transformers;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -34,8 +25,13 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 /**
- * <code>UMOMessageToResponseString</code> TODO
+ * <code>UMOMessageToResponseString</code> converts a UMOMEssage into an Http
+ * response.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -106,7 +102,7 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
         String value;
         for (Iterator iterator = headers.iterator(); iterator.hasNext();) {
             headerName = (String) iterator.next();
-            value = (String) context.getProperty(headerName);
+            value = context.getStringProperty(headerName);
             if (value != null) {
                 httpMessage.append(headerName).append(": ").append(value);
                 httpMessage.append(HttpConstants.CRLF);

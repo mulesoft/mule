@@ -13,13 +13,8 @@
  */
 package org.mule.impl;
 
-import java.beans.ExceptionListener;
-import java.util.NoSuchElementException;
-
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkManager;
-
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -30,12 +25,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.events.ComponentEvent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.ComponentException;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.*;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOWorkManager;
@@ -44,8 +34,11 @@ import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
+import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
+import javax.resource.spi.work.WorkManager;
+import java.beans.ExceptionListener;
+import java.util.NoSuchElementException;
 
 /**
  * <code>MuleComponent</code> manages the interaction and distribution of
@@ -354,7 +347,6 @@ public final class MuleComponent implements UMOComponent, Work
         try {
             paused.whenFalse(null);
         } catch (InterruptedException e) {
-            // TODO: add a subclass for wrapping InterruptedException ?
             throw new ComponentException(event.getMessage(), this, e);
         }
 

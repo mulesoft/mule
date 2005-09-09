@@ -91,12 +91,12 @@ public class HttpMessageAdapter extends AbstractMessageAdapter {
             if (!http11) {
                 String connection = (String) super.getProperty(HttpConstants.HEADER_CONNECTION);
                 if (connection != null && connection.equalsIgnoreCase("close")) {
-                    return new Boolean(false);
+                    return "false";
                 } else {
-                    return new Boolean(true);
+                    return "true";
                 }
             } else {
-                return new Boolean(super.getProperty(HttpConstants.HEADER_CONNECTION) != null);
+                return (super.getProperty(HttpConstants.HEADER_CONNECTION) != null ? "true" : "false");
             }
         } else {
             return super.getProperty(key);
