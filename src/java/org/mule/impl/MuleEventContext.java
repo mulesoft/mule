@@ -532,7 +532,8 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * 
-     * @return
+     * @return the component descriptor of the component that
+     * received this event
      */
     public UMODescriptor getComponentDescriptor()
     {
@@ -799,5 +800,20 @@ public class MuleEventContext implements UMOEventContext
                 throw new IllegalStateException(new Message(Messages.CANNOT_USE_TX_AND_REMOTE_SYNC).getMessage());
             }
         }
+    }
+
+    public String getStringProperty(String name) {
+        Object result = getProperty(name);
+        if(result==null)  {
+            return null;
+        } else {
+            return result.toString();
+        }
+    }
+
+    public String getStringProperty(String name, String defaultValue) {
+        String result = getStringProperty(name);
+        if(result==null) result = defaultValue;
+        return result;
     }
 }

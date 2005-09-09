@@ -358,7 +358,7 @@ public interface UMOEventContext
     /**
      * Gets a property associated with the current event. Calling this method is
      * equivilent to calling <code>event.getMessage().getProperty(...)</code>
-     * 
+     *
      * @param name the property name
      * @return the property value or null if the property does not exist
      */
@@ -368,7 +368,7 @@ public interface UMOEventContext
      * Gets a property associated with the current event. Calling this method is
      * equivilent to calling
      * <code>event.getMessage().getProperty(..., ...)</code>
-     * 
+     *
      * @param name the property name
      * @param defaultValue a default value if the property doesn't exist in the
      *            event
@@ -377,6 +377,29 @@ public interface UMOEventContext
      */
     Object getProperty(String name, Object defaultValue);
 
+    /**
+     * Gets a property associated with the current event. Calling this method is
+     * equivilent to calling <code>event.getMessage().getProperty(...)</code>
+     * This will convert the returned value into a string
+     *
+     * @param name the property name
+     * @return the property value or null if the property does not exist
+     */
+    String getStringProperty(String name);
+
+    /**
+     * Gets a String property associated with the current event. Calling this method is
+     * equivilent to calling
+     * <code>event.getMessage().getProperty(..., ...)</code>
+     * This will convert the returned value into a string
+     *
+     * @param name the property name
+     * @param defaultValue a default value if the property doesn't exist in the
+     *            event
+     * @return the property value or the defaultValue if the property does not
+     *         exist
+     */
+    String getStringProperty(String name, String defaultValue);
     /**
      * Gets an Integer property associated with the current event. Calling this
      * method is equivilent to calling
