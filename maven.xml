@@ -40,6 +40,7 @@
         <j:set var="mule.dist.dir" value="${maven.build.dir}/dist"/>
         <echo>About to copy Mule jars to ${mule.dist.dir}</echo>
         <mkdir dir="${mule.release.dist.dir}"/>
+        <mkdir dir="${mule.release.lib.dir}"/>
         <mkdir dir="${mule.release.dist.dir}/temp"/>
 
         <copy todir="${mule.release.dist.dir}" flatten="true">
@@ -379,6 +380,11 @@
             <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.jar ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/jars/"/>
         </exec>
 
+        <echo> Copying rars from ${mule.release.dist.dir}</echo>
+        <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
+            <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.rar ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/rars/"/>
+        </exec>
+
         <echo> Copying dtds from ${mule.release.dist.dir}</echo>
         <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
             <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.dtd ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/dtds/"/>
@@ -389,16 +395,30 @@
         </exec>
     </goal>
 
-    <goal name="dist:nightly" prereqs="setvars, clean, multiproject:install-snapshot, deploy:nightly"/>
+    <goal name="dist:nightly" prereqs="setvars, clean, multiproject:clean, multiproject:install-snapshot, mule:night-release, deploy:nightly"/>
 
     <goal name="deploy:nightly" prereqs="setvars">
         <echo> Copying Nightly distribution jars from ${mule.release.dist.dir}</echo>
 
+        <mkdir dir="${mule.release.dist.dir}/nightly"/>
+
+        <copy file="${maven.build.dir}/mule-${pom.currentVersion}.jar" todir="${mule.release.dist.dir}/nightly"/>
+        <copy file="${mule.release.dist.dir}/mule-ra-${pom.currentVersion}.rar" todir="${mule.release.dist.dir}/nightly"/>
+        <copy todir="${mule.release.dist.dir}/nightly">
+            <fileset file="${mule.release.dist.dir}/*.dtd"/>
+        </copy>
+
         <tar compression="gzip" tarfile="${maven.build.dir}/${maven.final.name}-nightly-dist.tar.gz" longfile="gnu">
-            <tarfileset dir="${mule.release.dist.dir}" prefix=""/>
+            <tarfileset dir="${mule.release.dist.dir}/nightly" prefix=""/>
         </tar>
 
-        <!-- copy the tar-'d dirtro -->
+        <!-- copy the tar-'d and zipped dirtro -->
+        <echo>Exec: ${maven.scp.executable} ${maven.scp.args} ${maven.build.dir}/distributions/${maven.final.name}-dist.* ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/nightly</echo>
+        <exec dir="${maven.build.dir}" executable="${maven.scp.executable}">
+            <arg line="${maven.scp.args} ${maven.build.dir}/distributions/${maven.final.name}-dist.* ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/nightly"/>
+        </exec>
+
+        <!-- copy the tar-'d jars -->
         <exec dir="${maven.build.dir}" executable="${maven.scp.executable}">
             <arg line="${maven.scp.args} ${maven.final.name}-nightly-dist.tar.gz ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/"/>
         </exec>

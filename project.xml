@@ -5,7 +5,7 @@
     <id>mule</id>
     <groupId>mule</groupId>
     <artifactId>mule</artifactId>
-    <currentVersion>1.1</currentVersion>
+    <currentVersion>SNAPSHOT</currentVersion>
     <organization>
         <name>SymphonySoft Limited</name>
         <url>http://www.symphonysoft.com</url>
@@ -200,12 +200,18 @@
                     <includes>
                         <include>**/*</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/log4j.properties</exclude>
+                    </excludes>
                 </resource>
                 <resource>
                     <directory>${basedir}/src/conf</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/log4j.properties</exclude>
+                    </excludes>
                 </resource>
             </resources>
         </unitTest>
