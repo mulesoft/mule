@@ -224,6 +224,7 @@ public class Launcher {
         // or default using location of mule-launcher.jar
         File muleLibDir = null;
         File muleLibOptDir = null;
+        File muleLibPatchDir = null;
         String muleLibDirProperty = getProperty(MULE_LIB_DIR_PROPERTY);
         if (muleLibDirProperty != null) {
             muleLibDir = new File(muleLibDirProperty);
@@ -243,18 +244,23 @@ public class Launcher {
 
         URL[] systemJars = Locator.getLocationURLs(muleLibDir);
 
+        //Optional libraries
         muleLibOptDir = new File(muleLibDir.getAbsolutePath() + File.separator + "opt");
-
         URL[] muleOptJars = muleLibOptDir.exists() ? Locator.getLocationURLs(muleLibOptDir) :  new URL[0];
 
-        int numJars = libJars.length + muleOptJars.length + systemJars.length;
+        //Patch libraries
+        muleLibPatchDir = new File(muleLibDir.getAbsolutePath() + File.separator + "patch");
+        URL[] mulePatchJars = muleLibOptDir.exists() ? Locator.getLocationURLs(muleLibPatchDir) :  new URL[0];
+
+        int numJars = mulePatchJars.length + libJars.length + muleOptJars.length + systemJars.length;
         if (toolsJar != null) {
             numJars++;
         }
         URL[] jars = new URL[numJars];
-        System.arraycopy(libJars, 0, jars, 0, libJars.length);
-        System.arraycopy(muleOptJars, 0, jars, libJars.length, muleOptJars.length);
-        System.arraycopy(systemJars, 0, jars, muleOptJars.length + libJars.length,
+        System.arraycopy(mulePatchJars, 0, jars, 0, mulePatchJars.length);
+        System.arraycopy(libJars, 0, jars, mulePatchJars.length, libJars.length);
+        System.arraycopy(muleOptJars, 0, jars, mulePatchJars.length + libJars.length, muleOptJars.length);
+        System.arraycopy(systemJars, 0, jars, mulePatchJars.length + muleOptJars.length + libJars.length,
             systemJars.length);
 
         if (toolsJar != null) {

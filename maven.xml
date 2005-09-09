@@ -130,6 +130,7 @@
         <j:set var="mule.release.dir" value="${maven.build.dir}\release"/>
         <j:set var="mule.release.lib.dir" value="${mule.release.dir}\lib"/>
         <j:set var="mule.release.lib.opt.dir" value="${mule.release.lib.dir}\opt"/>
+        <j:set var="mule.release.lib.patch.dir" value="${mule.release.lib.dir}\patch"/>
         <j:set var="mule.release.dist.dir" value="${mule.release.dir}\dist"/>
         <echo>Release dir is ${mule.release.dir}</echo>
         <j:set var="mule.base.context.path" value="../../.."/>
@@ -145,6 +146,7 @@
         <mkdir dir="${mule.release.dist.dir}"/>
         <mkdir dir="${mule.release.lib.dir}"/>
         <mkdir dir="${mule.release.lib.opt.dir}"/>
+        <mkdir dir="${mule.release.lib.patch.dir}"/>
         <mkdir dir="${mule.release.lib.dir}/licenses"/>
     </goal>
 
