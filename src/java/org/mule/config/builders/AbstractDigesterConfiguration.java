@@ -15,7 +15,6 @@
 package org.mule.config.builders;
 
 import org.apache.commons.digester.Digester;
-import org.apache.commons.digester.NodeCreateRule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -26,33 +25,13 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.umo.UMOFilter;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Node;
-import org.xml.sax.Attributes;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -181,41 +160,41 @@ public abstract class AbstractDigesterConfiguration
         digester.addObjectCreate(path, DEFAULT_CONTAINER_CONTEXT, "className");
         addMulePropertiesRule(path, digester);
 
-        NodeCreateRule nodeCreateRule = null;
-        try {
-            nodeCreateRule = new NodeCreateRule(Node.DOCUMENT_FRAGMENT_NODE) {
-                private String encoding;
-                private String doctype;
-
-                public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
-                    encoding = attributes.getValue("encoding");
-                    doctype = attributes.getValue("doctype");
-                    super.begin(endpointName, endpointName1, attributes);
-                }
-
-                public void end(String endpointName, String endpointName1) throws Exception {
-                    super.end(endpointName, endpointName1);
-
-                    DocumentFragment config = (DocumentFragment) digester.pop();
-                    StringWriter s = new StringWriter();
-                    StreamResult streamResult = new StreamResult(s);
-                    TransformerFactory tFactory = TransformerFactory.newInstance();
-                    try {
-                        Transformer transformer = tFactory.newTransformer();
-                        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-                        transformer.transform(new DOMSource(config), streamResult);
-                    } catch (TransformerException e) {
-                        throw new ContainerException(new Message(Messages.COULD_NOT_RECOVER_CONTIANER_CONFIG), e);
-                    }
-                    Reader reader = new StringReader(s.toString());
-                    UMOContainerContext ctx = (UMOContainerContext) digester.peek();
-                    ctx.configure(reader, doctype, encoding);
-                }
-            };
-        } catch (ParserConfigurationException e) {
-            throw new ConfigurationException(e);
-        }
-        digester.addRule(path + "/configuration", nodeCreateRule);
+//        NodeCreateRule nodeCreateRule = null;
+//        try {
+//            nodeCreateRule = new NodeCreateRule(Node.DOCUMENT_FRAGMENT_NODE) {
+//                private String encoding;
+//                private String doctype;
+//
+//                public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
+//                    encoding = attributes.getValue("encoding");
+//                    doctype = attributes.getValue("doctype");
+//                    super.begin(endpointName, endpointName1, attributes);
+//                }
+//
+//                public void end(String endpointName, String endpointName1) throws Exception {
+//                    super.end(endpointName, endpointName1);
+//
+//                    DocumentFragment config = (DocumentFragment) digester.pop();
+//                    StringWriter s = new StringWriter();
+//                    StreamResult streamResult = new StreamResult(s);
+//                    TransformerFactory tFactory = TransformerFactory.newInstance();
+//                    try {
+//                        Transformer transformer = tFactory.newTransformer();
+//                        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+//                        transformer.transform(new DOMSource(config), streamResult);
+//                    } catch (TransformerException e) {
+//                        throw new ContainerException(new Message(Messages.COULD_NOT_RECOVER_CONTIANER_CONFIG), e);
+//                    }
+//                    Reader reader = new StringReader(s.toString());
+//                    UMOContainerContext ctx = (UMOContainerContext) digester.peek();
+//                    ctx.configure(reader, doctype, encoding);
+//                }
+//            };
+//        } catch (ParserConfigurationException e) {
+//            throw new ConfigurationException(e);
+//        }
+//        digester.addRule(path + "/configuration", nodeCreateRule);
         //Set the container on the parent object
         digester.addSetNext(path, setterMethod);
     }

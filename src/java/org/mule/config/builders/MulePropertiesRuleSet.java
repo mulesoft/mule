@@ -98,6 +98,7 @@ public class MulePropertiesRuleSet extends RuleSetBase
         addSystemPropertyRule(digester, path + "/system-property");
         addFilePropertiesRule(digester, path + "/file-properties");
         addContainerPropertyRule(digester, path + "/container-property", propertiesSetterName==null);
+        addTextPropertyRule(digester, path + "/text-property");
 
         addMapPropertyRules(digester, path);
         addListPropertyRules(digester, path);
@@ -264,6 +265,29 @@ public class MulePropertiesRuleSet extends RuleSetBase
                     obj = digester.peek();
                 }
                 objectRefs.add(new ContainerReference(name, value, obj, req, container));
+            }
+        });
+    }
+
+    protected void addTextPropertyRule(Digester digester, String path)
+    {
+
+        digester.addRule(path, new Rule() {
+            private String name = null;
+            public void begin(String s, String s1, Attributes attributes) throws Exception
+            {
+                // Process template tokens
+                attributes = processor.processAttributes(attributes, s1);
+                name = attributes.getValue("name");
+            }
+
+            public void body(String string, String string1, String string2) throws Exception {
+                Object props = digester.peek();
+                if (props instanceof Map) {
+                    ((Map) props).put(name, string2);
+                } else {
+                    ((List) props).add(string2);
+                }
             }
         });
     }
