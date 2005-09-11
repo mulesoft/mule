@@ -16,6 +16,8 @@ package org.mule.components.rest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.config.PropertyExtractor;
+import org.mule.config.SimplePropertyExtractor;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -35,7 +37,9 @@ import org.mule.util.SgmlCodec;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * todo document
@@ -54,12 +58,14 @@ public class RestServiceWrapper implements Callable, Initialisable
 
     private String serviceUrl;
     private boolean urlFromMessage = false;
-    private List reqiredParams = new ArrayList();
-    private List optionalParams = new ArrayList();
+    private Map reqiredParams = new HashMap();
+    private Map optionalParams = new HashMap();
     private String httpMethod = "GET";
     private String payloadParameterName;
     private UMOFilter errorFilter;
     private String errorExpression;
+
+    private PropertyExtractor propertyExtractor = new SimplePropertyExtractor();
 
     public String getServiceUrl() {
         return serviceUrl;
@@ -77,19 +83,19 @@ public class RestServiceWrapper implements Callable, Initialisable
         this.urlFromMessage = urlFromMessage;
     }
 
-    public List getReqiredParams() {
+    public Map getReqiredParams() {
         return reqiredParams;
     }
 
-    public void setReqiredParams(List reqiredParams) {
+    public void setReqiredParams(Map reqiredParams) {
         this.reqiredParams = reqiredParams;
     }
 
-    public List getOptionalParams() {
+    public Map getOptionalParams() {
         return optionalParams;
     }
 
-    public void setOptionalParams(List optionalParams) {
+    public void setOptionalParams(Map optionalParams) {
         this.optionalParams = optionalParams;
     }
 
@@ -162,17 +168,14 @@ public class RestServiceWrapper implements Callable, Initialisable
         }
         StringBuffer urlBuffer = new StringBuffer(tempUrl);
 
-        Map params = new HashMap(eventContext.getProperties());
         if(payloadParameterName!=null) {
-            params.put(payloadParameterName, request);
             requestBody = new NullPayload();
         } else if(request instanceof Map) {
-            params.putAll((Map)request);
             requestBody = new NullPayload();
         }
 
-        setRESTParams(urlBuffer, params, reqiredParams, false);
-        setRESTParams(urlBuffer, params, optionalParams, true);
+        setRESTParams(urlBuffer, eventContext.getMessage(), reqiredParams, false);
+        setRESTParams(urlBuffer, eventContext.getMessage(), optionalParams, true);
 
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
@@ -190,27 +193,29 @@ public class RestServiceWrapper implements Callable, Initialisable
         return result;
     }
 
-    private void setRESTParams(StringBuffer url, Map params, List args, boolean optional) {
+    private void setRESTParams(StringBuffer url, UMOMessage msg, Map args, boolean optional) {
         char sep;
         if(url.indexOf("?") > -1) {
             sep = '&';
         } else {
             sep = '?';
         }
-        String arg;
+        String name;
+        String exp;
         Object value;
-        for (Iterator iterator = args.iterator(); iterator.hasNext();) {
-            arg = (String) iterator.next();
-            value = params.get(arg);
+        for (Iterator iterator = args.keySet().iterator(); iterator.hasNext();) {
+            name = (String) iterator.next();
+            exp = (String)args.get(name);
+            value = propertyExtractor.getProperty(exp, msg);
             if(value==null && !optional) {
-                throw new IllegalArgumentException(new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT, arg).toString());
+                throw new IllegalArgumentException(new Message(Messages.X_PROPERTY_IS_NOT_SET_ON_EVENT, exp).toString());
             }
             url.append(sep);
             sep = '&';
-            url.append(arg).append("=").append(value);
+            url.append(name).append("=").append(value);
         }
         if(!optional && payloadParameterName!=null) {
-            url.append(sep).append(payloadParameterName).append("=").append(params.get(payloadParameterName));
+            url.append(sep).append(payloadParameterName).append("=").append(msg.getPayload().toString());
         }
     }
 
