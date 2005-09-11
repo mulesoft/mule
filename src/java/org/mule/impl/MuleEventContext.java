@@ -724,7 +724,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public boolean isStopFurtherProcessing()
     {
-        return event.isStopFurtherProcessing();
+        return RequestContext.getEvent().isStopFurtherProcessing();
     }
 
     /**
@@ -741,7 +741,7 @@ public class MuleEventContext implements UMOEventContext
      */
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
     {
-        event.setStopFurtherProcessing(stopFurtherProcessing);
+        RequestContext.getEvent().setStopFurtherProcessing(stopFurtherProcessing);
     }
 
     /**
