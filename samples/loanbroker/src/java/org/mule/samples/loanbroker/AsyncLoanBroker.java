@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.samples.loanbroker.service.LoanBroker;
 
 /**
- * <code>AsyncLoanBroker</code> is the Service that starts the loan
+ * <code>LoanBroker</code> is the Service that starts the loan
  * request process.  The broker also receives the final quote.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

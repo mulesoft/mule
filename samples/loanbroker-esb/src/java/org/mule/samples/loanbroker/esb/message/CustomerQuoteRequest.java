@@ -11,23 +11,20 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.samples.loanbroker;
+package org.mule.samples.loanbroker.esb.message;
 
 import java.io.Serializable;
 
 /**
- * <code>LoanRequest</code> is the request sent by the the LoanBroker
+ * <code>CustomerQuoteRequest</code> is the request sent by the the LoanBroker
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class LoanRequest implements Serializable
+public class CustomerQuoteRequest implements Serializable
 {
     /** The customer that requested the quote */
     private Customer customer;
-
-    /** credit profile for the customer */
-    private CreditProfile creditProfile;
 
     /** The requested loan Amount */
     private double loanAmount;
@@ -35,11 +32,7 @@ public class LoanRequest implements Serializable
     /** the duration of the loan */
     private int loanDuration;
 
-    public LoanRequest()
-    {
-    }
-
-    public LoanRequest(Customer customer, double loanAmount, int loanDuration)
+    public CustomerQuoteRequest(Customer customer, double loanAmount, int loanDuration)
     {
         this.customer = customer;
         this.loanAmount = loanAmount;
@@ -74,15 +67,5 @@ public class LoanRequest implements Serializable
     public void setLoanDuration(int loanDuration)
     {
         this.loanDuration = loanDuration;
-    }
-
-    public CreditProfile getCreditProfile()
-    {
-        return creditProfile;
-    }
-
-    public void setCreditProfile(CreditProfile creditProfile)
-    {
-        this.creditProfile = creditProfile;
     }
 }

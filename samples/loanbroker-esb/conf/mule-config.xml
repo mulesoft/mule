@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+
+<mule-configuration id="Loan_broker_Async" version="1.0">
+
+
+    <connector name="ejbConnector" className="org.mule.providers.ejb.EJBConnector">
+        <properties>
+            <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>
+            <property name="jndiUrlPkgPrefixes" value="org.openejb"/>
+            <property name="securityPolicy" value="C:\Projects\iwiser\classes\wideopen.policy"/>
+        </properties>
+    </connector>
+
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
+            <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <property name="specification" value="1.1"/>
+            <map name="jndiProviderProperties">
+                <property name="brokerURL" value="tcp://localhost:61616"/>
+            </map>
+        </properties>
+    </connector>
+
+    <!--
+        The Mule model initialises and manages your UMO components
+    -->
+    <model name="loan-broker">
+        <!--
+        The loan broker is used to receive loan requests
+        -->
+        <mule-descriptor name="LoanBroker"
+            implementation="org.mule.samples.loanbroker.LoanBroker">
+
+            <inbound-router>
+                <endpoint address="axis:http://localhost:8080/services"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://credit.agency.queue"/>
+                </router>
+            </outbound-router>
+
+            <response-router timeout="10000">
+                <endpoint address="jms://loan.quotes.queue"/>
+                <router className="org.mule.samples.loanbroker.esb.routers.BankQuotesResponseAggregator"/>
+            </response-router>
+        </mule-descriptor>
+
+        <!--
+        The credit agency service will get the credit profile for a customer
+        -->
+        <mule-descriptor name="CreditAgencyGateway"
+            implementation="org.mule.components.builder.ReflectionMessageBuilder">
+
+            <inbound-router>
+                <endpoint address="jms://credit.agency.queue"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="ejb://localhost:1099/creditAgencyHome?method=getCreditProfile">
+                        <properties>
+                            <list name="methodArgumentTypes">
+                                <entry value="java.lang.String"/>
+                                <entry value="java.lang.String"/>
+                            </list>
+                        </properties>
+                    </endpoint>
+                    <endpoint address="jms://lender.queue"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="CreditAgencyGateway"
+            implementation="org.mule.components.builder.ReflectionMessageBuilder">
+            </mule-descriptor>
+
+        <mule-descriptor name="LenderGateway"
+                         implementation="org.mule.components.rest.RestServiceWrapper">
+
+            <inbound-router>
+                <endpoint address="jms://esb.lender.queue"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://esb.banking.queue"/>
+                </router>
+            </outbound-router>
+
+            <properties>
+                <property name="serviceUrl" value="http://lendersrus.com/services/GetLenders"/>
+                <map name="requiredParams">
+                    <property name="creditScore" value="creditProfile/creditScore"/>
+                    <property name="creditHistory" value="creditProfile/creditHistory"/>
+                    <property name="amount" value="customerRequest/loanAmount"/>
+                </map>
+            </properties>
+        </mule-descriptor>
+
+        <mule-descriptor name="BankingGateway"
+            implementation="org.mule.components.simple.BridgeComponent">
+
+            <inbound-router>
+                <endpoint address="jms://esb.banking.queue"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.StaticRecipientList">
+                    <reply-to address="jms://esb.loan.quotes"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+        <!--
+        These are mock bank services that represent remote bank loan services
+        One or more of these are selected by the LenderService and a request
+        is routed to them.   The lenderService outbound router also defines a
+        replyTo property which will be used by Mule to route the responses back
+        to the LoanBrokerQuotes destination
+        -->
+        <mule-descriptor name="Bank1"
+            inboundEndpoint="axis:http://localhost:10080/mule"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank2"
+            inboundEndpoint="axis:http://localhost:20080/mule"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank3"
+            inboundEndpoint="axis:http://localhost:30080/mule"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank4"
+            inboundEndpoint="axis:http://localhost:40080/mule"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+
+        <mule-descriptor name="Bank5"
+            inboundEndpoint="axis:http://localhost:50080/mule"
+            implementation="org.mule.samples.loanbroker.Bank">
+        </mule-descriptor>
+    </model>
+</mule-configuration>

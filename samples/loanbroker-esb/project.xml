@@ -1,0 +1,7 @@
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <name>Mule Loan Broker ESB Sample</name>
+    <id>mule-samples-loanbroker-esb</id>
+    <groupId>mule</groupId>
+    <dependencies/>
+</project>
