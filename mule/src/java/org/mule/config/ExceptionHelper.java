@@ -25,12 +25,7 @@ import org.mule.util.Utility;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * <code>ExceptionHelper</code> provides a number of helper functions that can
@@ -347,7 +342,7 @@ public class ExceptionHelper
             Throwable throwable = (Throwable) iterator.next();
             buf.append(i).append(". ").append(throwable.getMessage()).append(" (");
             buf.append(throwable.getClass().getName()).append(")\n");
-            if (verbose) {
+            if (verbose && throwable.getStackTrace().length > 0) {
                 StackTraceElement e = throwable.getStackTrace()[0];
                 buf.append("  ")
                    .append(e.getClassName())
