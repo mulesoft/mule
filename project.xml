@@ -176,6 +176,10 @@
                 <exclude>**/PxeHelloWorldTestCase.*</exclude>
 		        <exclude>**/PxeAsyncTestCase.*</exclude>
 
+                <!-- deprecated groovy components don't work with latest Groovy -->
+                <exclude>**/GroovyMessageBuilderTestCase.*</exclude>
+                <exclude>**/GroovyTransformerTestCase.*</exclude>
+
                 <!-- need to have a Jms server running to include these -->
 <!--                <exclude>**/*Jms*.*</exclude>-->
 <!--                <exclude>**/*JMS*.*</exclude>-->

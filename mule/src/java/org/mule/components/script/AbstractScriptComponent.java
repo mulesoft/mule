@@ -13,8 +13,6 @@
  */
 package org.mule.components.script;
 
-import java.io.File;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.UMODescriptorAware;
@@ -24,8 +22,13 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
+import org.mule.util.ClassHelper;
 import org.mule.util.monitor.FileListener;
 import org.mule.util.monitor.FileMonitor;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * <code>AbstractScriptComponent</code> is a component that can execute
@@ -44,6 +47,8 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private String script = null;
+    private String scriptText = null;
+
     private boolean autoReload = true;
     protected UMODescriptor descriptor;
     private FileMonitor monitor;
@@ -56,7 +61,7 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
 
     public void initialise() throws InitialisationException
     {
-        if (getScript() == null) {
+        if (getScript() == null && getScriptText()== null) {
             String extension = getDefaultFileExtension();
             if (!extension.startsWith(".")) {
                 extension = "." + extension;
@@ -64,10 +69,14 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
             setScript(descriptor.getName() + extension);
             logger.info("script name is not set, using default: " + descriptor.getName() + extension);
         }
-        // load script before creating a file monitor so that the script name
-        // can
-        // be monified
-        loadInterpreter(getScript());
+
+        if(getScriptText()!=null) {
+            loadInterpreter(getScriptText());
+        } else {
+            // load script before creating a file monitor so that the script name
+            // can be monified
+            loadInterpreter(getScriptUrl(getScript()));
+        }
         if (autoReload) {
             File f = new File(getScript());
             if (f.exists()) {
@@ -78,6 +87,21 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
             } else {
                 logger.warn("Cannot setup autoreload as the script fie is not on the local file system");
             }
+        }
+    }
+
+    protected URL getScriptUrl(String scriptLocation)
+    {
+        File f = new File(scriptLocation);
+        if (f.exists()) {
+            try {
+                return f.toURL();
+            } catch (MalformedURLException e) {
+                logger.error("Failed to create URL from file: " + f.getAbsolutePath(), e);
+                return null;
+            }
+        } else {
+            return ClassHelper.getResource(scriptLocation, getClass());
         }
     }
 
@@ -124,7 +148,18 @@ public abstract class AbstractScriptComponent implements Initialisable, Lifecycl
         }
     }
 
-    protected abstract void loadInterpreter(String script) throws InitialisationException;
+
+    public String getScriptText() {
+        return scriptText;
+    }
+
+    public void setScriptText(String scriptText) {
+        this.scriptText = scriptText;
+    }
+
+    protected abstract void loadInterpreter(URL script) throws InitialisationException;
+
+    protected abstract void loadInterpreter(String scriptText) throws InitialisationException;
 
     protected abstract String getDefaultFileExtension();
 }

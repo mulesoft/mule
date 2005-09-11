@@ -16,24 +16,24 @@ package org.mule.extras.groovy;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyCodeSource;
 import groovy.lang.GroovyObject;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-
 import org.mule.components.script.AbstractScriptComponent;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.util.ClassHelper;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * <code>GroovyComponent</code> allows a grooy object ot managed as a Mule
  * component.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
+ * @deprecated Use the org.mule.components.script.js223.ScriptComponent which
+ * can run with any JSR223 compliant script engine
  */
 public class GroovyComponent extends AbstractScriptComponent
 {
@@ -43,24 +43,32 @@ public class GroovyComponent extends AbstractScriptComponent
 
     /**
      * Loads the script for this component
-     * 
-     * @param script the script file location
+     *
+     * @param scriptText the script text
      * @throws InitialisationException if anything fails while starting up
      */
-    protected void loadInterpreter(String script) throws InitialisationException
+    protected void loadInterpreter(String scriptText) throws InitialisationException
     {
         try {
-            File f = new File(script);
+            GroovyClassLoader loader = new GroovyClassLoader(Thread.currentThread().getContextClassLoader());
+                Class groovyClass = loader.parseClass(new GroovyCodeSource(scriptText, "", ""));
+                component = (GroovyObject) groovyClass.newInstance();
+
+        } catch (Exception e) {
+            if (e instanceof InitialisationException)
+                throw (InitialisationException) e;
+            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Groovy component"), e, this);
+        }
+    }
+
+    protected void loadInterpreter(URL script) throws InitialisationException {
+        try {
+            File f = new File(script.toExternalForm());
             if (f.exists()) {
                 fileChanged(f);
             } else {
                 GroovyClassLoader loader = new GroovyClassLoader(Thread.currentThread().getContextClassLoader());
-                URL url = ClassHelper.getResource(script, getClass());
-                if (url == null) {
-                    throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Groovy script: " + script),
-                                                      this);
-                }
-                Class groovyClass = loader.parseClass(new GroovyCodeSource(url));
+                Class groovyClass = loader.parseClass(new GroovyCodeSource(script));
                 component = (GroovyObject) groovyClass.newInstance();
             }
         } catch (Exception e) {

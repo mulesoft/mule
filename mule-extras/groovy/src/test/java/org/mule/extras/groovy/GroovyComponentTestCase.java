@@ -22,6 +22,7 @@ import org.mule.umo.UMOMessage;
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
+ * 
  */
 public class GroovyComponentTestCase extends NamedTestCase
 {
