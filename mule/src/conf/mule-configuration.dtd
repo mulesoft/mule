@@ -766,7 +766,7 @@ Jndi
     There are different implementations for different containers
 	such as PicoContainer or Spring
 -->
-<!ELEMENT container-context (properties?, configuration?)>
+<!ELEMENT container-context (properties?)>
 
 <!--
 
@@ -782,29 +782,6 @@ Jndi
     is usually the the name of the container implementation
 -->
 <!ATTLIST container-context name  	CDATA		#IMPLIED>
-
-<!--
-A blob of configuration of configration data that can be used to embed application
-specific configuration in a Mule Xml document
--->
-<!ELEMENT configuration (CDATA)>
-<!--
-The doctype declaration to use for the configuration fragment.
-can be null if no validation is to be performed or the fragment is not Xml
-the doc type can be in the form of :
-<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-  "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
-or
-mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-"http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd"
--->
-<!ATTLIST configuration doctype         CDATA       #IMPLIED>
-
-<!--
-The ecoding to use in the Xml declaration for the configuration fragment.
-Can be null if fragment is not Xml.  If not set UTF-8 will be used.
--->
-<!ATTLIST configuration encoding         CDATA       #IMPLIED>
 
 <!--
 	The <i>model</i> defines the components and interations between components in the Mule
@@ -1167,7 +1144,7 @@ or relax dtd validation on their parser
   		A collection of properties for the parent component
 -->
 
-<!ELEMENT properties ((property | factory-property | container-property | system-property | map | list | file-properties)*)>
+<!ELEMENT properties ((property | factory-property | container-property | system-property | map | list | file-properties | text-property)*)>
 
 <!--
   		An property element allows arbitrary name/value pairs.
@@ -1338,6 +1315,19 @@ The system property key to use when lookin up the property
 Whether the properties in the properties file override properties already set on this object
 -->
 <!ATTLIST file-properties override					(true | false)		"true">
+
+<!--
+  		An property element allows to embed arbitary text as a property, such as script or xml
+-->
+
+<!ELEMENT text-property (#PCDATA)>
+
+<!--
+	The name identifies the name of the attribute.
+-->
+
+<!ATTLIST text-property name 			CDATA		#REQUIRED>
+
 
 <!--
 	Optional description of the enclosing element.

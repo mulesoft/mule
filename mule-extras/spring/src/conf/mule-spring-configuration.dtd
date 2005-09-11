@@ -754,30 +754,6 @@ Agents is a collection of one or more agent configurations
 <!ATTLIST container-context name  	CDATA		#IMPLIED>
 
 <!--
-A blob of configuration of configration data that can be used to embed application
-specific configuration in a Mule Xml document
--->
-<!ELEMENT configuration (PCDATA)>
-
-<!--
-The doctype declaration to use for the configuration fragment.
-can be null if no validation is to be performed or the fragment is not Xml
-the doc type can be in the form of :
-<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-  "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
-or
-mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-"http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd"
--->
-<!ATTLIST configuration         doctype         CDATA       #IMPLIED>
-
-<!--
-The ecoding to use in the Xml declaration for the configuration fragment.
-Can be null if fragment is not Xml.  If not set UTF-8 will be used.
--->
-<!ATTLIST configuration         ecoding         CDATA       #IMPLIED>
-
-<!--
 	The <i>model</i> defines the components and interations between components in the Mule
 	run-time environment.  Here is specified which components exist in the system and how they
 	should behave.
@@ -1291,6 +1267,18 @@ The system property key to use when lookin up the property
 Whether the properties in the file override properties already set on this object
 -->
 <!ATTLIST file-properties override					(true | false)		"true">
+
+<!--
+  		An property element allows to embed arbitary text as a property, such as script or xml
+-->
+
+<!ELEMENT text-property (#PCDATA)>
+
+<!--
+	The name identifies the name of the attribute.
+-->
+
+<!ATTLIST text-property name 			CDATA		#REQUIRED>
 
 <!--
 	Optional description of the enclosing element.
