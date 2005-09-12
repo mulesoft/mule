@@ -13,16 +13,16 @@
  */
 package org.mule.management.mbeans;
 
-import javax.management.MBeanRegistration;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.MuleComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
+
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 /**
  * <code>ComponentService</code> exposes service information about a Mule
@@ -115,6 +115,14 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
     public void stop() throws UMOException
     {
         getComponent().stop();
+    }
+
+    public void forceStop() throws UMOException {
+        getComponent().forceStop();
+    }
+
+    public boolean isStopping() {
+        return getComponent().isStopping();
     }
 
     public void dispose() throws UMOException

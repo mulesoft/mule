@@ -25,7 +25,12 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.events.ComponentEvent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.*;
+import org.mule.umo.ComponentException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOWorkManager;
@@ -76,7 +81,7 @@ public final class MuleComponent implements UMOComponent, Work
     /**
      * Determines whether stop has been called and is still in progress
      */
-    private SynchronizedBoolean stopping = new SynchronizedBoolean(false);
+    private WaitableBoolean stopping = new WaitableBoolean(false);
 
     /**
      * Determines if the component has been paused
@@ -191,7 +196,7 @@ public final class MuleComponent implements UMOComponent, Work
         // queue.remove(event);
     }
 
-    public void stop() throws UMOException
+    public void forceStop() throws UMOException
     {
         if (!stopped.get()) {
             logger.debug("Stopping UMOComponent");
@@ -199,6 +204,22 @@ public final class MuleComponent implements UMOComponent, Work
             workManager.stop();
             stopped.set(true);
             stopping.set(false);
+            model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_STOPPED));
+        }
+    }
+
+    public void stop() throws UMOException
+    {
+        if (!stopped.get()) {
+            logger.debug("Stopping UMOComponent");
+            stopping.set(true);
+            try {
+                stopping.whenFalse(null);
+            } catch (InterruptedException e) {
+                //we can ignore this
+            }
+            workManager.stop();
+            stopped.set(true);
             model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_STOPPED));
         }
     }
@@ -290,7 +311,6 @@ public final class MuleComponent implements UMOComponent, Work
             throw new ComponentException(new Message(Messages.COMPONENT_X_IS_STOPPED, getDescriptor().getName()), event.getMessage(), this);
         }
         // Dispatching event to an inbound endpoint
-        // TODO: remove this code as it is already done
         // in the MuleSession#dispatchEvent
         if (!event.getEndpoint().canReceive()) {
             UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(event.getEndpoint()
@@ -422,6 +442,11 @@ public final class MuleComponent implements UMOComponent, Work
         return stopped.get();
     }
 
+    public boolean isStopping()
+    {
+        return stopping.get();
+    }
+
     public boolean isPaused()
     {
         return paused.get();
@@ -437,13 +462,20 @@ public final class MuleComponent implements UMOComponent, Work
         MuleProxy proxy = null;
         QueueSession queueSession = null;
 
-        while (!stopped.get() && !stopping.get()) {
+        while (!stopped.get()) {
             try {
                 // Wait if the component is paused
                 paused.whenFalse(null);
                 // Wait until an event is available
                 queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
-                // queueSession.begin();
+                //If we're doing a draining stop, read all events from the queue
+                //before stopping
+                if(stopping.get()) {
+                    if(queueSession.getQueue(descriptor.getName() + ".component").size() ==0) {
+                        stopping.set(false);
+                        break;
+                    }
+                }
                 event = (MuleEvent) queueSession.getQueue(descriptor.getName() + ".component").take();
 
                 if (stats.isEnabled()) {
