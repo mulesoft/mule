@@ -268,7 +268,7 @@ if [ -n "MULE_MAIN" ] ; then
   MULE_MAIN=org.mule.MuleServer
 fi
 
-mule_exec_command="exec \"$JAVACMD\" $MULE_DEBUG_OPTS $MULE_OPTS -classpath \"$LOCALCLASSPATH\" -Dorg.mule.main.class=\"$MULE_HOME\" -Dorg.mule.home=\"$MULE_HOME\" -Dorg.mule.lib.dir=\"$MULE_LIB\" $mule_sys_opts org.mule.tools.launcher.Launcher $MULE_ARGS -lib \"$CLASSPATH\" $mule_exec_args"
+mule_exec_command="exec \"$JAVACMD\" $MULE_DEBUG_OPTS $MULE_OPTS -classpath \"$LOCALCLASSPATH\" -Dorg.mule.main.class=\"$MULE_MAIN\" -Dorg.mule.home=\"$MULE_HOME\" -Dorg.mule.lib.dir=\"$MULE_LIB\" $mule_sys_opts org.mule.tools.launcher.Launcher $MULE_ARGS -lib \"$CLASSPATH\" $mule_exec_args"
 if $mule_exec_debug ; then
     echo $mule_exec_command
 fi
