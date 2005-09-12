@@ -13,11 +13,11 @@
  */
 package org.mule.management.mbeans;
 
-import javax.management.ObjectName;
-
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
+
+import javax.management.ObjectName;
 
 /**
  * <code>ComponentServiceMBean</code> defines the management interface for a
@@ -77,4 +77,11 @@ public interface ComponentServiceMBean extends Stoppable, Startable
     boolean isStopped();
 
     void dispose() throws UMOException;
+
+    /**
+     * Causes the component to stop without processing its event queue first
+     */
+    void forceStop() throws UMOException;
+
+    boolean isStopping();
 }
