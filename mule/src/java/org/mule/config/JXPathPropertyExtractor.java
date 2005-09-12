@@ -21,6 +21,11 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.mule.umo.UMOMessage;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Will extract properties based on Xpath expressions.  Will work on
  * Xml/Dom and beans
@@ -51,8 +56,51 @@ public class JXPathPropertyExtractor extends SimplePropertyExtractor {
             result = doc.valueOf(name);
         } else {
             JXPathContext context = JXPathContext.newContext(obj);
-            result = context.getValue(name);
+            try {
+                result = context.getValue(name);
+            } catch (Exception e) {
+                result=null;
+            }
+        }
+        if(result==null) {
+            result = super.getProperty(name, message);
         }
         return result;
+    }
+
+    public Map getProperties(List names, UMOMessage message) {
+        Map props = new HashMap();
+        Object result = null;
+        Object obj = message.getPayload();
+        Document doc = null;
+        JXPathContext context = null;
+        if (obj instanceof String) {
+
+            try {
+                doc = DocumentHelper.parseText((String) obj);
+            } catch (DocumentException e) {
+                logger.error(e);
+                return null;
+            }
+        } else {
+            context = JXPathContext.newContext(obj);
+        }
+        for (Iterator iterator = names.iterator(); iterator.hasNext();) {
+            String name = (String) iterator.next();
+            if(doc!=null) {
+             result = doc.valueOf(name);
+            } else {
+                try {
+                    result = context.getValue(name);
+                } catch (Exception e) {
+                    result=null;
+                }
+            }
+            if(result==null) {
+                result = super.getProperty(name, message);
+            }
+            props.put(name, result);
+        }
+        return props;
     }
 }

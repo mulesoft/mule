@@ -20,7 +20,7 @@ import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.PropertyExtractor;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.routing.DefaultPropertiesExtractor;
+import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -53,7 +53,7 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     protected int enableCorrelation = ENABLE_CORRELATION_IF_NOT_SET;
 
-    protected PropertyExtractor propertyExtractor = new DefaultPropertiesExtractor();
+    protected PropertyExtractor propertyExtractor = new CorrelationPropertiesExtractor();
 
     protected RouterStatistics routerStatistics;
 
