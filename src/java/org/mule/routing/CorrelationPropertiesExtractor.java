@@ -14,7 +14,7 @@
 package org.mule.routing;
 
 import org.mule.config.MuleProperties;
-import org.mule.config.PropertyExtractor;
+import org.mule.config.SimplePropertyExtractor;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.UUID;
@@ -30,19 +30,13 @@ import org.mule.util.UUID;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DefaultPropertiesExtractor implements PropertyExtractor
+public class CorrelationPropertiesExtractor extends SimplePropertyExtractor
 {
     public final Object getProperty(String name, UMOMessage message)
     {
         Object result = null;
         if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(name)) {
             result = getCorrelationId(message);
-            // } else
-            // if(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(name)){
-            // result = getCorrelationGroupSize(message);
-            // } else
-            // if(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(name)){
-            // result = getCorrelationSequence(message);
         } else if (MuleProperties.MULE_MESSAGE_ID_PROPERTY.equals(name)) {
             result = getMessageId(message);
         } else {
@@ -73,15 +67,4 @@ public class DefaultPropertiesExtractor implements PropertyExtractor
         }
         return id;
     }
-
-    // public String getCorrelationGroupSize(UMOMessage message) {
-    // int x = message.getCorrelationGroupSize();
-    // if(x < 1) x = 1;
-    // return String.valueOf(x);
-    // }
-    //
-    // public String getCorrelationSequence(UMOMessage message) {
-    // int x = message.getCorrelationSequence();
-    // return String.valueOf(x);
-    // }
 }

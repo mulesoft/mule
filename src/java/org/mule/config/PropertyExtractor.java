@@ -15,6 +15,9 @@ package org.mule.config;
 
 import org.mule.umo.UMOMessage;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * <code>PropertyExtractor</code> extracts a property from the message in a
  * generic way. i.e. composite properties can be pulled and aggregated depending
@@ -26,5 +29,21 @@ import org.mule.umo.UMOMessage;
  */
 public interface PropertyExtractor
 {
+    /**
+     * Extracts a single property from the message
+     * @param name the property name or expression
+     * @param message the message to extract from
+     * @return the result of the extraction or null if the property was not found
+     */
     Object getProperty(String name, UMOMessage message);
+
+    /**
+     * Where a property extract must first parse the message body of a message this
+     * implementation meothd will be more efficient as the parsed content is cached
+     * for each property extraction
+     * @param names a list of property names or expressions
+     * @param message the message to extract from
+     * @return a map of key/value pairs where the key is the name or expression
+     */
+    Map getProperties(List names, UMOMessage message);
 }

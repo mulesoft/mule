@@ -16,7 +16,7 @@ package org.mule.routing.response;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PropertyExtractor;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.routing.DefaultPropertiesExtractor;
+import org.mule.routing.CorrelationPropertiesExtractor;
 import org.mule.umo.routing.UMOResponseRouter;
 
 /**
@@ -33,7 +33,7 @@ public abstract class AbstractResponseRouter implements UMOResponseRouter
 
     private int timeout = MuleConfiguration.DEFAULT_TIMEOUT;
 
-    protected PropertyExtractor correlationExtractor = new DefaultPropertiesExtractor();
+    protected PropertyExtractor correlationExtractor = new CorrelationPropertiesExtractor();
 
     public RouterStatistics getRouterStatistics()
     {
