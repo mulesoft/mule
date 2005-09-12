@@ -13,6 +13,8 @@ The distribution you have downloaded contains the following -
 ./dist         - The Mule jars and configuration dtd (note there is a combined jar in the ./lib directory).
 ./docs         - API documentation for Mule and its sub-projects.
 ./lib          - Jars needed by the Mule distribution
+./lib/opt      - Optional jars required by certain Mule transports and components
+./lib/patch    - Used to include jars and resources at the beginning of the classpath. This directory is empty.
 ./lib/licences - License information about all the jars shipped with Mule.
 ./samples      - Sample applications, scripts and source code
 ./src          - The source code for Mule and its sub-projects.

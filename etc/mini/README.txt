@@ -19,6 +19,7 @@ The distribution you have downloaded contains the following -
 ./bin          - Scripts for running Mule
 ./dist         - The Mini Mule jar and configuration dtd.
 ./lib          - Jars needed by the Mini Mule distribution
+./lib/patch    - Used to include jars and resources at the beginning of the classpath. This directory is empty.
 ./lib/licenses - License information about all the jars shipped with Mule.
 ./samples      - Sample applications, scripts and source code (some samples have been adapted to
                 only use transports included in this distribution)
