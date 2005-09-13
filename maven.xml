@@ -119,7 +119,7 @@
         </u:available>
 
         <!--local deploy -->
-        <copy todir="${maven.repo.local}/mule/jars" file="${mule.build.dir}/mule-${pom.currentVersion}.jar"/>
+        <copy todir="${maven.repo.local}/mule/jars" file="${maven.build.dir}/mule-${pom.currentVersion}.jar"/>
 
         <!-- do custom deploy -->
 <!--        <j:if test="${context.getVariable('mule.release.dist.deploy.dir')!= null}">-->
@@ -237,8 +237,8 @@
         <copy todir="${mule.release.dir}/bin">
             <fileset dir="${basedir}/bin"/>
         </copy>
-        <ant:fixcrlf srcdir="${mule.release.dir}/bin" eol="crlf" eof="doc" includes="*.bat"/>
-        <ant:fixcrlf srcdir="${mule.release.dir}/bin" eol="lf" eof="unix" includes="*" excludes="*.bat"/>
+        <ant:fixcrlf srcdir="${mule.release.dir}/bin" eol="crlf" eof="doc" includes="*.bat" excludes="*.jar"/>
+        <ant:fixcrlf srcdir="${mule.release.dir}/bin" eol="lf" eof="unix" includes="*" excludes="*.bat *.jar"/>
 
         <ant:chmod perm="ugo+rx">
           <ant:fileset dir="${mule.release.dir}/bin">
@@ -319,8 +319,8 @@
     <goal name="mule:zip-release" prereqs="setvars">
         <mkdir dir="${maven.build.dir}/distributions"/>
 
-        <ant:fixcrlf srcdir="${mule.release.dir}" eol="crlf" eof="doc" includes="**/bin/*.bat"/>
-        <ant:fixcrlf srcdir="${mule.release.dir}" eol="lf" eof="unix" includes="**/bin/*" excludes="*.bat"/>
+        <ant:fixcrlf srcdir="${mule.release.dir}" eol="crlf" eof="doc" includes="**/bin/*.bat" excludes="**/bin/*.jar"/>
+        <ant:fixcrlf srcdir="${mule.release.dir}" eol="lf" eof="unix" includes="**/bin/*" excludes="*.bat *.jar"/>
 
         <ant:chmod perm="ugo+rx">
           <ant:fileset dir="${mule.release.dir}">

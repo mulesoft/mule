@@ -57,8 +57,8 @@
             <fileset dir="bin"/>
         </copy>
 
-        <ant:fixcrlf srcdir="${mule.samples.dist.dir}/bin" eol="crlf" eof="doc" includes="*.bat"/>
-        <ant:fixcrlf srcdir="${mule.samples.dist.dir}/bin" eol="lf" eof="unix" includes="*" excludes="*.bat"/>
+        <ant:fixcrlf srcdir="${mule.samples.dist.dir}/bin" eol="crlf" eof="doc" includes="*.bat" excludes="*.jar"/>
+        <ant:fixcrlf srcdir="${mule.samples.dist.dir}/bin" eol="lf" eof="unix" includes="*" excludes="*.bat *.jar"/>
 
         <ant:chmod perm="ugo+rx">
           <ant:fileset dir="${mule.samples.dist.dir}/bin">
