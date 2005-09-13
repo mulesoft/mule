@@ -33,7 +33,6 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.util.SgmlCodec;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -180,7 +179,7 @@ public class RestServiceWrapper implements Callable, Initialisable
         tempUrl = urlBuffer.toString();
         logger.info("Invoking REST service: " + tempUrl);
 
-        UMOEndpointURI endpointURI = new MuleEndpointURI(SgmlCodec.encodeString(tempUrl));
+        UMOEndpointURI endpointURI = new MuleEndpointURI(tempUrl);
         eventContext.getMessage().setProperty("http.method", httpMethod);
 
         UMOMessage result = eventContext.sendEvent(new MuleMessage(requestBody, eventContext.getProperties()), endpointURI);
