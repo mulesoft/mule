@@ -36,15 +36,44 @@ rem and for NT handling to skip to.
 
 :doneStart
 
-if exist %CD%\sethome.bat call %CD%\sethome.bat
+rem Set MULE_HOME if not set
+rem %~dp0 is expanded pathname of the current script under NT
+set DEFAULT_MULE_HOME=%~dp0..
 
-if not exist %CD%\sethome.bat if %MULE_HOME% == "" echo Did not find sethome.bat in current directory and MULE_HOME is not set.
+if "%MULE_HOME%"=="" set MULE_HOME=%DEFAULT_MULE_HOME%
+set DEFAULT_MULE_HOME=
+
+:doneStart
+rem find MULE_HOME if it does not exist due to either an invalid value passed
+rem by the user or the %0 problem on Windows 9x
+if exist "%MULE_HOME%\README.txt" goto end
+
+rem check for mule in Program Files on system drive
+if not exist "%SystemDrive%\Program Files\mule" goto checkSystemDrive
+set MULE_HOME=%SystemDrive%\Program Files\mule
+goto end
+
+:checkSystemDrive
+rem check for mule in root directory of system drive
+if not exist %SystemDrive%\mule\README.txt goto checkCDrive
+set MULE_HOME=%SystemDrive%\mule
+goto end
+
+:checkCDrive
+rem check for mule in C:\mule for Win9X users
+if not exist C:\mule\README.txt goto noMuleHome
+set MULE_HOME=C:\mule
+goto end
+
+
+:end
+echo MULE_HOME=%MULE_HOME%
 
 if %MULE_HOME% == "" goto :noMuleHome
 goto checkJava
 
 :noMuleHome
-echo MULE_HOME is set incorrectly or mule could not be located. Please set MULE_HOME.
+echo MULE_HOME is set incorrectly or mule could not be located. Please set MULE_HOME in your environment.
 goto end
 
 :checkJava

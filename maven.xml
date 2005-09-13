@@ -46,9 +46,6 @@
 
     <goal name="dist:nightly" prereqs="setvars, clean, multiproject:clean, mule:libs, multiproject:install-snapshot, mule:night-release, deploy:nightly"/>
 
-    <goal name="dist:minor" prereqs="setvars, clean, multiproject:clean, mule:libs, multiproject:install, mule:night-release"/>
-
-
     <postGoal name="multiproject:install">
         <attainGoal name="all-jars"/>
     </postGoal>
@@ -125,11 +122,11 @@
         <copy todir="${maven.repo.local}/mule/jars" file="${mule.build.dir}/mule-${pom.currentVersion}.jar"/>
 
         <!-- do custom deploy -->
-        <j:if test="${context.getVariable('mule.release.dist.deploy.dir')!= null}">
-            <copy todir="${mule.release.dist.deploy.dir}">
-                <fileset file="${mule.release.dist.dir}/*.*"/>
-            </copy>
-        </j:if>
+<!--        <j:if test="${context.getVariable('mule.release.dist.deploy.dir')!= null}">-->
+<!--            <copy todir="${mule.release.dist.deploy.dir}">-->
+<!--                <fileset file="${mule.release.dist.dir}/*.*"/>-->
+<!--            </copy>-->
+<!--        </j:if>-->
     </goal>
 
     <goal name="mule:javadoc" prereqs="setvars,build-classpath">
@@ -371,7 +368,7 @@
         </copy>
 
         <u:available file="${maven.build.dir}/mule-${pom.currentVersion}.jar">
-            <copy file="${maven.build.dir}/mule-${pom.currentVersion}.jar" dir="${mule.release.lib.dir}"/>
+            <copy file="${maven.build.dir}/mule-${pom.currentVersion}.jar" todir="${mule.release.lib.dir}"/>
         </u:available>
     </goal>
 

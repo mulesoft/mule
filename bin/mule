@@ -86,7 +86,39 @@ case "`uname`" in
            ;;
 esac
 
-exec sethome
+
+#set MULE_HOME if not set
+if [ -z "$MULE_HOME" -o ! -d "$MULE_HOME" ] ; then
+  # try to find MULE
+  if [ -d /opt/mule ] ; then
+    MULE_HOME=/opt/mule
+  fi
+
+  if [ -d "${HOME}/opt/mule" ] ; then
+    MULE_HOME="${HOME}/opt/mule"
+  fi
+
+  ## resolve links - $0 may be a link to mule's home
+  PRG="$0"
+  progname=`basename "$0"`
+
+  # need this for relative symlinks
+  while [ -h "$PRG" ] ; do
+    ls=`ls -ld "$PRG"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+    else
+    PRG=`dirname "$PRG"`"/$link"
+    fi
+  done
+
+  MULE_HOME=`dirname "$PRG"`/..
+
+  # make it fully qualified
+  MULE_HOME=`cd "$MULE_HOME" && pwd`
+fi
+echo MULE_HOME=$MULE_HOME
 
 # For Cygwin, ensure paths are in UNIX format before anything is touched
 if $cygwin ; then
