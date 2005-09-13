@@ -48,12 +48,11 @@ import java.util.NoSuchElementException;
 /**
  * <code>MuleComponent</code> manages the interaction and distribution of
  * events for a Mule-managed component.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public final class MuleComponent implements UMOComponent, Work
-{
+public final class MuleComponent implements UMOComponent, Work {
     /**
      * logger used by this class
      */
@@ -114,8 +113,7 @@ public final class MuleComponent implements UMOComponent, Work
     /**
      * Default constructor
      */
-    public MuleComponent(MuleDescriptor descriptor)
-    {
+    public MuleComponent(MuleDescriptor descriptor) {
         if (descriptor == null) {
             throw new IllegalArgumentException("Descriptor cannot be null");
         }
@@ -127,12 +125,11 @@ public final class MuleComponent implements UMOComponent, Work
      * Initialise the component. The component will first create a Mule UMO from
      * the UMODescriptor and then initialise a pool based on the attributes in
      * the UMODescriptor.
-     * 
+     *
      * @throws InitialisationException if the component fails to initialise
      * @see UMODescriptor
      */
-    public synchronized void initialise() throws InitialisationException
-    {
+    public synchronized void initialise() throws InitialisationException {
         if (initialised.get()) {
             throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED, "Component '"
                     + descriptor.getName() + "'"), this);
@@ -143,8 +140,8 @@ public final class MuleComponent implements UMOComponent, Work
 
         // initialise statistics
         stats = new ComponentStatistics(getName(),
-                                        descriptor.getPoolingProfile().getMaxActive(),
-                                        descriptor.getThreadingProfile().getMaxThreadsActive());
+                descriptor.getPoolingProfile().getMaxActive(),
+                descriptor.getThreadingProfile().getMaxThreadsActive());
 
         stats.setEnabled(((MuleManager) MuleManager.getInstance()).getStatistics().isEnabled());
         ((MuleManager) MuleManager.getInstance()).getStatistics().add(stats);
@@ -169,8 +166,7 @@ public final class MuleComponent implements UMOComponent, Work
 
     }
 
-    private void initialisePool() throws InitialisationException
-    {
+    private void initialisePool() throws InitialisationException {
         try {
             // Initialise the proxy pool
             proxyPool = descriptor.getPoolingProfile().getPoolFactory().createPool(descriptor);
@@ -189,15 +185,13 @@ public final class MuleComponent implements UMOComponent, Work
         }
     }
 
-    void finaliseEvent(UMOEvent event)
-    {
+    void finaliseEvent(UMOEvent event) {
         logger.debug("Finalising event for: " + descriptor.getName() + " event endpointUri is: "
                 + event.getEndpoint().getEndpointURI());
         // queue.remove(event);
     }
 
-    public void forceStop() throws UMOException
-    {
+    public void forceStop() throws UMOException {
         if (!stopped.get()) {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
@@ -208,24 +202,26 @@ public final class MuleComponent implements UMOComponent, Work
         }
     }
 
-    public void stop() throws UMOException
-    {
+    public void stop() throws UMOException {
         if (!stopped.get()) {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
-            try {
-                stopping.whenFalse(null);
-            } catch (InterruptedException e) {
-                //we can ignore this
+            if (MuleManager.getInstance().getQueueManager().getQueueSession().getQueue(descriptor.getName() + ".component").size() > 0) {
+                try {
+
+                    stopping.whenFalse(null);
+                } catch (InterruptedException e) {
+                    //we can ignore this
+                }
             }
+
             workManager.stop();
             stopped.set(true);
             model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_STOPPED));
         }
     }
 
-    public void start() throws UMOException
-    {
+    public void start() throws UMOException {
         if (stopped.get()) {
             stopped.set(false);
             try {
@@ -246,20 +242,17 @@ public final class MuleComponent implements UMOComponent, Work
         model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_STARTED));
     }
 
-    public void pause()
-    {
+    public void pause() {
         paused.set(true);
         model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_PAUSED));
     }
 
-    public void resume()
-    {
+    public void resume() {
         paused.set(false);
         model.fireEvent(new ComponentEvent(descriptor, ComponentEvent.COMPONENT_RESUMED));
     }
 
-    public void dispose()
-    {
+    public void dispose() {
         try {
             if (!stopped.get()) {
                 stop();
@@ -290,8 +283,7 @@ public final class MuleComponent implements UMOComponent, Work
         ((MuleManager) MuleManager.getInstance()).getStatistics().remove(stats);
     }
 
-    public ComponentStatistics getStatistics()
-    {
+    public ComponentStatistics getStatistics() {
         return stats;
     }
 
@@ -300,13 +292,11 @@ public final class MuleComponent implements UMOComponent, Work
      * 
      * @see org.mule.umo.UMOSession#getDescriptor()
      */
-    public UMODescriptor getDescriptor()
-    {
+    public UMODescriptor getDescriptor() {
         return descriptor;
     }
 
-    public void dispatchEvent(UMOEvent event) throws UMOException
-    {
+    public void dispatchEvent(UMOEvent event) throws UMOException {
         if (stopping.get() || stopped.get()) {
             throw new ComponentException(new Message(Messages.COMPONENT_X_IS_STOPPED, getDescriptor().getName()), event.getMessage(), this);
         }
@@ -314,8 +304,8 @@ public final class MuleComponent implements UMOComponent, Work
         // in the MuleSession#dispatchEvent
         if (!event.getEndpoint().canReceive()) {
             UMOMessageDispatcher dispatcher = event.getEndpoint().getConnector().getDispatcher(event.getEndpoint()
-                                                                                                    .getEndpointURI()
-                                                                                                    .getAddress());
+                    .getEndpointURI()
+                    .getAddress());
             try {
                 dispatcher.dispatch(event);
             } catch (Exception e) {
@@ -347,17 +337,16 @@ public final class MuleComponent implements UMOComponent, Work
             }
         } catch (InterruptedException e) {
             FailedToQueueEventException e1 = new FailedToQueueEventException(new Message(Messages.INTERRUPTED_QUEUING_EVENT_FOR_X,
-                                                                                         getName()),
-                                                                             event.getMessage(),
-                                                                             this,
-                                                                             e);
+                    getName()),
+                    event.getMessage(),
+                    this,
+                    e);
             handleException(e1);
         }
         logger.trace("Event added to queue for: " + descriptor.getName());
     }
 
-    public UMOMessage sendEvent(UMOEvent event) throws UMOException
-    {
+    public UMOMessage sendEvent(UMOEvent event) throws UMOException {
         if (stopping.get() || stopped.get()) {
             throw new ComponentException(new Message(Messages.COMPONENT_X_IS_STOPPED, getDescriptor().getName()), event.getMessage(), this);
         }
@@ -408,16 +397,14 @@ public final class MuleComponent implements UMOComponent, Work
     /**
      * @return the Mule descriptor name which is associated with the component
      */
-    public String getName()
-    {
+    public String getName() {
         return descriptor.getName();
     }
 
     /**
      * @return the pool of Mule UMOs initialised in this component
      */
-    ObjectPool getProxyPool()
-    {
+    ObjectPool getProxyPool() {
         return proxyPool;
     }
 
@@ -426,29 +413,24 @@ public final class MuleComponent implements UMOComponent, Work
      * 
      * @see java.lang.Object#toString()
      */
-    public String toString()
-    {
+    public String toString() {
         return descriptor.getName();
     }
 
-    public int getQueueSize()
-    {
+    public int getQueueSize() {
         QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
         return queueSession.getQueue(descriptor.getName()).size();
     }
 
-    public boolean isStopped()
-    {
+    public boolean isStopped() {
         return stopped.get();
     }
 
-    public boolean isStopping()
-    {
+    public boolean isStopping() {
         return stopping.get();
     }
 
-    public boolean isPaused()
-    {
+    public boolean isPaused() {
         return paused.get();
     }
 
@@ -456,8 +438,7 @@ public final class MuleComponent implements UMOComponent, Work
      * While the component isn't stopped this runs a continuous loop checking
      * for new events in the queue
      */
-    public void run()
-    {
+    public void run() {
         MuleEvent event = null;
         MuleProxy proxy = null;
         QueueSession queueSession = null;
@@ -470,8 +451,8 @@ public final class MuleComponent implements UMOComponent, Work
                 queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
                 //If we're doing a draining stop, read all events from the queue
                 //before stopping
-                if(stopping.get()) {
-                    if(queueSession.getQueue(descriptor.getName() + ".component").size() ==0) {
+                if (stopping.get()) {
+                    if (queueSession.getQueue(descriptor.getName() + ".component").size() == 0) {
                         stopping.set(false);
                         break;
                     }
@@ -509,33 +490,31 @@ public final class MuleComponent implements UMOComponent, Work
                     break;
                 } else if (e instanceof NoSuchElementException) {
                     handleException(new ComponentException(new Message(Messages.PROXY_POOL_TIMED_OUT),
-                                                           event.getMessage(),
-                                                           this,
-                                                           e));
+                            event.getMessage(),
+                            this,
+                            e));
                 } else if (e instanceof UMOException) {
                     handleException(e);
                 } else if (e instanceof WorkException) {
                     handleException(new ComponentException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
-                                                                       descriptor.getName()),
-                                                           event.getMessage(),
-                                                           this,
-                                                           e));
+                            descriptor.getName()),
+                            event.getMessage(),
+                            this,
+                            e));
                 } else {
                     handleException(new ComponentException(new Message(Messages.FAILED_TO_GET_POOLED_OBJECT),
-                                                           event.getMessage(),
-                                                           this,
-                                                           e));
+                            event.getMessage(),
+                            this,
+                            e));
                 }
             }
         }
     }
 
-    public void release()
-    {
+    public void release() {
     }
 
-    protected void handleException(Exception e)
-    {
+    protected void handleException(Exception e) {
         RequestContext.getEvent().getEndpoint().getConnector().getExceptionListener().exceptionThrown(e);
         if (exceptionListener instanceof DefaultComponentExceptionStrategy) {
             if (((DefaultComponentExceptionStrategy) exceptionListener).getComponent() == null) {
