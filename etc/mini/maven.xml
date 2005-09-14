@@ -146,7 +146,17 @@
         <!--<zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dist.zip">
             <zipfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
         </zip>-->
-        <chmod dir="${mule.release.dir}" perm="ugo+rx" includes="**/bin/*"/>
+        <ant:fixcrlf srcdir="${mule.release.dir}" eol="crlf" eof="doc" includes="*.bat" excludes="*.jar"/>
+        <ant:fixcrlf srcdir="${mule.release.dir}/bin" eol="lf" eof="unix" includes="mule" excludes="*.bat"/>
+        <ant:fixcrlf srcdir="${mule.release.dir}" eol="lf" eof="unix" includes="*.sh" excludes="*.bat"/>
+
+        <ant:chmod perm="ugo+rx">
+          <ant:fileset dir="${mule.release.dir}">
+            <ant:include name="**/bin/*.sh"/>
+            <ant:include name="bin/mule"/>
+          </ant:fileset>
+        </ant:chmod>
+
         <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-dist.tar.gz" longfile="gnu">
             <tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
         </tar>
