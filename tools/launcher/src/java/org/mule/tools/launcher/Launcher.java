@@ -44,7 +44,7 @@ import java.util.*;
  */
 public class Launcher {
 
-    public static final String MULE_LAUNCHER_PROPERTIES = "mule-laucher.properties";
+    public static final String MULE_LAUNCHER_PROPERTIES = "mule-launcher.properties";
 
     /**
      * Mule home directory
