@@ -386,6 +386,17 @@
                 <mule.mini>false</mule.mini>
             </properties>
         </dependency>
+        <dependency>
+            <groupId>script</groupId>
+            <artifactId>jsr223</artifactId>
+            <version>${jsr223_scripting_version}</version>
+            <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>true</mule.mini>
+            </properties>
+        </dependency>
     </dependencies>
 
     <build>
