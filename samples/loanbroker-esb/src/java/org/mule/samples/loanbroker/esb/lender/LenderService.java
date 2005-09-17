@@ -29,7 +29,7 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DefaultLenderService
+public class LenderService
 {
     public void setLenderList(LoanQuoteRequest request)
     {
@@ -40,13 +40,13 @@ public class DefaultLenderService
     public Bank[] getLenderList(CreditProfile creditProfile, Double loanAmount)
     {
         Bank[] lenders;
-        if ((loanAmount.doubleValue() >= (double) 20000)) //&& (creditProfile.getCreditScore() >= 600) && (creditProfile.getCreditHistory() >= 8))
+        if ((loanAmount.doubleValue() >= (double) 20000))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank1", getEndpoint("Bank1"));
             lenders[1] =new Bank("Bank2", getEndpoint("Bank2"));
 
-        } else if (((loanAmount.doubleValue() >= (double) 10000) && (loanAmount.doubleValue() <= (double) 19999))) // && (creditProfile.getCreditScore() >= 400) && (creditProfile.getCreditHistory() >= 3))
+        } else if (((loanAmount.doubleValue() >= (double) 10000) && (loanAmount.doubleValue() <= (double) 19999)))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank3", getEndpoint("Bank3"));

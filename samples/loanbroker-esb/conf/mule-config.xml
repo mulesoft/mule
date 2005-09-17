@@ -11,7 +11,7 @@
         <properties>
             <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>
             <property name="jndiUrlPkgPrefixes" value="org.openejb"/>
-            <property name="securityPolicy" value="C:\Projects\iwiser\classes\wideopen.policy"/>
+            <property name="securityPolicy" value="conf/security.policy"/>
         </properties>
     </connector>
 
@@ -26,6 +26,10 @@
         </properties>
     </connector>
 
+    <transformers>
+        <transformer name="RestRequestToCustomerRequest" className="org.mule.samples.loanbroker.esb.transformers.RestRequestToCustomerRequest"/>
+    </transformers>
+
     <!--
         The Mule model initialises and manages your UMO components
     -->
@@ -37,7 +41,7 @@
             implementation="org.mule.samples.loanbroker.LoanBroker">
 
             <inbound-router>
-                <endpoint address="axis:http://localhost:8080/services"/>
+                <endpoint address="jetty:rest://localhost:8080/loanbroker" transformers="RestRequestToCustomerRequest"/>
             </inbound-router>
 
             <outbound-router>
@@ -72,36 +76,41 @@
                             </list>
                         </properties>
                     </endpoint>
-                    <endpoint address="jms://lender.queue"/>
+                    <endpoint address="vm://credit.agency.service"/>
+                    <endpoint address="jms://esb.lender.queue"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="CreditAgencyGateway"
-            implementation="org.mule.components.builder.ReflectionMessageBuilder">
-            </mule-descriptor>
+        <mule-descriptor name="CreditAgency"
+                         implementation="org.mule.samples.loanbroker.esb.ca.CreditAgencyBean">
+
+            <inbound-router>
+                <endpoint address="vm://credit.agency.service"/>
+            </inbound-router>
+        </mule-descriptor>
 
         <mule-descriptor name="LenderGateway"
-                         implementation="org.mule.components.rest.RestServiceWrapper">
+                         implementation="org.mule.components.simple.BridgeComponent">
 
             <inbound-router>
                 <endpoint address="jms://esb.lender.queue"/>
             </inbound-router>
 
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <endpoint address="vm://lender.service"/>
                     <endpoint address="jms://esb.banking.queue"/>
                 </router>
             </outbound-router>
+        </mule-descriptor>
 
-            <properties>
-                <property name="serviceUrl" value="http://lendersrus.com/services/GetLenders"/>
-                <map name="requiredParams">
-                    <property name="creditScore" value="creditProfile/creditScore"/>
-                    <property name="creditHistory" value="creditProfile/creditHistory"/>
-                    <property name="amount" value="customerRequest/loanAmount"/>
-                </map>
-            </properties>
+        <mule-descriptor name="LenderService"
+                         implementation="org.mule.samples.loanbroker.esb.lender.DefaultLenderService">
+
+            <inbound-router>
+                <endpoint address="vm://lender.service"/>
+            </inbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="BankingGateway"
