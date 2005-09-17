@@ -14,9 +14,6 @@
 
 package org.mule.interceptors;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.mule.umo.Invocation;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptor;
@@ -26,8 +23,11 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
- * TODO: document this class
+ * Maintains a list of interceptors that can be applied to components
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$

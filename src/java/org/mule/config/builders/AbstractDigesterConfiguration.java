@@ -17,21 +17,24 @@ package org.mule.config.builders;
 import org.apache.commons.digester.Digester;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleDtdResolver;
+import org.mule.config.MuleProperties;
 import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.umo.UMOFilter;
 import org.mule.util.ClassHelper;
-import org.mule.util.Utility;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,11 +58,12 @@ public abstract class AbstractDigesterConfiguration
 
     protected Digester digester;
     protected List containerReferences = new ArrayList();
+    protected String configEncoding;
+
 
     protected AbstractDigesterConfiguration(boolean validate, String dtd) {
         // This is a hack to stop Digester spitting out unnecessary warnings
-        // where there is
-        // a customer error handler registered
+        // when there is a customer error handler registered
         digester = new Digester() {
             public void warning(SAXParseException e) throws SAXException {
                 if (errorHandler != null) {
@@ -67,6 +71,8 @@ public abstract class AbstractDigesterConfiguration
                 }
             }
         };
+
+        configEncoding = System.getProperty(MuleProperties.CONFIG_ENCODING_SYS_PROPERTY, "UTF-8");
 
         digester.setValidating(validate);
         digester.setEntityResolver(new MuleDtdResolver(dtd));
@@ -88,20 +94,20 @@ public abstract class AbstractDigesterConfiguration
         });
     }
 
-    protected ReaderResource[] parseResources(String configResources) throws ConfigurationException {
-        String[] resources = Utility.split(configResources, ",");
-        MuleManager.getConfiguration().setConfigResources(resources);
-        ReaderResource[] readers = new ReaderResource[resources.length];
-        for (int i = 0; i < resources.length; i++) {
-            try {
-                readers[i] = new ReaderResource(resources[i].trim(),
-                        new InputStreamReader(loadConfig(resources[i].trim()), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new ConfigurationException(e);
-            }
-        }
-        return readers;
-    }
+//    protected ReaderResource[] parseResources(String configResources) throws ConfigurationException {
+//        String[] resources = Utility.split(configResources, ",");
+//        MuleManager.getConfiguration().setConfigResources(resources);
+//        ReaderResource[] readers = new ReaderResource[resources.length];
+//        for (int i = 0; i < resources.length; i++) {
+//            try {
+//                readers[i] = new ReaderResource(resources[i].trim(),
+//                        new InputStreamReader(loadConfig(resources[i].trim()), "UTF-8"));
+//            } catch (UnsupportedEncodingException e) {
+//                throw new ConfigurationException(e);
+//            }
+//        }
+//        return readers;
+//    }
 
     protected Object process(ReaderResource[] configResources) throws ConfigurationException {
         Object result = null;
@@ -160,41 +166,6 @@ public abstract class AbstractDigesterConfiguration
         digester.addObjectCreate(path, DEFAULT_CONTAINER_CONTEXT, "className");
         addMulePropertiesRule(path, digester);
 
-//        NodeCreateRule nodeCreateRule = null;
-//        try {
-//            nodeCreateRule = new NodeCreateRule(Node.DOCUMENT_FRAGMENT_NODE) {
-//                private String encoding;
-//                private String doctype;
-//
-//                public void begin(String endpointName, String endpointName1, Attributes attributes) throws Exception {
-//                    encoding = attributes.getValue("encoding");
-//                    doctype = attributes.getValue("doctype");
-//                    super.begin(endpointName, endpointName1, attributes);
-//                }
-//
-//                public void end(String endpointName, String endpointName1) throws Exception {
-//                    super.end(endpointName, endpointName1);
-//
-//                    DocumentFragment config = (DocumentFragment) digester.pop();
-//                    StringWriter s = new StringWriter();
-//                    StreamResult streamResult = new StreamResult(s);
-//                    TransformerFactory tFactory = TransformerFactory.newInstance();
-//                    try {
-//                        Transformer transformer = tFactory.newTransformer();
-//                        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-//                        transformer.transform(new DOMSource(config), streamResult);
-//                    } catch (TransformerException e) {
-//                        throw new ContainerException(new Message(Messages.COULD_NOT_RECOVER_CONTIANER_CONFIG), e);
-//                    }
-//                    Reader reader = new StringReader(s.toString());
-//                    UMOContainerContext ctx = (UMOContainerContext) digester.peek();
-//                    ctx.configure(reader, doctype, encoding);
-//                }
-//            };
-//        } catch (ParserConfigurationException e) {
-//            throw new ConfigurationException(e);
-//        }
-//        digester.addRule(path + "/configuration", nodeCreateRule);
         //Set the container on the parent object
         digester.addSetNext(path, setterMethod);
     }

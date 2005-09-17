@@ -33,6 +33,11 @@ public interface MuleProperties
     String REGISTER_COMPONENT_PROPERTY = "org.mule.register.component";
     String DISABLE_SERVER_CONNECTIONS = "org.mule.disable.server.connections";
 
+    /** Configuration parsing properties */
+    String XML_VALIDATE_SYS_PROPERTY = "org.mule.xml.validate";
+    String XML_DTD_SYS_PROPERTY = "org.mule.xml.dtd";
+    String CONFIG_ENCODING_SYS_PROPERTY = "org.mule.config.encoding";
+
     // Generic Event properties
     String MULE_EVENT_PROPERTY = PROPERTY_PREFIX + "EVENT";
     String MULE_EVENT_TIMEOUT_PROPERTY = PROPERTY_PREFIX + "EVENT_TIMEOUT";

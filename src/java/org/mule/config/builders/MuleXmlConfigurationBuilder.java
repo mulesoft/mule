@@ -28,6 +28,7 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleDtdResolver;
+import org.mule.config.MuleProperties;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ReaderResource;
@@ -80,10 +81,13 @@ import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.PropertiesHelper;
+import org.mule.util.Utility;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.xml.sax.Attributes;
 
 import java.beans.ExceptionListener;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -146,8 +150,8 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
     public MuleXmlConfigurationBuilder() throws ConfigurationException
     {
-        super(System.getProperty("org.mule.xml.validate", "true").equalsIgnoreCase("true"),
-                System.getProperty("org.mule.xml.dtd", MuleDtdResolver.DEFAULT_MULE_DTD));
+        super(System.getProperty(MuleProperties.XML_VALIDATE_SYS_PROPERTY, "true").equalsIgnoreCase("true"),
+                System.getProperty(MuleProperties.XML_DTD_SYS_PROPERTY, MuleDtdResolver.DEFAULT_MULE_DTD));
 
         ConvertUtils.register(new EndpointConverter(), UMOEndpoint.class);
         ConvertUtils.register(new TransformerConverter(), UMOTransformer.class);
@@ -181,7 +185,18 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
     public UMOManager configure(String configResources) throws ConfigurationException
     {
-        return configure(parseResources(configResources));
+        try {
+            String[] resources = Utility.split(configResources, ",");
+            MuleManager.getConfiguration().setConfigResources(resources);
+            ReaderResource[] readers = new ReaderResource[resources.length];
+            for (int i = 0; i < resources.length; i++) {
+                InputStream is = loadConfig(resources[i].trim());
+                readers[i] = new ReaderResource(resources[i].trim(), new InputStreamReader(is, configEncoding));
+            }
+            return configure(readers);
+        } catch (Exception e) {
+            throw new ConfigurationException(e);
+        }
     }
 
     public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException

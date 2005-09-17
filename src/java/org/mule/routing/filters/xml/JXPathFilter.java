@@ -49,6 +49,14 @@ public class JXPathFilter implements UMOFilter
 
     private boolean lenient = true;
 
+    public JXPathFilter() {
+
+    }
+
+    public JXPathFilter(String expression) {
+        this.expression = expression;
+    }
+
     public boolean accept(UMOMessage obj)
     {
         return accept(obj.getPayload());
