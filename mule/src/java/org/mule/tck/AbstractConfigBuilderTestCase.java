@@ -17,12 +17,10 @@ package org.mule.tck;
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.MuleProperties;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.pool.CommonsPoolFactory;
-import org.mule.impl.AbstractExceptionListener;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -31,7 +29,6 @@ import org.mule.interceptors.TimerInterceptor;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.logic.AndFilter;
@@ -39,33 +36,24 @@ import org.mule.routing.filters.xml.JXPathFilter;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.SelectiveConsumer;
 import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.TestCatchAllStrategy;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
-import org.mule.tck.testmodels.mule.TestEntryPointResolver;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOException;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOInboundRouter;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.umo.routing.UMOResponseMessageRouter;
-import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,36 +61,10 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
+public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
-    protected static boolean initialised = false;
-
-    protected AbstractConfigBuilderTestCase()
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        initialised = false;
-    }
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (!initialised) {
-            System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
-
-            if (MuleManager.isInstanciated())
-                MuleManager.getInstance().dispose();
-            ConfigurationBuilder configBuilder = getConfigBuilder();
-            configBuilder.configure(getConfigResource());
-            initialised = true;
-            System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
-
-        }
-    }
-
     public void testManagerConfig() throws Exception
     {
-        assertEquals("true", MuleManager.getInstance().getProperty("doCompression"));
         assertNotNull(MuleManager.getInstance().getTransactionManager());
     }
 
@@ -152,19 +114,9 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
         assertTrue(stack.getInterceptors().get(1) instanceof TimerInterceptor);
     }
 
-    public void testExceptionStrategy()
+    public void testExceptionStrategy2()
     {
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
-        assertNotNull(MuleManager.getInstance().getModel().getExceptionListener());
-        assertNotNull(descriptor.getExceptionListener());
-
-        assertTrue(((AbstractExceptionListener) descriptor.getExceptionListener()).getEndpoints().size() > 0);
-        UMOEndpoint ep = (UMOEndpoint) ((AbstractExceptionListener) descriptor.getExceptionListener()).getEndpoints()
-                                                                                                      .get(0);
-
-        assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
-
-        descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent");
+        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent");
         assertNotNull(descriptor.getExceptionListener());
         assertEquals(DefaultExceptionStrategy.class, descriptor.getExceptionListener().getClass());
 
@@ -182,60 +134,13 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
     public void testModelConfig() throws Exception
     {
         UMOModel model = MuleManager.getInstance().getModel();
-        assertNotNull(model);
-        assertEquals("test-model", model.getName());
-        assertTrue(model.getEntryPointResolver() instanceof TestEntryPointResolver);
-        assertTrue(model.getExceptionListener() instanceof TestExceptionStrategy);
-
-        assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().size() > 0);
-        UMOEndpoint ep = (UMOEndpoint) ((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().get(0);
-
-        assertEquals("test://component.exceptions", ep.getEndpointURI().toString());
-
-        assertTrue(model.getLifecycleAdapterFactory() instanceof TestDefaultLifecycleAdapterFactory);
-
-        assertTrue(model.isComponentRegistered("orangeComponent"));
+        super.testModelConfig();
         assertTrue(model.isComponentRegistered("appleComponent"));
         assertTrue(model.isComponentRegistered("appleComponent2"));
     }
 
-    public void testPropertiesConfig() throws Exception
-    {
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
 
-        Map props = descriptor.getProperties();
-        assertNotNull(props);
-        assertEquals("9", props.get("segments"));
-        assertEquals("4.21", props.get("radius"));
-        assertEquals("Juicy Baby!", props.get("brand"));
-
-        assertNotNull(props.get("listProperties"));
-        List list = (List) props.get("listProperties");
-        assertEquals(3, list.size());
-        assertEquals("prop1", list.get(0));
-        assertEquals("prop2", list.get(1));
-        assertEquals("prop3", list.get(2));
-
-        assertNotNull(props.get("arrayProperties"));
-        list = (List) props.get("arrayProperties");
-        assertEquals(3, list.size());
-        assertEquals("prop4", list.get(0));
-        assertEquals("prop5", list.get(1));
-        assertEquals("prop6", list.get(2));
-
-        assertNotNull(props.get("mapProperties"));
-        props = (Map) props.get("mapProperties");
-        assertEquals("prop1", props.get("prop1"));
-        assertEquals("prop2", props.get("prop2"));
-
-        descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
-        assertEquals(7, descriptor.getProperties().size());
-        assertEquals(2, descriptor.getInboundRouter().getEndpoints().size());
-        // assertNotNull(descriptor.getInboundEndpoint());
-        // assertNotNull(descriptor.getOutboundEndpoint());
-    }
-
-    public void testOutboundRouterConfig()
+    public void testOutboundRouterConfig2()
     {
         // test outbound message router
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent");
@@ -273,48 +178,48 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
         assertTrue(router.getCatchAllStrategy() instanceof TestCatchAllStrategy);
     }
 
-    public void testDescriptorEndpoints()
-    {
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
-        assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
-        UMOOutboundRouter router = (UMOOutboundRouter) descriptor.getOutboundRouter().getRouters().get(0);
-        assertEquals(1, router.getEndpoints().size());
-        UMOEndpoint endpoint = (UMOEndpoint) router.getEndpoints().get(0);
-        assertNotNull(endpoint);
-        assertEquals("appleInEndpoint", endpoint.getName());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof TestCompressionTransformer);
+//    public void testDescriptorEndpoints()
+//    {
+//        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+//        assertEquals(1, descriptor.getOutboundRouter().getRouters().size());
+//        UMOOutboundRouter router = (UMOOutboundRouter) descriptor.getOutboundRouter().getRouters().get(0);
+//        assertEquals(1, router.getEndpoints().size());
+//        UMOEndpoint endpoint = (UMOEndpoint) router.getEndpoints().get(0);
+//        assertNotNull(endpoint);
+//        assertEquals("appleInEndpoint", endpoint.getName());
+//        assertNotNull(endpoint.getTransformer());
+//        assertTrue(endpoint.getTransformer() instanceof TestCompressionTransformer);
+//
+//        // check the global endpoint
+//        endpoint = MuleManager.getInstance().lookupEndpoint("appleInEndpoint");
+//        assertNotNull(endpoint);
+//        assertNull(endpoint.getTransformer());
+//
+//        endpoint = descriptor.getInboundEndpoint();
+//        assertEquals(2, descriptor.getInboundRouter().getEndpoints().size());
+//        assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy());
+//        assertTrue(descriptor.getInboundRouter().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
+//        assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy().getEndpoint());
+//        assertEquals("test://catch.all", descriptor.getInboundRouter()
+//                                                   .getCatchAllStrategy()
+//                                                   .getEndpoint()
+//                                                   .getEndpointURI()
+//                                                   .toString());
+//        endpoint = descriptor.getInboundRouter().getEndpoint("orangeEndpoint");
+//        assertNotNull(endpoint);
+//        assertEquals("orangeEndpoint", endpoint.getName());
+//        assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());
+//        // assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
+//        assertNotNull(endpoint.getTransformer());
+//        assertTrue(endpoint.getTransformer() instanceof TestCompressionTransformer);
+//
+//        // check the global endpoint
+//        endpoint = MuleManager.getInstance().lookupEndpoint("orangeEndpoint");
+//        assertNotNull(endpoint);
+//        assertNull(endpoint.getTransformer());
+//    }
 
-        // check the global endpoint
-        endpoint = MuleManager.getInstance().lookupEndpoint("appleInEndpoint");
-        assertNotNull(endpoint);
-        assertNull(endpoint.getTransformer());
-
-        endpoint = descriptor.getInboundEndpoint();
-        assertEquals(2, descriptor.getInboundRouter().getEndpoints().size());
-        assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy());
-        assertTrue(descriptor.getInboundRouter().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
-        assertNotNull(descriptor.getInboundRouter().getCatchAllStrategy().getEndpoint());
-        assertEquals("test://catch.all", descriptor.getInboundRouter()
-                                                   .getCatchAllStrategy()
-                                                   .getEndpoint()
-                                                   .getEndpointURI()
-                                                   .toString());
-        endpoint = descriptor.getInboundRouter().getEndpoint("orangeEndpoint");
-        assertNotNull(endpoint);
-        assertEquals("orangeEndpoint", endpoint.getName());
-        assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());
-        // assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, endpoint.getType());
-        assertNotNull(endpoint.getTransformer());
-        assertTrue(endpoint.getTransformer() instanceof TestCompressionTransformer);
-
-        // check the global endpoint
-        endpoint = MuleManager.getInstance().lookupEndpoint("orangeEndpoint");
-        assertNotNull(endpoint);
-        assertNull(endpoint.getTransformer());
-    }
-
-    public void testInboundRouterConfig()
+    public void testInboundRouterConfig2()
     {
         UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("appleComponent");
         assertNotNull(descriptor.getInboundRouter());
@@ -333,27 +238,6 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
 
         UMOInboundRouter router2 = (UMOInboundRouter) messageRouter.getRouters().get(1);
         assertTrue(router2 instanceof IdempotentReceiver);
-    }
-
-    public void testResponseRouterConfig()
-    {
-        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
-        assertNotNull(descriptor.getResponseRouter());
-        UMOResponseMessageRouter messageRouter = descriptor.getResponseRouter();
-        assertNull(messageRouter.getCatchAllStrategy());
-        assertNotNull(messageRouter.getTransformer());
-        assertTrue(messageRouter.getTransformer() instanceof TestCompressionTransformer);
-        assertEquals(1, messageRouter.getRouters().size());
-        UMOResponseRouter router = (UMOResponseRouter) messageRouter.getRouters().get(0);
-        assertTrue(router instanceof TestResponseAggregator);
-        assertNotNull(messageRouter.getEndpoints());
-        assertEquals(2, messageRouter.getEndpoints().size());
-        UMOEndpoint ep = (UMOEndpoint) messageRouter.getEndpoints().get(0);
-        assertEquals("response1", ep.getEndpointURI().getAddress());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
-        ep = (UMOEndpoint) messageRouter.getEndpoints().get(1);
-        assertEquals("AppleResponseQueue", ep.getEndpointURI().getAddress());
-        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RESPONSE, ep.getType());
     }
 
     public void testThreadingConfig() throws MuleException
@@ -468,22 +352,6 @@ public abstract class AbstractConfigBuilderTestCase extends NamedTestCase
         assertEquals(UMOTransactionConfig.ACTION_ALWAYS_BEGIN, inEndpoint.getTransactionConfig().getAction());
         assertTrue(inEndpoint.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
         assertNull(inEndpoint.getTransactionConfig().getConstraint());
-    }
-
-    public void testObjectReferences() throws UMOException
-    {
-        MuleDescriptor descriptor = (MuleDescriptor) MuleManager.getInstance()
-                                                                .getModel()
-                                                                .getDescriptor("orangeComponent");
-        assertEquals("local:orange", descriptor.getImplementation());
-        assertNotNull(descriptor.getProperties().get("orange"));
-        assertEquals(Orange.class, descriptor.getImplementationClass());
-    }
-
-    public void testAgentConfiguration() throws UMOException
-    {
-        UMOAgent agent = MuleManager.getInstance().removeAgent("jmxAgent");
-        assertNotNull(agent);
     }
 
     public void testEnvironmentProperties()

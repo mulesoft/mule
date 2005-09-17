@@ -27,12 +27,15 @@ import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.manager.UMOManager;
+import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.MuleObjectHelper;
 
 import java.util.Map;
 
@@ -61,9 +64,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * the current Manager if one exists
      * 
      * @param disposeCurrent true to dispose the current manager
-     * @throws UMOException if the manager throws an exception when disposing
      */
-    public QuickConfigurationBuilder(boolean disposeCurrent) throws UMOException
+    public QuickConfigurationBuilder(boolean disposeCurrent)
     {
         if (disposeCurrent) {
             disposeCurrent();
@@ -74,11 +76,8 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
 
     /**
      * Disposes the current MuleManager if there is one.
-     * 
-     * @throws UMOException if there is a current Manager and it fails to
-     *             shutdown
      */
-    public void disposeCurrent() throws UMOException
+    public void disposeCurrent()
     {
         if (MuleManager.isInstanciated()) {
             MuleManager.getInstance().dispose();
@@ -221,6 +220,16 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
                 outEndpoint = createEndpoint(outboundEndpoint, null, false);
             }
         }
+        UMODescriptor d = createDescriptor(implementation, name, inEndpoint, outEndpoint, properties);
+        return registerComponent(d);
+    }
+
+    public UMOComponent registerComponent(String implementation,
+                                          String name,
+                                          UMOEndpoint inEndpoint,
+                                          UMOEndpoint outEndpoint,
+                                          Map properties) throws UMOException
+    {
         UMODescriptor d = createDescriptor(implementation, name, inEndpoint, outEndpoint, properties);
         return registerComponent(d);
     }
@@ -476,9 +485,29 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
 
     public UMOEndpoint createEndpoint(String uri, String name, boolean inbound) throws UMOException
     {
+        return createEndpoint(uri, name, inbound, null, null);
+    }
+
+    public UMOEndpoint createEndpoint(String uri, String name, boolean inbound, String transformers) throws UMOException
+    {
+        return createEndpoint(uri, name, inbound, transformers, null);
+    }
+
+    public UMOEndpoint createEndpoint(String uri, String name, boolean inbound, UMOFilter filter) throws UMOException
+    {
+        return createEndpoint(uri, name, inbound, null, filter);
+    }
+
+    public UMOEndpoint createEndpoint(String uri, String name, boolean inbound, String transformers, UMOFilter filter) throws UMOException
+    {
         UMOEndpoint ep = MuleEndpoint.createEndpointFromUri(new MuleEndpointURI(uri), (inbound
                 ? UMOEndpoint.ENDPOINT_TYPE_RECEIVER : UMOEndpoint.ENDPOINT_TYPE_SENDER));
         ep.setName(name);
+        if(transformers!=null) {
+            String delim = (transformers.indexOf(",") > - 1 ? "," : " ");
+            ep.setTransformer(MuleObjectHelper.getTransformer(transformers, delim));
+        }
+        ep.setFilter(filter);
         return ep;
     }
 
@@ -497,6 +526,24 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         ep.initialise();
         manager.registerEndpoint(ep);
         return ep;
+    }
+
+    public UMOEndpoint registerEndpoint(String uri, String name, boolean inbound, Map properties, UMOFilter filter) throws UMOException
+    {
+        UMOEndpoint ep = createEndpoint(uri, name, inbound);
+        if(properties!=null) ep.getProperties().putAll(properties);
+        if(filter!=null) ep.setFilter(filter);
+        ep.initialise();
+        manager.registerEndpoint(ep);
+        return ep;
+    }
+
+    public void registerModel(UMOModel model) throws UMOException {
+        manager.setModel(model);
+    }
+
+    public UMOManager getManager(){
+        return manager;
     }
 
     public UMOManager configure(String configResources) throws ConfigurationException {

@@ -21,7 +21,11 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 
-import javax.script.*;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.Namespace;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
 /**
  * A message builder component that can execute message building as a script
@@ -32,14 +36,14 @@ import javax.script.*;
 public class ScriptMessageBuilder extends AbstractMessageBuilder implements Initialisable {
 
     /** Delegating script component that actually does the work */
-    protected ScriptComponent scriptComponent;
+    protected Scriptable scriptable;
 
     public ScriptMessageBuilder() {
-        this.scriptComponent = new ScriptComponent();
+        this.scriptable = new Scriptable();
     }
 
     public Object buildMessage(UMOMessage request, UMOMessage response) throws MessageBuilderException {
-        Namespace namespace = scriptComponent.getNamespace();
+        Namespace namespace = scriptable.getScriptEngine().createNamespace();
         populateNamespace(namespace, request, response);
         Object result = null;
         try {
@@ -52,7 +56,7 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
     }
 
     public void initialise() throws InitialisationException, RecoverableException {
-        scriptComponent.initialise();
+        scriptable.initialise();
     }
 
     protected void populateNamespace(Namespace namespace, UMOMessage request, UMOMessage response) {
@@ -64,63 +68,64 @@ public class ScriptMessageBuilder extends AbstractMessageBuilder implements Init
     }
 
     public ScriptEngine getScriptEngine() {
-        return scriptComponent.getScriptEngine();
+        return scriptable.getScriptEngine();
     }
 
     public void setScriptEngine(ScriptEngine scriptEngine) {
-        scriptComponent.setScriptEngine(scriptEngine);
+        scriptable.setScriptEngine(scriptEngine);
     }
 
     public CompiledScript getCompiledScript() {
-        return scriptComponent.getCompiledScript();
+        return scriptable.getCompiledScript();
     }
 
     public void setCompiledScript(CompiledScript compiledScript) {
-        scriptComponent.setCompiledScript(compiledScript);
+        scriptable.setCompiledScript(compiledScript);
     }
 
     public String getScriptText() {
-        return scriptComponent.getScriptText();
+        return scriptable.getScriptText();
     }
 
     public void setScriptText(String scriptText) {
-        scriptComponent.setScriptText(scriptText);
+        scriptable.setScriptText(scriptText);
     }
 
     public String getScriptFile() {
-        return scriptComponent.getScriptFile();
+        return scriptable.getScriptFile();
     }
 
     public void setScriptFile(String scriptFile) {
-        scriptComponent.setScriptFile(scriptFile);
+        scriptable.setScriptFile(scriptFile);
     }
 
     public void setScriptEngineName(String scriptEngineName) {
-        scriptComponent.setScriptEngineName(scriptEngineName);
-    }
-
-    public Namespace getNamespace() {
-        return scriptComponent.getNamespace();
+        scriptable.setScriptEngineName(scriptEngineName);
     }
 
     protected void populateNamespace(Namespace namespace, UMOEventContext context) {
-        scriptComponent.populateNamespace(namespace, context);
+        namespace.put("context", context);
+        namespace.put("message", context.getMessage());
+        namespace.put("descriptor", context.getComponentDescriptor());
+        namespace.put("componentNamespace", namespace);
+        namespace.put("log", logger);
+        namespace.put("result", new Object());
     }
 
-    protected void compileScript(Compilable compilable) throws InitialisationException {
-        scriptComponent.compileScript(compilable);
+    protected void compileScript(Compilable compilable) throws ScriptException {
+        scriptable.compileScript(compilable);
     }
 
     protected Object evaluteScript(Namespace namespace) throws ScriptException {
-        return scriptComponent.evaluteScript(namespace);
+        return scriptable.evaluteScript(namespace);
     }
 
     protected Object runScript(Namespace namespace) throws ScriptException {
-        return scriptComponent.runScript(namespace);
+        return scriptable.runScript(namespace);
     }
 
     protected ScriptEngine createScriptEngine() {
-        return scriptComponent.createScriptEngine();
+        return scriptable.createScriptEngine();
     }
 
 }

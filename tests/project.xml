@@ -438,6 +438,11 @@
         	<artifactId>hibernate</artifactId>
         	<version>${hibernate_version}</version>
         </dependency>
+        <dependency>
+        	<groupId>groovy</groupId>
+        	<artifactId>groovy-all</artifactId>
+        	<version>${groovy_version}</version>
+        </dependency>
     </dependencies>
      <build>
         <sourceDirectory>${basedir}/src/test/java</sourceDirectory>

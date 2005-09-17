@@ -11,7 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.extras.groovy;
+package org.mule.test.integration.components.script;
 
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -24,7 +24,7 @@ import org.mule.umo.UMOMessage;
 public class GroovyMessageBuilderTestCase extends FunctionalTestCase
 {
     protected String getConfigResources() {
-        return "groovy-builder-config.xml";
+        return "org/mule/test/integration/components/script/groovy-builder-config.xml";
     }
 
     public void testFunctionBehaviour() throws Exception
