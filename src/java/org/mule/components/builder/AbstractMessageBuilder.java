@@ -65,10 +65,21 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
             }
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
                 UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
-                responseMessage = eventContext.sendEvent(requestMessage, endpoint);
-                builtMessage = buildMessage(requestMessage, responseMessage);
-                responseMessage = new MuleMessage(builtMessage, responseMessage.getProperties());
-                requestMessage = responseMessage;
+                if(!endpoint.isRemoteSync()) {
+                    logger.info("Endpoint: " + endpoint + " is not remoteSync enabled. Message builder finishing");
+                    if(endpoint.isSynchronous()) {
+                        responseMessage = eventContext.sendEvent(requestMessage, endpoint);
+                    } else {
+                        eventContext.dispatchEvent(requestMessage, endpoint);
+                        responseMessage=null;
+                    }
+                    break;
+                } else {
+                    responseMessage = eventContext.sendEvent(requestMessage, endpoint);
+                    builtMessage = buildMessage(requestMessage, responseMessage);
+                    responseMessage = new MuleMessage(builtMessage, responseMessage.getProperties());
+                    requestMessage = responseMessage;
+                }
             }
         } else {
             logger.info("There are currently no endpoints configured on component: " + descriptor.getName());

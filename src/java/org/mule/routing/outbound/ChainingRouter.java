@@ -48,16 +48,24 @@ public class ChainingRouter extends FilteringOutboundRouter
         }
         try {
 
-            if (synchronous) {
-                result = message;
-                for (int i = 0; i < endpoints.size(); i++) {
-                    result = send(session, result, (UMOEndpoint) endpoints.get(i));
-                }
+            result = message;
+            UMOEndpoint ep = null;
 
-            } else {
-                logger.info("Invocation is asynchronous no result will be returned for any further invocations");
-                dispatch(session, message, (UMOEndpoint) endpoints.get(0));
+            for (int i = 0; i < endpoints.size(); i++) {
+                ep = (UMOEndpoint) endpoints.get(i);
+                if(ep.isSynchronous()) {
+                    result = send(session, result, ep);
+                    if(result==null) {
+                        logger.warn("There was no result returned from endpoint invocation: " + ep + " Chaining router cannot process any further endpoints");
+                        break;
+                    }
+                } else {
+                    logger.info("Invocation is asynchronous no result will be returned for any further invocations");
+                    dispatch(session, result, ep);
+                    break;
+                }
             }
+
         } catch (UMOException e) {
             throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint) endpoints.get(0), e);
         }

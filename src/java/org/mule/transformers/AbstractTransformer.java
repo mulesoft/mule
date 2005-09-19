@@ -323,7 +323,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     public String toString()
     {
-        return "AbstractTransformer{" + "name='" + name + "'" + ", returnClass=" + ignoreBadInput + ", returnClass=" +
+        return "Transformer{" + "name='" + name + "'" + ", returnClass=" + ignoreBadInput + ", returnClass=" +
                 ignoreBadInput + ", sourceTypes=" + sourceTypes + "}";
     }
 }
