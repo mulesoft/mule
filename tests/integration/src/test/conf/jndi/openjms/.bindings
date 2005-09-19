@@ -1,0 +1,30 @@
+#This file is used by the JNDI FSContext.
+#Fri Mar 19 17:06:15 EST 2004
+JmsTopicConnectionFactory/RefAddr/1/Type=serverClass
+JmsQueueConnectionFactory/RefAddr/3/Encoding=String
+JmsTopicConnectionFactory/RefAddr/2/Type=org.exolab.jms.mipc.server.port
+JmsTopicConnectionFactory/RefAddr/3/Content=localhost
+JmsTopicConnectionFactory/RefAddr/3/Encoding=String
+JmsQueueConnectionFactory/RefAddr/0/Type=serverClass
+JmsTopicConnectionFactory/RefAddr/1/Content=org.exolab.jms.client.mipc.IpcJmsServerStub
+JmsTopicConnectionFactory/RefAddr/3/Type=org.exolab.jms.mipc.server.host
+JmsQueueConnectionFactory/RefAddr/1/Encoding=String
+JmsQueueConnectionFactory/RefAddr/3/Content=localhost
+JmsQueueConnectionFactory/RefAddr/0/Encoding=String
+JmsQueueConnectionFactory/ClassName=org.exolab.jms.client.JmsQueueConnectionFactory
+JmsQueueConnectionFactory/RefAddr/0/Content=org.exolab.jms.client.mipc.IpcJmsServerStub
+JmsQueueConnectionFactory/RefAddr/1/Type=serverClass
+JmsTopicConnectionFactory/RefAddr/1/Encoding=String
+JmsTopicConnectionFactory/RefAddr/0/Encoding=String
+JmsQueueConnectionFactory/RefAddr/2/Type=org.exolab.jms.mipc.server.port
+JmsTopicConnectionFactory/ClassName=org.exolab.jms.client.JmsTopicConnectionFactory
+JmsQueueConnectionFactory/RefAddr/3/Type=org.exolab.jms.mipc.server.host
+JmsQueueConnectionFactory/RefAddr/2/Encoding=String
+JmsQueueConnectionFactory/FactoryName=org.exolab.jms.client.JmsConnectionFactoryBuilder
+JmsTopicConnectionFactory/RefAddr/2/Content=3030
+JmsTopicConnectionFactory/RefAddr/0/Content=org.exolab.jms.client.mipc.IpcJmsServerStub
+JmsQueueConnectionFactory/RefAddr/2/Content=3030
+JmsTopicConnectionFactory/RefAddr/2/Encoding=String
+JmsQueueConnectionFactory/RefAddr/1/Content=org.exolab.jms.client.mipc.IpcJmsServerStub
+JmsTopicConnectionFactory/RefAddr/0/Type=serverClass
+JmsTopicConnectionFactory/FactoryName=org.exolab.jms.client.JmsConnectionFactoryBuilder
