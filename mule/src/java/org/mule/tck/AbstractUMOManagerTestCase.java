@@ -17,6 +17,7 @@ import org.mule.MuleManager;
 import org.mule.impl.MuleModel;
 import org.mule.interceptors.InterceptorStack;
 import org.mule.interceptors.LoggingInterceptor;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOManager;
@@ -148,8 +149,7 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
     // assertTrue(connector.isDisposed());
     // }
 
-    public void testModelSetting()
-    {
+    public void testModelSetting() throws UMOException {
         assertNotNull(MuleManager.getInstance().getModel());
         MuleManager.getInstance().setModel(new MuleModel());
         assertEquals("mule", MuleManager.getInstance().getModel().getName());

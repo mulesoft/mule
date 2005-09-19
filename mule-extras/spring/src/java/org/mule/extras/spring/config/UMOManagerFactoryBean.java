@@ -14,10 +14,6 @@ package org.mule.extras.spring.config;
  * the LICENSE.txt file.
  */
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.umo.UMOException;
@@ -32,6 +28,10 @@ import org.mule.umo.transformer.UMOTransformer;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>UMOManagerFactoryBean</code> is a Spring FactoryBean used for
@@ -126,8 +126,7 @@ public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, Dis
         }
     }
 
-    public void setModel(UMOModel model)
-    {
+    public void setModel(UMOModel model) throws UMOException {
         manager.setModel(model);
     }
 

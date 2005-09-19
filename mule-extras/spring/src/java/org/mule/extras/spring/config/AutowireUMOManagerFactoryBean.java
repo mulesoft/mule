@@ -14,11 +14,6 @@ package org.mule.extras.spring.config;
  * the LICENSE.txt file.
  */
 
-import java.beans.ExceptionListener;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -48,6 +43,11 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
+
+import java.beans.ExceptionListener;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>UMOManagerFactoryBean</code> is a MuleManager factory bean that is
@@ -178,8 +178,7 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
         }
     }
 
-    protected void createModel()
-    {
+    protected void createModel() throws UMOException {
         // set the model
         Map temp = context.getBeansOfType(UMOModel.class, true, true);
         UMOModel model;

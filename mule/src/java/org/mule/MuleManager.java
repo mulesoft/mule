@@ -214,7 +214,7 @@ public class MuleManager implements UMOManager
         if (config == null) {
             config = new MuleConfiguration();
         }
-        setModel(new MuleModel());
+        //setModel(new MuleModel());
         containerContext = new MultiContainerContext();
         securityManager = new MuleSecurityManager();
     }
@@ -643,7 +643,7 @@ public class MuleManager implements UMOManager
                 initialiseConnectors();
                 initialiseEndpoints();
                 initialiseAgents();
-                model.initialise();
+                if(model!=null) model.initialise();
 
             } finally {
                 initialised.set(true);
@@ -683,7 +683,7 @@ public class MuleManager implements UMOManager
             queueManager.start();
             startConnectors();
             startAgents();
-            model.start();
+            if(model!=null) model.start();
             started.set(true);
             starting.set(false);
             if(!config.isEmbedded()) {
@@ -800,17 +800,26 @@ public class MuleManager implements UMOManager
      */
     public UMOModel getModel()
     {
+        if(model==null) {
+            model = new MuleModel();
+        }
         return model;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void setModel(UMOModel model)
-    {
+    public void setModel(UMOModel model) throws UMOException {
         this.model = model;
         if (model instanceof MuleModel) {
             ((MuleModel) model).setListeners(eventManager);
+        }
+        if(initialised.get()) {
+            model.initialise();
+        }
+
+         if(started.get()) {
+            model.start();
         }
     }
 
@@ -966,9 +975,10 @@ public class MuleManager implements UMOManager
      */
     public UMOAgent removeAgent(String name) throws UMOException
     {
+        if(name==null) return null;
         for (Iterator iterator = agents.values().iterator(); iterator.hasNext();) {
             UMOAgent agent = (UMOAgent) iterator.next();
-            if(agent.getName().equals(name)) {
+            if(name.equals(agent.getName())) {
                 agents.remove(agent);
                 agent.dispose();
                 agent.unregistered();

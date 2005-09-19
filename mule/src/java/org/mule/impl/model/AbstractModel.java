@@ -11,7 +11,7 @@
  * LICENSE.txt file.
  *  
  */
-package org.mule.impl;
+package org.mule.impl.model;
 
 import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
@@ -20,8 +20,11 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.DefaultComponentExceptionStrategy;
+import org.mule.impl.DefaultLifecycleAdapterFactory;
+import org.mule.impl.ImmutableMuleDescriptor;
+import org.mule.impl.MuleSession;
 import org.mule.impl.internal.events.ModelEvent;
-import org.mule.impl.internal.events.ServerEventManager;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
@@ -34,7 +37,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.model.ModelException;
-import org.mule.umo.model.UMOComponentFactory;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 
@@ -53,12 +55,12 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleModel implements UMOModel
+public abstract class AbstractModel implements UMOModel
 {
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(MuleModel.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     private String name;
     private UMOEntryPointResolver entryPointResolver;
@@ -77,14 +79,10 @@ public class MuleModel implements UMOModel
 
     private ExceptionListener exceptionListener;
 
-    private ServerEventManager listeners;
-
-    private UMOComponentFactory componentFactory;
-
     /**
      * Default constructor
      */
-    public MuleModel()
+    public AbstractModel()
     {
         // Always set default entrypoint resolver, lifecycle and compoenent
         // resolver and exceptionstrategy.
@@ -93,23 +91,12 @@ public class MuleModel implements UMOModel
         components = new ConcurrentHashMap();
         descriptors = new ConcurrentHashMap();
         exceptionListener = new DefaultComponentExceptionStrategy();
-        componentFactory = new MuleComponentFactory();
         name = "mule";
-    }
-
-    /**
-     * Returns the model type name. This is a friendly identifier that is used to
-     * look up the SPI class for the model
-     *
-     * @return the model type
-     */
-    public String getType() {
-        return null;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOModel#getName()
      */
     public String getName()
@@ -119,7 +106,7 @@ public class MuleModel implements UMOModel
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOModel#setName(java.lang.String)
      */
     public void setName(String name)
@@ -129,7 +116,7 @@ public class MuleModel implements UMOModel
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.model.UMOModel#getEntryPointResolver()
      */
     public UMOEntryPointResolver getEntryPointResolver()
@@ -139,7 +126,7 @@ public class MuleModel implements UMOModel
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.model.UMOModel#setEntryPointResolver(org.mule.umo.model.UMOEntryPointResolver)
      */
     public void setEntryPointResolver(UMOEntryPointResolver entryPointResolver)
@@ -149,7 +136,7 @@ public class MuleModel implements UMOModel
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOModel#isUMORegistered(java.lang.String)
      */
     public boolean isComponentRegistered(String name)
@@ -159,7 +146,7 @@ public class MuleModel implements UMOModel
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.UMOModel#registerUMO(org.mule.umo.UMODescriptor)
      */
     public UMOComponent registerComponent(UMODescriptor descriptor) throws UMOException
@@ -182,7 +169,7 @@ public class MuleModel implements UMOModel
         UMOComponent component = (UMOComponent) components.get(descriptor.getName());
 
         if (component == null) {
-            component = componentFactory.create(descriptor);
+            component = createComponent(descriptor);
             descriptors.put(descriptor.getName(), descriptor);
             components.put(descriptor.getName(), component);
         }
@@ -273,7 +260,7 @@ public class MuleModel implements UMOModel
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.model.UMOModel#getLifecycleAdapterFactory()
      */
     public UMOLifecycleAdapterFactory getLifecycleAdapterFactory()
@@ -283,7 +270,7 @@ public class MuleModel implements UMOModel
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mule.umo.model.UMOModel#setLifecycleAdapterFactory(org.mule.umo.lifecycle.UMOLifecycleAdapterFactory)
      */
     public void setLifecycleAdapterFactory(UMOLifecycleAdapterFactory lifecycleAdapterFactory)
@@ -293,7 +280,7 @@ public class MuleModel implements UMOModel
 
     /**
      * Destroys any current components
-     * 
+     *
      */
     public void dispose()
     {
@@ -324,7 +311,7 @@ public class MuleModel implements UMOModel
 
     /**
      * Returns a valid component for the given Mule name
-     * 
+     *
      * @param muleName the Name of the Mule for which the component is required
      * @return a component for the specified name
      */
@@ -341,7 +328,7 @@ public class MuleModel implements UMOModel
 
     /**
      * Stops any registered components
-     * 
+     *
      * @throws UMOException if a Component fails tcomponent
      */
     public void stop() throws UMOException
@@ -357,7 +344,7 @@ public class MuleModel implements UMOModel
 
     /**
      * Starts all registered components
-     * 
+     *
      * @throws UMOException if any of the components fail to start
      */
     public void start() throws UMOException
@@ -396,7 +383,7 @@ public class MuleModel implements UMOModel
     /**
      * Stops a single Mule Component. This can be useful when stopping and
      * starting some Mule UMOs while letting others continue.
-     * 
+     *
      * @param name the name of the Mule UMO to stop
      * @throws UMOException if the MuleUMO is not registered
      */
@@ -415,7 +402,7 @@ public class MuleModel implements UMOModel
     /**
      * Starts a single Mule Component. This can be useful when stopping and
      * starting some Mule UMOs while letting others continue
-     * 
+     *
      * @param name the name of the Mule UMO to start
      * @throws UMOException if the MuleUMO is not registered or the component
      *             failed to start
@@ -439,7 +426,7 @@ public class MuleModel implements UMOModel
      * component is resumed. <p/> In order to persist these queued messages you
      * can set the 'recoverableMode' property on the Muleconfiguration to true.
      * this causes all internal queues to store their state.
-     * 
+     *
      * @param name the name of the Mule UMO to stop
      * @throws org.mule.umo.UMOException if the MuleUMO is not registered or the
      *             component failed to pause.
@@ -459,7 +446,7 @@ public class MuleModel implements UMOModel
     /**
      * Resumes a single Mule Component that has been paused. If the component is
      * not paused nothing is executed.
-     * 
+     *
      * @param name the name of the Mule UMO to resume
      * @throws org.mule.umo.UMOException if the MuleUMO is not registered or the
      *             component failed to resume
@@ -521,7 +508,7 @@ public class MuleModel implements UMOModel
 
     /**
      * Gets an iterator of all component names registered in the model
-     * 
+     *
      * @return an iterator of all component names
      */
     public Iterator getComponentNames()
@@ -529,23 +516,10 @@ public class MuleModel implements UMOModel
         return components.keySet().iterator();
     }
 
-    public void setListeners(ServerEventManager listeners)
-    {
-        this.listeners = listeners;
-    }
-
     void fireEvent(UMOServerEvent event)
     {
         MuleManager.getInstance().fireEvent(event);
     }
 
-    public void setComponentFactory(UMOComponentFactory factory)
-    {
-        this.componentFactory = factory;
-    }
-
-    public UMOComponentFactory getComponentFactory()
-    {
-        return componentFactory;
-    }
+    protected abstract UMOComponent createComponent(UMODescriptor descriptor);
 }

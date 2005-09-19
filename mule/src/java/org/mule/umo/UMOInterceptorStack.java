@@ -17,7 +17,7 @@ package org.mule.umo;
 import java.util.List;
 
 /**
- * TODO: document this class
+ * Maintains a list of interceptors
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$

@@ -15,10 +15,6 @@
 
 package org.mule.umo.manager;
 
-import java.util.Map;
-
-import javax.transaction.TransactionManager;
-
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -29,6 +25,9 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.queue.QueueManager;
+
+import javax.transaction.TransactionManager;
+import java.util.Map;
 
 /**
  * <code>UMOManager</code> maintains and provides services for a UMO server
@@ -177,7 +176,7 @@ public interface UMOManager extends Lifecycle
      * 
      * @param model The model used for managing components for this server
      */
-    void setModel(UMOModel model);
+    void setModel(UMOModel model) throws UMOException;
 
     /**
      * Gets all properties associated with the UMOManager

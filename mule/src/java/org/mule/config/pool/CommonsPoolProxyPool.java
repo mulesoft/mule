@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleProxy;
+import org.mule.impl.model.MuleProxy;
 import org.mule.umo.UMOException;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
