@@ -296,7 +296,7 @@ fi
 # Uncomment to enable remote debugging
 #MULE_DEBUG_OPTS="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
 
-if [ ! -n "MULE_MAIN" ] ; then
+if [ ! -n "$MULE_MAIN" ] ; then
   MULE_MAIN=org.mule.MuleServer
 fi
 
