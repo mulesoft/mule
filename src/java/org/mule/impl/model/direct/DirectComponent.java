@@ -1,57 +1,73 @@
-/*
- * $Header$
- * $Revision$
- * $Date$
- * ------------------------------------------------------------------------------------------------------
- *
- * Copyright (c) SymphonySoft Limited. All rights reserved.
- * http://www.symphonysoft.com
- *
- * The software in this package is published under the terms of the BSD
- * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file.
- */
-package org.mule.config.pool;
+/* 
+* $Header$
+* $Revision$
+* $Date$
+* ------------------------------------------------------------------------------------------------------
+* 
+* Copyright (c) SymphonySoft Limited. All rights reserved.
+* http://www.symphonysoft.com
+* 
+* The software in this package is published under the terms of the BSD
+* style license a copy of which has been included with this distribution in
+* the LICENSE.txt file. 
+*
+*/
+package org.mule.impl.model.direct;
 
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.RequestContext;
+import org.mule.impl.model.AbstractComponent;
 import org.mule.impl.model.MuleProxy;
+import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOManager;
+import org.mule.umo.model.UMOModel;
 import org.mule.util.ClassHelper;
-import org.mule.util.ObjectFactory;
-import org.mule.util.ObjectPool;
+
+import java.util.List;
 
 /**
- * <code>AbstractProxyFactory</code> provides common behaviour for creating
- * proxy objects
- * 
+ * todo document
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
+public class DirectComponent extends AbstractComponent {
 
-public abstract class AbstractProxyFactory implements ObjectFactory
-{
-    /**
-     * The UMODescriptor used to create new components in the pool
-     */
-    protected MuleDescriptor descriptor;
-    protected ObjectPool pool;
+    protected List interceptorList = null;
+    protected MuleProxy proxy;
 
-    /**
-     * Creates a pool factory using the descriptor as the basis for creating its
-     * objects
-     * 
-     * @param descriptor the descriptor to use to construct a MuleProxy
-     * @see org.mule.umo.UMODescriptor
-     */
-    public AbstractProxyFactory(MuleDescriptor descriptor, ObjectPool pool)
-    {
-        this.descriptor = descriptor;
-        this.pool = pool;
+    public DirectComponent(MuleDescriptor descriptor, UMOModel model) {
+        super(descriptor, model);
+    }
+
+    protected void doInitialise() throws InitialisationException {
+
+        try {
+            Object component = create();
+            proxy = new MuleProxy(component, descriptor, null);
+        } catch (UMOException e) {
+            throw new InitialisationException(e, this);
+        }
+    }
+
+    protected UMOMessage doSend(UMOEvent event) throws UMOException {
+        Object obj = proxy.onCall(event);
+        if(obj instanceof UMOMessage) {
+            return (UMOMessage)obj;
+        } else {
+            return new MuleMessage(obj, RequestContext.getProperties());
+        }
+    }
+
+    protected void doDispatch(UMOEvent event) throws UMOException {
+        proxy.onCall(event);
     }
 
     public Object create() throws UMOException
@@ -91,13 +107,6 @@ public abstract class AbstractProxyFactory implements ObjectFactory
         // Call any custom initialisers
         descriptor.fireInitialisationCallbacks(component);
 
-        afterComponentCreate(component);
-
-        MuleProxy proxy = new MuleProxy(component, descriptor, pool);
-        return proxy;
-    }
-
-    protected void afterComponentCreate(Object component) throws InitialisationException
-    {
+        return component;
     }
 }

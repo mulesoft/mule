@@ -13,10 +13,6 @@
  */
 package org.mule.umo.model;
 
-import java.beans.ExceptionListener;
-import java.util.Iterator;
-import java.util.List;
-
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -24,6 +20,10 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
+
+import java.beans.ExceptionListener;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * The <code>UMOModel</code> encapsulates and manages the runtime behaviour of
@@ -53,6 +53,13 @@ public interface UMOModel extends Lifecycle, Initialisable
      * @return the model's name
      */
     String getName();
+
+    /**
+     * Returns the model type name. This is a friendly identifier that is used to
+     * look up the SPI class for the model
+     * @return the model type
+     */
+    String getType();
 
     /**
      * The entry point resolver is used to determine the method to be called on
@@ -108,7 +115,7 @@ public interface UMOModel extends Lifecycle, Initialisable
      * 
      * @return Returns the lifecycleAdapterFactory used by this Model.
      * @see UMOLifecycleAdapterFactory
-     * @UMOLifecycleAdapter
+     * @see org.mule.umo.lifecycle.UMOLifecycleAdapter
      */
     UMOLifecycleAdapterFactory getLifecycleAdapterFactory();
 
@@ -227,22 +234,4 @@ public interface UMOModel extends Lifecycle, Initialisable
      * @return an iterator of all component names
      */
     Iterator getComponentNames();
-
-    /**
-     * Sets the factory used to create component wrappers that are registered on
-     * the Model
-     * 
-     * @param factory the factory used to create component wrappers that are
-     *            registered on the Model
-     */
-    void setComponentFactory(UMOComponentFactory factory);
-
-    /**
-     * Returns the factory used to create component wrappers that are registered
-     * on the Model
-     * 
-     * @return the factory used to create component wrappers that are registered
-     *         on the Model
-     */
-    UMOComponentFactory getComponentFactory();
 }

@@ -24,6 +24,7 @@ import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.events.ComponentEvent;
+import org.mule.impl.model.MuleProxy;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOComponent;
@@ -185,7 +186,7 @@ public final class MuleComponent implements UMOComponent, Work {
         }
     }
 
-    void finaliseEvent(UMOEvent event) {
+    public void finaliseEvent(UMOEvent event) {
         logger.debug("Finalising event for: " + descriptor.getName() + " event endpointUri is: "
                 + event.getEndpoint().getEndpointURI());
         // queue.remove(event);
