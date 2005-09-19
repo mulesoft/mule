@@ -30,7 +30,11 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.soap.axis.AxisConnector;
-import org.mule.umo.*;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
@@ -136,7 +140,7 @@ public class UniversalSender extends BasicHandler {
                 updateEndpointCache(axis.getOutboundRouter());
                 ep = (UMOEndpoint)endpointsCache.get(endpoint.getAddress());
                 if(ep==null) {
-                    logger.info("Dispatch Endpoint uri: " + uri + " not found on the AxisServiceComponent. Creating the endpoint instead.");
+                    logger.debug("Dispatch Endpoint uri: " + uri + " not found on the cache. Creating the endpoint instead.");
                     ep = new MuleEndpoint(uri, false);
                 } else {
                     logger.info("Found endpoint: " + uri + " on the Axis service component");

@@ -15,12 +15,19 @@
 
 package org.mule.providers.http;
 
-import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.ConnectMethod;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpConnection;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.message.ExceptionPayload;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.transformers.HttpClientMethodResponseToObject;
@@ -77,6 +84,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         HttpMethod httpMethod = execute(event, true);
         if(httpMethod!=null) {
             httpMethod.releaseConnection();
+            if(httpMethod.getStatusCode() >= 400 ) {
+                throw new DispatchException(event.getMessage(), event.getEndpoint(),
+                        new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText()));
+            }
         }
     }
 
@@ -228,7 +239,14 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             String status = String.valueOf(httpMethod.getStatusCode());
             h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
             logger.debug("Http response is: " + status);
-            return new MuleMessage(httpMethod.getResponseBodyAsString(), h);
+            ExceptionPayload ep = null;
+            if(httpMethod.getStatusCode() >= 400 ) {
+                throw new DispatchException(event.getMessage(), event.getEndpoint(),
+                        new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText()));
+            }
+            UMOMessage m = new MuleMessage(httpMethod.getResponseBodyAsString(), h);
+            m.setExceptionPayload(ep);
+            return m;
         } catch (Exception e) {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         } finally {

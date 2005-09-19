@@ -72,11 +72,13 @@ public class JettyHttpMessageReceiver extends AbstractMessageReceiver
             path ="/";
         }
 
+        if(!path.endsWith("/")) path += "/";
+
         HttpContext context = httpServer.getContext(path);
         context.setRequestLog(null);
 
         ServletHandler handler = new ServletHandler();
-        if("jetty:rest".equals(endpoint.getEndpointURI().getSchemeMetaInfo())) {
+        if("rest".equals(endpoint.getEndpointURI().getScheme())) {
             handler.addServlet("MuleRESTReceiverServlet", path + "*", MuleRESTReceiverServlet.class.getName());
         } else {
             handler.addServlet("JettyReceiverServlet", path + "*", JettyReceiverServlet.class.getName());
