@@ -87,7 +87,7 @@ public class Main {
             //let the request catch up
             Thread.sleep(1500);
         } else {
-            UMOMessage result = client.send("vm://LoanBrokerRequests", request, null);
+            UMOMessage result = client.send("vm://loan.broker.requests", request, null);
             if (result == null) {
                 System.out.println("A result was not received, an error must have occurred. Check the logs.");
             } else {

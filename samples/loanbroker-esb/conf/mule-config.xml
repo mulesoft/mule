@@ -7,27 +7,43 @@
 <mule-configuration id="Loan_broker_Async" version="1.0">
 
 
-    <connector name="ejbConnector" className="org.mule.providers.ejb.EJBConnector">
-        <properties>
-            <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>
-            <property name="jndiUrlPkgPrefixes" value="org.openejb"/>
-            <property name="securityPolicy" value="conf/security.policy"/>
-        </properties>
-    </connector>
+<!--    <connector name="ejbConnector" className="org.mule.providers.ejb.EJBConnector">-->
+<!--        <properties>-->
+<!--            <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>-->
+<!--            <property name="jndiUrlPkgPrefixes" value="org.openejb"/>-->
+<!--            <property name="securityPolicy" value="conf/security.policy"/>-->
+<!--        </properties>-->
+<!--    </connector>-->
+<!---->
+<!--    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">-->
+<!--        <properties>-->
+<!--            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>-->
+<!--            <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>-->
+<!--            <property name="specification" value="1.1"/>-->
+<!--            <map name="jndiProviderProperties">-->
+<!--                <property name="brokerURL" value="tcp://localhost:61616"/>-->
+<!--            </map>-->
+<!--        </properties>-->
+<!--    </connector>-->
 
-    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
-        <properties>
-            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
-            <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
-            <property name="specification" value="1.1"/>
-            <map name="jndiProviderProperties">
-                <property name="brokerURL" value="tcp://localhost:61616"/>
-            </map>
-        </properties>
-    </connector>
-
+    <endpoint-identifiers>
+        <endpoint-identifier name="LoanBrokerRequestsREST" value="jetty:rest://localhost:8080/loanbroker"/>
+        <endpoint-identifier name="LoanBrokerRequests" value="vm://loan.broker.requests"/>
+        <endpoint-identifier name="LoanQuotes" value="vm://esb.loan.quotes.queue"/>
+        <endpoint-identifier name="CreditAgencyGateway" value="vm://esb.credit.agency.queue"/>
+        <endpoint-identifier name="CreditAgency" value="vm://credit.agency.service"/>
+        <endpoint-identifier name="LenderGateway" value="vm://esb.lender.queue"/>
+        <endpoint-identifier name="LenderService" value="vm://lender.service"/>
+        <endpoint-identifier name="BankingGateway" value="vm://esb.banking.queue"/>
+        <endpoint-identifier name="Bank1" value="axis:http://localhost:10080/mule"/>
+        <endpoint-identifier name="Bank2" value="axis:http://localhost:20080/mule"/>
+        <endpoint-identifier name="Bank3" value="axis:http://localhost:30080/mule"/>
+        <endpoint-identifier name="Bank4" value="axis:http://localhost:40080/mule"/>
+        <endpoint-identifier name="Bank5" value="axis:http://localhost:50080/mule"/>
+    </endpoint-identifiers>
     <transformers>
         <transformer name="RestRequestToCustomerRequest" className="org.mule.samples.loanbroker.esb.transformers.RestRequestToCustomerRequest"/>
+        <transformer name="LoanQuoteRequestToCustomer" className="org.mule.samples.loanbroker.esb.transformers.LoanQuoteRequestToCustomer"/>
     </transformers>
 
     <!--
@@ -38,20 +54,21 @@
         The loan broker is used to receive loan requests
         -->
         <mule-descriptor name="LoanBroker"
-            implementation="org.mule.samples.loanbroker.LoanBroker">
+            implementation="org.mule.samples.loanbroker.esb.LoanBroker">
 
             <inbound-router>
-                <endpoint address="jetty:rest://localhost:8080/loanbroker" transformers="RestRequestToCustomerRequest"/>
+                <endpoint address="LoanBrokerRequestsREST" transformers="RestRequestToCustomerRequest"/>
+                <endpoint address="LoanBrokerRequests"/>
             </inbound-router>
 
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://credit.agency.queue"/>
+                    <endpoint address="CreditAgencyGateway"/>
                 </router>
             </outbound-router>
 
-            <response-router timeout="10000">
-                <endpoint address="jms://loan.quotes.queue"/>
+            <response-router timeout="1000000">
+                <endpoint address="LoanQuotes"/>
                 <router className="org.mule.samples.loanbroker.esb.routers.BankQuotesResponseAggregator"/>
             </response-router>
         </mule-descriptor>
@@ -63,21 +80,14 @@
             implementation="org.mule.components.builder.ReflectionMessageBuilder">
 
             <inbound-router>
-                <endpoint address="jms://credit.agency.queue"/>
+                <endpoint address="CreditAgencyGateway"/>
             </inbound-router>
 
             <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="ejb://localhost:1099/creditAgencyHome?method=getCreditProfile">
-                        <properties>
-                            <list name="methodArgumentTypes">
-                                <entry value="java.lang.String"/>
-                                <entry value="java.lang.String"/>
-                            </list>
-                        </properties>
-                    </endpoint>
-                    <endpoint address="vm://credit.agency.service"/>
-                    <endpoint address="jms://esb.lender.queue"/>
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+<!--                    <endpoint transformers="LoanQuoteRequestToCustomer" address="ejb://localhost:1099/creditAgencyHome?method=getCreditProfile"/>-->
+                    <endpoint remoteSync="true" transformers="LoanQuoteRequestToCustomer" address="CreditAgency"/>
+                    <endpoint address="LenderGateway"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -86,7 +96,7 @@
                          implementation="org.mule.samples.loanbroker.esb.ca.CreditAgencyBean">
 
             <inbound-router>
-                <endpoint address="vm://credit.agency.service"/>
+                <endpoint address="CreditAgency"/>
             </inbound-router>
         </mule-descriptor>
 
@@ -94,22 +104,22 @@
                          implementation="org.mule.components.simple.BridgeComponent">
 
             <inbound-router>
-                <endpoint address="jms://esb.lender.queue"/>
+                <endpoint address="LenderGateway"/>
             </inbound-router>
 
             <outbound-router>
                 <router className="org.mule.routing.outbound.ChainingRouter">
-                    <endpoint address="vm://lender.service"/>
-                    <endpoint address="jms://esb.banking.queue"/>
+                    <endpoint remoteSync="true" address="LenderService"/>
+                    <endpoint address="BankingGateway"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
 
         <mule-descriptor name="LenderService"
-                         implementation="org.mule.samples.loanbroker.esb.lender.DefaultLenderService">
+                         implementation="org.mule.samples.loanbroker.esb.lender.LenderService">
 
             <inbound-router>
-                <endpoint address="vm://lender.service"/>
+                <endpoint address="LenderService"/>
             </inbound-router>
         </mule-descriptor>
 
@@ -117,12 +127,12 @@
             implementation="org.mule.components.simple.BridgeComponent">
 
             <inbound-router>
-                <endpoint address="jms://esb.banking.queue"/>
+                <endpoint address="BankingGateway"/>
             </inbound-router>
 
             <outbound-router>
                 <router className="org.mule.routing.outbound.StaticRecipientList">
-                    <reply-to address="jms://esb.loan.quotes"/>
+                    <reply-to address="LoanQuotes"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
@@ -135,28 +145,28 @@
         to the LoanBrokerQuotes destination
         -->
         <mule-descriptor name="Bank1"
-            inboundEndpoint="axis:http://localhost:10080/mule"
-            implementation="org.mule.samples.loanbroker.Bank">
+            inboundEndpoint="Bank1"
+            implementation="org.mule.samples.loanbroker.esb.Bank">
         </mule-descriptor>
 
         <mule-descriptor name="Bank2"
-            inboundEndpoint="axis:http://localhost:20080/mule"
-            implementation="org.mule.samples.loanbroker.Bank">
+            inboundEndpoint="Bank2"
+            implementation="org.mule.samples.loanbroker.esb.Bank">
         </mule-descriptor>
 
         <mule-descriptor name="Bank3"
-            inboundEndpoint="axis:http://localhost:30080/mule"
-            implementation="org.mule.samples.loanbroker.Bank">
+            inboundEndpoint="Bank3"
+            implementation="org.mule.samples.loanbroker.esb.Bank">
         </mule-descriptor>
 
         <mule-descriptor name="Bank4"
-            inboundEndpoint="axis:http://localhost:40080/mule"
-            implementation="org.mule.samples.loanbroker.Bank">
+            inboundEndpoint="Bank4"
+            implementation="org.mule.samples.loanbroker.esb.Bank">
         </mule-descriptor>
 
         <mule-descriptor name="Bank5"
-            inboundEndpoint="axis:http://localhost:50080/mule"
-            implementation="org.mule.samples.loanbroker.Bank">
+            inboundEndpoint="Bank5"
+            implementation="org.mule.samples.loanbroker.esb.Bank">
         </mule-descriptor>
     </model>
 </mule-configuration>
