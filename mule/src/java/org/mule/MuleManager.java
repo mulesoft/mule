@@ -342,7 +342,9 @@ public class MuleManager implements UMOManager
         disposed.set(true);
         disposeConnectors();
 
-        model.dispose();
+        if (model != null) {
+            model.dispose();
+        }
         disposeAgents();
 
         transformers.clear();
