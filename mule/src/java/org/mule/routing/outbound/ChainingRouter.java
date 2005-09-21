@@ -42,33 +42,47 @@ public class ChainingRouter extends FilteringOutboundRouter
 
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
-        UMOMessage result = null;
-        if (endpoints == null || endpoints.size() == 0) {
+        UMOMessage resultToReturn = null;
+        final int endpointsCount = endpoints.size();
+        if (endpoints == null || endpointsCount == 0) {
             throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
         }
+
+        logger.debug("About to chain " + endpointsCount + " endpoints.");
+
+        // need that ref for an error message
+        UMOEndpoint endpoint = null;
         try {
+            UMOMessage intermediaryResult = message;
 
-            result = message;
-            UMOEndpoint ep = null;
-
-            for (int i = 0; i < endpoints.size(); i++) {
-                ep = (UMOEndpoint) endpoints.get(i);
-                if(ep.isSynchronous()) {
-                    result = send(session, result, ep);
-                    if(result==null) {
-                        logger.warn("There was no result returned from endpoint invocation: " + ep + " Chaining router cannot process any further endpoints");
+            for (int i = 0; i < endpointsCount; i++) {
+                endpoint = (UMOEndpoint) endpoints.get(i);
+                // if it's not the last endpoint in the chain,
+                // enforce the synchronous call, otherwise we lose response
+                boolean lastEndpointInChain = (i == endpointsCount - 1);
+                if (!lastEndpointInChain) {
+                    intermediaryResult = send(session, intermediaryResult, endpoint);
+                    if (intermediaryResult == null) {
+                        logger.warn("Chaining router cannot process any further endpoints. " +
+                                    "There was no result returned from endpoint invocation: " + endpoint);
                         break;
                     }
                 } else {
-                    logger.info("Invocation is asynchronous no result will be returned for any further invocations");
-                    dispatch(session, result, ep);
-                    break;
+                    // ok, the last call,
+                    // use the 'sync/async' method parameter
+                    if (synchronous) {
+                        resultToReturn = send(session, intermediaryResult, endpoint);
+                    } else {
+                        // reset the previous call result to avoid confusion
+                        resultToReturn = null;
+                        dispatch(session, intermediaryResult, endpoint);
+                    }
                 }
             }
 
         } catch (UMOException e) {
-            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint) endpoints.get(0), e);
+            throw new CouldNotRouteOutboundMessageException(message, endpoint, e);
         }
-        return result;
+        return resultToReturn;
     }
 }
