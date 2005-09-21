@@ -54,6 +54,8 @@ import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -488,8 +490,9 @@ public class AxisServiceComponent implements Initialisable, Callable
                 msgContext.setProperty("securityProvider", securityProvider);
             }
 
-            String request = context.getTransformedMessageAsString();
-            Message requestMsg = new Message(request,
+            Object request = context.getTransformedMessage();
+            Message requestMsg = new Message((request instanceof File) ? new FileInputStream((File) request) :
+                                             request,
                                              false,
                                              (String) context.getProperty(HTTPConstants.HEADER_CONTENT_TYPE),
                                              (String) context.getProperty(HTTPConstants.HEADER_CONTENT_LOCATION));
@@ -522,6 +525,10 @@ public class AxisServiceComponent implements Initialisable, Callable
             }
             if (RequestContext.getExceptionPayload() instanceof Exception) {
                 throw (Exception) RequestContext.getExceptionPayload().getException();
+            }
+            // remove temporary file used for soap message with attachment
+            if (request instanceof File) {
+            	((File) request).delete();
             }
             responseMsg = msgContext.getResponseMessage();
             if (responseMsg == null)

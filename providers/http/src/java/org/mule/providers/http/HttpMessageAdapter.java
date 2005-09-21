@@ -16,8 +16,10 @@
 package org.mule.providers.http;
 
 import org.mule.providers.AbstractMessageAdapter;
+import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
+import org.mule.umo.transformer.UMOTransformer;
 
 import java.util.Map;
 
@@ -29,13 +31,14 @@ import java.util.Map;
  * @version $Revision$
  */
 public class HttpMessageAdapter extends AbstractMessageAdapter {
-    private byte[] message = null;
+    private Object message = null;
+    private UMOTransformer trans = new SerializableToByteArray();
 
     private boolean http11 = true;
 
     public HttpMessageAdapter(Object message) throws MessagingException {
         if (message instanceof Object[]) {
-            this.message = (byte[]) ((Object[]) message)[0];
+            this.message = ((Object[]) message)[0];
             if (((Object[]) message).length > 1) {
                 properties = (Map) ((Object[]) message)[1];
             }
@@ -68,8 +71,9 @@ public class HttpMessageAdapter extends AbstractMessageAdapter {
      * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsBytes()
      */
-    public byte[] getPayloadAsBytes() throws Exception {
-        return message;
+    public byte[] getPayloadAsBytes() throws Exception
+    {
+        return (byte[]) trans.transform(message);
     }
 
     /*
@@ -78,7 +82,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter {
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsString()
      */
     public String getPayloadAsString() throws Exception {
-        return new String(message);
+        return message.toString();
     }
 
     /*

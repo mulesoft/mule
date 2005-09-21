@@ -28,6 +28,7 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.*;
 
@@ -50,6 +51,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         requestHeaders = new ArrayList(Arrays.asList(HttpConstants.REQUEST_HEADER_NAMES));
         responseHeaders = new ArrayList(Arrays.asList(HttpConstants.RESPONSE_HEADER_NAMES));
     }
+
     private int addParameters(String queryString, PostMethod postMethod)
     {
         //Parse the HTTP argument list and convert to a NameValuePair collection
@@ -125,9 +127,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     addParameters(uri.getQuery(), postMethod);
                     //Dont set a POST payload if the body is a Null Payload.  This way client calls
                     //can control if a POST body is posted explicitly
-                   if(!(context.getMessage().getPayload() instanceof NullPayload)) {
+                    if(!(context.getMessage().getPayload() instanceof NullPayload)) {
                         if (src instanceof String) {
                             postMethod.setRequestBody(new ByteArrayInputStream(src.toString().getBytes()));
+                        } else if (src instanceof InputStream) {
+	                        postMethod.setRequestBody((InputStream) src);
+	                        postMethod.setRequestContentLength(Integer.parseInt((String) context.getProperty(HttpConstants.HEADER_CONTENT_LENGTH))); // must set this for httpclient to stream
                         } else {
                             byte[] buffer = Utility.objectToByteArray(src);
                             postMethod.setRequestBody(new ByteArrayInputStream(buffer));
@@ -160,12 +165,16 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                         headerName = "X-" + headerName;
                     }
                     //Make sure we have a valid header name otherwise we will corrupt the request
-                    if (headerName.startsWith("Content-Length") && httpMethod.getResponseHeader("Content-Length")==null) {
+                    if (headerName.startsWith(HttpConstants.HEADER_CONTENT_LENGTH) && httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH) == null) {
                         httpMethod.addRequestHeader(headerName, (String) header.getValue());
-                    }else {
+                    } else {
                         httpMethod.addRequestHeader(headerName, (String) header.getValue());
                     }
                 }
+            }
+
+            if (context.getMessage().getPayload() instanceof InputStream) {
+                httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related"); // must set this for receiver to properly parse attachments
             }
     }
 }

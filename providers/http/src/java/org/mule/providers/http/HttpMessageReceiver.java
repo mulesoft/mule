@@ -139,7 +139,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                     }
 
                     Properties headers = new Properties();
-                    byte[] payload = parseRequest(dataIn, headers);
+                    Object payload = parseRequest(dataIn, headers);
                     if (payload == null) {
                         break;
                     }
@@ -236,10 +236,10 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         return receiver;
     }
 
-    protected byte[] parseRequest(InputStream is, Properties p) throws IOException
+    protected Object parseRequest(InputStream is, Properties p) throws IOException
     {
         RequestInputStream req = new RequestInputStream(is);
-        byte[] payload;
+        Object payload = null;
         String startLine = null;
         do {
             try {
@@ -265,22 +265,44 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         if (method.equals(HttpConstants.METHOD_GET)) {
             payload = request.getBytes();
         } else {
+            boolean multipart = p.getProperty(HttpConstants.HEADER_CONTENT_TYPE, "").equals("multipart/related");
             String contentLengthHeader = p.getProperty(HttpConstants.HEADER_CONTENT_LENGTH, null);
             if (contentLengthHeader == null) throw new IllegalStateException(HttpConstants.HEADER_CONTENT_LENGTH + " header must be set");
 
             int contentLength = Integer.parseInt(contentLengthHeader);
-            byte[] buffer = new byte[ contentLength ];
 
-            int length = -1;
-            int offset = req.read(buffer);
-            while (offset >= 0 && offset < buffer.length) {
-                length = req.read(buffer, offset, buffer.length - offset);
-                if (length == -1) {
-                    break;
+            if (multipart) {
+            	byte[] buffer = new byte[1024];
+
+            	payload = File.createTempFile("mime", ".att");
+            	((File) payload).deleteOnExit();
+            	FileOutputStream os = new FileOutputStream((File) payload);
+
+            	int length = -1;
+            	int offset = 0;
+                while (offset != contentLength) {
+                	buffer = new byte[1024];
+                	length = is.read(buffer);
+                    if (length != -1) {
+                        os.write(buffer, 0, length);
+                        offset += length;
+                    }
                 }
-                offset += length;
+                os.close();
+            } else {
+                byte[] buffer = new byte[ contentLength ];
+
+                int length = -1;
+                int offset = req.read(buffer);
+                while (offset >= 0 && offset < buffer.length) {
+                    length = req.read(buffer, offset, buffer.length - offset);
+                    if (length == -1) {
+                        break;
+                    }
+                    offset += length;
+                }
+                payload = buffer;
             }
-            payload = buffer;
         }
         return payload;
     }

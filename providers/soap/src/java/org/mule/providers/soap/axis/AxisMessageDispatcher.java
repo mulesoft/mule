@@ -43,6 +43,7 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
 
+import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPEnvelope;
 import java.util.*;
@@ -148,12 +149,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     public void doDispatch(UMOEvent event) throws Exception
     {
         AxisProperties.setProperty("axis.doAutoTypes", "true");
-        Call call = getCall(event);
+        Object[] args = getArgs(event);
+        Call call = getCall(event, args);
         // dont use invokeOneWay here as we are already in a thread pool.
         // Axis creates a new thread for every invoke one way call. nasty!
         // Mule overides the default Axis HttpSender to return immediately if
         //the axis.one.way property is set
-        Object[] args = getArgs(event);
         call.setProperty("axis.one.way", Boolean.TRUE);
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
         call.invoke(args);
@@ -163,9 +164,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
         AxisProperties.setProperty("axis.doAutoTypes", "true");
-        Call call = getCall(event);
-
         Object[] args = getArgs(event);
+        Call call = getCall(event, args);
+
         Object result = call.invoke(args);
         if (result == null) {
             return null;
@@ -176,7 +177,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    private Call getCall(UMOEvent event) throws Exception
+    private Call getCall(UMOEvent event, Object[] args) throws Exception
     {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         String method = (String) endpointUri.getParams().remove("method");
@@ -250,6 +251,21 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             call.setPassword(endpointUri.getPassword());
         }
 
+        Map methodCalls = (Map)event.getProperty("soapMethods");
+        if (methodCalls == null) {
+        	ArrayList params = new ArrayList();
+        	for (int i = 0; i < args.length; i++) {
+        		if (args[i] instanceof DataHandler[]) {
+        			params.add("attachments;qname{DataHandler:http://xml.apache.org/xml-soap};in");
+        		} else {        			
+        			params.add("value" + i + ";" + args[i].getClass().getName() + ";in");
+        		}
+        	}
+        	HashMap map = new HashMap();
+        	map.put(method, params);
+            event.setProperty("soapMethods", map);
+        }
+
         setCallParams(call, event, call.getOperationName());
         return call;
     }
@@ -257,11 +273,21 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     private Object[] getArgs(UMOEvent event) throws TransformerException
     {
         Object payload = event.getTransformedMessage();
-        Object[] args;
-        if (payload instanceof Object[]) {
-            args = (Object[]) payload;
-        } else {
-            args = new Object[] { payload };
+        Object[] args = new Object[0];
+		if (payload instanceof Object[]) {
+		    args = (Object[]) payload;
+		} else {
+		    args = new Object[] { payload };
+		}
+        if (event.getMessage().getAttachmentNames() != null && event.getMessage().getAttachmentNames().size() > 0) {
+            ArrayList attachments = new ArrayList();
+            Iterator i = event.getMessage().getAttachmentNames().iterator();
+            while(i.hasNext()) {
+                attachments.add(event.getMessage().getAttachment((String) i.next()));
+            }
+            ArrayList temp = new ArrayList(Arrays.asList(args));
+            temp.add(attachments.toArray(new DataHandler[0]));
+            args = temp.toArray();
         }
         return args;
     }

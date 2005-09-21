@@ -29,6 +29,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
@@ -41,6 +42,9 @@ import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -57,8 +61,8 @@ public class UniversalSender extends BasicHandler {
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
-
     protected Map endpointsCache = new ConcurrentHashMap();
+
     public void invoke(MessageContext msgContext) throws AxisFault {
         boolean sync = true;
         Call call = (Call) msgContext.getProperty("call_object");
@@ -87,9 +91,23 @@ public class UniversalSender extends BasicHandler {
         }
 
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        	Object payload = null;
+        	int contentLength = 0;
+            if (msgContext.getRequestMessage().countAttachments() > 0) {
+                File temp = File.createTempFile("soap", ".tmp");
+                temp.deleteOnExit();
+	            FileOutputStream fos = new FileOutputStream(temp);
+	            msgContext.getRequestMessage().writeTo(fos);
+	            fos.close();
+	            contentLength = (int) temp.length();
+	            payload = new FileInputStream(temp);
+            } else {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 msgContext.getRequestMessage().writeTo(baos);
-            
+                baos.close();
+                payload = baos.toByteArray();
+            }
+
             Map props = new HashMap();
            // props.putAll(event.getProperties());
             for (Iterator iterator = msgContext.getPropertyNames(); iterator.hasNext();) {
@@ -99,12 +117,15 @@ public class UniversalSender extends BasicHandler {
                 }
             }
             props.put("SOAPAction", uri);
+            if (contentLength > 0) {
+            	props.put(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(contentLength)); // necessary for supporting httpclient
+            }
 
             UMOSession session = new MuleSession();
-            UMOEvent dispatchEvent = new MuleEvent(new MuleMessage(baos.toByteArray(), props), endpoint, session, sync);
+            UMOEvent dispatchEvent = new MuleEvent(new MuleMessage(payload, props), endpoint, session, sync);
             logger.info("Making Axis soap request on: " + uri);
             if(logger.isDebugEnabled()) {
-                logger.debug("Soap request is:\n" + baos.toString());
+                logger.debug("Soap request is:\n" + payload.toString());
             }
             if(sync) {
                 dispatchEvent.getEndpoint().setRemoteSync(true);
@@ -116,8 +137,12 @@ public class UniversalSender extends BasicHandler {
                 } else {
                     logger.warn("No response message was returned from synchronous call to: " + uri);
                 }
+                // remove temp file created for streaming
+                if (payload instanceof File) {
+                	((File) payload).delete();
+                }
             } else {
-                dispatchEvent.getSession().dispatchEvent(dispatchEvent);
+                session.dispatchEvent(dispatchEvent);
             }
         } catch (Exception e) {
             logger.error("Failed to dispatch soap event from Axis Universal transport: " + e.toString());
