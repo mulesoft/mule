@@ -234,6 +234,10 @@ public class MuleManager implements UMOManager
         }
 
         MuleManager.setInstance((UMOManager) obj);
+
+        // HACK hit the model, so it's created and initialized
+        MuleManager.getInstance().getModel();
+
         return MuleManager.getInstance();
     }
 
@@ -753,7 +757,9 @@ public class MuleManager implements UMOManager
         stopAgents();
         queueManager.stop();
         logger.debug("Stopping model...");
-        model.stop();
+        if (model != null) {
+            model.stop();
+        }
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STOPPED));
     }
 
