@@ -23,26 +23,10 @@ import org.mule.config.MuleProperties;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleModel;
 import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.internal.admin.MuleAdminAgent;
-import org.mule.impl.internal.events.AdminEvent;
-import org.mule.impl.internal.events.AdminEventListener;
-import org.mule.impl.internal.events.ComponentEvent;
-import org.mule.impl.internal.events.ComponentEventListener;
-import org.mule.impl.internal.events.ConnectionEvent;
-import org.mule.impl.internal.events.ConnectionEventListener;
-import org.mule.impl.internal.events.CustomEvent;
-import org.mule.impl.internal.events.CustomEventListener;
-import org.mule.impl.internal.events.ManagementEvent;
-import org.mule.impl.internal.events.ManagementEventListener;
-import org.mule.impl.internal.events.ManagerEvent;
-import org.mule.impl.internal.events.ManagerEventListener;
-import org.mule.impl.internal.events.ModelEvent;
-import org.mule.impl.internal.events.ModelEventListener;
-import org.mule.impl.internal.events.SecurityEvent;
-import org.mule.impl.internal.events.SecurityEventListener;
-import org.mule.impl.internal.events.ServerEventManager;
+import org.mule.impl.internal.events.*;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.management.stats.AllStatistics;
@@ -50,12 +34,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOManager;
-import org.mule.umo.manager.UMOServerEvent;
-import org.mule.umo.manager.UMOServerEventListener;
-import org.mule.umo.manager.UMOWorkManager;
+import org.mule.umo.manager.*;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -70,13 +49,7 @@ import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
 import javax.transaction.TransactionManager;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -214,7 +187,6 @@ public class MuleManager implements UMOManager
         if (config == null) {
             config = new MuleConfiguration();
         }
-        //setModel(new MuleModel());
         containerContext = new MultiContainerContext();
         securityManager = new MuleSecurityManager();
     }
@@ -243,7 +215,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Getter method for the current singleton MuleManager
-     * 
+     *
      * @return the current singleton MuleManager
      */
     public static UMOManager getInstance()
@@ -261,7 +233,7 @@ public class MuleManager implements UMOManager
      * </code>
      * because getInstance never returns a null. If an istance is not available
      * one is created. This method queries the instance directly.
-     * 
+     *
      * @return true if the manager is instanciated
      */
     public static boolean isInstanciated()
@@ -282,7 +254,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Gets all statisitcs for this instance
-     * 
+     *
      * @return all statisitcs for this instance
      */
     public AllStatistics getStatistics()
@@ -292,7 +264,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Sets statistics on this instance
-     * 
+     *
      * @param stat
      */
     public void setStatistics(AllStatistics stat)
@@ -312,7 +284,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Sets the configuration for the <code>MuleManager</code>.
-     * 
+     *
      * @param config the configuration object
      * @throws IllegalAccessError if the <code>MuleManager</code> has already
      *             been initialised.
@@ -355,6 +327,7 @@ public class MuleManager implements UMOManager
         endpoints.clear();
         endpointIdentifiers.clear();
         containerContext.dispose();
+        containerContext = null;
         // props.clear();
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_DISPOSED));
 
@@ -592,6 +565,7 @@ public class MuleManager implements UMOManager
     {
         if (!initialised.get()) {
             initialising.set(true);
+            startDate = System.currentTimeMillis();
             // if no work manager has been set create a default one
             if (workManager == null) {
                 ThreadingProfile tp = config.getDefaultThreadingProfile();
@@ -630,21 +604,6 @@ public class MuleManager implements UMOManager
                                                           e);
                     }
                 }
-                // Allows users to disable all server components and connections
-                // this can be useful for testing
-                boolean disable = PropertiesHelper.getBooleanProperty(System.getProperties(),
-                                                                      MuleProperties.DISABLE_SERVER_CONNECTIONS,
-                                                                      false);
-
-                // if endpointUri is null do not setup server components
-                if (config.getServerUrl() == null || "".equals(config.getServerUrl().trim())) {
-                    logger.info("Server endpointUri is null, not registering Mule Admin agent");
-                    disable = true;
-                }
-
-                if (!disable) {
-                    registerAgent(new MuleAdminAgent());
-                }
 
                 initialiseConnectors();
                 initialiseEndpoints();
@@ -656,6 +615,24 @@ public class MuleManager implements UMOManager
                 initialising.set(false);
                 fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_INITIALISED));
             }
+        }
+    }
+
+    protected void registerAdminAgent() throws UMOException {
+        // Allows users to disable all server components and connections
+        // this can be useful for testing
+        boolean disable = PropertiesHelper.getBooleanProperty(System.getProperties(),
+                                                              MuleProperties.DISABLE_SERVER_CONNECTIONS,
+                                                              false);
+
+        // if endpointUri is null do not setup server components
+        if (config.getServerUrl() == null || "".equals(config.getServerUrl().trim())) {
+            logger.info("Server endpointUri is null, not registering Mule Admin agent");
+            disable = true;
+        }
+
+        if (!disable) {
+            registerAgent(new MuleAdminAgent());
         }
     }
 
@@ -675,7 +652,7 @@ public class MuleManager implements UMOManager
     /**
      * Start the <code>MuleManager</code>. This will start the connectors and
      * sessions.
-     * 
+     *
      * @throws UMOException if the the connectors or components fail to start
      */
     public synchronized void start() throws UMOException
@@ -683,9 +660,9 @@ public class MuleManager implements UMOManager
         initialise();
 
         if (!started.get()) {
-            startDate = System.currentTimeMillis();
             starting.set(true);
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STARTING));
+            registerAdminAgent();
             queueManager.start();
             startConnectors();
             startAgents();
@@ -706,7 +683,7 @@ public class MuleManager implements UMOManager
     /**
      * Start the <code>MuleManager</code>. This will start the connectors and
      * sessions.
-     * 
+     *
      * @param serverUrl the server Url for this instance
      * @throws UMOException if the the connectors or components fail to start
      */
@@ -719,7 +696,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Starts the connectors
-     * 
+     *
      * @throws MuleException if the connectors fail to start
      */
     private void startConnectors() throws UMOException
@@ -743,7 +720,7 @@ public class MuleManager implements UMOManager
     /**
      * Stops the <code>MuleManager</code> which stops all sessions and
      * connectors
-     * 
+     *
      * @throws UMOException if either any of the sessions or connectors fail to
      *             stop
      */
@@ -765,7 +742,7 @@ public class MuleManager implements UMOManager
 
     /**
      * Stops the connectors
-     * 
+     *
      * @throws MuleException if any of the connectors fail to stop
      */
     private void stopConnectors() throws UMOException
@@ -780,7 +757,7 @@ public class MuleManager implements UMOManager
     /**
      * If the <code>MuleManager</code> was started from the
      * <code>MuleServer</code> daemon then this will be called by the Server
-     * 
+     *
      * @param server a reference to the <code>MuleServer</code>.
      */
     void setServer(MuleServer server)
@@ -791,7 +768,7 @@ public class MuleManager implements UMOManager
     /**
      * Shuts down the whole server tring to shut down all resources cleanly on
      * the way
-     * 
+     *
      * @param e an exception that caused the <code>shutdown()</code> method to
      *            be called. If e is null the shutdown message will just display
      *            a time when the server was shutdown. Otherwise the exception
@@ -808,8 +785,9 @@ public class MuleManager implements UMOManager
      */
     public UMOModel getModel()
     {
+        //todo in version two we must not assume the model
         if(model==null) {
-            model = new MuleModel();
+            model = new SedaModel();
         }
         return model;
     }
@@ -819,9 +797,6 @@ public class MuleManager implements UMOManager
      */
     public void setModel(UMOModel model) throws UMOException {
         this.model = model;
-        if (model instanceof MuleModel) {
-            ((MuleModel) model).setListeners(eventManager);
-        }
         if(initialised.get()) {
             model.initialise();
         }
@@ -960,7 +935,7 @@ public class MuleManager implements UMOManager
         List message = new ArrayList(2);
         long currentTime = System.currentTimeMillis();
         message.add(new Message(Messages.SHUTDOWN_NORMALLY_ON_X, new Date().toString()).getMessage());
-        long duration = currentTime;
+        long duration = 10;
         if (startDate > 0) {
             duration = currentTime - startDate;
         }
@@ -976,6 +951,12 @@ public class MuleManager implements UMOManager
     {
         agents.put(agent.getName(), agent);
         agent.registered();
+        if (initialised.get() || initialising.get()) {
+            agent.initialise();
+        }
+        if ((started.get() || starting.get())) {
+            agent.start();
+        }
     }
 
     /**

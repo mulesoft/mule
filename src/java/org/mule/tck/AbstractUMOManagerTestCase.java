@@ -14,7 +14,7 @@
 package org.mule.tck;
 
 import org.mule.MuleManager;
-import org.mule.impl.MuleModel;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.interceptors.InterceptorStack;
 import org.mule.interceptors.LoggingInterceptor;
 import org.mule.umo.UMOException;
@@ -135,23 +135,9 @@ public abstract class AbstractUMOManagerTestCase extends AbstractMuleTestCase
         }
     }
 
-    // public void testManagerLifecycle() throws Exception
-    // {
-    // MuleManager.getInstance().start();
-    // UMOConnector connector =
-    // MuleManager.getInstance().lookupConnector("testConnector");
-    // assertTrue(connector.isStarted());
-    //
-    // MuleManager.getInstance().stop();
-    // assertTrue(!connector.isStarted());
-    //
-    // MuleManager.getInstance().dispose();
-    // assertTrue(connector.isDisposed());
-    // }
-
     public void testModelSetting() throws UMOException {
         assertNotNull(MuleManager.getInstance().getModel());
-        MuleManager.getInstance().setModel(new MuleModel());
+        MuleManager.getInstance().setModel(new SedaModel());
         assertEquals("mule", MuleManager.getInstance().getModel().getName());
     }
 }

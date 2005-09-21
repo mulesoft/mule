@@ -15,15 +15,11 @@ package org.mule.tck;
 
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
-import org.mule.impl.DefaultExceptionStrategy;
-import org.mule.impl.MuleComponent;
-import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleModel;
-import org.mule.impl.MuleSession;
+import org.mule.impl.*;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.seda.SedaComponent;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
@@ -49,7 +45,7 @@ public class MuleTestUtils {
         if (MuleManager.isInstanciated())
             MuleManager.getInstance().dispose();
         manager = MuleManager.getInstance();
-        manager.setModel(new MuleModel());
+        manager.setModel(new SedaModel());
         MuleManager.getConfiguration().setSynchronous(true);
         MuleManager.getConfiguration()
                    .getPoolingProfile()
@@ -124,9 +120,9 @@ public class MuleTestUtils {
         return new TestConnector();
     }
 
-    public static MuleComponent getTestComponent(MuleDescriptor descriptor)
+    public static UMOComponent getTestComponent(MuleDescriptor descriptor)
     {
-        return new MuleComponent(descriptor);
+        return new SedaComponent(descriptor, new SedaModel());
     }
 
     public static MuleDescriptor getTestDescriptor(String name, String implementation) throws Exception
@@ -143,9 +139,10 @@ public class MuleTestUtils {
         return descriptor;
     }
 
-    public static UMOManager getTestManager()
-    {
-        return MuleManager.getInstance();
+    public static UMOManager getTestManager() throws UMOException {
+        UMOManager manager = MuleManager.getInstance();
+        manager.setModel(new SedaModel());
+        return manager;
     }
 
 }

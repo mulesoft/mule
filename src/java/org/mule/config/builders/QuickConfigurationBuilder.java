@@ -20,9 +20,9 @@ import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.ModelFactory;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -105,7 +105,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         }
         MuleManager.getConfiguration().setServerUrl(serverUrl);
         MuleManager.getConfiguration().setSynchronous(synchronous);
-        manager.setModel(new MuleModel());
+        manager.setModel(ModelFactory.createModel(MuleManager.getConfiguration().getModelType()));
         manager.start();
         return manager;
     }
@@ -547,10 +547,20 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
     }
 
     public UMOManager configure(String configResources) throws ConfigurationException {
+        try {
+            manager.start();
+        } catch (UMOException e) {
+            throw new ConfigurationException(e);
+        }
         return manager;
     }
 
     public UMOManager configure(ReaderResource[] configResources) throws ConfigurationException {
+        try {
+            manager.start();
+        } catch (UMOException e) {
+            throw new ConfigurationException(e);
+        }
         return manager;
     }
 

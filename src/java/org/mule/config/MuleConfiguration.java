@@ -197,6 +197,12 @@ public class MuleConfiguration
      * features
      */
     private boolean embedded = false;
+
+    /**
+     * The model type to use for component invocations
+     */
+    private String modelType = "default";
+
     /**
      * The default connection Strategy used for a connector when one hasn't been
      * defined for the connector
@@ -436,7 +442,7 @@ public class MuleConfiguration
     public void setClientMode(boolean clientMode)
     {
         this.clientMode = clientMode;
-        setServerUrl("");
+        if(clientMode) setServerUrl("");
     }
 
     public QueuePersistenceStrategy getPersistenceStrategy()
@@ -484,5 +490,13 @@ public class MuleConfiguration
     public void setEmbedded(boolean embedded) {
         this.embedded = embedded;
         serverUrl=null;
+    }
+
+    public String getModelType() {
+        return modelType;
+    }
+
+    public void setModelType(String modelType) {
+        this.modelType = modelType;
     }
 }

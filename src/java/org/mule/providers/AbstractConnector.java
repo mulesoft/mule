@@ -149,6 +149,8 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     protected WaitableBoolean connecting = new WaitableBoolean(false);
 
+    protected WaitableBoolean startedBeforeDisconnect = new WaitableBoolean(false);
+
     public AbstractConnector()
     {
         // make sure we always have an exception strategy
@@ -298,6 +300,21 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             logger.info("Disposing Connector: " + getClass().getName());
             logger.debug("Disposing Receivers");
         }
+        disposeReceivers();
+        disposeDispatchers();
+
+        doDispose();
+        disposed.set(true);
+
+        if (logger.isInfoEnabled()) {
+            logger.info("Connector " + getClass().getName() + " has been disposed.");
+        }
+
+        receivers = null;
+        dispatchers = null;
+    }
+
+    protected void disposeReceivers() {
         if (receivers != null) {
             Map.Entry entry;
             for (Iterator iterator = receivers.entrySet().iterator(); iterator.hasNext();) {
@@ -312,7 +329,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             }
             logger.debug("Receivers Disposed");
         }
+    }
 
+    protected void disposeDispatchers()
+    {
         if (dispatchers != null) {
             // Map.Entry entry;
             logger.debug("Disposing Dispatchers");
@@ -323,22 +343,13 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
             dispatchers.clear();
             logger.debug("Dispatchers Disposed");
         }
-        doDispose();
-        disposed.set(true);
-
-        if (logger.isInfoEnabled()) {
-            logger.info("Connector " + getClass().getName() + " has been disposed.");
-        }
-
-        receivers = null;
-        dispatchers = null;
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOConnector#isAlive()
-     */
+    * (non-Javadoc)
+    *
+    * @see org.mule.umo.provider.UMOConnector#isAlive()
+    */
     public boolean isDisposed()
     {
         return disposed.get();
@@ -766,12 +777,17 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         }
         connected.set(true);
         connecting.set(false);
+        if(startedBeforeDisconnect.get()) {
+            startConnector();
+        }
     }
 
     public void disconnect() throws Exception {
+        startedBeforeDisconnect.set(isStarted());
         fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_DISCONNECTED));
         connected.set(false);
         doDisconnect();
+        stopConnector();
         logger.info("Disconnected: " + getConnectionDescription());
     }
 

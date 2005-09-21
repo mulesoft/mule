@@ -58,8 +58,6 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
 
         Object borrowed = pool.borrowObject();
         assertNotNull(borrowed);
-        // ((MuleProxy)
-        // borrowed).getDescriptor().setUseBeanInitialisation(true);
         assertEquals(1, pool.getSize());
         pool.returnObject(borrowed);
 
@@ -69,9 +67,6 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
         Object borrowed2 = pool.borrowObject();
         assertNotNull(borrowed2);
         assertEquals(2, pool.getSize());
-        // assertTrue(((MuleProxy)
-        // borrowed).getDescriptor().isUseBeanInitialisation() ^ ((MuleProxy)
-        // borrowed).getDescriptor().isUseBeanInitialisation());
     }
 
     public void testFailOnExhaust() throws Exception

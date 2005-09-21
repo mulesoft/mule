@@ -85,4 +85,12 @@ public class ChainingRouter extends FilteringOutboundRouter
         }
         return resultToReturn;
     }
+
+    public void addEndpoint(UMOEndpoint endpoint) {
+        if(!endpoint.isRemoteSync()) {
+            logger.debug("Endpoint: " + endpoint.getEndpointURI().getAddress() + " registered on chaining router needs to be RemoteSync enabled. Setting this property now");
+            endpoint.setRemoteSync(true);
+        }
+        super.addEndpoint(endpoint);
+    }
 }

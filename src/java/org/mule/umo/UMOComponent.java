@@ -14,10 +14,10 @@
  */
 package org.mule.umo;
 
-import java.io.Serializable;
-
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.Lifecycle;
+
+import java.io.Serializable;
 
 /**
  * <code>UMOComponent</code> is the interal repesentation of a Mule Managed
@@ -75,4 +75,6 @@ public interface UMOComponent extends Serializable, Lifecycle, Initialisable
      * @throws UMOException if the component failed to resume
      */
     void resume() throws UMOException;
+
+    boolean isStarted();
 }
