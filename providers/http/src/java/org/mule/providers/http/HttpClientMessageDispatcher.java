@@ -15,13 +15,7 @@
 
 package org.mule.providers.http;
 
-import org.apache.commons.httpclient.ConnectMethod;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpConnection;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -241,8 +235,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             logger.debug("Http response is: " + status);
             ExceptionPayload ep = null;
             if(httpMethod.getStatusCode() >= 400 ) {
-                throw new DispatchException(event.getMessage(), event.getEndpoint(),
-                        new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText()));
+
+                ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
+                        new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText())));
             }
             UMOMessage m = new MuleMessage(httpMethod.getResponseBodyAsString(), h);
             m.setExceptionPayload(ep);

@@ -14,8 +14,10 @@
 package org.mule.extras.client;
 
 import org.mule.MuleManager;
+import org.mule.config.ConfigurationBuilder;
+import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.NoReceiverForEndpointException;
 
@@ -23,13 +25,21 @@ import org.mule.umo.provider.NoReceiverForEndpointException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MuleClientListenerTestCase extends NamedTestCase
+public class MuleClientListenerTestCase extends FunctionalTestCase
 {
+    protected String getConfigResources() {
+        return null;
+    }
+
+    protected ConfigurationBuilder getBuilder() throws Exception {
+        return new QuickConfigurationBuilder();
+    }
+
     public void doTestRegisterListener(String urlString, boolean canSendWithoutReceiver) throws Exception
     {
         MuleClient client = new MuleClient();
-        MuleManager.getConfiguration().setSynchronous(true);
-        MuleManager.getConfiguration().setSynchronousReceive(true);
+        client.getConfiguration().setSynchronous(true);
+        client.getConfiguration().setSynchronousReceive(true);
 
         if (!canSendWithoutReceiver) {
             try {
@@ -73,15 +83,4 @@ public class MuleClientListenerTestCase extends NamedTestCase
         doTestRegisterListener("tcp://localhost:56324", true);
     }
 
-    protected void tearDown() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-    }
-
-    protected void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-    }
 }

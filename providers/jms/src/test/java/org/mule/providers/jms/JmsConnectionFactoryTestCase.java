@@ -1,6 +1,7 @@
 package org.mule.providers.jms;
 
-import org.mule.tck.NamedTestCase;
+import org.mule.MuleManager;
+import org.mule.tck.AbstractMuleTestCase;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -11,7 +12,7 @@ import java.util.Map;
 /**
  * $Id$
  */
-public class JmsConnectionFactoryTestCase extends NamedTestCase
+public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
 {
     /**
      * Test providerProperties set on JmsConnector
@@ -19,6 +20,10 @@ public class JmsConnectionFactoryTestCase extends NamedTestCase
      */
     public void testProviderPropertiesNotPassed() throws Exception
     {
+        //needed so that when the connecotr is initialsied the manage eventing
+        //model will be available. This is used by Jms for reconnection notifications
+        ((MuleManager)MuleManager.getInstance()).initialise();
+
         JmsConnector connector = new JmsConnector();
         Map providerProperties = new HashMap(1);
         final String testProviderProperty = "providerProperty";
@@ -43,6 +48,10 @@ public class JmsConnectionFactoryTestCase extends NamedTestCase
      */
     public void testConnectionFactoryPropertiesPassed() throws Exception
     {
+        //needed so that when the connecotr is initialsied the manage eventing
+        //model will be available. This is used by Jms for reconnection notifications
+        ((MuleManager)MuleManager.getInstance()).initialise();
+        
         JmsConnector connector = new JmsConnector();
         Map connectionFactoryProperties = new HashMap(1);
         final String testConnectionFactoryProperty = "connectionFactoryProperty";

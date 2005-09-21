@@ -13,10 +13,6 @@
  */
 package org.mule.providers.http.filters;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpRecoverableException;
@@ -28,10 +24,9 @@ import org.mule.components.simple.EchoComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.AbstractMessageReceiver;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.routing.filters.WildcardFilter;
@@ -43,6 +38,10 @@ import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author Jack Hung
@@ -62,7 +61,7 @@ public class HttpRequestWildcardFilterTestCase extends NamedTestCase {
 		MuleManager.getConfiguration().setSynchronous(true);
         MuleManager.getConfiguration().getPoolingProfile()
                    .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
-        manager.setModel(new MuleModel());
+        manager.setModel(new SedaModel());
 		
         MuleDescriptor descriptor = createInDescriptor(
 				"httpIn", EchoComponent.class.getName());

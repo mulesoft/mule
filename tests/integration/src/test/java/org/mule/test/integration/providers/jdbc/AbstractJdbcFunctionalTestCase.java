@@ -17,8 +17,8 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
-import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.jdbc.JdbcConnector;
 import org.mule.providers.jdbc.JdbcUtils;
 import org.mule.tck.AbstractMuleTestCase;
@@ -65,7 +65,7 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
                    .getPoolingProfile()
                    .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
         // Create an empty model
-        manager.setModel(new MuleModel());
+        manager.setModel(new SedaModel());
         // Create and register connector
         connector = createConnector();
         MuleManager.getInstance().registerConnector(connector);

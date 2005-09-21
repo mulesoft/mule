@@ -16,6 +16,7 @@
 package org.mule.providers.jms;
 
 import com.mockobjects.dynamic.Mock;
+import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
@@ -35,6 +36,11 @@ import javax.jms.ConnectionFactory;
 public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     private JmsConnector connector;
+
+    protected void doSetUp() throws Exception {
+        MuleManager.getInstance().registerConnector(getConnector());
+        super.doSetUp();
+    }
 
     public void testReceive() throws Exception
     {
@@ -71,7 +77,6 @@ public class JmsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             connection.expect("start");
             connection.expect("stop");
             connector.setConnectionFactory((ConnectionFactory) connectionFactory.proxy());
-            connector.initialise();
         }
         return connector;
     }

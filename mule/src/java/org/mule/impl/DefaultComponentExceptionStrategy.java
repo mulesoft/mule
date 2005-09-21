@@ -16,6 +16,7 @@ package org.mule.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.message.ExceptionPayload;
+import org.mule.impl.model.AbstractComponent;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -120,8 +121,8 @@ public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
     public void setComponent(UMOComponent component)
     {
         this.component = component;
-        if (component instanceof MuleComponent) {
-            this.statistics = ((MuleComponent) component).getStatistics();
+        if (component instanceof AbstractComponent) {
+            this.statistics = ((AbstractComponent) component).getStatistics();
         }
     }
 }

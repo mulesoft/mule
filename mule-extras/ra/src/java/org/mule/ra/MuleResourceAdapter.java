@@ -13,19 +13,6 @@
  */
 package org.mule.ra;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.resource.NotSupportedException;
-import javax.resource.ResourceException;
-import javax.resource.spi.ActivationSpec;
-import javax.resource.spi.BootstrapContext;
-import javax.resource.spi.ResourceAdapter;
-import javax.resource.spi.ResourceAdapterInternalException;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import javax.resource.spi.endpoint.MessageEndpointFactory;
-import javax.transaction.xa.XAResource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -43,6 +30,18 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.ClassHelper;
+
+import javax.resource.NotSupportedException;
+import javax.resource.ResourceException;
+import javax.resource.spi.ActivationSpec;
+import javax.resource.spi.BootstrapContext;
+import javax.resource.spi.ResourceAdapter;
+import javax.resource.spi.ResourceAdapterInternalException;
+import javax.resource.spi.endpoint.MessageEndpoint;
+import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.transaction.xa.XAResource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>MuleResourceAdapter</code> TODO
@@ -75,6 +74,7 @@ public class MuleResourceAdapter implements ResourceAdapter
     public void start(BootstrapContext bootstrapContext) throws ResourceAdapterInternalException
     {
         this.bootstrapContext = bootstrapContext;
+        MuleManager.getConfiguration().setModelType("jca");
         if (info.getConfigurations() != null) {
             if (MuleManager.isInstanciated()) {
                 throw new ResourceAdapterInternalException("A manageris already configured, cannot configure a new one using the configurations set on the Resource Adapter");
@@ -90,6 +90,7 @@ public class MuleResourceAdapter implements ResourceAdapter
                 }
 
                 try {
+
                     manager = builder.configure(info.getConfigurations());
                 } catch (ConfigurationException e) {
                     throw new ResourceAdapterInternalException("Failed to load configurations: "
@@ -98,7 +99,6 @@ public class MuleResourceAdapter implements ResourceAdapter
             }
         }
         manager = MuleManager.getInstance();
-        manager.getModel().setComponentFactory(new JcaComponentFactory());
     }
 
     /**
@@ -112,7 +112,7 @@ public class MuleResourceAdapter implements ResourceAdapter
     }
 
     /**
-     * @return
+     * @return the bootstrap context for this adapter
      */
     public BootstrapContext getBootstrapContext()
     {
@@ -126,8 +126,6 @@ public class MuleResourceAdapter implements ResourceAdapter
     public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec activationSpec)
             throws ResourceException
     {
-
-        // spec section 5.3.3
         if (activationSpec.getResourceAdapter() != this) {
             throw new ResourceException("ActivationSpec not initialized with this ResourceAdapter instance");
         }

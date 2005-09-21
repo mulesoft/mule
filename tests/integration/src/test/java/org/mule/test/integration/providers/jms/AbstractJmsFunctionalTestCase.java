@@ -18,8 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -69,7 +69,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
                    .getPoolingProfile()
                    .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
-        MuleManager.getInstance().setModel(new MuleModel());
+        MuleManager.getInstance().setModel(new SedaModel());
         callbackCalled = false;
         cnn = getConnection();
         cnn.start();

@@ -17,8 +17,8 @@ import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -56,7 +56,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
                    .getPoolingProfile()
                    .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
-        manager.setModel(new MuleModel());
+        manager.setModel(new SedaModel());
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();

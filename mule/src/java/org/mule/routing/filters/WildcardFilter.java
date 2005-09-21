@@ -71,7 +71,7 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
         boolean match = false;
         for (int x = 0; x < patterns.length; x++) {
             pattern = patterns[x];
-
+            
             String string = object.toString();
             if ("*".equals(pattern) || "**".equals(pattern)) {
                 return true;

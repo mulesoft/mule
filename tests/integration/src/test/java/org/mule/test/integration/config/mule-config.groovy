@@ -1,8 +1,8 @@
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.DefaultComponentExceptionStrategy;
-import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.interceptors.InterceptorStack;
 import org.mule.interceptors.LoggingInterceptor;
 import org.mule.interceptors.TimerInterceptor;
@@ -90,7 +90,7 @@ stack.setInterceptors(interceptors);
 manager.registerInterceptorStack("default", stack);
 
 //register model
-UMOModel model = new MuleModel();
+UMOModel model = new SedaModel();
 model.setName("test-model");
 TestExceptionStrategy es = new TestExceptionStrategy();
 es.addEndpoint(new MuleEndpoint("test://component.exceptions", false));

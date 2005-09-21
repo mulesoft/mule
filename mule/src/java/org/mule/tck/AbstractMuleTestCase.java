@@ -18,7 +18,6 @@ package org.mule.tck;
 import com.mockobjects.dynamic.Mock;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-import org.mule.impl.MuleComponent;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.*;
@@ -112,7 +111,7 @@ public abstract class AbstractMuleTestCase extends NamedTestCase
         return MuleTestUtils.getTestConnector();
     }
 
-    public static MuleComponent getTestComponent(MuleDescriptor descriptor)
+    public static UMOComponent getTestComponent(MuleDescriptor descriptor)
     {
         return MuleTestUtils.getTestComponent(descriptor);
     }
@@ -122,8 +121,7 @@ public abstract class AbstractMuleTestCase extends NamedTestCase
         return MuleTestUtils.getTestDescriptor(name, implementation);
     }
 
-    public static UMOManager getTestManager()
-    {
+    public static UMOManager getTestManager() throws UMOException {
         return MuleTestUtils.getTestManager();
     }
 

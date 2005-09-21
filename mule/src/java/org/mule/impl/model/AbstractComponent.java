@@ -26,12 +26,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.internal.events.ComponentEvent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.ComponentException;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.*;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
@@ -338,6 +333,10 @@ public abstract class AbstractComponent implements UMOComponent {
 
     protected void doInitialise() throws InitialisationException {
 
+    }
+
+    public boolean isStarted() {
+        return !stopped.get();
     }
 
     protected abstract UMOMessage doSend(UMOEvent event) throws UMOException;

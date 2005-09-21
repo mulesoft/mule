@@ -19,6 +19,8 @@ import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.internal.events.ConnectionEvent;
+import org.mule.impl.internal.events.ConnectionEventListener;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.ConnectException;
 import org.mule.providers.ReplyToHandler;
@@ -31,6 +33,7 @@ import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
+import org.mule.umo.manager.UMOServerEvent;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassHelper;
 
@@ -53,7 +56,7 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class JmsConnector extends AbstractServiceEnabledConnector
+public class JmsConnector extends AbstractServiceEnabledConnector implements ConnectionEventListener
 {
 
     public static final String JMS_SELECTOR_PROPERTY = "selector";
@@ -115,6 +118,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
+        MuleManager.getInstance().registerListener(this, getName());
         try {
             // If we have a connection factory, there is no need to initialise
             // the JndiContext
@@ -231,7 +235,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     	} catch (Exception e) {
     		throw new ConnectException(e, this);
     	} finally {
-    		connection = null;
+            connectionFactory = null;
+            connection = null;
     	}
     }
     
@@ -269,7 +274,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector
     public Session getSession(boolean transacted, boolean topic) throws JMSException
     {
         if(!isConnected()) {
-
+            throw new JMSException("Not connected");
         }
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         Session session = getCurrentSession();
@@ -633,5 +638,12 @@ public class JmsConnector extends AbstractServiceEnabledConnector
 
     public boolean isRemoteSyncEnabled() {
         return true;
+    }
+
+    public void onEvent(UMOServerEvent event) {
+        if(event.getAction() == ConnectionEvent.CONNECTION_DISCONNECTED) {
+            //Remove all dispatchers as any cached session will be invalidated
+            disposeDispatchers();
+        }
     }
 }

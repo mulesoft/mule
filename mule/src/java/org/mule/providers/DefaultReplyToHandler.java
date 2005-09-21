@@ -19,10 +19,10 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleComponent;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.model.AbstractComponent;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -82,7 +82,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
             if (logger.isInfoEnabled()) {
                 logger.info("reply to sent: " + endpoint);
             }
-            ((MuleComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
+            ((AbstractComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
         } catch (Exception e) {
             throw new DispatchException(new Message(Messages.FAILED_TO_DISPATCH_TO_REPLYTO_X, endpoint),
                                         replyToEvent.getMessage(),

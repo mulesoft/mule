@@ -223,7 +223,7 @@
                 <xsl:when test="@className">
                     <xsl:value-of select="@className"/>
                 </xsl:when>
-                <xsl:otherwise>org.mule.impl.MuleModel</xsl:otherwise>
+                <xsl:otherwise>org.mule.impl.model.seda.SedaModel</xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
         <bean name="{@name}" class="{$type}">

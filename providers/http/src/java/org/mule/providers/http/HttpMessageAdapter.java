@@ -82,7 +82,11 @@ public class HttpMessageAdapter extends AbstractMessageAdapter {
      * @see org.mule.umo.providers.UMOMessageAdapter#getPayloadAsString()
      */
     public String getPayloadAsString() throws Exception {
-        return message.toString();
+        if(message instanceof byte[]) {
+            return new String((byte[])message);
+        } else {
+            return message.toString();
+        }
     }
 
     /*

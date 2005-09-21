@@ -20,24 +20,13 @@ import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.ImmutableMuleDescriptor;
-import org.mule.impl.InterceptorsInvoker;
-import org.mule.impl.MuleComponent;
-import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
+import org.mule.impl.*;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.ReplyToHandler;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOImmutableDescriptor;
-import org.mule.umo.UMOInterceptor;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Disposable;
@@ -298,12 +287,6 @@ public class MuleProxy implements Work, Lifecycle
                 handleException(new MessagingException(new Message(Messages.EVENT_PROCESSING_FAILED_FOR_X,
                                                                    descriptor.getName()), event.getMessage(), e));
             }
-        } finally {
-            //Component can be null if a remoting call was made for the client using the remote dispatcher
-            if(event.getComponent()!=null) {
-                // Finalise the event for this component
-                ((MuleComponent) event.getComponent()).finaliseEvent(event);
-            }
         }
         //Finally apply response transformer
         return applyResponseTransformer(returnMessage);
@@ -429,15 +412,10 @@ public class MuleProxy implements Work, Lifecycle
                 dispatcher.dispatch(event);
             }
 
-            // Finalise the event for this component
-            ((MuleComponent) event.getComponent()).finaliseEvent(event);
-
             if (stat.isEnabled()) {
                 stat.incSentEventASync();
             }
         } catch (Exception e) {
-            // Finalise the event for this component
-            ((MuleComponent) event.getComponent()).finaliseEvent(event);
             event.getSession().setValid(false);
             if (e instanceof UMOException) {
                 handleException(e);

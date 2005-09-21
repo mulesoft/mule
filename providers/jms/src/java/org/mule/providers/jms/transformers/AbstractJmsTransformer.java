@@ -16,12 +16,17 @@ package org.mule.providers.jms.transformers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
+import org.mule.impl.internal.events.ConnectionEvent;
+import org.mule.impl.internal.events.ConnectionEventListener;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.compression.CompressionHelper;
@@ -42,9 +47,11 @@ import java.util.Map;
  * @version 1.2
  */
 
-public abstract class AbstractJmsTransformer extends AbstractTransformer
+public abstract class AbstractJmsTransformer extends AbstractTransformer implements ConnectionEventListener
 {
     public static final char REPLACEMENT_CHAR = '_';
+
+    protected boolean requireNewSession = true;
 
     /**
      * logger used by this class
@@ -72,6 +79,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         }
         if (session != null) {
             this.session = session;
+            requireNewSession=false;
         }
         if (src == null) {
             throw new TransformerException(new org.mule.config.i18n.Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X,
@@ -96,37 +104,13 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         try {
             // The session can be closed by the dispatcher closing so its more
             // reliable to get it from the dispatcher each time
-            if (session == null || getEndpoint() != null) {
+            if (requireNewSession || getEndpoint() != null) {
                 session = (Session) getEndpoint().getConnector()
                                                  .getDispatcher("transformerSession")
                                                  .getDelegateSession();
-                // throw new TransformerException("You must set the JMS
-                // AbstractMessageDispatcher on a
-                // AbstractJmsTransformer before using it");
+                requireNewSession = session==null;
             }
 
-            // if (getDoCompression())
-            // {
-            // byte[] buffer = compressMessage(src);
-            // if (logger.isDebugEnabled())
-            // {
-            // logger.debug("Compressing message in transformation");
-            // }
-            // BytesMessage bMsg = session.createBytesMessage();
-            // bMsg.clearBody();
-            // bMsg.setBooleanProperty(JMS_PROPERTY_COMPRESSED, true);
-            //
-            // //was getting strange results with the unit tests if I used
-            // //bMsg.writeObject(buffer) or bMsg.writeBytes(buffer) to do with
-            // an
-            // //optimisation in the server I am testing with.
-            // //Doing it byte by byte for now
-            // for (int i = 0; i < buffer.length; i++)
-            // {
-            // bMsg.writeByte(buffer[i]);
-            // }
-            // return bMsg;
-            // } else {
             Message msg = null;
             if (src instanceof Message) {
                 msg = (Message) src;
@@ -231,4 +215,14 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer
         this.session = session;
     }
 
+    public void initialise() throws InitialisationException {
+        MuleManager.getInstance().registerListener(this, endpoint.getConnector().getName());
+    }
+
+    public void onEvent(UMOServerEvent event) {
+        if(event.getAction() == ConnectionEvent.CONNECTION_DISCONNECTED) {
+            session = null;
+            requireNewSession = true;
+        }
+    }
 }

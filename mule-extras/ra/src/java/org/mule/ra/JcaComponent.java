@@ -13,8 +13,7 @@
  */
 package org.mule.ra;
 
-import java.lang.reflect.Method;
-
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -26,21 +25,19 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.internal.events.ComponentEvent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.*;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPoint;
 import org.mule.util.ClassHelper;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import java.lang.reflect.Method;
 
 /**
- * <code>JcaComponent</code> TODO
+ * <code>JcaComponent</code> Is the type of component used in mul when embedded inside
+ * an app server using JCA.
+ * If future we might want to use one of the existing models
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -55,6 +52,8 @@ public class JcaComponent implements UMOComponent
     private MuleDescriptor descriptor;
     private UMOEntryPoint entryPoint;
     private Object component;
+
+    private boolean started = false;
 
     /**
      * Determines if the component has been initilised
@@ -91,49 +90,6 @@ public class JcaComponent implements UMOComponent
             // Invoke method
             result = entryPoint.invoke(component, RequestContext.getEventContext(), method);
 
-            // UMOMessage resultMessage = null;
-            // if(result==null && entryPoint.isVoid()) {
-            // resultMessage = new MuleMessage(event.getTransformedMessage(),
-            // event.getProperties());
-            // } else if(result!=null) {
-            // if(result instanceof UMOMessage) {
-            // resultMessage = (UMOMessage)result;
-            // } else {
-            // resultMessage = new MuleMessage(result, event.getProperties());
-            // }
-            // }
-            // boolean stopProcessing = false;
-            // if(descriptor.getResponseRouter()!=null) {
-            // stopProcessing =
-            // descriptor.getResponseRouter().isStopProcessing();
-            // } else {
-            // stopProcessing = event.isStopFurtherProcessing();
-            // }
-
-            // Need to find a cleaner solution for handling response messages
-            // Right now routing is split between here a nd the proxy
-            // if(descriptor.getResponseRouter()!=null) {
-            // if(event.isSynchronous() && !stopProcessing) {
-            // //we need to do the outbound first but we dispatch aynshonously
-            // as
-            // //we are waiting for a response on another resource
-            // stopProcessing = true;
-            // descriptor.getOutboundRouter().route(resultMessage,
-            // event.getSession(), false);
-            // }
-            // logger.debug("Waiting for response router message");
-            // result =
-            // descriptor.getResponseRouter().getResponse(resultMessage);
-            //
-            // if (stopProcessing) {
-            // logger.debug("Setting stop oubound processing according to
-            // response router");
-            // RequestContext.getEvent().setStopFurtherProcessing(true);
-            // }
-            // return result;
-            // } else {
-            // return resultMessage;
-            // }
         } catch (Exception e) {
             throw new MuleException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: " + descriptor.getName()),
                                     e);
@@ -163,10 +119,12 @@ public class JcaComponent implements UMOComponent
 
     public void start() throws UMOException
     {
+        started = true;
     }
 
     public void stop() throws UMOException
     {
+        started = false;
     }
 
     public void dispose()
@@ -224,5 +182,9 @@ public class JcaComponent implements UMOComponent
         // Call any custom initialisers
         descriptor.fireInitialisationCallbacks(component);
         return component;
+    }
+
+    public boolean isStarted() {
+        return started; 
     }
 }

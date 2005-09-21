@@ -487,7 +487,7 @@
         </property>
     </bean>
 
-    <bean id="test-model" class="org.mule.impl.MuleModel">
+    <bean id="test-model" class="org.mule.impl.model.seda.SedaModel">
         <property name="entryPointResolver"><ref local="entryPointResolver"/></property>
         <property name="lifecycleAdapterFactory"><ref local="lifecycleAdapterFactory"/></property>
         <property name="exceptionListener"><ref local="dummyExceptionStrategy"/></property>

@@ -17,8 +17,8 @@ package org.mule.test.config;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.DefaultComponentExceptionStrategy;
-import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.interceptors.InterceptorStack;
 import org.mule.interceptors.LoggingInterceptor;
 import org.mule.interceptors.TimerInterceptor;
@@ -31,13 +31,7 @@ import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.response.ResponseMessageRouter;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.testmodels.mule.TestCompressionTransformer;
-import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.tck.testmodels.mule.TestDefaultLifecycleAdapterFactory;
-import org.mule.tck.testmodels.mule.TestEntryPointResolver;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.tck.testmodels.mule.TestResponseAggregator;
-import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
+import org.mule.tck.testmodels.mule.*;
 import org.mule.transformers.DefaultTransformer;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptorStack;
@@ -128,7 +122,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             m.registerInterceptorStack("default", stack);
 
             //register model
-            UMOModel model = new MuleModel();
+            UMOModel model = new SedaModel();
             model.setName("test-model");
             TestExceptionStrategy es = new TestExceptionStrategy();
             es.addEndpoint(new MuleEndpoint("test://component.exceptions", false));

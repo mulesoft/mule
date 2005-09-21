@@ -14,14 +14,23 @@
  */
 package org.mule.tck.providers;
 
+import org.mule.impl.RequestContext;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.provider.UMOMessageAdapter;
 
 /**
- * @author Ross Mason <p/> //TODO document
+ * @author Ross Mason
  */
 public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCase
 {
+    protected void doSetUp() throws Exception {
+        RequestContext.setEvent(getTestEvent("hello"));
+    }
+
+    protected void doTearDown() throws Exception {
+        RequestContext.clear();
+    }
+
     public void testMessageRetrieval() throws Exception
     {
         Object message = getValidMessage();

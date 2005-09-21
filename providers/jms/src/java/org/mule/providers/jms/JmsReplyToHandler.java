@@ -13,7 +13,7 @@
  */
 package org.mule.providers.jms;
 
-import org.mule.impl.MuleComponent;
+import org.mule.impl.model.AbstractComponent;
 import org.mule.providers.DefaultReplyToHandler;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -21,12 +21,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.Topic;
+import javax.jms.*;
 
 /**
  * <code>JmsReplyToHandler</code> will process a Jms replyTo or hand off to
@@ -98,9 +93,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             // connector.getJmsSupport().send(replyToProducer, replyToMessage,
             // replyToDestination);
             logger.info("Reply Message sent to: " + replyToDestination);
-            ((MuleComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
+            ((AbstractComponent) event.getComponent()).getStatistics().incSentReplyToEvent();
         } catch (Exception e) {
-            throw new DispatchException(new org.mule.config.i18n.Message("jms", 8, replyToDestination),
+            throw new DispatchException(new org.mule.config.i18n.Message("jms", 8, replyToDestination.toString()),
                                         returnMessage,
                                         null, e);
         } finally {

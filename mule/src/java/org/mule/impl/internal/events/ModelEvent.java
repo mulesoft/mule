@@ -20,7 +20,6 @@ import org.mule.umo.model.UMOModel;
  * <code>ModelEvent</code> is fired when an event such as the model starting
  * occurs. The payload of this event will always be a reference to the model.
  * 
- * @see org.mule.impl.MuleModel
  * @see org.mule.umo.model.UMOModel
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

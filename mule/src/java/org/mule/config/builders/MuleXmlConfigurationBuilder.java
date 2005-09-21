@@ -15,38 +15,20 @@
 package org.mule.config.builders;
 
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.digester.AbstractObjectCreationFactory;
-import org.apache.commons.digester.Digester;
-import org.apache.commons.digester.ObjectCreateRule;
-import org.apache.commons.digester.Rule;
-import org.apache.commons.digester.SetNextRule;
-import org.apache.commons.digester.SetPropertiesRule;
+import org.apache.commons.digester.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.ConfigurationException;
-import org.mule.config.MuleConfiguration;
-import org.mule.config.MuleDtdResolver;
-import org.mule.config.MuleProperties;
-import org.mule.config.PoolingProfile;
-import org.mule.config.QueueProfile;
-import org.mule.config.ReaderResource;
-import org.mule.config.ThreadingProfile;
-import org.mule.config.converters.ConnectorConverter;
-import org.mule.config.converters.EndpointConverter;
-import org.mule.config.converters.EndpointURIConverter;
-import org.mule.config.converters.TransactionFactoryConverter;
-import org.mule.config.converters.TransformerConverter;
+import org.mule.config.*;
+import org.mule.config.converters.*;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.config.pool.CommonsPoolFactory;
 import org.mule.impl.DefaultLifecycleAdapter;
-import org.mule.impl.MuleComponentFactory;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleModel;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.model.ModelFactory;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.interceptors.InterceptorStack;
 import org.mule.model.DynamicEntryPointResolver;
@@ -57,19 +39,11 @@ import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.response.ResponseMessageRouter;
 import org.mule.transaction.constraints.BatchConstraint;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEncryptionStrategy;
-import org.mule.umo.UMOInterceptor;
-import org.mule.umo.UMOInterceptorStack;
-import org.mule.umo.UMOTransactionFactory;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.ContainerException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOManager;
-import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.mule.umo.manager.*;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.routing.UMOInboundMessageRouter;
@@ -110,7 +84,6 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
     public static final String DEFAULT_ENTRY_POINT_RESOLVER = DynamicEntryPointResolver.class.getName();
     public static final String DEFAULT_LIFECYCLE_ADAPTER = DefaultLifecycleAdapter.class.getName();
-    public static final String DEFAULT_COMPONENT_FACTORY = MuleComponentFactory.class.getName();
     public static final String DEFAULT_ENDPOINT = MuleEndpoint.class.getName();
     public static final String DEFAULT_TRANSACTION_CONFIG = MuleTransactionConfig.class.getName();
     public static final String DEFAULT_DESCRIPTOR = MuleDescriptor.class.getName();
@@ -120,7 +93,6 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
     public static final String DEFAULT_RESPONSE_MESSAGE_ROUTER = ResponseMessageRouter.class.getName();
     public static final String DEFAULT_CATCH_ALL_STRATEGY = LoggingCatchAllStrategy.class.getName();
     public static final String DEFAULT_POOL_FACTORY = CommonsPoolFactory.class.getName();
-    public static final String DEFAULT_MODEL = MuleModel.class.getName();
     public static final String THREADING_PROFILE = ThreadingProfile.class.getName();
     public static final String POOLING_PROFILE = PoolingProfile.class.getName();
     public static final String QUEUE_PROFILE = QueueProfile.class.getName();
@@ -542,7 +514,16 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
     {
         // Create Model
         path += "/model";
-        addObjectCreateOrGetFromContainer(path, DEFAULT_MODEL, "className", "ref", false);
+
+        digester.addRule(path, new Rule() {
+            public void begin(String string, String string1, Attributes attributes) throws Exception {
+                String modelType = attributes.getValue("type");
+                if(modelType==null) {
+                    modelType = MuleManager.getConfiguration().getModelType();
+                    digester.push(ModelFactory.createModel(modelType));
+                }
+            }
+        });
 
         addSetPropertiesRule(path, digester);
 
@@ -558,11 +539,6 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
         digester.addObjectCreate(path + "/component-lifecycle-adapter-factory", DEFAULT_LIFECYCLE_ADAPTER, "className");
         addSetPropertiesRule(path, digester);
         digester.addSetNext(path + "/component-lifecycle-adapter-factory", "setLifecycleAdapterFactory");
-
-        // Create component factory
-        digester.addObjectCreate(path + "/component-factory", DEFAULT_COMPONENT_FACTORY, "className");
-        addSetPropertiesRule(path, digester);
-        digester.addSetNext(path + "/component-factory", "setComponentFactory");
 
         // Pool factory
         addPoolingProfileRules(digester, path);

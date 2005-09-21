@@ -17,7 +17,7 @@ import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.inbound.EventGroup;
 import org.mule.routing.response.ResponseCorrelationAggregator;
-import org.mule.samples.loanbroker.LoanQuote;
+import org.mule.samples.loanbroker.esb.message.LoanQuote;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.RoutingException;
@@ -78,19 +78,5 @@ public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
         {
             throw new RoutingException(Message.createStaticMessage("Failed to get lowest quote"), new MuleMessage(events, null), null, e);
         }
-    }
-
-    /**
-     * Determines if the event group is ready to be aggregated.
-     * if the group is ready to be aggregated (this is entirely up
-     * to the application. it could be determined by volume, last modified time
-     * or some oher criteria based on the last event received)
-     *
-     * @param events
-     * @return
-     */
-    protected boolean shouldAggregate(EventGroup events)
-    {
-        return super.shouldAggregate(events);
     }
 }

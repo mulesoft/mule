@@ -16,7 +16,9 @@ package org.mule.management.mbeans;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.impl.MuleComponent;
+import org.mule.impl.model.AbstractComponent;
+import org.mule.impl.model.seda.SedaComponent;
+import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
 
@@ -60,20 +62,13 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     public int getQueueSize()
     {
-        return getComponent().getQueueSize();
+        UMOComponent c = getComponent();
+        if(c instanceof SedaComponent) {
+            return ((SedaComponent)c).getQueueSize();
+        } else {
+            return -1;
+        }
     }
-
-    // public String printStatistics()
-    // {
-    // MuleComponent c = getComponent();
-    // if(!c.getStatistics().isEnabled()) {
-    // return "Statistics not enabled on this component: " + name;
-    // }
-    // StringWriter writer = new StringWriter();
-    // HtmlTablePrinter printer = new HtmlTablePrinter(writer);
-    // c.getStatistics().logSummary(printer);
-    // return writer.toString();
-    // }
 
     /**
      * Pauses event processing for theComponent. Unlike stop(), a paused
@@ -206,13 +201,13 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
     {
     }
 
-    private MuleComponent getComponent()
+    private AbstractComponent getComponent()
     {
         UMOSession session = MuleManager.getInstance().getModel().getComponentSession(getName());
         if (session == null) {
             return null;
         } else {
-            return (MuleComponent) session.getComponent();
+            return (AbstractComponent)session.getComponent();
         }
     }
 }

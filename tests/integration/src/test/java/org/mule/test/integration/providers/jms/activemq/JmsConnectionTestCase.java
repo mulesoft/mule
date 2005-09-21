@@ -16,19 +16,23 @@ package org.mule.test.integration.providers.jms.activemq;
 import EDU.oswego.cs.dl.util.concurrent.LinkedQueue;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
+import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.MuleModel;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.events.ConnectionEvent;
 import org.mule.impl.internal.events.ConnectionEventListener;
+import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.test.integration.ServerTools;
 import org.mule.test.integration.providers.jms.AbstractJmsFunctionalTestCase;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
+import org.mule.test.integration.service.TestReceiver;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.provider.UMOConnector;
@@ -64,11 +68,14 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
                    .getPoolingProfile()
                    .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);
 
-        MuleManager.getInstance().setModel(new MuleModel());
+        MuleManager.getInstance().setModel(new SedaModel());
         callbackCalled = false;
         MuleManager.getInstance().registerConnector(createConnector());
         currentMsg = null;
         eventCount = 0;
+
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        builder.registerComponent(TestReceiver.class.getName(), "testJmsReconnection", new MuleEndpointURI("jms://reconnect.queue"));
     }
 
     protected void doTearDown() throws Exception
@@ -151,6 +158,14 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
                 fail("Connection should have succeeded");
             }
         }
+
+        Thread.sleep(3000);
+        MuleClient client = new MuleClient();
+        UMOMessage m = client.send("jms://reconnect.queue", "test", null);
+        Thread.sleep(200000);
+        assertNotNull(m);
+        assertEquals("Received: test", m.getPayloadAsString());
+
         // Kill activemq
         ServerTools.killActiveMq();
         // Check that the connection is lost
@@ -179,6 +194,13 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
                 fail("Connection should have succeeded");
             }
         }
+
+        //Lets send another test message to esure everything is back up
+        m = client.send("jms://reconnect.queue", "test", null);
+        assertNotNull(m);
+        assertEquals("Received: test", m.getPayloadAsString());
+
+        //Lets send a message nd to end to make sure all Jms connections have recovered
         ServerTools.killActiveMq();
 
     }

@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.extras.spring.SpringContainerContext;
-import org.mule.impl.MuleModel;
+import org.mule.impl.model.ModelFactory;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
@@ -59,7 +59,7 @@ import java.util.Map;
  * AutowireUMOManagerFactoryBean. There is no need to declare a UMOModel
  * instance in the configuration. If the factory doesn't find a UMOModel
  * implementation it creates a default one of type
- * <i>org.mule.impl.model.MuleModel</i>. The model is automatically initialised
+ * <i>org.mule.impl.model.seda.SedaModel</i>. The model is automatically initialised
  * with a SpringContainercontext using the current beanFactory and defaults are
  * used for the other Model properties. If you want to override the defaults,
  * such as define your own exception strategy, (which you will most likely want
@@ -188,7 +188,7 @@ public class AutowireUMOManagerFactoryBean implements FactoryBean, InitializingB
             model.setName(entry.getKey().toString());
         } else {
             // create a defaultModel
-            model = new MuleModel();
+            model = ModelFactory.createModel(MuleManager.getConfiguration().getModelType());
         }
 
         // autowire the model so any ExceptionStrategy or PoolingStrategy beans

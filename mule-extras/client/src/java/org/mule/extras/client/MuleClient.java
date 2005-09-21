@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
+import org.mule.config.MuleConfiguration;
 import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -31,13 +32,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.umo.FutureMessageResult;
-import org.mule.umo.MessagingException;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -49,11 +44,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
@@ -769,5 +760,9 @@ public class MuleClient implements Disposable
     public Object getProperty(Object key)
     {
         return manager.getProperty(key);
+    }
+
+    public MuleConfiguration getConfiguration() {
+        return MuleManager.getConfiguration();
     }
 }

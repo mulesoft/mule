@@ -14,8 +14,6 @@
  */
 package org.mule.extras.spring;
 
-import java.io.Reader;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
@@ -36,6 +34,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.core.io.InputStreamResource;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * <code>SpringContainerContext</code> is a Spring Context that can expose
@@ -60,6 +61,8 @@ public class SpringContainerContext extends AbstractContainerContext implements 
     protected BeanFactory externalBeanFactory;
 
     protected String configFile;
+
+    protected String configuration = null;
 
     public SpringContainerContext()
     {
@@ -148,15 +151,21 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         setExternalBeanFactory(bf);
     }
 
-    protected String getDefaultDocType()
-    {
-        return "beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\"";
-    }
-
     public void initialise() throws InitialisationException, RecoverableException
     {
-        if (configFile == null)
-            return;
+        if (configFile == null) {
+            if(configuration!=null) {
+                try {
+                    configure(new StringReader(configuration));
+                    return;
+                } catch (ContainerException e) {
+                    throw new InitialisationException(e, this);
+                }
+            } else {
+                return;
+            }
+        }
+
         try {
             if (ClassHelper.getResource(configFile, getClass()) == null) {
                 logger.warn("Spring config resource: " + configFile
@@ -180,6 +189,14 @@ public class SpringContainerContext extends AbstractContainerContext implements 
         }
         super.dispose();
 
+    }
+
+    public String getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(String configuration) {
+        this.configuration = configuration;
     }
 
 }

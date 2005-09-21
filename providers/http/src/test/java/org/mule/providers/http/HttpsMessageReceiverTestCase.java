@@ -14,6 +14,7 @@
 package org.mule.providers.http;
 
 import com.mockobjects.dynamic.Mock;
+import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
@@ -29,6 +30,10 @@ import org.mule.umo.provider.UMOMessageReceiver;
 
 public class HttpsMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
+    protected void doSetUp() throws Exception {
+        MuleManager.getInstance().registerConnector(HttpsConnectorTestCase.createConnector(false));
+        super.doSetUp();
+    }
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockComponent = new Mock(UMOComponent.class);
@@ -44,7 +49,6 @@ public class HttpsMessageReceiverTestCase extends AbstractMessageReceiverTestCas
     public UMOEndpoint getEndpoint() throws Exception
     {
         endpoint = new MuleEndpoint("https://localhost:6789", true);
-        endpoint.setConnector(HttpsConnectorTestCase.createConnector(true));
         return endpoint;
     }
 }
