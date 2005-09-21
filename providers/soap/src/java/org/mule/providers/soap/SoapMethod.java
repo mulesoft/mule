@@ -85,7 +85,7 @@ public class SoapMethod {
                     QName paramName = (QName)converter.convert(QName.class, name);
                     QName qtype = null;
                     if(type.startsWith("qname{")) {
-                        qtype = (QName)converter.convert(QName.class, name);
+                        qtype = (QName)converter.convert(QName.class, type);
                     } else {
                         qtype = NamedParameter.createQName(type);
                     }
