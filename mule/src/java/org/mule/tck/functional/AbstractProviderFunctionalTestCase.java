@@ -42,6 +42,9 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     protected static UMOManager manager;
     protected boolean callbackCalled = false;
     protected int callbackCount = 0;
+
+    private final Object lock = new Object();
+
     protected MuleDescriptor descriptor;
 
     protected void doSetUp() throws Exception
@@ -133,8 +136,10 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         EventCallback callback = new EventCallback() {
             public void eventReceived(UMOEventContext context, Object Component)
             {
-                callbackCalled = true;
-                callbackCount++;
+                synchronized (lock) {
+                    callbackCalled = true;
+                    callbackCount++;
+                }
                 assertNull(context.getCurrentTransaction());
 
             }
