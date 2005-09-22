@@ -46,7 +46,7 @@ public class TcpSyncTestCase extends NamedTestCase
 
     protected UMOMessage send(Object payload) throws Exception
     {
-        UMOMessage message = new MuleMessage(payload, null);
+        UMOMessage message = new MuleMessage(payload);
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(new MuleEndpointURI(endpointUri),
                                                                       UMOEndpoint.ENDPOINT_TYPE_SENDER);
         MuleSession session = new MuleSession();

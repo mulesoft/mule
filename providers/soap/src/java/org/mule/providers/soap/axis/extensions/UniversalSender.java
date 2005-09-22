@@ -91,7 +91,9 @@ public class UniversalSender extends BasicHandler {
         }
 
         try {
-        	Object payload = null;
+            msgContext.setTypeMappingRegistry(((AxisConnector)event.getEndpoint().getConnector()).getAxisServer().getTypeMappingRegistry());
+
+            Object payload = null;
         	int contentLength = 0;
             if (msgContext.getRequestMessage().countAttachments() > 0) {
                 File temp = File.createTempFile("soap", ".tmp");

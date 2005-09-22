@@ -52,7 +52,7 @@ public class VMMessageAdapterTestCase extends AbstractMessageAdapterTestCase
      */
     public Object getValidMessage() throws UMOException
     {
-        return new MuleMessage("Valid Message", null);
+        return new MuleMessage("Valid Message");
     }
 
     /*

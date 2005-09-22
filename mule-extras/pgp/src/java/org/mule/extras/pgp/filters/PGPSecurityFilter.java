@@ -113,8 +113,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         event.getSession().setSecurityContext(context);
 
         try {
-            RequestContext.rewriteEvent(new MuleMessage(getUnencryptedMessageWithoutSignature((PGPAuthentication) authResult),
-                                                        null));
+            RequestContext.rewriteEvent(new MuleMessage(getUnencryptedMessageWithoutSignature((PGPAuthentication) authResult)));
         } catch (Exception e2) {
             throw new UnauthorisedException(event.getMessage(), context, event.getEndpoint(), this);
         }
@@ -178,7 +177,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
         try {
             String mesg = new String(msg);
-            RequestContext.rewriteEvent(new MuleMessage(mesg, null));
+            RequestContext.rewriteEvent(new MuleMessage(mesg));
             logger.debug("Message:" + mesg);
         } catch (Exception e2) {
             throw new UnauthorisedException(event.getMessage(),

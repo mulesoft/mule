@@ -59,7 +59,7 @@ public class FilteringListMessageSplitterTestCase extends AbstractMuleTestCase
         payload.add("three");
         payload.add("four");
 
-        UMOMessage message = new MuleMessage(payload, null);
+        UMOMessage message = new MuleMessage(payload);
 
         // need this dirty trick, otherwise "testConnector not started" error
         // is popping up

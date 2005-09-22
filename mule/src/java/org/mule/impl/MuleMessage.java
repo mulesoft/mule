@@ -19,6 +19,9 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.PropertiesHelper;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import javax.activation.DataHandler;
 import java.util.Collections;
@@ -41,9 +44,14 @@ public class MuleMessage implements UMOMessage
 
     protected UMOExceptionPayload exceptionPayload;
 
-    public MuleMessage(UMOMessageAdapter message)
+//    public MuleMessage(UMOMessageAdapter message)
+//    {
+//        adapter = message;
+//    }
+    public MuleMessage(Object message)
     {
-        adapter = message;
+        //this(message, (RequestContext.getEvent()!=null ? RequestContext.getEvent().getMessage() : null));
+        this(message, new HashMap());
     }
 
     public MuleMessage(Object message, Map props)
@@ -54,6 +62,25 @@ public class MuleMessage implements UMOMessage
             adapter = new DefaultMessageAdapter(message);
         }
         addProperties(props);
+    }
+
+    public MuleMessage(Object message, UMOMessage previous) {
+        if (message instanceof UMOMessageAdapter) {
+            adapter = (UMOMessageAdapter) message;
+        } else {
+            adapter = new DefaultMessageAdapter(message);
+        }
+        if(previous!=null) {
+            addProperties(previous.getProperties());
+            for (Iterator iterator = previous.getAttachmentNames().iterator(); iterator.hasNext();) {
+                String name = (String) iterator.next();
+                try {
+                    addAttachment(name, previous.getAttachment(name));
+                } catch (Exception e) {
+                    throw new MuleRuntimeException(new Message(Messages.FAILED_TO_READ_PAYLOAD), e);
+                }
+            }
+        }
     }
 
     public UMOMessageAdapter getAdapter()

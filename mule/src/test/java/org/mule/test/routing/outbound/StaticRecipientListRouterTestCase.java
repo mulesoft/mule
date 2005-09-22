@@ -52,7 +52,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(2, router.getRecipients().size());
 
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
         assertTrue(router.isMatch(message));
         // note this router clones endpoints so that the endpointUri can be
         // changed
@@ -61,7 +61,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage("test event", null);
+        message = new MuleMessage("test event");
         router.getRecipients().add("test://recipient3");
         session.expectAndReturn("sendEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)), message);
         session.expectAndReturn("sendEvent", C.args(C.eq(message), C.isA(UMOEndpoint.class)), message);
@@ -92,7 +92,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(1, router.getRecipients().size());
 
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
         assertTrue(router.isMatch(message));
         try {
             router.route(message, (UMOSession) session.proxy(), false);

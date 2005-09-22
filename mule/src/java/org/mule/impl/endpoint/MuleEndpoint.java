@@ -275,4 +275,8 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setInitialState(String state) {
         this.initialState = state;
     }
+
+    public void setResponseTransformer(UMOTransformer trans) {
+        responseTransformer = trans;
+    }
 }

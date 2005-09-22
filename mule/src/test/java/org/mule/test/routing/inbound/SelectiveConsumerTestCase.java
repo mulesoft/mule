@@ -53,7 +53,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         router.setFilter(filter);
 
         assertEquals(filter, router.getFilter());
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
 
         UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOEvent event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
@@ -75,7 +75,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("getComponent", testComponent);
         session.expectAndReturn("toString", "");
-        message = new MuleMessage(new Exception(), null);
+        message = new MuleMessage(new Exception());
 
         event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
         assertTrue(!router.isMatch(event));
@@ -98,7 +98,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
         router.setFilter(filter);
 
         assertEquals(filter, router.getFilter());
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
 
         UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint.setTransformer(new StringToByteArray());
@@ -121,7 +121,7 @@ public class SelectiveConsumerTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("getComponent", testComponent);
         session.expectAndReturn("toString", "");
-        message = new MuleMessage("Hello String", null);
+        message = new MuleMessage("Hello String");
 
         event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
         router.setTransformFirst(false);

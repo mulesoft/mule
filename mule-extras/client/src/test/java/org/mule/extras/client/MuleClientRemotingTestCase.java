@@ -45,9 +45,21 @@ public class MuleClientRemotingTestCase extends FunctionalTestCase
         assertEquals("Received: Test Client Send message", message.getPayload());
     }
 
+//     public void testClientRequestResponseOnEndpoint() throws Exception
+//    {
+//        // Will connect to the server using tcp://localhost:60504
+//        MuleClient client = new MuleClient();
+//        MuleManager.getConfiguration().setSynchronous(true);
+//
+//        RemoteDispatcher dispatcher = client.getRemoteDispatcher(getServerUrl());
+//        UMOMessage message = dispatcher.sendRemote("vm://remote.endpoint", "foo", null);
+//        assertNotNull(message);
+//        assertEquals("received from remote", message.getPayload());
+//    }
+
     public void testClientSendAndReceiveRemote() throws Exception
     {
-        String remoteEndpoint = "vm://vmRemoteProvider/remote.queue";
+        String remoteEndpoint = "vm://remote.queue";
         // Will connect to the server using tcp://localhost:60504
         MuleClient client = new MuleClient();
         MuleManager.getConfiguration().setSynchronous(true);

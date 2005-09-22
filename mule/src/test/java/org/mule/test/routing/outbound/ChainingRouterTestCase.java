@@ -67,10 +67,10 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
     public void testChainingOutboundRouterSynchronous() throws Exception
     {
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
         assertTrue(router.isMatch(message));
 
-        message = new MuleMessage("test event", null);
+        message = new MuleMessage("test event");
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(0)), message);
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(1)), message);
@@ -82,10 +82,10 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
     public void testChainingOutboundRouterAsynchronous() throws Exception
     {
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
         assertTrue(router.isMatch(message));
 
-        message = new MuleMessage("test event", null);
+        message = new MuleMessage("test event");
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(0)), message);
         session.expectAndReturn("dispatchEvent", C.eq(message, endpoints.get(1)), message);
@@ -99,7 +99,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
      */
     public void testBrokenChain() throws Exception
     {
-        final UMOMessage message = new MuleMessage("test event", null);
+        final UMOMessage message = new MuleMessage("test event");
         final UMOEndpoint endpoint1 = (UMOEndpoint) endpoints.get(0);
         session.expect("sendEvent", C.eq(message, endpoint1));
         UMOMessage result = router.route(message, (UMOSession) session.proxy(), false);

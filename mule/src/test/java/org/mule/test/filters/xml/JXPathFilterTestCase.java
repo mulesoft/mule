@@ -38,7 +38,7 @@ public class JXPathFilterTestCase extends NamedTestCase
 
         myFilter.setExpression("catalog/cd[3]/title");
         myFilter.setValue("Greatest Hits");
-        boolean res = myFilter.accept(new MuleMessage(obj, null));
+        boolean res = myFilter.accept(new MuleMessage(obj));
         assertTrue(res);
 
     }
@@ -47,7 +47,7 @@ public class JXPathFilterTestCase extends NamedTestCase
     {
         Object obj = transformer.transform(xmlData);
         myFilter.setExpression("(catalog/cd[3]/title) ='Greatest Hits'");
-        boolean res = myFilter.accept(new MuleMessage(obj, null));
+        boolean res = myFilter.accept(new MuleMessage(obj));
         assertTrue(res);
 
     }
@@ -56,7 +56,7 @@ public class JXPathFilterTestCase extends NamedTestCase
     {
         Object obj = transformer.transform(xmlData);
         myFilter.setExpression("count(catalog/cd) = 26");
-        boolean res = myFilter.accept(new MuleMessage(obj, null));
+        boolean res = myFilter.accept(new MuleMessage(obj));
         assertTrue(res);
 
     }
@@ -68,7 +68,7 @@ public class JXPathFilterTestCase extends NamedTestCase
         d.setContent("hello");
 
         myFilter.setExpression("id=10 and content='hello'");
-        boolean res = myFilter.accept(new MuleMessage(d, null));
+        boolean res = myFilter.accept(new MuleMessage(d));
         assertTrue(res);
 
     }

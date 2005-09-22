@@ -20,6 +20,7 @@ import org.mule.samples.loanbroker.esb.message.CreditProfile;
 import org.mule.samples.loanbroker.esb.message.CustomerQuoteRequest;
 import org.mule.samples.loanbroker.esb.message.LoanQuote;
 import org.mule.samples.loanbroker.esb.message.LoanQuoteRequest;
+import org.mule.samples.loanbroker.esb.service.BankService;
 import org.mule.umo.UMODescriptor;
 
 import java.io.Serializable;
@@ -33,7 +34,7 @@ import java.io.Serializable;
  * @version $Revision$
  */
 
-public class Bank implements UMODescriptorAware, Serializable
+public class Bank implements UMODescriptorAware, Serializable, BankService
 {
     /**
      * logger used by this class
@@ -59,15 +60,6 @@ public class Bank implements UMODescriptorAware, Serializable
     public void setDescriptor(UMODescriptor descriptor)
     {
         this.bankName = descriptor.getName();
-    }
-
-    public LoanQuote getLoanQuote(CustomerQuoteRequest request, CreditProfile creditProfile)
-    {
-        LoanQuote quote = new LoanQuote();
-        quote.setBankName(getBankName());
-        quote.setInterestRate(primeRate);
-        logger.info("Returning Rate is:" + quote);
-        return quote;
     }
 
     public LoanQuote getLoanQuote(LoanQuoteRequest request)

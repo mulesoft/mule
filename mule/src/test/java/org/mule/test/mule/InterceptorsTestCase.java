@@ -44,7 +44,7 @@ public class InterceptorsTestCase extends AbstractMuleTestCase
         UMODescriptor descriptor = getTestDescriptor("orange", Orange.class.getName());
         List interceptors = new ArrayList();
         interceptors.add(new LoggingInterceptor());
-        InterceptorsInvoker invoker = new InterceptorsInvoker(interceptors, descriptor, new MuleMessage(data, null));
+        InterceptorsInvoker invoker = new InterceptorsInvoker(interceptors, descriptor, new MuleMessage(data));
         invoker.execute();
     }
 }

@@ -61,7 +61,7 @@ public class SyncLoanBroker
         //the message id of the dispatched message. Of course custom implementations can ignore these requirements
         //and implement a custom router that aggregates using something other than the UMOMessage.getUniqueId()
 
-        UMOMessage msg = new MuleMessage(bqr, null);
+        UMOMessage msg = new MuleMessage(bqr);
         //dispatch the message using the default outbound router settings
         context.dispatchEvent(msg);
         context.setStopFurtherProcessing(true);

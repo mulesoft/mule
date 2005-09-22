@@ -181,7 +181,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
         if (result == null) {
             return null;
         } else {
-            resultMessage = new MuleMessage(connector.getMessageAdapter(result).getPayload(), null);
+            resultMessage = new MuleMessage(connector.getMessageAdapter(result).getPayload());
         }
 
         return resultMessage;

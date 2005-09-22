@@ -176,17 +176,17 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         UMOSession session = getTestSession(getTestComponent(getTestDescriptor("test", "test")));
 
-        messageRouter.route(new MuleMessage("hello", null), session, true);
+        messageRouter.route(new MuleMessage("hello"), session, true);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        messageRouter.route(new MuleMessage(new StringBuffer(), null), session, true);
+        messageRouter.route(new MuleMessage(new StringBuffer()), session, true);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(1, count2[0]);
 
-        messageRouter.route(new MuleMessage(new Exception(), null), session, true);
+        messageRouter.route(new MuleMessage(new Exception()), session, true);
         assertEquals(1, catchAllCount[0]);
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);

@@ -53,6 +53,6 @@ public class TestAggregator extends ResponseCorrelationAggregator
             }
         }
         System.out.println("event payload is: " + buffer.toString());
-        return new MuleMessage(buffer.toString(), null);
+        return new MuleMessage(buffer.toString());
     }
 }

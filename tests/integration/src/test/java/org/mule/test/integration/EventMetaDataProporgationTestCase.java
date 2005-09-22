@@ -58,7 +58,7 @@ public class EventMetaDataProporgationTestCase extends FunctionalTestCase implem
     public void testEventMetaDataProporgation() throws UMOException
     {
         UMOSession session = MuleManager.getInstance().getModel().getComponentSession("component1");
-        UMOEvent event = new MuleEvent(new MuleMessage("Test Event", null), session.getComponent()
+        UMOEvent event = new MuleEvent(new MuleMessage("Test Event"), session.getComponent()
                                                                                    .getDescriptor()
                                                                                    .getInboundEndpoint(), session, true);
         session.sendEvent(event);

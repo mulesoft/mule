@@ -79,6 +79,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         if(httpMethod!=null) {
             httpMethod.releaseConnection();
             if(httpMethod.getStatusCode() >= 400 ) {
+                logger.error(httpMethod.getResponseBodyAsString());
                 throw new DispatchException(event.getMessage(), event.getEndpoint(),
                         new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText()));
             }
@@ -235,7 +236,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             logger.debug("Http response is: " + status);
             ExceptionPayload ep = null;
             if(httpMethod.getStatusCode() >= 400 ) {
-
+                logger.error(httpMethod.getResponseBodyAsString());
                 ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
                         new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText())));
             }

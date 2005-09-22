@@ -200,7 +200,7 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher
     Object result = invokedMethod.invoke(remoteObject, arguments);
 
     return (null == result ? null
-            : new MuleMessage(connector.getMessageAdapter(result).getPayload(), null));
+            : new MuleMessage(connector.getMessageAdapter(result).getPayload()));
   }
 
   public Object getDelegateSession() throws UMOException

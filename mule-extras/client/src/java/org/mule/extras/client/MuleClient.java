@@ -270,7 +270,7 @@ public class MuleClient implements Disposable
         }
 
         if (result != null && trans != null) {
-            return new MuleMessage(trans.transform(result.getPayload()), null);
+            return new MuleMessage(trans.transform(result.getPayload()));
         } else {
             return result;
         }
@@ -519,7 +519,7 @@ public class MuleClient implements Disposable
     {
         UMOMessage message = receive(url, timeout);
         if (message != null && transformer != null) {
-            return new MuleMessage(transformer.transform(message.getPayload()), null);
+            return new MuleMessage(transformer.transform(message.getPayload()));
         } else {
             return message;
         }

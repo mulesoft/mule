@@ -25,6 +25,7 @@ import org.mule.impl.internal.events.ConnectionEventListener;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.transformer.TransformerException;
@@ -213,10 +214,6 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
     public void setSession(Session session)
     {
         this.session = session;
-    }
-
-    public void initialise() throws InitialisationException {
-        MuleManager.getInstance().registerListener(this, endpoint.getConnector().getName());
     }
 
     public void onEvent(UMOServerEvent event) {

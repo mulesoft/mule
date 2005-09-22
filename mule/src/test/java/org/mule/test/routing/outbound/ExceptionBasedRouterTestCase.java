@@ -60,7 +60,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
 
         assertTrue(router.isMatch(message));
 
@@ -69,7 +69,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage("test event", null);
+        message = new MuleMessage("test event");
 
         //Only one send should be called as the others should fail
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
@@ -98,7 +98,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
 
         assertTrue(router.isMatch(message));
 
@@ -108,7 +108,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         } catch (CouldNotRouteOutboundMessageException e) {
             //expected
         }
-        message = new MuleMessage("test event", null);
+        message = new MuleMessage("test event");
 
         UMOMessage result = null;
         try {
@@ -139,7 +139,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
 
         assertTrue(router.isMatch(message));
 
@@ -148,7 +148,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage("test event", null);
+        message = new MuleMessage("test event");
 
         //Only one send should be called as the others should fail
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);

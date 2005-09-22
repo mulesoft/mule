@@ -99,6 +99,11 @@ public interface UMOEndpoint extends UMOImmutableEndpoint
     void setTransformer(UMOTransformer trans);
 
     /**
+     * Sets tyhe transformer used when a response is sent back from the endpoint invocation
+     * @param trans the transformer to use
+     */
+    void setResponseTransformer(UMOTransformer trans);
+    /**
      * @param props properties for this endpoint
      */
     void setProperties(Map props);

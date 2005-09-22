@@ -117,6 +117,12 @@ public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialis
     UMOTransformer getTransformer();
 
     /**
+     * The transformer used when a response is returned from invoking this endpoint
+     * @return the transformer to use when receiving the response data
+     */
+    UMOTransformer getResponseTransformer();
+
+    /**
      * Returns any properties set on this endpoint
      * 
      * @return a map of properties for this endpoint

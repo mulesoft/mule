@@ -51,9 +51,9 @@ public class EventResequencerTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOMessage message1 = new MuleMessage("test event A", null);
-        UMOMessage message2 = new MuleMessage("test event B", null);
-        UMOMessage message3 = new MuleMessage("test event C", null);
+        UMOMessage message1 = new MuleMessage("test event A");
+        UMOMessage message2 = new MuleMessage("test event B");
+        UMOMessage message3 = new MuleMessage("test event C");
 
         UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOEvent event1 = new MuleEvent(message1, endpoint, (UMOSession) session.proxy(), false);

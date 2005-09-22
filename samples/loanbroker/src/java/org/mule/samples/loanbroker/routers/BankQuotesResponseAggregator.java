@@ -81,7 +81,7 @@ public class BankQuotesResponseAggregator extends ResponseCorrelationAggregator
             //}
         } catch (TransformerException e)
         {
-            throw new RoutingException(Message.createStaticMessage("Failed to get lowest quote"), new MuleMessage(events, null), null, e);
+            throw new RoutingException(Message.createStaticMessage("Failed to get lowest quote"), new MuleMessage(events), null, e);
         }
     }
 

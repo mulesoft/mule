@@ -127,8 +127,14 @@ public final class MuleSession implements UMOSession
         }
 
         UMOEvent event = createOutboundEvent(message, endpoint, RequestContext.getEvent());
+        UMOMessage result = sendEvent(event);
 
-        return sendEvent(event);
+        if(endpoint.isRemoteSync() && endpoint.getResponseTransformer()!=null) {
+            Object response = endpoint.getResponseTransformer().transform(result.getPayload());
+            result = new MuleMessage(response, result); 
+        }
+        if(result!=null) RequestContext.rewriteEvent(result);
+        return result;
     }
 
     /*

@@ -86,7 +86,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         String data = "Test Data";
         UMOEndpoint endpoint = getTestEndpoint("Test", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint.setTransformer(new TestEventTransformer());
-        MuleEvent event = new MuleEvent(new MuleMessage(data, null),
+        MuleEvent event = new MuleEvent(new MuleMessage(data),
                                         endpoint,
                                         getTestSession(getTestComponent(getTestDescriptor("apple",
                                                                                           Apple.class.getName()))),
@@ -100,7 +100,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertNotNull(event.getMessage());
         assertEquals(data, event.getMessageAsString());
 
-        UMOEvent event2 = new MuleEvent(new MuleMessage("New Data", null), event);
+        UMOEvent event2 = new MuleEvent(new MuleMessage("New Data"), event);
         assertNotNull(event2.getId());
         assertEquals(event.getId(), event2.getId());
         assertNotNull(event2.getSession());

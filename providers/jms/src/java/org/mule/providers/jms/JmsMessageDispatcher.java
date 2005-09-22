@@ -175,7 +175,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     return null;
                 } else {
                     Object resultObject = JmsMessageUtils.getObjectForMessage(result);
-                    return new MuleMessage(resultObject, null);
+                    return new MuleMessage(resultObject);
                 }
             }
 

@@ -51,6 +51,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.HashMap;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used
@@ -172,7 +173,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                     UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), os);
 
                     if (returnMessage == null) {
-                        returnMessage = new MuleMessage("", null);
+                        returnMessage = new MuleMessage("");
                     }
 
                     RequestContext.rewriteEvent(returnMessage);
@@ -272,17 +273,17 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
             int contentLength = Integer.parseInt(contentLengthHeader);
 
             if (multipart) {
-            	byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[1024];
 
-            	payload = File.createTempFile("mime", ".att");
-            	((File) payload).deleteOnExit();
-            	FileOutputStream os = new FileOutputStream((File) payload);
+                payload = File.createTempFile("mime", ".att");
+                ((File) payload).deleteOnExit();
+                FileOutputStream os = new FileOutputStream((File) payload);
 
-            	int length = -1;
-            	int offset = 0;
+                int length = -1;
+                int offset = 0;
                 while (offset != contentLength) {
-                	buffer = new byte[1024];
-                	length = is.read(buffer);
+                    buffer = new byte[1024];
+                    length = is.read(buffer);
                     if (length != -1) {
                         os.write(buffer, 0, length);
                         offset += length;

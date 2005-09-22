@@ -208,7 +208,8 @@ public class MuleEventContext implements UMOEventContext
         // If synchronous receive has not been explicitly set, default it to
         // true
         setRemoteSync(message, endpoint);
-        return session.sendEvent(message, endpoint);
+        UMOMessage result = session.sendEvent(message, endpoint);
+        return result;
     }
 
     /**

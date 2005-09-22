@@ -124,7 +124,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
             if (!client.retrieveFile(file.getName(), baos)) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
-            UMOMessage message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()), null);
+            UMOMessage message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()));
             message.setProperty(FtpConnector.PROPERTY_FILENAME, file.getName());
             routeMessage(message);
             if (!client.deleteFile(file.getName())) {

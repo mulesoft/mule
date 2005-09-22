@@ -62,7 +62,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
 
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(DEFAULT_OUT_URI);
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        UMOMessage message = new MuleMessage(DEFAULT_MESSAGE, null);
+        UMOMessage message = new MuleMessage(DEFAULT_MESSAGE);
         MuleSession session = new MuleSession();
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
         session.dispatchEvent(event);

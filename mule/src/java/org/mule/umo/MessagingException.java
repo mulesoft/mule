@@ -53,7 +53,7 @@ public class MessagingException extends UMOException
         if (payload == null) {
             this.umoMessage = RequestContext.getEventContext().getMessage();
         } else {
-            this.umoMessage = new MuleMessage(payload, null);
+            this.umoMessage = new MuleMessage(payload);
         }
         setMessage(generateMessage(message));
     }
@@ -64,7 +64,7 @@ public class MessagingException extends UMOException
         if (payload == null) {
             this.umoMessage = RequestContext.getEventContext().getMessage();
         } else {
-            this.umoMessage = new MuleMessage(payload, null);
+            this.umoMessage = new MuleMessage(payload);
         }
         setMessage(generateMessage(message));
     }

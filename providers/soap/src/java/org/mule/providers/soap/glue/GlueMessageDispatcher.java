@@ -89,7 +89,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
             if (result == null) {
                 return null;
             } else {
-                return new MuleMessage(result, null);
+                return new MuleMessage(result);
             }
         } catch (Throwable t) {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), t);
@@ -110,7 +110,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
         IProxy proxy = Registry.bind(bindAddress);
         try {
             Object result = proxy.invoke(method, params.values().toArray());
-            return new MuleMessage(result, null);
+            return new MuleMessage(result);
         } catch (Throwable t) {
             throw new ReceiveException(endpointUri, timeout, t);
         }

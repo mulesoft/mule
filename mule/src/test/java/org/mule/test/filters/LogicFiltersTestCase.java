@@ -35,17 +35,17 @@ public class LogicFiltersTestCase extends NamedTestCase
         assertNotNull(filter.getLeftFilter());
         assertNotNull(filter.getRightFilter());
 
-        assertTrue(filter.accept(new MuleMessage("blah.blah.blah", null)));
-        assertTrue(right.accept(new MuleMessage("blah.blah", null)));
-        assertTrue(!left.accept(new MuleMessage("blah.blah", null)));
-        assertTrue(!filter.accept(new MuleMessage("blah.blah", null)));
+        assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
+        assertTrue(right.accept(new MuleMessage("blah.blah")));
+        assertTrue(!left.accept(new MuleMessage("blah.blah")));
+        assertTrue(!filter.accept(new MuleMessage("blah.blah")));
 
         filter = new AndFilter();
         filter.setLeftFilter(left);
         filter.setRightFilter(right);
 
-        assertTrue(filter.accept(new MuleMessage("blah.blah.blah", null)));
-        assertTrue(!filter.accept(new MuleMessage("blah.blah", null)));
+        assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
+        assertTrue(!filter.accept(new MuleMessage("blah.blah")));
     }
 
     public void testOrFilter()
@@ -56,19 +56,19 @@ public class LogicFiltersTestCase extends NamedTestCase
         assertNotNull(filter.getLeftFilter());
         assertNotNull(filter.getRightFilter());
 
-        assertTrue(filter.accept(new MuleMessage("blah.blah.blah", null)));
-        assertTrue(right.accept(new MuleMessage("blah.blah", null)));
-        assertTrue(!left.accept(new MuleMessage("blah.blah", null)));
-        assertTrue(filter.accept(new MuleMessage("blah.blah", null)));
-        assertTrue(!filter.accept(new MuleMessage("blah.x.blah", null)));
+        assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
+        assertTrue(right.accept(new MuleMessage("blah.blah")));
+        assertTrue(!left.accept(new MuleMessage("blah.blah")));
+        assertTrue(filter.accept(new MuleMessage("blah.blah")));
+        assertTrue(!filter.accept(new MuleMessage("blah.x.blah")));
 
         filter = new OrFilter();
         filter.setLeftFilter(left);
         filter.setRightFilter(right);
 
-        assertTrue(filter.accept(new MuleMessage("blah.blah.blah", null)));
-        assertTrue(filter.accept(new MuleMessage("blah.blah", null)));
-        assertTrue(!filter.accept(new MuleMessage("blah.x.blah", null)));
+        assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
+        assertTrue(filter.accept(new MuleMessage("blah.blah")));
+        assertTrue(!filter.accept(new MuleMessage("blah.x.blah")));
     }
 
     public void testNotFilter()
@@ -77,12 +77,12 @@ public class LogicFiltersTestCase extends NamedTestCase
         NotFilter notFilter = new NotFilter(filter);
         assertNotNull(notFilter.getFilter());
 
-        assertTrue(filter.accept(new MuleMessage("blah.blah.blah", null)));
-        assertTrue(!notFilter.accept(new MuleMessage("blah.blah.blah", null)));
+        assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
+        assertTrue(!notFilter.accept(new MuleMessage("blah.blah.blah")));
 
         notFilter = new NotFilter();
         notFilter.setFilter(filter);
-        assertTrue(filter.accept(new MuleMessage("blah.blah.blah", null)));
-        assertTrue(!notFilter.accept(new MuleMessage("blah.blah.blah", null)));
+        assertTrue(filter.accept(new MuleMessage("blah.blah.blah")));
+        assertTrue(!notFilter.accept(new MuleMessage("blah.blah.blah")));
     }
 }

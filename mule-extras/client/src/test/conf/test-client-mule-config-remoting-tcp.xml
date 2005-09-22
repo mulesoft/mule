@@ -8,14 +8,19 @@
     <mule-environment-properties synchronous="true" serverUrl="tcp://localhost:60504" />
 
     <!-- this connector/provider simulates an existing endpoint on a remote server -->
-    <connector name="vmRemoteConnector" className="org.mule.providers.vm.VMConnector">
+    <connector name="vmRemoteQueueConnector" className="org.mule.providers.vm.VMConnector">
         <properties>
             <property name="queueEvents" value="true"/>
         </properties>
     </connector>
 
+
+    <connector name="vmRemoteConnector" className="org.mule.providers.vm.VMConnector">
+
+    </connector>
+
     <global-endpoints>
-        <endpoint name="vmRemoteEndpoint" connector="vmRemoteConnector" address="vm://remote.queue"/>
+        <endpoint name="vmRemoteQueueEndpoint" connector="vmRemoteQueueConnector" address="vm://remote.queue"/>
     </global-endpoints>
 
     <model name="model">
@@ -23,6 +28,16 @@
             inboundEndpoint="vm://localhost/test.queue"
             outboundEndpoint="stream://localhost/system"
             implementation="org.mule.extras.client.TestReceiver">
+        </mule-descriptor>
+
+        <mule-descriptor name="remoteUMO"
+            implementation="org.mule.components.simple.StaticComponent">
+            <inbound-router>
+                <endpoint address="vm://remote.endpoint" connector="vmRemoteConnector" remoteSync="true"/>
+            </inbound-router>
+            <properties>
+                <property name="data" value="received from remote"/>
+            </properties>
         </mule-descriptor>
     </model>
 </mule-configuration>

@@ -109,6 +109,6 @@ public class VMConnectorTestCase extends AbstractConnectorTestCase
 
     public Object getValidMessage() throws Exception
     {
-        return new MuleMessage("TestMessage", null);
+        return new MuleMessage("TestMessage");
     }
 }

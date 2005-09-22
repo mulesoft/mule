@@ -58,7 +58,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         assertEquals(filter, router.getFilter());
 
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
 
         assertTrue(router.isMatch(message));
 
@@ -67,7 +67,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage("test event", null);
+        message = new MuleMessage("test event");
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
         session.expectAndReturn("sendEvent", C.eq(message, endpoint2), message);
