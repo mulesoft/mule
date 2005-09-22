@@ -224,6 +224,10 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
         public void initialise() throws InitialisationException, RecoverableException {
 
         }
+
+        public boolean isStarted() {
+            return true;
+        }
     }
 
 }
