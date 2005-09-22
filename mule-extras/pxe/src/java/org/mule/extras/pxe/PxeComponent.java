@@ -452,18 +452,18 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
             if (event.getEventType() == MessageExchangeEvent.IN_RCVD_EVENT) {
                 com.fs.pxe.sfwk.spi.MessageExchange me = event.getMessageExchange();
                 Message input = me.lastInput();
-                result = new MuleMessage(input.getMessage(), null);
+                result = new MuleMessage(input.getMessage());
 
             } else if (event.getEventType() == MessageExchangeEvent.OUT_RCVD_EVENT) {
                 com.fs.pxe.sfwk.spi.MessageExchange me = event.getMessageExchange();
                 Message output = me.lastOutput();
-                result = new MuleMessage(output.getMessage(), null);
+                result = new MuleMessage(output.getMessage());
             } else if (event.getEventType() == MessageExchangeEvent.IN_FAULT_EVENT ||
                     event.getEventType() == MessageExchangeEvent.OUT_FAULT_EVENT) {
                 com.fs.pxe.sfwk.spi.MessageExchange me = event.getMessageExchange();
                 //todo what needs to be passed in here??
                 Message fault = me.lastFault(null);
-                result = new MuleMessage(fault.getMessage(), null);
+                result = new MuleMessage(fault.getMessage());
                 result.setExceptionPayload(new ExceptionPayload(new Exception("Failed to process PXE Bpel event. See Message payload for details: " + fault.getDescription())));
 
             }
