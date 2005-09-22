@@ -176,7 +176,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                     msg = new ExceptionMessage(getErrorMessagePayload(message), t, ctx);
                 }
 
-                ctx.sendEvent(new MuleMessage(msg, null), endpoint);
+                ctx.sendEvent(new MuleMessage(msg), endpoint);
                 if (logger.isDebugEnabled()) {
                     logger.debug("routed Exception message via " + endpoint);
                 }

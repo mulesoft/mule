@@ -27,7 +27,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilter() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
-        UMOMessage message = new MuleMessage("blah", null);
+        UMOMessage message = new MuleMessage("blah");
         assertTrue(!filter.accept(message));
         message.setProperty("foo", "bar");
         assertTrue(filter.accept(message));
@@ -36,7 +36,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithNot() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=bar");
-        UMOMessage message = new MuleMessage("blah", null);
+        UMOMessage message = new MuleMessage("blah");
 
         assertTrue(filter.accept(message));
         message.setProperty("foo", "bar");
@@ -48,7 +48,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithNotNull() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
-        UMOMessage message = new MuleMessage("blah", null);
+        UMOMessage message = new MuleMessage("blah");
 
         assertTrue(!filter.accept(message));
         message.setProperty("foo", null);
@@ -60,7 +60,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterWithCaseSensitivity() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=Bar");
-        UMOMessage message = new MuleMessage("blah", null);
+        UMOMessage message = new MuleMessage("blah");
         message.setProperty("foo", "bar");
         assertTrue(!filter.accept(message));
         filter.setCaseSensitive(false);
@@ -70,7 +70,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     public void testMessagePropertyFilterDodgyValues() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo = bar");
-        UMOMessage message = new MuleMessage("blah", null);
+        UMOMessage message = new MuleMessage("blah");
         message.setProperty("foo", "bar");
         assertTrue(filter.accept(message));
         filter.setCaseSensitive(false);

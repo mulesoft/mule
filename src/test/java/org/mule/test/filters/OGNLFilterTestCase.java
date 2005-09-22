@@ -46,21 +46,21 @@ public class OGNLFilterTestCase extends NamedTestCase
 
     public void testNoExpressionEmptyMessage()
     {
-        UMOMessage message = new MuleMessage(null, null);
+        UMOMessage message = new MuleMessage(null);
 
         assertFalse(filter.accept(message));
     }
 
     public void testNoExpressionValidMessage()
     {
-        UMOMessage message = new MuleMessage("foo", null);
+        UMOMessage message = new MuleMessage("foo");
 
         assertFalse(filter.accept(message));
     }
 
     public void testStringExpression()
     {
-        UMOMessage message = new MuleMessage("foo", null);
+        UMOMessage message = new MuleMessage("foo");
         filter.setExpression("equals(\"foo\")");                                     
 
         assertTrue(filter.accept(message));
@@ -70,7 +70,7 @@ public class OGNLFilterTestCase extends NamedTestCase
     {
         Dummy payload = new Dummy();
         payload.setContent("foobar");
-        UMOMessage message = new MuleMessage(payload, null);
+        UMOMessage message = new MuleMessage(payload);
         filter.setExpression("content.endsWith(\"bar\")");
 
         assertTrue(filter.accept(message));

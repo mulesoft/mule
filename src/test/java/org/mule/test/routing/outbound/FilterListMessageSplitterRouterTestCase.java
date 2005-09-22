@@ -62,7 +62,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         payload.add(new Apple());
         payload.add(new Orange());
         payload.add(new String());
-        UMOMessage message = new MuleMessage(payload, null);
+        UMOMessage message = new MuleMessage(payload);
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)));
@@ -72,7 +72,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage(payload, null);
+        message = new MuleMessage(payload);
 
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)), message);
         session.expectAndReturn("sendEvent", C.args(new PayloadConstraint(Apple.class), C.eq(endpoint1)), message);

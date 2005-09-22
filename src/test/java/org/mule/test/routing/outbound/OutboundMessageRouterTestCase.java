@@ -77,13 +77,13 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         list.add(router2);
         messageRouter.setRouters(list);
 
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
 
         session.expect("dispatchEvent", C.eq(message, endpoint1));
         messageRouter.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage(new IllegalArgumentException(), null);
+        message = new MuleMessage(new IllegalArgumentException());
 
         session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
         session.expect("dispatchEvent", C.eq(message, endpoint2));
@@ -98,7 +98,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(router3);
 
         // now the message should be routed twice to different endpoints
-        message = new MuleMessage("testing multiple routing", null);
+        message = new MuleMessage("testing multiple routing");
         session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
         session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
 
@@ -153,17 +153,17 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         UMOSession session = getTestSession(getTestComponent(getTestDescriptor("test", "test")));
 
-        messageRouter.route(new MuleMessage("hello", null), session, true);
+        messageRouter.route(new MuleMessage("hello"), session, true);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        messageRouter.route(new MuleMessage(new StringBuffer(), null), session, true);
+        messageRouter.route(new MuleMessage(new StringBuffer()), session, true);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(1, count2[0]);
 
-        messageRouter.route(new MuleMessage(new Exception(), null), session, true);
+        messageRouter.route(new MuleMessage(new Exception()), session, true);
         assertEquals(1, catchAllCount[0]);
         assertEquals(1, count1[0]);
         assertEquals(1, count2[0]);
@@ -192,7 +192,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
     public void testCorrelation() throws Exception {
         TestFilteringOutboundRouter filterRouter = new TestFilteringOutboundRouter();
         UMOSession session = getTestSession(getTestComponent(getTestDescriptor("test", "test")));
-        UMOMessage message = new MuleMessage(new TestMessageAdapter(new StringBuffer()), null);
+        UMOMessage message = new MuleMessage(new TestMessageAdapter(new StringBuffer()));
         UMOEndpoint endpoint = getTestEndpoint("test", "sender");
         filterRouter.setMessageProperties(session, message, endpoint);
         assertNotNull(message.getCorrelationId());

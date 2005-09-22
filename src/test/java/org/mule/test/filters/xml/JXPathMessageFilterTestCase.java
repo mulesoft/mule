@@ -36,7 +36,7 @@ public class JXPathMessageFilterTestCase extends NamedTestCase
     public void testFilter1() throws Exception
     {
         Object obj = transformer.transform(xmlData);
-        UMOMessage message = new MuleMessage(obj, null);
+        UMOMessage message = new MuleMessage(obj);
         myFilter.setExpression("payload/catalog/cd[3]/title");
         myFilter.setValue("Greatest Hits");
         boolean res = myFilter.accept(message);
@@ -47,7 +47,7 @@ public class JXPathMessageFilterTestCase extends NamedTestCase
     public void testFilter2() throws Exception
     {
         Object obj = transformer.transform(xmlData);
-        UMOMessage message = new MuleMessage(obj, null);
+        UMOMessage message = new MuleMessage(obj);
         myFilter.setExpression("(payload/catalog/cd[3]/title) ='Greatest Hits'");
         boolean res = myFilter.accept(message);
         assertTrue(res);
@@ -57,7 +57,7 @@ public class JXPathMessageFilterTestCase extends NamedTestCase
     public void testFilter3() throws Exception
     {
         Object obj = transformer.transform(xmlData);
-        UMOMessage message = new MuleMessage(obj, null);
+        UMOMessage message = new MuleMessage(obj);
         myFilter.setExpression("count(payload/catalog/cd) = 26");
         boolean res = myFilter.accept(message);
         assertTrue(res);
@@ -69,7 +69,7 @@ public class JXPathMessageFilterTestCase extends NamedTestCase
         Dummy d = new Dummy();
         d.setId(10);
         d.setContent("hello");
-        UMOMessage message = new MuleMessage(d, null);
+        UMOMessage message = new MuleMessage(d);
         myFilter.setExpression("payload/id=10 and payload/content='hello'");
         boolean res = myFilter.accept(message);
         assertTrue(res);

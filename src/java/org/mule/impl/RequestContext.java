@@ -15,6 +15,7 @@ package org.mule.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOEventContext;
@@ -109,5 +110,17 @@ public class RequestContext
     public static UMOExceptionPayload getExceptionPayload()
     {
         return getEvent().getMessage().getExceptionPayload();
+    }
+
+    public static Map getAttachments() {
+        Map attachments = new HashMap();
+        if(getEvent()!=null) {
+            UMOMessage message = getEvent().getMessage();
+            for (Iterator iterator = message.getAttachmentNames().iterator(); iterator.hasNext();) {
+                String name = (String) iterator.next();
+                attachments.put(name, message.getAttachment(name));
+            }
+        }
+        return attachments;
     }
 }

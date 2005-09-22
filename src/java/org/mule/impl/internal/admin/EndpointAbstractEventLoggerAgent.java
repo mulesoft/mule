@@ -63,7 +63,7 @@ public class EndpointAbstractEventLoggerAgent extends AbstractEventLoggerAgent
         if (logEndpoint != null) {
             try {
                 UMOMessageDispatcher dispatcher = logEndpoint.getConnector().getDispatcher("ANY");
-                UMOEvent event = new MuleEvent(new MuleMessage(e.toString(), null), logEndpoint, session, false);
+                UMOEvent event = new MuleEvent(new MuleMessage(e.toString()), logEndpoint, session, false);
                 dispatcher.dispatch(event);
             } catch (Exception e1) {
                 LOGGER.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + logEndpoint

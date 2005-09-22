@@ -60,11 +60,11 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
             protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
             {
                 if (endpoint.getEndpointURI().getAddress().equals("endpointUri.1")) {
-                    return new MuleMessage(parts.get(0), null);
+                    return new MuleMessage(parts.get(0));
                 } else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.2")) {
-                    return new MuleMessage(parts.get(1), null);
+                    return new MuleMessage(parts.get(1));
                 } else if (endpoint.getEndpointURI().getAddress().equals("endpointUri.3")) {
-                    return new MuleMessage(parts.get(2), null);
+                    return new MuleMessage(parts.get(2));
                 } else {
                     return null;
                 }
@@ -77,7 +77,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         endpoints.add(endpoint3);
         router.setEndpoints(endpoints);
 
-        UMOMessage message = new MuleMessage("test,mule,message", null);
+        UMOMessage message = new MuleMessage("test,mule,message");
 
         assertTrue(router.isMatch(message));
         session.expect("dispatchEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint1)));
@@ -86,7 +86,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
         router.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
-        message = new MuleMessage("test,mule,message", null);
+        message = new MuleMessage("test,mule,message");
 
         session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint1)), message);
         session.expectAndReturn("sendEvent", C.args(C.isA(UMOMessage.class), C.eq(endpoint2)), message);

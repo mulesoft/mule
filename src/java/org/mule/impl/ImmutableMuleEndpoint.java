@@ -72,6 +72,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     protected UMOTransformer transformer = null;
 
     /**
+     * The transformer used to transform the incoming or outgoing data
+     */
+    protected UMOTransformer responseTransformer = null;
+
+    /**
      * The name for the endpoint
      */
     protected String name = null;
@@ -531,6 +536,15 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             transformer.setEndpoint(this);
         }
 
+        if (responseTransformer == null) {
+            if (connector instanceof AbstractConnector) {
+                responseTransformer = ((AbstractConnector) connector).getDefaultResponseTransformer();
+            }
+        }
+        if (responseTransformer != null) {
+            responseTransformer.setEndpoint(this);
+        }
+
         if (securityFilter != null) {
             securityFilter.setEndpoint(this);
             securityFilter.initialise();
@@ -588,7 +602,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public boolean isRemoteSync() {
         if(remoteSync==null) {
-            if(connector.isRemoteSyncEnabled()) {
+            if(connector==null || connector.isRemoteSyncEnabled()) {
                 remoteSync = new Boolean(MuleManager.getConfiguration().isSynchronousReceive());
             } else {
                 remoteSync = Boolean.FALSE;
@@ -617,5 +631,9 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public String getInitialState() {
         return initialState;
+    }
+
+    public UMOTransformer getResponseTransformer() {
+        return responseTransformer;
     }
 }

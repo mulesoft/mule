@@ -61,7 +61,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         messageRouter.addRouter(router);
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOMessage message = new MuleMessage("test event", null);
+        UMOMessage message = new MuleMessage("test event");
 
         UMOEndpoint endpoint = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOEvent event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), false);
@@ -79,7 +79,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
         messageRouter.route(event);
         session.verify();
 
-        message = new MuleMessage("test event", null);
+        message = new MuleMessage("test event");
         event = new MuleEvent(message, endpoint, (UMOSession) session.proxy(), true);
 
         session.expectAndReturn("sendEvent", C.eq(event), message);

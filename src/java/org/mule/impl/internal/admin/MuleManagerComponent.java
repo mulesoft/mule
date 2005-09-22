@@ -131,13 +131,15 @@ public class MuleManagerComponent implements Callable, Initialisable
 
     protected Object sendAction(AdminEvent action, UMOEventContext context) throws UMOException
     {
-        UMOEndpointURI endpointUri = new MuleEndpointURI(action.getResourceIdentifier());
+        UMOEndpoint endpoint = new MuleEndpoint(action.getResourceIdentifier(), false);
+
         try {
             if (AdminEvent.ACTION_DISPATCH == action.getAction()) {
-                context.dispatchEvent(action.getMessage(), endpointUri);
+                context.dispatchEvent(action.getMessage(), endpoint);
                 return null;
             } else {
-                UMOMessage result = context.sendEvent(action.getMessage(), endpointUri);
+                endpoint.setRemoteSync(true);
+                UMOMessage result = context.sendEvent(action.getMessage(), endpoint);
                 if (result != null) {
                     return xstream.toXML(result);
                 } else {

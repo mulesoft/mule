@@ -68,9 +68,9 @@ public class FutureMessageResult extends FutureResult
             }
             if (transformer != null) {
                 Object payload = transformer.transform(obj);
-                return new MuleMessage(payload, null);
+                return new MuleMessage(payload);
             }
-            return new MuleMessage(obj, null);
+            return new MuleMessage(obj);
         } else {
             return null;
         }

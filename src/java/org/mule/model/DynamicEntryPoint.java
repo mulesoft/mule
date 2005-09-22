@@ -74,7 +74,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
                     payload = context.getTransformedMessage();
                     method = getMethod(component, payload);
                     if (method != null) {
-                        RequestContext.rewriteEvent(new MuleMessage(payload, null));
+                        RequestContext.rewriteEvent(new MuleMessage(payload));
                     }
                 } else {
                     payload = context;
@@ -85,7 +85,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
             currentMethod = method;
             if (payload == null) {
                 payload = context.getTransformedMessage();
-                RequestContext.rewriteEvent(new MuleMessage(payload, null));
+                RequestContext.rewriteEvent(new MuleMessage(payload));
             }
             return invokeCurrent(component, payload);
         }
