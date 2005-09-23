@@ -1,15 +1,23 @@
+/*
+* $Header$
+* $Revision$
+* $Date$
+* ------------------------------------------------------------------------------------------------------
+*
+* Copyright (c) SymphonySoft Limited. All rights reserved.
+* http://www.symphonysoft.com
+*
+* The software in this package is published under the terms of the BSD
+* style license a copy of which has been included with this distribution in
+* the LICENSE.txt file.
+*
+*/
 package org.mule.jbi.components;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.impl.work.MuleWorkManager;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.messaging.MessageExchangeConstants;
-import org.mule.jbi.messaging.MessageListener;
-import org.mule.jbi.messaging.NoMessageException;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jbi.JBIException;
 import javax.jbi.component.Bootstrap;
@@ -30,8 +38,16 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.resource.spi.work.Work;
 import javax.xml.namespace.QName;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.impl.work.MuleWorkManager;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.messaging.MessageExchangeConstants;
+import org.mule.jbi.messaging.MessageListener;
+import org.mule.jbi.messaging.NoMessageException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 
 public abstract class AbstractComponent implements Component, ComponentLifeCycle,
         MessageExchangeConstants, ServiceUnitManager, Work {
@@ -46,9 +62,9 @@ public abstract class AbstractComponent implements Component, ComponentLifeCycle
 	
 	protected MuleWorkManager workManager;
 
-    protected SynchronizedBoolean stopped = new SynchronizedBoolean(true);
+    protected AtomicBoolean stopped = new AtomicBoolean(true);
 
-    protected SynchronizedBoolean stopping = new SynchronizedBoolean(false);
+    protected AtomicBoolean stopping = new AtomicBoolean(false);
 
     protected MessageExchangeFactory exchangeFactory;
 
@@ -630,5 +646,5 @@ public abstract class AbstractComponent implements Component, ComponentLifeCycle
                 handleException(e);
             }
         }
-    };
+    }
 }

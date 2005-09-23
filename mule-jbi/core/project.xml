@@ -118,9 +118,9 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>concurrent</groupId>
-            <artifactId>concurrent</artifactId>
-            <version>${concurrent_version}</version>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>${backport_util_concurrent_version}</version>
             <type>jar</type>
         </dependency>
         <dependency>

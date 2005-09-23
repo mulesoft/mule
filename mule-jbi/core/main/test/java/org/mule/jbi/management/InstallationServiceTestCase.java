@@ -15,18 +15,14 @@ package org.mule.jbi.management;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.Locale;
 
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import junit.framework.TestCase;
 
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.framework.JbiContainerImpl;
-import org.mule.jbi.routing.RouterImpl;
 import org.mule.jbi.util.IOUtils;
 
 public class InstallationServiceTestCase extends TestCase {

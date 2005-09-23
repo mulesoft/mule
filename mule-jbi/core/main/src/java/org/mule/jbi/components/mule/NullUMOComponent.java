@@ -74,4 +74,8 @@ public class NullUMOComponent implements UMOComponent
     public void initialise() throws InitialisationException, RecoverableException {
 
     }
+    
+    public boolean isStarted() {
+    	return false;
+    }
 }

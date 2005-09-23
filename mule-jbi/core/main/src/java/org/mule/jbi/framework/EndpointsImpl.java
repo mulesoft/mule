@@ -13,7 +13,16 @@
  */
 package org.mule.jbi.framework;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.jbi.JBIException;
+import javax.jbi.servicedesc.ServiceEndpoint;
+import javax.xml.namespace.QName;
+
 import org.mule.jbi.Endpoints;
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.registry.Component;
@@ -21,13 +30,6 @@ import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 import org.mule.jbi.servicedesc.ExternalEndpointImpl;
 import org.mule.jbi.servicedesc.InternalEndpointImpl;
 import org.w3c.dom.Document;
-
-import javax.jbi.JBIException;
-import javax.jbi.servicedesc.ServiceEndpoint;
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * 
