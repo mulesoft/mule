@@ -13,6 +13,8 @@
  */
 package org.mule.extras.spring.transaction;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.umo.TransactionException;
 import org.mule.umo.UMOTransaction;
@@ -20,8 +22,6 @@ import org.mule.umo.UMOTransactionFactory;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
  * TODO: document this class
@@ -41,10 +41,10 @@ public class SpringTransactionFactory implements UMOTransactionFactory
     {
 
         protected TransactionStatus status;
-        protected SynchronizedBoolean started = new SynchronizedBoolean(false);
-        protected SynchronizedBoolean committed = new SynchronizedBoolean(false);
-        protected SynchronizedBoolean rolledBack = new SynchronizedBoolean(false);
-        protected SynchronizedBoolean rollbackOnly = new SynchronizedBoolean(false);
+        protected AtomicBoolean started = new AtomicBoolean(false);
+        protected AtomicBoolean committed = new AtomicBoolean(false);
+        protected AtomicBoolean rolledBack = new AtomicBoolean(false);
+        protected AtomicBoolean rollbackOnly = new AtomicBoolean(false);
 
         public SpringTransaction()
         {
