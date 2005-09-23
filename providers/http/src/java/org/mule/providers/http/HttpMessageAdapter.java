@@ -73,7 +73,11 @@ public class HttpMessageAdapter extends AbstractMessageAdapter {
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return (byte[]) trans.transform(message);
+        if(message instanceof byte[]) {
+            return (byte[]) message;
+        } else {
+            return (byte[]) trans.transform(message);
+        }
     }
 
     /*
