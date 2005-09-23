@@ -13,13 +13,14 @@
  */
 package org.mule.routing.inbound;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.provider.UniqueIdNotSupportedException;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+
+import org.mule.umo.UMOEvent;
+import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 /**
  * <code>EventGroup</code> is a holder over events grouped by a common group

@@ -13,6 +13,10 @@
  */
 package org.mule.impl.internal.events;
 
+import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,9 +35,6 @@ import org.mule.umo.lifecycle.Disposable;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.manager.UMOServerEventListener;
 import org.mule.umo.manager.UMOWorkManager;
-
-import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>ServerEventManager</code> manages all server listeners for a Mule

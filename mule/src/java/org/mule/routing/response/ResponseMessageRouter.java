@@ -13,7 +13,11 @@
  */
 package org.mule.routing.response;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleConfiguration;
@@ -29,9 +33,6 @@ import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * <code>ResponseMessageRouter</code> is a router that can be used to control

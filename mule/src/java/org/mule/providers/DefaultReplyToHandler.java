@@ -13,7 +13,10 @@
  */
 package org.mule.providers;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -30,8 +33,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
-
-import java.util.Map;
 
 /**
  * <code>DefaultReplyToHandler</code> is responsible for processing a message

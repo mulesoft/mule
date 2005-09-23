@@ -83,7 +83,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     {
         String inbox = null;
         if (connector.getProtocol().equals("imap")) {
-            inbox = (String) endpoint.getEndpointURI().getPath();
+            inbox = endpoint.getEndpointURI().getPath();
             if(inbox.length()==0) {
                 inbox = Pop3Connector.MAILBOX;
             } else {

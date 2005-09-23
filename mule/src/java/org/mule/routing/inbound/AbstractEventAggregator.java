@@ -13,8 +13,11 @@
  */
 package org.mule.routing.inbound;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.util.Map;
+
 import org.mule.impl.MuleEvent;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.umo.MessagingException;
@@ -22,8 +25,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
-
-import java.util.Map;
 
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into
@@ -42,13 +43,13 @@ public abstract class AbstractEventAggregator extends SelectiveConsumer
 
     public UMOEvent[] process(UMOEvent event) throws MessagingException
     {
-        SynchronizedBoolean doAggregate = new SynchronizedBoolean(false);
+    	AtomicBoolean doAggregate = new AtomicBoolean(false);
         EventGroup eg = null;
         // synchronized (lock)
         // {
         if (isMatch(event)) {
             eg = addEvent(event);
-            doAggregate.commit(false, shouldAggregate(eg));
+            doAggregate.compareAndSet(false, shouldAggregate(eg));
         }
         // }
         if (doAggregate.get()) {

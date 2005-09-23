@@ -13,7 +13,8 @@
  */
 package org.mule;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.collections.SequencedHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -120,23 +121,23 @@ public class MuleManager implements UMOManager
     /**
      * True once the Mule Manager is initialised
      */
-    private SynchronizedBoolean initialised = new SynchronizedBoolean(false);
-    private SynchronizedBoolean initialising = new SynchronizedBoolean(false);
+    private AtomicBoolean initialised = new AtomicBoolean(false);
+    private AtomicBoolean initialising = new AtomicBoolean(false);
 
     /**
      * Determines of the MuleManager has been started
      */
-    private SynchronizedBoolean started = new SynchronizedBoolean(false);
+    private AtomicBoolean started = new AtomicBoolean(false);
 
     /**
      * Determines in the manager is in the process of starting
      */
-    private SynchronizedBoolean starting = new SynchronizedBoolean(false);
+    private AtomicBoolean starting = new AtomicBoolean(false);
 
     /**
      * Determines if the manager has been disposed
      */
-    private SynchronizedBoolean disposed = new SynchronizedBoolean(false);
+    private AtomicBoolean disposed = new AtomicBoolean(false);
 
     /**
      * Holds a reference to the deamon running the Manager if any

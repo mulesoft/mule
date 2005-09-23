@@ -15,8 +15,10 @@
 
 package org.mule.providers;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.io.OutputStream;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
@@ -44,8 +46,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.security.SecurityException;
-
-import java.io.OutputStream;
+import org.mule.util.concurrent.WaitableBoolean;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all
@@ -79,13 +80,13 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     protected boolean serverSide = true;
 
-    protected SynchronizedBoolean disposing = new SynchronizedBoolean(false);
+    protected AtomicBoolean disposing = new AtomicBoolean(false);
 
     protected WaitableBoolean connected = new WaitableBoolean(false);
 
     protected WaitableBoolean stopped = new WaitableBoolean(true);
 
-    private SynchronizedBoolean connecting = new SynchronizedBoolean(false);
+    private AtomicBoolean connecting = new AtomicBoolean(false);
 
     /**
      * Stores the endpointUri that this receiver listens on. This enpoint can be
@@ -346,7 +347,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         if (logger.isDebugEnabled()) {
             logger.debug("Attempting to connect to: " + endpoint.getEndpointURI());
         }
-        if (connecting.commit(false, true)) {
+        if (connecting.compareAndSet(false, true)) {
             connectionStrategy.connect(this);
             logger.info("Successfully connected to: " + endpoint.getEndpointURI());
             return;

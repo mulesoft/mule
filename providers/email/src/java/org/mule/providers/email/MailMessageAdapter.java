@@ -145,7 +145,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                     addAttachment(name, part.getDataHandler());
                 }
             } else {
-                messagePart = (Part) msg;
+                messagePart = msg;
             }
 
             // Set message attrributes as properties

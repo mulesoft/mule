@@ -13,6 +13,8 @@
  */
 package org.mule.providers.email;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -28,8 +30,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
-
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
  * <code>Pop3MessageDispatcher</code> For Pop3 connections the dispatcher can
@@ -48,7 +48,7 @@ public class Pop3MessageDispatcher extends AbstractMessageDispatcher
 
     private Session session = null;
 
-    private SynchronizedBoolean initialised = new SynchronizedBoolean(false);
+    private AtomicBoolean initialised = new AtomicBoolean(false);
 
     public Pop3MessageDispatcher(Pop3Connector connector)
     {
