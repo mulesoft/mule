@@ -10,6 +10,19 @@
     <dependencies>
         <!-- required: used by the core server -->
         <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>${backport_util_concurrent_version}</version>
+            <type>jar</type>
+            <url>http://www.mathcs.emory.edu/dcl/util/backport-util-concurrent/</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>true</mule.mini>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
             <groupId>concurrent</groupId>
             <artifactId>concurrent</artifactId>
             <version>${concurrent_version}</version>
