@@ -13,14 +13,7 @@
  */
 package org.mule.providers.udp;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -28,6 +21,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.UMOConnector;
 
 /**
  * <code>UdpMessageDispatcher</code> is responsible for dispatching MuleEvents as
@@ -43,7 +44,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     protected InetAddress inetAddress;
     protected DatagramSocket socket;
     protected int port;
-    protected SynchronizedBoolean initialised = new SynchronizedBoolean(false);
+    protected AtomicBoolean initialised = new AtomicBoolean(false);
 
     public UdpMessageDispatcher(UdpConnector connector)
     {

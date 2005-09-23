@@ -14,7 +14,21 @@
 
 package org.mule.providers.jms;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Hashtable;
+import java.util.Map;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.jms.XAConnectionFactory;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
@@ -36,14 +50,6 @@ import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassHelper;
-
-import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Hashtable;
-import java.util.Map;
 
 /**
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be

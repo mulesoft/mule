@@ -13,13 +13,8 @@
  */
 package org.mule.providers.jbi.components;
 
-import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.config.converters.QNameConverter;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jbi.JBIException;
 import javax.jbi.component.Component;
@@ -27,7 +22,12 @@ import javax.jbi.component.ComponentContext;
 import javax.jbi.component.ComponentLifeCycle;
 import javax.jbi.component.ServiceUnitManager;
 import javax.jbi.management.DeploymentException;
-import javax.jbi.messaging.*;
+import javax.jbi.messaging.DeliveryChannel;
+import javax.jbi.messaging.ExchangeStatus;
+import javax.jbi.messaging.Fault;
+import javax.jbi.messaging.MessageExchange;
+import javax.jbi.messaging.MessageExchangeFactory;
+import javax.jbi.messaging.MessagingException;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -35,8 +35,14 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 import javax.xml.namespace.QName;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.config.converters.QNameConverter;
+import org.mule.util.concurrent.WaitableBoolean;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 
 /**
  * A base Jbi component implementation.  This is agnostic to any particular Jbi container
@@ -348,8 +354,6 @@ public abstract class AbstractJbiComponent implements Component, Work, Component
             }
         }
     }
-
-    ;
 
     protected void handleException(Throwable t) {
         logger.error(t.getMessage(), t);
