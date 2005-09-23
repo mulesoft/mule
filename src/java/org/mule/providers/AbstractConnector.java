@@ -12,9 +12,16 @@
 
 package org.mule.providers;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,11 +43,14 @@ import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerEvent;
-import org.mule.umo.provider.*;
+import org.mule.umo.provider.ConnectorException;
+import org.mule.umo.provider.UMOConnectable;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOMessageDispatcherFactory;
+import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.transformer.UMOTransformer;
-
-import java.beans.ExceptionListener;
-import java.util.*;
+import org.mule.util.concurrent.WaitableBoolean;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all
@@ -66,12 +76,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * Specifies if the endpoint started
      */
-    protected SynchronizedBoolean started = new SynchronizedBoolean(false);
+    protected AtomicBoolean started = new AtomicBoolean(false);
 
     /**
      * True once the endpoint has been initialsed
      */
-    protected SynchronizedBoolean initialised = new SynchronizedBoolean(false);
+    protected AtomicBoolean initialised = new AtomicBoolean(false);
 
     /**
      * The name that identifies the endpoint
@@ -86,12 +96,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /**
      * Determines in the connector is alive and well
      */
-    protected SynchronizedBoolean disposed = new SynchronizedBoolean(false);
+    protected AtomicBoolean disposed = new AtomicBoolean(false);
 
     /**
      * Determines in connector has been told to dispose
      */
-    protected SynchronizedBoolean disposing = new SynchronizedBoolean(false);
+    protected AtomicBoolean disposing = new AtomicBoolean(false);
 
     /**
      * Factory used to create dispatchers for this connector

@@ -13,6 +13,8 @@
  */
 package org.mule.management.stats;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,8 +23,6 @@ import java.util.Map;
 
 import org.mule.management.stats.printers.SimplePrinter;
 import org.mule.umo.endpoint.UMOEndpoint;
-
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>RouterStatistics</code> todo

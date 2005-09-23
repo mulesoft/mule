@@ -15,7 +15,11 @@
 
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -38,9 +42,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOEndpointSecurityFilter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server.
@@ -111,7 +112,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     /**
      * has this endpoint been initialised
      */
-    protected SynchronizedBoolean initialised = new SynchronizedBoolean(false);
+    protected AtomicBoolean initialised = new AtomicBoolean(false);
 
     /**
      * The security filter to apply to this endpoint

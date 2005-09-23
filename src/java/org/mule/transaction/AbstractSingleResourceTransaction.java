@@ -14,11 +14,11 @@
  */
 package org.mule.transaction;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.TransactionException;
-
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 /**
  * This abstract class can be used as a base class for transactions that can
@@ -33,10 +33,10 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     protected Object key;
     protected Object resource;
 
-    protected SynchronizedBoolean started = new SynchronizedBoolean(false);
-    protected SynchronizedBoolean committed = new SynchronizedBoolean(false);
-    protected SynchronizedBoolean rolledBack = new SynchronizedBoolean(false);
-    protected SynchronizedBoolean rollbackOnly = new SynchronizedBoolean(false);
+    protected AtomicBoolean started = new AtomicBoolean(false);
+    protected AtomicBoolean committed = new AtomicBoolean(false);
+    protected AtomicBoolean rolledBack = new AtomicBoolean(false);
+    protected AtomicBoolean rollbackOnly = new AtomicBoolean(false);
 
     /*
      * (non-Javadoc)
@@ -46,7 +46,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     public void begin() throws TransactionException
     {
         super.begin();
-        started.commit(false, true);
+        started.compareAndSet(false, true);
     }
 
     /*
@@ -57,7 +57,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     public void commit() throws TransactionException
     {
         super.commit();
-        committed.commit(false, true);
+        committed.compareAndSet(false, true);
     }
 
     /*
@@ -68,7 +68,7 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
     public void rollback() throws TransactionException
     {
         super.rollback();
-        rolledBack.commit(false, true);
+        rolledBack.compareAndSet(false, true);
     }
 
     /*

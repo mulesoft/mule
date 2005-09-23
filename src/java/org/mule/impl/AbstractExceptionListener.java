@@ -13,6 +13,8 @@
  */
 package org.mule.impl;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import java.beans.ExceptionListener;
 import java.util.Iterator;
 import java.util.List;
@@ -33,8 +35,6 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.routing.RoutingException;
-
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>AbstractExceptionListener</code> is a base implementation that custom

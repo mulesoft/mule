@@ -13,7 +13,10 @@
  */
 package org.mule.routing.outbound;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -27,8 +30,6 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
-
-import java.util.List;
 
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks

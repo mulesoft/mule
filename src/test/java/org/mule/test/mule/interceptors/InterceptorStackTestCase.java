@@ -14,6 +14,10 @@
 
 package org.mule.test.mule.interceptors;
 
+import com.mockobjects.dynamic.Mock;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,10 +28,6 @@ import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
-
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedInt;
-
-import com.mockobjects.dynamic.Mock;
 
 /**
  * TODO: document this class
@@ -53,7 +53,7 @@ public class InterceptorStackTestCase extends AbstractMuleTestCase
 
     public void testStack() throws Exception
     {
-        final SynchronizedInt c = new SynchronizedInt(0);
+        final AtomicInteger c = new AtomicInteger(0);
         final UMOMessage m1 = (UMOMessage) new Mock(UMOMessage.class).proxy();
         final UMOMessage m2 = (UMOMessage) new Mock(UMOMessage.class).proxy();
         final UMOMessage m3 = (UMOMessage) new Mock(UMOMessage.class).proxy();
@@ -67,12 +67,12 @@ public class InterceptorStackTestCase extends AbstractMuleTestCase
             public UMOMessage intercept(Invocation invocation) throws UMOException
             {
                 assertEquals(0, c.get());
-                c.increment();
+                c.incrementAndGet();
                 assertTrue(m1 == invocation.getMessage());
                 invocation.setMessage(m2);
                 UMOMessage msg = invocation.execute();
                 assertEquals(3, c.get());
-                c.increment();
+                c.incrementAndGet();
                 assertTrue(m4 == msg);
                 assertTrue(d == invocation.getDescriptor());
                 return m5;
@@ -82,12 +82,12 @@ public class InterceptorStackTestCase extends AbstractMuleTestCase
             public UMOMessage intercept(Invocation invocation) throws UMOException
             {
                 assertEquals(1, c.get());
-                c.increment();
+                c.incrementAndGet();
                 assertTrue(m2 == invocation.getMessage());
                 invocation.setMessage(m3);
                 UMOMessage msg = invocation.execute();
                 assertEquals(2, c.get());
-                c.increment();
+                c.incrementAndGet();
                 assertTrue(m3 == msg);
                 assertTrue(d == invocation.getDescriptor());
                 return m4;

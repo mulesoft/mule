@@ -14,6 +14,8 @@
  */
 package org.mule.util.queue;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,8 +42,6 @@ import org.doomdark.uuid.UUID;
 import org.doomdark.uuid.UUIDGenerator;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 
 /**
  * 

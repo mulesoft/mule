@@ -15,7 +15,15 @@
 
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
@@ -35,9 +43,6 @@ import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
-
-import java.beans.ExceptionListener;
-import java.util.*;
 
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO.

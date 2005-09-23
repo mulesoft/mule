@@ -13,10 +13,14 @@
  */
 package org.mule.routing.response;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
 import EDU.oswego.cs.dl.util.concurrent.Latch;
 import EDU.oswego.cs.dl.util.concurrent.Sync;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -27,8 +31,6 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
-
-import java.util.Map;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for
@@ -54,9 +56,9 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
 
     public void process(UMOEvent event) throws RoutingException
     {
-        SynchronizedBoolean doAggregate = new SynchronizedBoolean(false);
+    	AtomicBoolean doAggregate = new AtomicBoolean(false);
         EventGroup eg = addEvent(event);
-        doAggregate.commit(false, shouldAggregate(eg));
+        doAggregate.compareAndSet(false, shouldAggregate(eg));
 
         if (doAggregate.get()) {
             synchronized (lock) {

@@ -14,12 +14,12 @@
 
 package org.mule.routing.outbound;
 
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import java.util.List;
 
 import org.mule.impl.RequestContext;
 import org.mule.umo.UMOMessage;
-
-import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * <code>StaticRecipientList</code> is used to dispatch a single event to
