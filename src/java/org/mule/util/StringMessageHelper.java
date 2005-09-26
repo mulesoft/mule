@@ -75,14 +75,30 @@ public class StringMessageHelper
             if (size > trimLength) {
                 String temp = messages.get(i).toString();
                 int k = i;
+                int x;
+                int len;
                 messages.remove(i);
-                while (temp.length() > trimLength) {
-                    String msg = temp.substring(0, trimLength);
-                    temp = temp.substring(trimLength);
+                while (temp.length() > 0) {
+                    len=(trimLength < temp.length() ? trimLength : temp.length());
+                    String msg = temp.substring(0, len);
+                    x = msg.indexOf("\n");
+
+                    if(x > -1) {
+                        msg = msg.substring(0, x);
+                        len = x+1;
+                    } else {
+                        x = msg.lastIndexOf(" ");
+                         if(x > -1 && len == trimLength) {
+                            msg = msg.substring(0, x);
+                            len = x+1;
+                        }
+                    }
+                    if(msg.startsWith(" ")) msg = msg.substring(1);
+
+                    temp = temp.substring(len);
                     messages.add(k, msg);
                     k++;
                 }
-                messages.add(k, temp);
             }
         }
         buf.append("\n");
