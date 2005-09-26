@@ -15,7 +15,7 @@ package org.mule.samples.loanbroker.esb.lender;
 
 import org.mule.MuleManager;
 import org.mule.impl.RequestContext;
-import org.mule.samples.loanbroker.esb.Bank;
+import org.mule.samples.loanbroker.esb.bank.Bank;
 import org.mule.samples.loanbroker.esb.message.CreditProfile;
 import org.mule.samples.loanbroker.esb.message.LoanQuoteRequest;
 
@@ -57,13 +57,13 @@ public class LenderService
             lenders[0] = new Bank("Bank5", getEndpoint("Bank5"));
         }
 
-        List recipients = new ArrayList(lenders.length);
+        StringBuffer recipients = new StringBuffer();
         for (int i =0;i < lenders.length; i++)
         {
-            recipients.add(lenders[i].getEndpoint());
+            recipients.append(lenders[i].getEndpoint()).append(",");
         }
 
-        RequestContext.setProperty("recipients", recipients);
+        RequestContext.setProperty("recipients", recipients.substring(0, recipients.length()-1));
         return lenders;
     }
 

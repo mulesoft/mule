@@ -13,7 +13,7 @@
  */
 package org.mule.samples.loanbroker.esb.message;
 
-import org.mule.samples.loanbroker.esb.Bank;
+import org.mule.samples.loanbroker.esb.bank.Bank;
 
 import java.io.Serializable;
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project default="default"
+  xmlns:j="jelly:core"
+  xmlns:ant="jelly:ant">
+
+     <goal name="default" prereqs="clean, ejb">
+         <!-- OpenEJB will not find the ejb descriptor in the jar because the META-INF
+         directory in the jar appears to be lower case, however when unpacked the META-INF
+         directory is upper case?? -->
+         <ant:mkdir dir="${maven.build.dir}/ejbjar"/>
+         <ant:unjar src="${maven.build.dir}/${pom.name}-${pom.currentVersion}.jar" dest="${maven.build.dir}/ejbjar"/>
+     </goal>
+</project>

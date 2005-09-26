@@ -11,7 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.samples.loanbroker.esb;
+package org.mule.samples.loanbroker.esb.bank;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +20,6 @@ import org.mule.samples.loanbroker.esb.message.CreditProfile;
 import org.mule.samples.loanbroker.esb.message.CustomerQuoteRequest;
 import org.mule.samples.loanbroker.esb.message.LoanQuote;
 import org.mule.samples.loanbroker.esb.message.LoanQuoteRequest;
-import org.mule.samples.loanbroker.esb.service.BankService;
 import org.mule.umo.UMODescriptor;
 
 import java.io.Serializable;

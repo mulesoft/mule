@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<!-- The purpose of this file is essentially to map you ejb-jar.xml to the openejb.xml -->
+<openejb-jar xmlns="http://www.openejb.org/openejb-jar/1.1">
+    <ejb-deployment ejb-name="/local/CreditAgency" deployment-id="/local/CreditAgency" container-id="Default Stateless Container">
+    </ejb-deployment>
+</openejb-jar>
