@@ -36,18 +36,23 @@ import java.util.Iterator;
  */
 public class ObjectToMimeMessage extends StringToEmailMessage {
 
-    protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context) throws Exception {
-
-            if(context.getMessage().getAttachmentNames().size() > 0) {
-                MimeMultipart multipart = new MimeMultipart();
-                multipart.addBodyPart(getPayloadBodyPart(payload, contentType));
-                for (Iterator iterator = context.getMessage().getAttachmentNames().iterator(); iterator.hasNext();) {
-                    String name = (String) iterator.next();
-                    BodyPart part = getBodyPartForAttachment(context.getMessage().getAttachment(name), name);
-                    multipart.addBodyPart(part);
-                }
-
+    protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context)
+            throws Exception {
+        if (context.getMessage().getAttachmentNames().size() > 0) {
+            MimeMultipart multipart = new MimeMultipart("mixed"); // The contenttype must be multipart/mixed
+            multipart.addBodyPart(getPayloadBodyPart(payload, contentType));
+            for (Iterator it = context.getMessage().getAttachmentNames().iterator(); it.hasNext();) {
+                String name = (String) it.next();
+                BodyPart part = getBodyPartForAttachment(context.getMessage().getAttachment(name), name);
+                multipart.addBodyPart(part);
             }
+            // the payload must be set to the constructed MimeMultipart message
+            payload = multipart;
+            // the ContentType of the message to be sent, must be the multipart
+            contentType = multipart.getContentType();
+            // content type
+        }
+        // now the message will contain the multipart payload, and the multipart contentType
         super.setContent(payload, msg, contentType, context);
     }
 
