@@ -85,6 +85,18 @@
             <email>aperepel@itci.com</email>
             <organization>IT Consulting International Corp.</organization>
         </developer>
+        <developer>
+            <name>Lajos Moczar</name>
+            <id>lajos</id>
+            <email>lajos@galatea.com</email>
+            <organization>Galatea IS Inc.</organization>
+        </developer>
+        <developer>
+      	    <name>Holger Hoffstaette</name>
+            <id>holger</id>
+            <email>holger@codehaus.org</email>
+            <organization></organization>
+        </developer>
     </developers>
     <contributors>
         <contributor>
@@ -139,11 +151,6 @@
         </contributor>
         <contributor>
         	<name>Zed Shaw</name>
-            <id></id>
-            <email></email>
-        </contributor>
-        <contributor>
-        	<name>Holger Hoffstaette</name>
             <id></id>
             <email></email>
         </contributor>
