@@ -52,7 +52,7 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
 
     public Object onCall(UMOEventContext eventContext) throws Exception {
 
-        UMOMessage requestMessage = eventContext.getMessage();;
+        UMOMessage requestMessage = new MuleMessage(eventContext.getTransformedMessage());
 
         UMOMessage responseMessage = requestMessage;
         UMOEventContext c = RequestContext.getEventContext();

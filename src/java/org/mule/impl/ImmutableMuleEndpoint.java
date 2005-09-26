@@ -205,10 +205,17 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             getTransformer().setEndpoint(this);
         }
 
+        if (this.responseTransformer == null) {
+            this.responseTransformer = source.getResponseTransformer();
+        }
+        if (responseTransformer != null) {
+            getResponseTransformer().setEndpoint(this);
+        }
         this.type = source.getType();
         if (source.getProperties() != null) {
             this.properties = source.getProperties();
         }
+        
         this.transactionConfig = source.getTransactionConfig();
         if (properties != null && endpointUri != null) {
             properties.putAll(endpointUri.getParams());
@@ -526,10 +533,10 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
         if (transformer == null) {
             if (connector instanceof AbstractConnector) {
-                if (UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type)) {
-                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
-                } else {
+                if (UMOEndpoint.ENDPOINT_TYPE_SENDER.equals(type)) {
                     transformer = ((AbstractConnector) connector).getDefaultOutboundTransformer();
+                } else {
+                    transformer = ((AbstractConnector) connector).getDefaultInboundTransformer();
                 }
             }
         }

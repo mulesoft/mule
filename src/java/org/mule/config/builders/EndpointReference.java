@@ -52,6 +52,7 @@ public class EndpointReference
     private String endpointName;
     private String address;
     private String transformer;
+    private String responseTransformer;
     private String createConnector;
     private Object object;
     private Map properties;
@@ -62,6 +63,7 @@ public class EndpointReference
                              String endpointName,
                              String address,
                              String transformer,
+                             String responseTransformer,
                              String createConnector,
                              Object object)
     {
@@ -69,6 +71,7 @@ public class EndpointReference
         this.endpointName = endpointName;
         this.address = address;
         this.transformer = transformer;
+        this.responseTransformer = responseTransformer;
         this.object = object;
         this.createConnector = createConnector;
     }
@@ -158,6 +161,16 @@ public class EndpointReference
                 UMOTransformer trans = MuleObjectHelper.getTransformer(transformer, " ");
                 ep.setTransformer(trans);
             }
+
+            if (responseTransformer != null) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Overloading responseTransformer for: " + endpointName + " from " + ep.getResponseTransformer()
+                            + " to " + responseTransformer);
+                }
+                UMOTransformer trans = MuleObjectHelper.getTransformer(responseTransformer, " ");
+                ep.setResponseTransformer(trans);
+            }
+            
             if (filter != null) {
                 ep.setFilter(filter);
             }
@@ -190,7 +203,7 @@ public class EndpointReference
     public String toString()
     {
         return "EndpointReference{" + "propertyName='" + propertyName + "'" + ", endpointName='" + endpointName + "'"
-                + ", address='" + address + "'" + ", transformer='" + transformer + "'" + ", object=" + object
+                + ", address='" + address + "'" + ", transformer='" + transformer + "'" + ",  responseTransformer='" + responseTransformer + "'" + ", object=" + object
                 + ", properties=" + properties + ", filter=" + filter + ", transactionConfig=" + transactionConfig
                 + "}";
     }
