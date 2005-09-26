@@ -99,13 +99,13 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
             }
         }
 
-        if (result != null && transformer != null) {
-            try {
-                result = new MuleMessage(transformer.transform(result.getPayload()), result.getProperties());
-            } catch (TransformerException e) {
-                throw new RoutingException(result, null);
-            }
-        }
+//        if (result != null && transformer != null) {
+//            try {
+//                result = new MuleMessage(transformer.transform(result.getPayload()), result.getProperties());
+//            } catch (TransformerException e) {
+//                throw new RoutingException(result, null);
+//            }
+//        }
         return result;
 
     }

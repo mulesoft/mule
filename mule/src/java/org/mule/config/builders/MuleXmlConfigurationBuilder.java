@@ -794,11 +794,13 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
                 String name = attributes.getValue("name");
                 String address = attributes.getValue("address");
                 String trans = attributes.getValue("transformers");
+                String responseTrans = attributes.getValue("responseTransformers");
                 String createConnector = attributes.getValue("createConnector");
                 EndpointReference ref = new EndpointReference(method,
                                                               name,
                                                               address,
                                                               trans,
+                                                              responseTrans,
                                                               createConnector,
                                                               digester.peek());
                 digester.push(ref);
@@ -816,8 +818,8 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
     {
         addSetPropertiesRule(path,
                              digester,
-                             new String[] { "address", "transformers", "createConnector" },
-                             new String[] { "endpointURI", "transformer", "createConnectorAsString" });
+                             new String[] { "address", "transformers", "responseTransformers", "createConnector" },
+                             new String[] { "endpointURI", "transformer", "responseTransformer", "createConnectorAsString" });
         //todo test
         addMulePropertiesRule(path, digester, "setProperties");
         addTransactionConfigRules(path, digester);
@@ -889,7 +891,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
 
     private void addEndpointReference(String propName, String endpointName, Object object)
     {
-        endpointReferences.add(new EndpointReference(propName, endpointName, null, null, null, object));
+        endpointReferences.add(new EndpointReference(propName, endpointName, null, null, null, null, object));
     }
 
     /**
@@ -930,6 +932,16 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
             transformerNames = attributes.getValue("transformers");
             if (transformerNames != null) {
                 addTransformerReference("transformer", transformerNames, digester.peek());
+            }
+
+            transformerNames = attributes.getValue("responseTransformers");
+            if (transformerNames != null) {
+                addTransformerReference("responseTransformer", transformerNames, digester.peek());
+            }
+
+            transformerNames = attributes.getValue("responseTransformer");
+            if (transformerNames != null) {
+                addTransformerReference("responseTransformer", transformerNames, digester.peek());
             }
 
             transformerNames = attributes.getValue("inboundTransformer");

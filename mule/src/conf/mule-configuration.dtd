@@ -546,6 +546,13 @@ Jndi
 -->	
 <!ATTLIST endpoint transformers	IDREFS			#IMPLIED>
 
+
+<!--
+    Is responsible for transforming data when it is returned from a request/response
+    invocation. If the endpoint is a receiver the responseTransformers is ignored.
+-->
+<!ATTLIST endpoint responseTransformers	IDREFS			#IMPLIED>
+
 <!--
     synchronous
     determines if requests received on this endpoint execute within a single thread
@@ -599,6 +606,12 @@ Jndi
     Used to override the transformers on the global endpoint
 -->
 <!ATTLIST global-endpoint transformers	IDREFS			#IMPLIED>
+
+<!--
+    Is responsible for transforming data when it is returned from a request/response
+    invocation. If the endpoint is a receiver the responseTransformers is ignored.
+-->
+<!ATTLIST endpoint responseTransformers	IDREFS			#IMPLIED>
 
 <!--
     synchronous
@@ -893,7 +906,7 @@ Jndi
 	If the implementation is an object reference then it will be resolved using the component resolver
 	configured on the model
 -->
-<!ATTLIST mule-descriptor implementation		    	NMTOKEN         #REQUIRED>
+<!ATTLIST mule-descriptor implementation		    	CDATA         #REQUIRED>
 <!--
 	The default subject that the Mule UMO sends events.
 -->

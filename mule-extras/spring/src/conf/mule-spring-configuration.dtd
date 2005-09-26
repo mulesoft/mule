@@ -526,6 +526,12 @@ a connection to the underlying resource
 <!ATTLIST endpoint transformers	IDREFS			#IMPLIED>
 
 <!--
+    Is responsible for transforming data when it is returned from a request/response
+    invocation. If the endpoint is a receiver the responseTransformers is ignored.
+-->
+<!ATTLIST endpoint responseTransformers	IDREFS			#IMPLIED>
+
+<!--
     synchronous
     determines if requests received on this endpoint execute within a single thread
     if not set the MuleManager synchronous property will be used
@@ -583,6 +589,12 @@ a connection to the underlying resource
     Used to override the transformers on the global endpoint
 -->
 <!ATTLIST global-endpoint transformers	IDREFS			#IMPLIED>
+
+<!--
+    Is responsible for transforming data when it is returned from a request/response
+    invocation. If the endpoint is a receiver the responseTransformers is ignored.
+-->
+<!ATTLIST endpoint responseTransformers	IDREFS			#IMPLIED>
 
 <!--
     synchronous
