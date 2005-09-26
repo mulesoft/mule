@@ -17,6 +17,9 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.dom4j.io.DOMReader;
+import org.dom4j.Document;
+import org.dom4j.Node;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -96,10 +99,32 @@ public abstract class JdbcUtils
             Object value = null;
             if ("NOW".equalsIgnoreCase(name)) {
                 value = new Timestamp(Calendar.getInstance().getTimeInMillis());
+            } else if (root instanceof org.w3c.dom.Document) {
+		org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document) root;
+		org.dom4j.Document dom4jDoc = new DOMReader().read(x3cDoc);
+		try {
+		    Node node = dom4jDoc.selectSingleNode(name);
+		    if (node != null) {
+			value = node.getText();
+		    }
+                } catch (Exception ignored) {
+		    value = null;
+		}
+            } else if (root instanceof org.dom4j.Document) {
+		org.dom4j.Document dom4jDoc = (org.dom4j.Document) root;
+		try {
+		    Node node = dom4jDoc.selectSingleNode(name);
+		    if (node != null) {
+			value = node.getText();
+		    }
+                } catch (Exception ignored) {
+		    value = null;
+		} 
             } else {
                 try {
                     value = BeanUtils.getProperty(root, name);
                 } catch (Exception ignored) {
+		    value = null;
                 }
             }
             if (value == null) {
