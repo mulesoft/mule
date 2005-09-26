@@ -21,12 +21,14 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.ResponseOutputStream;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformers.DefaultTransformer;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.transformer.TransformerException;
 
@@ -156,6 +158,20 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         event = new MuleEvent(msg, endpoint, prevEvent.getComponent(), prevEvent);
         assertEquals("value1", event.getProperty("prop"));
 
+    }
+
+    /**
+     * See http://jira.muleumo.org/browse/MULE-384 for details.
+     */
+    public void testNoPasswordNoNullPointerException() throws Exception
+    {
+        UMOEndpoint endpoint = getTestEndpoint("AuthTest", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        // provide the username, but not the password, as is the case for SMTP
+        // cannot set SMTP endpoint type, because the module doesn't have this dependency
+        endpoint.setEndpointURI(new MuleEndpointURI("test://john.doe@xyz.fr"));
+        UMOEvent event = getTestEvent(new Object(), endpoint);
+        UMOCredentials credentials = event.getCredentials();
+        assertNull("Credentials must not be created for endpoints without a password.", credentials);
     }
 
     private class TestEventTransformer extends DefaultTransformer
