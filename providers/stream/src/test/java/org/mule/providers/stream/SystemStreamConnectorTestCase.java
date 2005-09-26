@@ -21,6 +21,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.provider.UMOConnector;
 
+import java.util.HashMap;
+
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -63,7 +65,7 @@ public class SystemStreamConnectorTestCase extends AbstractConnectorTestCase
         event.expectAndReturn("isSynchronous", false);
         event.expectAndReturn("getEndpoint", endpoint);
         event.expect("setProperty", C.ANY_ARGS);
-        event.expectAndReturn("getTransformedMessage", new byte[0]);
+        event.expectAndReturn("getProperties", new HashMap());
         event.expectAndReturn("getEndpoint", getTestEndpoint("test", UMOEndpoint.ENDPOINT_TYPE_SENDER));
         connector.registerListener(component, endpoint);
         connector.startConnector();

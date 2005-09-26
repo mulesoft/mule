@@ -54,7 +54,7 @@ public class RequestContext
     public static synchronized void setEvent(UMOEvent event)
     {
         events.set(event);
-        props.set(event.getProperties());
+        if(event!=null) props.set(event.getProperties());
     }
 
     public static void setProperty(String key, Object value)
