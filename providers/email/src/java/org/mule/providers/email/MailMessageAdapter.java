@@ -140,7 +140,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                 String name;
                 for (int i = 1; i < ((Multipart) content).getCount(); i++) {
                     part = ((Multipart) content).getBodyPart(i);
-                    name = part.getDescription();
+                    name = part.getFileName();
                     if (name == null) name = String.valueOf(i - 1);
                     addAttachment(name, part.getDataHandler());
                 }
