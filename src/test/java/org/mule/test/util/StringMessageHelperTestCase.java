@@ -84,7 +84,8 @@ public class StringMessageHelperTestCase extends TestCase
         msgs.add("Boiler Plate");
 
         String plate = StringMessageHelper.getBoilerPlate(msgs, '*', 12);
-        assertEquals("\n************\n* This     *\n* is a     *\n* Boiler P *\n* late     *\n************", plate);
+        assertEquals("\n************\n* This     *\n* is a     *\n* Boiler   *\n* Plate    *\n************", plate);
+
     }
 
     public void testBoilerPlate2() throws Exception
@@ -95,7 +96,7 @@ public class StringMessageHelperTestCase extends TestCase
         msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
 
         String plate = StringMessageHelper.getBoilerPlate(msgs, '*', 12);
-        assertEquals("\n************\n* This     *\n* is a     *\n* Boiler P *\n* late Mes *\n* sage tha *\n* t should *\n*  get wra *\n* pped to  *\n* the next *\n*  line if *\n*  it is w *\n* orking p *\n* roperly  *\n************",
+        assertEquals("\n************\n* This     *\n* is a     *\n* Boiler   *\n* Plate    *\n* Message  *\n* that     *\n* should   *\n* get      *\n* wrapped  *\n* to the   *\n* next     *\n* line if  *\n* it is    *\n* working  *\n* properly *\n************",
                      plate);
     }
 
