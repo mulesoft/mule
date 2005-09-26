@@ -97,16 +97,19 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
             if (files == null || files.length == 0) {
                 return files;
             }
+            if (filenameFilter == null) {
+                return files;
+            }
             ArrayList v = new ArrayList();
             for (int i = 0; i < files.length; i++) {
                 if (files[i].isFile()) {
-                    if (filenameFilter == null ||
-                            filenameFilter.accept(null, files[i].getName())) {
+                    if (filenameFilter.accept(null, files[i].getName())) {
                         v.add(files[i]);
                     }
                 }
             }
             return (FTPFile[]) v.toArray(new FTPFile[v.size()]);
+
         } finally {
             connector.releaseFtp(uri, client);
         }
