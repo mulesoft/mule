@@ -196,9 +196,11 @@ public class MuleEvent extends EventObject implements UMOEvent
 
 
     protected void setCredentials() {
-         if(endpoint.getEndpointURI().getUserInfo()!=null) {
-            credentials = new MuleCredentials(endpoint.getEndpointURI().getUsername(),
-                    endpoint.getEndpointURI().getPassword().toCharArray());
+        if (endpoint.getEndpointURI().getUserInfo() != null) {
+            final String userName = endpoint.getEndpointURI().getUsername();
+            final String password = endpoint.getEndpointURI().getPassword();
+            if (password != null && userName != null)
+                credentials = new MuleCredentials(userName, password.toCharArray());
         }
     }
 
