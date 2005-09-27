@@ -13,8 +13,6 @@
  */
 package org.mule.extras.pxe;
 
-import EDU.oswego.cs.dl.util.concurrent.Latch;
-import EDU.oswego.cs.dl.util.concurrent.Sync;
 import com.fs.pxe.bpel.provider.BpelServiceProvider;
 import com.fs.pxe.kernel.modbpellog.ModBpelEventLogger;
 import com.fs.pxe.kernel.modhibernatedao.ModHibernateDAO;
@@ -32,6 +30,33 @@ import com.fs.pxe.sfwk.spi.PxeException;
 import com.fs.pxe.sfwk.spi.ServiceContext;
 import com.fs.pxe.sfwk.spi.ServicePort;
 import com.fs.pxe.sfwk.spi.ServiceProviderException;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
+
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.management.Attribute;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.MBeanServerInvocationHandler;
+import javax.management.ObjectName;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
+import javax.wsdl.Definition;
+import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -55,29 +80,8 @@ import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 import org.mule.util.PropertiesHelper;
+import org.mule.util.concurrent.Latch;
 import org.w3c.dom.Document;
-
-import javax.management.Attribute;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.MBeanServerInvocationHandler;
-import javax.management.ObjectName;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
-import javax.wsdl.Definition;
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <code>PxeComponent</code> embeds the PXE runtime engineas a a Mule component so that
@@ -98,7 +102,7 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
     private Map dbAttributes = new HashMap();
     private Map daoAttributes = new HashMap();
     private Map bpelAttributes = new HashMap();
-    private Sync lock;
+    private Lock lock;
     private MuleMessage result;
     private String configuration;
     private String pxeEndpoint;
@@ -386,7 +390,7 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
     }
 
     public Object onCall(UMOEventContext eventContext) throws Exception {
-        TransactionManager mgr = (TransactionManager) MuleManager.getInstance().getTransactionManager();
+        TransactionManager mgr = MuleManager.getInstance().getTransactionManager();
         Transaction tx = mgr.getTransaction();
         com.fs.pxe.sfwk.spi.MessageExchange mePxe = null;
         try {
@@ -429,9 +433,9 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
             if(eventContext.isSynchronous()) {
                 lock = new Latch();
                 if(eventContext.getTimeout() == UMOEvent.TIMEOUT_WAIT_FOREVER) {
-                    lock.acquire();
+                    lock.lock();
                 } else {
-                    lock.attempt(eventContext.getTimeout());
+                    lock.tryLock(eventContext.getTimeout(), TimeUnit.MILLISECONDS);
                     if(result == null) {
                         logger.info("Synchronization either timed out or no result was returned");
                     }
@@ -467,7 +471,7 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
                 result.setExceptionPayload(new ExceptionPayload(new Exception("Failed to process PXE Bpel event. See Message payload for details: " + fault.getDescription())));
 
             }
-            lock.release();
+            lock.unlock();
 
         } catch (Exception e) {
             throw new MessageExchangeException(e);

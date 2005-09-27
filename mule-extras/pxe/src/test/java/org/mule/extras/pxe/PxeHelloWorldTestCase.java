@@ -13,6 +13,13 @@
  */
 package org.mule.extras.pxe;
 
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.dom.DOMSource;
+
 import org.dom4j.io.XMLWriter;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
@@ -21,13 +28,6 @@ import org.mule.tck.NamedTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.ClassHelper;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.dom.DOMSource;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -62,7 +62,7 @@ public class PxeHelloWorldTestCase extends NamedTestCase
         assertNotNull(result);
         StringWriter w = new StringWriter();
         XMLWriter writer = new XMLWriter(w);
-        writer.write((Element)result.getPayload());
+        writer.write(result.getPayload());
         String xml = w.toString();
         System.out.println(xml);
         assertTrue(xml.indexOf("Hello World") > -1);

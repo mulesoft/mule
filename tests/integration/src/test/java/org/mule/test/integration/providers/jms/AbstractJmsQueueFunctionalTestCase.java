@@ -13,6 +13,8 @@
  */
 package org.mule.test.integration.providers.jms;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import java.util.List;
 
 import javax.jms.Message;
@@ -32,8 +34,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-
-import EDU.oswego.cs.dl.util.concurrent.CountDown;
+import org.mule.util.concurrent.CountDownLatch;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -42,19 +43,19 @@ import EDU.oswego.cs.dl.util.concurrent.CountDown;
 
 public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunctionalTestCase
 {
-    protected static CountDown receiverIsUp;
+    protected static CountDownLatch receiverIsUp;
 
     public void testSend() throws Exception
     {
-        final CountDown countDown = new CountDown(2);
-        receiverIsUp = new CountDown(1);
+        final CountDownLatch countDown = new CountDownLatch(2);
+        receiverIsUp = new CountDownLatch(1);
 
         EventCallback callback = new EventCallback() {
             public void eventReceived(UMOEventContext context, Object Component)
             {
                 callbackCalled = true;
                 assertNull(context.getCurrentTransaction());
-                countDown.release();
+                countDown.countDown();
             }
         };
 
@@ -73,16 +74,16 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
             public void onMessage(Message message)
             {
                 currentMsg = message;
-                countDown.release();
+                countDown.countDown();
             }
         });
 
         logger.debug("Waiting for coutdown isReceiverUp");
-        assertTrue(receiverIsUp.attempt(LOCK_WAIT));
+        assertTrue(receiverIsUp.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
         receiverIsUp = null;
 
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, null);
-        assertTrue(countDown.attempt(LOCK_WAIT));
+        assertTrue(countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
@@ -93,15 +94,15 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
 
     public void testSendWithReplyTo() throws Exception
     {
-        final CountDown countDown = new CountDown(2);
-        receiverIsUp = new CountDown(1);
+        final CountDownLatch countDown = new CountDownLatch(2);
+        receiverIsUp = new CountDownLatch(1);
 
         EventCallback callback = new EventCallback() {
             public void eventReceived(UMOEventContext context, Object Component)
             {
                 callbackCalled = true;
                 assertNull(context.getCurrentTransaction());
-                countDown.release();
+                countDown.countDown();
             }
         };
 
@@ -120,17 +121,17 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
             public void onMessage(Message message)
             {
                 currentMsg = message;
-                countDown.release();
+                countDown.countDown();
             }
         });
 
         logger.debug("Waiting for coutdown isReceiverUp");
-        assertTrue(receiverIsUp.attempt(LOCK_WAIT));
+        assertTrue(receiverIsUp.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
         receiverIsUp = null;
 
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE, "replyto");
 
-        assertTrue(countDown.attempt(LOCK_WAIT));
+        assertTrue(countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
@@ -155,7 +156,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         {
             if (receiverIsUp != null) {
                 logger.debug("Releasing coutdown isReceiverUp");
-                receiverIsUp.release();
+                receiverIsUp.countDown();
             }
             return super.getMessages();
         }

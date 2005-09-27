@@ -14,6 +14,8 @@
  */
 package org.mule.providers;
 
+import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,9 +29,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-
-import EDU.oswego.cs.dl.util.concurrent.CountDown;
-import EDU.oswego.cs.dl.util.concurrent.Sync;
+import org.mule.util.concurrent.CountDownLatch;
 
 /**
  * The TransactedPollingMessageReceiver is an abstract receiver that handles
@@ -96,7 +96,7 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
             // for each message
             List messages = getMessages();
             if (messages != null && messages.size() > 0) {
-                final CountDown countdown = new CountDown(messages.size());
+                final Lock countdown = new CountDownLatch(messages.size());
                 for (Iterator it = messages.iterator(); it.hasNext();) {
                     final Object message = it.next();
                     if (logger.isTraceEnabled()) {
@@ -105,11 +105,11 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
                     try {
                         getWorkManager().scheduleWork(new MessageProcessorWorker(tt, countdown, message));
                     } catch (Exception e) {
-                        countdown.release();
+                        countdown.unlock();
                         throw e;
                     }
                 }
-                countdown.acquire();
+                countdown.lock();
             }
         }
     }
@@ -119,13 +119,13 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
 
         private TransactionTemplate tt;
         private Object message;
-        private Sync sync;
+        private Lock lock;
 
-        public MessageProcessorWorker(TransactionTemplate tt, Sync sync, Object message)
+        public MessageProcessorWorker(TransactionTemplate tt, Lock lock, Object message)
         {
             this.tt = tt;
             this.message = message;
-            this.sync = sync;
+            this.lock = lock;
         }
 
         public void release()
@@ -139,7 +139,7 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
             } catch (Exception e) {
                 handleException(e);
             } finally {
-            	sync.release();
+            	lock.unlock();
 			}
         }
 

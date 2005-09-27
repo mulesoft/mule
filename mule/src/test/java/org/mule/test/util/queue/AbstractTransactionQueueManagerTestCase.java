@@ -19,13 +19,12 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
+import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueSession;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.xa.AbstractResourceManager;
-
-import EDU.oswego.cs.dl.util.concurrent.Latch;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -82,7 +81,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
             public void run()
             {
                 try {
-                    latch.release();
+                    latch.countDown();
                     Thread.sleep(200);
                     QueueSession s = mgr.getQueueSession();
                     Queue q = s.getQueue("queue1");
@@ -93,7 +92,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
             }
         };
         t.start();
-        latch.acquire();
+        latch.await();
         long t0 = System.currentTimeMillis();
         QueueSession s = mgr.getQueueSession();
         Queue q = s.getQueue("queue1");
@@ -124,7 +123,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
             public void run()
             {
                 try {
-                    latch.release();
+                    latch.countDown();
                     Thread.sleep(200);
                     QueueSession s = mgr.getQueueSession();
                     Queue q = s.getQueue("queue1");
@@ -140,7 +139,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
             }
         };
         t.start();
-        latch.acquire();
+        latch.await();
         long t0 = System.currentTimeMillis();
         QueueSession s = mgr.getQueueSession();
         Queue q = s.getQueue("queue1");
@@ -172,7 +171,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
             public void run()
             {
                 try {
-                    latch.acquire();
+                    latch.await();
                     Thread.sleep(200);
                     QueueSession s = mgr.getQueueSession();
                     Queue q = s.getQueue("queue1");
@@ -188,7 +187,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
         assertEquals(0, q.size());
         q.put("String1");
         q.put("String2");
-        latch.release();
+        latch.countDown();
         long t0 = System.currentTimeMillis();
         q.put("String3");
         long t1 = System.currentTimeMillis();

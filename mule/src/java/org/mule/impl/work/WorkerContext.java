@@ -27,8 +27,7 @@ import javax.resource.spi.work.WorkRejectedException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import EDU.oswego.cs.dl.util.concurrent.Latch;
+import org.mule.util.concurrent.Latch;
 
 /**
  * <code>WorkerContext</code> TODO
@@ -271,21 +270,22 @@ public class WorkerContext implements Work
         if (isTimedOut()) {
             // In case of a time out, one releases the start and end latches
             // to prevent a dead-lock.
-            startLatch.release();
-            endLatch.release();
+            startLatch.countDown();
+            endLatch.countDown();
             return;
         }
         // Implementation note: the work listener is notified prior to release
         // the start lock. This behavior is intentional and seems to be the
         // more conservative.
         workListener.workStarted(new WorkEvent(this, WorkEvent.WORK_STARTED, worker, null));
-        startLatch.release();
+        startLatch.countDown();
         // Implementation note: we assume this is being called without an
         // interesting TransactionContext,
         // and ignore/replace whatever is associated with the current thread.
         try {
             if (executionContext == null || executionContext.getXid() == null) {
-                ExecutionContext context = new ExecutionContext();
+            	// TODO currently unused, see below
+                // ExecutionContext context = new ExecutionContext();
                 try {
                     worker.run();
                 } finally {
@@ -336,7 +336,7 @@ public class WorkerContext implements Work
                     : new WorkCompletedException("Unknown error", WorkCompletedException.UNDEFINED).initCause(e));
             workListener.workCompleted(new WorkEvent(this, WorkEvent.WORK_REJECTED, worker, workException));
         } finally {
-            endLatch.release();
+            endLatch.countDown();
         }
     }
 

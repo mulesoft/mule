@@ -14,7 +14,19 @@
 
 package org.mule.test.integration.providers.jms;
 
-import EDU.oswego.cs.dl.util.concurrent.CountDown;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import java.util.HashMap;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.QueueConnection;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.TopicConnection;
+
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -30,15 +42,20 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
-
-import javax.jms.*;
-import java.util.HashMap;
+import org.mule.util.concurrent.CountDownLatch;
 
 /**
  * <code>AbstractJmsTransactionFunctionalTest</code> is a base class for all
@@ -70,14 +87,15 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
     {
         UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
-        final CountDown countDown = new CountDown(2);
+        final int countDownInitialCount = 2;
+        final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
 
         EventCallback callback = new EventCallback() {
             public void eventReceived(UMOEventContext context, Object Component)
             {
                 callbackCalled = true;
                 assertNull(context.getCurrentTransaction());
-                countDown.release();
+                countDown.countDown();
             }
         };
 
@@ -87,9 +105,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         afterInitialise();
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
-        countDown.attempt(LOCK_WAIT);
-        assertTrue("Only " + (countDown.initialCount() - countDown.currentCount()) + " of " + countDown.initialCount()
-                + " checkpoints hit", countDown.attempt(0));
+        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        assertTrue("Only " + (countDownInitialCount - countDown.getCount())
+        		+ " of " + countDownInitialCount
+                + " checkpoints hit", countDown.tryLock());
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
@@ -100,7 +119,9 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
     public void testSendTransactedAlways() throws Exception
     {
-        final CountDown countDown = new CountDown(2);
+        final int countDownInitialCount = 2;
+        final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
+
         // setup the component and start Mule
         UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
@@ -111,7 +132,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 currentTx = context.getCurrentTransaction();
                 assertNotNull(currentTx);
                 assertTrue(currentTx.isBegun());
-                countDown.release();
+                countDown.countDown();
             }
         };
 
@@ -125,9 +146,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         // started
         send(DEFAULT_MESSAGE, false, getAcknowledgementMode());
 
-        countDown.attempt(LOCK_WAIT);
-        assertTrue("Only " + (countDown.initialCount() - countDown.currentCount()) + " of " + countDown.initialCount()
-                + " checkpoints hit", countDown.attempt(0));
+        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        assertTrue("Only " + (countDownInitialCount - countDown.getCount())
+        		+ " of " + countDownInitialCount
+                + " checkpoints hit", countDown.tryLock());
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
@@ -153,7 +175,9 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
     private void doSendTransactedIfPossible(final boolean transactionAvailable) throws Exception
     {
-        final CountDown countDown = new CountDown(2);
+        final int countDownInitialCount = 2;
+        final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
+
         // setup the component and start Mule
         UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
@@ -168,7 +192,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 } else {
                     assertNull(currentTx);
                 }
-                countDown.release();
+                countDown.countDown();
             }
         };
 
@@ -183,9 +207,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         // started
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
-        countDown.attempt(LOCK_WAIT);
-        assertTrue("Only " + (countDown.initialCount() - countDown.currentCount()) + " of " + countDown.initialCount()
-                + " checkpoints hit", countDown.attempt(0));
+        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        assertTrue("Only " + (countDownInitialCount - countDown.getCount())
+        		+ " of " + countDownInitialCount
+                + " checkpoints hit", countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS));
 
         assertNotNull(currentMsg);
         assertTrue(currentMsg instanceof TextMessage);
@@ -206,7 +231,9 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
     public void testSendTransactedRollback() throws Exception
     {
-        final CountDown countDown = new CountDown(2);
+        final int countDownInitialCount = 2;
+        final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
+
         // This exception strategy will be invoked when a message is redelivered
         // after a rollback
 
@@ -222,7 +249,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 assertTrue(currentTx.isBegun());
                 System.out.println("@@@@ Rolling back transaction @@@@");
                 currentTx.setRollbackOnly();
-                countDown.release();
+                countDown.countDown();
             }
         };
 
@@ -242,9 +269,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
         afterInitialise();
-        countDown.attempt(LOCK_WAIT);
-        assertTrue("Only " + (countDown.initialCount() - countDown.currentCount()) + " of " + countDown.initialCount()
-                + " checkpoints hit", countDown.attempt(0));
+        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        assertTrue("Only " + (countDownInitialCount - countDown.getCount())
+        		+ " of " + countDownInitialCount
+                + " checkpoints hit", countDown.tryLock());
 
         // Sleep a while to allow transaction to be rolled back
         afterInitialise();
@@ -371,7 +399,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         return Session.AUTO_ACKNOWLEDGE;
     }
 
-    protected void addResultListener(String dest, final CountDown countDown) throws JMSException
+    protected void addResultListener(String dest, final CountDownLatch countDown) throws JMSException
     {
         MessageConsumer mc;
         // check replyTo
@@ -385,7 +413,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
             {
                 currentMsg = message;
                 if (countDown != null)
-                    countDown.release();
+                    countDown.countDown();
             }
         });
     }
@@ -396,14 +424,14 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
     private class RollbackExceptionListener extends DefaultExceptionStrategy
     {
-        private CountDown countDown;
+        private CountDownLatch countDown;
 
-        public RollbackExceptionListener(CountDown countDown)
+        public RollbackExceptionListener(CountDownLatch countDown)
         {
             this.countDown = countDown;
         }
 
-        public RollbackExceptionListener(CountDown countDown, UMOEndpointURI deadLetter) throws UMOException
+        public RollbackExceptionListener(CountDownLatch countDown, UMOEndpointURI deadLetter) throws UMOException
         {
             this.countDown = countDown;
             UMOEndpoint ep = MuleEndpoint.createEndpointFromUri(deadLetter, UMOEndpoint.ENDPOINT_TYPE_SENDER);
@@ -417,7 +445,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         {
             System.out.println("@@@@ ExceptionHandler Called @@@@");
             if (t instanceof MessageRedeliveredException) {
-                countDown.release();
+                countDown.countDown();
                 try {
                     // MessageRedeliveredException mre =
                     // (MessageRedeliveredException)t;
@@ -449,9 +477,9 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
     public void testTransactedRedeliveryToDLDestination() throws Exception
     {
         // there are 2 check points for each message delivered, so
-        // the message will be delivered twice before this countdown will
-        // release
-        final CountDown countDown = new CountDown(4);
+        // the message will be delivered twice before this countdown will release
+        final int countDownInitialCount = 4;
+        final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
         // This exception strategy will be invoked when a message is redelivered
         // after a rollback
 
@@ -467,7 +495,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                 assertTrue(currentTx.isBegun());
                 System.out.println("@@@@ Rolling back transaction @@@@");
                 currentTx.setRollbackOnly();
-                countDown.release();
+                countDown.countDown();
             }
         };
 
@@ -491,9 +519,10 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         send(DEFAULT_MESSAGE, false, Session.AUTO_ACKNOWLEDGE);
 
         afterInitialise();
-        countDown.attempt(LOCK_WAIT);
-        assertTrue("Only " + (countDown.initialCount() - countDown.currentCount()) + " of " + countDown.initialCount()
-                + " checkpoints hit", countDown.attempt(0));
+        countDown.tryLock(LOCK_WAIT, TimeUnit.MILLISECONDS);
+        assertTrue("Only " + (countDownInitialCount - countDown.getCount())
+        		+ " of " + countDownInitialCount
+                + " checkpoints hit", countDown.tryLock());
 
         assertNotNull(currentMsg);
         System.out.println(currentMsg);
