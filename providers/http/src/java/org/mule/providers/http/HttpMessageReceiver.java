@@ -49,7 +49,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.HashMap;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used
@@ -174,8 +173,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                         returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), os);
                         if (returnMessage == null) {
                             returnMessage = new MuleMessage("");
-                            RequestContext.rewriteEvent(returnMessage);
                         }
+                        RequestContext.rewriteEvent(returnMessage);
                     } else {
                         returnMessage = new MuleMessage(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, endpoint.getEndpointURI().toString()).toString());
                         returnMessage.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_FOUND);
