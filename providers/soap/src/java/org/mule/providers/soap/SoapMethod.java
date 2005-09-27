@@ -35,7 +35,7 @@ public class SoapMethod {
     private QName name;
     private List namedParameters = new ArrayList();
     private QName returnType;
-    private Class returnClass;
+    private Class returnClass = Object.class;
     private static QNameConverter converter = new QNameConverter();
 
     public SoapMethod(String methodName, String paramsString) throws ClassNotFoundException {
