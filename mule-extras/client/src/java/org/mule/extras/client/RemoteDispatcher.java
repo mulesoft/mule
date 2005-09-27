@@ -162,14 +162,19 @@ public class RemoteDispatcher implements Disposable
         return result;
     }
 
+    public UMOMessage sendRemote(String endpoint, Object payload, Map messageProperties, int timeout) throws UMOException
+    {
+        return doToRemote(endpoint, payload, messageProperties, true, timeout);
+    }
+    
     public UMOMessage sendRemote(String endpoint, Object payload, Map messageProperties) throws UMOException
     {
-        return doToRemote(endpoint, payload, messageProperties, true);
+        return doToRemote(endpoint, payload, messageProperties, true, MuleManager.getConfiguration().getSynchronousEventTimeout());
     }
 
     public void dispatchRemote(String endpoint, Object payload, Map messageProperties) throws UMOException
     {
-        doToRemote(endpoint, payload, messageProperties, false);
+        doToRemote(endpoint, payload, messageProperties, false, -1);
     }
 
     public FutureMessageResult sendAsyncRemote(final String endpoint, final Object payload, final Map messageProperties)
@@ -181,7 +186,7 @@ public class RemoteDispatcher implements Disposable
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
-                return doToRemote(endpoint, payload, messageProperties, true);
+                return doToRemote(endpoint, payload, messageProperties, true, -1);
             }
         };
 
@@ -228,7 +233,7 @@ public class RemoteDispatcher implements Disposable
         return result;
     }
 
-    protected UMOMessage doToRemote(String endpoint, Object payload, Map messageProperties, boolean synchronous)
+    protected UMOMessage doToRemote(String endpoint, Object payload, Map messageProperties, boolean synchronous, int timeout)
             throws UMOException
     {
         UMOMessage message = new MuleMessage(payload, messageProperties);
@@ -238,7 +243,7 @@ public class RemoteDispatcher implements Disposable
                                            (synchronous ? AdminEvent.ACTION_SEND : AdminEvent.ACTION_DISPATCH),
                                            endpoint);
 
-        UMOMessage result = dispatchAction(action, synchronous, -1);
+        UMOMessage result = dispatchAction(action, synchronous, timeout);
         return result;
     }
 
