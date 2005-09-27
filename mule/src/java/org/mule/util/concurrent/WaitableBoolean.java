@@ -60,7 +60,10 @@ public class WaitableBoolean extends SynchronizedVariable
 		}
 		else if (other instanceof WaitableBoolean)
 		{
-			return get() == ((WaitableBoolean)other).get();
+			synchronized (_lock)
+			{
+				return _value.get() == ((WaitableBoolean)other).get();
+			}
 		}
 		else
 		{
