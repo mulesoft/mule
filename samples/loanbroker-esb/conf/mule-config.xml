@@ -13,8 +13,8 @@
             <property name="jndiInitialFactory" value="org.openejb.client.LocalInitialContextFactory"/>
             <property name="securityPolicy" value="security.policy"/>
             <map name="jndiProviderProperties">
-                <property name="openejb.base" value="/projects/mule/samples/loanbroker-esb/"/>
-                <property name="openejb.configuration" value="openejb.conf"/>
+                <property name="openejb.base" value="."/>
+                <property name="openejb.configuration" value="../conf/openejb.conf"/>
                 <property name="openejb.nobanner" value="true"/>
             </map>
         </properties>

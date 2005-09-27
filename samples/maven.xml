@@ -23,25 +23,27 @@
     <!--=================================================-->
     <!--                SAMPLES TARGETS                  -->
     <!--=================================================-->
-
-    <goal name="dist-samples" prereqs="setvars">
+    
+    <goal name="distro" prereqs="setvars">
          <maven:reactor
             basedir="${basedir}"
             postProcessing="false"
-            includes="**/project.xml"
+            includes="/*/project.xml"
             goals="distro"
             banner="Dist Samples"
             ignoreFailures="false"/>
 
     </goal>
-    
-    <goal name="distro"/>
 
     <goal name="dist-sample">
         <j:set var="mule.samples.dist.dir" value="${samples.dist}/${mule.sample.name}"/>
         <mkdir dir="${mule.samples.dist.dir}"/>
         <mkdir dir="${mule.samples.dist.dir}/src"/>
         <mkdir dir="${mule.samples.dist.dir}/conf"/>
+
+        <j:if test="mule.samples.class.root==null">
+            <j:set var="mule.samples.class.root" value="${mule.samples.name}"/>
+        </j:if>
 
         <copy todir="${mule.samples.dist.dir}/conf" file="${root.dir}/../mule/src/conf/log4j.properties"/>
 
@@ -66,10 +68,10 @@
           </ant:fileset>
         </ant:chmod>
 
-        <u:available file="${basedir}/target/classes/org/mule/samples/${mule.sample.name}">
+        <u:available file="${basedir}/target/classes/org/mule/samples/${mule.samples.class.root}">
             <mkdir dir="${mule.samples.dist.dir}/classes"/>
-            <copy todir="${mule.samples.dist.dir}/classes/org/mule/samples/${mule.sample.name}">
-                <fileset dir="${basedir}/target/classes/org/mule/samples/${mule.sample.name}">
+            <copy todir="${mule.samples.dist.dir}/classes/org/mule/samples/${mule.samples.class.root}">
+                <fileset dir="${basedir}/target/classes/org/mule/samples/${mule.samples.class.root}">
                     <include name="**/*.class"/>
                 </fileset>
             </copy>

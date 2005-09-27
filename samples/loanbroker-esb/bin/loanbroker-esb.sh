@@ -6,7 +6,8 @@ export MULE_HOME=../../..
 export MULE_MAIN=org.mule.samples.loanbroker.esb.Main
 
 # Set your application specific classpath like this
-SET CLASSPATH=$MULE_HOME/samples/loanbroker/conf:$MULE_HOME/samples/loanbroker/classes
+export CLASSPATH=$MULE_HOME/samples/loanbroker-esb/conf:$MULE_HOME/samples/loanbroker-esb/classes
+export CUSTOM_LIB=$MULE_HOME/samples/loanbroker-esb/lib
 
 $MULE_HOME/bin/mule
 export MULE_MAIN=

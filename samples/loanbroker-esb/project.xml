@@ -3,53 +3,5 @@
     <name>Mule Loan Broker ESB Sample</name>
     <id>mule-samples-loanbroker-esb</id>
     <groupId>mule</groupId>
-    <dependencies>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-ejb</artifactId>
-            <version>${geronimo_spec_ejb_version}</version>
-            <properties>
-                <mule.core.jar>true</mule.core.jar>
-                <mule.mini>false</mule.mini>
-                <rar.bundle>false</rar.bundle>
-                <war.bundle>false</war.bundle>
-            </properties>
-        </dependency>
-
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-j2ee</artifactId>
-            <version>1.4-rc4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>openejb</groupId>
-            <artifactId>openejb-core</artifactId>
-            <version>1.0-beta1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>xerces</groupId>
-            <artifactId>xercesImpl</artifactId>
-            <version>2.6.0</version>
-            <url>http://xml.apache.org</url>
-        </dependency>
-
-        <dependency>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-            <version>1.0.b2</version>
-        </dependency>
-
-        <dependency>
-            <id>castor</id>
-            <version>0.9.5.3</version>
-            <url>http://www.castor.org</url>
-        </dependency>
-
-        <dependency>
-            <id>oro</id>
-            <version>2.0.8</version>
-        </dependency>
-    </dependencies>
+    <dependencies/>
 </project>

@@ -19,8 +19,8 @@
             <map name="environment">
                 <property name="java.naming.factory.initial" value="org.openejb.client.LocalInitialContextFactory"/>
                 <property name="java.naming.provider.url" value="rmi://localhost:1099"/>
-                <property name="openejb.base" value="/projects/mule/samples/loanbroker-esb/"/>
-                <property name="openejb.configuration" value="openejb.conf"/>
+                <property name="openejb.base" value="."/>
+                <property name="openejb.configuration" value="../conf/openejb.conf"/>
                 <property name="openejb.nobanner" value="true"/>
             </map>
         </properties>
