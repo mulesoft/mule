@@ -30,9 +30,7 @@ package org.mule.providers.http;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
-import org.mule.impl.ResponseOutputStream;
+import org.mule.impl.*;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.tcp.TcpMessageReceiver;
@@ -170,15 +168,21 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 
                     //determine if the request path on this request denotes a different receiver
                     AbstractMessageReceiver receiver = getTargetReceiver(message, endpoint);
-                    UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), os);
 
-                    if (returnMessage == null) {
-                        returnMessage = new MuleMessage("");
+                    UMOMessage returnMessage = null;
+                    if(receiver!=null) {
+                        returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), os);
+                        if (returnMessage == null) {
+                            returnMessage = new MuleMessage("");
+                            RequestContext.rewriteEvent(returnMessage);
+                        }
+                    } else {
+                        returnMessage = new MuleMessage(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, endpoint.getEndpointURI().toString()).toString());
+                        returnMessage.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_FOUND);
+                        RequestContext.setEvent(new MuleEvent(returnMessage, endpoint, new MuleSession(), true));
                     }
 
-                    RequestContext.rewriteEvent(returnMessage);
-
-                    Object response = responseTransformer.transform(returnMessage.getPayload());
+                    Object response = responseTransformer.transform(returnMessage);
                     if (response instanceof byte[]) {
                         dataOut.write((byte[]) response);
                     } else {
@@ -229,10 +233,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                 requestUri.append(path);
             }
             receiver = connector.getReceiver(requestUri.toString());
-        }
-        if (receiver == null) {
-
-            throw new ConnectException(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, requestUri.toString()), this);
         }
         return receiver;
     }

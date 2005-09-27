@@ -17,6 +17,7 @@ package org.mule.test.integration.providers.http;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,23 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
 
         sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 10);
         sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 10);
+    }
+
+    public void testSendToEachWithBadEndpoint() throws Exception {
+
+        MuleClient client = new MuleClient();
+
+        sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 5);
+        sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 5);
+
+        UMOMessage result = client.send("http://localhost:8081/mycomponent-notfound", "test", null);
+        assertNotNull(result);
+        assertNotNull(result.getExceptionPayload());
+        assertEquals(404, result.getIntProperty("http.status", 0));
+
+        //Test that after the exception the endpoints still receive events
+        sendWithResponse("http://localhost:8081/mycomponent1", "test", "mycomponent1", 5);
+        sendWithResponse("http://localhost:8081/mycomponent2", "test", "mycomponent2", 5);
     }
 
     protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages) throws UMOException {

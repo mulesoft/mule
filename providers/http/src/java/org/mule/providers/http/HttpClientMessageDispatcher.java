@@ -204,6 +204,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 //retry
                 Thread.sleep(100);
                 httpMethod.execute(state, connection);
+            } catch(HttpRecoverableException e) {
+                logger.error(e, e);
             }
             return httpMethod;
         } catch (Exception e) {
