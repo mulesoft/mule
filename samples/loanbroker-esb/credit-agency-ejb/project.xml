@@ -5,6 +5,7 @@
     <id>credit-agency-ejb-sample</id>
     <name>credit-agency-ejb-sample</name>
     <groupId>mule</groupId>
+    <currentVersion>1.0</currentVersion>
     <description>Example EJB app for the Loan Broker ESB example</description>
     <dependencies>
         <dependency>
