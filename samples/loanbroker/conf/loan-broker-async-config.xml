@@ -28,6 +28,17 @@ the different components are made from the loan broker component (a la hub and s
         <!--       <agent name="Log4jAgent" className="org.mule.management.agents.Log4jAgent" />-->
     </agents>
 
+    <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level
+    bean types for the objects you're passing around -->
+    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
+        <properties>
+            <list name="beanTypes">
+                <entry value="org.mule.samples.loanbroker.Customer"/>
+                <entry value="org.mule.samples.loanbroker.BankQuoteRequest"/>
+            </list>
+        </properties>
+    </connector>
+
     <!--
     Setting global endpoints can help simplify configuration by defining an actual
     url endpointUri in one place. The endpointUri name can be used in place of the url.

@@ -12,6 +12,17 @@
         <agent name="JdmkAgent" className="org.mule.management.agents.JdmkAgent"/>
     </agents>
 
+    <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level
+    bean types for the objects you're passing around -->
+    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
+        <properties>
+            <list name="beanTypes">
+                <entry value="org.mule.samples.loanbroker.Customer"/>
+                <entry value="org.mule.samples.loanbroker.BankQuoteRequest"/>
+            </list>
+        </properties>
+    </connector>
+
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
         <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanQuotes"/>
