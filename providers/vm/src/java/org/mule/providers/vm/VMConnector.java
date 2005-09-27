@@ -212,4 +212,8 @@ public class VMConnector extends AbstractServiceEnabledConnector
         logger.debug("No receiver found for endpointUri: " + endpointUri);
         return null;
     }
+
+    public boolean isRemoteSyncEnabled() {
+        return true;
+}
 }
