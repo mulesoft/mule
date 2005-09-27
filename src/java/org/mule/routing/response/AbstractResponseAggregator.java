@@ -13,11 +13,10 @@
  */
 package org.mule.routing.response;
 
-import EDU.oswego.cs.dl.util.concurrent.Latch;
-import EDU.oswego.cs.dl.util.concurrent.Sync;
-
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 
 import java.util.Map;
 
@@ -31,6 +30,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
+import org.mule.util.concurrent.Latch;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for
@@ -66,15 +66,15 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
                 Object id = eg.getGroupId();
                 removeGroup(id);
                 responseEvents.put(id, returnMessage);
-                Sync s = (Sync) locks.get(id);
-                if (s == null) {
+                Lock l = (Lock) locks.get(id);
+                if (l == null) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Creating latch for " + id + " in " + this);
                     }
-                    s = new Latch();
-                    locks.put(id, s);
+                    l = new Latch();
+                    locks.put(id, l);
                 }
-                s.release();
+                l.unlock();
             }
         }
     }
@@ -147,12 +147,12 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
             logger.debug("Waiting for response for message id: " + messageId + " in " + this);
         }
 
-        Sync s = (Sync) locks.get(messageId);
-        if (s == null) {
-            logger.debug("Got response but no one is waiting for it yet. Creating latch for " + messageId + " in "
-                    + this);
-            s = new Latch();
-            locks.put(messageId, s);
+        Lock l = (Lock) locks.get(messageId);
+        if (l == null) {
+            logger.debug("Got response but no one is waiting for it yet. Creating latch for "
+            		+ messageId + " in " + this);
+            l = new Latch();
+            locks.put(messageId, l);
         } else {
             logger.debug("Got latch for message: " + messageId);
         }
@@ -161,10 +161,10 @@ public abstract class AbstractResponseAggregator extends AbstractResponseRouter
         try {
             logger.debug("Waiting for response to message: " + messageId);
             if (getTimeout() <= 0) {
-                s.acquire();
+                l.lock();
                 b = true;
             } else {
-                b = s.attempt(getTimeout());
+                b = l.tryLock(this.getTimeout(), TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);

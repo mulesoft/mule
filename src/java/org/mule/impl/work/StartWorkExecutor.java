@@ -17,10 +17,11 @@
 
 package org.mule.impl.work;
 
+import EDU.oswego.cs.dl.util.concurrent.Executor;
+
 import javax.resource.spi.work.WorkException;
 
-import EDU.oswego.cs.dl.util.concurrent.Executor;
-import EDU.oswego.cs.dl.util.concurrent.Latch;
+import org.mule.util.concurrent.Latch;
 
 /**
  * 
@@ -35,6 +36,6 @@ public class StartWorkExecutor implements WorkExecutor
     {
         Latch latch = work.provideStartLatch();
         executor.execute(work);
-        latch.acquire();
+        latch.await();
     }
 }
