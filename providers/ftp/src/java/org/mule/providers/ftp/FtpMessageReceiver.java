@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.providers.ftp;
@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -97,13 +98,11 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
             if (files == null || files.length == 0) {
                 return files;
             }
-            if (filenameFilter == null) {
-                return files;
-            }
-            ArrayList v = new ArrayList();
+            List v = new ArrayList();
             for (int i = 0; i < files.length; i++) {
                 if (files[i].isFile()) {
-                    if (filenameFilter.accept(null, files[i].getName())) {
+                       if (filenameFilter == null ||
+                           filenameFilter.accept(null, files[i].getName())) {
                         v.add(files[i]);
                     }
                 }
