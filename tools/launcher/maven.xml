@@ -1,2 +1,3 @@
-<project default="jar"
-    xmlns:j="jelly:core"/>
+<project default="default" xmlns:j="jelly:core">
+    <goal name="default" prereqs="clean, jar"/>
+</project>

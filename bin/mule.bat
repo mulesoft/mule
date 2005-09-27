@@ -96,6 +96,8 @@ if "%MULE_OPTS%" == "" set MULE_OPTS=-Xmx512M
 
 if "%MULE_MAIN%" == "" set MULE_MAIN=org.mule.MuleServer
 
+if not "%CUSTOM_LIB%" == "" set MULE_OPTS=%MULE_OPTS% -Dorg.mule.custom.lib.dir=%CUSTOM_LIB%
+
 REM Uncomment to enable YourKit profiling
 REM SET MULE_DEBUG_OPTS="-Xrunyjpagent"
 

@@ -44,8 +44,11 @@
 
     ======================================================================================
     -->
+    <goal name="build" prereqs="start-build, complete-build"/>
 
-    <goal name="build" prereqs="setvars, clean, multiproject:clean, mule:libs, multiproject:install-snapshot, mule:night-release"/>
+    <goal name="start-build" prereqs="setvars, clean, multiproject:clean, multiproject:install-snapshot"/>
+
+    <goal name="complete-build" prereqs="mule:night-release"/>
 
     <goal name="dist:nightly" prereqs="build, deploy:nightly"/>
 
@@ -266,12 +269,20 @@
     </goal>
 
     <goal name="mule:samples" prereqs="setvars">
-        <j:set var="root.dir" value="${basedir}"/>
+
         <maven:reactor
             basedir="${basedir}/samples"
             postProcessing="false"
             includes="project.xml"
-            goals="dist-samples"
+            goals="clean"
+            banner="Clean Samples"
+            ignoreFailures="false"/>
+
+        <maven:reactor
+            basedir="${basedir}"
+            postProcessing="false"
+            includes="samples/*/project.xml"
+            goals="clean,distro"
             banner="Dist Samples"
             ignoreFailures="false"/>
 

@@ -220,13 +220,17 @@ if [ -n "$JAVA_HOME" ] ; then
   fi
 fi
 
-if [ -n "MULE_OPTS" ] ; then
+if [ -n "$MULE_OPTS" ] ; then
   MULE_OPTS="-Xmx512M"
 fi
 
 # Allow Jikes support (off by default)
 if $usejikes; then
   MULE_OPTS="$MULE_OPTS -Dbuild.compiler=jikes"
+fi
+
+if [ -n "$CUSTOM_LIB" ] ; then
+  MULE_OPTS="$MULE_OPTS -Dorg.mule.custom.lib.dir=$CUSTOM_LIB"
 fi
 
 # For Cygwin, switch paths to appropriate format before running java

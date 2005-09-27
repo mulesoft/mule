@@ -19,9 +19,12 @@ For Windows
 set CLASSPATH=/myproject/classes;/myproject/conf
 mule -config mule-config.xml
 
-You can include jars and other resources on the classpath by putting them in the
-lib/patch directory.  This is useful for dropping new Mule Jars or your application
-jars and will be included as the first entries in the classpath.
+If you want to include a whole directory of jars, rether than listing them all in
+the CLASSPATH variable you can specify the CUSTOM_LIB variable and point it to the
+directory containing your jars.
+
+You will see a 'patch' directory in the Mule lib directory/ This is useful for dropping in
+patched Mule jars and will be included as the first entries in the classpath.
 
 When the script is run it will set a MULE_HOME environment variable to the parent directory
 from where the script was run.  If you have problems with files not being found set

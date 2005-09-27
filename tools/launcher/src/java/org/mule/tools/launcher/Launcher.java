@@ -32,6 +32,8 @@ package org.mule.tools.launcher;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,10 +52,27 @@ public class Launcher {
      * Mule home directory
      */
     public static final String MULE_HOME_PROPERTY = "org.mule.home";
+
+    /**
+     * Defines the specific location of the mule-launcher.properties file.
+     * If this is not set the property file will be looked for on the classpath and in
+     * the current directory
+     */
+    public static final String MULE_LAUNCHER_PROPERTIES_PROPERTY = "org.mule.launcher.properties";
     /**
      * The Mule Library Directory property
+     * Under this directory two other directories will be searched for -
+     * opt - any optional jars in the Mule distribution
+     * patch - Adirectory containing any patch jars for the Mule distribution.  This will
+     * always be empty in a new distribution, but jars can be placed in here and will be loaded
+     * at the top of the classpath
      */
     public static final String MULE_LIB_DIR_PROPERTY = "org.mule.lib.dir";
+
+    /**
+     * A custom directory containing additional jars
+     */
+    public static final String MULE_CUSTOM_LIB_DIR_PROPERTY = "org.mule.custom.lib.dir";
 
     /**
      * The main class to invoke. default is org.mule.MuleServer
@@ -82,10 +101,35 @@ public class Launcher {
      * @param args commandline arguments
      */
     public static void main(String[] args) {
-        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(MULE_LAUNCHER_PROPERTIES);
+        InputStream is=null;
+
+        //Try loading properties from a specific location
+        String propsFile = System.getProperty(MULE_LAUNCHER_PROPERTIES_PROPERTY, null);
+        if(propsFile!=null) {
+            File file = new File(propsFile);
+            try {
+                is = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                logError("Failed to load " + propsFile, e);
+                System.exit(1);
+            }
+        }
+        File file = new File(MULE_LAUNCHER_PROPERTIES);
+        if(file.exists()) {
+            try {
+                is = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                //ignore
+            }
+        }
+
+        if(is==null) {
+            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(MULE_LAUNCHER_PROPERTIES);
+        }
         if(is!=null) {
             try {
                 properties.load(is);
+                System.out.println("Loaded Mule launcher from " + Thread.currentThread().getContextClassLoader().getResource(MULE_LAUNCHER_PROPERTIES));
             } catch (Throwable e) {
                 logError("Failed to load " + MULE_LAUNCHER_PROPERTIES, e);
             }
@@ -223,6 +267,7 @@ public class Launcher {
         // determine Mule library directory for system jars: use property
         // or default using location of mule-launcher.jar
         File muleLibDir = null;
+        File muleCustomLibDir = null;
         File muleLibOptDir = null;
         File muleLibPatchDir = null;
         String muleLibDirProperty = getProperty(MULE_LIB_DIR_PROPERTY);
@@ -242,6 +287,11 @@ public class Launcher {
             if(debug) System.out.println("Set " + MULE_LIB_DIR_PROPERTY + " to " + muleLibDir.getAbsolutePath());
         }
 
+        String muleCustomLibDirProperty = getProperty(MULE_CUSTOM_LIB_DIR_PROPERTY);
+        if (muleCustomLibDirProperty != null) {
+            muleCustomLibDir = new File(muleCustomLibDirProperty);
+        }
+
         URL[] systemJars = Locator.getLocationURLs(muleLibDir);
 
         //Optional libraries
@@ -252,7 +302,9 @@ public class Launcher {
         muleLibPatchDir = new File(muleLibDir.getAbsolutePath() + File.separator + "patch");
         URL[] mulePatchJars = muleLibOptDir.exists() ? Locator.getLocationURLs(muleLibPatchDir) :  new URL[0];
 
-        int numJars = mulePatchJars.length + libJars.length + muleOptJars.length + systemJars.length;
+        URL[] muleCustomLibJars = (muleCustomLibDir!=null && muleCustomLibDir.exists() ? Locator.getLocationURLs(muleCustomLibDir) :  new URL[0]);
+
+        int numJars = mulePatchJars.length + libJars.length + muleOptJars.length + systemJars.length + muleCustomLibJars.length;
         if (toolsJar != null) {
             numJars++;
         }
@@ -260,8 +312,8 @@ public class Launcher {
         System.arraycopy(mulePatchJars, 0, jars, 0, mulePatchJars.length);
         System.arraycopy(libJars, 0, jars, mulePatchJars.length, libJars.length);
         System.arraycopy(muleOptJars, 0, jars, mulePatchJars.length + libJars.length, muleOptJars.length);
-        System.arraycopy(systemJars, 0, jars, mulePatchJars.length + muleOptJars.length + libJars.length,
-            systemJars.length);
+        System.arraycopy(systemJars, 0, jars, mulePatchJars.length + libJars.length + muleOptJars.length, systemJars.length);
+        System.arraycopy(muleCustomLibJars, 0, jars, mulePatchJars.length + libJars.length + muleOptJars.length + systemJars.length, muleCustomLibJars.length);
 
         if (toolsJar != null) {
             jars[jars.length - 1] = toolsJar.toURL();

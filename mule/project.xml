@@ -206,7 +206,7 @@
         <dependency>
             <groupId>script</groupId>
             <artifactId>jsr223</artifactId>
-            <version>${script_version}</version>
+            <version>${jsr223_scripting_version}</version>
             <properties>
                 <rar.bundle>true</rar.bundle>
                 <war.bundle>true</war.bundle>
