@@ -38,7 +38,7 @@ public class MuleComponentTestCase extends AbstractMuleTestCase
     public void testSendToPausedComponent() throws Exception
     {
         UMOSession session = MuleManager.getInstance().getModel().getComponentSession("orangeComponent");
-        final UMOComponent comp = (UMOComponent) session.getComponent();
+        final UMOComponent comp = session.getComponent();
         assertTrue(comp.isStarted());
         comp.pause();
         new Thread(new Runnable() {
