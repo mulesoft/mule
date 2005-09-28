@@ -13,17 +13,23 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.util.HashMap;
+
 import org.mule.MuleManager;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleTransactionConfig;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.functional.EventCallback;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
-
-import java.util.HashMap;
 
 /**
  * @author Guillaume Nodet
@@ -41,7 +47,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
 
     public void testReceiveAndSendWithException() throws Exception
     {
-        final SynchronizedBoolean called = new SynchronizedBoolean(false);
+        final AtomicBoolean called = new AtomicBoolean(false);
 
         EventCallback callback = new EventCallback() {
             public void eventReceived(UMOEventContext context, Object Component) throws Exception

@@ -13,8 +13,15 @@
  */
 package org.mule.impl.model;
 
-import EDU.oswego.cs.dl.util.concurrent.ConcurrentHashMap;
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -39,12 +46,6 @@ import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
-
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * <code>MuleModel</code> is the default implementation of the UMOModel. The
@@ -73,9 +74,9 @@ public abstract class AbstractModel implements UMOModel
      */
     protected ConcurrentHashMap descriptors;
 
-    private SynchronizedBoolean initialised = new SynchronizedBoolean(false);
+    private AtomicBoolean initialised = new AtomicBoolean(false);
 
-    private SynchronizedBoolean started = new SynchronizedBoolean(false);
+    private AtomicBoolean started = new AtomicBoolean(false);
 
     private ExceptionListener exceptionListener;
 

@@ -14,8 +14,10 @@
 */
 package org.mule.impl.model;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import EDU.oswego.cs.dl.util.concurrent.WaitableBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import java.beans.ExceptionListener;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -26,13 +28,17 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.internal.events.ComponentEvent;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.*;
+import org.mule.umo.ComponentException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
-
-import java.beans.ExceptionListener;
+import org.mule.util.concurrent.WaitableBoolean;
 
 /**
  * todo document
@@ -56,7 +62,7 @@ public abstract class AbstractComponent implements UMOComponent {
     /**
      * Determines if the component has been stopped
      */
-    protected SynchronizedBoolean stopped = new SynchronizedBoolean(true);
+    protected AtomicBoolean stopped = new AtomicBoolean(true);
 
     /**
      * Determines whether stop has been called and is still in progress
@@ -71,7 +77,7 @@ public abstract class AbstractComponent implements UMOComponent {
     /**
      * determines if the proxy pool has been initialised
      */
-    protected SynchronizedBoolean poolInitialised = new SynchronizedBoolean(false);
+    protected AtomicBoolean poolInitialised = new AtomicBoolean(false);
 
     /**
      * The exception strategy used by the component, this is provided by the
@@ -82,7 +88,7 @@ public abstract class AbstractComponent implements UMOComponent {
     /**
      * Determines if the component has been initilised
      */
-    protected SynchronizedBoolean initialised = new SynchronizedBoolean(false);
+    protected AtomicBoolean initialised = new AtomicBoolean(false);
 
     protected UMOModel model;
 
@@ -157,7 +163,6 @@ public abstract class AbstractComponent implements UMOComponent {
             stopping.set(true);
             if (MuleManager.getInstance().getQueueManager().getQueueSession().getQueue(descriptor.getName() + ".component").size() > 0) {
                 try {
-
                     stopping.whenFalse(null);
                 } catch (InterruptedException e) {
                     //we can ignore this
