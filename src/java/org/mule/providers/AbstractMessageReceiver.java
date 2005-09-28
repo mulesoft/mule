@@ -190,6 +190,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                     logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
                 }
                 message.setProperty(propName, code);
+                RequestContext.rewriteEvent(message);
             }
         }
     }
