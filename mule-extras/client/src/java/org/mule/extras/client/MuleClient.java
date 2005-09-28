@@ -209,7 +209,21 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, Object payload, Map messageProperties) throws UMOException
     {
-        UMOMessage message = new MuleMessage(payload, messageProperties);
+        dispatch(url, new MuleMessage(payload, messageProperties));
+    }
+
+    /**
+     * Dispatches an event asynchronously to a endpointUri via a mule server.
+     * the Url determines where to dispathc the event to, this can be in the
+     * form of
+     *
+     * @param url the Mule url used to determine the destination and transport
+     *            of the message
+     * @param message the message to send
+     * @throws org.mule.umo.UMOException
+     */
+    public void dispatch(String url, UMOMessage message) throws UMOException
+    {
         UMOEvent event = getEvent(message, url, false);
         try {
             event.getSession().dispatchEvent(event);
@@ -219,7 +233,6 @@ public class MuleClient implements Disposable
             throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
         }
     }
-
     /**
      * sends an event synchronously to a components
      * 
@@ -236,15 +249,28 @@ public class MuleClient implements Disposable
     public UMOMessage sendDirect(String component, String transformers, Object payload, Map messageProperties)
             throws UMOException
     {
+        UMOMessage message = new MuleMessage(payload, messageProperties);
+        return sendDirect(component, transformers, message);
+    }
+
+    /**
+     * sends an event synchronously to a components
+     *
+     * @param component the name of the Mule components to send to
+     * @param transformers a comma separated list of transformers to apply to
+     *            the result message
+     * @param message the message to send
+     * @return the result message if any of the invocation
+     * @throws org.mule.umo.UMOException if the dispatch fails or the components
+     *             or transfromers cannot be found
+     */
+    public UMOMessage sendDirect(String component, String transformers, UMOMessage message)
+            throws UMOException
+    {
         boolean compregistered = getManager().getModel().isComponentRegistered(component);
-        // if(!compregistered && forwardDirectRequests) {
-        // logger.info("Component '" + components + "' not found in local
-        // server, forwarding remote request to " + serverEndpoint);
-        // sendRemote(components, transformers, payload, messageProperties);
-        // } else
         if (!compregistered) {
             throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Component '" + component
-                    + "'"), payload, null);
+                    + "'"), message, null);
         }
         UMOTransformer trans = null;
         if (transformers != null) {
@@ -254,9 +280,8 @@ public class MuleClient implements Disposable
         if (!MuleManager.getConfiguration().isSynchronous()) {
             logger.warn("The mule manager is running synchronously, a null message payload will be returned");
         }
-        UMOMessage message = new MuleMessage(payload, messageProperties);
         UMOSession session = getManager().getModel().getComponentSession(component);
-        UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(), payload);
+        UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(), message.getPayload());
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
 
         if (logger.isDebugEnabled()) {
@@ -288,28 +313,35 @@ public class MuleClient implements Disposable
      */
     public void dispatchDirect(String component, Object payload, Map messageProperties) throws UMOException
     {
-        boolean compregistered = getManager().getModel().isComponentRegistered(component);
-
-        // if(!compregistered && forwardDirectRequests) {
-        // logger.info("Component '" + components + "' not found in local
-        // server, forwarding remote request to " + serverEndpoint);
-        // dispatchRemote(components, payload, messageProperties);
-        // } else
-        if (!compregistered) {
-            throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Component '" + component
-                    + "'"), payload, null);
-        }
-        UMOMessage message = new MuleMessage(payload, messageProperties);
-        UMOSession session = getManager().getModel().getComponentSession(component);
-        UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(), payload);
-        UMOEvent event = new MuleEvent(message, endpoint, session, true);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("MuleClient dispatching event direct to: " + component + ". Event is: " + event);
-        }
-
-        event.getComponent().dispatchEvent(event);
+        dispatchDirect(component,new MuleMessage(payload, messageProperties));
     }
+
+    /**
+         * dispatches an event asynchronously to the components
+         *
+         * @param component the name of the Mule components to dispatch to
+         * @param message the message to send
+         * @throws org.mule.umo.UMOException if the dispatch fails or the components
+         *             or transfromers cannot be found
+         */
+        public void dispatchDirect(String component, UMOMessage message) throws UMOException
+        {
+            boolean compregistered = getManager().getModel().isComponentRegistered(component);
+            if (!compregistered) {
+                throw new MessagingException(new Message(Messages.X_NOT_REGISTERED_WITH_MANAGER, "Component '" + component
+                        + "'"), message, null);
+            }
+            UMOSession session = getManager().getModel().getComponentSession(component);
+            UMOEndpoint endpoint = getDefaultClientEndpoint(session.getComponent().getDescriptor(), message.getPayload());
+            UMOEvent event = new MuleEvent(message, endpoint, session, true);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("MuleClient dispatching event direct to: " + component + ". Event is: " + event);
+            }
+
+            event.getComponent().dispatchEvent(event);
+        }
+
 
     /**
      * sends an event request to a Url, making the result of the event trigger
@@ -332,6 +364,22 @@ public class MuleClient implements Disposable
     /**
      * sends an event request to a Url, making the result of the event trigger
      * available as a Future result that can be accessed later by client code.
+     *
+     * @param url the url to make a request on
+     * @param message the message to send
+     * @return the result message if any of the invocation
+     * @throws org.mule.umo.UMOException if the dispatch fails or the components
+     *             or transfromers cannot be found
+     */
+    public FutureMessageResult sendAsync(final String url, final UMOMessage message)
+            throws UMOException
+    {
+        return sendAsync(url, message, MuleManager.getConfiguration().getSynchronousEventTimeout());
+    }
+
+    /**
+     * sends an event request to a Url, making the result of the event trigger
+     * available as a Future result that can be accessed later by client code.
      * 
      * @param url the url to make a request on
      * @param payload the object that is the payload of the event
@@ -347,12 +395,30 @@ public class MuleClient implements Disposable
                                          final Map messageProperties,
                                          final int timeout) throws UMOException
     {
+        return sendAsync(url, new MuleMessage(payload, messageProperties), timeout);
+    }
+
+    /**
+     * sends an event request to a Url, making the result of the event trigger
+     * available as a Future result that can be accessed later by client code.
+     *
+     * @param url the url to make a request on
+     * @param message the message to send
+     * @param timeout how long to block in milliseconds waiting for a result
+     * @return the result message if any of the invocation
+     * @throws org.mule.umo.UMOException if the dispatch fails or the components
+     *             or transfromers cannot be found
+     */
+    public FutureMessageResult sendAsync(final String url,
+                                         final UMOMessage message,
+                                         final int timeout) throws UMOException
+    {
         FutureMessageResult result = new FutureMessageResult();
 
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
-                return send(url, payload, messageProperties, timeout);
+                return send(url, message, timeout);
             }
         };
 
@@ -384,6 +450,30 @@ public class MuleClient implements Disposable
                                                final Object payload,
                                                final Map messageProperties) throws UMOException
     {
+        return sendDirectAsync(component, transformers, new MuleMessage(payload, messageProperties));
+    }
+
+    /**
+     * sends an event to a components on a local Mule instance, while making the
+     * result of the event trigger available as a Future result that can be
+     * accessed later by client code. If forwardDirectRequests flag s set and
+     * the components is not found on the local Mule instance it will forward to
+     * a remote server. Users can endpoint a url to a remote Mule server in the
+     * constructor of a Mule client, by default the default Mule server url
+     * tcp://localhost:60504 is used.
+     *
+     * @param component the name of the Mule components to send to
+     * @param transformers a comma separated list of transformers to apply to
+     *            the result message
+     * @param message the message to send
+     * @return the result message if any of the invocation
+     * @throws org.mule.umo.UMOException if the dispatch fails or the components
+     *             or transfromers cannot be found
+     */
+    public FutureMessageResult sendDirectAsync(final String component,
+                                               String transformers,
+                                               final UMOMessage message) throws UMOException
+    {
         UMOTransformer trans = null;
         FutureMessageResult result = null;
         if (transformers != null) {
@@ -396,7 +486,7 @@ public class MuleClient implements Disposable
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
-                return sendDirect(component, null, payload, messageProperties);
+                return sendDirect(component, null, message);
             }
         };
 
@@ -407,7 +497,7 @@ public class MuleClient implements Disposable
     /**
      * Sends an event synchronously to a endpointUri via a mule server and a
      * resulting message is returned.
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport
      *            of the message
      * @param payload the object that is the payload of the event
@@ -421,6 +511,22 @@ public class MuleClient implements Disposable
     public UMOMessage send(String url, Object payload, Map messageProperties) throws UMOException
     {
         return send(url, payload, messageProperties, MuleManager.getConfiguration().getSynchronousEventTimeout());
+    }
+
+    /**
+     * Sends an event synchronously to a endpointUri via a mule server and a
+     * resulting message is returned.
+     *
+     * @param url the Mule url used to determine the destination and transport
+     *            of the message
+     * @param message the Message for the event
+     * @return A return message, this could be null if the the components
+     *         invoked explicitly sets a return as null
+     * @throws org.mule.umo.UMOException
+     */
+    public UMOMessage send(String url, UMOMessage message) throws UMOException
+    {
+        return send(url, message, MuleManager.getConfiguration().getSynchronousEventTimeout());
     }
 
     /**
@@ -448,6 +554,24 @@ public class MuleClient implements Disposable
             messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
         }
         UMOMessage message = new MuleMessage(payload, messageProperties);
+        return send(url, message,  timeout);
+    }
+
+    /**
+     * Sends an event synchronously to a endpointUri via a mule server and a
+     * resulting message is returned.
+     *
+     * @param url the Mule url used to determine the destination and transport
+     *            of the message
+     * @param message The message to send
+     * @param timeout The time in milliseconds the the call should block waiting
+     *            for a response
+     * @return A return message, this could be null if the the components
+     *         invoked explicitly sets a return as null
+     * @throws org.mule.umo.UMOException
+     */
+    public UMOMessage send(String url, UMOMessage message, int timeout) throws UMOException
+    {
         UMOEvent event = getEvent(message, url, true);
         event.setTimeout(timeout);
         UMOMessage result = null;
