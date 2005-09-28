@@ -179,7 +179,10 @@ public class SedaComponent extends AbstractComponent implements Work {
                     e);
             handleException(e1);
         }
-        logger.trace("Event added to queue for: " + descriptor.getName());
+
+        if (logger.isTraceEnabled()) {
+        	logger.trace("Event added to queue for: " + descriptor.getName());
+        }
     }
 
     public UMOMessage doSend(UMOEvent event) throws UMOException {
