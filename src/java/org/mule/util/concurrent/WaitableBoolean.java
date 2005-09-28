@@ -163,7 +163,7 @@ public class WaitableBoolean extends SynchronizedVariable
 		{
 			while (!(_value.get() == condition))
 			{
-				_value.wait();
+				_lock.wait();
 			}
 
 			if (action != null)
