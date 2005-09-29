@@ -259,8 +259,8 @@ public class ServerEventManager implements Work, Disposable
         UMOServerEvent event;
         while (!disposed) {
             try {
-                event = (UMOServerEvent) eventQueue.take();
-                notifyListeners(event);
+                event = (UMOServerEvent) eventQueue.poll(5000);
+                if(event!=null) notifyListeners(event);
             } catch (InterruptedException e) {
                 if (!disposed) {
                     logger.error("Failed to take event from server event queue", e);
