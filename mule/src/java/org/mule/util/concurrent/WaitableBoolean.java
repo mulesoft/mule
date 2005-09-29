@@ -14,32 +14,32 @@
  */
 package org.mule.util.concurrent;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * @author Holger Hoffstaette
  */
 
 public class WaitableBoolean extends SynchronizedVariable
 {
-	private AtomicBoolean _value;
+	private boolean _value;
 
 	public WaitableBoolean(boolean initialValue)
 	{
 		super();
-		_value = new AtomicBoolean(initialValue);
+		_value = initialValue;
 	}
 
 	public WaitableBoolean(boolean initialValue, Object lock)
 	{
 		super(lock);
-		_value = new AtomicBoolean(initialValue);
+		_value = initialValue;
 	}
 
 	public int compareTo(boolean other)
 	{
-		boolean val = this.get();
-		return (val == other) ? 0 : (val) ? 1 : -1;
+		synchronized (_lock)
+		{
+			return (_value == other ? 0 : (_value ? 1 : -1));
+		}
 	}
 
 	public int compareTo(WaitableBoolean other)
@@ -62,7 +62,7 @@ public class WaitableBoolean extends SynchronizedVariable
 		{
 			synchronized (_lock)
 			{
-				return _value.get() == ((WaitableBoolean)other).get();
+				return (_value == ((WaitableBoolean)other).get());
 			}
 		}
 		else
@@ -78,14 +78,14 @@ public class WaitableBoolean extends SynchronizedVariable
 
 	public String toString()
 	{
-		return _value.toString();
+		return Boolean.toString(_value);
 	}
 
 	public boolean get()
 	{
 		synchronized (_lock)
 		{
-			return _value.get();
+			return _value;
 		}
 	}
 
@@ -94,7 +94,9 @@ public class WaitableBoolean extends SynchronizedVariable
 		synchronized (_lock)
 		{
 			_lock.notifyAll();
-			return _value.getAndSet(newValue);
+			boolean oldValue = _value;
+			_value = newValue;
+			return oldValue;
 		}
 	}
 
@@ -102,11 +104,14 @@ public class WaitableBoolean extends SynchronizedVariable
 	{
 		synchronized (_lock)
 		{
-			boolean success = _value.compareAndSet(assumedValue, newValue);
+			boolean success = (_value == assumedValue);
+
 			if (success)
 			{
+				_value = newValue;
 				_lock.notifyAll();
 			}
+
 			return success;
 		}
 	}
@@ -116,7 +121,7 @@ public class WaitableBoolean extends SynchronizedVariable
 		synchronized (_lock)
 		{
 			_lock.notifyAll();
-			return !_value.get();
+			return (_value = !_value);
 		}
 	}
 
@@ -125,7 +130,7 @@ public class WaitableBoolean extends SynchronizedVariable
 		synchronized (_lock)
 		{
 			_lock.notifyAll();
-			return (_value.get() & b);
+			return (_value &= b);
 		}
 	}
 
@@ -134,7 +139,7 @@ public class WaitableBoolean extends SynchronizedVariable
 		synchronized (_lock)
 		{
 			_lock.notifyAll();
-			return (_value.get() | b);
+			return (_value |= b);
 		}
 	}
 
@@ -143,7 +148,7 @@ public class WaitableBoolean extends SynchronizedVariable
 		synchronized (_lock)
 		{
 			_lock.notifyAll();
-			return (_value.get() ^ b);
+			return (_value ^= b);
 		}
 	}
 
@@ -161,7 +166,7 @@ public class WaitableBoolean extends SynchronizedVariable
 	{
 		synchronized (_lock)
 		{
-			while (!(_value.get() == condition))
+			while (_value != condition)
 			{
 				_lock.wait();
 			}

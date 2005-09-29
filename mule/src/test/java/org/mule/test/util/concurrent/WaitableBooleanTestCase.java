@@ -112,7 +112,10 @@ public class WaitableBooleanTestCase extends TestCase
 	public void testComplement()
 	{
 		assertFalse(TRUE.complement());
+		assertFalse(TRUE.get());
+
 		assertTrue(FALSE.complement());
+		assertTrue(FALSE.get());
 	}
 
 	public void testAnd()
@@ -121,6 +124,11 @@ public class WaitableBooleanTestCase extends TestCase
 		assertFalse((new WaitableBoolean(true)).and(false));
 		assertFalse((new WaitableBoolean(false)).and(false));
 		assertFalse((new WaitableBoolean(false)).and(true));
+
+		assertTrue(TRUE.and(true));
+		assertTrue(TRUE.get());
+		assertFalse(TRUE.and(false));
+		assertFalse(TRUE.get());
 	}
 
 	public void testOr()
@@ -129,6 +137,11 @@ public class WaitableBooleanTestCase extends TestCase
 		assertTrue((new WaitableBoolean(true)).or(false));
 		assertFalse((new WaitableBoolean(false)).or(false));
 		assertTrue((new WaitableBoolean(false)).or(true));
+
+		assertTrue(TRUE.or(true));
+		assertTrue(TRUE.get());
+		assertTrue(TRUE.or(false));
+		assertTrue(TRUE.get());
 	}
 
 	public void testXor()
@@ -174,6 +187,24 @@ public class WaitableBooleanTestCase extends TestCase
 		assertTrue(actionPerformed.get());
 	}
 
+	public void testWhenFalseAlreadyFalse() throws InterruptedException
+	{
+		final WaitableBoolean blocker = new WaitableBoolean(false);
+		final WaitableBoolean actionPerformed = new WaitableBoolean(false);
+
+		Runnable action = new Runnable()
+		{
+			public void run()
+			{
+				actionPerformed.set(true);
+			}
+		};
+
+		blocker.whenFalse(action);
+		assertFalse(blocker.get());
+		assertTrue(actionPerformed.get());
+	}
+
 	public void testWhenTrue() throws InterruptedException
 	{
 		final WaitableBoolean blocker = new WaitableBoolean(false);
@@ -204,6 +235,24 @@ public class WaitableBooleanTestCase extends TestCase
 		};
 
 		new Thread(switcher).run();
+		blocker.whenTrue(action);
+		assertTrue(blocker.get());
+		assertTrue(actionPerformed.get());
+	}
+
+	public void testWhenTrueAlreadyTrue() throws InterruptedException
+	{
+		final WaitableBoolean blocker = new WaitableBoolean(true);
+		final WaitableBoolean actionPerformed = new WaitableBoolean(false);
+
+		Runnable action = new Runnable()
+		{
+			public void run()
+			{
+				actionPerformed.set(true);
+			}
+		};
+
 		blocker.whenTrue(action);
 		assertTrue(blocker.get());
 		assertTrue(actionPerformed.get());
