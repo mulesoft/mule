@@ -18,7 +18,6 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
-import org.mule.config.MuleConfiguration;
 import org.mule.MuleManager;
 
 /**
