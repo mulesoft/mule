@@ -31,7 +31,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.umo.model.UMOModel;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
@@ -304,6 +303,8 @@ public class SedaComponent extends AbstractComponent implements Work {
                             this,
                             e));
                 }
+            } finally {
+            	stopping.set(false);
             }
         }
     }
