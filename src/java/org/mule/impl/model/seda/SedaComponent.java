@@ -41,7 +41,9 @@ import javax.resource.spi.work.WorkManager;
 import java.util.NoSuchElementException;
 
 /**
- * todo document
+ * A Seda component runs inside a Seda Model and is responsible for managing
+ * a Seda Queue and thread pool for a Mule sevice component.  In Seda terms
+ * this is equivilent to a stage.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -55,12 +57,17 @@ public class SedaComponent extends AbstractComponent implements Work {
 
     private UMOWorkManager workManager;
 
+    /**
+     * The time out used for taking from the Seda Queue
+     */
+    private int queueTimeout = 0;
 
     /**
      * Default constructor
      */
-    public SedaComponent(MuleDescriptor descriptor, UMOModel model) {
+    public SedaComponent(MuleDescriptor descriptor, SedaModel model) {
         super(descriptor, model);
+        queueTimeout = model.getQueueTimeout();
     }
 
     /**
@@ -251,21 +258,22 @@ public class SedaComponent extends AbstractComponent implements Work {
                     }
                 }
                 event = (MuleEvent) dequeue();
+                if(event!=null) {
+                    if (stats.isEnabled()) {
+                        stats.decQueuedEvent();
+                    }
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Component: " + descriptor.getName() + " dequeued event on: "
+                                + event.getEndpoint().getEndpointURI());
+                    }
 
-                if (stats.isEnabled()) {
-                    stats.decQueuedEvent();
+                    proxy = (MuleProxy) proxyPool.borrowObject();
+                    getStatistics().setComponentPoolSize(proxyPool.getSize());
+                    proxy.setStatistics(getStatistics());
+                    proxy.start();
+                    proxy.onEvent(queueSession, event);
+                    workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, null);
                 }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Component: " + descriptor.getName() + " dequeued event on: "
-                            + event.getEndpoint().getEndpointURI());
-                }
-
-                proxy = (MuleProxy) proxyPool.borrowObject();
-                getStatistics().setComponentPoolSize(proxyPool.getSize());
-                proxy.setStatistics(getStatistics());
-                proxy.start();
-                proxy.onEvent(queueSession, event);
-                workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, null);
             } catch (Exception e) {
                 if (proxy != null) {
                     try {
@@ -274,11 +282,7 @@ public class SedaComponent extends AbstractComponent implements Work {
                         logger.info("Failed to return proxy to pool", e2);
                     }
                 }
-                /*
-                 * if (queueSession != null) { try { queueSession.rollback(); }
-                 * catch (Exception e2) { logger.info("Error rolling back queue
-                 * session", e2); } }
-                 */
+
                 if (e instanceof InterruptedException) {
                     break;
                 } else if (e instanceof NoSuchElementException) {
@@ -315,7 +319,7 @@ public class SedaComponent extends AbstractComponent implements Work {
     protected UMOEvent dequeue() throws Exception {
         // Wait until an event is available
         QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
-        return (UMOEvent) queueSession.getQueue(descriptor.getName() + ".component").take();
+        return (UMOEvent) queueSession.getQueue(descriptor.getName() + ".component").poll(queueTimeout);
     }
 
 }
