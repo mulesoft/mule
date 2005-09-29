@@ -35,9 +35,10 @@ public class ComponentEvent extends UMOServerEvent
     public static final int COMPONENT_PAUSED = COMPONENT_EVENT_ACTION_START_RANGE + 4;
     public static final int COMPONENT_RESUMED = COMPONENT_EVENT_ACTION_START_RANGE + 5;
     public static final int COMPONENT_DISPOSED = COMPONENT_EVENT_ACTION_START_RANGE + 6;
+    public static final int COMPONENT_STOPPING = COMPONENT_EVENT_ACTION_START_RANGE + 7;
 
     private static final transient String[] ACTIONS = new String[] { "initialised", "started", "stopped", "paused",
-            "resumed", "disposed" };
+            "resumed", "disposed", "stopping"};
 
     public ComponentEvent(UMODescriptor message, int action)
     {

@@ -18,14 +18,23 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.model.AbstractModel;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
+import org.mule.config.MuleConfiguration;
+import org.mule.MuleManager;
 
 /**
- * todo document
+ * A mule component service model that uses Seda principals to
+ * achieve high throughput by Quing events for compoonents and processing
+ * them concurrently.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class SedaModel extends AbstractModel {
+
+    /**
+     * The time out used for taking from the Seda Queue
+     */
+    private int queueTimeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
     /**
      * Returns the model type name. This is a friendly identifier that is used to
      * look up the SPI class for the model
@@ -41,4 +50,11 @@ public class SedaModel extends AbstractModel {
     }
 
 
+    public int getQueueTimeout() {
+        return queueTimeout;
+    }
+
+    public void setQueueTimeout(int queueTimeout) {
+        this.queueTimeout = queueTimeout;
+    }
 }

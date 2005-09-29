@@ -150,6 +150,7 @@ public abstract class AbstractComponent implements UMOComponent {
         if (!stopped.get()) {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
+            fireComponentEvent(ComponentEvent.COMPONENT_STOPPING);
             doForceStop();
             stopped.set(true);
             stopping.set(false);
@@ -161,6 +162,7 @@ public abstract class AbstractComponent implements UMOComponent {
         if (!stopped.get()) {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
+            fireComponentEvent(ComponentEvent.COMPONENT_STOPPING);
             if (MuleManager.getInstance().getQueueManager().getQueueSession().getQueue(descriptor.getName() + ".component").size() > 0) {
                 try {
                     stopping.whenFalse(null);
