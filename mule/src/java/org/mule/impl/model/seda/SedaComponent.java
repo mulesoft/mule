@@ -56,6 +56,8 @@ public class SedaComponent extends AbstractComponent implements Work {
 
     private UMOWorkManager workManager;
 
+    private String descriptorQueueName;
+
     /**
      * The time out used for taking from the Seda Queue
      */
@@ -66,6 +68,7 @@ public class SedaComponent extends AbstractComponent implements Work {
      */
     public SedaComponent(MuleDescriptor descriptor, SedaModel model) {
         super(descriptor, model);
+        descriptorQueueName = descriptor.getName() + ".component";
         queueTimeout = model.getQueueTimeout();
     }
 
@@ -314,13 +317,13 @@ public class SedaComponent extends AbstractComponent implements Work {
 
     protected void enqueue(UMOEvent event) throws Exception {
         QueueSession session = MuleManager.getInstance().getQueueManager().getQueueSession();
-        session.getQueue(descriptor.getName() + ".component").put(event);
+        session.getQueue(descriptorQueueName).put(event);
     }
 
     protected UMOEvent dequeue() throws Exception {
         // Wait until an event is available
         QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
-        return (UMOEvent) queueSession.getQueue(descriptor.getName() + ".component").poll(queueTimeout);
+        return (UMOEvent)queueSession.getQueue(descriptorQueueName).poll(queueTimeout);
     }
 
 }
