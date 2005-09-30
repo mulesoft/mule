@@ -17,7 +17,6 @@ package org.mule.providers;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.provider.UMOConnectable;
-import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
  * A simple connection retry strategy where the a connection will be attempted X

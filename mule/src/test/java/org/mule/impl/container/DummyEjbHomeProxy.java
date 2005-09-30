@@ -14,7 +14,6 @@
 package org.mule.impl.container;
 
 import javax.ejb.CreateException;
-import javax.ejb.EJBHome;
 import javax.ejb.EJBMetaData;
 import javax.ejb.HomeHandle;
 import javax.ejb.Handle;

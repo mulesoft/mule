@@ -15,8 +15,6 @@ package org.mule.transformers.xml;
 
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOMessage;
-import org.w3c.dom.Document;
 
 /**
  * <code>XmlToObject</code> converts xml created by the ObjectToXml

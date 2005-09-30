@@ -14,7 +14,6 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.provider.UMOConnectable;
 

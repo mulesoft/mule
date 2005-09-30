@@ -115,10 +115,8 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
         container.initialise();
         assertNotNull(container);
 
-        Object result = null;
-
         try {
-            result = container.getComponent(Apple.class.getName());
+            container.getComponent(Apple.class.getName());
             fail("Should throw ObjectNotFoundException for non-ejb object");
         } catch (ObjectNotFoundException e) {
             // expected

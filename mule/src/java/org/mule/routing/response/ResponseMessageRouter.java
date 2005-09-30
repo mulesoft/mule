@@ -21,7 +21,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleConfiguration;
-import org.mule.impl.MuleMessage;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.providers.AbstractConnector;
 import org.mule.routing.AbstractRouterCollection;
@@ -31,7 +30,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**

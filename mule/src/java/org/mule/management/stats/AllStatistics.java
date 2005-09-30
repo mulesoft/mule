@@ -18,8 +18,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.printers.AbstractTablePrinter;
 import org.mule.management.stats.printers.SimplePrinter;
 
@@ -31,8 +29,6 @@ import org.mule.management.stats.printers.SimplePrinter;
  */
 public class AllStatistics
 {
-
-    private static final Log log = LogFactory.getLog(AllStatistics.class);
     private boolean isStatisticsEnabled;
     private long startTime;
 

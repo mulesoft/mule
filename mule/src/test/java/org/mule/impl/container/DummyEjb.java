@@ -13,11 +13,9 @@
  */
 package org.mule.impl.container;
 
-import org.mule.umo.UMOException;
+import java.rmi.RemoteException;
 
 import javax.ejb.EJBObject;
-import javax.naming.NamingException;
-import java.rmi.RemoteException;
 
 /**
  * <code>Sender</code> TODO
