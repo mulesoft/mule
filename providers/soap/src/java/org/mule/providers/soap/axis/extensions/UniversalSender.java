@@ -15,15 +15,6 @@
 package org.mule.providers.soap.axis.extensions;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
@@ -40,15 +31,19 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.AxisConnector;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * todo document
@@ -75,25 +70,22 @@ public class UniversalSender extends BasicHandler {
         }
         //Get the event stored in call
         //If a receive call is made there will be no event
-        UMOEvent event = (UMOEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
+        //UMOEvent event = (UMOEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
         //Get the dispatch endpoint
         String uri = msgContext.getStrProp(MessageContext.TRANS_URL);
+        UMOEndpoint requestEndpoint = (UMOEndpoint)call.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
         UMOEndpoint endpoint = null;
         try {
             endpoint = lookupEndpoint(uri);
         } catch (UMOException e) {
-            if(event!=null) {
-                event.getEndpoint().getConnector().handleException(e);
-            } else {
-                //not much else we can do here but log it
-                logger.error("Failed to dispatch soap event from Axis Universal transport: " + e.toString(), e);
-            }
+            requestEndpoint.getConnector().handleException(e);
             return;
         }
 
         try {
-            msgContext.setTypeMappingRegistry(((AxisConnector)event.getEndpoint().getConnector()).getAxisServer().getTypeMappingRegistry());
-
+            if(requestEndpoint.getConnector() instanceof AxisConnector) {
+                msgContext.setTypeMappingRegistry(((AxisConnector)requestEndpoint.getConnector()).getAxisServer().getTypeMappingRegistry());
+            }
             Object payload = null;
         	int contentLength = 0;
             if (msgContext.getRequestMessage().countAttachments() > 0) {
@@ -118,6 +110,9 @@ public class UniversalSender extends BasicHandler {
                 if(!name.equals("call_object") && !name.equals("wsdl.service")) {
                     props.put(name, msgContext.getProperty(name));
                 }
+            }
+            if(call.useSOAPAction()) {
+                uri = call.getSOAPActionURI();
             }
             props.put("SOAPAction", uri);
             if (contentLength > 0) {
@@ -149,11 +144,7 @@ public class UniversalSender extends BasicHandler {
             }
         } catch (Exception e) {
             logger.error("Failed to dispatch soap event from Axis Universal transport: " + e.toString());
-            if(event!=null) {
-                event.getEndpoint().getConnector().handleException(e);
-            } else {
-                endpoint.getConnector().handleException(e);
-            }
+            requestEndpoint.getConnector().handleException(e);
         }
 
     }

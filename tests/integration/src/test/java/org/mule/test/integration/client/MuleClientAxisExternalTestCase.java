@@ -42,6 +42,8 @@ public class MuleClientAxisExternalTestCase extends NamedTestCase
         String input =  "IBM";
         Map properties = new HashMap();
         properties.put(AxisConnector.WSDL_URL_PROPERTY, "http://services.xmethods.net/soap/urn:xmethods-delayed-quotes.wsdl");
+        properties.put(AxisConnector.SOAP_ACTION_PROPERTY, "${methodNamespace}#${method}");
+        properties.put(AxisConnector.METHOD_NAMESPACE_PROPERTY, "urn:xmethods-delayed-quotes");
         String url = "axis:http://services.xmethods.net:9090/soap?method=getQuote";
         MuleClient client = null;
         try {

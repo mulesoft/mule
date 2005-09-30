@@ -34,24 +34,53 @@ public class TemplateParser
      */
     protected static transient Log logger = LogFactory.getLog(TemplateParser.class);
 
-    private static Pattern tmplPattern = Pattern.compile("\\[[^\\]]+\\]");
+    private Pattern pattern = null;
+    private int pre = 1;
+    private int post = 1;
 
-    public static String parseString(Map props, String template)
+
+    public static TemplateParser createAntStyleParser() {
+        return new TemplateParser("ant");
+    }
+
+    public static TemplateParser createSquareBracesStyleParser() {
+        return new TemplateParser("square");
+    }
+
+    private TemplateParser(String type) {
+        if("ant".equals(type)) {
+            pattern = Pattern.compile("\\$\\{[^\\}]+\\}");
+            pre = 2;
+        } else if("square".equals(type)) {
+            pattern = Pattern.compile("\\[[^\\]]+\\]");
+        }
+    }
+    public String parse(Map props, String template)
     {
         String result = template;
-        Matcher m = tmplPattern.matcher(template);
+        Matcher m = pattern.matcher(template);
         String match, propname;
         Object value;
         while (m.find()) {
             match = m.group();
-            propname = match.substring(1, match.length() - 1);
+            propname = match.substring(pre, match.length() - post);
             value = props.get(propname);
             if (value == null) {
                 logger.error("Value " + propname + " not found in context");
                 value = "";
             }
-            result = result.replaceAll("\\[" + propname + "\\]", value.toString());
+            match = escape(match);
+            result = result.replaceAll(match, value.toString());
         }
         return result;
+    }
+
+    private String escape(String string) {
+        string = string.replace("[", "\\[");
+        string = string.replace("]", "\\]");
+        string = string.replace("{", "\\{");
+        string = string.replace("}", "\\}");
+        string = string.replace("$", "\\$");
+        return string;
     }
 }

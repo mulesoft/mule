@@ -70,6 +70,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
     protected void init() throws Exception
     {
+        AxisProperties.setProperty("axis.doAutoTypes", "true");
         service = new SOAPService(new MuleProvider(connector));
         MuleDescriptor descriptor = (MuleDescriptor) component.getDescriptor();
 

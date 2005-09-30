@@ -55,38 +55,38 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     }
 
     protected String getRequestResponseEndpoint() {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?method=echo";
+        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=echo";
     }
 
     protected String getReceiveEndpoint() {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
+        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
     }
 
     protected String getReceiveComplexEndpoint() {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Fred";
+        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Fred";
     }
 
     protected String getSendReceiveComplexEndpoint1() {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
+        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
     }
 
     protected String getSendReceiveComplexEndpoint2() {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Ross";
+        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Ross";
     }
 
     protected String getReceiveComplexCollectionEndpoint() {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPeople";
+        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPeople";
     }
 
     protected String getDispatchAsyncComplexEndpoint1() {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
+        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
     }
 
     protected String getDispatchAsyncComplexEndpoint2() {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Joe";
+        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Joe";
     }
 
     protected String getTestExceptionEndpoint() {
-        return "http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
+        return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
     }
 }

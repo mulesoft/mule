@@ -20,6 +20,7 @@ import org.apache.axis.deployment.wsdd.WSDDConstants;
 import org.apache.axis.deployment.wsdd.WSDDProvider;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.server.AxisServer;
+import org.apache.axis.transport.http.HTTPTransport;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -69,6 +70,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public static final String DEFAULT_MULE_AXIS_CLIENT_CONFIG = "mule-axis-client-config.wsdd";
     public static final String AXIS_SERVICE_COMPONENT_NAME = "_axisServiceComponent";
     public static final String METHOD_NAMESPACE_PROPERTY = "methodNamespace";
+    public static final String SOAP_ACTION_PROPERTY = "soapAction";
 
     public static final String SERVICE_PROPERTY_COMPONENT_NAME = "componentName";
     public static final String SERVICE_PROPERTY_SERVCE_PATH = "servicePath";
@@ -104,13 +106,8 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public AxisConnector() {
         super();
-        //Overload the UrlHandlers provided by Axis so Mule can use its transports to move
-        //Soap messages around
-        System.setProperty("java.protocol.handler.pkgs", "org.mule.providers.soap.axis.transport|");
-
         axisTransportProtocols = new HashMap();
-        axisTransportProtocols.put("https", MuleTransport.class);
-        axisTransportProtocols.put("http", MuleTransport.class);
+        //axisTransportProtocols.put("http", MuleTransport.class);
         axisTransportProtocols.put("smtp", MuleTransport.class);
         axisTransportProtocols.put("pop3", MuleTransport.class);
         axisTransportProtocols.put("jms", MuleTransport.class);
@@ -130,6 +127,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         // Create the AxisServer
         axisServer = new AxisServer(serverProvider);
+        axisServer.setOption("axis.doAutoTypes", Boolean.TRUE);
 
         // Register the Mule service serverProvider
         WSDDProvider.registerProvider(QNAME_MULERPC_PROVIDER, new WSDDJavaMuleProvider(this));
@@ -138,6 +136,15 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             registerTransportTypes();
         } catch (ClassNotFoundException e) {
             throw new InitialisationException(new org.mule.config.i18n.Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, e.getMessage()), e, this);
+        }
+
+        //Overload the UrlHandlers provided by Axis so Mule can use its transports to move
+        //Soap messages around
+        String handlerPkgs = System.getProperty("java.protocol.handler.pkgs", null);
+        if(handlerPkgs!=null) {
+            if(!handlerPkgs.endsWith("|")) handlerPkgs += "|";
+            handlerPkgs = "org.mule.providers.soap.axis.transport|" + handlerPkgs;
+            System.setProperty("java.protocol.handler.pkgs", handlerPkgs);
         }
     }
 

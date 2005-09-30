@@ -26,38 +26,38 @@ public class AxisConnectorVMFunctionalTestCase extends AbstractSoapFunctionalTes
     }
 
     protected String getRequestResponseEndpoint() {
-        return "vm://mycomponent?method=echo";
+        return "axis:vm://mycomponent?method=echo";
     }
 
     protected String getReceiveEndpoint() {
-        return "vm://mycomponent2?method=getDate";
+        return "axis:vm://mycomponent2?method=getDate";
     }
 
     protected String getReceiveComplexEndpoint() {
-        return "vm://mycomponent3?method=getPerson&param=Fred";
+        return "axis:vm://mycomponent3?method=getPerson&param=Fred";
     }
 
     protected String getSendReceiveComplexEndpoint1() {
-        return "vm://mycomponent3?method=addPerson";
+        return "axis:vm://mycomponent3?method=addPerson";
     }
 
     protected String getSendReceiveComplexEndpoint2() {
-        return "vm://mycomponent3?method=getPerson&param=Ross";
+        return "axis:vm://mycomponent3?method=getPerson&param=Ross";
     }
 
     protected String getReceiveComplexCollectionEndpoint() {
-        return "vm://mycomponent3?method=getPeople";
+        return "axis:vm://mycomponent3?method=getPeople";
     }
 
     protected String getDispatchAsyncComplexEndpoint1() {
-        return "vm://mycomponent4?method=addPerson";
+        return "axis:vm://mycomponent4?method=addPerson";
     }
 
     protected String getDispatchAsyncComplexEndpoint2() {
-        return "vm://mycomponent3?method=getPerson&param=Joe";
+        return "axis:vm://mycomponent3?method=getPerson&param=Joe";
     }
 
     protected String getTestExceptionEndpoint() {
-        return "vm://mycomponent3?method=addPerson";
+        return "axis:vm://mycomponent3?method=addPerson";
     }
 }

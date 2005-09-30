@@ -64,7 +64,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         List results = new ArrayList();
         int number = 100;
         for (int i = 0; i < number; i++) {
-            results.add(client.send(getProtocol() + ":" + getRequestResponseEndpoint(), "Message " + i, null).getPayload());
+            results.add(client.send(getRequestResponseEndpoint(), "Message " + i, null).getPayload());
         }
 
         assertEquals(number, results.size());

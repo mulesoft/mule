@@ -126,7 +126,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         }
 
         public void run() {
-            boolean keepAlive;
+            boolean keepAlive = ((HttpConnector) connector).isKeepAlive();
             try {
                 dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
@@ -144,7 +144,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 
                     UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{payload, headers});
 
-                    keepAlive = adapter.getBooleanProperty(HttpConstants.HEADER_KEEP_ALIVE, true);
+                    keepAlive = adapter.getBooleanProperty(HttpConstants.HEADER_KEEP_ALIVE, keepAlive);
                     //Removed the keep alive monitoring stuff for now
                     //Most other http servers tend not to worry about the keep-alive time out
                     //nstead just wait for the client to disconnect

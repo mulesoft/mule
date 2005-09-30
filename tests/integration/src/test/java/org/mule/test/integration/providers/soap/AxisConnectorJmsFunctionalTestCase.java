@@ -26,38 +26,38 @@ public class AxisConnectorJmsFunctionalTestCase extends AbstractSoapFunctionalTe
     }
 
     protected String getRequestResponseEndpoint() {
-        return "jms://mycomponent?method=echo";
+        return "axis:jms://mycomponent?method=echo";
     }
 
     protected String getReceiveEndpoint() {
-        return "jms://mycomponent2?method=getDate";
+        return "axis:jms://mycomponent2?method=getDate";
     }
 
     protected String getReceiveComplexEndpoint() {
-        return "jms://mycomponent3?method=getPerson&param=Fred";
+        return "axis:jms://mycomponent3?method=getPerson&param=Fred";
     }
 
     protected String getSendReceiveComplexEndpoint1() {
-        return "jms://mycomponent3?method=addPerson";
+        return "axis:jms://mycomponent3?method=addPerson";
     }
 
     protected String getSendReceiveComplexEndpoint2() {
-        return "jms://mycomponent3?method=getPerson&param=Ross";
+        return "axis:jms://mycomponent3?method=getPerson&param=Ross";
     }
 
     protected String getReceiveComplexCollectionEndpoint() {
-        return "jms://mycomponent3?method=getPeople";
+        return "axis:jms://mycomponent3?method=getPeople";
     }
 
     protected String getDispatchAsyncComplexEndpoint1() {
-        return "jms://mycomponent4?method=addPerson";
+        return "axis:jms://mycomponent4?method=addPerson";
     }
 
     protected String getDispatchAsyncComplexEndpoint2() {
-        return "jms://mycomponent3?method=getPerson&param=Joe";
+        return "axis:jms://mycomponent3?method=getPerson&param=Joe";
     }
 
     protected String getTestExceptionEndpoint() {
-        return "jms://mycomponent3?method=addPerson";
+        return "axis:jms://mycomponent3?method=addPerson";
     }
 }

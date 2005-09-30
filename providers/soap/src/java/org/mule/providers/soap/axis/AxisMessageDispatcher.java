@@ -16,6 +16,7 @@
 package org.mule.providers.soap.axis;
 
 import org.apache.axis.*;
+import org.apache.axis.transport.http.HTTPTransport;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
@@ -29,19 +30,23 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
 import org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler;
 import org.mule.providers.soap.axis.extensions.UniversalSender;
+import org.mule.providers.soap.axis.extensions.MuleHttpSender;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
+import org.mule.util.TemplateParser;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
@@ -92,9 +97,22 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         SimpleChain respHandler = new SimpleChain();
         reqHandler.addHandler(muleHandler);
         respHandler.addHandler(muleHandler);
+
+        //Htpp
+        Handler httppivot = new MuleHttpSender();
+        Handler httptransport = new SimpleTargetedChain(reqHandler, httppivot, respHandler);
+        clientConfig.deployTransport(HTTPTransport.DEFAULT_TRANSPORT_NAME, httptransport);
         Handler pivot = new UniversalSender();
         Handler transport = new SimpleTargetedChain(reqHandler, pivot, respHandler);
         clientConfig.deployTransport("MuleTransport", transport);
+//        Handler universalpivot = new UniversalSender();
+//        Handler universaltransport = new SimpleTargetedChain(reqHandler, universalpivot, respHandler);
+//        clientConfig.deployTransport("https", universaltransport);
+//        clientConfig.deployTransport("jms", universaltransport);
+//        clientConfig.deployTransport("xmpp", universaltransport);
+//        clientConfig.deployTransport("vm", universaltransport);
+//        clientConfig.deployTransport("smtp", universaltransport);
+//        clientConfig.deployTransport("pop3", universaltransport);
     }
 
     protected Service createService(UMOEvent event) throws Exception
@@ -223,12 +241,15 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         call.setTargetEndpointAddress(endpointUri.toString());
 
         //Set custom soap action if set on the event or endpoint
-        String soapAction = (String)event.getProperty("soapAction");
+        String soapAction = (String)event.getProperty(AxisConnector.SOAP_ACTION_PROPERTY);
         if(soapAction != null) {
             soapAction = parseSoapAction(soapAction, method, event);
             call.setSOAPActionURI(soapAction);
             call.setUseSOAPAction(Boolean.TRUE.booleanValue());
+        } else {
+            //call.setSOAPActionURI(endpointUri.getAddress());
         }
+
 
         //Set a custome method namespace if one is set.  This will be used forthe parameters too
         String methodNamespace = (String)event.getProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY);
@@ -240,6 +261,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
+        call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint());
         // Set timeout
         int timeout = event.getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
         if (timeout >= 0) {
@@ -331,6 +353,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
 
         call.setOperationName(method);
+        UMOEndpoint ep = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        ep.initialise();
+        call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY,  ep);
         Object result = call.invoke(method, args);
         return createMessage(result, call);
     }
@@ -392,19 +417,24 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     }
 
     public String parseSoapAction(String soapAction, String method, UMOEvent event) {
-        if(soapAction.indexOf("${") > -1)
-        {
-            UMOEndpointURI endpointURI = event.getEndpoint().getEndpointURI();
-            soapAction = soapAction.replaceFirst("\\$\\{method\\}", method);
-            soapAction = soapAction.replaceFirst("\\$\\{address\\}", endpointURI.getAddress());
-            soapAction = soapAction.replaceFirst("\\$\\{scheme\\}", endpointURI.getScheme());
-            soapAction = soapAction.replaceFirst("\\$\\{host\\}", endpointURI.getHost());
-            soapAction = soapAction.replaceFirst("\\$\\{port\\}", String.valueOf(endpointURI.getPort()));
-            soapAction = soapAction.replaceFirst("\\$\\{path\\}", endpointURI.getPath());
-            soapAction = soapAction.replaceFirst("\\$\\{hostInfo\\}", endpointURI.getScheme() + "://" + endpointURI.getHost() +
+
+        UMOEndpointURI endpointURI = event.getEndpoint().getEndpointURI();
+        Map properties = new HashMap(event.getProperties());
+        properties.put("method", method);
+        properties.put("address", endpointURI.getAddress());
+        properties.put("scheme", endpointURI.getScheme());
+        properties.put("host", endpointURI.getHost());
+        properties.put("port", String.valueOf(endpointURI.getPort()));
+        properties.put("path", endpointURI.getPath());
+        properties.put("hostInfo", endpointURI.getScheme() + "://" + endpointURI.getHost() +
                     (endpointURI.getPort() > -1 ? ":" + String.valueOf(endpointURI.getPort()) : ""));
-            soapAction = soapAction.replaceFirst("\\$\\{serviceName\\}", event.getComponent().getDescriptor().getName());
+        if(event.getComponent()!=null) {
+            properties.put("serviceName", event.getComponent().getDescriptor().getName());
         }
+
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+        soapAction = tp.parse(properties, soapAction);
+
         if(logger.isDebugEnabled()) {
             logger.debug("SoapAction for this call is: " + soapAction);
         }

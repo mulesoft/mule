@@ -46,42 +46,42 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapFunctionalT
     }
 
     protected String getComponentWithoutInterfacesEndpoint() {
-        return "http://localhost:38011/mule/test";
+        return "axis:http://localhost:38011/mule/test";
     }
     protected String getRequestResponseEndpoint() {
-        return "http://localhost:38008/mule/mycomponent?method=echo";
+        return "axis:http://localhost:38008/mule/mycomponent?method=echo";
     }
 
     protected String getReceiveEndpoint() {
-        return "http://localhost:38009/mule/services/mycomponent2?method=getDate";
+        return "axis:http://localhost:38009/mule/services/mycomponent2?method=getDate";
     }
 
     protected String getReceiveComplexEndpoint() {
-        return "http://localhost:38009/mycomponent3?method=getPerson&param=Fred";
+        return "axis:http://localhost:38009/mycomponent3?method=getPerson&param=Fred";
     }
 
     protected String getSendReceiveComplexEndpoint1() {
-        return "http://localhost:38009/mycomponent3?method=addPerson";
+        return "axis:http://localhost:38009/mycomponent3?method=addPerson";
     }
 
     protected String getSendReceiveComplexEndpoint2() {
-        return "http://localhost:38009/mycomponent3?method=getPerson&param=Ross";
+        return "axis:http://localhost:38009/mycomponent3?method=getPerson&param=Ross";
     }
 
     protected String getReceiveComplexCollectionEndpoint() {
-        return "http://localhost:38009/mycomponent3?method=getPeople";
+        return "axis:http://localhost:38009/mycomponent3?method=getPeople";
     }
 
     protected String getDispatchAsyncComplexEndpoint1() {
-        return "http://localhost:38010/mycomponent4?method=addPerson";
+        return "axis:http://localhost:38010/mycomponent4?method=addPerson";
     }
 
     protected String getDispatchAsyncComplexEndpoint2() {
-        return "http://localhost:38009/mycomponent3?method=getPerson&param=Joe";
+        return "axis:http://localhost:38009/mycomponent3?method=getPerson&param=Joe";
     }
 
     protected String getTestExceptionEndpoint() {
-        return "http://localhost:38009/mycomponent3?method=addPerson";
+        return "axis:http://localhost:38009/mycomponent3?method=addPerson";
     }
 
     public void testComponentWithoutInterfaces() throws Throwable
