@@ -57,8 +57,6 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
 
     private DynamicEntryPoint entryPoint;
 
-    private Object lock = new Object();
-
     public DefaultLifecycleAdapter(Object component, UMODescriptor descriptor) throws UMOException
     {
         this(component, descriptor, new DynamicEntryPointResolver());

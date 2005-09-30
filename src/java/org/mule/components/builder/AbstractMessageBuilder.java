@@ -16,7 +16,6 @@ package org.mule.components.builder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.RequestContext;
 import org.mule.impl.UMODescriptorAware;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
@@ -55,8 +54,8 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
         UMOMessage requestMessage = new MuleMessage(eventContext.getTransformedMessage());
 
         UMOMessage responseMessage = requestMessage;
-        UMOEventContext c = RequestContext.getEventContext();
         Object builtMessage;
+
         if(descriptor.getOutboundRouter().hasEndpoints() ) {
             List endpoints = new ArrayList();
             for (Iterator iterator = descriptor.getOutboundRouter().getRouters().iterator(); iterator.hasNext();) {

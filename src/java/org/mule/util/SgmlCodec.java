@@ -295,7 +295,7 @@ public class SgmlCodec {
         for (int i = 0; i < length; i++) {
 
             char c = s.charAt(i);
-            int j = (int) c;
+            int j = c;
 
             if ((j < 0x100) && (encoder[j] != null)) {
 

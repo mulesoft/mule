@@ -73,11 +73,11 @@ public class MuleTestUtils {
     public static UMOEvent getTestEvent(Object data) throws Exception
     {
         UMOComponent component = getTestComponent(getTestDescriptor("string", String.class.getName()));
-        UMOSession session = getTestSession(component);
-        return (UMOEvent) new MuleEvent(new MuleMessage(data),
-                                       getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER),
-                                       session,
-                                       true);
+		UMOSession session = getTestSession(component);
+		return new MuleEvent(new MuleMessage(data),
+				getTestEndpoint("test1",
+				UMOEndpoint.ENDPOINT_TYPE_SENDER),
+				session, true);
     }
 
     public static UMOTransformer getTestTransformer()
@@ -93,13 +93,13 @@ public class MuleTestUtils {
 
         UMOEndpoint endpoint = getTestEndpoint("test1", UMOEndpoint.ENDPOINT_TYPE_SENDER);
 
-        return (UMOEvent)new MuleEvent(new MuleMessage(data), endpoint, session, true);
+        return new MuleEvent(new MuleMessage(data), endpoint, session, true);
     }
 
     public static UMOEvent getTestEvent(Object data, UMOEndpoint endpoint) throws Exception
     {
         UMOSession session = getTestSession(getTestComponent(getTestDescriptor("string", String.class.getName())));
-        return (UMOEvent)new MuleEvent(new MuleMessage(data), endpoint, session, true);
+        return new MuleEvent(new MuleMessage(data), endpoint, session, true);
     }
 
     public static UMOEvent getTestEvent(Object data, MuleDescriptor descriptor, UMOEndpoint endpoint)

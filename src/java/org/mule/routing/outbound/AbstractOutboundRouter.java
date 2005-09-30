@@ -119,7 +119,8 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
             }
             correlation = o.toString();
 
-            int seq = 1;
+            // TODO clean this up
+            //int seq = 1;
             // o =
             // propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
             // message);
@@ -138,7 +139,7 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
             // }
             // }
 
-            int group = 1;
+            //int group = 1;
             // o =
             // propertyExtractor.getPropertry(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
             // message);
