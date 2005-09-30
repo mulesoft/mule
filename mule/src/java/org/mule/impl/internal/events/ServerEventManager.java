@@ -13,9 +13,10 @@
  */
 package org.mule.impl.internal.events;
 
-import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
-
+import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -54,7 +55,7 @@ public class ServerEventManager implements Work, Disposable
 
     private Map listenersMap = null;
     private Map eventsMap = null;
-    private BoundedBuffer eventQueue;
+    private BlockingQueue eventQueue;
     private boolean disposed = false;
 
     private Comparator comparator = new Comparator() {
@@ -78,7 +79,7 @@ public class ServerEventManager implements Work, Disposable
     {
         listenersMap = new ConcurrentHashMap();
         eventsMap = new ConcurrentHashMap();
-        eventQueue = new BoundedBuffer(1000);
+        eventQueue = new ArrayBlockingQueue(1000);
     }
 
     public void registerEventType(Class eventType, Class listenerType)
@@ -255,17 +256,25 @@ public class ServerEventManager implements Work, Disposable
      * @see Thread#run()
      */
     public void run()
-    {
-        UMOServerEvent event;
-        while (!disposed) {
-            try {
-                event = (UMOServerEvent) eventQueue.poll(5000);
-                if(event!=null) notifyListeners(event);
-            } catch (InterruptedException e) {
-                if (!disposed) {
-                    logger.error("Failed to take event from server event queue", e);
-                }
-            }
-        }
-    }
+	{
+		UMOServerEvent event;
+		while (!disposed)
+		{
+			try
+			{
+				event = (UMOServerEvent)eventQueue.poll(5000, TimeUnit.MILLISECONDS);
+				if (event != null)
+				{
+					notifyListeners(event);
+				}
+			}
+			catch (InterruptedException e)
+			{
+				if (!disposed)
+				{
+					logger.error("Failed to take event from server event queue", e);
+				}
+			}
+		}
+	}
 }
