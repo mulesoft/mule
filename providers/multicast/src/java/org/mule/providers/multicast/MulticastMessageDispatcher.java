@@ -52,6 +52,6 @@ public class MulticastMessageDispatcher extends UdpMessageDispatcher
         } catch (IOException e) {
             logger.error("Failed to leave group: " + inetAddress);
         }
-        super.dispose();
+        super.doDispose();
     }
 }
