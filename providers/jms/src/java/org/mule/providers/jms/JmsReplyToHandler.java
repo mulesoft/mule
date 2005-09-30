@@ -62,6 +62,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             session = connector.getSession(false, replyToDestination instanceof Topic);
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);
 
+            replyToMessage.setJMSReplyTo(null);
             if (logger.isDebugEnabled()) {
                 logger.debug("Sending jms reply to: " + replyToDestination + "("
                         + replyToDestination.getClass().getName() + ")");
