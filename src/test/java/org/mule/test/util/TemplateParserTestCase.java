@@ -26,17 +26,34 @@ import org.mule.util.TemplateParser;
  */
 public class TemplateParserTestCase extends TestCase
 {
-    public void testStringParser()
+    public void testStringParserSquareBraces()
     {
+        TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
         Map props = new HashMap();
         props.put("fromAddress", "ross.mason@symphonysoft.com");
         String string = "smtp://[fromAddress]";
 
-        String result = TemplateParser.parseString(props, string);
+        String result = tp.parse(props, string);
         assertEquals("smtp://ross.mason@symphonysoft.com", result);
         string = "smtp://[toAddress]";
-        result = TemplateParser.parseString(props, string);
+        result = tp.parse(props, string);
         assertEquals("smtp://", result);
+
+    }
+
+    public void testStringParserAntBraces()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+        Map props = new HashMap();
+        props.put("prop1", "value1");
+        props.put("prop2", "value2");
+        String string = "Some String with ${prop1} and ${prop2} in it";
+
+        String result = tp.parse(props, string);
+        assertEquals("Some String with value1 and value2 in it", result);
+        string = "${prop1}${prop1}${prop2}";
+        result = tp.parse(props, string);
+        assertEquals("value1value1value2", result);
 
     }
 }
