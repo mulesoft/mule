@@ -93,7 +93,7 @@ public class SedaComponent extends AbstractComponent implements Work {
         } catch (InitialisationException e) {
             throw e;
         } catch (Throwable e) {
-            throw new InitialisationException(new Message(Messages.X_FAILED_TO_INITIALISE, "Compoennt Queue"), e, this);
+            throw new InitialisationException(new Message(Messages.X_FAILED_TO_INITIALISE, "Component Queue"), e, this);
         }
     }
 
@@ -286,6 +286,7 @@ public class SedaComponent extends AbstractComponent implements Work {
                 }
 
                 if (e instanceof InterruptedException) {
+                    stopping.set(false);
                     break;
                 } else if (e instanceof NoSuchElementException) {
                     handleException(new ComponentException(new Message(Messages.PROXY_POOL_TIMED_OUT),
@@ -313,6 +314,7 @@ public class SedaComponent extends AbstractComponent implements Work {
     }
 
     public void release() {
+        stopping.set(false);
     }
 
     protected void enqueue(UMOEvent event) throws Exception {
@@ -325,5 +327,4 @@ public class SedaComponent extends AbstractComponent implements Work {
         QueueSession queueSession = MuleManager.getInstance().getQueueManager().getQueueSession();
         return (UMOEvent)queueSession.getQueue(descriptorQueueName).poll(queueTimeout);
     }
-
 }
