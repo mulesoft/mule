@@ -296,7 +296,10 @@ public class RemoteDispatcher implements Disposable
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
         }
 
-        logger.debug("Result of MuleClient remote call is: " + (result == null ? "null" : result.getPayload()));
+        if (logger.isDebugEnabled()) {
+        	logger.debug("Result of MuleClient remote call is: " + (result == null ? "null" : result.getPayload()));
+        }
+
         return result;
     }
 
