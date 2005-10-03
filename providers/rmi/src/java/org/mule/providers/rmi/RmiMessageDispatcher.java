@@ -13,19 +13,7 @@
  */
 package org.mule.providers.rmi;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.impl.MuleMessage;
-import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.DispatchException;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.util.PropertiesHelper;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -38,6 +26,19 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.impl.MuleMessage;
+import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.provider.DispatchException;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.util.PropertiesHelper;
 
 /**
  * <code>RmiMessageDispatcher</code> will send transformed mule events over
@@ -52,7 +53,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
 
     private RmiConnector connector;
 
-    private SynchronizedBoolean initialised = new SynchronizedBoolean(false);
+    private AtomicBoolean initialised = new AtomicBoolean(false);
 
     private InetAddress inetAddress;
 

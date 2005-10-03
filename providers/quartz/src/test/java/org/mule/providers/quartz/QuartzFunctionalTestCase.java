@@ -14,12 +14,13 @@
 
 package org.mule.providers.quartz;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.tck.NamedTestCase;
-
-import EDU.oswego.cs.dl.util.concurrent.CountDown;
+import org.mule.util.concurrent.CountDownLatch;
 
 /**
  * TODO: document this class
@@ -30,7 +31,7 @@ import EDU.oswego.cs.dl.util.concurrent.CountDown;
 public class QuartzFunctionalTestCase extends NamedTestCase
 {
 
-    protected static CountDown countDown;
+    protected static CountDownLatch countDown;
 
     protected void setUp() throws Exception
     {
@@ -47,10 +48,10 @@ public class QuartzFunctionalTestCase extends NamedTestCase
 
     public void test() throws Exception
     {
-        countDown = new CountDown(3);
+        countDown = new CountDownLatch(3);
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
         configBuilder.configure("quartz.xml");
-        assertTrue(countDown.attempt(5000));
+        assertTrue(countDown.tryLock(5000, TimeUnit.MILLISECONDS));
     }
 
 }

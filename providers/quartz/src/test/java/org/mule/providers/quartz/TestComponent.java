@@ -23,7 +23,7 @@ public class TestComponent implements Callable
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         if (QuartzFunctionalTestCase.countDown != null) {
-            QuartzFunctionalTestCase.countDown.release();
+            QuartzFunctionalTestCase.countDown.unlock();
         }
         return null;
     }
