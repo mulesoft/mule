@@ -13,7 +13,7 @@
  */
 package org.mule.providers.ejb;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.rmi.RmiConnector;
@@ -36,8 +36,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 /*
  * Code by (c) 2005 P.Oikari.
@@ -49,7 +48,7 @@ import java.util.Collections;
 public class EjbMessageDispatcher extends AbstractMessageDispatcher {
     private EjbConnector connector;
 
-    private SynchronizedBoolean initialised = new SynchronizedBoolean(false);
+    private AtomicBoolean initialised = new AtomicBoolean(false);
 
     protected EJBObject remoteObject;
 
@@ -135,7 +134,7 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher {
         String arguments = (String) event.getEndpoint()
                 .getProperties().get(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
 
-        ArrayList methodArgumentTypes = new ArrayList();
+        List methodArgumentTypes = new ArrayList();
         if (null != arguments) {
             String[] split = arguments.split(",");
 
@@ -201,6 +200,7 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher {
         return (payload instanceof Object[] ? (Object[]) payload : new Object[]{payload});
     }
 
+    // TODO never used. Remove it?
     private class EjbHolder {
         private Object ejb;
         private Method method;
