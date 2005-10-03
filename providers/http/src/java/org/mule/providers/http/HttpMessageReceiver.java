@@ -144,9 +144,8 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 
                     UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{payload, headers});
 
-                    keepAlive = adapter.getBooleanProperty(HttpConstants.HEADER_KEEP_ALIVE, keepAlive);
+                    keepAlive = false; //adapter.getBooleanProperty(HttpConstants.HEADER_KEEP_ALIVE, keepAlive);
                     //Removed the keep alive monitoring stuff for now
-                    //Most other http servers tend not to worry about the keep-alive time out
                     //nstead just wait for the client to disconnect
 //                    if (keepAlive && !keepAliveRegistered) {
 //                        keepAliveRegistered = true;

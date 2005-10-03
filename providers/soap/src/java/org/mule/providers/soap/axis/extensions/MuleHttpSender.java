@@ -13,6 +13,22 @@
  */
 package org.mule.providers.soap.axis.extensions;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+
+import javax.xml.soap.MimeHeader;
+import javax.xml.soap.MimeHeaders;
+import javax.xml.soap.SOAPException;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.Constants;
 import org.apache.axis.Message;
@@ -36,21 +52,6 @@ import org.apache.axis.transport.http.SocketInputStream;
 import org.apache.axis.utils.Messages;
 import org.apache.axis.utils.TeeOutputStream;
 import org.apache.commons.logging.Log;
-
-import javax.xml.soap.MimeHeader;
-import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.SOAPException;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
 
 /**
  * <code>MuleHttpSender</code> is a rewrite of the Axis HttpSender.
@@ -115,18 +116,10 @@ public class MuleHttpSender extends BasicHandler
     public void invoke(MessageContext msgContext) throws AxisFault
     {
 
-
         if (log.isDebugEnabled()) {
             log.debug(Messages.getMessage("enter00", "HTTPSender::invoke"));
         }
         try {
-            if (msgContext.isClient() && msgContext.containsProperty("call_object")) {
-                Call call = (Call) msgContext.getProperty("call_object");
-                if (Boolean.TRUE.equals(call.getProperty("axis.one.way"))) {
-                    //dispatch
-                    return;
-                }
-            }
             BooleanHolder useFullURL = new BooleanHolder(false);
             StringBuffer otherHeaders = new StringBuffer();
             targetURL = new URL(msgContext.getStrProp(MessageContext.TRANS_URL));
@@ -145,7 +138,11 @@ public class MuleHttpSender extends BasicHandler
                                             msgContext.getTimeout(),
                                             useFullURL);
 
-
+            if (msgContext.isClient() && msgContext.containsProperty("call_object")) {
+                Call call = (Call) msgContext.getProperty("call_object");
+                if (Boolean.TRUE.equals(call.getProperty("axis.one.way")))
+                    return;
+            }
 
             // Read the response back from the server
             Hashtable headers = new Hashtable();

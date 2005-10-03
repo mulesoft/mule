@@ -56,7 +56,11 @@ public class TestServiceComponent extends FunctionalTestComponent implements Ech
 
     public Person getPerson(String firstName)
     {
-        return (Person) people.get(firstName);
+        if(firstName==null ||"".equals(firstName)) {
+            throw new NullPointerException("Name paramewter cannot be null");
+        }
+        Person p = (Person) people.get(firstName);
+        return p;
     }
 
     public Person[] getPeople()
