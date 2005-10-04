@@ -62,7 +62,7 @@ public class NullWorkExecutorPool implements WorkExecutorPool
         return this;
     }
 
-    public void execute(Runnable command) throws InterruptedException
+    public void execute(Runnable command)
     {
         throw new IllegalStateException("Stopped");
     }

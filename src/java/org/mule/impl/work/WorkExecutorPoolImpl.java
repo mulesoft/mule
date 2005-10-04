@@ -17,10 +17,12 @@
 
 package org.mule.impl.work;
 
-import org.mule.config.ThreadingProfile;
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-import EDU.oswego.cs.dl.util.concurrent.Channel;
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+import org.mule.config.ThreadingProfile;
+import org.mule.util.concurrent.WaitPolicy;
 
 /**
  * Based class for WorkExecutorPool. Sub-classes define the synchronization
@@ -35,7 +37,7 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
     /**
      * A timed out pooled executor.
      */
-    private PooledExecutor pooledExecutor;
+    private ThreadPoolExecutor pooledExecutor;
 
     private ThreadingProfile profile;
 
@@ -63,14 +65,14 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
      * Creates a pool with the specified minimum and maximum sizes and using the
      * specified Channel to enqueue the submitted Work instances.
      * 
-     * @param channel Queue to be used as the queueing facility of this pool.
+     * @param queue Queue to be used as the queueing facility of this pool.
      * @param maxSize Maximum size of the work executor pool.
      */
-    public WorkExecutorPoolImpl(Channel channel, int maxSize)
+    public WorkExecutorPoolImpl(BlockingQueue queue, int maxSize)
     {
-        pooledExecutor = new PooledExecutor(channel, maxSize);
-        pooledExecutor.setMinimumPoolSize(maxSize);
-        pooledExecutor.waitWhenBlocked();
+        pooledExecutor = new ThreadPoolExecutor(0, maxSize, 60L, TimeUnit.SECONDS, queue);
+        pooledExecutor.setCorePoolSize(maxSize);
+        pooledExecutor.setRejectedExecutionHandler(new WaitPolicy());
     }
 
     /**
@@ -81,7 +83,7 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
      * @exception InterruptedException Indicates that the Work execution has
      *                been unsuccessful.
      */
-    public void execute(Runnable work) throws InterruptedException
+    public void execute(Runnable work)
     {
         pooledExecutor.execute(work);
     }
@@ -127,7 +129,7 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
     {
         pooledExecutor.shutdownNow();
         try {
-            pooledExecutor.awaitTerminationAfterShutdown(SHUTDOWN_TIMEOUT);
+            pooledExecutor.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             // Continue
         }

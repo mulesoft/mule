@@ -13,14 +13,15 @@
  */
 package org.mule.umo;
 
-import java.lang.reflect.InvocationTargetException;
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutionException;
+import edu.emory.mathcs.backport.java.util.concurrent.FutureTask;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeoutException;
 
 import org.mule.impl.MuleMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
-
-import EDU.oswego.cs.dl.util.concurrent.Callable;
-import EDU.oswego.cs.dl.util.concurrent.FutureResult;
 
 /**
  * <code>FutureMessageResult</code> is an UMOMessage result of a remote
@@ -32,32 +33,31 @@ import EDU.oswego.cs.dl.util.concurrent.FutureResult;
  * @version $Revision$
  */
 
-public class FutureMessageResult extends FutureResult
+public class FutureMessageResult extends FutureTask
 {
     private UMOTransformer transformer;
 
-    public FutureMessageResult()
+    public FutureMessageResult(Callable callable)
     {
-        super();
+        super(callable);
     }
 
-    public FutureMessageResult(UMOTransformer transformer)
+    public FutureMessageResult(Callable callable, UMOTransformer transformer)
     {
-        this();
+        this(callable);
         this.transformer = transformer;
     }
 
-    public UMOMessage getMessage() throws InvocationTargetException, InterruptedException, TransformerException
+    public UMOMessage getMessage()
+    	throws InterruptedException, ExecutionException, TransformerException
     {
-        Object obj = get();
-        return getMessage(obj);
+        return this.getMessage(this.get());
     }
 
-    public UMOMessage getMessage(long timeout) throws InvocationTargetException, InterruptedException,
-            TransformerException
+    public UMOMessage getMessage(long timeout)
+    	throws InterruptedException, ExecutionException, TimeoutException, TransformerException
     {
-        Object obj = this.timedGet(timeout);
-        return getMessage(obj);
+        return this.getMessage(this.get(timeout, TimeUnit.MILLISECONDS));
     }
 
     private UMOMessage getMessage(Object obj) throws TransformerException
@@ -67,8 +67,7 @@ public class FutureMessageResult extends FutureResult
                 return (UMOMessage) obj;
             }
             if (transformer != null) {
-                Object payload = transformer.transform(obj);
-                return new MuleMessage(payload);
+                obj = transformer.transform(obj);
             }
             return new MuleMessage(obj);
         } else {
@@ -82,10 +81,10 @@ public class FutureMessageResult extends FutureResult
      * 
      * @param callable the Action to execute
      */
-    public void execute(Callable callable)
+    public void execute()
     {
-        Runnable runnable = setter(callable);
-        Thread worker = new Thread(runnable);
-        worker.start();
+    	// TODO rather use ExecutorService.submit()
+    	new Thread(this).start();
     }
+
 }
