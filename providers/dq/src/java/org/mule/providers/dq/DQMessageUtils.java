@@ -13,21 +13,21 @@
  */
 package org.mule.providers.dq;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Iterator;
+import com.ibm.as400.access.AS400;
+import com.ibm.as400.access.AS400Text;
+import com.ibm.as400.access.CharacterFieldDescription;
+import com.ibm.as400.access.Record;
+import com.ibm.as400.access.RecordFormat;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import com.ibm.as400.access.AS400;
-import com.ibm.as400.access.AS400Text;
-import com.ibm.as400.access.CharacterFieldDescription;
-import com.ibm.as400.access.Record;
-import com.ibm.as400.access.RecordFormat;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Iterator;
 
 /**
  * @author m999svm <p/> DQMessageUtils utility class for DQMessage
@@ -90,7 +90,7 @@ public final class DQMessageUtils
         String[] tab = format.getFieldNames();
 
         for (int i = 0; i < tab.length; i++) {
-            name = (String) tab[i];
+            name = tab[i];
             field = msg.getEntry(name);
             if (field == null) {
                 field = "";

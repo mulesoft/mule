@@ -50,9 +50,9 @@ public class ObjectToXmppPacket extends AbstractEventAwareTransformer {
         for (Iterator iterator = context.getProperties().keySet().iterator(); iterator.hasNext();) {
             String name = (String) iterator.next();
             if (name.equals(XmppConnector.XMPP_THREAD)) {
-                ((Message) result).setThread((String) context.getProperty(name));
+                result.setThread((String) context.getProperty(name));
             } else if (name.equals(XmppConnector.XMPP_SUBJECT)) {
-                ((Message) result).setSubject((String) context.getProperty(name));
+                result.setSubject((String) context.getProperty(name));
             } else if (name.equals(XmppConnector.XMPP_FROM)) {
                 result.setFrom((String) context.getProperty(name));
             } else if (name.equals(XmppConnector.XMPP_TO)) {

@@ -14,12 +14,9 @@
 package org.mule.providers.jdbc;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.umo.endpoint.UMOEndpointURI;
-import org.dom4j.io.DOMReader;
-import org.dom4j.Document;
 import org.dom4j.Node;
+import org.dom4j.io.DOMReader;
+import org.mule.umo.endpoint.UMOEndpointURI;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -36,9 +33,7 @@ import java.util.regex.Pattern;
 public abstract class JdbcUtils
 {
 
-    private static final transient Log logger = LogFactory.getLog(JdbcUtils.class);
-
-    public static void close(Connection con) throws SQLException
+	public static void close(Connection con) throws SQLException
     {
         if (con != null) {
             con.close();

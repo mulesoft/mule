@@ -25,9 +25,8 @@ public class XmppEndpointTestCase extends NamedTestCase
 {
     public void testMalformedXmppUrl() throws Exception
     {
-        MuleEndpointURI endpointUri = null;
         try {
-            endpointUri = new MuleEndpointURI("xmpp://mule:secret@jabber.org");
+            new MuleEndpointURI("xmpp://mule:secret@jabber.org");
             fail("There is no path set on the endpoint");
         } catch (MalformedEndpointException e) {
             //expected
@@ -67,12 +66,12 @@ public class XmppEndpointTestCase extends NamedTestCase
     public void testXmppBadGroupChatParams() throws Exception
     {
         try {
-            MuleEndpointURI endpointUri = new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=true");
+            new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=true");
             fail("if groupchat is set to true a nickname must be set");
         } catch (MalformedEndpointException e) {
             //expected
         }
 
-        MuleEndpointURI endpointUri = new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=false");
+        new MuleEndpointURI("xmpp://mule:secret@jabber.org:6666/ross@jabber.org?groupChat=false");
     }
 }
