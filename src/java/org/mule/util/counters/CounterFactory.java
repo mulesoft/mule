@@ -14,9 +14,9 @@
  */
 package org.mule.util.counters;
 
-import java.util.Iterator;
-
 import org.mule.util.counters.impl.CounterFactoryImpl;
+
+import java.util.Iterator;
 
 /**
  * This class is the Counter's factory. It is the main entry point for
@@ -84,6 +84,11 @@ public class CounterFactory
         protected Type(String name)
         {
             this.name = name;
+        }
+        
+        public String getName()
+        {
+        	return this.name;
         }
     }
 
