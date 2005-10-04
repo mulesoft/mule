@@ -13,13 +13,16 @@
  */
 package org.mule.config;
 
+import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
+import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
+import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.umo.manager.UMOWorkManager;
-import org.mule.util.DisposableThreadPool;
-
-import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
-import EDU.oswego.cs.dl.util.concurrent.ThreadFactory;
+import org.mule.util.concurrent.WaitPolicy;
 
 /**
  * <code>ThreadingProfile</code> is used to configure a thread pool. Mule uses
@@ -74,7 +77,7 @@ public class ThreadingProfile
 
     private WorkManagerFactory workManagerFactory = new DefaultWorkManagerFactory();
 
-    private PooledExecutor.BlockedExecutionHandler blockedExecutionHandler;
+    private RejectedExecutionHandler rejectedExecutionHandler;
 
     private ThreadFactory threadFactory;
 
@@ -86,14 +89,14 @@ public class ThreadingProfile
                             int maxThreadsIdle,
                             long threadTTL,
                             int poolExhaustPolicy,
-                            PooledExecutor.BlockedExecutionHandler blockedExecutionHandler,
+                            RejectedExecutionHandler rejectedExecutionHandler,
                             ThreadFactory threadFactory)
     {
         this.maxThreadsActive = maxThreadsActive;
         this.maxThreadsIdle = maxThreadsIdle;
         this.threadTTL = threadTTL;
         this.poolExhaustPolicy = poolExhaustPolicy;
-        this.blockedExecutionHandler = blockedExecutionHandler;
+        this.rejectedExecutionHandler = rejectedExecutionHandler;
         this.threadFactory = threadFactory;
     }
 
@@ -103,7 +106,7 @@ public class ThreadingProfile
         this.maxThreadsIdle = tp.getMaxThreadsIdle();
         this.threadTTL = tp.getThreadTTL();
         this.poolExhaustPolicy = tp.getPoolExhaustedAction();
-        this.blockedExecutionHandler = tp.getBlockedExecutionHandler();
+        this.rejectedExecutionHandler = tp.getRejectedExecutionHandler();
         this.threadFactory = tp.getThreadFactory();
         this.workManagerFactory = tp.getWorkManagerFactory();
         this.threadPriority = tp.getThreadPriority();
@@ -140,9 +143,9 @@ public class ThreadingProfile
         return poolExhaustPolicy;
     }
 
-    public PooledExecutor.BlockedExecutionHandler getBlockedExecutionHandler()
+    public RejectedExecutionHandler getRejectedExecutionHandler()
     {
-        return blockedExecutionHandler;
+        return rejectedExecutionHandler;
     }
 
     public ThreadFactory getThreadFactory()
@@ -187,9 +190,9 @@ public class ThreadingProfile
         }
     }
 
-    public void setBlockedExecutionHandler(PooledExecutor.BlockedExecutionHandler blockedExecutionHandler)
+    public void setBlockedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler)
     {
-        this.blockedExecutionHandler = blockedExecutionHandler;
+        this.rejectedExecutionHandler = rejectedExecutionHandler;
     }
 
     public void setThreadFactory(ThreadFactory threadFactory)
@@ -222,64 +225,64 @@ public class ThreadingProfile
         return workManagerFactory.createWorkManager(this, name);
     }
 
-    public PooledExecutor createPool()
+    public ThreadPoolExecutor createPool()
     {
         return configurePool();
     }
 
-    public PooledExecutor createPool(String name)
+    public ThreadPoolExecutor createPool(String name)
     {
         threadFactory = new NamedThreadFactory(name, threadPriority);
         return configurePool();
     }
 
-    public void configurePool(PooledExecutor pool)
+    public void configurePool(ThreadPoolExecutor pool)
     {
-        pool.setMinimumPoolSize(maxThreadsIdle);
+        pool.setCorePoolSize(maxThreadsIdle);
         pool.setMaximumPoolSize(maxThreadsActive);
-        pool.setKeepAliveTime(threadTTL);
-        if (blockedExecutionHandler != null) {
-            pool.setBlockedExecutionHandler(blockedExecutionHandler);
+        pool.setKeepAliveTime(threadTTL, TimeUnit.MILLISECONDS);
+        if (rejectedExecutionHandler != null) {
+            pool.setRejectedExecutionHandler(rejectedExecutionHandler);
         }
         if (threadFactory != null) {
             pool.setThreadFactory(threadFactory);
         }
 
         switch (poolExhaustPolicy) {
-        case WHEN_EXHAUSTED_DISCARD_OLDEST: {
-            pool.discardOldestWhenBlocked();
-            break;
-        }
-        case WHEN_EXHAUSTED_RUN: {
-            pool.runWhenBlocked();
-            break;
-        }
-        case WHEN_EXHAUSTED_ABORT: {
-            pool.abortWhenBlocked();
-            break;
-        }
-        case WHEN_EXHAUSTED_DISCARD: {
-            pool.discardWhenBlocked();
-            break;
-        }
-        case WHEN_EXHAUSTED_WAIT: {
-            pool.waitWhenBlocked();
-            break;
-        }
-        default: {
-            pool.waitWhenBlocked();
-            break;
-        }
+	        case WHEN_EXHAUSTED_DISCARD_OLDEST: {
+	            pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
+	            break;
+	        }
+	        case WHEN_EXHAUSTED_RUN: {
+	            pool.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+	            break;
+	        }
+	        case WHEN_EXHAUSTED_ABORT: {
+	            pool.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+	            break;
+	        }
+	        case WHEN_EXHAUSTED_DISCARD: {
+	            pool.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+	            break;
+	        }
+	        case WHEN_EXHAUSTED_WAIT: {
+	            pool.setRejectedExecutionHandler(new WaitPolicy());
+	            break;
+	        }
+	        default: {
+	            pool.setRejectedExecutionHandler(new WaitPolicy());
+	            break;
+	        }
         }
     }
 
-    private PooledExecutor configurePool()
+    private ThreadPoolExecutor configurePool()
     {
-        PooledExecutor pool;
+    	ThreadPoolExecutor pool;
         if (maxBufferSize > 0) {
-            pool = new DisposableThreadPool(new BoundedBuffer(maxBufferSize));
+            pool = new ThreadPoolExecutor(0, maxBufferSize, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue(maxBufferSize));
         } else {
-            pool = new DisposableThreadPool();
+            pool = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue());
         }
         configurePool(pool);
         return pool;
@@ -300,7 +303,7 @@ public class ThreadingProfile
         return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle=" + maxThreadsIdle
                 + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL + ", poolExhaustPolicy="
                 + poolExhaustPolicy + ", doThreading=" + doThreading + ", threadPriority=" + threadPriority
-                + ", workManagerFactory=" + workManagerFactory + ", blockedExecutionHandler=" + blockedExecutionHandler
+                + ", workManagerFactory=" + workManagerFactory + ", rejectedExecutionHandler=" + rejectedExecutionHandler
                 + ", threadFactory=" + threadFactory + "}";
     }
 

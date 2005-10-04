@@ -13,7 +13,8 @@
  */
 package org.mule.impl;
 
-import EDU.oswego.cs.dl.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -22,7 +23,15 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.*;
+import org.mule.umo.FutureMessageResult;
+import org.mule.umo.TransactionException;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.transformer.TransformerException;
@@ -269,8 +278,6 @@ public class MuleEventContext implements UMOEventContext
      */
     public FutureMessageResult sendEventAsync(final Object message, final int timeout) throws UMOException
     {
-        FutureMessageResult result = new FutureMessageResult();
-
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
@@ -281,7 +288,8 @@ public class MuleEventContext implements UMOEventContext
             }
         };
 
-        result.execute(callable);
+        FutureMessageResult result = new FutureMessageResult(callable);
+        result.execute();
         return result;
     }
 
@@ -303,8 +311,6 @@ public class MuleEventContext implements UMOEventContext
      */
     public FutureMessageResult sendEventAsync(final UMOMessage message, final int timeout) throws UMOException
     {
-        FutureMessageResult result = new FutureMessageResult();
-
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
@@ -314,7 +320,8 @@ public class MuleEventContext implements UMOEventContext
             }
         };
 
-        result.execute(callable);
+        FutureMessageResult result = new FutureMessageResult(callable);
+        result.execute();
         return result;
     }
 
@@ -339,8 +346,6 @@ public class MuleEventContext implements UMOEventContext
                                               final UMOEndpointURI endpointUri,
                                               final int timeout) throws UMOException
     {
-        FutureMessageResult result = new FutureMessageResult();
-
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
@@ -350,7 +355,8 @@ public class MuleEventContext implements UMOEventContext
             }
         };
 
-        result.execute(callable);
+        FutureMessageResult result = new FutureMessageResult(callable);
+        result.execute();
         return result;
     }
 
@@ -376,8 +382,6 @@ public class MuleEventContext implements UMOEventContext
     public FutureMessageResult sendEventAsync(final UMOMessage message, final String endpointName, final int timeout)
             throws UMOException
     {
-        FutureMessageResult result = new FutureMessageResult();
-
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
@@ -387,7 +391,8 @@ public class MuleEventContext implements UMOEventContext
             }
         };
 
-        result.execute(callable);
+        FutureMessageResult result = new FutureMessageResult(callable);
+        result.execute();
         return result;
     }
 

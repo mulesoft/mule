@@ -13,9 +13,11 @@
  */
 package org.mule.extras.client;
 
-import EDU.oswego.cs.dl.util.concurrent.Callable;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.XppDriver;
+
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -61,6 +63,7 @@ public class RemoteDispatcher implements Disposable
 
     private MuleEndpointURI serverEndpoint;
 
+    // TODO remove this? (only used from constructor)
     private MuleClient client;
 
     private UMOCredentials credentials = null;
@@ -142,14 +145,8 @@ public class RemoteDispatcher implements Disposable
                                                           final Object payload,
                                                           final Map messageProperties) throws UMOException
     {
-        UMOTransformer trans = null;
         FutureMessageResult result = null;
-        if (transformers != null) {
-            trans = MuleObjectHelper.getTransformer(transformers, ",");
-            result = new FutureMessageResult(trans);
-        } else {
-            result = new FutureMessageResult();
-        }
+        UMOTransformer trans = null;
 
         Callable callable = new Callable() {
             public Object call() throws Exception
@@ -158,7 +155,14 @@ public class RemoteDispatcher implements Disposable
             }
         };
 
-        result.execute(callable);
+        if (transformers != null) {
+            trans = MuleObjectHelper.getTransformer(transformers, ",");
+            result = new FutureMessageResult(callable, trans);
+        } else {
+            result = new FutureMessageResult(callable);
+        }
+
+        result.execute();
         return result;
     }
 
@@ -180,9 +184,6 @@ public class RemoteDispatcher implements Disposable
     public FutureMessageResult sendAsyncRemote(final String endpoint, final Object payload, final Map messageProperties)
             throws UMOException
     {
-        FutureMessageResult result = null;
-        result = new FutureMessageResult();
-
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
@@ -190,7 +191,8 @@ public class RemoteDispatcher implements Disposable
             }
         };
 
-        result.execute(callable);
+        FutureMessageResult result = new FutureMessageResult(callable);
+        result.execute();
         return result;
     }
 
@@ -205,9 +207,6 @@ public class RemoteDispatcher implements Disposable
 
     public FutureMessageResult asyncReceiveRemote(final String endpoint, final int timeout) throws UMOException
     {
-        FutureMessageResult result = null;
-        result = new FutureMessageResult();
-
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
@@ -215,7 +214,8 @@ public class RemoteDispatcher implements Disposable
             }
         };
 
-        result.execute(callable);
+        FutureMessageResult result = new FutureMessageResult(callable);
+        result.execute();
         return result;
     }
 

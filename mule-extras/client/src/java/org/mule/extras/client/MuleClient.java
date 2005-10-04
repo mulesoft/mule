@@ -13,7 +13,8 @@
  */
 package org.mule.extras.client;
 
-import EDU.oswego.cs.dl.util.concurrent.Callable;
+import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -32,7 +33,13 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.umo.*;
+import org.mule.umo.FutureMessageResult;
+import org.mule.umo.MessagingException;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -44,7 +51,11 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>MuleClient</code> is a simple interface for Mule clients to send and
@@ -413,8 +424,6 @@ public class MuleClient implements Disposable
                                          final UMOMessage message,
                                          final int timeout) throws UMOException
     {
-        FutureMessageResult result = new FutureMessageResult();
-
         Callable callable = new Callable() {
             public Object call() throws Exception
             {
@@ -422,7 +431,8 @@ public class MuleClient implements Disposable
             }
         };
 
-        result.execute(callable);
+        FutureMessageResult result = new FutureMessageResult(callable);
+        result.execute();
         return result;
     }
 
@@ -474,14 +484,8 @@ public class MuleClient implements Disposable
                                                String transformers,
                                                final UMOMessage message) throws UMOException
     {
-        UMOTransformer trans = null;
         FutureMessageResult result = null;
-        if (transformers != null) {
-            trans = MuleObjectHelper.getTransformer(transformers, ",");
-            result = new FutureMessageResult(trans);
-        } else {
-            result = new FutureMessageResult();
-        }
+        UMOTransformer trans = null;
 
         Callable callable = new Callable() {
             public Object call() throws Exception
@@ -490,7 +494,14 @@ public class MuleClient implements Disposable
             }
         };
 
-        result.execute(callable);
+        if (transformers != null) {
+            trans = MuleObjectHelper.getTransformer(transformers, ",");
+            result = new FutureMessageResult(callable, trans);
+        } else {
+            result = new FutureMessageResult(callable);
+        }
+
+        result.execute();
         return result;
     }
 
@@ -856,7 +867,7 @@ public class MuleClient implements Disposable
     }
 
     /**
-     * Will dispose the MUleManager instance *IF* a new instance was created for
+     * Will dispose the MuleManager instance *IF* a new instance was created for
      * this client. Otherwise this method only cleans up resources no longer
      * needed
      */

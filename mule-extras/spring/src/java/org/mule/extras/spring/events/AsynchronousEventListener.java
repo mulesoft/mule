@@ -13,7 +13,9 @@
  */
 package org.mule.extras.spring.events;
 
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
@@ -43,9 +45,9 @@ public class AsynchronousEventListener implements MuleEventListener
     /**
      * the pool that manages the threads of execution
      */
-    private PooledExecutor threadPool;
+    private ExecutorService threadPool;
 
-    public AsynchronousEventListener(PooledExecutor threadPool, ApplicationListener listener)
+    public AsynchronousEventListener(ExecutorService threadPool, ApplicationListener listener)
     {
         this.threadPool = threadPool;
         this.listener = listener;
@@ -55,7 +57,7 @@ public class AsynchronousEventListener implements MuleEventListener
     {
         try {
             threadPool.execute(new Worker(event));
-        } catch (InterruptedException e) {
+        } catch (RejectedExecutionException e) {
             logger.error("Failed to process event: " + event.toString(), e);
         }
     }

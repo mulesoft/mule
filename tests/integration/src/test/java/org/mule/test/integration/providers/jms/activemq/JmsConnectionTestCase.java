@@ -13,7 +13,9 @@
  */
 package org.mule.test.integration.providers.jms.activemq;
 
-import EDU.oswego.cs.dl.util.concurrent.LinkedQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -38,6 +40,7 @@ import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.jms.Connection;
+
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -51,7 +54,7 @@ import java.util.Properties;
 public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase implements ConnectionEventListener {
 
     private JmsConnector connector;
-    private LinkedQueue events = new LinkedQueue();
+    private BlockingQueue events = new LinkedBlockingQueue();
 
     private long TIME_OUT = 10000L;
     public static final String BROKER_URL = "tcp://localhost:56312";

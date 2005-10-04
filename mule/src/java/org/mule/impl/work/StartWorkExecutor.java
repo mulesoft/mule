@@ -17,11 +17,11 @@
 
 package org.mule.impl.work;
 
-import EDU.oswego.cs.dl.util.concurrent.Executor;
-
-import javax.resource.spi.work.WorkException;
+import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
 import org.mule.util.concurrent.Latch;
+
+import javax.resource.spi.work.WorkException;
 
 /**
  * 
