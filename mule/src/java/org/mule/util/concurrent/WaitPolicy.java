@@ -45,6 +45,8 @@ public class WaitPolicy implements RejectedExecutionHandler
 		{
 			try
 			{
+				// TODO add a customizable timeout to avoid deadlocks
+				// see http://altair.cs.oswego.edu/pipermail/concurrency-interest/2004-April/000943.html
 				e.getQueue().put(r);
 			}
 			catch (InterruptedException ie)
