@@ -61,18 +61,52 @@ public class EmailEndpointsTestCase extends NamedTestCase
         assertEquals(0, url.getParams().size());
     }
 
-    public void testPop3UrlWithFolder() throws Exception
+    public void testImapUrlWithFolder() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("pop3://username:password@pop3.muleumo.org/INBOX");
-        assertEquals("pop3", endpointUri.getScheme());
+        MuleEndpointURI endpointUri = new MuleEndpointURI("imap://username:password@imap.muleumo.org/MyMail");
+        assertEquals("imap", endpointUri.getScheme());
         assertEquals("username@muleumo.org", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
         assertEquals(-1, endpointUri.getPort());
-        assertEquals("pop3.muleumo.org", endpointUri.getHost());
+        assertEquals("imap.muleumo.org", endpointUri.getHost());
         assertEquals("username:password", endpointUri.getUserInfo());
-        assertEquals("pop3://username:password@pop3.muleumo.org/INBOX", endpointUri.toString());
+        assertEquals("imap://username:password@imap.muleumo.org/MyMail", endpointUri.toString());
         assertEquals(0, endpointUri.getParams().size());
-        assertEquals("/INBOX", endpointUri.getPath());
+        assertEquals("/MyMail", endpointUri.getPath());
+
+    }
+
+    public void testSmtpUrlEmailUsernameAndParams() throws Exception
+    {
+        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://test%40tippitinc.com:password@smtpout.secureserver.net:3535?address=test@tippitinc.com&ccAddresses=entropy@loopysoft.com");
+        assertEquals("smtp", endpointUri.getScheme());
+        assertEquals("test@tippitinc.com", endpointUri.getAddress());
+        assertNull(endpointUri.getEndpointName());
+        assertEquals(3535, endpointUri.getPort());
+        assertEquals("smtpout.secureserver.net", endpointUri.getHost());
+        assertEquals("test@tippitinc.com:password", endpointUri.getUserInfo());
+        assertEquals("smtp://test%40tippitinc.com:password@smtpout.secureserver.net:3535?address=test@tippitinc.com&ccAddresses=entropy@loopysoft.com", endpointUri.toString());
+        assertEquals(1, endpointUri.getParams().size());
+        assertEquals("entropy@loopysoft.com", endpointUri.getParams().get("ccAddresses"));
+
+    }
+
+    /**
+     * Mule will assume that the username is the from address as it has an @ symbol in it
+     * @throws Exception
+     */
+    public void testSmtpUrlEmailUsernameWithoutAddressParam() throws Exception
+    {
+        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://test%40tippitinc.com:password@smtpout.secureserver.net:3535?ccAddresses=entropy@loopysoft.com");
+        assertEquals("smtp", endpointUri.getScheme());
+        assertEquals("test@tippitinc.com", endpointUri.getAddress());
+        assertNull(endpointUri.getEndpointName());
+        assertEquals(3535, endpointUri.getPort());
+        assertEquals("smtpout.secureserver.net", endpointUri.getHost());
+        assertEquals("test@tippitinc.com:password", endpointUri.getUserInfo());
+        assertEquals("smtp://test%40tippitinc.com:password@smtpout.secureserver.net:3535?ccAddresses=entropy@loopysoft.com", endpointUri.toString());
+        assertEquals(1, endpointUri.getParams().size());
+        assertEquals("entropy@loopysoft.com", endpointUri.getParams().get("ccAddresses"));
 
     }
 }

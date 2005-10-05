@@ -32,34 +32,37 @@ public class UserInfoEndpointBuilder extends AbstractEndpointBuilder
 {
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
+        //Check and handle '@' symbols in the user info
         address = uri.getHost();
-        if (address.startsWith("mail.")) {
-            address = address.substring(5);
-        } else if (address.startsWith("pop3.")) {
-            address = address.substring(5);
-        } else if (address.startsWith("pop.")) {
-            address = address.substring(4);
-        } else if (address.startsWith("smtp.")) {
-            address = address.substring(5);
+        int a=address.indexOf(".");
+        int b = (a==-1 ? -1 : address.indexOf(".", a+1));
+        if(b > -1) {
+            address = address.substring(a + 1);
         }
+
         if (uri.getPort() != -1) {
             // set the endpointUri to be a proper url if host and port are set
             this.address += ":" + uri.getPort();
         }
 
-        if (uri.getUserInfo() != null) {
-            int x = uri.getUserInfo().indexOf(":");
+        if (userInfo!= null) {
+            int x = userInfo.indexOf(":");
             if (x > -1) {
-                String user = uri.getRawUserInfo().substring(0, x);
-                address = user + "@" + address;
+                String user = userInfo.substring(0, x);
+                if(user.indexOf("@") > -1){
+                    address = user;
+                } else {
+                    address = user + "@" + address;
+                }
             } else {
-                address = uri.getRawUserInfo() + "@" + address;
+                if(userInfo.indexOf("@") > -1){
+                    address = userInfo;
+                } else {
+                    address = userInfo + "@" + address;
+                }
             }
         } else {
             throw new MalformedEndpointException(uri.toString(), new Exception("User info is not set"));
         }
-//        if (uri.getPath() != null && !"".equals(uri.getPath())) {
-//            props.put("folder", uri.getPath().substring(1));
-//        }
     }
 }
