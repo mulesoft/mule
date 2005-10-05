@@ -57,6 +57,8 @@ public class MuleConfiguration
      * default value is 'false'.
      */
     public static final String SYNCHRONOUS_PROPERTY = "synchronous";
+
+    public static final String DEFAULT_ENCODING = "UTF-8";
     // /**
     // * Determines the default inboundProvider that Mule uses to communicate
     // between MuelUMO's when an
@@ -110,6 +112,8 @@ public class MuleConfiguration
      * Name of the model to use. If blank the first model will be used
      */
     private String model = null;
+
+    private String encoding = DEFAULT_ENCODING;
 
     private PoolingProfile poolingProfile = new PoolingProfile();
 
@@ -498,5 +502,13 @@ public class MuleConfiguration
 
     public void setModelType(String modelType) {
         this.modelType = modelType;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 }

@@ -37,6 +37,7 @@ public class SgmlCodec {
         add("&amp", 38);
         add("&lt", 60);
         add("&gt", 62);
+        add("&at", 64); //@
         add("&nbsp", 160);
         add("&iexcl", 161);
         add("&cent", 162);

@@ -60,6 +60,11 @@
 <!ATTLIST mule-environment-properties synchronousEventTimeout  		NMTOKEN                 #IMPLIED>
 
 <!--
+     Added default encoding to use for general parsing of strings
+-->
+<!ATTLIST mule-environment-properties encoding  		CDATA                 #IMPLIED>
+
+<!--
      Default transaction timeout
 -->
 <!ATTLIST mule-environment-properties transactionTimeout  		NMTOKEN                 #IMPLIED>
