@@ -64,6 +64,11 @@
 <!ATTLIST mule-environment-properties synchronousEventTimeout  		NMTOKEN                 #IMPLIED>
 
 <!--
+     Added default encoding to use for general parsing of strings
+-->
+<!ATTLIST mule-environment-properties encoding  		CDATA                 #IMPLIED>
+
+<!--
      Determines whether when running synchronously, return events are received before
      returning the call. i.e. in jms wait for a replyTo. Vm queues do this automatically
 -->
