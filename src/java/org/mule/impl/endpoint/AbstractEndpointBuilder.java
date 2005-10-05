@@ -14,12 +14,16 @@
 package org.mule.impl.endpoint;
 
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.Properties;
+import java.io.UnsupportedEncodingException;
 
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesHelper;
+import org.mule.util.SgmlCodec;
+import org.mule.MuleManager;
 
 /**
  * <code>UrlEndpointBuilder</code> is the default endpointUri strategy
@@ -42,12 +46,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String transformers;
     protected String userInfo;
 
+
     protected int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
 
     public UMOEndpointURI build(URI uri) throws MalformedEndpointException
     {
         Properties props = getPropertiesForURI(uri);
-        if (address == null) {
+        if(address==null) {
             setEndpoint(uri, props);
         }
 
@@ -69,8 +74,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected abstract void setEndpoint(URI uri, Properties props) throws MalformedEndpointException;
 
-    protected Properties getPropertiesForURI(URI uri)
-    {
+    protected Properties getPropertiesForURI(URI uri) throws MalformedEndpointException {
         Properties properties = PropertiesHelper.getPropertiesFromQueryString(uri.getQuery());
 
         String tempEndpointName = (String) properties.remove(PROPERTY_ENDPOINT_NAME);
@@ -81,6 +85,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         String endpoint = (String) properties.remove(PROPERTY_ENDPOINT_URI);
         if (endpoint != null) {
             this.address = endpoint;
+            address = decode(address, uri);
         }
 
         String cnnName = (String) properties.remove(PROPERTY_CONNECTOR_NAME);
@@ -113,6 +118,19 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         if (transformers != null) {
             transformers = transformers.replaceAll(" ", ",");
         }
+        //If we have user info, decode it as it might contain '@' or other encodable characters
+        userInfo = uri.getUserInfo();
+        if(userInfo!=null) {
+            userInfo = decode(userInfo, uri);
+        }
         return properties;
+    }
+
+    private String decode(String string, URI uri) throws MalformedEndpointException {
+        try {
+            return URLDecoder.decode(string, MuleManager.getConfiguration().getEncoding());
+        } catch (UnsupportedEncodingException e) {
+            throw new MalformedEndpointException(uri.toString(), e);
+        }
     }
 }
