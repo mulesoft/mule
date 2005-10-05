@@ -26,6 +26,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.umo.UMOFilter;
 import org.mule.util.ClassHelper;
+import org.mule.MuleManager;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -72,7 +73,7 @@ public abstract class AbstractDigesterConfiguration
             }
         };
 
-        configEncoding = System.getProperty(MuleProperties.CONFIG_ENCODING_SYS_PROPERTY, "UTF-8");
+        configEncoding = System.getProperty(MuleProperties.CONFIG_ENCODING_SYS_PROPERTY, MuleManager.getConfiguration().getEncoding());
 
         digester.setValidating(validate);
         digester.setEntityResolver(new MuleDtdResolver(dtd));

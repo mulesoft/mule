@@ -66,6 +66,6 @@ public class ReaderResource
     }
 
     public static ReaderResource[] parseResources(String configResources) throws IOException {
-        return parseResources(configResources, "UTF-8");
+        return parseResources(configResources, MuleManager.getConfiguration().getEncoding());
     }
 }
