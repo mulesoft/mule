@@ -18,6 +18,8 @@ import org.mule.jbi.components.AbstractComponent;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.response.ResponseMessageRouter;
+import org.mule.registry.ComponentType;
+import org.mule.registry.RegistryException;
 
 import javax.jbi.JBIException;
 import javax.xml.namespace.QName;

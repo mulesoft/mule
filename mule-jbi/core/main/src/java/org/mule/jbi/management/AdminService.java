@@ -13,7 +13,7 @@
  */
 package org.mule.jbi.management;
 
-import org.mule.management.ManagementContext;
+import org.mule.ManagementContext;
 import org.mule.registry.ComponentType;
 import org.mule.registry.RegistryComponent;
 

@@ -21,6 +21,10 @@ import org.mule.registry.RegistryComponent;
 import org.mule.registry.RegistryStore;
 import org.mule.registry.Unit;
 import org.mule.registry.impl.AbstractRegistry;
+import org.mule.ManagementContext;
+import org.mule.jbi.management.InstallationContextImpl;
+
+import javax.jbi.component.Bootstrap;
 
 /**
  * todo document
@@ -30,8 +34,8 @@ import org.mule.registry.impl.AbstractRegistry;
  */
 public class JbiRegistry extends AbstractRegistry {
 
-    public JbiRegistry(RegistryStore store) {
-        super(store);
+    public JbiRegistry(RegistryStore store, ManagementContext context) {
+        super(store, context);
     }
 
     public RegistryComponent createComponent(String name, ComponentType type) {
@@ -55,5 +59,17 @@ public class JbiRegistry extends AbstractRegistry {
         Library library = new JbiLibrary(this);
         library.setName(name);
         return library;
+    }
+
+    protected void bootstrapComponent(RegistryComponent component, Object bootstrap) throws Exception {
+        if(bootstrap instanceof Bootstrap) {
+            Bootstrap bs = (Bootstrap)bootstrap;
+            InstallationContextImpl ctx = new InstallationContextImpl(component, bs);
+            bs.init(ctx);
+            ctx.install();
+        } else {
+            throw new IllegalArgumentException("For JBI registry Boostrap class must be of type: " + Bootstrap.class.getName());
+        }
+
     }
 }

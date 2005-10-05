@@ -19,7 +19,7 @@ import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 import org.mule.jbi.servicedesc.DynamicEndpointImpl;
 import org.mule.jbi.servicedesc.ExternalEndpointImpl;
 import org.mule.jbi.servicedesc.InternalEndpointImpl;
-import org.mule.management.ManagementContext;
+import org.mule.ManagementContext;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistryComponent;
 import org.w3c.dom.Document;

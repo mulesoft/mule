@@ -21,12 +21,15 @@ import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.registry.RegistryException;
+import org.mule.registry.ComponentType;
 
 import javax.jbi.messaging.InOnly;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.NormalizedMessage;
 import javax.jbi.servicedesc.ServiceEndpoint;
+import javax.jbi.JBIException;
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 

@@ -17,6 +17,7 @@ package org.mule.jbi.registry;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistryFactory;
 import org.mule.registry.RegistryStore;
+import org.mule.ManagementContext;
 
 /**
  * todo document
@@ -25,7 +26,7 @@ import org.mule.registry.RegistryStore;
  * @version $Revision$
  */
 public class JbiRegistryFactory implements RegistryFactory {
-    public Registry create(RegistryStore store) {
-        return new JbiRegistry(store);
+    public Registry create(RegistryStore store, ManagementContext context) {
+        return new JbiRegistry(store, context);
     }
 }

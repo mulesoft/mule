@@ -16,8 +16,8 @@ package org.mule.jbi.management;
 import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.ManagementContext;
 import org.mule.jbi.JbiContainer;
-import org.mule.management.ManagementContext;
 import org.mule.registry.RegistryComponent;
 import org.mule.registry.RegistryException;
 import org.w3c.dom.Document;
@@ -43,11 +43,7 @@ import javax.xml.namespace.QName;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.MissingResourceException;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**

@@ -13,10 +13,10 @@
  */
 package org.mule.jbi.management;
 
+import org.mule.ManagementContext;
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.framework.ComponentContextImpl;
 import org.mule.jbi.registry.JbiRegistryComponent;
-import org.mule.management.ManagementContext;
 import org.mule.registry.RegistryException;
 
 import javax.jbi.JBIException;

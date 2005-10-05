@@ -19,12 +19,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.jbi.registry.JbiDescriptor;
 import org.mule.jbi.util.IOUtils;
-import org.mule.management.MBeanNameFactory;
-import org.mule.management.ManagementContext;
 import org.mule.registry.ComponentType;
 import org.mule.registry.Library;
 import org.mule.registry.RegistryComponent;
 import org.mule.util.Utility;
+import org.mule.ManagementContext;
 
 import javax.jbi.JBIException;
 import javax.jbi.management.InstallationServiceMBean;
@@ -164,7 +163,7 @@ public class InstallationService implements InstallationServiceMBean {
 	}
 
 	private ObjectName createComponentInstallerName(String name) {
-		return MBeanNameFactory.createMBeanName(context.getJmxDomainName(), name, "installer", null);
+		return context.createMBeanName(name, "installer", null);
 	}
 
 	public synchronized ObjectName loadInstaller(String aComponentName) {

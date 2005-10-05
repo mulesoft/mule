@@ -14,7 +14,7 @@
 package org.mule.jbi;
 
 import org.mule.jbi.nmr.InternalMessageRouter;
-import org.mule.management.ManagementContext;
+import org.mule.ManagementContext;
 import org.mule.registry.Registry;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.queue.QueueSession;

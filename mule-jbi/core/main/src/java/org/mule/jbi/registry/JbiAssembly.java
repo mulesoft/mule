@@ -17,7 +17,6 @@ import com.sun.java.xml.ns.jbi.ConnectionDocument.Connection;
 import com.sun.java.xml.ns.jbi.ConnectionsDocument.Connections;
 import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
 import com.sun.java.xml.ns.jbi.ServiceUnitDocument.ServiceUnit;
-import org.mule.config.IOUtils;
 import org.mule.registry.Registry;
 import org.mule.registry.RegistryComponent;
 import org.mule.registry.RegistryDescriptor;
@@ -25,6 +24,7 @@ import org.mule.registry.RegistryException;
 import org.mule.registry.Unit;
 import org.mule.registry.impl.AbstractAssembly;
 import org.mule.registry.impl.AbstractUnit;
+import org.mule.util.Utility;
 
 import javax.jbi.JBIException;
 import javax.jbi.component.Component;
@@ -138,7 +138,7 @@ public class JbiAssembly extends AbstractAssembly  {
 					}
 				}
 				// Unzip artifact
-				IOUtils.unzip(artifact, installDir);
+				Utility.unzip(artifact, installDir);
 				// Create Unit
 				Unit unit = registry.createUnit(suName);
 				unit.setAssembly(this);
