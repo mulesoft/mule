@@ -97,7 +97,7 @@ public class ManagementContext {
             StringBuffer sb = new StringBuffer();
             sb.append(getJmxDomainName()).append(':');
             if (componentName != null) {
-                sb.append("component=").append(validateString(name));
+                sb.append("component=").append(validateString(componentName));
                 sb.append(',');
             }
             sb.append("type=").append(validateString(type));
