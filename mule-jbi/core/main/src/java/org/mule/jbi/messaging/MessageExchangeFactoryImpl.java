@@ -19,10 +19,11 @@ import org.apache.wsdl.WSDLDescription;
 import org.apache.wsdl.WSDLInterface;
 import org.apache.wsdl.WSDLOperation;
 import org.apache.wsdl.impl.WSDLDescriptionImpl;
-import org.mule.jbi.registry.Component;
 import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
+import org.mule.registry.RegistryComponent;
 import org.w3c.dom.Document;
 
+import javax.jbi.component.Component;
 import javax.jbi.messaging.InOnly;
 import javax.jbi.messaging.InOptionalOut;
 import javax.jbi.messaging.InOut;
@@ -74,8 +75,8 @@ public class MessageExchangeFactoryImpl implements MessageExchangeFactory {
 				// TODO: service descriptions should be cached
 				// TODO: operations can be put on the endpoint 
 				String name = ((AbstractServiceEndpoint) endpoints[i]).getComponent();
-				Component info = this.channel.getContainer().getRegistry().getComponent(name);
-				Document doc = info.getComponent().getServiceDescription(endpoints[i]);
+				RegistryComponent info = this.channel.getContainer().getRegistry().getComponent(name);
+				Document doc = ((Component)info.getComponent()).getServiceDescription(endpoints[i]);
 				String uri = doc.getDocumentElement().getNamespaceURI();
 				WSDLDescription desc = null; 
 				if (WSDLConstants.WSDL2_0_NAMESPACE.equals(uri)) {

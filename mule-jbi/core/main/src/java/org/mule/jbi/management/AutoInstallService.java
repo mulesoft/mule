@@ -1,5 +1,13 @@
 package org.mule.jbi.management;
 
+import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.util.IOUtils;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
@@ -8,19 +16,12 @@ import java.io.PrintStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.util.IOUtils;
-
 public class AutoInstallService implements AutoInstallServiceMBean {
 
 	private int pollingFrequency = 60000;
 	private Timer timer;
 	private Log logger = LogFactory.getLog(getClass());
+    private SynchronizedBoolean started = new SynchronizedBoolean(false);
 
 	public AutoInstallService() {
 		this.timer = new Timer(true);
@@ -39,17 +40,19 @@ public class AutoInstallService implements AutoInstallServiceMBean {
 	}
 	
 	public void poll() {
-		File wrkDir = JbiContainer.Factory.getInstance().getWorkingDir();
-		File insDir = Directories.getAutoInstallDir(wrkDir);
-		File[] files = insDir.listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				  name = name.toLowerCase();
-				  return name.endsWith(".zip") || name.endsWith(".jar");
-				}
-		});
-		for (int i = 0; i < files.length; i++) {
-			install(files[i]);
-		}
+        if(started.get()) {
+            File wrkDir = JbiContainer.Factory.getInstance().getWorkingDir();
+            File insDir = Directories.getAutoInstallDir(wrkDir);
+            File[] files = insDir.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                      name = name.toLowerCase();
+                      return name.endsWith(".zip") || name.endsWith(".jar");
+                    }
+            });
+            for (int i = 0; i < files.length; i++) {
+                install(files[i]);
+            }
+        }
 	}
 	
 	public void install(File f) {

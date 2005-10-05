@@ -15,9 +15,12 @@ package org.mule.jbi.management;
 
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.framework.ComponentContextImpl;
-import org.mule.jbi.registry.Component;
+import org.mule.jbi.registry.JbiRegistryComponent;
+import org.mule.management.ManagementContext;
+import org.mule.registry.RegistryException;
 
 import javax.jbi.JBIException;
+import javax.jbi.component.Component;
 import javax.jbi.management.ComponentLifeCycleMBean;
 import javax.management.ObjectName;
 import java.io.IOException;
@@ -29,46 +32,59 @@ import java.io.IOException;
  */
 public class ComponentLifeCycle implements ComponentLifeCycleMBean {
 
-	private JbiContainer container;
-	private Component component;
+	private ManagementContext context;
+	private JbiRegistryComponent component;
 	
-	public ComponentLifeCycle(JbiContainer container, Component component) {
-		this.container = container;
+	public ComponentLifeCycle(ManagementContext context, JbiRegistryComponent component) {
+		this.context = context;
 		this.component = component;
 	}
 	
 	public synchronized void init() throws JBIException {
-		ComponentContextImpl context = new ComponentContextImpl(this.container, this.component);
-		this.component.getComponent().getLifeCycle().init(context);
+		ComponentContextImpl context = new ComponentContextImpl(this.context, this.component,
+                JbiContainer.Factory.getInstance().getEndpoints());
+		((Component)component.getComponent()).getLifeCycle().init(context);
 	}
 	
 	/* (non-Javadoc)
 	 * @see javax.jbi.management.ComponentLifeCycleMBean#getExtensionMBeanName()
 	 */
 	public ObjectName getExtensionMBeanName() throws JBIException {
-		return this.component.getComponent().getLifeCycle().getExtensionMBeanName();
+		return ((Component)component.getComponent()).getLifeCycle().getExtensionMBeanName();
 	}
 
 	/* (non-Javadoc)
 	 * @see javax.jbi.management.LifeCycleMBean#start()
 	 */
 	public void start() throws JBIException, IOException {
-		this.component.start();
-	}
+        try {
+            this.component.start();
+        } catch (RegistryException e) {
+            throw new JBIException(e);
+        }
+    }
 
 	/* (non-Javadoc)
 	 * @see javax.jbi.management.LifeCycleMBean#stop()
 	 */
 	public void stop() throws JBIException, IOException {
-		this.component.stop();
-	}
+        try {
+            this.component.stop();
+        } catch (RegistryException e) {
+            throw new JBIException(e);
+        }
+    }
 
 	/* (non-Javadoc)
 	 * @see javax.jbi.management.LifeCycleMBean#shutDown()
 	 */
 	public void shutDown() throws JBIException, IOException {
-		this.component.shutDown();
-	}
+        try {
+            this.component.shutDown();
+        } catch (RegistryException e) {
+            throw new JBIException(e);
+        }
+    }
 
 	/* (non-Javadoc)
 	 * @see javax.jbi.management.LifeCycleMBean#getCurrentState()

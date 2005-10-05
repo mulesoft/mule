@@ -1,10 +1,12 @@
 package org.mule.jbi;
 import com.fs.utils.DOMUtils;
 import junit.framework.TestCase;
+import org.mule.jbi.container.TestComponent;
 import org.mule.jbi.engines.pxe.PxeBootstrap;
 import org.mule.jbi.engines.pxe.PxeComponent;
 import org.mule.jbi.framework.JbiContainerImpl;
-import org.mule.jbi.registry.Engine;
+import org.mule.registry.ComponentType;
+import org.mule.registry.RegistryComponent;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.InOnly;
@@ -33,12 +35,12 @@ public class PxeJbiTestCase extends TestCase {
 		container.initialize();
 		// Create components
 		PxeComponent provider = new PxeComponent();
-		TestComponent consumer1 = new TestComponent();
-		TestComponent consumer2 = new TestComponent();
+		org.mule.jbi.container.TestComponent consumer1 = new TestComponent("consumer 1");
+		TestComponent consumer2 = new TestComponent("consumer 2");
 		// Register components
-		container.getRegistry().addTransientEngine("consumer1", consumer1);
-		container.getRegistry().addTransientEngine("consumer2", consumer2);
-		Engine pxe = container.getRegistry().addTransientEngine("provider", provider, new PxeBootstrap());
+		container.getRegistry().addTransientComponent("consumer1", ComponentType.JBI_ENGINE_COMPONENT, consumer1, null);
+		container.getRegistry().addTransientComponent("consumer2", ComponentType.JBI_ENGINE_COMPONENT, consumer2, null);
+		RegistryComponent pxe = container.getRegistry().addTransientComponent("provider", ComponentType.JBI_ENGINE_COMPONENT, provider, new PxeBootstrap());
 		// Start jbi
 		container.start();
 		// Deploy service unit
@@ -61,7 +63,7 @@ public class PxeJbiTestCase extends TestCase {
 		m.setContent(new DOMSource(soap.getDocumentElement()));
 		me.setInMessage(m);
 		
-		// Set transaction context
+		// Set transaction container
 		//container.getTransactionManager().begin();
 		//me.setProperty(me.JTA_TRANSACTION_PROPERTY_NAME, container.getTransactionManager().getTransaction());
 		consumer1.getChannel().send(me);

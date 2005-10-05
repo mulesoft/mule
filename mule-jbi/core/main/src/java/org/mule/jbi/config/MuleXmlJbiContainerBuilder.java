@@ -33,6 +33,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.components.AbstractComponent;
 import org.mule.jbi.framework.JbiContainerImpl;
+import org.mule.registry.ComponentType;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
@@ -51,6 +52,7 @@ import org.xml.sax.Attributes;
 
 import javax.jbi.JBIException;
 import javax.xml.namespace.QName;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -111,7 +113,11 @@ public class MuleXmlJbiContainerBuilder extends AbstractDigesterConfiguration im
     }
 
     public JbiContainer configure(String configResources) throws ConfigurationException {
-        return configure(parseResources(configResources));
+        try {
+            return configure(ReaderResource.parseResources(configResources));
+        } catch (IOException e) {
+            throw new ConfigurationException(e);
+        }
     }
 
     public JbiContainer configure(ReaderResource[] configResources) throws ConfigurationException {
@@ -186,7 +192,7 @@ public class MuleXmlJbiContainerBuilder extends AbstractDigesterConfiguration im
                 AbstractComponent c = (AbstractComponent)digester.peek();
                 JbiContainer cont = ((JbiContainer)digester.getRoot());
                 c.setContainer(cont);
-                cont.getRegistry().addTransientEngine(c.getName(), c, c.getBootstrap());
+                cont.getRegistry().addTransientComponent(c.getName(), ComponentType.JBI_ENGINE_COMPONENT, c, c.getBootstrap());
             }
         });
     }

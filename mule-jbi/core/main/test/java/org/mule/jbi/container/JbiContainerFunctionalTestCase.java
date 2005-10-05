@@ -11,10 +11,12 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi;
+package org.mule.jbi.container;
 
 import junit.framework.TestCase;
+import org.mule.jbi.JbiContainer;
 import org.mule.jbi.framework.JbiContainerImpl;
+import org.mule.registry.ComponentType;
 
 import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.InOnly;
@@ -29,7 +31,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 
-public class SimpleFunctionalTestCase extends TestCase {
+public class JbiContainerFunctionalTestCase extends TestCase {
 
 	public static final QName SERVICE_NAME = new QName("http://jbi.mule.org", "myService");
 	public static final String ENDPOINT_NAME = "myEndpoint";
@@ -54,14 +56,14 @@ public class SimpleFunctionalTestCase extends TestCase {
 		provider = new TestComponent("provider");
 		consumer = new TestComponent("consumer");
 		// Register components
-		container.getRegistry().addTransientEngine("provider", provider);
-		container.getRegistry().addTransientEngine("consumer", consumer);
+		container.getRegistry().addTransientComponent("provider", ComponentType.JBI_ENGINE_COMPONENT, provider, null);
+		container.getRegistry().addTransientComponent("consumer", ComponentType.JBI_ENGINE_COMPONENT, consumer, null);
 		// Start jbi
 		container.start();
 		// Activate endpoint
 		endpoint = provider.getContext().activateEndpoint(SERVICE_NAME, ENDPOINT_NAME);
 	}
-	
+
 	public void tearDown() throws Exception {
 		if (container != null) {
 			container.shutDown();

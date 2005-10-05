@@ -13,13 +13,12 @@
  */
 package org.mule.jbi.management;
 
+import org.mule.management.ManagementContext;
+import org.mule.registry.ComponentType;
+import org.mule.registry.RegistryComponent;
+
 import javax.jbi.management.AdminServiceMBean;
 import javax.management.ObjectName;
-
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.registry.Binding;
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.registry.Engine;
 
 /**
  * 
@@ -27,14 +26,14 @@ import org.mule.jbi.registry.Engine;
  */
 public class AdminService implements AdminServiceMBean {
 
-	protected JbiContainer container;
+	protected ManagementContext context;
 	
-	public AdminService(JbiContainer container) {
-		this.container = container;
+	public AdminService(ManagementContext context) {
+		this.context = context;
 	}
 	
-	public ObjectName[] getEngineComponents() {
-		Engine[] engines = this.container.getRegistry().getEngines();
+	protected ObjectName[] getComponents(ComponentType type) {
+		RegistryComponent[] engines = context.getRegistry().getComponents(type);
 		ObjectName[] names = new ObjectName[engines.length];
 		for (int i = 0; i < names.length; i++) {
 			names[i] = engines[i].getObjectName();
@@ -43,16 +42,15 @@ public class AdminService implements AdminServiceMBean {
 	}
 
 	public ObjectName[] getBindingComponents() {
-		Binding[] bindings = this.container.getRegistry().getBindings();
-		ObjectName[] names = new ObjectName[bindings.length];
-		for (int i = 0; i < names.length; i++) {
-			names[i] = bindings[i].getObjectName();
-		}
-		return names;
+        return getComponents(ComponentType.JBI_BINDING_COMPONENT);
+	}
+
+    public ObjectName[] getEngineComponents() {
+        return getComponents(ComponentType.JBI_ENGINE_COMPONENT);
 	}
 
 	public ObjectName getComponentByName(String name) {
-		Component comp = this.container.getRegistry().getComponent(name);
+		RegistryComponent comp = context.getRegistry().getComponent(name);
 		if (comp != null) {
 			return comp.getObjectName();
 		}
@@ -74,13 +72,12 @@ public class AdminService implements AdminServiceMBean {
 	}
 
 	public boolean isBinding(String componentName) {
-		Component comp = this.container.getRegistry().getComponent(componentName);
-		return comp instanceof Binding;
+		RegistryComponent comp = context.getRegistry().getComponent(componentName);
+		return comp.getType().equals(ComponentType.JBI_BINDING_COMPONENT);
 	}
 
-	public boolean isEngine(String componentName) {
-		Component comp = this.container.getRegistry().getComponent(componentName);
-		return comp instanceof Engine;
+    public boolean isEngine(String componentName) {
+		RegistryComponent comp = context.getRegistry().getComponent(componentName);
+		return comp.getType().equals(ComponentType.JBI_ENGINE_COMPONENT);
 	}
-
 }

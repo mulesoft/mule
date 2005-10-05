@@ -17,7 +17,8 @@ package org.mule.jbi.config;
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.components.AbstractComponent;
 import org.mule.jbi.components.mule.InboundRouterComponent;
-import org.mule.jbi.registry.Engine;
+import org.mule.registry.ComponentType;
+import org.mule.registry.RegistryException;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.routing.response.ResponseMessageRouter;
@@ -83,7 +84,11 @@ public class ComponentDescriptor {
     }
 
     public void register(JbiContainer container) throws JBIException, IOException {
-        Engine e = container.getRegistry().addTransientEngine(name, component);
+        try {
+            container.getRegistry().addTransientComponent(name, ComponentType.JBI_ENGINE_COMPONENT, component, null);
+        } catch (RegistryException e) {
+            throw new JBIException(e);
+        }
         ComponentContext ctx = ((AbstractComponent)component).getContext();
 
         registerInboundRouter(container, ctx);
@@ -95,7 +100,12 @@ public class ComponentDescriptor {
         routerComponent.setRouter(inboundMessageRouter);
         QName routerService = new QName(name + ":InboundRouter");
         routerComponent.setTargetService(routerService);
-        container.getRegistry().addTransientEngine(routerService.getLocalPart(), routerComponent);
+        try {
+            container.getRegistry().addTransientComponent(routerService.getLocalPart(),
+                    ComponentType.JBI_ENGINE_COMPONENT, routerComponent, null);
+        } catch (RegistryException e) {
+            throw new JBIException(e);
+        }
         routerComponent.getContext().activateEndpoint(routerService, routerService.getLocalPart());
     }
 

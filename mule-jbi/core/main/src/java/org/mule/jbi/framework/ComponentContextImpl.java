@@ -13,10 +13,20 @@
  */
 package org.mule.jbi.framework;
 
-import java.util.MissingResourceException;
-import java.util.logging.Logger;
+import org.mule.jbi.Endpoints;
+import org.mule.jbi.registry.JbiRegistryComponent;
+import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
+import org.mule.jbi.servicedesc.DynamicEndpointImpl;
+import org.mule.jbi.servicedesc.ExternalEndpointImpl;
+import org.mule.jbi.servicedesc.InternalEndpointImpl;
+import org.mule.management.ManagementContext;
+import org.mule.registry.Registry;
+import org.mule.registry.RegistryComponent;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 
 import javax.jbi.JBIException;
+import javax.jbi.component.Component;
 import javax.jbi.component.ComponentContext;
 import javax.jbi.management.MBeanNames;
 import javax.jbi.messaging.DeliveryChannel;
@@ -26,17 +36,8 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.xml.namespace.QName;
-
-import org.mule.jbi.Endpoints;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.registry.Registry;
-import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
-import org.mule.jbi.servicedesc.DynamicEndpointImpl;
-import org.mule.jbi.servicedesc.ExternalEndpointImpl;
-import org.mule.jbi.servicedesc.InternalEndpointImpl;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
+import java.util.MissingResourceException;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -44,16 +45,16 @@ import org.w3c.dom.DocumentFragment;
  */
 public class ComponentContextImpl implements ComponentContext, MBeanNames {
 
-	private JbiContainer container;
-	private Component component;
+	private ManagementContext context;
+	private JbiRegistryComponent component;
 	private Registry registry;
 	private Endpoints endpoints;
 	
-	public ComponentContextImpl(JbiContainer container, Component component) {
-		this.container = container;
+	public ComponentContextImpl(ManagementContext context, JbiRegistryComponent component, Endpoints endpoints) {
+		this.context = context;
 		this.component = component;
-		this.registry = container.getRegistry();
-		this.endpoints = container.getEndpoints();
+		this.registry = context.getRegistry();
+		this.endpoints = endpoints;
 	}
 	
 	public ServiceEndpoint activateEndpoint(QName serviceName, String endpointName) throws JBIException {
@@ -83,9 +84,9 @@ public class ComponentContextImpl implements ComponentContext, MBeanNames {
 	}
 
 	public ServiceEndpoint resolveEndpointReference(DocumentFragment epr) {
-		Component[] components = this.registry.getComponents();
+		RegistryComponent[] components = this.registry.getComponents();
 		for (int i = 0; i < components.length; i++) {
-			ServiceEndpoint se = components[i].getComponent().resolveEndpointReference(epr);
+			ServiceEndpoint se = ((Component)components[i].getComponent()).resolveEndpointReference(epr);
 			if (se != null) {
 				return new DynamicEndpointImpl(components[i].getName(), se);
 			}
@@ -98,7 +99,7 @@ public class ComponentContextImpl implements ComponentContext, MBeanNames {
 	}
 
 	public DeliveryChannel getDeliveryChannel() throws MessagingException {
-		return this.component.getChannel();
+		return component.getChannel();
 	}
 
 	public ServiceEndpoint getEndpoint(QName service, String name) {
@@ -112,10 +113,10 @@ public class ComponentContextImpl implements ComponentContext, MBeanNames {
 		if (se instanceof AbstractServiceEndpoint) {
 			// Query for the component
 			String name = ((AbstractServiceEndpoint) se).getComponent();
-			Component component = this.registry.getComponent(name);
+			RegistryComponent component = this.registry.getComponent(name);
 			if (component != null) {
 				// Delegate to the component
-				return component.getComponent().getServiceDescription(endpoint);
+				return ((Component)component.getComponent()).getServiceDescription(endpoint);
 			}
 		}
 		return null;
@@ -157,15 +158,15 @@ public class ComponentContextImpl implements ComponentContext, MBeanNames {
 	}
 
 	public MBeanServer getMBeanServer() {
-		return this.container.getMBeanServer();
+		return this.context.getMBeanServer();
 	}
 
 	public InitialContext getNamingContext() {
-		return this.container.getNamingContext();
+		return this.context.getNamingContext();
 	}
 
 	public Object getTransactionManager() {
-		return this.container.getTransactionManager();
+		return this.context.getTransactionManager();
 	}
 
 	public String getWorkspaceRoot() {
@@ -173,11 +174,11 @@ public class ComponentContextImpl implements ComponentContext, MBeanNames {
 	}
 
 	public ObjectName createCustomComponentMBeanName(String customName) {
-		return this.container.createMBeanName(this.component.getName(), "custom", customName);
+		return context.createMBeanName(this.component.getName(), "custom", customName);
 	}
 
 	public String getJmxDomainName() {
-		return this.container.getJmxDomainName();
+		return this.context.getJmxDomainName();
 	}
 
 }

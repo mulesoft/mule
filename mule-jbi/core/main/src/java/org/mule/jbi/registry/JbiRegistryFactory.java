@@ -12,12 +12,11 @@
 * the LICENSE.txt file. 
 *
 */
-package org.mule.jbi.nmr;
+package org.mule.jbi.registry;
 
 import org.mule.registry.Registry;
-
-import javax.jbi.messaging.MessageExchange;
-import javax.jbi.messaging.MessagingException;
+import org.mule.registry.RegistryFactory;
+import org.mule.registry.RegistryStore;
 
 /**
  * todo document
@@ -25,13 +24,8 @@ import javax.jbi.messaging.MessagingException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DirectRouter extends AbstractRouter {
-
-    public DirectRouter(Registry registry) {
-        super(registry);
-    }
-
-    public void route(MessageExchange me) throws MessagingException {
-        routeExchange(me);
+public class JbiRegistryFactory implements RegistryFactory {
+    public Registry create(RegistryStore store) {
+        return new JbiRegistry(store);
     }
 }

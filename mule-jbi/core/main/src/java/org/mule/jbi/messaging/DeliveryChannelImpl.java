@@ -13,19 +13,20 @@
  */
 package org.mule.jbi.messaging;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.registry.JbiRegistryComponent;
+import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
+import org.mule.util.queue.Queue;
+import org.mule.util.queue.QueueSession;
+
 import javax.jbi.messaging.DeliveryChannel;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessageExchangeFactory;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
-import org.mule.util.queue.Queue;
-import org.mule.util.queue.QueueSession;
 
 /**
  * 
@@ -163,7 +164,7 @@ public class DeliveryChannelImpl implements DeliveryChannel {
 			target = me.getConsumer();
 		}
 		me.handleSend(true);
-		DeliveryChannelImpl ch = (DeliveryChannelImpl) this.container.getRegistry().getComponent(target).getChannel();
+		DeliveryChannelImpl ch = (DeliveryChannelImpl) ((JbiRegistryComponent)container.getRegistry().getComponent(target)).getChannel();
 		ch.enqueue(me.getTwin());
 		try {
 			synchronized (exchange) {

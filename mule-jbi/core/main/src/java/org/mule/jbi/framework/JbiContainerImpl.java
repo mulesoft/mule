@@ -13,31 +13,6 @@
  */
 package org.mule.jbi.framework;
 
-import java.io.File;
-import java.rmi.registry.LocateRegistry;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.jbi.JBIException;
-import javax.jbi.management.AdminServiceMBean;
-import javax.jbi.management.DeploymentServiceMBean;
-import javax.jbi.management.InstallationServiceMBean;
-import javax.management.JMException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.StandardMBean;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
-import javax.management.remote.JMXServiceURL;
-import javax.management.remote.rmi.RMIConnectorServer;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.transaction.TransactionManager;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -53,12 +28,37 @@ import org.mule.jbi.management.Directories;
 import org.mule.jbi.management.InstallationService;
 import org.mule.jbi.nmr.DirectRouter;
 import org.mule.jbi.nmr.InternalMessageRouter;
-import org.mule.jbi.registry.Registry;
-import org.mule.jbi.registry.RegistryIO;
+import org.mule.jbi.registry.JbiRegistryFactory;
+import org.mule.management.ManagementContext;
+import org.mule.registry.Registry;
+import org.mule.registry.store.XmlRegistryStore;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.queue.QueueSession;
 import org.objectweb.jotm.Jotm;
+
+import javax.jbi.JBIException;
+import javax.jbi.management.AdminServiceMBean;
+import javax.jbi.management.DeploymentServiceMBean;
+import javax.jbi.management.InstallationServiceMBean;
+import javax.management.JMException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.ObjectName;
+import javax.management.StandardMBean;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
+import javax.management.remote.rmi.RMIConnectorServer;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.transaction.TransactionManager;
+import java.io.File;
+import java.rmi.registry.LocateRegistry;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -76,46 +76,42 @@ public class JbiContainerImpl implements JbiContainer {
 	
 	private static final Log LOGGER = LogFactory.getLog(JbiContainer.class);
 	
-	private MBeanServer mBeanServer;
-	private TransactionManager transactionManager;
-	private String jmxDomainName;
-	private Registry registry;
 	private Endpoints endpoints;
-	private File workingDir;
-	private InitialContext namingContext;
     private MultiContainerContext objectContainer;
     private InternalMessageRouter router;
+    private ManagementContext context;
 
     private static java.rmi.registry.Registry rmiRegistry = null;
     
 	public JbiContainerImpl() {
-		this.workingDir = new File(DEFAULT_WORKING_DIR);
-		this.jmxDomainName = DEFAULT_JMX_DOMAIN;
+        context = new ManagementContext();
+		context.setWorkingDir(new File(DEFAULT_WORKING_DIR));
+		context.setJmxDomainName(DEFAULT_JMX_DOMAIN);
         objectContainer = new MultiContainerContext();
 	}
 	
 	public MBeanServer getMBeanServer() {
-		return this.mBeanServer;
+		return context.getMBeanServer();
 	}
 
 	public void setMBeanServer(MBeanServer mBeanServer) {
-		this.mBeanServer = mBeanServer;
+		context.setMBeanServer(mBeanServer);
 	}
 
 	public TransactionManager getTransactionManager() {
-		return transactionManager;
+		return context.getTransactionManager();
 	}
 
 	public void setTransactionManager(TransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
+		context.setTransactionManager(transactionManager);
 	}
 	
 	public String getJmxDomainName() {
-		return this.jmxDomainName;
+		return context.getJmxDomainName();
 	}
 
 	public void setJmxDomainName(String jmxDomainName) {
-		this.jmxDomainName = jmxDomainName;
+		context.setJmxDomainName(jmxDomainName);
 	}
 
 	public InternalMessageRouter getRouter() {
@@ -127,46 +123,24 @@ public class JbiContainerImpl implements JbiContainer {
 	}
 	
 	public InitialContext getNamingContext() {
-		return this.namingContext;
+		return context.getNamingContext();
 	}
 	
 	public File getWorkingDir() {
-		return this.workingDir;
+		return context.getWorkingDir();
 	}
 
 	public void setWorkingDir(File workingDir) {
-		this.workingDir = workingDir;
+		context.setWorkingDir(workingDir);
 	}
 	
 	public ObjectName createMBeanName(String componentName, String type, String name) {
-		try {
-			StringBuffer sb = new StringBuffer();
-			sb.append(this.jmxDomainName).append(':');
-			if (componentName != null) {
-				sb.append("component=").append(validateString(componentName));
-				sb.append(',');
-			}
-			sb.append("type=").append(validateString(type));
-			if (name != null) {
-				sb.append(',');
-				sb.append("name=").append(validateString(name));
-			}
-			return new ObjectName(sb.toString());
-		} catch (MalformedObjectNameException e) {
-			LOGGER.error("Could not create component mbean name", e);
-			return null;
-		}
+		return context.createMBeanName(componentName, type, name);
 	}
 
-    private String validateString(String str) {
-    	str = str.replace(':', '_');
-    	str = str.replace('/', '_');
-    	str = str.replace('\\', '_');
-    	return str;
-    }
 
 	public Registry getRegistry() {
-		return this.registry;
+        return context.getRegistry();
 	}
 
 	public Endpoints getEndpoints() {
@@ -176,19 +150,19 @@ public class JbiContainerImpl implements JbiContainer {
 	public void initialize() throws JBIException {
 		try {
 			JbiContainer.Factory.setInstance(this);
-			Directories.createDirectories(this.workingDir);
+			Directories.createDirectories(getWorkingDir());
             //initialise a Mule instance that will manage our connections
             MuleManager.getConfiguration().setEmbedded(true);
-            MuleManager.getInstance().setTransactionManager(transactionManager);
+            MuleManager.getInstance().setTransactionManager(getTransactionManager());
             //todo should set workmanager too
             ((MuleManager)MuleManager.getInstance()).initialise();
-			if (this.mBeanServer == null) {
+			if (getMBeanServer() == null) {
 				LOGGER.debug("Creating MBeanServer");
 				List l = MBeanServerFactory.findMBeanServer(null);
 				if (l != null && l.size() > 0) {
-					this.mBeanServer = (MBeanServer) l.get(0);
+					setMBeanServer((MBeanServer) l.get(0));
 				} else {
-					this.mBeanServer = MBeanServerFactory.createMBeanServer();
+					setMBeanServer(MBeanServerFactory.createMBeanServer());
 				}
 			}
 			// Create jmx remote access
@@ -198,35 +172,36 @@ public class JbiContainerImpl implements JbiContainer {
 			String url = MessageFormat.format(DEFAULT_URL, new Object[] { DEFAULT_HOST, Integer.toString(DEFAULT_PORT) });
 			Map env = new HashMap();
 			env.put(RMIConnectorServer.JNDI_REBIND_ATTRIBUTE, "true");
-			JMXConnectorServer con = JMXConnectorServerFactory.newJMXConnectorServer(new JMXServiceURL(url), env, this.mBeanServer);
+			JMXConnectorServer con = JMXConnectorServerFactory.newJMXConnectorServer(new JMXServiceURL(url), env, getMBeanServer());
 			con.start();
 			
-			if (this.transactionManager == null) {
+			if (getTransactionManager() == null) {
 				LOGGER.debug("Creating TransactionManager");
-				this.transactionManager = new Jotm(true, false).getTransactionManager();
-				this.transactionManager.setTransactionTimeout(60);
+				setTransactionManager(new Jotm(true, false).getTransactionManager());
+				getTransactionManager().setTransactionTimeout(60);
 			}
-			if (this.namingContext == null) {
+			if (getNamingContext() == null) {
 			    System.setProperty(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
 			    System.setProperty(Context.PROVIDER_URL, "mule-jbi");
-			    this.namingContext = new InitialContext();
+			    setNamingContext(new InitialContext());
 			}
 			this.endpoints = new EndpointsImpl();
-			File regStore = new File(this.workingDir, "/registry.xml");
+			File regStore = new File(getWorkingDir(), "/registry.xml");
 			if (regStore.isFile()) {
 				try {
-					this.registry = RegistryIO.load(regStore);
+                    //todo support other store types
+					context.setRegistry(new XmlRegistryStore().load(regStore.getAbsolutePath()));
 				} catch (Exception e) {
 					LOGGER.warn("Invalid registry found. Creating a new one");
 				}
 			} else {
 				LOGGER.info("No registry found. Creating a new one");
 			}
-			if (this.registry == null) {
-				this.registry = RegistryIO.create(regStore);
+			if (getRegistry() == null) {
+				context.setRegistry(new XmlRegistryStore().create(regStore.getAbsolutePath(), new JbiRegistryFactory()));
 			}
 			if (this.router == null) {
-				this.router = new InternalMessageRouter(this, new DirectRouter(registry));
+				this.router = new InternalMessageRouter(this, new DirectRouter(getRegistry()));
 			}
 		} catch (Exception e) {
 			if (e instanceof JBIException) {
@@ -240,12 +215,12 @@ public class JbiContainerImpl implements JbiContainer {
 	public void start() throws JBIException {
 		try {
 			LOGGER.info("Starting JBI");
-			if (this.registry == null) {
+			if (getRegistry() == null) {
 				initialize();
 			}
-			AdminService admin = new AdminService(this);
+			AdminService admin = new AdminService(context);
 			registerMBean(new StandardMBean(admin, AdminServiceMBean.class), createMBeanName(null, "service", "admin"));
-			InstallationService install = new InstallationService(this);
+			InstallationService install = new InstallationService(context);
 			registerMBean(new StandardMBean(install, InstallationServiceMBean.class), createMBeanName(null, "service", "install"));
 			DeploymentService deploy = new DeploymentService(this);
 			registerMBean(new StandardMBean(deploy, DeploymentServiceMBean.class), createMBeanName(null, "service", "deploy"));
@@ -254,7 +229,7 @@ public class JbiContainerImpl implements JbiContainer {
 			// TODO: debug only
 			autoinstall.setPollingFrequency(1000);
 			autoinstall.start();
-			this.registry.start();
+			getRegistry().start();
 			Directories.deleteMarkedDirectories(getWorkingDir());
             MuleManager.getInstance().start();
 		} catch (Exception e) {
@@ -272,7 +247,7 @@ public class JbiContainerImpl implements JbiContainer {
 			unregisterMBean(createMBeanName(null, "service", "install"));
 			unregisterMBean(createMBeanName(null, "service", "deploy"));
 			unregisterMBean(createMBeanName(null, "service", "autoinstall"));
-			this.registry.shutDown();
+			getRegistry().shutDown();
 			JbiContainer.Factory.setInstance(null);
 		} catch (Exception e) {
 			if (e instanceof JBIException) {
@@ -284,25 +259,25 @@ public class JbiContainerImpl implements JbiContainer {
 	}
 	
 	private void unregisterMBean(ObjectName name) throws JMException {
-		if (this.mBeanServer.isRegistered(name)) {
-			this.mBeanServer.unregisterMBean(name);
+		if (getMBeanServer().isRegistered(name)) {
+			getMBeanServer().unregisterMBean(name);
 		}
 	}
 	
 	private void registerMBean(Object mbean, ObjectName name) throws JMException {
 		unregisterMBean(name);
-		this.mBeanServer.registerMBean(mbean, name);
+		getMBeanServer().registerMBean(mbean, name);
 	}
 
 	public void setNamingContext(InitialContext namingContext) {
-		this.namingContext = namingContext;
+		context.setNamingContext(namingContext);
 	}
 
     /**
      * associatesone or more Dependency Injector/Jndi containers with this container.
      * This can be used to integrate container managed resources with Mule resources
      *
-     * @param container a Container context to use. By default, there is a
+     * @param container a Container container to use. By default, there is a
      *            default Mule container <code>MuleContainerContext</code>
      *            that will assume that the reference key for an oblect is a
      *            classname and will try to instanciate it.
@@ -334,5 +309,13 @@ public class JbiContainerImpl implements JbiContainer {
     
     public QueueSession getQueueSession() {
     	return MuleManager.getInstance().getQueueManager().getQueueSession();
+    }
+
+    public ManagementContext getManagementContext() {
+        return context;
+    }
+
+    public void setManagementContext(ManagementContext context) {
+        this.context = context;
     }
 }

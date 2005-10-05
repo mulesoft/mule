@@ -13,27 +13,27 @@
  */
 package org.mule.jbi.management;
 
+import com.sun.java.xml.ns.jbi.JbiDocument;
+import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.registry.JbiDescriptor;
+import org.mule.jbi.util.IOUtils;
+import org.mule.registry.Assembly;
+import org.mule.registry.Registry;
+import org.mule.registry.RegistryComponent;
+import org.mule.registry.Unit;
+
+import javax.jbi.JBIException;
+import javax.jbi.component.Component;
+import javax.jbi.component.ServiceUnitManager;
+import javax.jbi.management.DeploymentServiceMBean;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.jbi.JBIException;
-import javax.jbi.component.ServiceUnitManager;
-import javax.jbi.management.DeploymentServiceMBean;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.registry.Assembly;
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.registry.Registry;
-import org.mule.jbi.registry.Unit;
-import org.mule.jbi.util.IOUtils;
-
-import com.sun.java.xml.ns.jbi.JbiDocument;
-import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
 
 /**
  * 
@@ -91,7 +91,7 @@ public class DeploymentService implements DeploymentServiceMBean {
 			}
 			// Create assembly
 			Assembly assembly = this.registry.addAssembly(name);
-			assembly.setDescriptor(jbi);
+			assembly.setDescriptor(new JbiDescriptor(jbi));
 			assembly.setInstallRoot(installDir.getAbsolutePath());
 			String result = assembly.deploy();
 			return result;
@@ -113,7 +113,7 @@ public class DeploymentService implements DeploymentServiceMBean {
 
 	public String[] getDeployedServiceUnitList(String componentName)
 			throws Exception {
-		Component component = this.registry.getComponent(componentName);
+		RegistryComponent component = this.registry.getComponent(componentName);
 		if (component == null) {
 			throw new JBIException("Component not installed: " + componentName);
 		}
@@ -139,12 +139,12 @@ public class DeploymentService implements DeploymentServiceMBean {
 		if (assembly == null) {
 			throw new JBIException("Assembly not deployed: " + saName);
 		}
-		return assembly.getDescriptor().xmlText();
+		return ((Jbi)assembly.getDescriptor().getConfiguration()).xmlText();
 	}
 
 	public String[] getDeployedServiceAssembliesForComponent(
 			String componentName) throws Exception {
-		Component component = this.registry.getComponent(componentName);
+		RegistryComponent component = this.registry.getComponent(componentName);
 		if (component == null) {
 			throw new JBIException("Component not installed: " + componentName);
 		}
@@ -168,14 +168,14 @@ public class DeploymentService implements DeploymentServiceMBean {
 		Unit[] units = assembly.getUnits();
 		Set names = new HashSet();
 		for (int i = 0; i < units.length; i++) {
-			names.add(units[i].getComponent().getName());
+			names.add(units[i].getRegistryComponent().getName());
 		}
 		return (String[]) names.toArray(new String[names.size()]);
 	}
 
 	public boolean isDeployedServiceUnit(String componentName, String suName)
 			throws Exception {
-		Component comp = this.registry.getComponent(componentName);
+		RegistryComponent comp = this.registry.getComponent(componentName);
 		if (comp != null) {
 			Unit[] units = comp.getUnits();
 			for (int i = 0; i < units.length; i++) {
@@ -188,10 +188,10 @@ public class DeploymentService implements DeploymentServiceMBean {
 	}
 
 	public boolean canDeployToComponent(String componentName) {
-		Component comp = this.registry.getComponent(componentName);
+		RegistryComponent comp = this.registry.getComponent(componentName);
 		if (comp != null) {
 			// TODO: check component state
-			ServiceUnitManager mgr = comp.getComponent().getServiceUnitManager();
+			ServiceUnitManager mgr = ((Component)comp.getComponent()).getServiceUnitManager();
 			return mgr != null;
 		}
 		return false;

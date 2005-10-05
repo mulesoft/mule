@@ -13,16 +13,17 @@
  */
 package org.mule.jbi.management;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.MissingResourceException;
-import java.util.logging.Logger;
+import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.jbi.JbiContainer;
+import org.mule.management.ManagementContext;
+import org.mule.registry.RegistryComponent;
+import org.mule.registry.RegistryException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.jbi.JBIException;
 import javax.jbi.component.Bootstrap;
@@ -39,16 +40,15 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.naming.InitialContext;
 import javax.xml.namespace.QName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.jbi.JbiContainer;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.MissingResourceException;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -62,14 +62,15 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 	private File installRoot;
 	private Jbi jbi;
 	private Bootstrap bootstrap;
-	private org.mule.jbi.registry.Component component;
+	private RegistryComponent component;
 	private boolean install;
-	
-	public Installer(JbiContainer container, org.mule.jbi.registry.Component component) throws Exception {
-		this.container = container;
+    private ManagementContext context;
+
+	public Installer(ManagementContext context, RegistryComponent component) throws Exception {
+		this.context = context;
 		this.component = component;
 		this.installRoot = new File(this.component.getInstallRoot());
-		this.jbi = component.getDescriptor();
+		this.jbi = (Jbi)component.getDescriptor().getConfiguration();
 		this.install = true;
 		List l = Arrays.asList(this.jbi.getComponent().getComponentClassPath().getPathElementArray());
 		this.component.setClassPathElements(l);
@@ -176,7 +177,7 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 	public synchronized void uninstall() throws JBIException {
 		try {
 			this.component.uninstall();
-		} catch (IOException e) {
+		} catch (RegistryException e) {
 			throw new JBIException(e);
 		}
 	}
@@ -213,55 +214,55 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 	}
 
 	public ServiceEndpoint activateEndpoint(QName serviceName, String endpointName) throws JBIException {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public void deactivateEndpoint(ServiceEndpoint endpoint) throws JBIException {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public void registerExternalEndpoint(ServiceEndpoint externalEndpoint) throws JBIException {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public void deregisterExternalEndpoint(ServiceEndpoint externalEndpoint) throws JBIException {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public ServiceEndpoint resolveEndpointReference(DocumentFragment epr) {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public DeliveryChannel getDeliveryChannel() throws MessagingException {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public ServiceEndpoint getEndpoint(QName service, String name) {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public Document getEndpointDescriptor(ServiceEndpoint endpoint) throws JBIException {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public ServiceEndpoint[] getEndpoints(QName interfaceName) {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public ServiceEndpoint[] getEndpointsForService(QName serviceName) {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public ServiceEndpoint[] getExternalEndpoints(QName interfaceName) {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public ServiceEndpoint[] getExternalEndpointsForService(QName serviceName) {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public Logger getLogger(String suffix, String resourceBundleName) throws MissingResourceException, JBIException {
-		throw new IllegalStateException("Illegal call in an installation context");
+		throw new IllegalStateException("Illegal call in an installation container");
 	}
 
 	public MBeanNames getMBeanNames() {

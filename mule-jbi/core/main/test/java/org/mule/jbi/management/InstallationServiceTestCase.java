@@ -13,17 +13,15 @@
  */
 package org.mule.jbi.management;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Locale;
-
-import javax.management.ObjectName;
-
 import junit.framework.TestCase;
-
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.framework.JbiContainerImpl;
 import org.mule.jbi.util.IOUtils;
+
+import javax.management.ObjectName;
+import java.io.File;
+import java.net.URL;
+import java.util.Locale;
 
 public class InstallationServiceTestCase extends TestCase {
 
@@ -41,7 +39,8 @@ public class InstallationServiceTestCase extends TestCase {
 	public void testInstallComponent() throws Exception {
 		Locale.setDefault(Locale.US);
 		URL url = Thread.currentThread().getContextClassLoader().getResource("filebinding.jar");
-		ObjectName serviceON = container.createMBeanName(null, "service", "install");
+		assertNotNull(url);
+        ObjectName serviceON = container.createMBeanName(null, "service", "install");
 		ObjectName installON = (ObjectName) container.getMBeanServer().invoke(serviceON, "loadNewInstaller", new Object[] { url.toString() }, new String[] { "java.lang.String" });
 		assertNotNull(installON);
 		ObjectName lifecycleON = (ObjectName) container.getMBeanServer().invoke(installON, "install", null, null);

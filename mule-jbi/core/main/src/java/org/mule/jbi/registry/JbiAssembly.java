@@ -11,26 +11,29 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.registry.impl;
+package org.mule.jbi.registry;
 
 import com.sun.java.xml.ns.jbi.ConnectionDocument.Connection;
 import com.sun.java.xml.ns.jbi.ConnectionsDocument.Connections;
 import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
 import com.sun.java.xml.ns.jbi.ServiceUnitDocument.ServiceUnit;
-import org.mule.jbi.registry.Assembly;
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.registry.Unit;
-import org.mule.jbi.util.IOUtils;
+import org.mule.config.IOUtils;
+import org.mule.registry.Registry;
+import org.mule.registry.RegistryComponent;
+import org.mule.registry.RegistryDescriptor;
+import org.mule.registry.RegistryException;
+import org.mule.registry.Unit;
+import org.mule.registry.impl.AbstractAssembly;
+import org.mule.registry.impl.AbstractUnit;
 
 import javax.jbi.JBIException;
+import javax.jbi.component.Component;
 import javax.jbi.component.ServiceUnitManager;
 import javax.xml.namespace.QName;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * TODO: each SU should be deployed independently
@@ -41,18 +44,22 @@ import java.util.List;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  *
  */
-public class AssemblyImpl extends AbstractEntry implements Assembly {
+public class JbiAssembly extends AbstractAssembly  {
 
-	private List units;
-	private boolean isTransient;
-	
-	public AssemblyImpl() {
-		this.units = new ArrayList();
-	}
-	
+    public JbiAssembly(Registry registry) {
+        super(registry);
+    }
+
+    public RegistryDescriptor getDescriptor() throws RegistryException {
+        if(descriptor==null) {
+            descriptor = new JbiDescriptor(this.getInstallRoot());
+        }
+        return descriptor;
+    }
+
 	public Unit getUnit(String name) {
 		for (Iterator it = this.units.iterator(); it.hasNext();) {
-			UnitImpl u = (UnitImpl) it.next();
+			AbstractUnit u = (AbstractUnit) it.next();
 			if (u.getName().equals(name)) {
 				return u;
 			}
@@ -79,23 +86,23 @@ public class AssemblyImpl extends AbstractEntry implements Assembly {
 	/* (non-Javadoc)
 	 * @see org.mule.jbi.registry.mule.AbstractEntry#checkDescriptor()
 	 */
-	protected void checkDescriptor() throws JBIException {
+	protected void checkDescriptor() throws RegistryException {
 		super.checkDescriptor();
 		// Check that it is a service assembly
-		if (!getDescriptor().isSetServiceAssembly()) {
-			throw new JBIException("service-assembly should be set");
+		if (!getDescriptor().isServiceAssembly()) {
+			throw new RegistryException("service-assembly should be set");
 		}
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.mule.jbi.registry.Assembly#deploy()
 	 */
-	public synchronized String deploy() throws JBIException, IOException {
+	public synchronized String deploy() throws RegistryException {
 		if (!getCurrentState().equals(UNKNOWN)) {
-			throw new JBIException("Illegal status: " + getCurrentState());
+			throw new RegistryException("Illegal status: " + getCurrentState());
 		}
 		try {
-			Jbi jbi = getDescriptor();
+			Jbi jbi = (Jbi)getDescriptor().getConfiguration();
 			// Deploy service units
 			ServiceUnit[] sua = jbi.getServiceAssembly().getServiceUnitArray();
 			this.units = new ArrayList();
@@ -110,7 +117,7 @@ public class AssemblyImpl extends AbstractEntry implements Assembly {
 					throw new JBIException("Artifact file not found: " + sua[i].getTarget().getArtifactsZip());
 				}
 				// Check that component exists
-				Component component = getRegistry().getComponent(componentName);
+				RegistryComponent component = getRegistry().getComponent(componentName);
 				if (component == null) {
 					throw new JBIException("Service assembly requires a missing component: " + componentName);
 				}
@@ -119,7 +126,7 @@ public class AssemblyImpl extends AbstractEntry implements Assembly {
 					throw new JBIException("Component is not started: " + componentName);
 				}
 				// Check that we can deploy onto it
-				ServiceUnitManager mgr = component.getComponent().getServiceUnitManager();
+				ServiceUnitManager mgr = ((Component)component.getComponent()).getServiceUnitManager();
 				if (mgr == null) {
 					throw new JBIException("Component does not accept deployments: " + componentName);
 				}
@@ -133,10 +140,9 @@ public class AssemblyImpl extends AbstractEntry implements Assembly {
 				// Unzip artifact
 				IOUtils.unzip(artifact, installDir);
 				// Create Unit
-				UnitImpl unit = new UnitImpl();
-				unit.setName(suName);
+				Unit unit = registry.createUnit(suName);
 				unit.setAssembly(this);
-				unit.setComponent(component);
+				unit.setRegistryComponent(component);
 				unit.setInstallRoot(installDir.getAbsolutePath());
 				// Deploy this unit
 				String result = unit.deploy();
@@ -162,125 +168,11 @@ public class AssemblyImpl extends AbstractEntry implements Assembly {
 		} catch (Exception e) {
 			// If we failed, undeploy
 			undeploy();
-			if (e instanceof JBIException) {
-				throw (JBIException) e;
-			} else if (e instanceof IOException) {
-				throw (IOException) e;
+			if (e instanceof RegistryException) {
+				throw (RegistryException) e;
 			} else {
-				throw new JBIException("Could not deploy assembly", e);
+				throw new RegistryException("Could not deploy assembly", e);
 			}
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Assembly#start()
-	 */
-	public synchronized String start() throws JBIException, IOException {
-		if (getCurrentState().equals(UNKNOWN)) {
-			throw new JBIException("Illegal status: " + getCurrentState());
-		}
-		if (!getCurrentState().equals(RUNNING)) {
-			Unit[] units = getUnits();
-			for (int i = 0; i < units.length; i++) {
-				units[i].start();
-			}
-			setCurrentState(RUNNING);
-		}
-		// TODO
-		return "";
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Assembly#stop()
-	 */
-	public synchronized String stop() throws JBIException, IOException {
-		if (getCurrentState().equals(UNKNOWN) || getCurrentState().equals(SHUTDOWN)) {
-			throw new JBIException("Illegal status: " + getCurrentState());
-		}
-		if (!getCurrentState().equals(STOPPED)) {
-			Unit[] units = getUnits();
-			for (int i = 0; i < units.length; i++) {
-				units[i].stop();
-			}
-			setCurrentState(STOPPED);
-		}
-		// TODO
-		return "";
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Assembly#shutDown()
-	 */
-	public synchronized String shutDown() throws JBIException, IOException {
-		if (getCurrentState().equals(UNKNOWN)) {
-			throw new JBIException("Illegal status: " + getCurrentState());
-		}
-		if (!getCurrentState().equals(SHUTDOWN)) {
-			stop();
-			Unit[] units = getUnits();
-			for (int i = 0; i < units.length; i++) {
-				units[i].shutDown();
-			}
-			setCurrentState(SHUTDOWN);
-		}
-		// TODO
-		return "";
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Assembly#undeploy()
-	 */
-	public synchronized String undeploy() throws JBIException, IOException {
-		if (!getCurrentState().equals(SHUTDOWN) && !getCurrentState().equals(UNKNOWN)) {
-			throw new JBIException("Illegal status: " + getCurrentState());
-		}
-		Unit[] units = getUnits();
-		for (int i = 0; i < units.length; i++) {
-			String result = units[i].undeploy();
-			// TODO: analyse result
-		}
-		IOUtils.deleteFile(new File(getInstallRoot()));
-		getRegistry().removeAssembly(this);
-		setCurrentState(UNKNOWN);
-		// TODO: return info
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Assembly#isTransient()
-	 */
-	public boolean isTransient() {
-		return isTransient;
-	}
-
-	public void setTransient(boolean isTransient) {
-		this.isTransient = isTransient;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Assembly#restoreState()
-	 */
-	public void restoreState() throws JBIException, IOException {
-		Unit[] units = getUnits();
-		for (int i = 0; i < units.length; i++) {
-			units[i].init();
-			if (units[i].getStateAtShutdown().equals(Unit.RUNNING)) {
-				units[i].start();
-			} else if (units[i].getStateAtShutdown().equals(Unit.SHUTDOWN)) {
-				units[i].shutDown();
-			}
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.mule.jbi.registry.Assembly#saveAndShutdown()
-	 */
-	public void saveAndShutdown() throws JBIException, IOException {
-		Unit[] units = getUnits();
-		for (int i = 0; i < units.length; i++) {
-			units[i].setStateAtShutdown(units[i].getCurrentState());
-			units[i].shutDown();
-		}
-	}
-
 }

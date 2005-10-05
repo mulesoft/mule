@@ -11,7 +11,7 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi;
+package org.mule.jbi.container;
 
 import org.mule.jbi.components.AbstractComponent;
 

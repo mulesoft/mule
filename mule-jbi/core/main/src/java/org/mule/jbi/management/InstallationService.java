@@ -13,29 +13,30 @@
  */
 package org.mule.jbi.management;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import com.sun.java.xml.ns.jbi.JbiDocument;
+import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.jbi.registry.JbiDescriptor;
+import org.mule.jbi.util.IOUtils;
+import org.mule.management.MBeanNameFactory;
+import org.mule.management.ManagementContext;
+import org.mule.registry.ComponentType;
+import org.mule.registry.Library;
+import org.mule.registry.RegistryComponent;
+import org.mule.util.Utility;
 
 import javax.jbi.JBIException;
 import javax.jbi.management.InstallationServiceMBean;
 import javax.jbi.management.InstallerMBean;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.registry.Library;
-import org.mule.jbi.util.IOUtils;
-
-import com.sun.java.xml.ns.jbi.JbiDocument;
-import com.sun.java.xml.ns.jbi.JbiDocument.Jbi;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -48,17 +49,17 @@ public class InstallationService implements InstallationServiceMBean {
 	private static final Log LOGGER = LogFactory.getLog(InstallationService.class);
 	
 	private Map installers;
-	private JbiContainer container;
+    protected  ManagementContext context;
 	
-	public InstallationService(JbiContainer container) {
-		this.container = container;
+	public InstallationService(ManagementContext context) {
+		this.context = context;
 		this.installers = new HashMap();
 	}
 	
     /**
      * Load the installer for a new component from a component installation package.
      *
-     * @param installJarURL - URL locating a jar file containing a
+     * @param installJarURI - URL locating a jar file containing a
      * JBI Installable Component.
      * @return - the JMX ObjectName of the InstallerMBean loaded from
      * installJarURL.
@@ -75,7 +76,7 @@ public class InstallationService implements InstallationServiceMBean {
 				uri = new File(installJarURI).toURI();
 			}
 			// Create a temporary dir
-			dir = Directories.getNewTempDir(this.container.getWorkingDir());
+			dir = Directories.getNewTempDir(context.getWorkingDir());
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Temporary dir: " + dir);
 			}
@@ -112,7 +113,7 @@ public class InstallationService implements InstallationServiceMBean {
 				throw new JBIException("an installer has already been created");
 			}
 			// Check that component does not already exists
-			if (this.container.getRegistry().getComponent(name) != null) {
+			if (context.getRegistry().getComponent(name) != null) {
 				throw new JBIException("component already installed");
 			}
 			// Retrieve component type
@@ -121,11 +122,11 @@ public class InstallationService implements InstallationServiceMBean {
 			File installDir;
 			File workspaceDir;
 			if (engine) {
-				installDir = Directories.getEngineInstallDir(this.container.getWorkingDir(), name);
-				workspaceDir = Directories.getEngineWorkspaceDir(this.container.getWorkingDir(), name);
+				installDir = Directories.getEngineInstallDir(context.getWorkingDir(), name);
+				workspaceDir = Directories.getEngineWorkspaceDir(context.getWorkingDir(), name);
 			} else {
-				installDir = Directories.getBindingInstallDir(this.container.getWorkingDir(), name);
-				workspaceDir = Directories.getBindingWorkspaceDir(this.container.getWorkingDir(), name);
+				installDir = Directories.getBindingInstallDir(context.getWorkingDir(), name);
+				workspaceDir = Directories.getBindingWorkspaceDir(context.getWorkingDir(), name);
 			}
 			IOUtils.deleteFile(installDir);
 			IOUtils.deleteFile(workspaceDir);
@@ -134,21 +135,21 @@ public class InstallationService implements InstallationServiceMBean {
 			// Unzip all
 			IOUtils.unzip(f, installDir);
 			// Create component
-			Component component;
+			RegistryComponent component;
 			if (engine) {
-				component = this.container.getRegistry().addEngine(name);
+				component = context.getRegistry().addComponent(name, ComponentType.JBI_ENGINE_COMPONENT);
 			} else {
-				component = this.container.getRegistry().addBinding(name);
+				component = context.getRegistry().addComponent(name, ComponentType.JBI_BINDING_COMPONENT);
 			}
 			component.setInstallRoot(installDir.getAbsolutePath());
 			component.setWorkspaceRoot(workspaceDir.getAbsolutePath());
-			component.setDescriptor(jbi);
+			component.setDescriptor(new JbiDescriptor(jbi));
 			// Create and register installer
-			Installer installer = new Installer(this.container, component);
+			Installer installer = new Installer(context, component);
 			installer.init();
 			ObjectName objName = createComponentInstallerName(name);
 			StandardMBean mbean = new StandardMBean(installer, InstallerMBean.class);
-			this.container.getMBeanServer().registerMBean(mbean, objName);
+			context.getMBeanServer().registerMBean(mbean, objName);
 			this.installers.put(name, installer);
 			return objName;
 		} catch (Exception e) {
@@ -158,12 +159,12 @@ public class InstallationService implements InstallationServiceMBean {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Deleting temporary dir: " + dir);
 			}
-			IOUtils.deleteFile(dir);
+			Utility.deleteTree(dir);
 		}
 	}
 
 	private ObjectName createComponentInstallerName(String name) {
-		return this.container.createMBeanName(name, "installer", null);
+		return MBeanNameFactory.createMBeanName(context.getJmxDomainName(), name, "installer", null);
 	}
 
 	public synchronized ObjectName loadInstaller(String aComponentName) {
@@ -171,15 +172,15 @@ public class InstallationService implements InstallationServiceMBean {
 			if (this.installers.get(aComponentName) != null) {
 				return createComponentInstallerName(aComponentName);
 			} else {
-				Component component = this.container.getRegistry().getComponent(aComponentName);
+				RegistryComponent component = context.getRegistry().getComponent(aComponentName);
 				if (component == null) {
 					throw new JBIException("Component not installed: " + aComponentName);
 				}
-				Installer installer = new Installer(this.container, component);
+				Installer installer = new Installer(context, component);
 				installer.init();
 				ObjectName objName = createComponentInstallerName(aComponentName);
 				StandardMBean mbean = new StandardMBean(installer, InstallerMBean.class);
-				this.container.getMBeanServer().registerMBean(mbean, objName);
+				context.getMBeanServer().registerMBean(mbean, objName);
 				this.installers.put(aComponentName, installer);
 				return objName;
 			}
@@ -195,13 +196,13 @@ public class InstallationService implements InstallationServiceMBean {
 			return false;
 		}
 		try {
-			Component component = this.container.getRegistry().getComponent(aComponentName);
-			if (component != null && component.getCurrentState().equals(Component.UNKNOWN)) {
+			RegistryComponent component = context.getRegistry().getComponent(aComponentName);
+			if (component != null && component.getCurrentState().equals(RegistryComponent.UNKNOWN)) {
 				component.uninstall();
 			}
 			ObjectName objName = createComponentInstallerName(aComponentName);
-			if (this.container.getMBeanServer().isRegistered(objName)) {
-				this.container.getMBeanServer().unregisterMBean(objName);
+			if (context.getMBeanServer().isRegistered(objName)) {
+				context.getMBeanServer().unregisterMBean(objName);
 			}
 			this.installers.remove(aComponentName);
 			return true;
@@ -217,7 +218,7 @@ public class InstallationService implements InstallationServiceMBean {
 			// Check that the url is valid
 			URI uri = new URI(aSharedLibURI);
 			// Create a temporary dir
-			dir = Directories.getNewTempDir(this.container.getWorkingDir());
+			dir = Directories.getNewTempDir(context.getWorkingDir());
 			IOUtils.createDirs(dir);
 			File f = new File(dir, "jbi.zip");
 			// Download file
@@ -225,7 +226,8 @@ public class InstallationService implements InstallationServiceMBean {
 			// Install from the downloaded file
 			return installSharedLibrary(f, dir);
 		} catch (Exception e) {
-			LOGGER.error("Could not install shared library", e);
+			LOGGER.error("Could not install shared library: " + e, e);
+            e.printStackTrace();
 			return null;
 		} finally {
 			IOUtils.deleteFile(dir);
@@ -247,12 +249,12 @@ public class InstallationService implements InstallationServiceMBean {
 		// Retrieve name
 		String name = jbi.getSharedLibrary().getIdentification().getName();
 		// Check that it is not already installed
-		if (this.container.getRegistry().getLibrary(name) != null) {
+		if (context.getRegistry().getLibrary(name) != null) {
 			throw new JBIException("Shared library is already installed");
 		}
 		// Create library
-		File installDir = Directories.getLibraryInstallDir(this.container.getWorkingDir(), name);
-		Library lib = this.container.getRegistry().addLibrary(name);
+		File installDir = Directories.getLibraryInstallDir(context.getWorkingDir(), name);
+		Library lib = context.getRegistry().addLibrary(name);
 		lib.setInstallRoot(installDir.getAbsolutePath());
 		// Move unzipped files to install dir
 		IOUtils.unzip(file, installDir);
@@ -263,7 +265,7 @@ public class InstallationService implements InstallationServiceMBean {
 
 	public synchronized boolean uninstallSharedLibrary(String aSharedLibName) {
 		try {
-			Library lib = this.container.getRegistry().getLibrary(aSharedLibName);
+			Library lib = context.getRegistry().getLibrary(aSharedLibName);
 			if (lib == null) {
 				throw new JBIException("Library does not exists"); 
 			}

@@ -11,21 +11,17 @@
  * $Revision$
  * $Date$
  */
-package org.mule.jbi.management;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Locale;
-
-import javax.management.ObjectName;
+package org.mule.jbi;
 
 import junit.framework.TestCase;
-
-import org.mule.jbi.JbiContainer;
 import org.mule.jbi.framework.JbiContainerImpl;
 import org.mule.jbi.util.IOUtils;
 
-public class FunctionalTestCase extends TestCase {
+import javax.management.ObjectName;
+import java.io.File;
+import java.net.URL;
+
+public abstract class AbstractFunctionalTestCase extends TestCase {
 
 	protected JbiContainer container;
 	
@@ -35,18 +31,6 @@ public class FunctionalTestCase extends TestCase {
 		jbi.setWorkingDir(new File("target/.mule-jbi"));
 		jbi.start();
 		container = jbi;
-	}
-	
-	public void testRealInstall() throws Exception {
-		Locale.setDefault(Locale.US);
-		installLibrary("wsdlsl.jar");
-		installComponent("filebinding.jar");
-		container.shutDown();
-		container.start();
-		installComponent("transformationengine.jar");
-		deployAssembly("sa.zip");
-		installComponent("soapbinding.jar");
-		installComponent("sequencingengine.jar");
 	}
 	
 	protected void installLibrary(String file) throws Exception {
@@ -60,7 +44,8 @@ public class FunctionalTestCase extends TestCase {
 	protected void installComponent(String file) throws Exception {
 		ObjectName serviceON = container.createMBeanName(null, "service", "install");
 		URL url = Thread.currentThread().getContextClassLoader().getResource(file);
-		ObjectName installON = (ObjectName) container.getMBeanServer().invoke(serviceON, "loadNewInstaller", new Object[] { url.toString() }, new String[] { "java.lang.String" });
+		assertNotNull(url);
+        ObjectName installON = (ObjectName) container.getMBeanServer().invoke(serviceON, "loadNewInstaller", new Object[] { url.toString() }, new String[] { "java.lang.String" });
 		assertNotNull(installON);
 		ObjectName lifecycleON = (ObjectName) container.getMBeanServer().invoke(installON, "install", null, null);
 		assertNotNull(lifecycleON);
@@ -69,6 +54,7 @@ public class FunctionalTestCase extends TestCase {
 	
 	protected void deployAssembly(String file) throws Exception {
 		URL url = Thread.currentThread().getContextClassLoader().getResource(file);
+        assertNotNull(url);
 		ObjectName serviceON = container.createMBeanName(null, "service", "deploy");
 		String result = (String) container.getMBeanServer().invoke(serviceON, "deploy", new Object[] { url.toString() }, new String[] { "java.lang.String" });
 		System.err.println(result);

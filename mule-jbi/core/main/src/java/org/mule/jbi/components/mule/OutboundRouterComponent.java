@@ -17,19 +17,18 @@ package org.mule.jbi.components.mule;
 import org.mule.jbi.JbiContainer;
 import org.mule.jbi.components.AbstractComponent;
 import org.mule.jbi.messaging.MessageListener;
-import org.mule.routing.inbound.InboundMessageRouter;
+import org.mule.registry.ComponentType;
+import org.mule.registry.RegistryException;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.impl.MuleSession;
+import org.mule.umo.routing.UMOOutboundRouter;
 
-import javax.jbi.messaging.InOnly;
+import javax.jbi.JBIException;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.NormalizedMessage;
-import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 
@@ -85,7 +84,14 @@ public class OutboundRouterComponent extends AbstractComponent implements Messag
 
                     receiverComponent.setTargetService(routerService);
                     receiverComponent.setContainer(container);
-                    container.getRegistry().addTransientEngine(receiverComponent.getName(), receiverComponent, receiverComponent.getBootstrap());
+
+                    try {
+                        container.getRegistry().addTransientComponent(receiverComponent.getName(),
+                                ComponentType.JBI_ENGINE_COMPONENT, receiverComponent,
+                                receiverComponent.getBootstrap());
+                    } catch (RegistryException e) {
+                        throw new JBIException(e);
+                    }
                 }
             }
         }

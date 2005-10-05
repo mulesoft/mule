@@ -13,6 +13,9 @@
  */
 package org.mule.jbi.framework;
 
+import org.mule.registry.Library;
+import org.mule.registry.RegistryComponent;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -23,9 +26,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.registry.Library;
 
 /**
  * 
@@ -47,7 +47,7 @@ public class ClassLoaderFactory {
 		this.sharedClassLoaders = new HashMap();
 	}
 	
-	public ClassLoader createComponentClassLoader(Component component) throws MalformedURLException {
+	public ClassLoader createComponentClassLoader(RegistryComponent component) throws MalformedURLException {
 		DelegatingClassLoader dcl = new DelegatingClassLoader();
 		Library[] libraries = component.getLibraries();
 		for (int i = 0; i < libraries.length; i++) {

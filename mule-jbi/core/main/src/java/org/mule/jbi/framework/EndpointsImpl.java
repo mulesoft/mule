@@ -13,23 +13,22 @@
  */
 package org.mule.jbi.framework;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.jbi.JBIException;
-import javax.jbi.servicedesc.ServiceEndpoint;
-import javax.xml.namespace.QName;
-
+import EDU.oswego.cs.dl.util.concurrent.CopyOnWriteArrayList;
 import org.mule.jbi.Endpoints;
 import org.mule.jbi.JbiContainer;
-import org.mule.jbi.registry.Component;
 import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
 import org.mule.jbi.servicedesc.ExternalEndpointImpl;
 import org.mule.jbi.servicedesc.InternalEndpointImpl;
+import org.mule.registry.RegistryComponent;
 import org.w3c.dom.Document;
+
+import javax.jbi.JBIException;
+import javax.jbi.component.Component;
+import javax.jbi.servicedesc.ServiceEndpoint;
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 
@@ -203,8 +202,8 @@ public class EndpointsImpl implements Endpoints {
 			QName[] itfs = se.getInterfaces();
 			if (itfs == null && se instanceof InternalEndpointImpl) {
 				InternalEndpointImpl ie = (InternalEndpointImpl) se;
-				Component component = JbiContainer.Factory.getInstance().getRegistry().getComponent(ie.getComponent());
-				Document doc = component.getComponent().getServiceDescription(ie);
+				RegistryComponent component = JbiContainer.Factory.getInstance().getRegistry().getComponent(ie.getComponent());
+				Document doc = ((Component)component.getComponent()).getServiceDescription(ie);
 				ie.parseWsdl(doc);
 				itfs = se.getInterfaces();
 			}

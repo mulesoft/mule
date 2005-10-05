@@ -15,9 +15,15 @@
 package org.mule.jbi.components;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.impl.work.MuleWorkManager;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.messaging.MessageExchangeConstants;
+import org.mule.jbi.messaging.MessageListener;
+import org.mule.jbi.messaging.NoMessageException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 
 import javax.jbi.JBIException;
 import javax.jbi.component.Bootstrap;
@@ -38,16 +44,8 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.resource.spi.work.Work;
 import javax.xml.namespace.QName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.impl.work.MuleWorkManager;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.messaging.MessageExchangeConstants;
-import org.mule.jbi.messaging.MessageListener;
-import org.mule.jbi.messaging.NoMessageException;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class AbstractComponent implements Component, ComponentLifeCycle,
         MessageExchangeConstants, ServiceUnitManager, Work {
@@ -302,11 +300,11 @@ public abstract class AbstractComponent implements Component, ComponentLifeCycle
 //		this.meListener = new Thread(new Runnable() {
 //			public void run() {
 //				try {
-//					DeliveryChannel channel = AbstractComponent.this.context.getDeliveryChannel();
+//					DeliveryChannel channel = AbstractComponent.this.container.getDeliveryChannel();
 //					while (true) {
 //						final MessageExchange me = channel.accept();
 //						if (me.isTransacted()) {
-//							TransactionManager mgr = (TransactionManager) AbstractComponent.this.context.getTransactionManager();
+//							TransactionManager mgr = (TransactionManager) AbstractComponent.this.container.getTransactionManager();
 //							Transaction tx = (Transaction) me.getProperty(MessageExchange.JTA_TRANSACTION_PROPERTY_NAME);
 //							if (tx == mgr.getTransaction()) {
 //								mgr.suspend();
@@ -318,7 +316,7 @@ public abstract class AbstractComponent implements Component, ComponentLifeCycle
 //							public void run() {
 //								try {
 //									if (me.isTransacted()) {
-//										TransactionManager mgr = (TransactionManager) AbstractComponent.this.context.getTransactionManager();
+//										TransactionManager mgr = (TransactionManager) AbstractComponent.this.container.getTransactionManager();
 //										Transaction tx = (Transaction) me.getProperty(MessageExchange.JTA_TRANSACTION_PROPERTY_NAME);
 //										mgr.resume(tx);
 //									}
@@ -632,7 +630,7 @@ public abstract class AbstractComponent implements Component, ComponentLifeCycle
             try {
                 //todo getting component not owner exception
 //                if (me.isTransacted()) {
-//                    TransactionManager mgr = (TransactionManager) context.getTransactionManager();
+//                    TransactionManager mgr = (TransactionManager) container.getTransactionManager();
 //                    Transaction tx = (Transaction) me.getProperty(MessageExchange.JTA_TRANSACTION_PROPERTY_NAME);
 //                    mgr.resume(tx);
 //                }

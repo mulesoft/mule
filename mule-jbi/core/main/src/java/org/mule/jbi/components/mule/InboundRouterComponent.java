@@ -89,7 +89,14 @@ public class InboundRouterComponent extends AbstractComponent implements Message
 
                 receiverComponent.setTargetService(routerService);
                 receiverComponent.setContainer(container);
-                container.getRegistry().addTransientEngine(receiverComponent.getName(), receiverComponent, receiverComponent.getBootstrap());
+
+                try {
+                    container.getRegistry().addTransientComponent(receiverComponent.getName(),
+                            ComponentType.JBI_ENGINE_COMPONENT, receiverComponent,
+                            receiverComponent.getBootstrap());
+                } catch (RegistryException e) {
+                    throw new JBIException(e);
+                }
             }
         }
         getContext().activateEndpoint(routerService, routerService.getLocalPart());

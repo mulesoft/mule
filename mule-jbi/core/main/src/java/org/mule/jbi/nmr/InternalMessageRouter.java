@@ -15,21 +15,20 @@
 package org.mule.jbi.nmr;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.jbi.JbiContainer;
+import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
+import org.mule.registry.RegistryComponent;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import javax.jbi.component.Component;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessagingException;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.jbi.JbiContainer;
-import org.mule.jbi.registry.Component;
-import org.mule.jbi.servicedesc.AbstractServiceEndpoint;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * todo document
@@ -126,13 +125,13 @@ public class InternalMessageRouter
 		for (int i = 0; i < endpoints.length; i++) {
 			AbstractServiceEndpoint se = (AbstractServiceEndpoint) endpoints[i];
 			String compName = se.getComponent();
-			Component compInfo = container.getRegistry().getComponent(compName);
+			RegistryComponent compInfo = container.getRegistry().getComponent(compName);
 			if (me.getRole() == MessageExchange.Role.CONSUMER) {
-				if (compInfo.getComponent().isExchangeWithConsumerOkay(se, me)) {
+				if (((Component)compInfo.getComponent()).isExchangeWithConsumerOkay(se, me)) {
 					result.add(se);
 				}
 			} else {
-				if (compInfo.getComponent().isExchangeWithProviderOkay(se, me)) {
+				if (((Component)compInfo.getComponent()).isExchangeWithProviderOkay(se, me)) {
 					result.add(se);
 				}
 			}

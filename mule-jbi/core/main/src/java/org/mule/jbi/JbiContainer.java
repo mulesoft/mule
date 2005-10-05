@@ -14,7 +14,8 @@
 package org.mule.jbi;
 
 import org.mule.jbi.nmr.InternalMessageRouter;
-import org.mule.jbi.registry.Registry;
+import org.mule.management.ManagementContext;
+import org.mule.registry.Registry;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.queue.QueueSession;
 
@@ -84,4 +85,6 @@ public interface JbiContainer {
     UMOContainerContext removeObjectContainer(UMOContainerContext container);
     
     QueueSession getQueueSession();
+
+    ManagementContext getManagementContext();
 }

@@ -13,9 +13,6 @@
  */
 package org.mule.jbi.engines.pxe;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.fs.pxe.sfwk.spi.InteractionHandler;
 import com.fs.pxe.sfwk.spi.MessageExchangeEvent;
 import com.fs.pxe.sfwk.spi.MessageExchangeException;
@@ -25,6 +22,8 @@ import com.fs.pxe.sfwk.spi.ServiceContext;
 import com.fs.pxe.sfwk.spi.ServiceEvent;
 import com.fs.pxe.sfwk.spi.ServiceProviderContext;
 import com.fs.pxe.sfwk.spi.ServiceProviderException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class JbiAdapter implements ProtocolAdapter {
 
@@ -32,7 +31,7 @@ public class JbiAdapter implements ProtocolAdapter {
 	
 	private boolean isRunning = false;
 
-	/** Service provider context. */
+	/** Service provider container. */
 	private ServiceProviderContext context;
 	
 	public String getProviderURI() {

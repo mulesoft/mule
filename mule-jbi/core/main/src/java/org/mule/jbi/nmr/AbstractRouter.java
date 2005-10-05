@@ -17,7 +17,8 @@ package org.mule.jbi.nmr;
 import org.mule.jbi.messaging.DeliveryChannelImpl;
 import org.mule.jbi.messaging.MessageExchangeProxy;
 import org.mule.jbi.messaging.UnknownRoleException;
-import org.mule.jbi.registry.Registry;
+import org.mule.jbi.registry.JbiRegistryComponent;
+import org.mule.registry.Registry;
 
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.MessagingException;
@@ -54,7 +55,7 @@ public abstract class AbstractRouter implements InternalRouter
         } else {
             throw new UnknownRoleException(me.getRole());
         }
-        DeliveryChannelImpl ch = (DeliveryChannelImpl) registry.getComponent(target).getChannel();
+        DeliveryChannelImpl ch = (DeliveryChannelImpl) ((JbiRegistryComponent)registry.getComponent(target)).getChannel();
 		ch.enqueue(((MessageExchangeProxy) me).getTwin());
     }
 }

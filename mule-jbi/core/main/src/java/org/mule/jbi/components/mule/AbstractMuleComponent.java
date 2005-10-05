@@ -74,7 +74,13 @@ public abstract class AbstractMuleComponent extends AbstractComponent
         routerComponent.setContainer(container);
         QName targetService = new QName(getName());
         routerComponent.setTargetService(targetService);
-        container.getRegistry().addTransientEngine(routerComponent.getName(), routerComponent, routerComponent.getBootstrap());
+        try {
+            container.getRegistry().addTransientComponent(routerComponent.getName(),
+                    ComponentType.JBI_ENGINE_COMPONENT, routerComponent,
+                    routerComponent.getBootstrap());
+        } catch (RegistryException e) {
+            throw new JBIException(e);
+        }
         getContext().activateEndpoint(targetService, targetService.getLocalPart());
     }
 
