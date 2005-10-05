@@ -68,22 +68,29 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 		this.installRoot = new File(this.component.getInstallRoot());
 		this.jbi = (Jbi)component.getDescriptor().getConfiguration();
 		this.install = true;
-		List l = Arrays.asList(this.jbi.getComponent().getComponentClassPath().getPathElementArray());
-		this.component.setClassPathElements(l);
+        if(jbi.getComponent().getComponentClassPath()!=null) {
+            List l = Arrays.asList(jbi.getComponent().getComponentClassPath().getPathElementArray());
+            this.component.setClassPathElements(l);
+        }
 	}
 	
 	protected ClassLoader createBootstrapClassLoader() throws Exception {
 		if (this.jbi.getComponent().isSetBootstrapClassLoaderDelegation()) {
 			// TODO: use this
 		}
-		return createClassLoader(Arrays.asList(this.jbi.getComponent().getBootstrapClassPath().getPathElementArray()));
+        List path = new ArrayList();
+        if(jbi.getComponent().getComponentClassPath()!=null) {
+            path = Arrays.asList(jbi.getComponent().getBootstrapClassPath().getPathElementArray());
+        }
+		return createClassLoader(path);
 	}
 	
 	protected Bootstrap createBootstrap() throws Exception {
 		ClassLoader loader = createBootstrapClassLoader();
-		String bsCl = this.jbi.getComponent().getBootstrapClassName();
-		Class cl = Class.forName(bsCl, true, loader);
-		Bootstrap bs = (Bootstrap) cl.newInstance();
+		String bootstrapClassname = this.jbi.getComponent().getBootstrapClassName();
+        if(bootstrapClassname==null) return null;
+		Class clazz = Class.forName(bootstrapClassname, true, loader);
+		Bootstrap bs = (Bootstrap) clazz.newInstance();
 		return bs;
 	}
 	
@@ -115,7 +122,9 @@ public class Installer implements InstallerMBean, InstallationContext, Component
 		boolean success = false;
 		try {
 			this.bootstrap = createBootstrap();
-			this.bootstrap.init(this);
+            if(bootstrap!=null) {
+			    this.bootstrap.init(this);
+            }
 			success = true;
 		} finally {
 			if (!success && this.bootstrap != null) {

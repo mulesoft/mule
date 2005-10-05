@@ -64,6 +64,15 @@ public class InstallationService implements InstallationServiceMBean {
      * installJarURL.
      */
 	public synchronized ObjectName loadNewInstaller(String installJarURI) {
+        try {
+            return doLoadNewInstaller(installJarURI);
+        } catch (Exception e) {
+            LOGGER.error("Could not install component: " + e, e);
+			return null;
+        }
+    }
+
+    private ObjectName doLoadNewInstaller(String installJarURI) {
 		File dir = null;
 		try {
 			LOGGER.info("Creating new installer for " + installJarURI);
@@ -116,7 +125,7 @@ public class InstallationService implements InstallationServiceMBean {
 				throw new JBIException("component already installed");
 			}
 			// Retrieve component type
-			boolean engine = jbi.getComponent().getType() == com.sun.java.xml.ns.jbi.ComponentDocument.Component.Type.SERVICE_ENGINE; 
+			boolean engine = jbi.getComponent().getType() == com.sun.java.xml.ns.jbi.ComponentDocument.Component.Type.SERVICE_ENGINE;
 			// Init directories
 			File installDir;
 			File workspaceDir;
@@ -160,7 +169,7 @@ public class InstallationService implements InstallationServiceMBean {
 			}
 			Utility.deleteTree(dir);
 		}
-	}
+    }
 
 	private ObjectName createComponentInstallerName(String name) {
 		return context.createMBeanName(name, "installer", null);
@@ -226,7 +235,6 @@ public class InstallationService implements InstallationServiceMBean {
 			return installSharedLibrary(f, dir);
 		} catch (Exception e) {
 			LOGGER.error("Could not install shared library: " + e, e);
-            e.printStackTrace();
 			return null;
 		} finally {
 			IOUtils.deleteFile(dir);

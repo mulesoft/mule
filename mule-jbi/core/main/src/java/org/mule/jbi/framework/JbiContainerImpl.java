@@ -181,7 +181,7 @@ public class JbiContainerImpl implements JbiContainer {
 			if (regStore.isFile()) {
 				try {
                     //todo support other store types
-					context.setRegistry(new XmlRegistryStore().load(regStore.getAbsolutePath()));
+					context.setRegistry(new XmlRegistryStore(context).load(regStore.getAbsolutePath()));
 				} catch (Exception e) {
 					LOGGER.warn("Invalid registry found. Creating a new one");
 				}
@@ -189,7 +189,7 @@ public class JbiContainerImpl implements JbiContainer {
 				LOGGER.info("No registry found. Creating a new one");
 			}
 			if (getRegistry() == null) {
-				context.setRegistry(new XmlRegistryStore().create(regStore.getAbsolutePath(), new JbiRegistryFactory()));
+				context.setRegistry(new XmlRegistryStore(context).create(regStore.getAbsolutePath(), new JbiRegistryFactory()));
 			}
 			if (this.router == null) {
 				this.router = new InternalMessageRouter(this, new DirectRouter(getRegistry()));

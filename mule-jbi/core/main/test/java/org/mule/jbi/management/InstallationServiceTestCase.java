@@ -15,17 +15,20 @@ package org.mule.jbi.management;
 
 import junit.framework.TestCase;
 import org.mule.jbi.JbiContainer;
+import org.mule.jbi.AbstractFunctionalTestCase;
 import org.mule.jbi.framework.JbiContainerImpl;
 import org.mule.jbi.util.IOUtils;
 
 import javax.management.ObjectName;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.ReflectionException;
 import java.io.File;
 import java.net.URL;
 import java.util.Locale;
 
-public class InstallationServiceTestCase extends TestCase {
+public class InstallationServiceTestCase extends AbstractFunctionalTestCase {
 
-	protected JbiContainer container;
 	
 	public void setUp() throws Exception {
 		IOUtils.deleteFile(new File("target/.mule-jbi"));
@@ -35,8 +38,31 @@ public class InstallationServiceTestCase extends TestCase {
 		jbi.start();
 		container = jbi;
 	}
-	
+
+    public void testInstallSharedLibrary() throws Exception {
+		URL url = Thread.currentThread().getContextClassLoader().getResource("wsdlsl.jar");
+		ObjectName serviceON = container.createMBeanName(null, "service", "install");
+		String result = (String) container.getMBeanServer().invoke(serviceON, "installSharedLibrary", new Object[] { url.toString() }, new String[] { "java.lang.String" });
+		assertNotNull(result);
+	}
+
+    public void testAlreadyInstalledSharedLibrary() throws Exception {
+		installLibrary("wsdlsl.jar");
+        URL url = Thread.currentThread().getContextClassLoader().getResource("wsdlsl.jar");
+		ObjectName serviceON = container.createMBeanName(null, "service", "install");
+		String result = (String) container.getMBeanServer().invoke(serviceON, "installSharedLibrary", new Object[] { url.toString() }, new String[] { "java.lang.String" });
+		assertNull(result);
+	}
+
+	public void testInstallBadSharedLibrary() throws Exception {
+		URL url = Thread.currentThread().getContextClassLoader().getResource("filebinding.jar");
+		ObjectName serviceON = container.createMBeanName(null, "service", "install");
+		String result = (String) container.getMBeanServer().invoke(serviceON, "installSharedLibrary", new Object[] { url.toString() }, new String[] { "java.lang.String" });
+		assertNull(result);
+	}
+
 	public void testInstallComponent() throws Exception {
+        installLibrary("wsdlsl.jar");
 		Locale.setDefault(Locale.US);
 		URL url = Thread.currentThread().getContextClassLoader().getResource("filebinding.jar");
 		assertNotNull(url);
@@ -59,22 +85,8 @@ public class InstallationServiceTestCase extends TestCase {
 	public void testInstallBadComponent() throws Exception {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("wsdlsl.jar");
 		ObjectName serviceON = container.createMBeanName(null, "service", "install");
-		ObjectName result = (ObjectName) container.getMBeanServer().invoke(serviceON, "loadNewInstaller", new Object[] { url.toString() }, new String[] { "java.lang.String" });
-		assertNull(result);
-	}
-	
-	public void testInstallSharedLibrary() throws Exception {
-		URL url = Thread.currentThread().getContextClassLoader().getResource("wsdlsl.jar");
-		ObjectName serviceON = container.createMBeanName(null, "service", "install");
-		String result = (String) container.getMBeanServer().invoke(serviceON, "installSharedLibrary", new Object[] { url.toString() }, new String[] { "java.lang.String" });
-		assertNotNull(result);
-	}
-	
-	public void testInstallBadSharedLibrary() throws Exception {
-		URL url = Thread.currentThread().getContextClassLoader().getResource("filebinding.jar");
-		ObjectName serviceON = container.createMBeanName(null, "service", "install");
-		String result = (String) container.getMBeanServer().invoke(serviceON, "installSharedLibrary", new Object[] { url.toString() }, new String[] { "java.lang.String" });
-		assertNull(result);
+        ObjectName result = (ObjectName) container.getMBeanServer().invoke(serviceON, "loadNewInstaller", new Object[] { url.toString() }, new String[] { "java.lang.String" });
+        assertNull(result);
 	}
 	
 }

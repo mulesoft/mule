@@ -20,8 +20,6 @@ import java.util.Locale;
 
 public class JbiRegistryFunctionalTestCase extends AbstractFunctionalTestCase {
 
-	protected JbiContainer container;
-
 	public void testRealInstall() throws Exception {
 		Locale.setDefault(Locale.US);
 		installLibrary("wsdlsl.jar");

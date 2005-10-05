@@ -25,7 +25,8 @@ import org.mule.ManagementContext;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JbiRegistryFactory implements RegistryFactory {
+public class JbiRegistryFactory implements RegistryFactory
+ {
     public Registry create(RegistryStore store, ManagementContext context) {
         return new JbiRegistry(store, context);
     }

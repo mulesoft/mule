@@ -36,6 +36,7 @@ public abstract class AbstractFunctionalTestCase extends TestCase {
 	protected void installLibrary(String file) throws Exception {
 		
 		URL url = Thread.currentThread().getContextClassLoader().getResource(file);
+        assertNotNull(url);
 		ObjectName serviceON = container.createMBeanName(null, "service", "install");
 		String result = (String) container.getMBeanServer().invoke(serviceON, "installSharedLibrary", new Object[] { url.toString() }, new String[] { "java.lang.String" });
 		assertNotNull(result);
