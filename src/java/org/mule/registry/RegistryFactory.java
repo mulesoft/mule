@@ -14,6 +14,8 @@
 */
 package org.mule.registry;
 
+import org.mule.ManagementContext;
+
 /**
  * todo document
  *
@@ -21,6 +23,6 @@ package org.mule.registry;
  * @version $Revision$
  */
 public interface RegistryFactory {
-    public Registry create(RegistryStore store);
+    public Registry create(RegistryStore store, ManagementContext context);
 }
 
