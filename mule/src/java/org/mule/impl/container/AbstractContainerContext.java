@@ -22,6 +22,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.ChainedReader;
+import org.mule.MuleManager;
 
 /**
  * <code>AbstractContainerContext</code> provides base container configuration
@@ -37,7 +38,6 @@ public abstract class AbstractContainerContext implements UMOContainerContext
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public static final String DEFAULT_ENCODING = "UTF-8";
     private String name;
 
     protected AbstractContainerContext(String name)
@@ -101,7 +101,7 @@ public abstract class AbstractContainerContext implements UMOContainerContext
 
     protected String getDefaultEncoding()
     {
-        return DEFAULT_ENCODING;
+        return MuleManager.getConfiguration().getEncoding();
     }
 
     public abstract void configure(Reader configuration) throws ContainerException;
