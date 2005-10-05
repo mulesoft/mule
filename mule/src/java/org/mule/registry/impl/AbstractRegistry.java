@@ -346,4 +346,8 @@ public abstract class AbstractRegistry implements Registry {
     public boolean isStarted() {
         return started;
     }
+
+    public ManagementContext getManagementContext() {
+        return context;
+    }
 }
