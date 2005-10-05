@@ -49,10 +49,10 @@ public abstract class AbstractRegistry implements Registry {
 	private transient Map componentsMap;
 	private transient String storeLocation;
     private File workingDirectory;
-    protected RegistryStore store;
-    protected ManagementContext context;
+    protected transient RegistryStore store;
+    protected transient ManagementContext context;
 
-    private boolean started = false;
+    private transient boolean started = false;
 
 	public AbstractRegistry(RegistryStore store, ManagementContext context) {
         this.store = store;

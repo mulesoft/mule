@@ -20,6 +20,7 @@ import org.mule.registry.RegistryException;
 import org.mule.registry.RegistryFactory;
 import org.mule.registry.RegistryStore;
 import org.mule.registry.impl.AbstractRegistry;
+import org.mule.ManagementContext;
 
 import java.io.File;
 import java.io.FileReader;
@@ -35,6 +36,12 @@ import java.io.Writer;
  * @version $Revision$
  */
 public class XmlRegistryStore implements RegistryStore {
+
+    protected ManagementContext context;
+
+    public XmlRegistryStore(ManagementContext context) {
+        this.context = context;
+    }
 
 	public void save(Registry registry) throws RegistryException {
 		synchronized (registry) {
@@ -63,7 +70,7 @@ public class XmlRegistryStore implements RegistryStore {
     }
 	
 	public Registry create(String store, RegistryFactory factory) throws RegistryException {
-		Registry reg = factory.create(this);
+		Registry reg = factory.create(this, context);
         if(reg instanceof AbstractRegistry) {
             ((AbstractRegistry)reg).initialize();
             ((AbstractRegistry)reg).setStoreLocation(store);
