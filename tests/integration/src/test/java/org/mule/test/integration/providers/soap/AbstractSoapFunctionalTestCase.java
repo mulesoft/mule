@@ -90,15 +90,20 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
         assertNotNull(c);
         UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOMessage result = dispatcher.receive(new MuleEndpointURI(getReceiveComplexEndpoint()),
-                                               0);
+        UMOMessage result = dispatcher.receive(new MuleEndpointURI(getReceiveComplexEndpoint()), 0);
+        assertNotNull(result);
+        assertTrue(result.getPayload() instanceof Person);
+        assertEquals("Fred", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
+
+        result = dispatcher.receive(new MuleEndpointURI(getReceiveComplexEndpoint()), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Fred", ((Person) result.getPayload()).getFirstName());
         assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
     }
 
-    public void testSendComplex() throws Throwable
+    public void testSendAndReceiveComplex() throws Throwable
     {
         UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
         assertNotNull(c);
@@ -115,9 +120,12 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
         UMOMessage result = dispatcher.send(event);
         assertNull(result);
 
+        //Note with Axis 1.2.1  we get an error if we reuse the same dispatcher with a different operation
+        //thus we dispose it here.  Mule itself caches dispachers on the full uri so this doesn;t happen
+        dispatcher.dispose();
+        dispatcher = c.getDispatcher("ANY");
         // lets get our newly added person
-        result = dispatcher.receive(new MuleEndpointURI(getSendReceiveComplexEndpoint2()),
-                                    0);
+        result = dispatcher.receive(new MuleEndpointURI(getSendReceiveComplexEndpoint2()), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Ross", ((Person) result.getPayload()).getFirstName());
@@ -152,6 +160,12 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
         dispatcher.dispatch(event);
         Thread.sleep(2000);
+
+        //Note with Axis 1.2.1  we get an error if we reuse the same dispatcher with a different operation
+        //thus we dispose it here.  Mule itself caches dispachers on the full uri so this doesn;t happen
+        dispatcher.dispose();
+        dispatcher = c.getDispatcher("ANY");
+
         // lets get our newly added person
         UMOMessage result = dispatcher.receive(new MuleEndpointURI(getDispatchAsyncComplexEndpoint2()),
                                                0);
@@ -181,5 +195,4 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
             // This is ok
         }
     }
-
 }

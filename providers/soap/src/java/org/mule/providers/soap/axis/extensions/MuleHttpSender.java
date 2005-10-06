@@ -120,9 +120,17 @@ public class MuleHttpSender extends BasicHandler
             log.debug(Messages.getMessage("enter00", "HTTPSender::invoke"));
         }
         try {
+            Call call = (Call) msgContext.getProperty("call_object");
+            String transURL = msgContext.getStrProp(MessageContext.TRANS_URL);
+            String uri = transURL;
+            if(call!=null && call.useSOAPAction()) {
+                uri = call.getSOAPActionURI();
+            }
+            msgContext.setProperty("SOAPAction", uri);
+
             BooleanHolder useFullURL = new BooleanHolder(false);
             StringBuffer otherHeaders = new StringBuffer();
-            targetURL = new URL(msgContext.getStrProp(MessageContext.TRANS_URL));
+            targetURL = new URL(transURL);
             String host = targetURL.getHost();
             int port = targetURL.getPort();
 
@@ -138,8 +146,7 @@ public class MuleHttpSender extends BasicHandler
                                             msgContext.getTimeout(),
                                             useFullURL);
 
-            if (msgContext.isClient() && msgContext.containsProperty("call_object")) {
-                Call call = (Call) msgContext.getProperty("call_object");
+            if (msgContext.isClient() && call!=null) {
                 if (Boolean.TRUE.equals(call.getProperty("axis.one.way")))
                     return;
             }
@@ -194,8 +201,13 @@ public class MuleHttpSender extends BasicHandler
         try {
             sock = factory.create(host, port, otherHeaders, useFullURL);
         } catch (Exception e) {
-            log.fatal("Axis client Failed: connect on socket: " + host + ":" + port, e);
-            throw e;
+            Thread.sleep(1000);
+            try {
+                sock = factory.create(host, port, otherHeaders, useFullURL);
+            } catch (Exception e1) {
+                log.fatal("Axis client Failed: connect on socket: " + host + ":" + port, e);
+                throw e;
+            }
         }
         if (timeout > 0) {
             sock.setSoTimeout(timeout);

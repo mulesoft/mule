@@ -15,7 +15,7 @@ package org.mule.providers.http;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.http.transformers.UMOMessageToResponseString;
+import org.mule.providers.http.transformers.UMOMessageToHttpResponse;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -47,7 +47,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         cnn.setClientKeyStorePassword("mulepassword");
         cnn.setKeyPassword("mulepassword");
         cnn.setStorePassword("mulepassword");
-        cnn.setDefaultResponseTransformer(new UMOMessageToResponseString());
+        cnn.setDefaultResponseTransformer(new UMOMessageToHttpResponse());
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
         if (initialised)
             cnn.initialise();

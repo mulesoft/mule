@@ -27,9 +27,9 @@
  */
 package org.mule.providers.http;
 
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.MuleProperties;
 import org.mule.impl.*;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
@@ -120,9 +120,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         public HttpWorker(Socket socket) throws SocketException {
             super(socket);
             boolean keepAlive = ((HttpConnector) connector).isKeepAlive();
-            if (keepAlive) {
+            if(keepAlive) {
                 socket.setKeepAlive(true);
+                socket.setSoTimeout(((HttpConnector) connector).getKeepAliveTimeout());
             }
+
         }
 
         public void run() {
@@ -131,22 +133,15 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                 dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                 do {
-                    if (disposing.get() || socket.isClosed()) {
-                        logger.debug("Peer closed connection");
-                        break;
-                    }
-
                     Properties headers = new Properties();
                     Object payload = parseRequest(dataIn, headers);
                     if (payload == null) {
                         break;
                     }
-
                     UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{payload, headers});
-
-                    keepAlive = false; //adapter.getBooleanProperty(HttpConstants.HEADER_KEEP_ALIVE, keepAlive);
                     //Removed the keep alive monitoring stuff for now
                     //nstead just wait for the client to disconnect
+                    //keepAlive = adapter.getBooleanProperty(HttpConstants.HEADER_KEEP_ALIVE, keepAlive);
 //                    if (keepAlive && !keepAliveRegistered) {
 //                        keepAliveRegistered = true;
 //                        if (keepAliveMonitor != null) {
@@ -190,9 +185,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 //                        if (keepAliveMonitor != null) {
 //                            keepAliveMonitor.resetExpirable(this);
 //                        }
-                } while (socket.isConnected() && keepAlive);
+                } while (!socket.isClosed() && !disposing.get() && keepAlive);
+                if (logger.isDebugEnabled() && socket.isClosed()) {
+                    logger.debug("Peer closed connection");
+                }
             } catch (Exception e) {
-                keepAlive = false;
                 handleException(e);
             } finally {
 //                if (keepAliveMonitor != null) {

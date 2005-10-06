@@ -35,4 +35,11 @@ public class MessageTypeNotSupportedException extends MessagingException
                           adapterClass.getName()), message);
     }
 
+    public MessageTypeNotSupportedException(Object message, Class adapterClass, Throwable cause)
+    {
+        super(new Message(Messages.MESSAGE_X_NOT_SUPPORTED_BY_ADAPTER_X,
+                          message.getClass().getName(),
+                          adapterClass.getName()), message, cause);
+    }
+
 }

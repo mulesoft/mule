@@ -59,6 +59,7 @@ public class HttpConnector extends TcpConnector
     /**
      * Event property to pass back the status for the response
      */
+    public static final String DEFAULT_CONTENT_TYPE = "text/plain";
     public static final String HTTP_STATUS_PROPERTY = "http.status";
     public static final String HTTP_VERSION_PROPERTY = "http.version";
     public static final String HTTP_CUSTOM_HEADERS_MAP_PROPERTY = "http.custom.headers";
@@ -80,9 +81,9 @@ public class HttpConnector extends TcpConnector
 
     private String proxyPassword = null;
 
-    private long keepAliveTimeout = 120000;
+    private int keepAliveTimeout = 1000;
 
-    private boolean keepAlive = true;
+    private boolean keepAlive = false;
 
     /*
      * (non-Javadoc)
@@ -158,12 +159,12 @@ public class HttpConnector extends TcpConnector
         proxyUsername = string;
     }
 
-    public long getKeepAliveTimeout()
+    public int getKeepAliveTimeout()
     {
         return keepAliveTimeout;
     }
 
-    public void setKeepAliveTimeout(long keepAliveTimeout)
+    public void setKeepAliveTimeout(int keepAliveTimeout)
     {
         this.keepAliveTimeout = keepAliveTimeout;
     }

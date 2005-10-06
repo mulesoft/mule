@@ -143,8 +143,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         String handlerPkgs = System.getProperty("java.protocol.handler.pkgs", null);
         if(handlerPkgs!=null) {
             if(!handlerPkgs.endsWith("|")) handlerPkgs += "|";
-            handlerPkgs = "org.mule.providers.soap.axis.transport|" + handlerPkgs;
+            handlerPkgs += "org.mule.providers.soap.axis.transport|";
             System.setProperty("java.protocol.handler.pkgs", handlerPkgs);
+            logger.debug("Setting java.protocol.handler.pkgs to: " + handlerPkgs);
         }
     }
 

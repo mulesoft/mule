@@ -30,20 +30,20 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * <code>UMOMessageToResponseString</code> converts a UMOMEssage into an Http
+ * <code>UMOMessageToHttpResponse</code> converts a UMOMEssage into an Http
  * response.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class UMOMessageToResponseString extends AbstractEventAwareTransformer
+public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 {
     private List headers = null;
     private SimpleDateFormat format = null;
     private String server = null;
 
-    public UMOMessageToResponseString()
+    public UMOMessageToHttpResponse()
     {
         registerSourceType(Object.class);
         setReturnClass(Object.class);
@@ -60,10 +60,11 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
         String version = (String) context.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
         String date = format.format(new Date());
         byte[] response = null;
-        String contentType = (String) context.getProperty(HttpConstants.HEADER_CONTENT_TYPE);
+        String contentType = (String) context.getProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConnector.DEFAULT_CONTENT_TYPE);
+
         if (src instanceof byte[]) {
             response = (byte[]) src;
-        } else if (contentType != null && contentType.startsWith("text/")) {
+        } else if (contentType.startsWith("text/")) {
             response = src.toString().getBytes();
         } else {
             try {
@@ -151,6 +152,15 @@ public class UMOMessageToResponseString extends AbstractEventAwareTransformer
         byte[] resultPayload = new byte[httpMessage.length() + response.length];
         System.arraycopy(httpMessage.toString().getBytes(), 0, resultPayload, 0, httpMessage.length());
         System.arraycopy(response, 0, resultPayload, httpMessage.length(), response.length);
-        return resultPayload;
+
+        if(contentType.startsWith("text")) {
+            if(resultPayload instanceof byte[]) {
+                return new String((byte[])resultPayload);
+            } else {
+                return resultPayload.toString();
+            }
+        } else {
+           return resultPayload;
+        }
     }
 }

@@ -3,5 +3,5 @@ dispatcher.factory=org.mule.providers.http.HttpClientMessageDispatcherFactory
 message.receiver=org.mule.providers.http.jetty.JettyHttpMessageReceiver
 message.adapter=org.mule.providers.http.servlet.HttpRequestMessageAdapter
 outbound.transformer=org.mule.providers.http.transformers.ObjectToHttpClientMethodRequest
-response.transformer=org.mule.providers.http.transformers.UMOMessageToResponseString
+response.transformer=org.mule.providers.http.transformers.UMOMessageToHttpResponse
 endpoint.builder=org.mule.impl.endpoint.UrlEndpointBuilder

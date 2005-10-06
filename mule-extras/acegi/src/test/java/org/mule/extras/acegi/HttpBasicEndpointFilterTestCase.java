@@ -52,6 +52,8 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
         QuickConfigurationBuilder builder = null;
         builder = new QuickConfigurationBuilder(true);
         UMOManager manager = builder.createStartedManager(true, "");
+        manager.setProperty("http.keepAlive", "true");
+        manager.setProperty("http.keepAliveTimeout", "1000");
         manager.setSecurityManager(sm);
         UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(),
                                                    "echo",

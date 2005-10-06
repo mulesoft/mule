@@ -18,9 +18,12 @@ package org.mule.providers.http;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
+import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -62,10 +65,6 @@ public class HttpMessageAdapter extends AbstractMessageAdapter {
         return message;
     }
 
-    public boolean isBinary() {
-        return message != null;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -75,6 +74,8 @@ public class HttpMessageAdapter extends AbstractMessageAdapter {
     {
         if(message instanceof byte[]) {
             return (byte[]) message;
+        } else if (message instanceof String) {
+            return message.toString().getBytes();
         } else {
             return (byte[]) trans.transform(message);
         }

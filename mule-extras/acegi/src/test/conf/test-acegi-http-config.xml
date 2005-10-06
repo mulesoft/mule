@@ -6,6 +6,10 @@
 
 <mule-configuration id="Test_Mule_Properties" version="1.0">
 
+    <environment-properties>
+        <property name="http.keepAlive" value="true"/>
+    </environment-properties>
+    
     <mule-environment-properties serverUrl=""/>
 
     <container-context className="org.mule.extras.spring.SpringContainerContext">

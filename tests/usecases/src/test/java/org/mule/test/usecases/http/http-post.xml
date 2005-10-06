@@ -20,7 +20,7 @@
 		<transformer name="Compress"
 			className="org.mule.transformers.compression.GZipCompressTransformer" />
 		<transformer name="ToHttpResponse"
-			className="org.mule.providers.http.transformers.UMOMessageToResponseString" />
+			className="org.mule.providers.http.transformers.UMOMessageToHttpResponse" />
 	</transformers>
 	
 	<global-endpoints>

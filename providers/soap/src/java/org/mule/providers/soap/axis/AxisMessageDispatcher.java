@@ -72,6 +72,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     public AxisMessageDispatcher(AxisConnector connector) throws UMOException {
         super(connector);
+        AxisProperties.setProperty("axis.doAutoTypes", "true");
         services = new HashMap();
         //Should be loading this from a WSDD but for some reason it is not working for me??
         createClientConfig();
@@ -85,9 +86,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
         String wsdlUrl = getWsdlUrl(event);
         Service service = (Service) services.get(wsdlUrl);
-        if (service == null) {
-            service = createService(event);
+        if (service != null) {
             services.put(wsdlUrl, service);
+        } else {
+            service = createService(event);
         }
         return service;
     }
@@ -342,19 +344,19 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
         Service service = new Service();
-        service.setEngineConfiguration(clientConfig);
+        //service.setEngineConfiguration(clientConfig);
         service.setEngine(new AxisClient(clientConfig));
         Call call = new Call(service);
         call.setSOAPActionURI(endpointUri.toString());
         call.setTargetEndpointAddress(endpointUri.toString());
 
-        String method = (String) endpointUri.getParams().remove("method");
+        String method = (String) endpointUri.getParams().remove(MuleProperties.MULE_METHOD_PROPERTY);
         call.setOperationName(method);
         Properties params = endpointUri.getUserParams();
-        Object args[] = new Object[params.size()];
+        String args[] = new String[params.size()];
         int i = 0;
         for (Iterator iterator = params.values().iterator(); iterator.hasNext(); i++) {
-            args[i] = iterator.next();
+            args[i] = iterator.next().toString();
         }
 
         call.setOperationName(method);
@@ -413,6 +415,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             props.put(key, call.getMessageContext().getProperty(key.toString()));
         }
         props.put("soap.message", call.getMessageContext().getMessage());
+        call.clearHeaders();
+        call.clearOperation();
         return new MuleMessage(result, props);
     }
 

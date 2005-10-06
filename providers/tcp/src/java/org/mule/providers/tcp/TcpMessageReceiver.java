@@ -211,8 +211,8 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         {
             closed.set(true);
             try {
-                if (socket != null) {
-                    logger.debug("Closing listener: " + socket.getInetAddress());
+                if (socket != null && !socket.isClosed()) {
+                    logger.debug("Closing listener: " + socket.getLocalSocketAddress().toString());
                     socket.shutdownInput();
                     socket.shutdownOutput();
                     socket.close();
