@@ -475,6 +475,8 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             // Next see if there are any UMOTransformers to register
             registerTransformers();
 
+            registerGlobalEndpoints();
+
             // Register the multicaster descriptor
             registerMulticasterDescriptor();
 
@@ -580,6 +582,25 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     if (c.getName() == null)
                         c.setName(entry.getKey().toString());
                     MuleManager.getInstance().registerConnector(c);
+                }
+            }
+        }
+    }
+
+    protected void registerGlobalEndpoints() throws UMOException
+    {
+        if (!MuleManager.getInstance().isInitialised()) {
+            // Next see if there are any UMOConnectors to register
+            Map endpoints = applicationContext.getBeansOfType(UMOEndpoint.class, true, true);
+            if (endpoints.size() > 0) {
+                Map.Entry entry;
+                UMOEndpoint endpoint;
+                for (Iterator iterator = endpoints.entrySet().iterator(); iterator.hasNext();) {
+                    entry = (Map.Entry) iterator.next();
+                    endpoint = (UMOEndpoint) entry.getValue();
+                    if (endpoint.getName() == null)
+                        endpoint.setName(entry.getKey().toString());
+                    MuleManager.getInstance().registerEndpoint(endpoint);
                 }
             }
         }
