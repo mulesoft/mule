@@ -264,7 +264,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         if (method.equals(HttpConstants.METHOD_GET)) {
             payload = request.getBytes();
         } else {
-            boolean multipart = p.getProperty(HttpConstants.HEADER_CONTENT_TYPE, "").equals("multipart/related");
+            boolean multipart = p.getProperty(HttpConstants.HEADER_CONTENT_TYPE, "").contains("multipart/related");
             String contentLengthHeader = p.getProperty(HttpConstants.HEADER_CONTENT_LENGTH, null);
             if (contentLengthHeader == null) throw new IllegalStateException(HttpConstants.HEADER_CONTENT_LENGTH + " header must be set");
 
