@@ -23,6 +23,8 @@ import org.apache.axis.client.Service;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
+import org.apache.axis.wsdl.fromJava.Namespaces;
+import org.apache.axis.wsdl.fromJava.Types;
 import org.apache.axis.wsdl.gen.Parser;
 import org.apache.axis.wsdl.symbolTable.ServiceEntry;
 import org.apache.axis.wsdl.symbolTable.SymTabEntry;
@@ -279,8 +281,11 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         	for (int i = 0; i < args.length; i++) {
         		if (args[i] instanceof DataHandler[]) {
         			params.add("attachments;qname{DataHandler:http://xml.apache.org/xml-soap};in");
-        		} else {        			
-        			params.add("value" + i + ";" + args[i].getClass().getName() + ";in");
+        		} else if (call.getTypeMapping().getTypeQName(args[i].getClass()) != null) {
+        			QName qname = call.getTypeMapping().getTypeQName(args[i].getClass());
+        			params.add("value" + i + ";qname{" + qname.getPrefix() + ":" + qname.getLocalPart() + ":" + qname.getNamespaceURI() + "};in");
+        		} else {
+        			params.add("value" + i + ";qname{" + Types.getLocalNameFromFullName(args[i].getClass().getName()) + ":" + Namespaces.makeNamespace(args[i].getClass().getName()) + "};in");
         		}
         	}
         	HashMap map = new HashMap();
