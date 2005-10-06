@@ -30,6 +30,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.routing.UMOResponseRouter;
+import org.mule.umo.routing.UMORouter;
 import org.mule.umo.transformer.UMOTransformer;
 
 /**
@@ -49,10 +50,6 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
 
     private List endpoints = new CopyOnWriteArrayList();
 
-    private UMOTransformer transformer;
-
-    private boolean transExplicitlySet = false;
-
     private int timeout = MuleConfiguration.DEFAULT_TIMEOUT;
 
     public ResponseMessageRouter()
@@ -63,9 +60,6 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
     public void route(UMOEvent event) throws RoutingException
     {
         UMOResponseRouter router = null;
-        if(!transExplicitlySet) {
-            transformer = ((AbstractConnector)event.getEndpoint().getConnector()).getDefaultResponseTransformer();
-        }
         for (Iterator iterator = getRouters().iterator(); iterator.hasNext();) {
             router = (UMOResponseRouter) iterator.next();
             router.process(event);
@@ -108,9 +102,9 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
 
     }
 
-    public void addRouter(UMOResponseRouter router)
+    public void addRouter(UMORouter router)
     {
-        router.setTimeout(getTimeout());
+        ((UMOResponseRouter)router).setTimeout(getTimeout());
         routers.add(router);
     }
 
@@ -166,17 +160,6 @@ public class ResponseMessageRouter extends AbstractRouterCollection implements U
             }
         }
         return null;
-    }
-
-    public UMOTransformer getTransformer()
-    {
-        return transformer;
-    }
-
-    public void setTransformer(UMOTransformer transformer)
-    {
-        this.transformer = transformer;
-        transExplicitlySet = true;
     }
 
     public int getTimeout() {

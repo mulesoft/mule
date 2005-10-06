@@ -118,6 +118,12 @@ public abstract class AbstractScriptConfigBuilderTestCase extends NamedTestCase
         UMOEndpoint endpoint = MuleManager.getInstance().lookupEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
+
+        UMODescriptor descriptor = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
+        UMOEndpoint ep = descriptor.getInboundRouter().getEndpoint("Orange");
+        assertNotNull(ep);
+        assertNotNull(ep.getResponseTransformer());
+        assertTrue(ep.getResponseTransformer() instanceof TestCompressionTransformer);
     }
 
     public void testInterceptorStacks()
@@ -275,8 +281,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends NamedTestCase
         assertNotNull(descriptor.getResponseRouter());
         UMOResponseMessageRouter messageRouter = descriptor.getResponseRouter();
         assertNull(messageRouter.getCatchAllStrategy());
-        assertNotNull(messageRouter.getTransformer());
-        assertTrue(messageRouter.getTransformer() instanceof TestCompressionTransformer);
+        assertEquals(10001, messageRouter.getTimeout());
         assertEquals(1, messageRouter.getRouters().size());
         UMOResponseRouter router = (UMOResponseRouter) messageRouter.getRouters().get(0);
         assertTrue(router instanceof TestResponseAggregator);
