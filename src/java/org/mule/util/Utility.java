@@ -37,6 +37,10 @@ import java.util.zip.ZipEntry;
 public class Utility
 {
     /**
+     * Saves creation of unecessary string creation
+     */
+    public static final String EMPTY_STRING = "";
+    /**
      * The default buffer size to use.
      */
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
