@@ -102,7 +102,8 @@
                 <catch-all-strategy className="org.mule.routing.ForwardingCatchAllStrategy">
                     <endpoint address="test://catch.all"/>
                 </catch-all-strategy>
-                <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer"/>
+                <endpoint name="Orange" type="receiver" address="test://orange/" transformers="TestCompressionTransformer"
+                    responseTransformers="TestCompressionTransformer"/>
                 <global-endpoint name="orangeEndpoint" transformers="TestCompressionTransformer">
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="java.lang.String"/>
                     <properties>
@@ -117,7 +118,7 @@
                 </router>
             </outbound-router>
 
-            <response-router transformers="TestCompressionTransformer">
+            <response-router timeout="10001">
                 <endpoint address="test://response1"/>
                 <global-endpoint name="appleResponseEndpoint"/>
                 <router className="org.mule.tck.testmodels.mule.TestResponseAggregator"/>

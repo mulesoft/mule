@@ -36,8 +36,6 @@ public interface UMOResponseMessageRouter extends UMORouterCollection
 
     UMOMessage getResponse(UMOMessage message) throws UMOException;
 
-    void addRouter(UMOResponseRouter router);
-
     UMOResponseRouter removeRouter(UMOResponseRouter router);
 
     void addEndpoint(UMOEndpoint endpoint);
@@ -54,10 +52,6 @@ public interface UMOResponseMessageRouter extends UMORouterCollection
     UMOEndpoint getEndpoint(String name);
 
     void setEndpoints(List endpoints);
-
-    UMOTransformer getTransformer();
-
-    void setTransformer(UMOTransformer transformer);
 
     public int getTimeout();
 

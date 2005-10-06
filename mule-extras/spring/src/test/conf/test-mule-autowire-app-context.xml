@@ -275,9 +275,7 @@
 
         <property name="responseRouter">
             <bean class="org.mule.routing.response.ResponseMessageRouter">
-                <property name="transformer">
-                    <ref local="TestCompressionTransformer"/>
-                </property>
+                <property name="timeout"><value>10001</value></property>
                 <property name="endpoints">
                     <list>
                         <bean id="response1" singleton="false" class="org.mule.impl.endpoint.MuleEndpoint">

@@ -18,7 +18,8 @@ import java.util.List;
 import org.mule.management.stats.RouterStatistics;
 
 /**
- * <code>UMORouterCollection</code> TODO
+ * <code>UMORouterCollection</code> defines the interface for a MessageRouter that
+ * manages more than one router.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

@@ -143,6 +143,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
             inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
             UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
+            ep2.setResponseTransformer(m.lookupTransformer("TestCompressionTransformer"));
             inRouter.addEndpoint(ep2);
             UMOEndpoint ep3 = m.lookupEndpoint("orangeEndpoint");
             ep3.setFilter(new PayloadTypeFilter(String.class));
@@ -158,7 +159,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
             responseRouter.addEndpoint(m.lookupEndpoint("appleResponseEndpoint"));
             responseRouter.addRouter(new TestResponseAggregator());
-            responseRouter.setTransformer(m.lookupTransformer("TestCompressionTransformer"));
+            responseRouter.setTimeout(10001);
             d.setResponseRouter(responseRouter);
 
             //Interceptors

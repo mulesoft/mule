@@ -111,6 +111,7 @@ UMOInboundMessageRouter inRouter = new InboundMessageRouter();
 inRouter.setCatchAllStrategy(new ForwardingCatchAllStrategy());
 inRouter.getCatchAllStrategy().setEndpoint(new MuleEndpoint("test://catch.all", false));
 UMOEndpoint ep2 = builder.createEndpoint("test://orange/", "Orange", true, "TestCompressionTransformer");
+ep2.setResponseTransformer(manager.lookupTransformer("TestCompressionTransformer"));
 inRouter.addEndpoint(ep2);
 UMOEndpoint ep3 = manager.lookupEndpoint("orangeEndpoint");
 ep3.setFilter(new PayloadTypeFilter(String.class));
@@ -126,7 +127,7 @@ UMOResponseMessageRouter responseRouter = new ResponseMessageRouter();
 responseRouter.addEndpoint(new MuleEndpoint("test://response1", true));
 responseRouter.addEndpoint(manager.lookupEndpoint("appleResponseEndpoint"));
 responseRouter.addRouter(new TestResponseAggregator());
-responseRouter.setTransformer(manager.lookupTransformer("TestCompressionTransformer"));
+responseRouter.setTimeout(10001);
 d.setResponseRouter(responseRouter);
 
 //Interceptors

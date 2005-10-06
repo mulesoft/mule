@@ -82,22 +82,6 @@ public class MuleBeanDefinitionReaderTestCase extends AbstractConfigBuilderTestC
         // assertEquals("1.1", d.getVersion());
     }
 
-    public void testTransformers()
-    {
-        UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("orangeComponent");
-        assertNotNull(d);
-        UMOResponseMessageRouter r = d.getResponseRouter();
-        assertNotNull(r);
-        UMOTransformer t = r.getTransformer();
-        assertNotNull(t);
-        assertEquals("TestCompressionTransformer", t.getName());
-        t = t.getTransformer();
-        assertNotNull(t);
-        assertEquals("Default", t.getName());
-        t = t.getTransformer();
-        assertNull(t);
-    }
-
     public void testPropertyBeansInMaps()
     {
         UMODescriptor d = MuleManager.getInstance().getModel().getDescriptor("appleComponent3");

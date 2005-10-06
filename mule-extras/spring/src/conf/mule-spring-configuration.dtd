@@ -938,7 +938,8 @@ Whether every configured router will be matched
    associated with it meaning that marshaling from transport specific MEssage types such as
    Jms will be done automatically.
 -->
-<!ATTLIST response-router transformers              IDREFS           #IMPLIED>
+<!-- This has been removed as you can now set the response router on the endpoint -->
+<!--<!ATTLIST response-router transformers              IDREFS           #IMPLIED>-->
 
 <!--
 	Defines the timeout for routers configure on this response-router

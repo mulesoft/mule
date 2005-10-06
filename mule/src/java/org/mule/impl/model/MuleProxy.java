@@ -214,6 +214,7 @@ public class MuleProxy implements Work, Lifecycle
         logger.trace("MuleProxy: sync call for Mule UMO " + descriptor.getName());
 
         UMOMessage returnMessage = null;
+        UMOTransformer responseTransformer = null;
         try {
             if (event.getEndpoint().canReceive()) {
                 RequestContext.setEvent(event);
@@ -222,6 +223,7 @@ public class MuleProxy implements Work, Lifecycle
                 if (replyTo != null) {
                     replyToHandler = ((AbstractConnector) event.getEndpoint().getConnector()).getReplyToHandler();
                 }
+                responseTransformer = event.getEndpoint().getResponseTransformer();
                 InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor, event.getMessage());
 
                 // stats
@@ -289,7 +291,7 @@ public class MuleProxy implements Work, Lifecycle
             }
         }
         //Finally apply response transformer
-        return applyResponseTransformer(returnMessage);
+        return applyResponseTransformer(returnMessage, responseTransformer);
     }
 
     /**
@@ -449,24 +451,21 @@ public class MuleProxy implements Work, Lifecycle
         return descriptor;
     }
 
-    protected UMOMessage applyResponseTransformer(UMOMessage returnMessage) throws TransformerException {
+    protected UMOMessage applyResponseTransformer(UMOMessage returnMessage, UMOTransformer transformer) throws TransformerException {
         if(returnMessage==null) return null;
-        UMOTransformer trans = descriptor.getResponseTransformer();
-        if(trans==null && descriptor.getResponseRouter()!=null) {
-            trans = descriptor.getResponseRouter().getTransformer();
-        }
-        if(trans!=null) {
-            if(trans.isSourceTypeSupported(returnMessage.getPayload().getClass())) {
-                Object result = trans.transform(returnMessage.getPayload());
-                if(result instanceof UMOMessage) {
-                    returnMessage = (UMOMessage)result;
-                } else {
-                    returnMessage = new MuleMessage(result, returnMessage.getProperties());
-                }
+        if(transformer==null) transformer = descriptor.getResponseTransformer();
+        if(transformer==null) return returnMessage;
+
+        if(transformer.isSourceTypeSupported(returnMessage.getPayload().getClass())) {
+            Object result = transformer.transform(returnMessage.getPayload());
+            if(result instanceof UMOMessage) {
+                returnMessage = (UMOMessage)result;
             } else {
-                if(logger.isDebugEnabled()) {
-                    logger.debug("Response transformer: " + trans + " doesn't support the result payload: " + returnMessage.getPayload().getClass());
-                }
+                returnMessage = new MuleMessage(result, returnMessage.getProperties());
+            }
+        } else {
+            if(logger.isDebugEnabled()) {
+                logger.debug("Response transformer: " + transformer + " doesn't support the result payload: " + returnMessage.getPayload().getClass());
             }
         }
         return returnMessage;
