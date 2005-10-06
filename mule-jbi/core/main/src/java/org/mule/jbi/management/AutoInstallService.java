@@ -1,6 +1,20 @@
+/*
+ * Copyright 2005 SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ * 
+ * ------------------------------------------------------------------------------------------------------
+ * $Header$
+ * $Revision$
+ * $Date$
+ */
 package org.mule.jbi.management;
 
-import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.jbi.JbiContainer;
@@ -8,6 +22,7 @@ import org.mule.jbi.util.IOUtils;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
@@ -21,7 +36,7 @@ public class AutoInstallService implements AutoInstallServiceMBean {
 	private int pollingFrequency = 60000;
 	private Timer timer;
 	private Log logger = LogFactory.getLog(getClass());
-    private SynchronizedBoolean started = new SynchronizedBoolean(false);
+    private AtomicBoolean started = new AtomicBoolean(false);
 
 	public AutoInstallService() {
 		this.timer = new Timer(true);
