@@ -36,6 +36,11 @@
                     <xsl:value-of select="@model"/>
                 </value>
             </property>
+            <property name="modelType">
+                <value>
+                    <xsl:value-of select="@modelType"/>
+                </value>
+            </property>
             <property name="recoverableMode">
                 <value>
                     <xsl:value-of select="@recoverableMode"/>
@@ -59,6 +64,21 @@
             <property name="serverUrl">
                 <value>
                     <xsl:value-of select="@serverUrl"/>
+                </value>
+            </property>
+            <property name="encoding">
+                <value>
+                    <xsl:value-of select="@encoding"/>
+                </value>
+            </property>
+            <property name="clientMode">
+                <value>
+                    <xsl:value-of select="@clientMode"/>
+                </value>
+            </property>
+            <property name="embedded">
+                <value>
+                    <xsl:value-of select="@embedded"/>
                 </value>
             </property>
 
@@ -152,6 +172,11 @@
     <xsl:template match="transformers">
         <xsl:apply-templates select="transformer"/>
     </xsl:template>
+
+    <xsl:template match="responseTransformers">
+        <xsl:apply-templates select="transformer"/>
+    </xsl:template>
+
     <xsl:template match="transformer">
         <xsl:variable name="name">
             <xsl:value-of select="@name"/>
@@ -174,9 +199,10 @@
 			</xsl:if>
 			<xsl:attribute name="class">org.mule.impl.endpoint.MuleEndpoint</xsl:attribute>
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
+            <xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
             <xsl:apply-templates select="@createConnector"/>
-            <xsl:apply-templates select="@*[local-name() != 'address' and local-name() != 'transformers' and local-name() != 'createConnector']" mode="addProperties"/>
+            <xsl:apply-templates select="@*[local-name() != 'address' and local-name() != 'transformers' and local-name() != 'createConnector' and local-name() != 'responseTransformers']" mode="addProperties"/>
             <xsl:apply-templates select="properties" mode="asMap"/>
             <xsl:apply-templates select="transaction"/>
             <xsl:apply-templates select="filter"/>
@@ -397,7 +423,7 @@
         </xsl:variable>
         <property name="responseRouter">
             <bean class="{$type}">
-                <xsl:apply-templates select="@transformers" mode="addTransformers"/>
+                <xsl:apply-templates select="@*" mode="addProperties"/>
                 <property name="endpoints">
                     <list>
                         <xsl:apply-templates select="endpoint"/>
@@ -459,6 +485,7 @@
                 </value>
             </constructor-arg>
             <xsl:apply-templates select="@transformers" mode="addTransformers"/>
+            <xsl:apply-templates select="@responseTransformers" mode="addTransformers"/>
             <xsl:apply-templates select="@address" mode="addEndpointURI"/>
         </bean>
     </xsl:template>
@@ -694,14 +721,20 @@
                 </property>
             </bean>
         </property>
-    </xsl:template> 
+    </xsl:template>
 
-    <xsl:template match="@transformers|@inboundTransformer|@outboundTransformer" mode="addTransformers">
+
+    <xsl:template match="@transformers|@responseTransformers|@inboundTransformer|@outboundTransformer" mode="addTransformers">
         <xsl:variable name="propertyName">
             <xsl:choose>
                 <xsl:when test="local-name() = 'transformers'">transformer</xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="local-name()"/>
+                    <xsl:choose>
+                        <xsl:when test="local-name() = 'responseTransformers'">responseTransformer</xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="local-name()"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
