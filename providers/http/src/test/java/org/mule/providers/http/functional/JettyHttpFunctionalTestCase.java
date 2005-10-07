@@ -85,6 +85,6 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
         String msg = new String(buf, 0, len);
 
         assertNotNull(msg);
-        assertEquals(TEST_MESSAGE + "\n Received", msg);
+        assertTrue(msg.endsWith(TEST_MESSAGE + "\n Received"));
     }
 }
