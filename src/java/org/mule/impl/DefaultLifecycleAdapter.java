@@ -173,7 +173,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                 if (result instanceof UMOMessage) {
                     resultMessage = (UMOMessage) result;
                 } else {
-                    resultMessage = new MuleMessage(result, event.getProperties());
+                    resultMessage = new MuleMessage(result, event.getMessage());
                 }
             }
             return resultMessage;
