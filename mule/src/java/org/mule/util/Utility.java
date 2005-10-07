@@ -16,6 +16,7 @@ package org.mule.util;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.ParsePosition;
@@ -246,12 +247,16 @@ public class Utility
     }
 
     public static String loadResourceAsString(String resourceName, Class callingClass) throws IOException {
+        return loadResourceAsString(resourceName, callingClass, "UTF-8");
+    }
+    
+    public static String loadResourceAsString(String resourceName, Class callingClass, String encoding) throws IOException {
         URL url = getResource(resourceName, callingClass);
         String resource = null;
         if (url == null) {
             resource = fileToString(resourceName);
         } else {
-            resource = fileToString(url.getFile());
+            resource = fileToString(URLDecoder.decode(url.getFile(), encoding));
         }
         return resource;
     }
@@ -271,6 +276,10 @@ public class Utility
     }
 
     public static String getResourcePath(String resourceName, Class callingClass) throws IOException {
+        return getResourcePath(resourceName, callingClass, "UTF-8");
+    }
+
+    public static String getResourcePath(String resourceName, Class callingClass, String encoding) throws IOException {
         if (resourceName == null) {
             return null;
         }
@@ -282,7 +291,7 @@ public class Utility
                 resource = f.getAbsolutePath();
             }
         } else {
-            resource = url.toExternalForm();
+            resource = URLDecoder.decode(url.toExternalForm(), encoding);
         }
         if (resource != null) {
             if (resource.startsWith("file:/")) {
