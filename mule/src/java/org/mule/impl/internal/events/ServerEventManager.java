@@ -30,6 +30,7 @@ import javax.resource.spi.work.WorkManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
+import org.mule.routing.filters.WildcardFilter;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.Disposable;
@@ -51,7 +52,7 @@ public class ServerEventManager implements Work, Disposable
      */
     protected static transient Log logger = LogFactory.getLog(ServerEventManager.class);
 
-    public static final String NULL_RESOURCE_IDENTIFIER = "NULL";
+    public static final String NULL_SUBSCRIPTION = "NULL";
 
     private Map listenersMap = null;
     private Map eventsMap = null;
@@ -106,14 +107,14 @@ public class ServerEventManager implements Work, Disposable
         registerListener(listener, null);
     }
 
-    public void registerListener(UMOServerEventListener listener, String resourceIdentifier)
+    public void registerListener(UMOServerEventListener listener, String subscription)
     {
-        if (resourceIdentifier == null) {
-            resourceIdentifier = NULL_RESOURCE_IDENTIFIER;
+        if (subscription == null) {
+            subscription = NULL_SUBSCRIPTION;
         }
         TreeMap listeners = getListeners(listener.getClass());
         synchronized (listeners) {
-            listeners.put(listener, resourceIdentifier);
+            listeners.put(listener, subscription);
         }
     }
 
@@ -197,7 +198,7 @@ public class ServerEventManager implements Work, Disposable
     protected void notifyListeners(UMOServerEvent event)
     {
         TreeMap listeners;
-        String resourceIdentifier = null;
+        String subscription = null;
         Class listenerClass = null;
 
         // determine the listewner class type for the current event
@@ -221,19 +222,19 @@ public class ServerEventManager implements Work, Disposable
         synchronized (listeners) {
             for (Iterator iterator = listeners.keySet().iterator(); iterator.hasNext();) {
                 l = (UMOServerEventListener) iterator.next();
-                resourceIdentifier = (String) listeners.get(l);
-                if (resourceIdentifier == null) {
-                    resourceIdentifier = NULL_RESOURCE_IDENTIFIER;
+                subscription = (String) listeners.get(l);
+                if (subscription == null) {
+                    subscription = NULL_SUBSCRIPTION;
                 }
                 // If the listener has a resource id associated with it, make
                 // sure the event
                 // is only fired if the event resource id and listener resource
                 // id match
-                if (NULL_RESOURCE_IDENTIFIER.equals(resourceIdentifier)
-                        || resourceIdentifier.equals(event.getResourceIdentifier())) {
+                if (NULL_SUBSCRIPTION.equals(subscription)
+                        || new WildcardFilter(subscription).accept(event.getResourceIdentifier())) {
                     l.onEvent(event);
                 } else {
-                    logger.trace("Resource id '" + resourceIdentifier + "' for listener " + l.getClass().getName()
+                    logger.trace("Resource id '" + subscription + "' for listener " + l.getClass().getName()
                             + " does not match Resource id '" + event.getResourceIdentifier()
                             + "' for event, not firing event for this listener");
                 }

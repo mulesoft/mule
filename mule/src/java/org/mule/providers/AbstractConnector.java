@@ -776,9 +776,9 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
         try {
             doConnect();
-            fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_CONNECTED));
+            fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_CONNECTED));
         } catch (Exception e) {
-            fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_FAILED));
+            fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_FAILED));
             if (e instanceof ConnectException) {
                 throw (ConnectException) e;
             } else {
@@ -794,7 +794,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     public void disconnect() throws Exception {
         startedBeforeDisconnect.set(isStarted());
-        fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_DISCONNECTED));
+        fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_DISCONNECTED));
         connected.set(false);
         doDisconnect();
         stopConnector();
@@ -826,4 +826,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     }
 
+    /**
+     * The resource id used when firing ConnectEvents from this connector
+     * @return
+     */
+    protected String getConnectEventId()
+    {
+        return getName();
+    }
 }
