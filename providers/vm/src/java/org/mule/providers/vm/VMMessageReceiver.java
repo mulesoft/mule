@@ -97,8 +97,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
      */
     public Object onCall(UMOEvent event) throws UMOException
     {
-        return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getProperties()),
-                            event.isSynchronous());
+        return routeMessage(new MuleMessage(event.getTransformedMessage(), event.getMessage()), event.isSynchronous());
     }
 
     protected List getMessages() throws Exception

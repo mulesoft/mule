@@ -31,7 +31,8 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-tcp-provider</id>
+            <artifactId>mule-tcp-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -40,7 +41,18 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-http-provider</id>
+            <artifactId>mule-http-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <artifactId>mule-email-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -69,7 +81,8 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-vm-provider</id>
+            <artifactId>mule-vm-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -78,7 +91,8 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-stream-provider</id>
+            <artifactId>mule-stream-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -87,7 +101,8 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-soap-provider</id>
+            <artifactId>mule-vm-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -99,7 +114,8 @@
         <!-- JDBC deps -->
 
         <dependency>
-            <id>mule:mule-jdbc-provider</id>
+            <artifactId>mule-jdbc-provider</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -241,7 +257,8 @@
 
 
         <dependency>
-            <id>mule:mule-extras-jotm</id>
+            <artifactId>mule-extras-jotm</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -250,7 +267,8 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-extras-spring</id>
+            <artifactId>mule-extras-spring</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
@@ -259,7 +277,8 @@
             </properties>
         </dependency>
         <dependency>
-            <id>mule:mule-extras-plexus</id>
+            <artifactId>mule-extras-plexus</artifactId>
+            <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
             <properties>
