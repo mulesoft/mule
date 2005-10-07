@@ -503,6 +503,9 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
         List endpoints = new ArrayList();
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
             ApplicationListener listener = (ApplicationListener) iterator.next();
+            if(listener instanceof AsynchronousEventListener) {
+                listener = ((AsynchronousEventListener)listener).getListener();
+            }
             if (listener instanceof MuleSubscriptionEventListener) {
                 subscriptions = ((MuleSubscriptionEventListener) listener).getSubscriptions();
                 for (int i = 0; i < subscriptions.length; i++) {

@@ -16,10 +16,12 @@
    <!-- The Mule implementation of the Spring ApplicationEventMulticaster.  On startup the
    application context will look in the container for a bean called applicationEventMulticaster and
    register it as the spring context event multicaster  -->
-   <bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster"/>
+   <bean id="applicationEventMulticaster" class="org.mule.extras.spring.events.MuleEventMulticaster">
+        <property name="asynchronous" value="true"/>
+     </bean>
 
    <!-- Our ourderManager bean -->
-    <bean id="orderManager" class="org.mule.test.integration.spring.events.OrderManagerBean">
+    <bean id="orderManager" class="org.mule.test.integration.spring.events.async.AsyncOrderManagerBean">
         <property name="subscriptions">
         <list>
             <value>jms://orders.queue</value>
