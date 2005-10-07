@@ -356,9 +356,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
         try {
             doConnect();
-            connector.fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_CONNECTED));
+            connector.fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_CONNECTED));
         } catch (Exception e) {
-            connector.fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_FAILED));
+            connector.fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_FAILED));
             if (e instanceof ConnectException) {
                 throw (ConnectException) e;
             } else {
@@ -373,7 +373,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         if (logger.isDebugEnabled()) {
             logger.debug("Disconnecting from: " + endpoint.getEndpointURI());
         }
-        connector.fireEvent(new ConnectionEvent(this, ConnectionEvent.CONNECTION_DISCONNECTED));
+        connector.fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_DISCONNECTED));
         connected.set(false);
         doDisconnect();
         logger.info("Disconnected from: " + endpoint.getEndpointURI());
@@ -472,5 +472,10 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
             }
             return resultMessage;
         }
+    }
+
+    protected String getConnectEventId()
+    {
+        return connector.getName() + ".receiver";
     }
 }

@@ -31,10 +31,10 @@ public class ConnectionEvent extends UMOServerEvent
 
     private static final transient String[] ACTIONS = new String[] { "connected", "connect failed", "disconnected" };
 
-    public ConnectionEvent(UMOConnectable message, int action)
+    public ConnectionEvent(UMOConnectable resource, String identifier, int action)
     {
-        super(message, action);
-        resourceIdentifier = message.toString();
+        super(resource, action);
+        resourceIdentifier = identifier;
     }
 
     protected String getPayloadToString()
