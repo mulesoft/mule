@@ -58,22 +58,11 @@ import org.mule.umo.transformer.UMOTransformer;
 public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 {
     protected ServerSocket serverSocket = null;
-    protected UMOTransformer responseTransformer = null;
 
     public TcpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException
     {
         super(connector, component, endpoint);
-        responseTransformer = getResponseTransformer();
-    }
-
-    protected UMOTransformer getResponseTransformer() throws InitialisationException
-    {
-        UMOTransformer transformer = component.getDescriptor().getResponseTransformer();
-        if (transformer == null) {
-            return connector.getDefaultResponseTransformer();
-        }
-        return transformer;
     }
 
     public void doConnect() throws ConnectException
@@ -258,16 +247,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             OutputStream os = new ResponseOutputStream(socket.getOutputStream(), socket);
             UMOMessage returnMessage = routeMessage(new MuleMessage(adapter), endpoint.isSynchronous(), os);
             if (returnMessage != null) {
-                if (responseTransformer != null) {
-                    Object response = responseTransformer.transform(returnMessage.getPayload());
-                    if (response instanceof byte[]) {
-                        return (byte[]) response;
-                    } else {
-                        return response.toString().getBytes();
-                    }
-                } else {
-                    return returnMessage.getPayloadAsBytes();
-                }
+                return returnMessage.getPayloadAsBytes();
             } else {
                 return null;
             }

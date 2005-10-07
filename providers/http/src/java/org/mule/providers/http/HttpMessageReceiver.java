@@ -68,18 +68,6 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 //        }
     }
 
-    protected UMOTransformer getResponseTransformer() throws InitialisationException {
-        UMOTransformer transformer = super.getResponseTransformer();
-        if (transformer == null) {
-            throw new InitialisationException(new Message("http", 1), this);
-        }
-        if (!transformer.getReturnClass().equals(String.class) && !transformer.getReturnClass().equals(byte[].class)
-                && !transformer.getReturnClass().equals(Object.class)) {
-            throw new InitialisationException(new Message("http", 2, getConnector().getName()), this);
-        }
-        return transformer;
-    }
-
     protected Work createWork(Socket socket) throws SocketException {
         return new HttpWorker(socket);
     }
@@ -175,7 +163,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                         RequestContext.setEvent(new MuleEvent(returnMessage, endpoint, new MuleSession(), true));
                     }
 
-                    Object response = responseTransformer.transform(returnMessage);
+                    Object response = returnMessage.getPayload();
                     if (response instanceof byte[]) {
                         dataOut.write((byte[]) response);
                     } else {

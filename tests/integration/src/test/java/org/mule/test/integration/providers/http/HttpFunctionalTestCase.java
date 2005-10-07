@@ -119,17 +119,11 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     public void testClientWithPath() throws Exception
     {
-        UMOEndpointURI request = new MuleEndpointURI("http://www.muleumo.org/docs/apidocs");
-        HttpConnector c = (HttpConnector) createConnector();
-        c.initialise();
-        UMOMessageDispatcher d = c.getDispatcher(request.getAddress());
-        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test",
-                                                                      request,
-                                                                      c,
-                                                                      null,
-                                                                      UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                                      0,
-                                                                      null));
+        String requestAddress = "http://mule.codehaus.org/docs/apidocs/?http.method=GET";
+        UMOEndpoint ep =new MuleEndpoint(requestAddress, false);
+        ep.initialise();
+        UMOMessageDispatcher d = ep.getConnector().getDispatcher(requestAddress);
+        UMOEvent e = getTestEvent(new NullPayload(), ep);
         UMOMessage m = d.send(e);
         assertNotNull(m);
         assertNotNull(m.getPayload());

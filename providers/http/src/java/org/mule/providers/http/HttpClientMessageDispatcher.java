@@ -199,6 +199,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
 
             try {
+                connection.open();
                 httpMethod.execute(state, connection);
             } catch (BindException e) {
                 //retry

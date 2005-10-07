@@ -40,8 +40,4 @@ public class RequestInputStream extends PushbackInputStream {
         }
         return buffer;
     }
-
-    public int read(byte[] b, int off, int len) throws IOException {
-        return super.read(b, off, len);    //To change body of overridden methods use File | Settings | File Templates.
-    }
 }

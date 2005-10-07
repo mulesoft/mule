@@ -60,6 +60,8 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         callbackCalled = false;
         callbackCount = 0;
         connector = createConnector();
+        // Start the server
+        MuleManager.getInstance().start();
     }
 
     protected void doTearDown() throws Exception
@@ -75,8 +77,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
                             UMOTransactionConfig.ACTION_NONE,
                             UMOTransactionConfig.ACTION_NONE,
                             this.createEventCallback());
-        // Start the server
-        MuleManager.getInstance().start();
+
 
         sendTestData(100);
 
