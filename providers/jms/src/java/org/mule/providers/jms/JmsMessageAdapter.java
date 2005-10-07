@@ -24,6 +24,7 @@ import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.Destination;
 import java.util.Enumeration;
 
 /**
@@ -194,27 +195,14 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      * 
      * @param replyTo the endpointUri url to reply to
      */
-    // public void setReplyTo(String replyTo)
-    // {
-    // if(MuleEndpointURI.isMuleUri(replyTo))
-    // {
-    // UMOEndpointURI ep =null;
-    // try
-    // {
-    // ep = new MuleEndpointURI(replyTo);
-    // } catch (MalformedEndpointException e)
-    // {
-    // throw new IllegalArgumentException(e.getMessage());
-    // }
-    // if(ep.getScheme().equalsIgnoreCase("jms")) {
-    // properties.put("JMSReplyTo", ep.getEndpointURI());
-    // } else {
-    // properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
-    // }
-    // } else {
-    // properties.put("JMSReplyTo", replyTo);
-    // }
-    // }
+     public void setReplyTo(Object replyTo)
+     {
+        if(replyTo instanceof Destination) {
+            setProperty("JMSReplyTo", replyTo);
+        } else {
+            super.setReplyTo(replyTo);
+        }
+     }
     /**
      * Sets a replyTo address for this message. This is useful in an
      * asynchronous environment where the caller doesn't wait for a response and
@@ -240,9 +228,9 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
     */
     public void setProperty(Object key, Object value)
     {
-        if ("JMSReplyTo".equals(key)) {
-            setReplyTo(value);
-        }
+//        if ("JMSReplyTo".equals(key)) {
+//            setReplyTo(value);
+//        }
         super.setProperty(key, value);
     }
 }

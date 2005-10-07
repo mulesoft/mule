@@ -35,6 +35,7 @@ import org.mule.util.compression.CompressionHelper;
 import javax.jms.BytesMessage;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.jms.Destination;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -136,7 +137,10 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
                 if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key)) {
                     msg.setJMSCorrelationID(entry.getValue().toString());
                 }
-                msg.setObjectProperty(encodeHeader(key), entry.getValue());
+                //We dont want to set the ReplyTo property again as it will be set using JMSReplyTo
+                if(!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && entry.getValue() instanceof Destination)) {
+                    msg.setObjectProperty(encodeHeader(key), entry.getValue());
+                }
             }
 
             return msg;
