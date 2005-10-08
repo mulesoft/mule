@@ -44,7 +44,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      * The fully qualified class name of the fallback <code>Transformer</code>
      * implementation class to use, if no other can be found.
      */
-    public static final String TRANSFORMER_DEFAULT = "org.mule.transformers.DefaultTransformer";
+    public static final String TRANSFORMER_DEFAULT = "org.mule.transformers.NoActionTransformer";
 
     /**
      * logger used by this class

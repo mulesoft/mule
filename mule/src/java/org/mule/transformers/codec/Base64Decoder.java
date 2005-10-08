@@ -17,7 +17,8 @@ import java.io.IOException;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import sun.misc.BASE64Decoder;
@@ -29,7 +30,7 @@ import sun.misc.BASE64Decoder;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class Base64Decoder extends DefaultTransformer
+public class Base64Decoder extends AbstractTransformer
 {
     private BASE64Decoder decoder;
 

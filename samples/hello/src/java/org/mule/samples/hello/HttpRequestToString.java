@@ -16,7 +16,8 @@
 package org.mule.samples.hello;
 
 import org.mule.config.i18n.Message;
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
@@ -26,7 +27,7 @@ import org.mule.umo.transformer.TransformerException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpRequestToString extends DefaultTransformer
+public class HttpRequestToString extends AbstractTransformer
 {
     /**
      *

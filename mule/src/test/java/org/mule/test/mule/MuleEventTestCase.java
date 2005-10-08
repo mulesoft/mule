@@ -25,7 +25,8 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.security.UMOCredentials;
@@ -174,7 +175,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertNull("Credentials must not be created for endpoints without a password.", credentials);
     }
 
-    private class TestEventTransformer extends DefaultTransformer
+    private class TestEventTransformer extends AbstractTransformer
     {
         /*
          * (non-Javadoc)

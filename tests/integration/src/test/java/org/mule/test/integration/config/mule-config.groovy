@@ -22,7 +22,7 @@ import org.mule.tck.testmodels.mule.TestEntryPointResolver;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;

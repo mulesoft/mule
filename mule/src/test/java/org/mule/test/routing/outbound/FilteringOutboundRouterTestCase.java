@@ -22,7 +22,8 @@ import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -76,7 +77,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(!router.isMatch(message));
 
-        router.setTransformer(new DefaultTransformer() {
+        router.setTransformer(new AbstractTransformer() {
             public Object doTransform(Object src) throws TransformerException
             {
                 return ((Exception) src).getMessage();

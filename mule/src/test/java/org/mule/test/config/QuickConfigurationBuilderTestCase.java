@@ -32,7 +32,7 @@ import org.mule.routing.response.ResponseMessageRouter;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.mule.*;
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -95,7 +95,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
             t.setBeanProperty1("this was set from the manager properties!");
             m.registerTransformer(t);
 
-            DefaultTransformer t2 = new DefaultTransformer();
+            NoActionTransformer t2 = new NoActionTransformer();
             t2.setReturnClass(byte[].class);
             m.registerTransformer(t2);
 

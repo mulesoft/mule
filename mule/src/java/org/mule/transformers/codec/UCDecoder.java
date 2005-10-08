@@ -17,7 +17,8 @@ import java.io.IOException;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
@@ -27,7 +28,7 @@ import org.mule.umo.transformer.TransformerException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class UCDecoder extends DefaultTransformer
+public class UCDecoder extends AbstractTransformer
 {
     private sun.misc.UCDecoder decoder;
 

@@ -15,16 +15,17 @@
  
 package org.mule.samples.hello;
 
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 /**
- *  <code>StringToNameString</code> TODO (document class)
+ *  <code>StringToNameString</code> converts from a String to a NameString object
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class StringToNameString extends DefaultTransformer
+public class StringToNameString extends AbstractTransformer
 {
     /**
      * 

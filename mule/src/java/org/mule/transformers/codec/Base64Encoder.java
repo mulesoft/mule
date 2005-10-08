@@ -13,7 +13,8 @@
  */
 package org.mule.transformers.codec;
 
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
 import sun.misc.BASE64Encoder;
@@ -25,7 +26,7 @@ import sun.misc.BASE64Encoder;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class Base64Encoder extends DefaultTransformer
+public class Base64Encoder extends AbstractTransformer
 {
     private BASE64Encoder encoder;
 
