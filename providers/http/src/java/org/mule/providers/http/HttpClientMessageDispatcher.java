@@ -193,7 +193,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 // Add User Creds
                 StringBuffer header = new StringBuffer();
                 header.append("Basic ");
-                String creds = event.getCredentials().getUsername().getBytes() + ":" + new String(event.getCredentials().getPassword());
+                String creds = event.getCredentials().getUsername() + ":" + new String(event.getCredentials().getPassword());
                 header.append(new BASE64Encoder().encode(creds.getBytes()));
                 httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
             }
