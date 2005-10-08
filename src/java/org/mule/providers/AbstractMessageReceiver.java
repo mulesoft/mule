@@ -461,6 +461,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                     handleException(e);
                     resultMessage = message;
                 }
+            } else {
+                authorised=true;
             }
 
             if(authorised) {
