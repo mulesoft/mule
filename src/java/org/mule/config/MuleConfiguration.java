@@ -493,7 +493,7 @@ public class MuleConfiguration
 
     public void setEmbedded(boolean embedded) {
         this.embedded = embedded;
-        serverUrl=null;
+        if(embedded) serverUrl=null;
     }
 
     public String getModelType() {
