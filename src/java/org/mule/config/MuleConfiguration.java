@@ -154,7 +154,7 @@ public class MuleConfiguration
      * before returning the call. i.e. in jms wait for a replyTo. Vm queues do
      * this automatically
      */
-    private boolean synchronousReceive = false;
+    private boolean remoteSync = false;
 
     /**
      * Determines whether internal vm queues are persistent. If they are, if the
@@ -312,14 +312,14 @@ public class MuleConfiguration
         this.synchronousEventTimeout = synchronousEventTimeout;
     }
 
-    public boolean isSynchronousReceive()
+    public boolean isRemoteSync()
     {
-        return synchronousReceive;
+        return remoteSync;
     }
 
-    public void setSynchronousReceive(boolean synchronousReceive)
+    public void setRemoteSync(boolean remoteSync)
     {
-        this.synchronousReceive = synchronousReceive;
+        this.remoteSync = remoteSync;
     }
 
     public QueueProfile getQueueProfile()
