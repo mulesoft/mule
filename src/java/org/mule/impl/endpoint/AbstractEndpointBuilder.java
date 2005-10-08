@@ -77,23 +77,23 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected Properties getPropertiesForURI(URI uri) throws MalformedEndpointException {
         Properties properties = PropertiesHelper.getPropertiesFromQueryString(uri.getQuery());
 
-        String tempEndpointName = (String) properties.remove(PROPERTY_ENDPOINT_NAME);
+        String tempEndpointName = (String) properties.get(PROPERTY_ENDPOINT_NAME);
         if (tempEndpointName != null) {
             this.endpointName = tempEndpointName;
         }
         // override the endpointUri if set
-        String endpoint = (String) properties.remove(PROPERTY_ENDPOINT_URI);
+        String endpoint = (String) properties.get(PROPERTY_ENDPOINT_URI);
         if (endpoint != null) {
             this.address = endpoint;
             address = decode(address, uri);
         }
 
-        String cnnName = (String) properties.remove(PROPERTY_CONNECTOR_NAME);
+        String cnnName = (String) properties.get(PROPERTY_CONNECTOR_NAME);
         if (cnnName != null) {
             this.connectorName = cnnName;
         }
 
-        String create = (String) properties.remove(PROPERTY_CREATE_CONNECTOR);
+        String create = (String) properties.get(PROPERTY_CREATE_CONNECTOR);
         if (create != null) {
             if ("0".equals(create)) {
                 this.createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
@@ -114,7 +114,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         }
 
-        transformers = (String) properties.remove(PROPERTY_TRANSFORMERS);
+        transformers = (String) properties.get(PROPERTY_TRANSFORMERS);
         if (transformers != null) {
             transformers = transformers.replaceAll(" ", ",");
         }
