@@ -13,6 +13,8 @@
  */
 package org.mule.util;
 
+import org.mule.MuleManager;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,10 +24,10 @@ import java.security.PrivilegedAction;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.StringTokenizer;
 import java.util.Enumeration;
-import java.util.zip.ZipFile;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * <code>Utility</code> is a singleton grouping common functionality like
@@ -247,7 +249,7 @@ public class Utility
     }
 
     public static String loadResourceAsString(String resourceName, Class callingClass) throws IOException {
-        return loadResourceAsString(resourceName, callingClass, "UTF-8");
+        return loadResourceAsString(resourceName, callingClass, MuleManager.getConfiguration().getEncoding());
     }
     
     public static String loadResourceAsString(String resourceName, Class callingClass, String encoding) throws IOException {
@@ -276,7 +278,7 @@ public class Utility
     }
 
     public static String getResourcePath(String resourceName, Class callingClass) throws IOException {
-        return getResourcePath(resourceName, callingClass, "UTF-8");
+        return getResourcePath(resourceName, callingClass, MuleManager.getConfiguration().getEncoding());
     }
 
     public static String getResourcePath(String resourceName, Class callingClass, String encoding) throws IOException {
