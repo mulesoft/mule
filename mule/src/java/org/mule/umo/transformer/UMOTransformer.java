@@ -46,4 +46,6 @@ public interface UMOTransformer extends UMOSimpleTransformer
 
     boolean isSourceTypeSupported(Class aClass);
 
+    boolean isAcceptNull();
+
 }

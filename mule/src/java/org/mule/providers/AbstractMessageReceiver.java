@@ -25,10 +25,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleSession;
-import org.mule.impl.RequestContext;
-import org.mule.impl.ResponseOutputStream;
+import org.mule.impl.*;
 import org.mule.impl.internal.events.ConnectionEvent;
 import org.mule.impl.internal.events.SecurityEvent;
 import org.mule.transaction.TransactionCoordination;
@@ -38,6 +35,8 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -47,6 +46,7 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.security.SecurityException;
 import org.mule.util.concurrent.WaitableBoolean;
+import org.mule.util.Utility;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all
@@ -435,6 +435,8 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
         public UMOMessage onMessage(UMOMessage message, UMOTransaction trans,
                                     boolean synchronous, OutputStream outputStream) throws UMOException {
+
+            UMOMessage resultMessage = null;
             ResponseOutputStream ros = null;
             if (outputStream != null) {
                 if (outputStream instanceof ResponseOutputStream) {
@@ -448,34 +450,66 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
             RequestContext.setEvent(muleEvent);
 
             // Apply Security filter if one is set
+            boolean authorised = false;
             if (endpoint.getSecurityFilter() != null) {
                 try {
                     endpoint.getSecurityFilter().authenticate(muleEvent);
+                    authorised=true;
                 } catch (SecurityException e) {
                     logger.warn("Request was made but was not authenticated: " + e.getMessage(), e);
                     connector.fireEvent(new SecurityEvent(e, SecurityEvent.SECURITY_AUTHENTICATION_FAILED));
                     handleException(e);
-                    return message;
+                    resultMessage = message;
                 }
             }
-            // the security filter may update the payload so we need to get the
-            // latest event again
-            muleEvent = RequestContext.getEvent();
 
-            UMOMessage resultMessage = null;
-            // This is a replyTo event for a current request
-            if (UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType())) {
-                component.getDescriptor().getResponseRouter().route(muleEvent);
-                return null;
-            } else {
-                resultMessage = component.getDescriptor().getInboundRouter().route(muleEvent);
+            if(authorised) {
+                // the security filter may update the payload so we need to get the
+                // latest event again
+                muleEvent = RequestContext.getEvent();
+
+                // This is a replyTo event for a current request
+                if (UMOEndpoint.ENDPOINT_TYPE_RESPONSE.equals(endpoint.getType())) {
+                    component.getDescriptor().getResponseRouter().route(muleEvent);
+                    return null;
+                } else {
+                    resultMessage = component.getDescriptor().getInboundRouter().route(muleEvent);
+                }
             }
-            return resultMessage;
+            return applyResponseTransformer(resultMessage);
         }
     }
 
     protected String getConnectEventId()
     {
         return connector.getName() + ".receiver";
+    }
+
+    protected UMOMessage applyResponseTransformer(UMOMessage returnMessage) throws TransformerException {
+        UMOTransformer transformer = endpoint.getResponseTransformer();
+        if(transformer==null) transformer = component.getDescriptor().getResponseTransformer();
+        if(transformer==null) return returnMessage;
+
+        if((returnMessage==null)) {
+            if(transformer.isAcceptNull()) {
+                returnMessage = new MuleMessage(new NullPayload(), RequestContext.getProperties());
+            } else {
+                return null;
+            }
+        }
+
+        if(transformer.isSourceTypeSupported(returnMessage.getPayload().getClass())) {
+            Object result = transformer.transform(returnMessage.getPayload());
+            if(result instanceof UMOMessage) {
+                returnMessage = (UMOMessage)result;
+            } else {
+                returnMessage = new MuleMessage(result, returnMessage.getProperties());
+            }
+        } else {
+            if(logger.isDebugEnabled()) {
+                logger.debug("Response transformer: " + transformer + " doesn't support the result payload: " + returnMessage.getPayload().getClass());
+            }
+        }
+        return returnMessage;
     }
 }

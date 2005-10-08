@@ -19,6 +19,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.NullPayload;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
@@ -56,6 +57,10 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 
     public Object transform(Object src, UMOEventContext context) throws TransformerException
     {
+        //Note this transformer excepts Null as we must always return a result from the Http
+        //connector if a response transformer is present
+        if(src instanceof NullPayload) src = Utility.EMPTY_STRING;
+        
         int status = context.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
         String version = (String) context.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
         String date = format.format(new Date());
@@ -162,5 +167,9 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         } else {
            return resultPayload;
         }
+    }
+
+    public boolean isAcceptNull() {
+        return true;
     }
 }
