@@ -77,7 +77,7 @@ public class MuleConfigurationService implements MuleConfigurationServiceMBean
 
     public boolean isSynchronousReceive()
     {
-        return config.isSynchronousReceive();
+        return config.isRemoteSync();
     }
 
     public QueueProfile getQueueProfile()

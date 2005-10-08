@@ -39,7 +39,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         client.getConfiguration().setSynchronous(true);
-        client.getConfiguration().setSynchronousReceive(true);
+        client.getConfiguration().setRemoteSync(true);
 
         if (!canSendWithoutReceiver) {
             try {

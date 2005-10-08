@@ -133,12 +133,12 @@ public class MuleConfigurationFactoryBean implements FactoryBean
 
     public boolean isSynchronousReceive()
     {
-        return muleConfiguration.isSynchronousReceive();
+        return muleConfiguration.isRemoteSync();
     }
 
     public void setSynchronousReceive(boolean synchronousReceive)
     {
-        muleConfiguration.setSynchronousReceive(synchronousReceive);
+        muleConfiguration.setRemoteSync(synchronousReceive);
     }
 
     public QueueProfile getQueueProfile()

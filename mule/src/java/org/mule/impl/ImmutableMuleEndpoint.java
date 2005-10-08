@@ -611,7 +611,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public boolean isRemoteSync() {
         if(remoteSync==null) {
             if(connector==null || connector.isRemoteSyncEnabled()) {
-                remoteSync = new Boolean(MuleManager.getConfiguration().isSynchronousReceive());
+                remoteSync = new Boolean(MuleManager.getConfiguration().isRemoteSync());
             } else {
                 remoteSync = Boolean.FALSE;
             }

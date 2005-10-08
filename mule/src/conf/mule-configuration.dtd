@@ -73,7 +73,13 @@
      Determines whether when running synchronously, return events are received before
      returning the call. i.e. in jms wait for a replyTo. Vm queues do this automatically
 -->
-<!ATTLIST mule-environment-properties synchronousReceive  		(true | false)          "false">
+<!ATTLIST mule-environment-properties remoteSync  		(true | false)          "false">
+
+<!--
+     Determines if Mule is running embedded and can be used to disable certain services and also hide the
+     start splash
+-->
+<!ATTLIST mule-environment-properties embedded  		(true | false)          "false">
 
 <!--
      Is the default endpointUri where Mule can receive Action requests such as running a

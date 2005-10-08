@@ -56,7 +56,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
      {
      MuleClient client = new MuleClient();
      MuleManager.getConfiguration().setSynchronous(true);
-     MuleManager.getConfiguration().setSynchronousReceive(true);
+     MuleManager.getConfiguration().setRemoteSync(true);
 
      UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
      assertNotNull(message);
@@ -67,7 +67,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
      {
      MuleClient client = new MuleClient();
      MuleManager.getConfiguration().setSynchronous(true);
-     MuleManager.getConfiguration().setSynchronousReceive(true);
+     MuleManager.getConfiguration().setRemoteSync(true);
 
      for(int i = 0;i < 100;i++) {
      UMOMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);

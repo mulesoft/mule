@@ -113,7 +113,7 @@ public class MuleService implements MuleServiceMBean
 
     public boolean isSynchronousReceive()
     {
-        return MuleManager.getConfiguration().isSynchronousReceive();
+        return MuleManager.getConfiguration().isRemoteSync();
     }
 
     public boolean isRecoverableMode()

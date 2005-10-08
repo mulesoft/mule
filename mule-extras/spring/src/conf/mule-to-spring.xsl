@@ -51,9 +51,9 @@
                     <xsl:value-of select="@synchronous"/>
                 </value>
             </property>
-            <property name="synchronousReceive">
+            <property name="remoteSync">
                 <value>
-                    <xsl:value-of select="@synchronousReceive"/>
+                    <xsl:value-of select="@remoteSync"/>
                 </value>
             </property>
             <property name="workingDirectory">
