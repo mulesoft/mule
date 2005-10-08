@@ -16,7 +16,6 @@ package org.mule.providers.jms.transformers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
@@ -25,17 +24,12 @@ import org.mule.impl.internal.events.ConnectionEventListener;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.endpoint.UMOImmutableEndpoint;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.compression.CompressionHelper;
 
-import javax.jms.BytesMessage;
-import javax.jms.Message;
-import javax.jms.Session;
-import javax.jms.Destination;
+import javax.jms.*;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -139,7 +133,13 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
                 }
                 //We dont want to set the ReplyTo property again as it will be set using JMSReplyTo
                 if(!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && entry.getValue() instanceof Destination)) {
-                    msg.setObjectProperty(encodeHeader(key), entry.getValue());
+                    try {
+                        msg.setObjectProperty(encodeHeader(key), entry.getValue());
+                    } catch (JMSException e) {
+                        //Various Jms servers have slightly different rules to what can be set as an object property on the message
+                        //As such we have to take a hit n' hope approach
+                        if(logger.isDebugEnabled()) logger.debug("Unable to set property '" + encodeHeader(key) + "' of type " +  entry.getValue().getClass().getName() + "': " + e.getMessage());
+                    }
                 }
             }
 
