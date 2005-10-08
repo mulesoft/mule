@@ -15,10 +15,11 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
-public class ObjectToFruitLover extends DefaultTransformer
+public class ObjectToFruitLover extends AbstractTransformer
 {
     public ObjectToFruitLover()
     {

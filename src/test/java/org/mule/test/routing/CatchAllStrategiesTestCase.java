@@ -24,7 +24,8 @@ import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transformers.DefaultTransformer;
+import org.mule.transformers.NoActionTransformer;
+import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -84,7 +85,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         assertNotNull(strategy.getEndpoint());
     }
 
-    private class TestEventTransformer extends DefaultTransformer
+    private class TestEventTransformer extends AbstractTransformer
     {
         /*
          * (non-Javadoc)

@@ -56,7 +56,7 @@
                 <container-property name="containerProperty" reference="java.lang.String"/> 
             </properties>
         </transformer>
-        <transformer name="TestTransformer" className="org.mule.transformers.DefaultTransformer"
+        <transformer name="TestTransformer" className="org.mule.transformers.NoActionTransformer"
         			returnClass="[B" />
     </transformers>
 
