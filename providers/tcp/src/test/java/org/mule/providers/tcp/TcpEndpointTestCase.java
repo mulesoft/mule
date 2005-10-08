@@ -60,7 +60,7 @@ public class TcpEndpointTestCase extends NamedTestCase
         assertEquals("localhost", url.getHost());
         assertEquals("tcp://localhost:7856?param=1&endpointName=tcpProvider&blankParam=", url.toString());
         assertEquals("param=1&endpointName=tcpProvider&blankParam=", url.getQuery());
-        assertEquals(2, url.getParams().size());
+        assertEquals(3, url.getParams().size());
         assertEquals("1", url.getParams().getProperty("param"));
         assertEquals("", url.getParams().getProperty("blankParam"));
     }

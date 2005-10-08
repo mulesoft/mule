@@ -63,7 +63,7 @@ public class EjbEndpointTestCase extends NamedTestCase
         assertEquals("ejb://localhost:1099/BeeShirtsejbServer?method=testMethod&endpointName=ejbProvider&blankParam=",
                      url.toString());
         assertEquals("method=testMethod&endpointName=ejbProvider&blankParam=", url.getQuery());
-        assertEquals(2, url.getParams().size());
+        assertEquals(3, url.getParams().size());
         assertEquals("testMethod", url.getParams().getProperty("method"));
         assertEquals("", url.getParams().getProperty("blankParam"));
     }

@@ -60,7 +60,7 @@ public class SslEndpointTestCase extends NamedTestCase
         assertEquals("localhost", url.getHost());
         assertEquals("ssl://localhost:7856?param=1&endpointName=sslProvider&blankParam=", url.toString());
         assertEquals("param=1&endpointName=sslProvider&blankParam=", url.getQuery());
-        assertEquals(2, url.getParams().size());
+        assertEquals(3, url.getParams().size());
         assertEquals("1", url.getParams().getProperty("param"));
         assertEquals("", url.getParams().getProperty("blankParam"));
     }

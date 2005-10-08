@@ -78,16 +78,16 @@ public class EmailEndpointsTestCase extends NamedTestCase
 
     public void testSmtpUrlEmailUsernameAndParams() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://test%40tippitinc.com:password@smtpout.secureserver.net:3535?address=test@tippitinc.com&ccAddresses=entropy@loopysoft.com");
+        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://test%40muleumo.org:password@smtpout.secureserver.net:3535?address=test@muleumo.org&ccAddresses=donkey@muleumo.org");
         assertEquals("smtp", endpointUri.getScheme());
-        assertEquals("test@tippitinc.com", endpointUri.getAddress());
+        assertEquals("test@muleumo.org", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
         assertEquals(3535, endpointUri.getPort());
         assertEquals("smtpout.secureserver.net", endpointUri.getHost());
-        assertEquals("test@tippitinc.com:password", endpointUri.getUserInfo());
-        assertEquals("smtp://test%40tippitinc.com:password@smtpout.secureserver.net:3535?address=test@tippitinc.com&ccAddresses=entropy@loopysoft.com", endpointUri.toString());
-        assertEquals(1, endpointUri.getParams().size());
-        assertEquals("entropy@loopysoft.com", endpointUri.getParams().get("ccAddresses"));
+        assertEquals("test@muleumo.org:password", endpointUri.getUserInfo());
+        assertEquals("smtp://test%40muleumo.org:password@smtpout.secureserver.net:3535?address=test@muleumo.org&ccAddresses=donkey@muleumo.org", endpointUri.toString());
+        assertEquals(2, endpointUri.getParams().size());
+        assertEquals("donkey@muleumo.org", endpointUri.getParams().get("ccAddresses"));
 
     }
 
@@ -97,16 +97,33 @@ public class EmailEndpointsTestCase extends NamedTestCase
      */
     public void testSmtpUrlEmailUsernameWithoutAddressParam() throws Exception
     {
-        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://test%40tippitinc.com:password@smtpout.secureserver.net:3535?ccAddresses=entropy@loopysoft.com");
+        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://test%40muleumo.org:password@smtpout.secureserver.net:3535?ccAddresses=donkey@muleumo.org");
         assertEquals("smtp", endpointUri.getScheme());
-        assertEquals("test@tippitinc.com", endpointUri.getAddress());
+        assertEquals("test@muleumo.org", endpointUri.getAddress());
         assertNull(endpointUri.getEndpointName());
         assertEquals(3535, endpointUri.getPort());
         assertEquals("smtpout.secureserver.net", endpointUri.getHost());
-        assertEquals("test@tippitinc.com:password", endpointUri.getUserInfo());
-        assertEquals("smtp://test%40tippitinc.com:password@smtpout.secureserver.net:3535?ccAddresses=entropy@loopysoft.com", endpointUri.toString());
+        assertEquals("test@muleumo.org:password", endpointUri.getUserInfo());
+        assertEquals("smtp://test%40muleumo.org:password@smtpout.secureserver.net:3535?ccAddresses=donkey@muleumo.org", endpointUri.toString());
         assertEquals(1, endpointUri.getParams().size());
-        assertEquals("entropy@loopysoft.com", endpointUri.getParams().get("ccAddresses"));
+        assertEquals("donkey@muleumo.org", endpointUri.getParams().get("ccAddresses"));
 
+    }
+
+    /**
+     * Mule will assume that the username is the from address as it has an @ symbol in it
+     * @throws Exception
+     */
+    public void testSmtpWithoutCredentials() throws Exception
+    {
+        MuleEndpointURI endpointUri = new MuleEndpointURI("smtp://smtpout.secureserver.net:3535?address=test@muleumo.org");
+        assertEquals("smtp", endpointUri.getScheme());
+        assertEquals("test@muleumo.org", endpointUri.getAddress());
+        assertNull(endpointUri.getEndpointName());
+        assertEquals(3535, endpointUri.getPort());
+        assertEquals("smtpout.secureserver.net", endpointUri.getHost());
+        assertNull(endpointUri.getUserInfo());
+        assertEquals("smtp://smtpout.secureserver.net:3535?address=test@muleumo.org", endpointUri.toString());
+        assertEquals(1, endpointUri.getParams().size());
     }
 }

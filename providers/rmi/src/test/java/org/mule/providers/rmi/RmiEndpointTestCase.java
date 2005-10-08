@@ -63,7 +63,7 @@ public class RmiEndpointTestCase extends NamedTestCase
         assertEquals("rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod&endpointName=rmiProvider&blankParam=",
                      url.toString());
         assertEquals("method=testMethod&endpointName=rmiProvider&blankParam=", url.getQuery());
-        assertEquals(2, url.getParams().size());
+        assertEquals(3, url.getParams().size());
         assertEquals("testMethod", url.getParams().getProperty("method"));
         assertEquals("", url.getParams().getProperty("blankParam"));
     }
