@@ -17,14 +17,15 @@ package org.mule.util.concurrent;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * @author Holger Hoffstaette
  */
 
 /**
- * A handler for unexecutable tasks that waits until the task can be
- * submitted for execution.
+ * A handler for unexecutable tasks that waits until the task can be submitted
+ * for execution or times out.
  * 
  * Generously snipped from the jsr166 repository at:
  * http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/main/java/util/concurrent/ThreadPoolExecutor.java
@@ -32,29 +33,42 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
  */
 public class WaitPolicy implements RejectedExecutionHandler
 {
+	private long _time;
+	private TimeUnit _timeUnit;
+
 	/**
-	 * Constructs a <tt>WaitPolicy</tt>.
+	 * Constructs a <tt>WaitPolicy</tt> which waits (almost) forever.
 	 */
 	public WaitPolicy()
 	{
+		// effectively waits forever
+		this(Long.MAX_VALUE, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * Constructs a <tt>WaitPolicy</tt> with timeout.
+	 */
+	public WaitPolicy(long time, TimeUnit timeUnit)
+	{
+		super();
+		_time = time;
+		_timeUnit = timeUnit;
 	}
 
 	public void rejectedExecution(Runnable r, ThreadPoolExecutor e)
 	{
-		if (!e.isShutdown())
+		try
 		{
-			try
+			if (e.isShutdown() || !e.getQueue().offer(r, _time, _timeUnit))
 			{
-				// TODO add a customizable timeout to avoid deadlocks
-				// see http://altair.cs.oswego.edu/pipermail/concurrency-interest/2004-April/000943.html
-				e.getQueue().put(r);
-			}
-			catch (InterruptedException ie)
-			{
-				Thread.currentThread().interrupt();
-				throw new RejectedExecutionException(ie);
+				throw new RejectedExecutionException();
 			}
 		}
+		catch (InterruptedException ie)
+		{
+			Thread.currentThread().interrupt();
+			throw new RejectedExecutionException(ie);
+		}
 	}
-}
 
+}
