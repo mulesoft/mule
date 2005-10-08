@@ -37,8 +37,6 @@ import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
 import org.mule.util.queue.QueueSession;
 
@@ -214,7 +212,6 @@ public class MuleProxy implements Work, Lifecycle
         logger.trace("MuleProxy: sync call for Mule UMO " + descriptor.getName());
 
         UMOMessage returnMessage = null;
-        UMOTransformer responseTransformer = null;
         try {
             if (event.getEndpoint().canReceive()) {
                 RequestContext.setEvent(event);
@@ -223,7 +220,6 @@ public class MuleProxy implements Work, Lifecycle
                 if (replyTo != null) {
                     replyToHandler = ((AbstractConnector) event.getEndpoint().getConnector()).getReplyToHandler();
                 }
-                responseTransformer = event.getEndpoint().getResponseTransformer();
                 InterceptorsInvoker invoker = new InterceptorsInvoker(interceptorList, descriptor, event.getMessage());
 
                 // stats
@@ -290,8 +286,7 @@ public class MuleProxy implements Work, Lifecycle
                                                                    descriptor.getName()), event.getMessage(), e));
             }
         }
-        //Finally apply response transformer
-        return applyResponseTransformer(returnMessage, responseTransformer);
+        return returnMessage;
     }
 
     /**
@@ -449,25 +444,5 @@ public class MuleProxy implements Work, Lifecycle
     public UMOImmutableDescriptor getDescriptor()
     {
         return descriptor;
-    }
-
-    protected UMOMessage applyResponseTransformer(UMOMessage returnMessage, UMOTransformer transformer) throws TransformerException {
-        if(returnMessage==null) return null;
-        if(transformer==null) transformer = descriptor.getResponseTransformer();
-        if(transformer==null) return returnMessage;
-
-        if(transformer.isSourceTypeSupported(returnMessage.getPayload().getClass())) {
-            Object result = transformer.transform(returnMessage.getPayload());
-            if(result instanceof UMOMessage) {
-                returnMessage = (UMOMessage)result;
-            } else {
-                returnMessage = new MuleMessage(result, returnMessage.getProperties());
-            }
-        } else {
-            if(logger.isDebugEnabled()) {
-                logger.debug("Response transformer: " + transformer + " doesn't support the result payload: " + returnMessage.getPayload().getClass());
-            }
-        }
-        return returnMessage;
     }
 }
