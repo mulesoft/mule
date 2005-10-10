@@ -41,6 +41,7 @@ public class ThreadingProfile
     public static final int WHEN_EXHAUSTED_DISCARD_OLDEST = 2;
     public static final int WHEN_EXHAUSTED_ABORT = 3;
     public static final int WHEN_EXHAUSTED_RUN = 4;
+
     /**
      * Default value for MAX_THREADS_ACTIVE
      */
@@ -57,7 +58,10 @@ public class ThreadingProfile
      * Default value for MAX_THREAD_TTL
      */
     public static final long DEFAULT_MAX_THREAD_TTL = 60000;
-
+	/**
+	 * Default value for DEFAULT_THREAD_WAIT_TIMEOUT
+	 */
+    public static final long DEFAULT_THREAD_WAIT_TIMEOUT = 30000L;
     /**
      * Default value for do threading
      */
@@ -71,6 +75,7 @@ public class ThreadingProfile
     private int maxThreadsIdle = DEFAULT_MAX_THREADS_IDLE;
     private int maxBufferSize = DEFAULT_MAX_BUFFER_SIZE;
     private long threadTTL = DEFAULT_MAX_THREAD_TTL;
+    private long threadWaitTimeout = DEFAULT_THREAD_WAIT_TIMEOUT;
     private int poolExhaustPolicy = DEFAULT_POOL_EXHAUST_ACTION;
     private boolean doThreading = DEFAULT_DO_THREADING;
     private int threadPriority = Thread.NORM_PRIORITY;
@@ -128,6 +133,11 @@ public class ThreadingProfile
         return threadTTL;
     }
 
+	public long getThreadWaitTimeout()
+	{
+		return threadWaitTimeout;
+	}
+
     public int getThreadPriority()
     {
         return threadPriority;
@@ -167,6 +177,11 @@ public class ThreadingProfile
     {
         this.threadTTL = threadTTL;
     }
+
+	public void setThreadWaitTimeout(long threadWaitTimeout)
+	{
+		this.threadWaitTimeout = threadWaitTimeout;
+	}
 
     public void setPoolExhaustedAction(int poolExhaustPolicy)
     {
@@ -266,11 +281,11 @@ public class ThreadingProfile
 	            break;
 	        }
 	        case WHEN_EXHAUSTED_WAIT: {
-	            pool.setRejectedExecutionHandler(new WaitPolicy());
+	            pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
 	            break;
 	        }
 	        default: {
-	            pool.setRejectedExecutionHandler(new WaitPolicy());
+	            pool.setRejectedExecutionHandler(new WaitPolicy(threadWaitTimeout, TimeUnit.MILLISECONDS));
 	            break;
 	        }
         }
@@ -339,4 +354,5 @@ public class ThreadingProfile
             return new MuleWorkManager(profile, name);
         }
     }
+
 }
