@@ -189,6 +189,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             if (MuleManager.getInstance().getTransactionManager() != null) {
                 connectionFactory = new ConnectionFactoryWrapper(connectionFactory,
                                                                  MuleManager.getInstance().getTransactionManager());
+            } else {
+                throw new InitialisationException(new Message("jms", 10), this);
             }
         }else if (temp != null && temp instanceof ConnectionFactory) {
             connectionFactory = (ConnectionFactory) temp;
