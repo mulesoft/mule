@@ -159,11 +159,13 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     protected UMOMessage handleUnacceptedFilter(UMOMessage message)
     {
         super.handleUnacceptedFilter(message);
-        Message msg = (Message) message.getPayload();
-        try {
-            msg.setFlag(Flags.Flag.DELETED, endpoint.isDeleteUnacceptedMessages());
-        } catch (MessagingException e) {
-            logger.error("failled to set message deleted: " + e.getMessage(), e);
+        if(message.getPayload() instanceof Message) {
+            Message msg = (Message) message.getPayload();
+            try {
+                msg.setFlag(Flags.Flag.DELETED, endpoint.isDeleteUnacceptedMessages());
+            } catch (MessagingException e) {
+                logger.error("failled to set message deleted: " + e.getMessage(), e);
+            }
         }
         return null;
     }
