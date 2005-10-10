@@ -35,7 +35,7 @@ public class ReflectionMessageBuilder extends AbstractMessageBuilder {
         Object property = response.getPayload();
         List methods = null;
         try {
-            methods = ClassHelper.getSatisfiableMethods(master.getClass(), new Class[]{property.getClass()}, true, true);
+            methods = ClassHelper.getSatisfiableMethods(master.getClass(), new Class[]{property.getClass()}, true, true, false);
         } catch (Exception e) {
             throw new MessageBuilderException(request, e);
         }
