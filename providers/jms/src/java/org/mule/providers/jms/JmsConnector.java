@@ -185,13 +185,18 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     {
 
         Object temp = jndiContext.lookup(connectionFactoryJndiName);
-
-        if (temp instanceof ConnectionFactory) {
-            return (ConnectionFactory) temp;
+        if (temp != null && temp instanceof XAConnectionFactory) {
+            if (MuleManager.getInstance().getTransactionManager() != null) {
+                connectionFactory = new ConnectionFactoryWrapper(connectionFactory,
+                                                                 MuleManager.getInstance().getTransactionManager());
+            }
+        }else if (temp != null && temp instanceof ConnectionFactory) {
+            connectionFactory = (ConnectionFactory) temp;
         } else {
             throw new InitialisationException(new Message(Messages.JNDI_RESOURCE_X_NOT_FOUND, connectionFactoryJndiName),
                                               this);
         }
+        return connectionFactory;
     }
 
     protected Connection createConnection() throws NamingException, JMSException, InitialisationException
@@ -199,12 +204,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         Connection connection = null;
         if (connectionFactory == null) {
             connectionFactory = createConnectionFactory();
-        }
-        if (connectionFactory != null && connectionFactory instanceof XAConnectionFactory) {
-            if (MuleManager.getInstance().getTransactionManager() != null) {
-                connectionFactory = new ConnectionFactoryWrapper(connectionFactory,
-                                                                 MuleManager.getInstance().getTransactionManager());
-            }
         }
 
         if (username != null) {
