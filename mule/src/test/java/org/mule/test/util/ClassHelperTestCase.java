@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
+import java.lang.reflect.Method;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -137,16 +138,39 @@ public class ClassHelperTestCase extends TestCase
 
     public void testGetSatisfiableMethods() throws Exception
     {
-        List methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true, true);
+        List methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true, true, true);
         assertNotNull(methods);
         assertEquals(1, methods.size());
 
-        methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true);
+        methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, false, true, true);
         assertNotNull(methods);
         assertEquals(0, methods.size());
 
-        methods = ClassHelper.getSatisfiableMethods(FruitBowl.class, new Class[]{WaterMelon.class}, true, true);
+        //Test object param being unacceptible
+        methods = ClassHelper.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, false);
         assertNotNull(methods);
         assertEquals(0, methods.size());
+
+        //Test object param being acceptible
+        methods = ClassHelper.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, true, true, true);
+        assertNotNull(methods);
+        assertEquals(2, methods.size());
+
+        //Test object param being acceptible but not void
+        methods = ClassHelper.getSatisfiableMethods(DummyObject.class, new Class[]{WaterMelon.class}, false, true, true);
+        assertNotNull(methods);
+        assertEquals(1, methods.size());
+        assertEquals("doSomethingElse", ((Method)methods.get(0)).getName());
+    }
+
+    private class DummyObject {
+
+        public void doSomething(Object object) {
+            //do nothing
+        }
+
+        public Object doSomethingElse(Object object) {
+            return object;
+        }
     }
 }

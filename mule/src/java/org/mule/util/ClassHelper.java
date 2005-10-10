@@ -340,13 +340,16 @@ public class ClassHelper {
      * @param voidOk         whether void methods shouldbe included in the found list
      * @param ignoreEquals   whether to ignore the equals method in the methods
      *                       returned
+     * @param matchOnObject  Determines whether parameters of OBject type are matched when they are
+     *                       of Object.class type
      * @return a list of methods on the class that match the criteria. If there
      *         are none, an empty list is returned
      */
     public static List getSatisfiableMethods(Class implementation,
                                              Class[] parameterTypes,
                                              boolean voidOk,
-                                             boolean ignoreEquals) {
+                                             boolean ignoreEquals,
+                                             boolean matchOnObject) {
 
         List result = new ArrayList();
         List methods = Arrays.asList(implementation.getMethods());
@@ -354,7 +357,7 @@ public class ClassHelper {
             Method method = (Method) iterator.next();
             Class[] methodParams = method.getParameterTypes();
 
-            if (compare(methodParams, parameterTypes)) {
+            if (compare(methodParams, parameterTypes, matchOnObject)) {
 
                 if ((method.getName().equals("equals") && !ignoreEquals) || !method.getName().equals("equals")) {
                     if ((method.getReturnType().getName().equals("void") && voidOk)
@@ -412,12 +415,16 @@ public class ClassHelper {
         return name.substring(name.lastIndexOf(".") + 1);
     }
 
-    public static boolean compare(Class[] c1, Class[] c2) {
+    public static boolean compare(Class[] c1, Class[] c2, boolean matchOnObject) {
         if (c1.length != c2.length) {
             return false;
         }
         for (int i = 0; i < c1.length; i++) {
-            if (!c1[i].equals(Object.class) && !c1[i].isAssignableFrom(c2[i])) {
+            if(c1[i].equals(Object.class) && !matchOnObject) {
+                return false;
+            }
+            if (!c1[i].isAssignableFrom(c2[i])) {
+                
                 return false;
             }
         }

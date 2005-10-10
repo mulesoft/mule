@@ -94,7 +94,8 @@ public class DynamicEntryPoint implements UMOEntryPoint
         List methods = ClassHelper.getSatisfiableMethods(component.getClass(),
                                                          ClassHelper.getClassTypes(context),
                                                          true,
-                                                         true);
+                                                         true,
+                                                         false);
         if (methods.size() == 1) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Dynamic Entrypoint using method: " + component.getClass().getName() + "."
@@ -105,6 +106,7 @@ public class DynamicEntryPoint implements UMOEntryPoint
         } else {
             methods = ClassHelper.getSatisfiableMethods(component.getClass(),
                                                         ClassHelper.getClassTypes(payload),
+                                                        true,
                                                         true,
                                                         true);
             if (methods.size() == 1) {
