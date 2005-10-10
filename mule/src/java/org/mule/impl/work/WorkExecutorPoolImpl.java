@@ -72,7 +72,7 @@ public class WorkExecutorPoolImpl implements WorkExecutorPool
     {
         pooledExecutor = new ThreadPoolExecutor(0, maxSize, 60L, TimeUnit.SECONDS, queue);
         pooledExecutor.setCorePoolSize(maxSize);
-        pooledExecutor.setRejectedExecutionHandler(new WaitPolicy());
+        pooledExecutor.setRejectedExecutionHandler(new WaitPolicy(ThreadingProfile.DEFAULT_THREAD_WAIT_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
     /**

@@ -167,10 +167,10 @@ Implementations must implement org.mule.umo.UMOPoolFactory.
 <!ATTLIST pooling-profile factory  		NMTOKEN					"org.mule.config.pool.CommonsPoolFactory">
 
 
-
 <!ELEMENT threading-profile EMPTY>
 
-<!-- The threading profile system id.  This is used to identify which system
+<!--
+The threading profile system id.  This is used to identify which system
 component should use the profile. This attribute is only used when declaring profiles on
 the mule-evironment-properties element and on connector components where 'messageReciever'
 or 'messageSender' can be used. For all other cases it can be set to 'default'.
@@ -178,19 +178,19 @@ or 'messageSender' can be used. For all other cases it can be set to 'default'.
 <!ATTLIST threading-profile id  (receiver|dispatcher|component|default)  "default">
 
 <!--
-    Controls the maximum number of threads that can be executed at any one time in a thread
-    pool
+Controls the maximum number of threads that can be executed at any one time in a
+thread pool
 -->
 <!ATTLIST threading-profile maxThreadsActive        		NMTOKEN         		#IMPLIED>
 
 <!--
-	Controls the maximum number threads that can be inactive or idle in a thread pool before they
-    are destroyed.
+Controls the maximum number threads that can be inactive or idle in a thread pool before
+they are destroyed.
 -->
 
 <!ATTLIST threading-profile maxThreadsIdle          		NMTOKEN         		#IMPLIED>
 <!--
-	Detemines how long an inactive thread is kept in the pool before being discarded
+Detemines how long an inactive thread is kept in the pool before being discarded
 -->
 <!ATTLIST threading-profile threadTTL           		NMTOKEN         		#IMPLIED>
 <!--
@@ -198,9 +198,12 @@ If the maximum pool size or queue size is bounded, then it is possible for incom
 There are five supported policies for handling this situation.
 
 <ol>
-<li>RUN (the default) - The thread making the execute request runs the task itself. This policy helps guard against lockup.
+<li>RUN (the default) - The thread making the execute request runs the task itself.
+ This policy helps guard against lockup.
 </li>
-<li>WAIT - Wait until a thread becomes available. This policy should, in general, not be used if the minimum number of of threads is zero, in which case a thread may never become available.
+<li>WAIT - Wait until a thread becomes available (or until the configurable timeout expires).
+This policy should, in general, not be used if the minimum number of of threads is zero, in
+ which case a thread may never become available.
 </li>
 <li>ABORT - Throw a RuntimeException
 </li>
@@ -213,7 +216,13 @@ There are five supported policies for handling this situation.
 <!ATTLIST threading-profile poolExhaustedAction 	(WAIT | DISCARD | DISCARD_OLDEST | ABORT | RUN)       "RUN">
 
 <!--
-determines whether threading is enabled for a connector.  It's useful to set this to false
+Allows configuration of a waiting timeout for threads that are blocked when WAIT
+has been configured as poolExhaustedAction
+-->
+<!ATTLIST threading-profile threadWaitTimeout    NMTOKEN    #IMPLIED>
+
+<!--
+Determines whether threading is enabled for a connector.  It's useful to set this to false
 when testing.  Setting it on the defaultThreadingProfile on the Mule configuration will disable
 threading in every connector
 -->
