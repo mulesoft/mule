@@ -18,6 +18,8 @@ import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
+import javax.mail.Authenticator;
+
 /**
  * <code>Pop3Connector</code> is used to connect and receive mail from a pop3
  * mailbox
@@ -25,7 +27,7 @@ import org.mule.umo.provider.UMOMessageReceiver;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class Pop3Connector extends AbstractServiceEnabledConnector
+public class Pop3Connector extends AbstractServiceEnabledConnector implements MailConnector
 {
     public static final String MAILBOX = "INBOX";
     public static final int DEFAULT_POP3_PORT = 110;
@@ -41,6 +43,17 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
      * holds a path where messages should be backed up to
      */
     private String backupFolder = null;
+
+     /**
+     * A custom authenticator to bew used on any mail sessions created with this connector
+     * This will only be used if user name credendtials are set on the endpoint
+     */
+    private Authenticator authenticator = null;
+
+    /**
+     * Default mail port if one is not set
+     */
+    private int port = DEFAULT_POP3_PORT;
 
     /**
      * @return
@@ -94,6 +107,21 @@ public class Pop3Connector extends AbstractServiceEnabledConnector
     {
         Object[] args = {new Long(checkFrequency), backupFolder};
         return serviceDescriptor.createMessageReceiver(this, component, endpoint, args); 
-    } 
- 
+    }
+
+    public Authenticator getAuthenticator() {
+        return authenticator;
+    }
+
+    public void setAuthenticator(Authenticator authenticator) {
+        this.authenticator = authenticator;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

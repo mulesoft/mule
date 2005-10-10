@@ -21,11 +21,13 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.AlreadyInitialisedException;
 import org.mule.providers.email.SmtpConnector;
 import org.mule.providers.email.transformers.EmailMessageToString;
 import org.mule.providers.email.transformers.StringToEmailMessage;
 import org.mule.tck.AbstractTransformerTestCase;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
@@ -50,6 +52,13 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     {
         StringToEmailMessage trans = new StringToEmailMessage();
         UMOEndpoint endpoint = new MuleEndpoint("smtp://a:a@a.com", false);
+
+        //We need to init the connect without actully connecting for this test case
+        try {
+            endpoint.getConnector().initialise();
+        } catch (AlreadyInitialisedException e) {
+            //ignore
+        }
         final Mock mockDispatcher = new Mock(UMOMessageDispatcher.class);
         mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));
         mockDispatcher.expectAndReturn("getDelegateSession", Session.getDefaultInstance(new Properties()));

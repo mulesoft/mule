@@ -1,6 +1,6 @@
-connector=org.mule.providers.email.ImapConnector
-dispatcher.factory=org.mule.providers.email.Pop3MessageDispatcherFactory
-message.receiver=org.mule.providers.email.MailMessageReceiver
+connector=org.mule.providers.email.SmtpsConnector
+dispatcher.factory=org.mule.providers.email.SmtpMessageDispatcherFactory
+#message.receiver=
 message.adapter=org.mule.providers.email.MailMessageAdapter
 inbound.transformer=org.mule.providers.email.transformers.EmailMessageToString
 outbound.transformer=org.mule.providers.email.transformers.StringToEmailMessage

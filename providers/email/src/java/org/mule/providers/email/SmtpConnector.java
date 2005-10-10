@@ -29,11 +29,11 @@
 package org.mule.providers.email;
 
 import java.util.Calendar;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Properties;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -44,6 +44,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOMessageReceiver;
 
@@ -54,19 +55,10 @@ import org.mule.umo.provider.UMOMessageReceiver;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SmtpConnector extends AbstractServiceEnabledConnector
+public class SmtpConnector extends AbstractServiceEnabledConnector implements MailConnector
 {
-    /**
-     * Event properties
-     */
-    public static final String TO_ADDRESSES_PROPERTY = "toAddresses";
-    public static final String CC_ADDRESSES_PROPERTY = "ccAddresses";
-    public static final String BCC_ADDRESSES_PROPERTY = "bccAddresses";
-    public static final String FROM_ADDRESS_PROPERTY = "fromAddress";
-    public static final String SUBJECT_PROPERTY = "subject";
-
     public static final int DEFAULT_SMTP_PORT = 25;
-
+    public static final String DEFAULT_CONTENT_TYPE = "text/plain";
     /**
      * Holds value of bcc addresses.
      */
@@ -76,6 +68,11 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
      * Holds value of cc addresses.
      */
     private String cc;
+
+    /**
+     * Holds value of replyTo addresses.
+     */
+    private String replyTo;
 
     /**
      * determines whether a mailbox connection is active
@@ -112,11 +109,21 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
      */
     private String username;
 
-    public SmtpConnector() throws Exception
-    {
-        super.doInitialise();
-    }
+    /**
+     * Any custom headers to be set on messages sent using this connector
+     */
+    private Properties customHeaders = new Properties();
 
+    /**
+     * A custom authenticator to bew used on any mail sessions created with this connector
+     * This will only be used if user name credendtials are set on the endpoint
+     */
+    private Authenticator authenticator = null;
+
+    public SmtpConnector() throws InitialisationException
+    {
+        initFromServiceDescriptor();
+    }
     /*
      * (non-Javadoc)
      * 
@@ -378,4 +385,27 @@ public class SmtpConnector extends AbstractServiceEnabledConnector
         this.port = port;
     }
 
+    public String getReplyToAddresses() {
+        return replyTo;
+    }
+
+    public void setReplyToAddresses(String replyTo) {
+        this.replyTo = replyTo;
+    }
+
+    public Properties getCustomHeaders() {
+        return customHeaders;
+    }
+
+    public void setCustomHeaders(Properties customHeaders) {
+        this.customHeaders = customHeaders;
+    }
+
+    public Authenticator getAuthenticator() {
+        return authenticator;
+    }
+
+    public void setAuthenticator(Authenticator authenticator) {
+        this.authenticator = authenticator;
+    }
 }

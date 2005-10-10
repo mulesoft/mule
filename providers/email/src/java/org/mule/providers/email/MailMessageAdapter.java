@@ -18,6 +18,7 @@ package org.mule.providers.email;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
 import javax.mail.Address;
@@ -25,6 +26,7 @@ import javax.mail.Header;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.internet.MimeMultipart;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -39,14 +41,6 @@ import java.util.Enumeration;
  */
 public class MailMessageAdapter extends AbstractMessageAdapter {
 
-    public static final String PROPERTY_TO_ADDRESSES = "toAddresses";
-    public static final String PROPERTY_FROM_ADDRESS = "fromAddress";
-    public static final String PROPERTY_FROM_ADDRESSES = "fromAddresses";
-    public static final String PROPERTY_CC_ADDRESSES = "ccAddresses";
-    public static final String PROPERTY_BCC_ADDRESSES = "bccAddresses";
-    public static final String PROPERTY_SUBJECT = "subject";
-
-    //private Message message = null;
     private Part messagePart = null;
     private byte[] contentBuffer;
 
@@ -149,16 +143,14 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
             }
 
             // Set message attrributes as properties
-            Address[] addresses = null;
-            properties.put(PROPERTY_SUBJECT, msg.getSubject());
-            addresses = msg.getFrom();
-            if (addresses != null && addresses.length > 0) {
-                properties.put(PROPERTY_FROM_ADDRESS, addresses[0].toString());
-                properties.put(PROPERTY_FROM_ADDRESSES, addresses);
-            }
-            properties.put(PROPERTY_TO_ADDRESSES, msg.getRecipients(Message.RecipientType.TO));
-            properties.put(PROPERTY_CC_ADDRESSES, msg.getRecipients(Message.RecipientType.CC));
-            properties.put(PROPERTY_BCC_ADDRESSES, msg.getRecipients(Message.RecipientType.BCC));
+            setProperty(MailProperties.TO_ADDRESSES_PROPERTY, MailUtils.mailAddressesToString(msg.getRecipients(Message.RecipientType.TO)));
+            setProperty(MailProperties.CC_ADDRESSES_PROPERTY, MailUtils.mailAddressesToString(msg.getRecipients(Message.RecipientType.CC)));
+            setProperty(MailProperties.BCC_ADDRESSES_PROPERTY, MailUtils.mailAddressesToString(msg.getRecipients(Message.RecipientType.BCC)));
+            setProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY,  MailUtils.mailAddressesToString(msg.getReplyTo()));
+            setProperty(MailProperties.FROM_ADDRESS_PROPERTY,  MailUtils.mailAddressesToString(msg.getFrom()));
+            setProperty(MailProperties.SUBJECT_PROPERTY, msg.getSubject());
+            setProperty(MailProperties.CONTENT_TYPE_PROPERTY, msg.getContentType());
+            setProperty(MailProperties.SENT_DATE_PROPERTY, msg.getSentDate());
 
             for (Enumeration e = msg.getAllHeaders(); e.hasMoreElements();) {
                 Header h = (Header) e.nextElement();

@@ -266,6 +266,10 @@ public class PropertiesHelper
     {
         StringBuffer buf = new StringBuffer();
         buf.append("Properties{");
+        if(props==null || props.entrySet().size()==0) {
+            buf.append("none}");
+            return buf.toString();
+        }
         if (newline) {
             buf.append("\n");
         }

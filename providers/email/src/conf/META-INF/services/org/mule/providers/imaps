@@ -1,4 +1,4 @@
-connector=org.mule.providers.email.ImapConnector
+connector=org.mule.providers.email.ImapsConnector
 dispatcher.factory=org.mule.providers.email.Pop3MessageDispatcherFactory
 message.receiver=org.mule.providers.email.MailMessageReceiver
 message.adapter=org.mule.providers.email.MailMessageAdapter

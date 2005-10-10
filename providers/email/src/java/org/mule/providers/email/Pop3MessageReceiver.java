@@ -82,7 +82,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
     public void doConnect() throws Exception
     {
         String inbox = null;
-        if (connector.getProtocol().equals("imap")) {
+        if (connector.getProtocol().equalsIgnoreCase("imap")) {
             inbox = endpoint.getEndpointURI().getPath();
             if(inbox.length()==0) {
                 inbox = Pop3Connector.MAILBOX;
@@ -100,7 +100,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
                                   endpoint.getEndpointURI().getUsername(),
                                   endpoint.getEndpointURI().getPassword());
 
-        session = MailUtils.createMailSession(url);
+        session = MailUtils.createMailSession(url, (MailConnector)connector);
         session.setDebug(logger.isDebugEnabled());
 
         Store store = session.getStore(url);

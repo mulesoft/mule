@@ -47,22 +47,11 @@ public class EmailMessageToString extends AbstractTransformer
     {
         Message msg = (Message) src;
         try {
-            // Other implementations of this message should do the following
-            // if they need further details of the incoming message
+            //Other information about the message such as cc addresses, attachments are handled
+            //By the Mail MEssage adapter.  If Transformers need access to these properties
+            //they should implement the AbstractEventAwareTransformer and extract these properties
+            //from the passed UMOEventContext
 
-            // String from = msg.getFrom()[0].toString();
-
-            // String to =
-            // getAddresses(msg.getRecipients(Message.RecipientType.TO)));
-            // String subject = msg.getSubject());
-
-            // get Raw content if you want it here
-            // ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            // msg.writeTo(baos);
-            // transMsg = new String(baos.toByteArray());
-            // baos.close();
-
-            // Hold these values on your object.
             // For this impl we just pass back the email content
             Object result = msg.getContent();
             if (result instanceof String) {
@@ -77,22 +66,4 @@ public class EmailMessageToString extends AbstractTransformer
             throw new TransformerException(this, e);
         }
     }
-
-    protected String getAddresses(Address[] addr)
-    {
-
-        if (addr == null)
-            return null;
-
-        String ret = "";
-
-        for (int i = 0; i < addr.length; i++) {
-            ret += addr[i].toString() + ",";
-        }
-        if (ret.length() > 0)
-            ret = ret.substring(0, ret.length() - 1);
-
-        return ret;
-    }
-
 }

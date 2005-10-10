@@ -11,7 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.test.providers.email;
+package org.mule.test.integration.providers.email;
 
 import org.mule.tck.AbstractMuleTestCase;
 

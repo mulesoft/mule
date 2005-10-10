@@ -16,16 +16,22 @@ package org.mule.providers.email.transformers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.providers.email.MailUtils;
+import org.mule.providers.email.SmtpConnector;
+import org.mule.providers.email.MailProperties;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
+import org.mule.util.PropertiesHelper;
+import org.mule.util.Utility;
 
 import javax.mail.Message;
 import javax.mail.Session;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>StringToEmailMessage</code> will convert a string to a java mail
@@ -40,13 +46,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
     /**
      * logger used by this class
      */
-    private static transient Log logger = LogFactory.getLog(StringToEmailMessage.class);
-
-    protected InternetAddress[] inetToAddresses = null;
-    protected InternetAddress inetFromAddress;
-    protected String subject;
-    protected String toAddresses;
-    protected String fromAddress;
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     public StringToEmailMessage()
     {
@@ -61,23 +61,68 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
      */
     public Object transform(Object src, UMOEventContext context) throws TransformerException
     {
-        String contentType = (String) context.getProperty("contentType");
-        if (contentType == null)
-            contentType = "text/plain";
+        String contentType = context.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY, SmtpConnector.DEFAULT_CONTENT_TYPE);
+
+        String endpointAddress = endpoint.getEndpointURI().getAddress();
+        SmtpConnector connector = (SmtpConnector)endpoint.getConnector();
+        String to = context.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
+        String cc = context.getStringProperty(MailProperties.CC_ADDRESSES_PROPERTY, connector.getCcAddresses());
+        String bcc = context.getStringProperty(MailProperties.BCC_ADDRESSES_PROPERTY, connector.getBccAddresses());
+        String from = context.getStringProperty(MailProperties.FROM_ADDRESS_PROPERTY, connector.getFromAddress());
+        String replyTo = context.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY, connector.getReplyToAddresses());
+        String subject = context.getStringProperty(MailProperties.SUBJECT_PROPERTY, connector.getSubject());
+
+        Properties headers = new Properties();
+        if(connector.getCustomHeaders()!=null) headers.putAll(connector.getCustomHeaders());
+        Properties otherHeaders = (Properties)context.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
+        if(otherHeaders!=null) headers.putAll(otherHeaders);
+
+        if(logger.isDebugEnabled()) {
+            StringBuffer buf = new StringBuffer();
+            buf.append("Constucting email using:\n");
+            buf.append("To: ").append(to);
+            buf.append("From: ").append(from);
+            buf.append("CC: ").append(cc);
+            buf.append("BCC: ").append(bcc);
+            buf.append("Subject: ").append(subject);
+            buf.append("ReplyTo: ").append(replyTo);
+            buf.append("Content type: ").append(contentType);
+            buf.append("Payload type: ").append(src.getClass().getName());
+            buf.append("Custom Headers: ").append(PropertiesHelper.propertiesToString(headers, false));
+            logger.debug(buf.toString());
+        }
 
         try {
-            Message msg = new MimeMessage((Session) endpoint.getConnector().getDispatcher("ANY").getDelegateSession());
+            Message msg = new MimeMessage((Session) endpoint.getConnector().getDispatcher(endpointAddress).getDelegateSession());
 
-            msg.setRecipients(Message.RecipientType.TO, inetToAddresses);
+            msg.setRecipients(Message.RecipientType.TO, MailUtils.StringToInternetAddresses(to));
 
             // sent date
             msg.setSentDate(Calendar.getInstance().getTime());
 
-            if (inetFromAddress != null) {
-                msg.setFrom(inetFromAddress);
+            if (from != null && !Utility.EMPTY_STRING.equals(from)) {
+                msg.setFrom(MailUtils.StringToInternetAddresses(from)[0]);
             }
 
-            msg.setSubject(getSubject());
+            if (cc != null && !Utility.EMPTY_STRING.equals(cc)) {
+                msg.setRecipients(Message.RecipientType.CC, MailUtils.StringToInternetAddresses(cc));
+            }
+
+            if (bcc != null && !Utility.EMPTY_STRING.equals(bcc)) {
+                msg.setRecipients(Message.RecipientType.BCC, MailUtils.StringToInternetAddresses(bcc));
+            }
+
+            if (replyTo != null && !Utility.EMPTY_STRING.equals(replyTo)) {
+                msg.setReplyTo(MailUtils.StringToInternetAddresses(replyTo));
+            }
+
+            msg.setSubject(subject);
+
+            Map.Entry entry;
+            for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
+                entry = (Map.Entry)iterator.next();
+                msg.setHeader(entry.getKey().toString(), entry.getValue().toString());
+            }
 
             setContent(src, msg, contentType, context);
 
@@ -90,73 +135,4 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
     protected void setContent(Object payload, Message msg, String contentType, UMOEventContext context) throws Exception {
         msg.setContent(payload, contentType);
     }
-
-    /**
-     * @return Returns the fromAddress.
-     */
-    public String getFromAddress()
-    {
-        return fromAddress;
-    }
-
-    /**
-     * @param fromAddress The fromAddress to set.
-     */
-    public void setFromAddress(String fromAddress) throws TransformerException
-    {
-        if (!(fromAddress == null || "".equals(fromAddress))) {
-            try {
-                inetFromAddress = new InternetAddress(fromAddress);
-            } catch (AddressException e) {
-                throw new TransformerException(new org.mule.config.i18n.Message("email", 1, fromAddress), this, e);
-            }
-        }
-        this.fromAddress = fromAddress;
-    }
-
-    /**
-     * @return Returns the subject.
-     */
-    public String getSubject()
-    {
-        if (subject == null)
-            subject = "";
-        return subject;
-    }
-
-    /**
-     * @param subject The subject to set.
-     */
-    public void setSubject(String subject)
-    {
-        this.subject = subject;
-        if (subject == null) {
-            subject = "[No Subject]";
-            logger.warn("Emails addressed to: " + toAddresses + " will be sent with a subject [no subject]");
-        }
-    }
-
-    /**
-     * @return Returns the toAddress.
-     */
-    public String getToAddress()
-    {
-        return toAddresses;
-    }
-
-    /**
-     * @param toAddress The toAddress to set.
-     */
-    public void setToAddress(String toAddress) throws TransformerException
-    {
-        if (!(toAddress == null || "".equals(toAddress))) {
-            try {
-                inetToAddresses = InternetAddress.parse(toAddress, false);
-            } catch (AddressException e) {
-                throw new TransformerException(new org.mule.config.i18n.Message("email", 2, toAddress), this, e);
-            }
-        }
-        this.toAddresses = toAddress;
-    }
-
 }
