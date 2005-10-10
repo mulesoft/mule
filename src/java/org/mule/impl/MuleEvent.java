@@ -575,4 +575,12 @@ public class MuleEvent extends EventObject implements UMOEvent
             throw (IOException) new IOException().initCause(e);
         }
     }
+
+    public String getStringProperty(String name, String defaultValue) {
+        return PropertiesHelper.getStringProperty(properties, name, defaultValue);
+    }
+
+    public void setStringProperty(String name, String value) {
+        setProperty(name, value);
+    }
 }

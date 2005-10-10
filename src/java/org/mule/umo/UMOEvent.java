@@ -183,6 +183,19 @@ public interface UMOEvent
     boolean getBooleanProperty(String name, boolean defaultValue);
 
     /**
+     * Gets a String property associated with the current event. Calling this
+     * method is equivilent to calling
+     * <code>event.getMessage().getStringProperty(..., ...)</code>
+     *
+     * @param name the property name
+     * @param defaultValue a default value if the property doesn't exist in the
+     *            event
+     * @return the property value or the defaultValue if the property does not
+     *         exist
+     */
+    String getStringProperty(String name, String defaultValue);
+
+    /**
      * Sets a property associated with the current event. Calling this method is
      * equivilent to calling
      * <code>event.getMessage().setProperty(..., ...)</code>
@@ -231,6 +244,16 @@ public interface UMOEvent
      * @param value the property value
      */
     void setDoubleProperty(String name, double value);
+
+    /**
+     * Sets a String property associated with the current event. Calling this
+     * method is equivilent to calling
+     * <code>event.getMessage().setStringProperty(..., ...)</code>
+     *
+     * @param name the property name or key
+     * @param value the property value
+     */
+    void setStringProperty(String name, String value);
 
     /**
      * Returns a map of properties associated with the event
@@ -340,4 +363,5 @@ public interface UMOEvent
      *         the underlying message does not return the removed property
      */
     Object removeProperty(Object key);
+
 }
