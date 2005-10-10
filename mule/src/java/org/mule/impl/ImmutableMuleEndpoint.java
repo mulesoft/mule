@@ -299,8 +299,19 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                                              (properties == null ? null : new HashMap(properties)));
         clone.setTransactionConfig(transactionConfig);
         clone.setFilter(filter);
+        clone.setSecurityFilter(securityFilter);
         if (synchronous != null) {
             clone.setSynchronous(synchronous.booleanValue());
+        }
+        clone.setDeleteUnacceptedMessages(deleteUnacceptedMessages);
+        clone.setInitialState(initialState);
+        if(initialised.get()) {
+            try {
+                clone.initialise();
+            } catch (InitialisationException e) {
+                //this really should never happen as the endpoint is already initialised
+                logger.error(e.getMessage(), e);
+            }
         }
         return clone;
 
@@ -322,7 +333,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 + transformer + ", name='" + name + "'" + ", type='" + type + "'" + ", properties=" + properties
                 + ", transactionConfig=" + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
                 + deleteUnacceptedMessages + ", initialised=" + initialised + ", securityFilter=" + securityFilter
-                + ", synchronous=" + synchronous + ", createConnector=" + createConnector + "}";
+                + ", synchronous=" + synchronous + ", initialState=" + initialState + ", createConnector=" + createConnector + "}";
     }
 
     /*
