@@ -120,7 +120,9 @@ public class HttpsConnector extends HttpConnector
 
         if (trustStore != null) {
             System.setProperty("javax.net.ssl.trustStore", getTrustStore());
-            System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword());
+            if(getTrustStorePassword()!=null) {
+                System.setProperty("javax.net.ssl.trustStorePassword", getTrustStorePassword());
+            }
             logger.debug("Set Trust store: javax.net.ssl.trustStore=" + getTrustStore());
         } else if (!isExplicitTrustStoreOnly()) {
             logger.info("Defaulting trust store to client Key Store");
