@@ -314,13 +314,15 @@ public class ThreadingProfile
     }
 
     public String toString()
-    {
-        return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle=" + maxThreadsIdle
-                + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL + ", poolExhaustPolicy="
-                + poolExhaustPolicy + ", doThreading=" + doThreading + ", threadPriority=" + threadPriority
-                + ", workManagerFactory=" + workManagerFactory + ", rejectedExecutionHandler=" + rejectedExecutionHandler
-                + ", threadFactory=" + threadFactory + "}";
-    }
+	{
+		return "ThreadingProfile{" + "maxThreadsActive=" + maxThreadsActive + ", maxThreadsIdle="
+				+ maxThreadsIdle + ", maxBufferSize=" + maxBufferSize + ", threadTTL=" + threadTTL
+				+ ", poolExhaustPolicy=" + poolExhaustPolicy + ", threadWaitTimeout="
+				+ threadWaitTimeout + ", doThreading=" + doThreading + ", threadPriority="
+				+ threadPriority + ", workManagerFactory=" + workManagerFactory
+				+ ", rejectedExecutionHandler=" + rejectedExecutionHandler + ", threadFactory="
+				+ threadFactory + "}";
+	}
 
     public static class NamedThreadFactory implements ThreadFactory
     {
