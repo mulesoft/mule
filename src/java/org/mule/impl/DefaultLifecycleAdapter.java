@@ -186,6 +186,8 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                     resultMessage = new MuleMessage(result, RequestContext.getProperties(), event.getMessage());
                 }
             }
+            //temporary fix until the new property handing in Mule 2.0
+            if(resultMessage!=null) resultMessage.removeProperty("method");
             return resultMessage;
         } catch (Exception e) {
             throw new MessagingException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: "
