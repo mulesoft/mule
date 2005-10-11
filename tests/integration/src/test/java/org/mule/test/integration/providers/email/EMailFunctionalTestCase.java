@@ -14,31 +14,50 @@
 package org.mule.test.integration.providers.email;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
- * @version $Revision$
- */
-public class EMailFunctionalTestCase extends FunctionalTestCase
+public class EMailFunctionalTestCase extends AbstractMuleTestCase
 {
-    protected String getConfigResources() {
-        return "org/mule/test/integration/providers/email/email-config.xml";
+    public void testPopRoundtrip() throws Exception
+    {
+        doRoundtrip("pop3://muletestbox:testbox1@pop.mail.yahoo.co.uk",
+                "smtp://muletestbox:testbox1@smtp.mail.yahoo.co.uk?address=muletestbox@yahoo.co.uk");
     }
 
-    public void testRoundtrip() throws Exception
+    public void testSecurePopRoundtrip() throws Exception
     {
+        doRoundtrip("pop3s://muletestbox:testbox@pop.gmail.com",
+                "smtps://muletestbox:testbox@smtp.gmail.com?address=muletestbox@gmail.com");
+    }
+
+    public void testSecureImapRoundtrip() throws Exception
+    {
+        //todo When Gmail support it
+        //doRoundtrip("imaps://muletestbox:testbox@pop.gmail.com",
+        //        "smtps://muletestbox:testbox@smtp.gmail.com?address=muletestbox@gmail.com");
+    }
+
+    public void doRoundtrip(String receiveUrl, String sendUrl) throws Exception
+    {
+
         MuleClient mc = new MuleClient();
-        String messageString = "test";
+        UMOMessage msg = mc.receive(receiveUrl, 5000);
+        while(msg!=null) {
+            msg = mc.receive(receiveUrl, 5000);
+            System.out.println("Received:" + msg.getPayloadAsString());
+        }
+
+        String messageString = "testtesttesttesttesttest";
         Map props = new HashMap();
         
-        mc.sendNoReceive("smtp://eat@deliasystems.com", messageString, props);
-        UMOMessage msg = mc.receive("pop3://eat%40delisys4.fr.fto:kIxUjC6R@pop.fr.oleane.com", 10000);
+        mc.sendNoReceive(sendUrl, messageString, props);
+        msg = mc.receive(receiveUrl, 20000);
         assertNotNull(msg);
+        assertTrue(msg.getPayloadAsString().indexOf(messageString) > -1);
     }
 
 }
