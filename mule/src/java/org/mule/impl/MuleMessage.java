@@ -64,14 +64,16 @@ public class MuleMessage implements UMOMessage
         addProperties(props);
     }
 
-    public MuleMessage(Object message, UMOMessage previous) {
+    public MuleMessage(Object message, Map properties, UMOMessage previous) {
         if (message instanceof UMOMessageAdapter) {
             adapter = (UMOMessageAdapter) message;
         } else {
             adapter = new DefaultMessageAdapter(message);
         }
-        if(previous!=null) {
+        if(properties!=null) {
             addProperties(previous.getProperties());
+        }
+        if(previous!=null) {
             for (Iterator iterator = previous.getAttachmentNames().iterator(); iterator.hasNext();) {
                 String name = (String) iterator.next();
                 try {
