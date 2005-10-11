@@ -18,5 +18,11 @@
             <version>${quartz_version}</version>
             <url>http://www.opensymphony.com/quartz/</url>
         </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+        </dependency>
     </dependencies>
 </project>

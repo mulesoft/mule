@@ -18,8 +18,6 @@ import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
 /**
- * TODO: document this class
- * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
@@ -46,8 +44,7 @@ public class QuartzConnectorTestCase extends AbstractConnectorTestCase
      */
     public Object getValidMessage() throws Exception
     {
-        // TODO Auto-generated method stub
-        return null;
+        return "test";
     }
 
     /*
@@ -59,10 +56,4 @@ public class QuartzConnectorTestCase extends AbstractConnectorTestCase
     {
         return "quartz:/myService?repeatInterval=1000";
     }
-
-    public void testConnectorMessageDispatcher() throws Exception
-    {
-        // Do not test this, as there is no dispatch
-    }
-
 }

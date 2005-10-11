@@ -28,9 +28,11 @@ import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
- * TODO: document this class
+ * Creates a connection to a Quartz sheduler.  This allows events to be sheduled
+ * at specific times, with repeat occurences
  * 
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class QuartzConnector extends AbstractServiceEnabledConnector
@@ -41,7 +43,20 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
     public static final String PROPERTY_REPEAT_COUNT = "repeatCount";
     public static final String PROPERTY_START_DELAY = "startDelay";
     public static final String PROPERTY_PAYLOAD = "payload";
+    public static final String PROPERTY_JOB_DISPATCH_ENDPOINT = "jobDispatchEndpoint";
+    public static final String PROPERTY_JOB_RECEIVE_ENDPOINT = "jobReceiveEndpoint";
+    public static final String PROPERTY_JOB_RECEIVE_TIMEOUT = "jobReceiveTimeout";
+
+    /** deprecated: use Payload reference */
     public static final String PROPERTY_PAYLOAD_CLASS_NAME = "payloadClassName";
+    public static final String PROPERTY_PAYLOAD_REFERENCE = "payloadRef";
+    public static final String PROPERTY_GROUP_NAME = "groupName";
+    public static final String PROPERTY_JOB_GROUP_NAME = "jobGroupName";
+    public static final String PROPERTY_JOB_REF = "jobRef";
+    public static final String PROPERTY_JOB_CLASS = "jobClass";
+    public static final String PROPERTY_JOB_OBJECT = "jobObject";
+
+    public static final String DEFUALT_GROUP_NAME = "mule";
 
     private String factoryClassName = StdSchedulerFactory.class.getName();
 
@@ -53,7 +68,7 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
 
     public String getProtocol()
     {
-        return "QUARTZ";
+        return "quartz";
     }
 
     public void doInitialise() throws InitialisationException
