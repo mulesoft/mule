@@ -155,7 +155,11 @@ public class DynamicEntryPoint implements UMOEntryPoint
 
         Object[] args;
         if (arg.getClass().isArray()) {
-            args = (Object[]) arg;
+            if(Object[].class.isAssignableFrom(arg.getClass())) {
+                args = (Object[]) arg;
+            } else {
+                args = new Object[]{arg};
+            }
         } else if (arg instanceof NullPayload) {
             args = null;
         } else {
