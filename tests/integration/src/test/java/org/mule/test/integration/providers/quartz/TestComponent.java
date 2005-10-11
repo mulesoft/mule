@@ -12,7 +12,7 @@
  * the LICENSE.txt file.
  */
 
-package org.mule.providers.quartz;
+package org.mule.test.integration.providers.quartz;
 
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
@@ -23,8 +23,8 @@ public class TestComponent implements Callable
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
        if (eventContext.getMessageAsString().equals("quartz test")) {
-            if (QuartzReceiverFunctionalTestCase.countDown != null) {
-                QuartzReceiverFunctionalTestCase.countDown.unlock();
+            if (QuartzFunctionalTestCase.countDown != null) {
+                QuartzFunctionalTestCase.countDown.unlock();
             }
         } else {
             throw new IllegalArgumentException("Unrecognised event payload");

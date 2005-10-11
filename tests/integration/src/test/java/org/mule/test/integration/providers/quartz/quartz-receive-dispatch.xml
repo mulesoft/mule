@@ -17,6 +17,9 @@
         <endpoint name="schedulerEndpoint" address="quartz:/myService">
             <properties>
                 <property name="repeatInterval" value="1000"/>
+                <property name="jobClass" value="org.mule.providers.quartz.jobs.MuleClientReceiveJob"/>
+                <property name="jobReceiveEndpoint" value="vm://event.queue"/>
+                <property name="jobDispatchEndpoint" value="vm://quartz.in"/>
             </properties>
         </endpoint>
     </global-endpoints>
@@ -34,7 +37,7 @@
             </outbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="scheduledService" implementation="org.mule.providers.quartz.TestComponent">
+        <mule-descriptor name="scheduledService" implementation="org.mule.test.integration.providers.quartz.TestComponent">
             <inbound-router>
                 <endpoint address="vm://quartz.in"/>
             </inbound-router>

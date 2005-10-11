@@ -462,6 +462,23 @@
         	<artifactId>groovy-all</artifactId>
         	<version>${groovy_version}</version>
         </dependency>
+        <!-- Quartz tests -->
+        <dependency>
+            <artifactId>mule-quartz-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>quartz</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz_version}</version>
+            <url>http://www.opensymphony.com/quartz/</url>
+        </dependency>
     </dependencies>
      <build>
         <sourceDirectory>${basedir}/src/test/java</sourceDirectory>

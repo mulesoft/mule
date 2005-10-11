@@ -12,7 +12,7 @@
  * the LICENSE.txt file.
  */
 
-package org.mule.providers.quartz;
+package org.mule.test.integration.providers.quartz;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.mule.MuleManager;
@@ -20,6 +20,7 @@ import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.quartz.jobs.MuleClientReceiveJob;
+import org.mule.providers.quartz.QuartzConnector;
 import org.mule.tck.NamedTestCase;
 import org.mule.util.concurrent.CountDownLatch;
 
@@ -49,19 +50,12 @@ public class QuartzFunctionalTestCase extends NamedTestCase
         super.tearDown();
     }
 
-    public void testMuleReceiverJob() throws Exception
-    {
-        countDown = new CountDownLatch(3);
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("quartz-receive.xml");
-        assertTrue(countDown.tryLock(5000, TimeUnit.MILLISECONDS));
-    }
 
     public void testMuleClientDispatchJob() throws Exception
     {
         countDown = new CountDownLatch(3);
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("quartz-dispatch.xml");
+        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-dispatch.xml");
         new MuleClient().send("vm://quartz.scheduler", "quartz test", null);
         assertTrue(countDown.tryLock(5000, TimeUnit.MILLISECONDS));
     }
@@ -70,7 +64,7 @@ public class QuartzFunctionalTestCase extends NamedTestCase
     {
         countDown = new CountDownLatch(3);
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("quartz-receive-dispatch.xml");
+        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-receive-dispatch.xml");
 
         new MuleClient().send("vm://event.queue", "quartz test", null);
         new MuleClient().send("vm://event.queue", "quartz test", null);
@@ -84,7 +78,7 @@ public class QuartzFunctionalTestCase extends NamedTestCase
     {
         countDown = new CountDownLatch(3);
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("quartz-receive-dispatch-delegating-job.xml");
+        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-receive-dispatch-delegating-job.xml");
 
         new MuleClient().send("vm://event.queue", "quartz test", null);
         new MuleClient().send("vm://event.queue", "quartz test", null);
@@ -102,7 +96,7 @@ public class QuartzFunctionalTestCase extends NamedTestCase
     {
         countDown = new CountDownLatch(3);
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("quartz-receive-dispatch-delegating-job.xml");
+        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-receive-dispatch-delegating-job.xml");
 
         new MuleClient().send("vm://event.queue", "quartz test", null);
         new MuleClient().send("vm://event.queue", "quartz test", null);
@@ -121,7 +115,7 @@ public class QuartzFunctionalTestCase extends NamedTestCase
     {
         countDown = new CountDownLatch(3);
         ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("quartz-receive-dispatch-delegating-job.xml");
+        configBuilder.configure("org/mule/test/integration/providers/quartz/quartz-receive-dispatch-delegating-job.xml");
 
         new MuleClient().send("vm://event.queue", "quartz test", null);
         new MuleClient().send("vm://event.queue", "quartz test", null);
