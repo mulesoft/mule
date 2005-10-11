@@ -131,7 +131,7 @@ public final class MuleSession implements UMOSession
 
         if(endpoint.isRemoteSync() && endpoint.getResponseTransformer()!=null) {
             Object response = endpoint.getResponseTransformer().transform(result.getPayload());
-            result = new MuleMessage(response, result); 
+            result = new MuleMessage(response, result.getProperties(), result); 
         }
         if(result!=null) RequestContext.rewriteEvent(result);
         return result;
