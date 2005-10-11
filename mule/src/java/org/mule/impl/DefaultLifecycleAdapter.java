@@ -23,8 +23,18 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.model.DynamicEntryPoint;
 import org.mule.model.DynamicEntryPointResolver;
-import org.mule.umo.*;
-import org.mule.umo.lifecycle.*;
+import org.mule.umo.Invocation;
+import org.mule.umo.MessagingException;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.Startable;
+import org.mule.umo.lifecycle.Stoppable;
+import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.util.ClassHelper;
 
@@ -168,7 +178,7 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
 
             UMOMessage resultMessage = null;
             if (result == null && entryPoint.isVoid()) {
-                resultMessage = new MuleMessage(event.getTransformedMessage(), RequestContext.getProperties());
+                resultMessage = new MuleMessage(event.getTransformedMessage(), RequestContext.getEvent().getMessage());
             } else if (result != null) {
                 if (result instanceof UMOMessage) {
                     resultMessage = (UMOMessage) result;
