@@ -87,6 +87,12 @@
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
         </dependency>
+        <dependency>
+            <groupId>javamail</groupId>
+            <artifactId>javamail</artifactId>
+            <version>${javamail_version}</version>
+            <url>http://java.sun.com/products/javamail/</url>
+        </dependency>
 
         <!-- XFire Deps -->
 <!--        <dependency>-->
