@@ -56,4 +56,20 @@ public class TemplateParserTestCase extends TestCase
         assertEquals("value1value1value2", result);
 
     }
+
+    public void testStringParserAntBracesWithSimilarNames()
+    {
+        TemplateParser tp = TemplateParser.createAntStyleParser();
+        Map props = new HashMap();
+        props.put("prop1", "value1");
+        props.put("prop1-2", "value2");
+        String string = "Some String with ${prop1} and ${prop1-2} in it";
+
+        String result = tp.parse(props, string);
+        assertEquals("Some String with value1 and value2 in it", result);
+        string = "A${prop1-2}B${prop1}C${prop2}";
+        result = tp.parse(props, string);
+        assertEquals("Avalue2Bvalue1C", result);
+
+    }
 }
