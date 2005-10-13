@@ -158,7 +158,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                         }
                         RequestContext.rewriteEvent(returnMessage);
                     } else {
-                        returnMessage = new MuleMessage(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, endpoint.getEndpointURI().toString()).toString());
+                        String failedPath = endpoint.getEndpointURI().getScheme() + "://" +
+                                endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort() +
+                                getRequestPath(message);
+                        
+                        logger.debug("Failed to bind to " + failedPath);
+                        returnMessage = new MuleMessage(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, failedPath));
                         returnMessage.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_FOUND);
                         RequestContext.setEvent(new MuleEvent(returnMessage, endpoint, new MuleSession(), true));
                     }
@@ -192,6 +197,14 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
             dispose();
         }
     }
+
+    protected String getRequestPath(UMOMessage message) {
+        String path = (String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        int i = path.indexOf("?");
+        if (i > -1) path = path.substring(0, i);
+        return path;
+    }
+
 
     protected AbstractMessageReceiver getTargetReceiver(UMOMessage message, UMOEndpoint endpoint) throws ConnectException {
 
