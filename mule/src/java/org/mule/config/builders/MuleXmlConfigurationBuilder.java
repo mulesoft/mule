@@ -520,8 +520,8 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
                 String modelType = attributes.getValue("type");
                 if(modelType==null) {
                     modelType = MuleManager.getConfiguration().getModelType();
-                    digester.push(ModelFactory.createModel(modelType));
                 }
+                digester.push(ModelFactory.createModel(modelType));
             }
         });
 
