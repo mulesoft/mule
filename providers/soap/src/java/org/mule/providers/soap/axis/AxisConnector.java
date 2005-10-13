@@ -37,6 +37,7 @@ import org.mule.providers.soap.axis.extensions.MuleTransport;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -280,8 +281,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
                     .getModel()
                     .getDescriptor(AXIS_SERVICE_COMPONENT_NAME);
             if (axisDescriptor == null) {
-                axisDescriptor = new MuleDescriptor(AXIS_SERVICE_COMPONENT_NAME);
-                axisDescriptor.setImplementation(AxisServiceComponent.class.getName());
+                axisDescriptor = createAxisDescriptor();
             } else {
                 // Lets unregister the 'template' instance, configure it and
                 // then register
@@ -352,6 +352,16 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         return endpointKey.toString();
     }
 
+    protected MuleDescriptor createAxisDescriptor() {
+        MuleDescriptor axisDescriptor = (MuleDescriptor) MuleManager.getInstance()
+                    .getModel().getDescriptor(AXIS_SERVICE_COMPONENT_NAME);
+        if (axisDescriptor == null) {
+            axisDescriptor = new MuleDescriptor(AXIS_SERVICE_COMPONENT_NAME);
+            axisDescriptor.setImplementation(AxisServiceComponent.class.getName());
+        }
+        return axisDescriptor;
+    }
+
     /**
      * Template method to perform any work when starting the connectoe
      *
@@ -402,6 +412,8 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             // model needs to be restarted before the listener is available
             if (!MuleManager.getInstance().getModel().isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME)) {
                 try {
+                    //Descriptor might be null if no inbound endpoints have been register for the Axis connector
+                    if(axisDescriptor==null) axisDescriptor = createAxisDescriptor();
                     MuleManager.getInstance().getModel().registerComponent(axisDescriptor);
                     //We have to perform a small hack here to rewrite servlet:// endpoints with the
                     //real http:// address

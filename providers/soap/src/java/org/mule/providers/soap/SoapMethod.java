@@ -55,7 +55,7 @@ public class SoapMethod {
     public SoapMethod(QName methodName, String paramsString) throws ClassNotFoundException {
          name =  methodName;
         List params = new ArrayList();
-        for (StringTokenizer stringTokenizer = new StringTokenizer(paramsString, ","); stringTokenizer.hasMoreTokens();) {
+        for (StringTokenizer stringTokenizer = new StringTokenizer(paramsString, ";"); stringTokenizer.hasMoreTokens();) {
             params.add(stringTokenizer.nextToken().trim());
         }
         initParams(params);
@@ -73,7 +73,7 @@ public class SoapMethod {
         for (Iterator iterator = params.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
 
-            for (StringTokenizer tokenizer = new StringTokenizer(s, ";"); tokenizer.hasMoreTokens();) {
+            for (StringTokenizer tokenizer = new StringTokenizer(s, ":"); tokenizer.hasMoreTokens();) {
                 String name = tokenizer.nextToken();
                 String type = tokenizer.nextToken();
                 if(name.equalsIgnoreCase("return")) {
@@ -82,7 +82,12 @@ public class SoapMethod {
                     returnClass = ClassHelper.loadClass(type, getClass());
                 } else {
                     String mode = tokenizer.nextToken();
-                    QName paramName = (QName)converter.convert(QName.class, name);
+                    QName paramName = null;
+                    if(name.startsWith("qname{")) {
+                        paramName = (QName)converter.convert(QName.class, name);
+                    } else {
+                        paramName = new QName(getName().getNamespaceURI(), name, getName().getPrefix());
+                    }
                     QName qtype = null;
                     if(type.startsWith("qname{")) {
                         qtype = (QName)converter.convert(QName.class, type);

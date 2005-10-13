@@ -244,17 +244,6 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
         call.setTargetEndpointAddress(endpointUri.toString());
 
-        //Set custom soap action if set on the event or endpoint
-        String soapAction = (String)event.getProperty(AxisConnector.SOAP_ACTION_PROPERTY);
-        if(soapAction != null) {
-            soapAction = parseSoapAction(soapAction, method, event);
-            call.setSOAPActionURI(soapAction);
-            call.setUseSOAPAction(Boolean.TRUE.booleanValue());
-        } else {
-            //call.setSOAPActionURI(endpointUri.getAddress());
-        }
-
-
         //Set a custome method namespace if one is set.  This will be used forthe parameters too
         String methodNamespace = (String)event.getProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY);
         if(methodNamespace!=null) {
@@ -296,6 +285,16 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
 
         setCallParams(call, event, call.getOperationName());
+
+        //Set custom soap action if set on the event or endpoint
+        String soapAction = (String)event.getProperty(AxisConnector.SOAP_ACTION_PROPERTY);
+        if(soapAction != null) {
+            soapAction = parseSoapAction(soapAction, call, event);
+            call.setSOAPActionURI(soapAction);
+            call.setUseSOAPAction(Boolean.TRUE.booleanValue());
+        } else {
+            //call.setSOAPActionURI(endpointUri.getAddress());
+        }
         return call;
     }
 
@@ -425,11 +424,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    public String parseSoapAction(String soapAction, String method, UMOEvent event) {
+    public String parseSoapAction(String soapAction, Call call, UMOEvent event) {
 
         UMOEndpointURI endpointURI = event.getEndpoint().getEndpointURI();
         Map properties = new HashMap(event.getProperties());
-        properties.put("method", method);
+        properties.put("method", call.getOperationName().getLocalPart());
+        properties.put("methodNamespace", call.getOperationName().getNamespaceURI());
         properties.put("address", endpointURI.getAddress());
         properties.put("scheme", endpointURI.getScheme());
         properties.put("host", endpointURI.getHost());
@@ -458,7 +458,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         SoapMethod soapMethod;
         soapMethod = (SoapMethod)event.removeProperty(MuleProperties.MULE_SOAP_METHOD);
         if(soapMethod==null) {
-            soapMethod = (SoapMethod)callParameters.get(method);
+            soapMethod = (SoapMethod)callParameters.get(method.getLocalPart());
         }
         if(soapMethod!=null) {
             for (Iterator iterator = soapMethod.getNamedParameters().iterator(); iterator.hasNext();) {
@@ -471,7 +471,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             if(soapMethod.getReturnClass()!=null) {
                 call.setReturnClass(soapMethod.getReturnClass());
             }
+            call.setOperationName(soapMethod.getName());
         }
+
     }
 
     private void loadCallParams(UMOEvent event, String namespace) throws ClassNotFoundException {
@@ -497,7 +499,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
                     soapMethod = new SoapMethod(new QName(namespace, entry.getKey().toString()), entry.getValue().toString());
                 }
             }
-            callParameters.put(soapMethod.getName(), soapMethod);
+            callParameters.put(soapMethod.getName().getLocalPart(), soapMethod);
         }
     }
 }
