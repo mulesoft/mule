@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="DotNet_Rest_Test" version="1.0">
+    <mule-environment-properties synchronous="true"/>
+
+    <connector name="SystemStreamConnector" className="org.mule.providers.stream.SystemStreamConnector">
+        <properties>
+            <property name="promptMessage" value="Please enter a stock symbol: "/>
+            <property name="messageDelayTime" value="1000"/>
+        </properties>
+    </connector>
+
+    <transformers>
+        <transformer name="XmlToObject" className="org.mule.transformers.xml.XmlToObject"/>
+        <transformer name="SgmlDecoder" className="org.mule.transformers.codec.SgmlEntityDecoder"/>
+        <transformer name="Xslt" className="org.mule.transformers.xml.XsltTransformer">
+            <properties>
+                <property name="xslFile" value="soap-stock.xsl"/>
+            </properties>
+        </transformer>
+    </transformers>
+    <!--
+        The Mule model initialises and manages your UMO components
+    -->
+    <model name="soapDotNetSample">
+        <!--
+            This component can proxy external web service calls over Jms, tcp, ssl or any other transport.
+            For this example we use Vm.
+        -->
+        <mule-descriptor name="serviceProxy" implementation="org.mule.components.simple.BridgeComponent">
+            <inbound-router>
+                <endpoint address="stream://System.in"/>
+            </inbound-router>
+            <outbound-router>
+                <!-- we use a chaining transformer to send the results of one endpoint execution as the input
+                for the next endpoint.  In this case it writes it out to System.out -->
+                <router className="org.mule.routing.outbound.ChainingRouter">
+                    <endpoint address="axis:http://www.webservicex.net/stockquote.asmx?method=GetQuote">
+                        <properties>
+                            <property name="soapAction" value="${methodNamespace}${method}"/>
+                            <map name="soapMethods">
+                                <list name="qname{GetQuote:http://www.webserviceX.NET/}">
+                                    <entry value="symbol:string:in"/>
+                                    <entry value="GetQuoteResult:string:out"/>
+                                    <entry value="return:string"/>
+                                </list>
+                            </map>
+                        </properties>
+                    </endpoint>
+                    <endpoint address="stream://System.out" transformers="SgmlDecoder Xslt XmlToObject"/>
+                </router>
+            </outbound-router>
+        </mule-descriptor>
+
+    </model>
+</mule-configuration>

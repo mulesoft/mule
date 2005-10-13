@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  This is a sample of what is returned from the ASPX Stock Quote service when invoked as a SOAP service
+      For some reason it differs from the same invocation using REST -->
+<StockQuotes>
+    <Stock>
+        <Symbol>IBM</Symbol>
+        <Last>82.98</Last>
+        <Date>10/13/2005</Date>
+        <Time>3:03pm</Time>
+        <Change>+0.79</Change>
+        <Open>81.70</Open>
+        <High>83.20</High>
+        <Low>81.70</Low>
+        <Volume>4295800</Volume>
+        <MktCap>132.4B</MktCap>
+        <PreviousClose>82.19</PreviousClose>
+        <PercentageChange>+0.96%</PercentageChange>
+        <AnnRange>71.85 - 99.10</AnnRange>
+        <Earns>5.124</Earns>
+        <P-E>16.04</P-E>
+        <Name>INTL BUSINESS MAC</Name>
+    </Stock>
+</StockQuotes>
