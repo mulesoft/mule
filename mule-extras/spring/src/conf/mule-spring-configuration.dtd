@@ -791,6 +791,25 @@ Agents is a collection of one or more agent configurations
 <!ATTLIST model name  			ID		#REQUIRED>
 
 <!--
+The type of Model to use for component processing for this Mule instance.  The different types of model are described
+at http://mule.codehaus.org/Models
+The custom model can be used to specify a custom model type.  In which case you must supply a className.
+-->
+<!ATTLIST model type           (seda | direct | pipeline | jms | jms-clustered | jcyclone | custom)         	"seda">
+
+<!--
+	The class used for instanciate the model if a custom model type is being used.  The class must implement
+    org.mule.umo.model.UMOModel.
+-->
+
+<!ATTLIST model className  			NMTOKEN		#IMPLIED>
+
+<!--
+The ref name of this object if it is to be loaeded from a container such as spring or
+Jndi
+-->
+<!ATTLIST model ref             		CDATA         		#IMPLIED>
+<!--
 	An entry Point resolver is used to determine which method on a UMO object
 	should receive events
 -->
@@ -1223,7 +1242,7 @@ The system property key to use when lookin up the property
 <!-- 
 	the name of the list property
 -->
-<!ATTLIST list name					NMTOKEN		#REQUIRED>
+<!ATTLIST list name					CDATA		#REQUIRED>
 
 <!--
 	Defines an entry for a list or array property	
@@ -1254,7 +1273,7 @@ The system property key to use when lookin up the property
 <!--
 	the reference of the object in the container
 -->
-<!ATTLIST container-entry reference					NMTOKEN		#REQUIRED>
+<!ATTLIST container-entry reference					CDTATA		#REQUIRED>
 
 <!--
 	determines if the object must be present in the container for configuration to
