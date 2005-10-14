@@ -243,16 +243,16 @@ public class LoanConsumer
     {
         byte[] buf = new byte[128];
         System.out.println("Enter your name:");
-        int len = System.in.read(buf);
-        String name = new String(buf, 0, len - 1);
+        System.in.read(buf);
+        String name = new String(buf).trim();
         System.out.println("Enter loan Amount:");
         buf = new byte[16];
-        len = System.in.read(buf);
-        String amount = new String(buf, 0, len - 1);
+        System.in.read(buf);
+        String amount = new String(buf).trim();
         System.out.println("Enter loan Duration in months:");
         buf = new byte[16];
-        len = System.in.read(buf);
-        String duration = new String(buf, 0, len - 1);
+        System.in.read(buf);
+        String duration = new String(buf).trim();
 
         int d = 0;
         try
