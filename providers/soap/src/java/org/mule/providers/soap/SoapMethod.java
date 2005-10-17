@@ -55,7 +55,7 @@ public class SoapMethod {
     public SoapMethod(QName methodName, String paramsString) throws ClassNotFoundException {
          name =  methodName;
         List params = new ArrayList();
-        for (StringTokenizer stringTokenizer = new StringTokenizer(paramsString, ";"); stringTokenizer.hasMoreTokens();) {
+        for (StringTokenizer stringTokenizer = new StringTokenizer(paramsString, ","); stringTokenizer.hasMoreTokens();) {
             params.add(stringTokenizer.nextToken().trim());
         }
         initParams(params);
@@ -73,7 +73,7 @@ public class SoapMethod {
         for (Iterator iterator = params.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
 
-            for (StringTokenizer tokenizer = new StringTokenizer(s, ":"); tokenizer.hasMoreTokens();) {
+            for (StringTokenizer tokenizer = new StringTokenizer(s, ";"); tokenizer.hasMoreTokens();) {
                 String name = tokenizer.nextToken();
                 String type = tokenizer.nextToken();
                 if(name.equalsIgnoreCase("return")) {

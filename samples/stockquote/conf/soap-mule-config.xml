@@ -42,9 +42,8 @@
                             <property name="soapAction" value="${methodNamespace}${method}"/>
                             <map name="soapMethods">
                                 <list name="qname{GetQuote:http://www.webserviceX.NET/}">
-                                    <entry value="symbol:string:in"/>
-                                    <entry value="GetQuoteResult:string:out"/>
-                                    <entry value="return:string"/>
+                                    <entry value="symbol;string;in"/>
+                                    <entry value="GetQuoteResult;string;out"/>
                                 </list>
                             </map>
                         </properties>
