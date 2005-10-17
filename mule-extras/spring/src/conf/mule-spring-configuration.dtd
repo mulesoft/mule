@@ -1326,7 +1326,7 @@ The system property key to use when lookin up the property
 <!--
 	the reference of the object in the container
 -->
-<!ATTLIST container-entry reference					CDTATA		#REQUIRED>
+<!ATTLIST container-entry reference					CDATA		#REQUIRED>
 
 <!--
 	determines if the object must be present in the container for configuration to
