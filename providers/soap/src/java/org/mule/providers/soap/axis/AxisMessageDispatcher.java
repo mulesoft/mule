@@ -16,13 +16,13 @@
 package org.mule.providers.soap.axis;
 
 import org.apache.axis.*;
-import org.apache.axis.transport.http.HTTPTransport;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
+import org.apache.axis.transport.http.HTTPTransport;
 import org.apache.axis.wsdl.fromJava.Namespaces;
 import org.apache.axis.wsdl.fromJava.Types;
 import org.apache.axis.wsdl.gen.Parser;
@@ -31,20 +31,20 @@ import org.apache.axis.wsdl.symbolTable.SymTabEntry;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.NullPayload;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
+import org.mule.providers.soap.axis.extensions.MuleHttpSender;
 import org.mule.providers.soap.axis.extensions.MuleSoapHeadersHandler;
 import org.mule.providers.soap.axis.extensions.UniversalSender;
-import org.mule.providers.soap.axis.extensions.MuleHttpSender;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
@@ -225,7 +225,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         if (style != null) {
             Style s = Style.getStyle(style);
             if(s==null) {
-                throw new IllegalArgumentException(new org.mule.config.i18n.Message(Messages.X_IS_INVALID, "style=" + style).toString());
+                throw new IllegalArgumentException(new org.mule.config.i18n.Message(Messages.VALUE_X_IS_INVALID_FOR_X, style, "style").toString());
             } else {
                 call.setOperationStyle(s);
             }
@@ -234,7 +234,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         if (use != null) {
             Use u = Use.getUse(use);
             if(u==null) {
-                throw new IllegalArgumentException(new org.mule.config.i18n.Message(Messages.X_IS_INVALID, "use=" + use).toString());
+                throw new IllegalArgumentException(new org.mule.config.i18n.Message(Messages.VALUE_X_IS_INVALID_FOR_X, use, "use").toString());
             } else {
                 call.setOperationUse(u);
             }

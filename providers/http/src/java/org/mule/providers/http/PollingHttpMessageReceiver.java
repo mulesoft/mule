@@ -25,11 +25,11 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 
 /**
  * todo document
@@ -52,7 +52,7 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         try {
             pollUrl = new URL(endpoint.getEndpointURI().getAddress());
         } catch (MalformedURLException e) {
-            throw new InitialisationException(new Message(Messages.X_IS_INVALID, "url: " + endpoint.getEndpointURI().getAddress()), e, this);
+            throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, endpoint.getEndpointURI().getAddress(), "uri"), e, this);
         }
     }
 

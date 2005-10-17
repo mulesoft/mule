@@ -15,17 +15,28 @@
 package org.mule.providers.ftp;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPReply;
+import org.mule.MuleManager;
+import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class FtpMessageDispatcher extends AbstractMessageDispatcher
@@ -90,13 +101,55 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
-        // TODO Auto-generated method stub
-        return null;
+        FTPClient client = null;
+        try {
+
+            client = connector.getFtp(endpointUri);
+            if (!client.changeWorkingDirectory(endpointUri.getPath())) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+
+            FilenameFilter filenameFilter = null;
+            String filter = (String)endpointUri.getParams().get("filter");
+            if(filter!=null) {
+                filter = URLDecoder.decode(filter, MuleManager.getConfiguration().getEncoding());
+                filenameFilter = new FilenameWildcardFilter(filter);
+            }
+            FTPFile[] files = client.listFiles();
+            if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
+                throw new IOException("Ftp error: " +
+                        client.getReplyCode());
+            }
+            if (files == null || files.length == 0) {
+                return null;
+            }
+            List fileList = new ArrayList();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isFile()) {
+                       if (filenameFilter == null ||
+                           filenameFilter.accept(null, files[i].getName())) {
+                        fileList.add(files[i]);
+                        //only read the first one
+                        break;
+                    }
+                }
+            }
+            if(fileList.size()==0) return null;
+
+            FTPFile file = (FTPFile)fileList.get(0);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            if (!client.retrieveFile(file.getName(), baos)) {
+                throw new IOException("Ftp error: " + client.getReplyCode());
+            }
+            return new MuleMessage(connector.getMessageAdapter(baos.toByteArray()));
+
+        } finally {
+            connector.releaseFtp(endpointUri, client);
+        }
     }
 
     public Object getDelegateSession() throws UMOException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 

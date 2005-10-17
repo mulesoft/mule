@@ -188,7 +188,7 @@ public class DefaultMuleConnection implements MuleConnection
     void checkIfValid() throws ResourceException
     {
         if (managedConnection == null) {
-            throw new ResourceException(new Message(Messages.X_IS_INVALID, "muleManagedConnection").toString());
+            throw new ResourceException(new Message(Messages.OBJECT_X_MARKED_INVALID, "muleManagedConnection").toString());
         }
     }
 

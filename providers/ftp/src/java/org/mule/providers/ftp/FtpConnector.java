@@ -14,11 +14,6 @@
  */
 package org.mule.providers.ftp;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
@@ -35,7 +30,13 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.ConnectorException;
+import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -59,10 +60,13 @@ public class FtpConnector extends AbstractServiceEnabledConnector
 
     private Map pools = new HashMap();
 
+
     public String getProtocol()
     {
-        return "FTP";
+        return "ftp";
     }
+
+
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
@@ -106,9 +110,22 @@ public class FtpConnector extends AbstractServiceEnabledConnector
 
     public void releaseFtp(UMOEndpointURI uri, FTPClient client) throws Exception
     {
+        if(isCreateDispatcherPerRequest()) {
+            destroyFtp(uri, client);
+            UMOMessageDispatcher dispatcher = getDispatcher(uri.toString());
+        } else {
+            if (client != null && client.isConnected()) {
+                ObjectPool pool = getFtpPool(uri);
+                pool.returnObject(client);
+            }
+        }
+    }
+
+    public void destroyFtp(UMOEndpointURI uri, FTPClient client) throws Exception
+    {
         if (client != null && client.isConnected()) {
             ObjectPool pool = getFtpPool(uri);
-            pool.returnObject(client);
+            pool.invalidateObject(client);
         }
     }
 

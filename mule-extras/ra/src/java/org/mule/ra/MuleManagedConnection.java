@@ -13,28 +13,25 @@
  */
 package org.mule.ra;
 
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.resource.NotSupportedException;
-import javax.resource.ResourceException;
-import javax.resource.spi.ConnectionEvent;
-import javax.resource.spi.ConnectionEventListener;
-import javax.resource.spi.ConnectionRequestInfo;
-import javax.resource.spi.ManagedConnection;
-import javax.resource.spi.ManagedConnectionMetaData;
-import javax.resource.spi.security.PasswordCredential;
-import javax.security.auth.Subject;
-import javax.transaction.xa.XAResource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.security.MuleCredentials;
+
+import javax.resource.NotSupportedException;
+import javax.resource.ResourceException;
+import javax.resource.spi.*;
+import javax.resource.spi.security.PasswordCredential;
+import javax.security.auth.Subject;
+import javax.transaction.xa.XAResource;
+import java.io.PrintWriter;
+import java.lang.IllegalStateException;
+import java.lang.SecurityException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>MuleManagedConnection</code> TODO
@@ -181,7 +178,7 @@ public class MuleManagedConnection implements ManagedConnection
             MuleConnection cnn = (MuleConnection) connection;
             cnn.associateConnection(this);
         } else {
-            throw new IllegalStateException(new Message(Messages.X_IS_INVALID, DefaultMuleConnection.class.getName()
+            throw new IllegalStateException(new Message(Messages.OBJECT_X_MARKED_INVALID, DefaultMuleConnection.class.getName()
                     + ": " + (connection == null ? "null" : connection.getClass().getName())).toString());
         }
     }

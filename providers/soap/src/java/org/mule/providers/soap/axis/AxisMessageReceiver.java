@@ -174,7 +174,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         if (style != null) {
             Style s = Style.getStyle(style);
             if(s==null) {
-                throw new InitialisationException(new Message(Messages.X_IS_INVALID, "style=" + style), this);
+                throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, style, "style"), this);
             } else {
                 sd.setStyle(s);
             }
@@ -183,7 +183,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         if (use != null) {
             Use u = Use.getUse(use);
             if(u==null) {
-                throw new InitialisationException(new Message(Messages.X_IS_INVALID, "use=" + use), this);
+                throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, use, "use"), this);
             } else {
                 sd.setUse(u);
             }

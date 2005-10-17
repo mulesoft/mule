@@ -126,7 +126,7 @@ public class NamedParameter {
         } else if(mode.equals("inout")) {
             this.mode = ParameterMode.INOUT;
         } else {
-            throw new IllegalArgumentException(new Message(Messages.X_IS_INVALID, "mode=" + mode).toString());
+            throw new IllegalArgumentException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, mode, "mode").toString());
         }
     }
     public QName getName() {

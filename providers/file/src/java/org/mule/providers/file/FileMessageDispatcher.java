@@ -15,9 +15,11 @@
 package org.mule.providers.file;
 
 import org.mule.MuleException;
+import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
@@ -27,7 +29,9 @@ import org.mule.util.Utility;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.URLDecoder;
 
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the
@@ -119,11 +123,17 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
     {
         File file = new File(endpointUri.getAddress());
         File result = null;
+        FilenameFilter filenameFilter = null;
+            String filter = (String)endpointUri.getParams().get("filter");
+            if(filter!=null) {
+                filter = URLDecoder.decode(filter, MuleManager.getConfiguration().getEncoding());
+                filenameFilter = new FilenameWildcardFilter(filter);
+            }
         if (file.exists()) {
             if (file.isFile()) {
                 result = file;
             } else if (file.isDirectory()) {
-                result = getNextFile(endpointUri.getAddress());
+                result = getNextFile(endpointUri.getAddress(), filenameFilter);
             }
             if (result != null) {
                 MuleMessage message = new MuleMessage(connector.getMessageAdapter(result));
@@ -143,7 +153,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    private File getNextFile(String dir) throws UMOException
+    private File getNextFile(String dir, FilenameFilter filter) throws UMOException
     {
         File[] files = new File[] {};
         File file = new File(dir);
@@ -153,8 +163,11 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 if (file.isFile()) {
                     result = file;
                 } else if (file.isDirectory()) {
-                    // todo what if we want to set a filter here?
-                    files = file.listFiles();
+                    if(filter!=null) {
+                        files = file.listFiles(filter);
+                    } else {
+                        files = file.listFiles();
+                    }
                     if (files.length > 0) {
                         result = files[0];
                     }
