@@ -14,14 +14,6 @@ package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,14 +35,12 @@ import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerEvent;
-import org.mule.umo.provider.ConnectorException;
-import org.mule.umo.provider.UMOConnectable;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
-import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.*;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.WaitableBoolean;
+
+import java.beans.ExceptionListener;
+import java.util.*;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all
@@ -131,9 +121,9 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /**
      * Determines whether dispatchers should be disposed straight away of
-     * deferred until the connector is disposing
+     * after every request or cached
      */
-    private boolean disposeDispatcherOnCompletion = false;
+    protected boolean createDispatcherPerRequest = false;
 
     /**
      * The service descriptor can define a default inbound transformer to be
@@ -828,10 +818,26 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /**
      * The resource id used when firing ConnectEvents from this connector
-     * @return
+     * @return the  resource id used when firing ConnectEvents from this connector
      */
     protected String getConnectEventId()
     {
         return getName();
+    }
+
+    /**
+     * controls whether dispatchers or cached or created per request
+     * @param createDispatcherPerRequest
+     */
+    public void setCreateDispatcherPerRequest(boolean createDispatcherPerRequest) {
+        this.createDispatcherPerRequest = createDispatcherPerRequest;
+    }
+
+    /**
+     * controls whether dispatchers or cached or created per request
+     * @return
+     */
+    public boolean isCreateDispatcherPerRequest() {
+        return createDispatcherPerRequest;
     }
 }
