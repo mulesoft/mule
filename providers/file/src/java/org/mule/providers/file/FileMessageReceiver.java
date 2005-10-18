@@ -119,7 +119,7 @@ public class FileMessageReceiver extends PollingMessageReceiver
         if (moveDir != null) {
             String fileName = file.getName();
             if (moveToPattern != null) {
-                fileName = ((FileConnector) connector).getFilenameParser().getFilename(null, moveToPattern);
+                fileName = ((FileConnector) connector).getFilenameParser().getFilename(msgAdapter, moveToPattern);
             }
             destinationFile = new File(moveDir, fileName);
         }
