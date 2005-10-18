@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <pomVersion>3</pomVersion>
+    <name>Mule Config Graph</name>
+    <groupId>mule</groupId>
+    <id>mule-grapher</id>
+    <version>1.0</version>
+    <inceptionYear>2005</inceptionYear>
+    <package>org.mule.tools.config.graph</package>
+    <logo>http://www.muleumo.org/images/mule-logo.gif</logo>
+    <shortDescription>mule-grapher</shortDescription>
+    <description>
+        A tool for generating configuration graphs for Xml config files
+    </description>
+    <url>http://mule.codehaus.org/ConfigGraph</url>
+    <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
+    <siteAddress>www.muleumo.org</siteAddress>
+    <siteDirectory>/var/www/html/muleumo.org</siteDirectory>
+    <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
+    <dependencies>
+    	<dependency>
+            <groupId>oy-lm</groupId>
+            <artifactId>oy-lm</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+     <build>
+        <sourceDirectory>${basedir}/src/java</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+         <unitTest>
+            <includes>
+                <include>**/*TestCase.*</include>
+            </includes>
+            <excludes>
+                <exclude>**/Abstract*.*</exclude>
+            </excludes>
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/test/conf</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
+        </unitTest>
+    </build>
+</project>

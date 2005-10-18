@@ -1,0 +1,71 @@
+<project default="generate"
+    xmlns:j="jelly:core">
+
+    <!--=================================================-->
+    <!--          Mule Config grapher TARGETS            -->
+    <!--=================================================-->
+
+    <!--
+    maven usage
+    Displays usage help
+
+    maven -Dfiles=[Mule config file,...] generate
+    Generates a configuration graph for one of more configuration files
+
+    maven generate-samples
+    Generates configuration graphs for all the mule sample applications and stores them in ./samples
+    -->
+
+<!-- Config Grapher -->
+  <goal name="generate" prereqs="setclasspath"
+    description="Generates a Graph for one or more config files">
+
+    <j:if test="${empty(files)}">
+      <echo>Command line param 'files' is not set, using default 'mule-config.xml'</echo>
+      <j:set var="files" value="mule-config.xml"/>
+    </j:if>
+    
+    <j:if test="${empty(outputdir)}">
+      <echo>Command line param 'outputdir' is not set, using current directory</echo>
+      <j:set var="outputdir" value="."/>
+    </j:if>
+    
+    <echo>Running the Mule Config Grapher with files = ${files}</echo>
+    <java classname="org.mule.tools.config.graph.MuleGrapher" fork="yes" maxmemory="128M">
+      <classpath refid="classpath"/>
+      <arg value="-files"/>
+      <arg value="${files}"/>
+      <arg value="-outputdir"/>
+      <arg value="${outputdir}"/>
+      <arg value="-caption"/>
+      <arg value="${caption}"/>
+      <arg value="-exec"/>
+      <arg value="${exec}"/>
+    </java>
+  </goal>
+
+    <goal name="usage" prereqs="setclasspath"
+    description="Provides usage information">
+
+    <java classname="org.mule.tools.config.graph.MuleGrapher" fork="yes" maxmemory="128M">
+      <classpath refid="classpath"/>
+      <arg value="?"/>
+    </java>
+  </goal>
+
+    <goal name="setclasspath" prereqs="test">
+    <path id="classpath">
+      <pathelement path="target/classes"/>
+      <pathelement path="target/test-classes"/>
+      <path refid="maven.dependency.classpath"/>
+    </path>
+  </goal>
+    
+    <goal name="generate-samples" prereqs="setclasspath"
+        description="Generates a Configuration graphs for the Mule sample applications">
+        <j:set var="files" value="../../samples/errorhandler/conf/mule-config.xml,../../samples/echo/conf/mule-config.xml,../../samples/hello/conf/hello-mule-config.xml,../../samples/loanbroker/conf/loan-broker-async-config.xml,../../samples/loanbroker/conf/loan-broker-sync-config.xml,../../samples/loanbroker-esb/conf/mule-config.xml,../../samples/loanbroker-esb/conf/mule-config-with-ejb-container.xml,../../samples/stockquote/conf/rest-mule-config.xml,../../samples/stockquote/conf/soap-mule-config.xml"/>
+        <j:set var="outputdir" value="samples"/>
+        <attainGoal name="generate"/>
+    </goal>
+
+</project>
