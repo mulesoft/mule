@@ -3,16 +3,15 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<!--
-	This file defines the configuration for the hello sample application.  The application
-	has two components -
+<mule-configuration id="Hello_Sample" version="1.0">
+
+    <description>
+    The hello sample application has two components -
 	1. The Greeter component that adds a greeting to the event it receives
 	2. The ChitChater component that adds some additional conversation to the event it receives
 	An event is triggered by input through the system console and the outbound event is
 	aslo written out through the system console.
--->
-<mule-configuration id="helloSampleProperties" version="1.0">
-
+    </description>
     <!--
         The VMConnector is used to send events between components within the ame VM
     -->
@@ -82,9 +81,15 @@
             Please refer to the Configuration Guide for a full description of all the parameters.
         -->
         <mule-descriptor name="GreeterUMO"
-            inboundEndpoint="stream://localhost?transformers=StringToNameString"
-            outboundEndpoint="vm://localhost/chitchatter"
             implementation="org.mule.samples.hello.Greeter">
+            <inbound-router>
+                <endpoint address="stream://localhost" transformers="StringToNameString"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="vm://localhost/chitchatter"/>
+                </router>
+            </outbound-router>
             <!--
             Here we tell this component to use the interceptor stack defined above
             -->
@@ -92,10 +97,16 @@
         </mule-descriptor>
 
         <mule-descriptor name="ChitChatUMO"
-            inboundEndpoint="vm://localhost/chitchatter?transformers=NameStringToChatString"
-            outboundEndpoint="stream://system.out?transformers=ChatStringToString"
             implementation="org.mule.samples.hello.ChitChatter">
 
+            <inbound-router>
+                <endpoint address="vm://localhost/chitchatter" transformers="NameStringToChatString"/>
+            </inbound-router>
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="stream://System.out" transformers="ChatStringToString" />
+                </router>
+            </outbound-router>
             <interceptor name="default"/>
         </mule-descriptor>
     </model>

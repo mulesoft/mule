@@ -3,13 +3,14 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="helloSampleProperties" version="1.0">
+<mule-configuration id="Mule_Echo_Sample" version="1.0">
 
-    <!--
-    to invoke the EchoUMO component as a webservice hit the following URL
+    <description>
+    Is a simple component example that demostrates how to expose a component over multiple transports.
 
-    http://localhost:8081/services/EchoUMO?method=echo&param=Is there an echo?
-    -->
+    To invoke the EchoUMO component as a webservice hit the following URL -
+    http://localhost:8081/services/EchoUMO?method=echo&amp;param=Is there an echo?
+    </description>
 
     <!--
     	The system stream connector is used to send and receive information via the

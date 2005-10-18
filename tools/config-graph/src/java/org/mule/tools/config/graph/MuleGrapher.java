@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Attribute;
 import org.jdom.input.SAXBuilder;
 
 import com.oy.shared.lm.graph.Graph;
@@ -26,10 +27,16 @@ public class MuleGrapher {
     private static final String TAG_ENDPOINT = "endpoint";
     private static final String COLOR_DEFINED_ENDPOINTS = "lightblue";
     private static final String COLOR_ROUTER = "darkolivegreen3";
+    private static final String COLOR_FILTER = "gold";
+    private static final String COLOR_ENDPOINT = "white";
 
     private Map endpoints = new HashMap();
     private String file = "";
     private static String exec = null;
+
+    private final String[] ignoredAttributes = new String[]{"className", "inboundEndpoint", "outboundEndpoint",
+     "responseEndpoint", "inboundTransformer", "outboundTransformer", "type", "singleton", "address",
+     "transformers", "name"};
 
     public static void main(String[] args) throws IOException, JDOMException {
 
@@ -112,6 +119,7 @@ public class MuleGrapher {
         captionBuffer.append(caption);
         appendDescription(root, captionBuffer);
         graph.getInfo().setCaption(captionBuffer.toString());
+        parseEndpointIdentifiers(graph, root);
         parseEndpoints(graph, root);
 
         Element model = root.getChild("model");
@@ -148,8 +156,8 @@ public class MuleGrapher {
         }
     }
 
-    private void appendProperties(Element connector, StringBuffer caption) {
-        Element properties = connector.getChild("properties");
+    private void appendProperties(Element element, StringBuffer caption) {
+        Element properties = element.getChild("properties");
         if (properties != null) {
             for (Iterator iterator = properties.getChildren("property")
                     .iterator(); iterator.hasNext();) {
@@ -158,6 +166,23 @@ public class MuleGrapher {
                         + property.getAttributeValue("value") + "\n");
             }
         }
+        for (Iterator iterator = element.getAttributes().iterator(); iterator.hasNext();) {
+            Attribute a = (Attribute) iterator.next();
+            if(!ignoreAttribute(a.getName())) {
+                caption.append(a.getName() + " :"
+                        + a.getValue() + "\n");
+            }
+        }
+    }
+
+    private boolean ignoreAttribute(String name) {
+        if(name==null || "".equals(name)) return true;
+        for (int i = 0; i < ignoredAttributes.length; i++) {
+            if(name.equals(ignoredAttributes[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void appendDescription(Element e, StringBuffer caption) {
@@ -319,7 +344,7 @@ public class MuleGrapher {
                     routerNode.getInfo().setHeader(router.getAttributeValue("className"));
                     routerNode.getInfo().setFillColor(COLOR_ROUTER);
                     graph.addEdge(node, routerNode).getInfo().setCaption("outbound router");
-                    processFilter(router, routerNode);
+                    //processFilter(graph, router, routerNode);
                     processOutBoundRouterEndpoints(graph, router, routerNode);
                     processReplyTOasElement(graph, router, routerNode);
                     proceeReplyTOasProperty(graph, router, routerNode);
@@ -347,23 +372,68 @@ public class MuleGrapher {
                     appendDescription(outEndpoint, caption);
                     out.getInfo().setCaption(caption.toString());
                     endpoints.put(url, out);
+                    processOutboundFilter(graph, outEndpoint, out, routerNode);
+                } else {
+                    graph.addEdge(routerNode, out).getInfo().setCaption("out");
                 }
-
-                graph.addEdge(routerNode, out).getInfo().setCaption("out");
             }
         }
     }
 
-    private void processFilter(Element router, GraphNode routerNode) {
-        if (router.getChild("filter") != null) {
-            String filterCaptions = "expectedType : "
-                    + router.getChild("filter").getAttributeValue("expectedType") + "\n";
-            filterCaptions += "className : "
-                    + router.getChild("filter").getAttributeValue("className")
-                    + "\n";
-            filterCaptions += "expression : "
-                    + router.getChild("filter").getAttributeValue("expression");
-            routerNode.getInfo().setCaption(filterCaptions);
+    private void processInboundFilter(Graph graph, Element endpoint, GraphNode endpointNode, GraphNode parent) {
+        Element filter=endpoint.getChild("filter");
+        boolean conditional = false;
+
+        if (filter == null) {
+            filter=endpoint.getChild("left-filter");
+            conditional = filter!=null;
+        }
+
+        if (filter != null) {
+
+            GraphNode filterNode = graph.addNode();
+            filterNode.getInfo().setHeader(filter.getAttributeValue("className"));
+            filterNode.getInfo().setFillColor(COLOR_FILTER);
+            StringBuffer caption = new StringBuffer();
+            appendProperties(filter, caption);
+            filterNode.getInfo().setCaption(caption.toString());
+            //this is a hack to pick up and/or filter conditions
+            //really we need a nice recursive way of doing this
+            if(conditional) {
+                filter=endpoint.getChild("right-filter");
+                GraphNode filterNode2 = graph.addNode();
+                filterNode2.getInfo().setHeader(filter.getAttributeValue("className"));
+                filterNode2.getInfo().setFillColor(COLOR_FILTER);
+                StringBuffer caption2 = new StringBuffer();
+                appendProperties(filter, caption2);
+                filterNode2.getInfo().setCaption(caption2.toString());
+                graph.addEdge(endpointNode, filterNode2).getInfo().setCaption("filters on");
+            }
+            processInboundFilter(graph, filter, filterNode, parent);
+
+            graph.addEdge(endpointNode, filterNode).getInfo().setCaption("filters on");
+        } else {
+            graph.addEdge(endpointNode, parent).getInfo().setCaption("in");
+        }
+    }
+
+    //todo doesn't currently support And/Or logic filters
+    private void processOutboundFilter(Graph graph, Element endpoint, GraphNode endpointNode, GraphNode parent) {
+        Element filter=endpoint.getChild("filter");
+        if (filter == null) filter=endpoint.getChild("left-filter");
+        if (filter == null) filter=endpoint.getChild("right-filter");
+
+        if (filter != null) {
+            GraphNode filterNode = graph.addNode();
+            filterNode.getInfo().setHeader(filter.getAttributeValue("className"));
+            filterNode.getInfo().setFillColor(COLOR_FILTER);
+            StringBuffer caption = new StringBuffer();
+            appendProperties(filter, caption);
+            filterNode.getInfo().setCaption(caption.toString());
+            processOutboundFilter(graph, filter, filterNode, parent);
+            graph.addEdge(filterNode, endpointNode).getInfo().setCaption("filters on");
+        } else {
+            graph.addEdge(parent, endpointNode).getInfo().setCaption("out");
         }
     }
 
@@ -419,20 +489,30 @@ public class MuleGrapher {
             List inbounEndpoints = inboundRouter.getChildren(TAG_ENDPOINT);
             for (Iterator iterator = inbounEndpoints.iterator(); iterator
                     .hasNext();) {
-                Element endpointIn = (Element) iterator.next();
-                String url = endpointIn.getAttributeValue(TAG_ATTRIBUTE_ADDRESS);
+                Element inEndpoint = (Element) iterator.next();
+                String url = inEndpoint.getAttributeValue(TAG_ATTRIBUTE_ADDRESS);
                 if (url != null) {
                     GraphNode in = (GraphNode) endpoints.get(url);
+                    StringBuffer caption = new StringBuffer();
                     if (in == null) {
                         in = graph.addNode();
-                        StringBuffer caption = new StringBuffer();
+                        in.getInfo().setFillColor(COLOR_ENDPOINT);
                         caption.append(url).append("\n");
-                        appendProperties(endpointIn, caption);
-                        appendDescription(endpointIn, caption);
+                        appendProperties(inEndpoint, caption);
+                        appendDescription(inEndpoint, caption);
+                        in.getInfo().setCaption(caption.toString());
+                    } else {
+                        //rewrite the properties
+                        //todo really we need a cleaner way of handling in/out endpoints between components
+                        caption.append(url).append("\n");
+                        appendProperties(inEndpoint, caption);
+                        appendDescription(inEndpoint, caption);
                         in.getInfo().setCaption(caption.toString());
                     }
-                    if (in != null)
-                        graph.addEdge(in, endpointsLink).getInfo().setCaption("in");
+
+                    if (in != null) {
+                        processInboundFilter(graph, inEndpoint, in, endpointsLink);
+                    }
                 }
             }
 
@@ -450,7 +530,7 @@ public class MuleGrapher {
 
     }
 
-    private void parseEndpoints(Graph graph, Element root) {
+    private void parseEndpointIdentifiers(Graph graph, Element root) {
         Element endpointIdentifiers = root.getChild("endpoint-identifiers");
 
         if (endpointIdentifiers == null) {
@@ -473,12 +553,37 @@ public class MuleGrapher {
         }
     }
 
+    private void parseEndpoints(Graph graph, Element root) {
+            Element globalEndpoints = root.getChild("global-endpoints");
+
+            if (globalEndpoints == null) {
+                System.out.println("no global-endpoints");
+                return;
+            }
+
+            List namedChildren = globalEndpoints.getChildren("endpoint");
+
+            for (Iterator iter = namedChildren.iterator(); iter.hasNext();) {
+                Element endpoint = (Element) iter.next();
+                GraphNode node = graph.addNode();
+                node.getInfo().setFillColor(COLOR_DEFINED_ENDPOINTS);
+                String name = endpoint.getAttributeValue("name");
+
+                node.getInfo().setHeader(endpoint.getAttributeValue("address") + " (" + name + ")");
+                StringBuffer caption = new StringBuffer();
+                appendProperties(endpoint, caption);
+                node.getInfo().setCaption(caption.toString());
+                endpoints.put(name, node);
+
+               //processFilter(graph, endpoint, node);
+            }
+        }
 
     private String getSaveExecutable() throws FileNotFoundException {
         if (exec == null) {
             String osName = System.getProperty("os.name").toLowerCase();
             if (osName.startsWith("windows")) {
-                File f = new File("./win32/dot.exe");
+                File f = new File("win32/dot.exe");
                 exec = f.getAbsolutePath();
             } else {
                 throw new UnsupportedOperationException("Mule Graph currently only works on Windows");

@@ -3,17 +3,16 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<!--
-This loan broker example is modeled on the Enterprise integration Patterns book
-sample.
-This implementation differs in that this configuration uses an asynchronous
-model where each component communicates messaging accordin to it's configuration
-in this file.
-There is a synchronous version of this in the loan-broker-sync-config.xml where calls to
-the different components are made from the loan broker component (a la hub and spoke).
--->
 
-<mule-configuration id="Loan_broker_Async" version="1.0">
+<mule-configuration id="Mule_Loan_Broker_Asynchronous_Sample" version="1.0">
+
+    <description>
+    This loan broker example is modeled on the Enterprise integration Patterns book
+    sample.
+    This implementation differs in that this configuration uses an asynchronous
+    model where each component communicates messaging accordin to it's configuration
+    in this file.
+    </description>
 
     <mule-environment-properties serverUrl="">
         <threading-profile maxBufferSize="0" maxThreadsActive="5" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="3000000"/>

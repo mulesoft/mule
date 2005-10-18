@@ -3,7 +3,13 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="Loan_broker_Sync" version="1.0">
+<mule-configuration id="Mule_Loan_broker_Synchronous_Sample" version="1.0">
+    <description>
+    This loan broker example is modeled on the Enterprise integration Patterns book
+    sample.
+    This implementation differs in that this configuration uses an synchronous
+    model where each component is invoked from the LoanBroker component.
+    </description>
 
     <mule-environment-properties synchronous="true" serverUrl=""/>
 

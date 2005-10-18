@@ -27,7 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * <code>LoanConsumer</code> TODO
+ * <code>LoanConsumer</code> is a loacn broker client app that uses command line
+ * prompts to obtain loan requests
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$

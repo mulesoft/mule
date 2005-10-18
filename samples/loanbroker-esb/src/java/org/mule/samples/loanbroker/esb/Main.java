@@ -76,7 +76,7 @@ public class Main
                 if (response == '1')
                 {
                     System.out.println("Loading 'Ejb via an Endpoint' version");
-                    loanConsumer = new Main("mule-config.xml");
+                    loanConsumer = new Main("loan-broker-esb-mule-config.xml");
                 } else if(response == 'q')
                 {
                     System.out.println("Bye");
@@ -84,7 +84,7 @@ public class Main
                 } else
                 {
                     System.out.println("Loading 'Managed Ejb Component' version");
-                    loanConsumer = new Main("mule-config-with-ejb-container.xml");
+                    loanConsumer = new Main("loan-broker-esb-mule-config-with-ejb-container.xml");
                 }
 
             while (response != 'q') {

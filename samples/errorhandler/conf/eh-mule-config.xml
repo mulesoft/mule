@@ -3,8 +3,14 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="Test_Mule_Properties" version="1.0">
+<mule-configuration id="Mule_Error_Handler_Sample" version="1.0">
 
+    <description>
+    Demonstrates using Spring as the external container to provide the objects managed by Mule and
+    how to publish events to multiple outbound endpoints. The sample consists of two components;
+    ExecptionManager and BusinessErrorManager.
+    </description>
+    
     <environment-properties>
         <!-- provider properties-->
         <property name="java.naming.username" value="[% Your Jndi User name %]"/>
