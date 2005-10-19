@@ -13,8 +13,8 @@
     <description>
     Mule extras is a sub-project of Mule where all extensions to Mule exist. Mule
     is a highly extensible framework where every component can be customised and
-    swapped in. These extensions will can be anything from transformers, routers,
-    interceptors to extensions to other frameworks such as Spring or Pico to providers
+    swapped in. These extensions can be anything from transformers, routers,
+    or interceptors to extensions to other frameworks such as Spring or Pico to providers
     that allow you to connect to other systems.
     </description>
     <url>http://wiki.muleumo.org/display/MULE/Mule+Extras</url>
