@@ -1,0 +1,119 @@
+package org.mule.providers.ejb;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.providers.rmi.RmiConnector;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.util.ClassHelper;
+import org.mule.util.PropertiesHelper;
+
+import javax.ejb.EJBObject;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
+
+/**
+ * Code by (c) 2005 P.Oikari.
+ *
+ * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
+ * @version $Revision$
+ */
+
+public class EjbConnectorUtil
+{
+    protected static transient Log logger = LogFactory.getLog(EjbConnectorUtil.class);
+
+    private EjbConnectorUtil()
+    {
+    }
+
+    /**
+     * @param endpoint
+     * @param connector
+     * @return Remote EJB object from Appserver
+     * @throws RemoteException
+     * @throws UnknownHostException
+     */
+
+    public static EJBObject getRemoteObject(UMOEndpoint endpoint, EjbConnector connector) throws RemoteException, UnknownHostException
+    {
+        EJBObject remoteObj = null;
+
+        UMOEndpointURI endpointUri = endpoint.getEndpointURI();
+
+        int port = endpointUri.getPort();
+
+        if (port < 1) {
+            port = RmiConnector.DEFAULT_RMI_REGISTRY_PORT;
+        }
+
+        InetAddress inetAddress = InetAddress.getByName(endpointUri.getHost());
+
+        String serviceName = endpointUri.getPath();
+
+        try {
+            Object ref = connector.getJndiContext(inetAddress.getHostAddress() + ":" + port).lookup(serviceName);
+
+            Method method = ClassHelper.getMethod("create", ref.getClass());
+
+            remoteObj = (EJBObject) method.invoke(ref, ClassHelper.NO_ARGS);
+        }
+        catch (Exception e) {
+            throw new RemoteException("Remote EJBObject lookup failed for '" + inetAddress.getHostAddress() + ":" + port + serviceName + "'", e);
+        }
+
+        return (remoteObj);
+    }
+
+    /**
+     * @param endpoint
+     * @param remoteObject
+     * @param connector
+     * @param clazz
+     * @return Actual remote method to be invoked
+     * @throws InitialisationException
+     * @throws NoSuchMethodException
+     */
+    public static Method getMethodObject(UMOEndpoint endpoint, EJBObject remoteObject, EjbConnector connector, Class clazz) throws InitialisationException, NoSuchMethodException
+    {
+        UMOEndpointURI endpointUri = endpoint.getEndpointURI();
+
+        String methodName = PropertiesHelper.getStringProperty(endpointUri.getParams(),
+                RmiConnector.PARAM_SERVICE_METHOD,
+                null);
+
+        if (null == methodName) {
+            methodName = (String) endpoint
+                    .getProperties()
+                    .get(RmiConnector.PARAM_SERVICE_METHOD);
+
+            if (null == methodName) {
+                throw new InitialisationException(new org.mule.config.i18n.Message("ejb",
+                        RmiConnector.MSG_PARAM_SERVICE_METHOD_NOT_SET), endpoint);
+            }
+        }
+
+        Class[] argumentClasses = null;
+
+        // Attempt to init params
+        if (clazz.equals(EjbMessageReceiver.class)) {
+            try {
+                EjbAble object = (EjbAble) Class.forName(connector.getReceiverArgumentClass()).newInstance();
+
+                argumentClasses = object.argumentClasses();
+
+                connector.setEjbAble(object);
+            }
+            catch (Exception e) {
+                throw new InitialisationException(new org.mule.config.i18n.Message("ejb", EjbConnector.EJB_SERVICECLASS_INVOCATION_FAILED), e);
+            }
+        } else {
+            argumentClasses = connector.getArgumentClasses();
+        }
+
+        return (remoteObject.getClass().getMethod(methodName, argumentClasses));
+    }
+}

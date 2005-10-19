@@ -14,104 +14,72 @@
 
 package org.mule.providers.ejb;
 
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.providers.rmi.RmiConnector;
-import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOMessageReceiver;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import java.util.Hashtable;
-import java.util.Map;
-
-/*
+/**
  * Code by (c) 2005 P.Oikari.
  *
- * @author <a href="mailto:pnirvin@hotmail.com">P.Oikari</a>
+ * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
  * @version $Revision$
  */
 
-public class EjbConnector extends RmiConnector {
-    private String jndiInitialFactory;
+public class EjbConnector extends RmiConnector
+{
+    ////////////////////////////////////////////
+    // Errorcodes
+    ///////////////////////////////////////////
+    public static final int EJB_SERVICECLASS_INVOCATION_FAILED = 2;
 
-    private String jndiUrlPkgPrefixes;
+    private long pollingFrequency = 1000;
 
-    private String jndiProviderUrl;
+    private String receiverArgumentClass = null;
 
-    private Context jndiContext;
+    private EjbAble ejbAble = null;
 
-    private Map jndiProviderProperties = null;
-
-    public String getProtocol() {
+    public String getProtocol()
+    {
         return "ejb";
     }
 
-    protected void initJndiContext() throws NamingException, InitialisationException {
-        if (null == jndiContext) {
-            Hashtable props = new Hashtable();
-
-            if (null != jndiInitialFactory)
-                props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
-
-            if (jndiProviderUrl != null)
-                props.put(Context.PROVIDER_URL, jndiProviderUrl);
-
-            if (jndiUrlPkgPrefixes != null)
-                props.put(Context.URL_PKG_PREFIXES, jndiUrlPkgPrefixes);
-
-            if(jndiProviderProperties!=null) {
-                props.putAll(jndiProviderProperties);
-            }
-            jndiContext = new InitialContext(props);
-        }
+    public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
+    {
+        final Object[] args = new Object[]{Long.valueOf(pollingFrequency)};
+        return getServiceDescriptor().createMessageReceiver(this, component, endpoint, args);
     }
 
-    public Context getJndiContext(String jndiProviderUrl) throws InitialisationException {
-        try {
-            setJndiProviderUrl(jndiProviderUrl);
-
-            initJndiContext();
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "EJB Connector"), e, this);
-        }
-
-        return jndiContext;
+    ////////////////////////////////////////////////////
+    //  Receiver method + args
+    ///////////////////////////////////////////////////
+    public long getPollingFrequency()
+    {
+        return pollingFrequency;
     }
 
-    public void setJndiContext(Context jndiContext) {
-        this.jndiContext = jndiContext;
+    public void setPollingFrequency(long pollingFrequency)
+    {
+        this.pollingFrequency = pollingFrequency;
     }
 
-    public void setJndiInitialFactory(String jndiInitialFactory) {
-        this.jndiInitialFactory = jndiInitialFactory;
+    public String getReceiverArgumentClass()
+    {
+        return receiverArgumentClass;
     }
 
-    public String getJndiInitialFactory() {
-        return jndiInitialFactory;
+    public void setReceiverArgumentClass(String className) throws Exception
+    {
+        this.receiverArgumentClass = className;
     }
 
-    public void setJndiUrlPkgPrefixes(String jndiUrlPkgPrefixes) {
-        this.jndiUrlPkgPrefixes = jndiUrlPkgPrefixes;
+    public EjbAble getEjbAble()
+    {
+        return ejbAble;
     }
 
-    public String getJndiUrlPkgPrefixes() {
-        return jndiUrlPkgPrefixes;
-    }
-
-    public String getJndiProviderUrl() {
-        return jndiProviderUrl;
-    }
-
-    public void setJndiProviderUrl(String jndiProviderUrl) {
-        this.jndiProviderUrl = jndiProviderUrl;
-    }
-
-    public Map getJndiProviderProperties() {
-        return jndiProviderProperties;
-    }
-
-    public void setJndiProviderProperties(Map jndiProviderProperties) {
-        this.jndiProviderProperties = jndiProviderProperties;
+    public void setEjbAble(EjbAble ejbAble)
+    {
+        this.ejbAble = ejbAble;
     }
 }

@@ -23,11 +23,12 @@ import org.mule.umo.provider.UMOMessageDispatcherFactory;
  * @author <a href="mailto:pnirvin@hotmail.com">P.Oikari</a>
  * @version $Revision$
  */
+
 public class EjbMessageDispatcherFactory implements UMOMessageDispatcherFactory
 {
-  public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
-  {
-    return new EjbMessageDispatcher((EjbConnector) connector);
-  }
+    public UMOMessageDispatcher create(UMOConnector connector) throws UMOException
+    {
+        return new EjbMessageDispatcher((EjbConnector) connector);
+    }
 }
 

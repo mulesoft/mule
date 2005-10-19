@@ -22,10 +22,11 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
  * @author <a href="mailto:pnirvin@hotmail.com">P.Oikari</a>
  * @version $Revision$
  */
+
 public class EjbMessageAdapter extends RmiMessageAdapter
 {
-  public EjbMessageAdapter(Object message) throws MessageTypeNotSupportedException
-  {
-    super(message);
-  }
+    public EjbMessageAdapter(Object message) throws MessageTypeNotSupportedException
+    {
+        super(message);
+    }
 }

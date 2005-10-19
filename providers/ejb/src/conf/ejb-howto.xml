@@ -1,0 +1,29 @@
+
+<!-- 
+	receiverArgumentClass = class that implements EjbAble interface for EjbReceiver.
+	 
+	Current connector assumes that both Receiver and Dispatcher EJBHomes are registered to same JNDI instance
+
+-->
+
+<connector name="EJBConnector" className="org.mule.providers.ejb.EjbConnector">
+    <properties>
+        <property name="jndiInitialFactory" value="org.jnp.interfaces.NamingContextFactory"/>
+        <property name="jndiUrlPkgPrefixes" value="org.jboss.naming:org.jnp.interfaces"/>
+        <property name="securityPolicy" value="wideopen.policy"/>
+        <property name="pollingFrequency" value="20000"/>
+      
+      	<property name="receiverArgumentClass" value="mule.test.ejb.EjbTester"/>
+        
+        <list name="methodArgumentTypes">
+	        <entry value="java.lang.String/"/>
+	        <entry value="java.lang.String/"/>
+    	  </list>    	
+    	    	
+    </properties>
+</connector>
+
+
+<!-- same endpoint addresstype for both receiver and dispatcher -->
+
+<endpoint address="ejb://localhost:1099/SomeService?method=remoteMethod">
