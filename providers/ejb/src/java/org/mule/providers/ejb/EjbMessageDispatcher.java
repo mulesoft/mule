@@ -200,22 +200,4 @@ public class EjbMessageDispatcher extends AbstractMessageDispatcher {
         return (payload instanceof Object[] ? (Object[]) payload : new Object[]{payload});
     }
 
-    // TODO never used. Remove it?
-    private class EjbHolder {
-        private Object ejb;
-        private Method method;
-
-        public EjbHolder(Object ejb, Method method) {
-            this.ejb = ejb;
-            this.method = method;
-        }
-
-        public Object getEjb() {
-            return ejb;
-        }
-
-        public Method getMethod() {
-            return method;
-        }
-    }
 }
