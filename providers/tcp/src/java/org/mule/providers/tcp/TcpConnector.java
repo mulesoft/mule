@@ -22,8 +22,10 @@ import org.mule.util.ClassHelper;
 /**
  * <code>TcpConnector</code> can bind or sent to a given tcp port on a given
  * host.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
+ *
  * @version $Revision$
  */
 public class TcpConnector extends AbstractServiceEnabledConnector
@@ -46,6 +48,52 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     private TcpProtocol tcpProtocol;
 
+    ////////////////////////////////////////////////////////////////////////
+    //  Properties for 'keepSocketConnected' TcpMessageDispatcher
+    ////////////////////////////////////////////////////////////////////////
+    public static final int KEEP_RETRYING_INDEFINETLY = 0;
+
+    private boolean keepSendSocketOpen = false;
+
+    // Time to sleep between reconnects in msecs
+    private int reconnectMillisecs = 10000;
+
+    // -1 try to reconnect forever
+    private int maxRetryCount = KEEP_RETRYING_INDEFINETLY;
+
+    public boolean isKeepSendSocketOpen()
+    {
+        return keepSendSocketOpen;
+    }
+
+    public void setKeepSendSocketOpen(boolean keepSendSocketOpen)
+    {
+        this.keepSendSocketOpen = keepSendSocketOpen;
+    }
+
+    public int getReconnectMillisecs()
+    {
+        return reconnectMillisecs;
+    }
+
+    public void setReconnectMillisecs(int reconnectMillisecs)
+    {
+        this.reconnectMillisecs = reconnectMillisecs;
+    }
+
+    public int getMaxRetryCount()
+    {
+        return maxRetryCount;
+    }
+
+    public void setMaxRetryCount(int maxRetryCount)
+    {
+        // Dont set negative numbers
+        if (maxRetryCount >= KEEP_RETRYING_INDEFINETLY)
+            this.maxRetryCount = maxRetryCount;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
@@ -117,7 +165,8 @@ public class TcpConnector extends AbstractServiceEnabledConnector
         this.tcpProtocolClassName = protocolClassName;
     }
 
-    public boolean isRemoteSyncEnabled() {
+    public boolean isRemoteSyncEnabled()
+    {
         return true;
     }
 }
