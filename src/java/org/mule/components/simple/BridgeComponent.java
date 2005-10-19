@@ -24,7 +24,7 @@ import org.mule.umo.routing.UMOInboundRouter;
 import java.util.Iterator;
 
 /**
- * Han be used to bridge inbound requests to an outbound router without any processing
+ * Can be used to bridge inbound requests to an outbound router without any processing
  * done inbetween.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -53,7 +53,7 @@ public class BridgeComponent implements UMODescriptorAware, Callable {
     }
 
     public Object onCall(UMOEventContext context) throws Exception {
-        throw new UnsupportedOperationException("A bridge should not ever receive an event an  event instead the event should be directly dispatched from the inbound endpoint to outbound router. Component is: "
+        throw new UnsupportedOperationException("A bridge should not ever receive an event, instead the event should be directly dispatched from the inbound endpoint to the outbound router. Component is: "
                 + context.getComponentDescriptor().getName());
     }
 }
