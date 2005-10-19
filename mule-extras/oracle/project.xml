@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <id>mule-extras-oracle</id>
+    <artifactId>mule-extras-oracle</artifactId>
+    <name>Mule Oracle Support</name>
+    <shortDescription>oracle</shortDescription>
+    <description>Mule Oracle Support adds Oracle-specific functionality to the standard Mule providers such as JMS and JDBC.  For more information see
+        <a href="http://mule.codehaus.org/Oracle+Integration">Oracle Integration</a>.
+    </description>
+    <dependencies>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-jms-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://mule.codehaus.org/docs/modules/mule-jms-provider/</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jdbc</groupId>
+            <artifactId>ojdbc</artifactId>
+            <jar>ojdbc14.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>aqapi</artifactId>
+            <jar>aqapi13.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>jmscommon</artifactId>
+            <jar>jmscommon.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+
+		<!-- For XMLType support only -->
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xdb</artifactId>
+            <jar>xdb.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xmlparserv2</artifactId>
+            <jar>xmlparserv2.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+    </dependencies>
+    <build>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
+         <unitTest>
+            <excludes>
+                <!-- TODO How can we unit test this without a real AQjmsSession? -->
+                <exclude>**/OracleJmsTransformersTestCase.*</exclude>
+                <!-- This fails because org.mule.tck.providers.AbstractConnectorTestCase.testConnectorLifecycle()
+                ends up trying to open a JDBC connection. -->
+                <exclude>**/OracleJmsConnectorTestCase.*</exclude>
+            </excludes>
+        </unitTest>
+    </build>
+</project>

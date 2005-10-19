@@ -1,0 +1,32 @@
+package org.mule.extras.oracle.jms;
+
+import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.umo.transformer.UMOTransformer;
+import org.mule.extras.oracle.jms.transformers.StringToXMLMessage;
+import org.mule.extras.oracle.jms.transformers.XMLMessageToString;
+
+/**
+ * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
+ * 
+ * TODO How can we unit test the <code>StringToXMLMessage</code> and 
+ * <code>XMLMessageToString</code> transformers without a real AQjmsSession? 
+ */
+public class OracleJmsTransformersTestCase extends AbstractTransformerTestCase
+{
+    public UMOTransformer getTransformer() throws Exception {
+        return new StringToXMLMessage();
+    }
+
+    public UMOTransformer getRoundTripTransformer() throws Exception {
+        return new XMLMessageToString();
+    }
+
+    public Object getTestData() {
+        return "<msg attrib=\"attribute\">This is an XML message.</msg>";
+    }
+
+    /** TODO An AdtMessage cannot be created without an AQjmsSession. */
+    public Object getResultData() {
+    	return null/*AdtMessage*/;
+    }
+}
