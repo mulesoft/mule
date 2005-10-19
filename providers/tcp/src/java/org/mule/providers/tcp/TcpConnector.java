@@ -89,8 +89,9 @@ public class TcpConnector extends AbstractServiceEnabledConnector
     public void setMaxRetryCount(int maxRetryCount)
     {
         // Dont set negative numbers
-        if (maxRetryCount >= KEEP_RETRYING_INDEFINETLY)
+        if (maxRetryCount >= KEEP_RETRYING_INDEFINETLY) {
             this.maxRetryCount = maxRetryCount;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////

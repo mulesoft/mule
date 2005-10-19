@@ -228,16 +228,18 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     /////////////////////////////////////////////////////////////////
     // New keepSocketOpen option methods by P.Oikari
     /////////////////////////////////////////////////////////////////
-    public boolean reconnect(UMOEvent event, int maxretries) throws Exception
+    public boolean reconnect(UMOEvent event, int maxRetries) throws Exception
     {
-        if (null != connectedSocket) // We already have conected socket
-            return (true);
+        if (null != connectedSocket) {
+            // We already have a connected socket
+            return true;
+        }
 
         boolean success = false;
 
-        int retrycount = -1;
+        int retryCount = -1;
 
-        while (!success && !disposed && (retrycount < maxretries)) {
+        while (!success && !disposed && (retryCount < maxRetries)) {
             try {
                 connectedSocket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
 
@@ -246,20 +248,22 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
             catch (Exception e) {
                 success = false;
 
-                if (maxretries != TcpConnector.KEEP_RETRYING_INDEFINETLY)
-                    retrycount++;
+                if (maxRetries != TcpConnector.KEEP_RETRYING_INDEFINETLY) {
+                    retryCount++;
+                }
 
                 logger.warn("run() warning at host: '" + event.getEndpoint().getEndpointURI().getAddress() + "'. Reason: " + e.getMessage());
 
-                if (retrycount < maxretries) {
+                if (retryCount < maxRetries) {
                     try {
                         Thread.sleep(connector.getReconnectMillisecs());
                     }
                     catch (Exception ex) {
                         logger.warn("SocketConnector threadsleep interrupted. Reason: " + ex.getMessage());
                     }
-                } else
+                } else {
                     throw e;
+                }
             }
         }
 
