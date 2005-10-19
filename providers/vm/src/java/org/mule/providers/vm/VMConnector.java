@@ -167,11 +167,17 @@ public class VMConnector extends AbstractServiceEnabledConnector
         UMOTransaction tx = TransactionCoordination.getInstance().getTransaction();
         if (tx != null) {
             if (tx.hasResource(qm)) {
-                logger.debug("Retrieving queue session from current transaction");
+                if (logger.isDebugEnabled()) {
+                	logger.debug("Retrieving queue session from current transaction");
+                }
                 return (QueueSession) tx.getResource(qm);
             }
         }
-        logger.debug("Retrieving new queue session from queue manager");
+
+        if (logger.isDebugEnabled()) {
+			logger.debug("Retrieving new queue session from queue manager");
+        }
+
         QueueSession session = qm.getQueueSession();
         if (tx != null) {
             logger.debug("Binding queue session to current transaction");
@@ -186,13 +192,17 @@ public class VMConnector extends AbstractServiceEnabledConnector
 
     protected UMOMessageReceiver getReceiverByEndpoint(UMOEndpointURI endpointUri) throws EndpointException
     {
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("Looking up vm receiver for address: " + endpointUri.toString());
+        }
+
         UMOMessageReceiver receiver;
         // If we have an exact match, use it
         receiver = (UMOMessageReceiver) receivers.get(endpointUri.getAddress());
         if (receiver != null) {
-            logger.debug("Found exact receiver match on endpointUri: " + endpointUri);
+            if (logger.isDebugEnabled()) {
+            	logger.debug("Found exact receiver match on endpointUri: " + endpointUri);
+            }
             return receiver;
         }
 
@@ -204,12 +214,16 @@ public class VMConnector extends AbstractServiceEnabledConnector
             if (filter.accept(endpointUri.getAddress())) {
                 receiver.getEndpoint().setEndpointURI(new MuleEndpointURI(endpointUri, filterAddress));
 
-                logger.debug("Found receiver match on endpointUri: " + receiver.getEndpointURI() + " against "
-                        + endpointUri);
+                if (logger.isDebugEnabled()) {
+	                logger.debug("Found receiver match on endpointUri: " +
+	                		receiver.getEndpointURI() + " against " + endpointUri);
+                }
                 return receiver;
             }
         }
-        logger.debug("No receiver found for endpointUri: " + endpointUri);
+        if (logger.isDebugEnabled()) {
+        	logger.debug("No receiver found for endpointUri: " + endpointUri);
+        }
         return null;
     }
 
