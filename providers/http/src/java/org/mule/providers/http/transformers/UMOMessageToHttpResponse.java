@@ -51,8 +51,15 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 
         headers = new ArrayList(Arrays.asList(HttpConstants.RESPONSE_HEADER_NAMES));
         format = new SimpleDateFormat(HttpConstants.DATE_FORMAT);
-        server = MuleManager.getConfiguration().getProductName() + "/"
+
+        //When running with the source code, Meta information is not set
+        //so product name and version are not available, hence we hard code
+        if(MuleManager.getConfiguration().getProductName()==null) {
+            server = "Mule/SNAPSHOT";
+        } else {
+            server = MuleManager.getConfiguration().getProductName() + "/"
                 + MuleManager.getConfiguration().getProductVersion();
+        }
     }
 
     public Object transform(Object src, UMOEventContext context) throws TransformerException
@@ -60,7 +67,6 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         //Note this transformer excepts Null as we must always return a result from the Http
         //connector if a response transformer is present
         if(src instanceof NullPayload) src = Utility.EMPTY_STRING;
-        
         int status = context.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
         String version = (String) context.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
         String date = format.format(new Date());
@@ -96,7 +102,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 
         httpMessage.append(HttpConstants.HEADER_CONTENT_TYPE);
         if (contentType == null) {
-            httpMessage.append(": ").append("text/xml").append(HttpConstants.CRLF);
+            httpMessage.append(": ").append(HttpConstants.DEFAULT_CONTENT_TYPE).append(HttpConstants.CRLF);
         } else {
             httpMessage.append(": ").append(contentType).append(HttpConstants.CRLF);
         }

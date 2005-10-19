@@ -243,7 +243,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
                         new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText())));
             }
-            UMOMessage m = new MuleMessage(httpMethod.getResponseBodyAsString(), h);
+            UMOMessage m = null;
+            if(httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE).getValue().startsWith("text/")) {
+                m = new MuleMessage(httpMethod.getResponseBody(), h);
+            } else {
+                m = new MuleMessage(httpMethod.getResponseBodyAsString(), h);
+            }
             m.setExceptionPayload(ep);
             return m;
         } catch (Exception e) {
