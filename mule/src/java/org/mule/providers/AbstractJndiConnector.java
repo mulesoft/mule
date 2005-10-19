@@ -1,0 +1,102 @@
+package org.mule.providers;
+
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.lifecycle.InitialisationException;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import java.util.Hashtable;
+
+/**
+ * Code by (c) 2005 P.Oikari.
+ *
+ * This class acts as common baseclass for both Rmi & EjbConnector
+ * Resolves Jndi root for connector usage
+ *
+ * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
+ * @version $Revision$
+ */
+
+
+public abstract class AbstractJndiConnector extends AbstractServiceEnabledConnector
+{
+  protected String jndiInitialFactory;
+
+  protected String jndiUrlPkgPrefixes;
+
+  protected String jndiProviderUrl;
+
+  protected Context jndiContext;
+
+   protected void initJndiContext() throws NamingException, InitialisationException
+  {
+    if (null == jndiContext)
+    {
+      Hashtable props = new Hashtable();
+
+      if (null != jndiInitialFactory)
+        props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
+
+      if (jndiProviderUrl != null)
+        props.put(Context.PROVIDER_URL, jndiProviderUrl);
+
+      if (jndiUrlPkgPrefixes != null)
+        props.put(Context.URL_PKG_PREFIXES, jndiUrlPkgPrefixes);
+
+      jndiContext = new InitialContext(props);
+    }
+  }
+
+  public Context getJndiContext(String jndiProviderUrl) throws InitialisationException
+  {
+    try
+    {
+      setJndiProviderUrl(jndiProviderUrl);
+
+      initJndiContext();
+    }
+    catch (Exception e)
+    {
+      throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "AbstractJndiConnector"), e, this);
+    }
+
+    return jndiContext;
+  }
+
+  public void setJndiContext(Context jndiContext)
+  {
+    this.jndiContext = jndiContext;
+  }
+
+  public void setJndiInitialFactory(String jndiInitialFactory)
+  {
+    this.jndiInitialFactory = jndiInitialFactory;
+  }
+
+  public String getJndiInitialFactory()
+  {
+    return jndiInitialFactory;
+  }
+
+  public void setJndiUrlPkgPrefixes(String jndiUrlPkgPrefixes)
+  {
+    this.jndiUrlPkgPrefixes = jndiUrlPkgPrefixes;
+  }
+
+  public String getJndiUrlPkgPrefixes()
+  {
+    return jndiUrlPkgPrefixes;
+  }
+
+  public String getJndiProviderUrl()
+  {
+    return jndiProviderUrl;
+  }
+
+  public void setJndiProviderUrl(String jndiProviderUrl)
+  {
+    this.jndiProviderUrl = jndiProviderUrl;
+  }
+}

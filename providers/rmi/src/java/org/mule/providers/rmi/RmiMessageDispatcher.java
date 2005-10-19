@@ -14,19 +14,6 @@
 package org.mule.providers.rmi;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.MuleMessage;
@@ -39,6 +26,19 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * <code>RmiMessageDispatcher</code> will send transformed mule events over
@@ -121,22 +121,15 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
             }
         }
 
-        ArrayList methodArgumentTypes = null;
 
-        try {
-            methodArgumentTypes = (ArrayList) event.getEndpoint()
-                    .getProperties()
-                    .get(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
-        } catch (Exception e) {
-        }
-
-        Class[] argTypes;
-
+        List methodArgumentTypes = (List) event.getEndpoint()
+                .getProperties()
+                .get(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES);
         if (methodArgumentTypes != null) {
             connector.setMethodArgumentTypes(methodArgumentTypes);
         }
 
-        argTypes = connector.getArgumentClasses();
+        Class [] argTypes = connector.getArgumentClasses();
         method = remoteObject.getClass().getMethod(methodName, argTypes);
 
         return method;
@@ -182,7 +175,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher {
         if (result == null) {
             return null;
         } else {
-            resultMessage = new MuleMessage(connector.getMessageAdapter(result).getPayload());
+            resultMessage = new MuleMessage(connector.getMessageAdapter(result).getPayload(), Collections.EMPTY_MAP);
         }
 
         return resultMessage;

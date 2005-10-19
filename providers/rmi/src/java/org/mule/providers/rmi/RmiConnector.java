@@ -13,24 +13,34 @@
  */
 package org.mule.providers.rmi;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.AbstractJndiConnector;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.util.ClassHelper;
 import org.mule.util.Utility;
 
 import java.net.URL;
 import java.rmi.RMISecurityManager;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
- * <code>RmiConnector</code> can bind or sent to a given rmi port on a given
+ * <code>RmiConnector</code> can bind or send to a given rmi port on a given
  * host.
- * 
+ *
  * @author <a href="mailto:fsweng@bass.com.my">fs Weng</a>
  * @version $Revision$
  */
-public class RmiConnector extends AbstractServiceEnabledConnector
+public class RmiConnector extends AbstractJndiConnector
 {
+    //////////////////////////////////////////////////
+    //  Receiver data
+    /////////////////////////////////////////////////
+    public static final int NO_RMI_SERVICECLASS_SET = 10;
+
+    public static final int RMI_SERVICECLASS_INVOCATION_FAILED = 11;
+
+    private String serviceClassName = null;
+    /////////////////////////////////////////////////
+
     public static final int DEFAULT_RMI_REGISTRY_PORT = 1099;
 
     public static final int MSG_PARAM_SERVICE_METHOD_NOT_SET = 1;
@@ -53,11 +63,30 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     private String serverClassName = null;
 
-    private ArrayList methodArgumentTypes = null;
+    private List methodArgumentTypes = null;
 
     private Class[] argumentClasses = null;
 
     private SecurityManager securityManager = new RMISecurityManager();
+
+    /////////////////////////////////////////////////////////
+    // Receiver meths
+    /////////////////////////////////////////////////////////
+    public String getServiceClassName()
+    {
+        return serviceClassName;
+    }
+
+    /**
+     * Sets RmiAble & java.rmi.Remote implementing serviceclass name
+     *
+     * @param serviceClassName
+     */
+    public void setServiceClassName(String serviceClassName)
+    {
+        this.serviceClassName = serviceClassName;
+    }
+    /////////////////////////////////////////////////////////
 
     public String getProtocol()
     {
@@ -89,10 +118,8 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     /**
      * Method getServerCodebase
-     * 
-     * 
+     *
      * @return
-     * 
      */
     public String getServerCodebase()
     {
@@ -101,10 +128,8 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     /**
      * Method setServerCodebase
-     * 
-     * 
+     *
      * @param serverCodebase
-     * 
      */
     public void setServerCodebase(String serverCodebase)
     {
@@ -113,10 +138,8 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     /**
      * Method getServerClassName
-     * 
-     * 
+     *
      * @return
-     * 
      */
     public String getServerClassName()
     {
@@ -125,10 +148,8 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     /**
      * Method setServerClassName
-     * 
-     * 
+     *
      * @param serverClassName
-     * 
      */
     public void setServerClassName(String serverClassName)
     {
@@ -137,32 +158,26 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     /**
      * Method getMethodArgumentTypes
-     * 
-     * 
+     *
      * @return
-     * 
      */
-    public ArrayList getMethodArgumentTypes()
+    public List getMethodArgumentTypes()
     {
         return (this.methodArgumentTypes);
     }
 
     /**
      * Method setMethodArgumentTypes
-     * 
-     * 
+     *
      * @param methodArgumentTypes
-     * 
      */
-    public void setMethodArgumentTypes(ArrayList methodArgumentTypes) throws ClassNotFoundException
+    public void setMethodArgumentTypes(List methodArgumentTypes) throws ClassNotFoundException
     {
         Class argumentClasses[] = null;
 
         this.methodArgumentTypes = methodArgumentTypes;
 
-        if (getMethodArgumentTypes() != null)
-
-        {
+        if (getMethodArgumentTypes() != null) {
             argumentClasses = new Class[methodArgumentTypes.size()];
 
             for (int i = 0; i < methodArgumentTypes.size(); i++) {
@@ -176,10 +191,8 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     /**
      * Method getArgumentClasses
-     * 
-     * 
+     *
      * @return
-     * 
      */
     public Class[] getArgumentClasses()
     {
@@ -188,10 +201,8 @@ public class RmiConnector extends AbstractServiceEnabledConnector
 
     /**
      * Method setArgumentClasses
-     * 
-     * 
+     *
      * @param argumentClasses
-     * 
      */
     public void setArgumentClasses(Class[] argumentClasses)
     {
@@ -202,7 +213,7 @@ public class RmiConnector extends AbstractServiceEnabledConnector
     {
         super.doInitialise();
 
-        if(securityPolicy!=null) {
+        if (securityPolicy != null) {
             System.setProperty("java.security.policy", securityPolicy);
         }
 
@@ -212,11 +223,13 @@ public class RmiConnector extends AbstractServiceEnabledConnector
         }
     }
 
-    public SecurityManager getSecurityManager() {
+    public SecurityManager getSecurityManager()
+    {
         return securityManager;
     }
 
-    public void setSecurityManager(SecurityManager securityManager) {
+    public void setSecurityManager(SecurityManager securityManager)
+    {
         this.securityManager = securityManager;
     }
 }
