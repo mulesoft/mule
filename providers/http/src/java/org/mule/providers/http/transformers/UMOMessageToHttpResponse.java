@@ -40,7 +40,6 @@ import java.util.*;
 
 public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 {
-    private List headers = null;
     private SimpleDateFormat format = null;
     private String server = null;
 
@@ -49,7 +48,6 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         registerSourceType(Object.class);
         setReturnClass(Object.class);
 
-        headers = new ArrayList(Arrays.asList(HttpConstants.RESPONSE_HEADER_NAMES));
         format = new SimpleDateFormat(HttpConstants.DATE_FORMAT);
 
         //When running with the source code, Meta information is not set
@@ -112,7 +110,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 
         String headerName;
         String value;
-        for (Iterator iterator = headers.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = HttpConstants.RESPONSE_HEADER_NAMES.iterator(); iterator.hasNext();) {
             headerName = (String) iterator.next();
             value = context.getStringProperty(headerName);
             if (value != null) {
@@ -120,7 +118,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
                 httpMessage.append(HttpConstants.CRLF);
             }
         }
-        // Custom headers
+        // Custom responseHeaderNames
         Map customHeaders = (Map) context.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
         if (customHeaders != null) {
             Map.Entry entry;
@@ -164,12 +162,8 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         System.arraycopy(httpMessage.toString().getBytes(), 0, resultPayload, 0, httpMessage.length());
         System.arraycopy(response, 0, resultPayload, httpMessage.length(), response.length);
 
-        if(contentType.startsWith("text")) {
-            if(resultPayload instanceof byte[]) {
-                return new String((byte[])resultPayload);
-            } else {
-                return resultPayload.toString();
-            }
+        if(contentType.startsWith("text/")) {
+            return new String(resultPayload);
         } else {
            return resultPayload;
         }

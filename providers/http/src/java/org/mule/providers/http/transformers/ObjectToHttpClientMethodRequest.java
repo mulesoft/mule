@@ -42,21 +42,19 @@ import java.util.*;
 
 public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransformer
 {
-    private List requestHeaders = null;
-    private List responseHeaders = null;
 
     public ObjectToHttpClientMethodRequest()
     {
         setReturnClass(HttpMethod.class);
-        requestHeaders = new ArrayList(Arrays.asList(HttpConstants.REQUEST_HEADER_NAMES));
-        responseHeaders = new ArrayList(Arrays.asList(HttpConstants.RESPONSE_HEADER_NAMES));
     }
 
     private int addParameters(String queryString, PostMethod postMethod)
     {
         //Parse the HTTP argument list and convert to a NameValuePair collection
 
-        if(queryString==null || queryString.length()==0) return 0;
+        if(queryString == null || queryString.length()==0) {
+        	return 0;
+        }
 
         String currentParam;
         int equals;
@@ -160,7 +158,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
             for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();) {
                 header = (Map.Entry) iterator.next();
                 headerName = header.getKey().toString();
-                if (!responseHeaders.contains(headerName) && header.getValue() instanceof String) {
+                if (!HttpConstants.REQUEST_HEADER_NAMES.contains(headerName) && header.getValue() instanceof String) {
                     if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX)) {
                         headerName = "X-" + headerName;
                     }
