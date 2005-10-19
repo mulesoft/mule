@@ -119,7 +119,7 @@ public class ManagementContext {
         return str;
     }
 
-    public static final String TEMP_DIR = "temp";;
+    public static final String TEMP_DIR = "temp";
 	public static final String COMPONENTS_DIR = "components";
 	public static final String LIBRARIES_DIR = "libraries";
 	public static final String ASSEMBLIES_DIR = "assemblies";
