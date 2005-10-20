@@ -3,7 +3,7 @@
     <pomVersion>3</pomVersion>
     <name>Mule Config Graph</name>
     <groupId>mule</groupId>
-    <id>mule-grapher</id>
+    <id>mule-tools-config-graph</id>
     <version>1.0</version>
     <inceptionYear>2005</inceptionYear>
     <package>org.mule.tools.config.graph</package>
@@ -27,6 +27,11 @@
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
             <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.6.5</version>
         </dependency>
     </dependencies>
      <build>
