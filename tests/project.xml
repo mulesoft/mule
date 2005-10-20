@@ -11,8 +11,8 @@
     <logo>http://www.muleumo.org/images/mule-logo.gif</logo>
     <shortDescription>mule-tests</shortDescription>
     <description>
-        Integration tests ensure that Mule sub projects work well to together. Use cases
-        are scenarios presented o the Mailing lists
+        Integration tests ensure that Mule sub projects work well together. 
+        Use cases are scenarios presented on the Mailing lists.
     </description>
     <url>http://wiki.muleumo.org/display/MULEPROJ/Integration+Tests</url>
     <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
@@ -146,6 +146,54 @@
                 <ignore>true</ignore>
             </properties>
         </dependency>
+
+        <!-- Oracle tests -->
+        <dependency>
+            <artifactId>mule-extras-oracle</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jdbc</groupId>
+            <artifactId>ojdbc</artifactId>
+            <jar>ojdbc14.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>aqapi</artifactId>
+            <jar>aqapi13.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>jmscommon</artifactId>
+            <jar>jmscommon.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xdb</artifactId>
+            <jar>xdb.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xmlparserv2</artifactId>
+            <jar>xmlparserv2.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.0</version>
+			<url>http://xmlunit.sourceforge.net</url>
+        </dependency>
+        <!-- end Oracle tests -->
 
         <!-- Jms deps -->
         <dependency>
@@ -496,6 +544,7 @@
                 <exclude>**/OpenJms*.*</exclude>
                 <exclude>**/Joram*.*</exclude>
                 <exclude>**/SpiritWave*.*</exclude>
+                <exclude>**/EmailEndpointsTestCase.*</exclude>
             </excludes>
             <resources>
                 <resource>
