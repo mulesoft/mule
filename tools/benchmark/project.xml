@@ -5,7 +5,7 @@
     <pomVersion>3</pomVersion>
     <name>Mule Benchmark</name>
     <groupId>mule</groupId>
-    <id>mule-benchmark</id>
+    <id>mule-tools-benchmark</id>
     <inceptionYear>2004</inceptionYear>
     <package>org.mule.tools.benchmark</package>
     <logo>http://www.muleumo.org/images/mule-logo.gif</logo>

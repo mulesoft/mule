@@ -180,10 +180,12 @@
                 <!-- sometimes fails failing to bind -->
                 <exclude>**/UdpConnectorFunctionalTestCase.*</exclude>
                 <exclude>**/Plexus*.*</exclude>
+
                 <exclude>**/PxeHelloWorldTestCase.*</exclude>
 		        <exclude>**/PxeAsyncTestCase.*</exclude>
 
                 <!-- deprecated groovy components don't work with latest Groovy -->
+                <!-- should remove from codebase -->
                 <exclude>**/GroovyMessageBuilderTestCase.*</exclude>
                 <exclude>**/GroovyTransformerTestCase.*</exclude>
 
@@ -198,6 +200,9 @@
                 <exclude>**/OpenJms*.*</exclude>
                 <exclude>**/Joram*.*</exclude>
                 <exclude>**/SpiritWave*.*</exclude>
+
+                <!-- needs to be run stand alone -->
+                <exclude>**/JmsReconnectionTestCase*.*</exclude>
 
                 <!-- Disable ftp because it needs a server -->
                 <exclude>**/FtpConnectorFunctionalTestCase.*</exclude>

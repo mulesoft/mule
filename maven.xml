@@ -563,9 +563,57 @@
     </goal>
 
         <preGoal name="idea">
+        	<j:if test="${context.getVariable('newBuild')== null}">
+	        	<u:available file="${basedir}/mule.iws">
+	        	    <copy file="${basedir}/mule.iws" tofile="${basedir}/mule.iws-old" overwrite="true"/>
+	        	</u:available>
+	        	<u:available file="${basedir}/mule.ipr">
+	        	    <copy file="${basedir}/mule.ipr" tofile="${basedir}/mule.ipr-old" overwrite="true"/>
+	        	</u:available>
+	        	<u:available file="${basedir}/mule.iml">
+	        	    <copy file="${basedir}/mule.ipr" tofile="${basedir}/mule.iml-old" overwrite="true"/>
+	        	</u:available>
+	         </j:if>
+        	
         <attainGoal name="idea:multiproject"/>
+        
 <!--        <copy todir="${basedir}" file="${basedir}/tools/idea/workspace/_root.iml"/>-->
     </preGoal>
+    
+    <goal name="mule:idea">
+    	<j:if test="${context.getVariable('newBuild')== null}">
+	        	<u:available file="${basedir}/mule.iws">
+	        	    <copy file="${basedir}/mule.iws" tofile="${basedir}/mule.iws-old" overwrite="true"/>
+	        	</u:available>
+	        	<u:available file="${basedir}/mule.ipr">
+	        	    <copy file="${basedir}/mule.ipr" tofile="${basedir}/mule.ipr-old" overwrite="true"/>
+	        	</u:available>
+	        	<u:available file="${basedir}/mule.iml">
+	        	    <copy file="${basedir}/mule.ipr" tofile="${basedir}/mule.iml-old" overwrite="true"/>
+	        	</u:available>
+	         </j:if>
+        	
+        <attainGoal name="idea:multiproject"/>
+        <attainGoal name="idea:module"/>
+    	<!-- preserve workspace -->
+    	<j:if test="${context.getVariable('newBuild')== null}">
+        <u:available file="${basedir}/mule.iws-old">
+        	<delete file="${basedir}/mule.iws"/>
+        	<copy file="${basedir}/mule.iws-old" tofile="${basedir}/mule.iws"/>
+        	<!--delete file="${basedir}/mule.iws-old"/-->
+        </u:available>
+        <u:available file="${basedir}/mule.ipr-old">
+        	<delete file="${basedir}/mule.ipr"/>
+        	<copy file="${basedir}/mule.ipr-old" tofile="${basedir}/mule.ipr"/>
+        	<!--delete file="${basedir}/mule.ipr-old"/-->
+        </u:available>
+        <u:available file="${basedir}/mule.iml-old">
+        	<delete file="${basedir}/mule.iml"/>
+        	<copy file="${basedir}/mule.iml-old" tofile="${basedir}/mule.iml"/>
+        	<!--delete file="${basedir}/mule.iml-old"/-->
+        </u:available>
+        </j:if>
+    </goal>
 
     <preGoal name="eclipse">
         <j:set var="goal" value="eclipse"/>

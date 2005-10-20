@@ -4,7 +4,7 @@
     <pomVersion>3</pomVersion>
     <name>Mule Launcher</name>
     <groupId>mule</groupId>
-    <id>mule-launcher</id>
+    <id>mule-tools-launcher</id>
     <inceptionYear>2005</inceptionYear>
     <package>org.mule.tools.launcher</package>
     <logo>http://www.muleumo.org/images/mule-logo.gif</logo>

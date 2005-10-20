@@ -22,9 +22,9 @@
             </properties>
         </dependency>
         <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis-jaxrpc</artifactId>
-            <version>${axis_jaxrpc_version}</version>
+            <groupId>jaxrpc</groupId>
+            <artifactId>jaxrpc</artifactId>
+            <version>${jaxrpc_version}</version>
         </dependency>
     </dependencies>
 </project>
