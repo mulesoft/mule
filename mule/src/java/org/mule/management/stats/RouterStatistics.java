@@ -13,16 +13,15 @@
  */
 package org.mule.management.stats;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import org.mule.management.stats.printers.SimplePrinter;
+import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.mule.management.stats.printers.SimplePrinter;
-import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * <code>RouterStatistics</code> todo
@@ -38,10 +37,10 @@ public class RouterStatistics implements Statistics
     public static final int TYPE_RESPONSE = 3;
 
     private boolean enabled;
-    private int notRouted;
-    private int caughtInCatchAll;
-    private int totalRouted;
-    private int totalReceived;
+    private long notRouted;
+    private long caughtInCatchAll;
+    private long totalRouted;
+    private long totalReceived;
     private Map routed;
     private int type;
 
@@ -55,7 +54,6 @@ public class RouterStatistics implements Statistics
         totalReceived = 0;
         caughtInCatchAll = 0;
         routed.clear();
-
     }
 
     /**
@@ -63,7 +61,6 @@ public class RouterStatistics implements Statistics
      */
     public boolean isEnabled()
     {
-
         return enabled;
     }
 
@@ -83,7 +80,6 @@ public class RouterStatistics implements Statistics
     public synchronized void setEnabled(boolean b)
     {
         enabled = b;
-
     }
 
     /**
@@ -93,7 +89,7 @@ public class RouterStatistics implements Statistics
     {
         super();
         this.type = type;
-        routed = new ConcurrentHashMap();
+        routed = new HashMap();
     }
 
     /**
@@ -124,16 +120,20 @@ public class RouterStatistics implements Statistics
         if (endpoint == null) {
             return;
         }
+
         String name = endpoint.getName();
-        Integer cpt = (Integer) routed.get(name);
-        int count = 0;
+
+        Long cpt = (Long) routed.get(name);
+        long count = 0;
 
         if (cpt != null) {
-            count = cpt.intValue();
+            count = cpt.longValue();
         }
-        count++;
 
-        routed.put(name, new Integer(count));
+        // TODO we should probably use a MutableLong here,
+        // but that might be problematic for remote MBean access (serialization)
+        routed.put(name, Long.valueOf(++count));
+
         totalRouted++;
         totalReceived++;
     }
@@ -158,7 +158,7 @@ public class RouterStatistics implements Statistics
     /**
      * @return Returns the notRouted.
      */
-    public final int getCaughtMessages()
+    public final long getCaughtMessages()
     {
         return caughtInCatchAll;
     }
@@ -166,7 +166,7 @@ public class RouterStatistics implements Statistics
     /**
      * @return Returns the notRouted.
      */
-    public final int getNotRouted()
+    public final long getNotRouted()
     {
         return notRouted;
     }
@@ -174,7 +174,7 @@ public class RouterStatistics implements Statistics
     /**
      * @return Returns the totalReceived.
      */
-    public final int getTotalReceived()
+    public final long getTotalReceived()
     {
         return totalReceived;
     }
@@ -182,7 +182,7 @@ public class RouterStatistics implements Statistics
     /**
      * @return Returns the totalRouted.
      */
-    public final int getTotalRouted()
+    public final long getTotalRouted()
     {
         return totalRouted;
     }
@@ -190,14 +190,14 @@ public class RouterStatistics implements Statistics
     /**
      * @return Returns the totalRouted.
      */
-    public final int getRouted(String endpointName)
+    public final long getRouted(String endpointName)
     {
-        Integer i = (Integer) routed.get(endpointName);
+        Long l = (Long) routed.get(endpointName);
 
-        if (i == null) {
+        if (l == null) {
             return 0;
         } else {
-            return i.intValue();
+            return l.longValue();
         }
     }
 
