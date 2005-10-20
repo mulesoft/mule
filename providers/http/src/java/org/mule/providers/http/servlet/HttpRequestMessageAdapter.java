@@ -23,6 +23,7 @@ import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,31 +33,29 @@ import java.util.Enumeration;
 /**
  * <code>HttpRequestMessageAdapter</code> is a MUle message adapter
  * for javax.servletHttpServletRequest objects
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class HttpRequestMessageAdapter extends AbstractMessageAdapter
-{
+public class HttpRequestMessageAdapter extends AbstractMessageAdapter {
     private Object message = null;
 
     private HttpServletRequest request;
 
-    public HttpRequestMessageAdapter(Object message) throws MessagingException
-    {
-        if(message instanceof HttpServletRequest) {
-            setPayload((HttpServletRequest)message);
-            if(request.getParameterMap()!=null) {
+    public HttpRequestMessageAdapter(Object message) throws MessagingException {
+        if (message instanceof HttpServletRequest) {
+            setPayload((HttpServletRequest) message);
+            if (request.getParameterMap() != null) {
                 properties.putAll(request.getParameterMap());
             }
             String key;
-            for(Enumeration e = request.getAttributeNames();e.hasMoreElements();) {
-                key = (String)e.nextElement();
+            for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
+                key = (String) e.nextElement();
                 properties.put(key, request.getAttribute(key));
             }
-            for(Enumeration e = request.getHeaderNames();e.hasMoreElements();) {
-                key = (String)e.nextElement();
+            for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();) {
+                key = (String) e.nextElement();
                 properties.put(key, request.getHeader(key));
             }
         } else {
@@ -69,13 +68,11 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getMessage()
      */
-    public Object getPayload()
-    {
+    public Object getPayload() {
         return message;
     }
 
-    public boolean isBinary()
-    {
+    public boolean isBinary() {
         return message instanceof byte[];
     }
 
@@ -84,8 +81,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getMessageAsBytes()
      */
-    public byte[] getPayloadAsBytes() throws Exception
-    {
+    public byte[] getPayloadAsBytes() throws Exception {
         if (isBinary()) {
             return (byte[]) message;
         } else {
@@ -98,8 +94,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      * 
      * @see org.mule.umo.providers.UMOMessageAdapter#getMessageAsString()
      */
-    public String getPayloadAsString() throws Exception
-    {
+    public String getPayloadAsString() throws Exception {
         if (isBinary()) {
             return new String((byte[]) message);
         } else {
@@ -112,10 +107,9 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      * 
      * @see org.mule.umo.providers.UMOMessageAdapter#setMessage(java.lang.Object)
      */
-    private void setPayload(HttpServletRequest message) throws MessagingException
-    {
+    private void setPayload(HttpServletRequest message) throws MessagingException {
         try {
-            request =  message;
+            request = message;
             //Check if a payload parameter has been set, if so use it
             //otherwise we'll use the request payload
             String payloadParam = (String) request.getAttribute(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME);
@@ -137,7 +131,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
                 } else {
                     InputStream is = request.getInputStream();
                     ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024*32];
+                    byte[] buffer = new byte[1024 * 32];
                     int len = 0;
                     while ((len = is.read(buffer, len, buffer.length)) != -1) {
                         baos.write(buffer, 0, len);
@@ -158,22 +152,27 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
         }
     }
 
-    public HttpServletRequest getRequest()
-    {
+    public HttpServletRequest getRequest() {
         return request;
     }
 
+    public String getUniqueId() throws UniqueIdNotSupportedException {
 
-    public String getUniqueId() throws UniqueIdNotSupportedException
-    {
-        if (getRequest().getSession() == null) {
+        HttpSession session = null;
+
+        try {
+            //We wrap this call as on some App Servers (Websfear) It can cause a NPE
+            session = getRequest().getSession();
+        } catch (Exception e) {
             throw new UniqueIdNotSupportedException(this, new Message(Messages.X_IS_NULL, "Http session"));
         }
-        return getRequest().getSession().getId();
+        if (session == null) {
+            throw new UniqueIdNotSupportedException(this, new Message(Messages.X_IS_NULL, "Http session"));
+        }
+        return session.getId();
     }
 
-    protected boolean isText(String contentType)
-    {
+    protected boolean isText(String contentType) {
         if (contentType == null)
             return true;
         return (contentType.startsWith("text/"));
@@ -185,11 +184,10 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      * asynchronous environment where the caller doesn't wait for a response and
      * the response needs to be routed somewhere for further processing. The
      * value of this field can be any valid endpointUri url.
-     * 
+     *
      * @param replyTo the endpointUri url to reply to
      */
-    public void setReplyTo(Object replyTo)
-    {
+    public void setReplyTo(Object replyTo) {
         if (replyTo != null && replyTo.toString().startsWith("http")) {
             setProperty(HttpConstants.HEADER_LOCATION, replyTo);
         }
@@ -202,11 +200,10 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter
      * asynchronous environment where the caller doesn't wait for a response and
      * the response needs to be routed somewhere for further processing. The
      * value of this field can be any valid endpointUri url.
-     * 
+     *
      * @return the endpointUri url to reply to or null if one has not been set
      */
-    public Object getReplyTo()
-    {
+    public Object getReplyTo() {
         String replyto = (String) getProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
         if (replyto == null) {
             replyto = (String) getProperty(HttpConstants.HEADER_LOCATION);
