@@ -81,6 +81,7 @@ public class ConnectorServiceDescriptor
     private String transactionFactory;
     private String messageAdapter;
     private String messageReceiver;
+    private String transactedMessageReceiver;
     private String endpointBuilder;
     private String defaultInboundTransformer;
     private String defaultOutboundTransformer;
@@ -105,6 +106,7 @@ public class ConnectorServiceDescriptor
         dispatcherFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
         transactionFactory = removeProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY);
         messageReceiver = removeProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
+        transactedMessageReceiver = removeProperty(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS);
         messageAdapter = removeProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
         defaultInboundTransformer = removeProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
         defaultOutboundTransformer = removeProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
@@ -123,6 +125,7 @@ public class ConnectorServiceDescriptor
         connectorFactory = props.getProperty(MuleProperties.CONNECTOR_FACTORY, connectorFactory);
         dispatcherFactory = props.getProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, dispatcherFactory);
         messageReceiver = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, messageReceiver);
+        transactedMessageReceiver = props.getProperty(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS, transactedMessageReceiver);
         messageAdapter = props.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, messageAdapter);
 
         String temp = props.getProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
@@ -199,6 +202,10 @@ public class ConnectorServiceDescriptor
     public String getMessageReceiver()
     {
         return messageReceiver;
+    }
+
+    public String getTransactedMessageReceiver() {
+        return transactedMessageReceiver;
     }
 
     public String getDefaultInboundTransformer()
@@ -284,7 +291,14 @@ public class ConnectorServiceDescriptor
                                                     UMOEndpoint endpoint,
                                                     Object[] args) throws UMOException
     {
-        if (messageReceiver != null) {
+        String receiverClass = messageReceiver;
+        if(endpoint.getTransactionConfig()!=null) {
+            if(transactedMessageReceiver!=null) {
+                receiverClass = transactedMessageReceiver;
+            }
+        }
+
+        if (receiverClass != null) {
             Object[] newArgs = null;
             if (args != null && args.length != 0) {
                 newArgs = new Object[3 + args.length];
@@ -299,7 +313,7 @@ public class ConnectorServiceDescriptor
             }
 
             try {
-                return (UMOMessageReceiver) ClassHelper.instanciateClass(messageReceiver, newArgs);
+                return (UMOMessageReceiver) ClassHelper.instanciateClass(receiverClass, newArgs);
             } catch (Exception e) {
                 throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                                                                 "Message Receiver",

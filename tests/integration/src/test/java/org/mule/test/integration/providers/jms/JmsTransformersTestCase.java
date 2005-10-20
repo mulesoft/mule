@@ -69,7 +69,7 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
     protected void doTearDown() throws Exception
     {
         RequestContext.setEvent(null);
-        super.tearDown();
+        super.doTearDown();
     }
 
     public void testTransObjectMessage() throws Exception

@@ -49,7 +49,7 @@ public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunction
         connector.getDispatcherThreadingProfile().setDoThreading(false);
 
         HashMap overrides = new HashMap();
-        overrides.put("message.receiver", JmsMessageReceiverSynchronous.class.getName());
+        overrides.put("transacted.message.receiver", JmsMessageReceiverSynchronous.class.getName());
         connector.setServiceOverrides(overrides);
         return connector;
     }

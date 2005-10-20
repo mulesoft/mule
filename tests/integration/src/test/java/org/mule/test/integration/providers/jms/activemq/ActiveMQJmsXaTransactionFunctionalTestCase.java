@@ -43,7 +43,7 @@ public class ActiveMQJmsXaTransactionFunctionalTestCase extends ActiveMQJmsTrans
             txManager = Current.getCurrent();
         }
         txManager.setTransactionTimeout(15000);
-        super.setUp();
+        super.doSetUp();
         MuleManager.getInstance().setTransactionManager(txManager);
     }
 

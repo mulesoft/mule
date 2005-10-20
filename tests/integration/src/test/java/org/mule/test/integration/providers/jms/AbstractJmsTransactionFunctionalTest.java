@@ -480,8 +480,6 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
         // the message will be delivered twice before this countdown will release
         final int countDownInitialCount = 4;
         final CountDownLatch countDown = new CountDownLatch(countDownInitialCount);
-        // This exception strategy will be invoked when a message is redelivered
-        // after a rollback
 
         // setup the component and start Mule
         UMODescriptor descriptor = getDescriptor("testComponent", FunctionalTestComponent.class.getName());

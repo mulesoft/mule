@@ -16,6 +16,7 @@ package org.mule.test.integration.providers.jms.activemq;
 import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsTransactionFactory;
+import org.mule.providers.jms.TransactedJmsMessageReceiver;
 import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOTransactionFactory;
@@ -23,6 +24,8 @@ import org.mule.umo.provider.UMOConnector;
 
 import javax.jms.Connection;
 import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -56,8 +59,13 @@ public class ActiveMQJmsTransactionFunctionalTestCase extends AbstractJmsTransac
         connector.setJndiProviderProperties(props);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
-        connector.getReceiverThreadingProfile().setMaxThreadsActive(1);
-
+        /** Always use the transacted Jms Message receivers for these test cases */
+        Map overrides = new HashMap();
+        overrides.put("message.receiver", TransactedJmsMessageReceiver.class.getName());
+        connector.setServiceOverrides(overrides);
+        //Using multiple receiver threads with ActiveMQ causes the DLQ test case to fail
+        //because of ActiveMQ prefetch. Disabling this feature fixes the problem
+        connector.setCreateMultipleTransactedReceivers(false);
         return connector;
     }
 

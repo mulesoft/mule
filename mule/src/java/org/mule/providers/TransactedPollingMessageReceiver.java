@@ -38,12 +38,16 @@ import org.mule.util.concurrent.CountDownLatch;
  * improveded throuput.
  * 
  * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public abstract class TransactedPollingMessageReceiver extends PollingMessageReceiver
 {
-
+    /** determines whether messages will be received in a transaction template */
     protected boolean receiveMessagesInTransaction = true;
+
+    /** determines whether Multiple receivers are created to improve throughput */
+    protected boolean useMultipleReceivers = true;
 
     public TransactedPollingMessageReceiver(UMOConnector connector,
                                             UMOComponent component,
@@ -51,18 +55,25 @@ public abstract class TransactedPollingMessageReceiver extends PollingMessageRec
                                             Long frequency) throws InitialisationException
     {
         super(connector, component, endpoint, frequency);
+
+        if (endpoint.getTransactionConfig().getFactory() != null) {
+            receiveMessagesInTransaction = true;
+        } else {
+            receiveMessagesInTransaction = false;
+        }
     }
 
     public void doStart() throws UMOException
     {
-        super.doStart();
+        //Connector property overrides any implied value
+        useMultipleReceivers = ((AbstractConnector)connector).isCreateMultipleTransactedReceivers();
         ThreadingProfile tp = connector.getReceiverThreadingProfile();
-        if (receiveMessagesInTransaction && tp.isDoThreading()) {
+        if (useMultipleReceivers && receiveMessagesInTransaction && tp.isDoThreading()) {
             for (int i = 0; i < tp.getMaxThreadsActive(); i++) {
-                super.start();
+                super.doStart();
             }
         } else {
-            super.start();
+            super.doStart();
         }
     }
 

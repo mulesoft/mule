@@ -183,8 +183,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         Object temp = jndiContext.lookup(connectionFactoryJndiName);
         if (temp != null && temp instanceof XAConnectionFactory) {
             if (MuleManager.getInstance().getTransactionManager() != null) {
-                connectionFactory = new ConnectionFactoryWrapper(connectionFactory,
-                                                                 MuleManager.getInstance().getTransactionManager());
+                connectionFactory = new ConnectionFactoryWrapper(temp, MuleManager.getInstance().getTransactionManager());
             } else {
                 throw new InitialisationException(new Message("jms", 10), this);
             }

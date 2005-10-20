@@ -45,7 +45,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 {
     public static final String DEFAULT_IN_QUEUE = "jms://in.q";
     public static final String DEFAULT_OUT_QUEUE = "jms://out.q";
-    public static final String DEFAULT_DL_QUEUE = "jms://jms";
+    public static final String DEFAULT_DL_QUEUE = "jms://dlq";
     public static final String DEFAULT_IN_TOPIC = "jms://topic:in.t";
     public static final String DEFAULT_OUT_TOPIC = "jms://topic:out.t";
     public static final String DEFAULT_DL_TOPIC = "jms://topic:dlt";

@@ -60,6 +60,7 @@ public interface MuleProperties
     // Connector Service descriptor properties
     String CONNECTOR_CLASS = "connector";
     String CONNECTOR_MESSAGE_RECEIVER_CLASS = "message.receiver";
+    String CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS = "transacted.message.receiver";
     String CONNECTOR_FACTORY = "connector.factory";
     String CONNECTOR_DISPATCHER_FACTORY = "dispatcher.factory";
     String CONNECTOR_TRANSACTION_FACTORY = "transaction.factory";

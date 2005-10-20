@@ -27,6 +27,7 @@ import javax.jms.TopicConnection;
 
 import org.mule.MuleManager;
 import org.mule.providers.jms.JmsMessageReceiver;
+import org.mule.providers.jms.TransactedJmsMessageReceiver;
 import org.mule.tck.functional.EventCallback;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOComponent;
@@ -144,7 +145,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         return false;
     }
 
-    protected static class JmsMessageReceiverSynchronous extends JmsMessageReceiver
+    protected static class JmsMessageReceiverSynchronous extends TransactedJmsMessageReceiver
     {
         public JmsMessageReceiverSynchronous(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
                 throws InitialisationException

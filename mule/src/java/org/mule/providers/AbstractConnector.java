@@ -102,7 +102,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * A pool of dispatchers for this connector, the pool is keyed on
      * endpointUri
      */
-    protected Map dispatchers;
+    protected ConcurrentHashMap dispatchers;
 
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
@@ -124,6 +124,14 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * after every request or cached
      */
     protected boolean createDispatcherPerRequest = false;
+
+    /**
+     * For better throughput when using TransactedMessageReceivers. This will create an number
+     * of receiver threads based on the ThreadingProfile configured fro the receiver. This property is
+     * user by transports that support transactions, specifically MessageReceivers that extend the
+     * TransactedPollingMessageReceiver.
+     */
+    protected boolean createMultipleTransactedReceivers = true;
 
     /**
      * The service descriptor can define a default inbound transformer to be
@@ -827,7 +835,11 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /**
      * controls whether dispatchers or cached or created per request
-     * @param createDispatcherPerRequest
+     * Note that if an exception occurs in the Dispatcher it is automatically disposed
+     * of and a new one is created for the next request.  This allows dispatchers to recover
+     * from loss of connection and other faults.
+     * @param createDispatcherPerRequest whether a new dispatcher is
+     * created for every request or not
      */
     public void setCreateDispatcherPerRequest(boolean createDispatcherPerRequest) {
         this.createDispatcherPerRequest = createDispatcherPerRequest;
@@ -835,9 +847,35 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /**
      * controls whether dispatchers or cached or created per request
-     * @return
+     * Note that if an exception occurs in the Dispatcher it is automatically disposed
+     * of and a new one is created for the next request.  This allows dispatchers to recover
+     * from loss of connection and other faults.
+     * @return true if a anew dispatcher is created for every request
      */
     public boolean isCreateDispatcherPerRequest() {
         return createDispatcherPerRequest;
+    }
+
+    /**
+     * For better throughput when using TransactedMessageReceivers. This will create an number
+     * of receiver threads based on the ThreadingProfile configured fro the receiver. This property is
+     * user by transports that support transactions, specifically MessageReceivers that extend the
+     * TransactedPollingMessageReceiver.
+     * @return true if multiple receiver threads will be created for receivers on this connection
+     */
+    public boolean isCreateMultipleTransactedReceivers() {
+        return createMultipleTransactedReceivers;
+    }
+
+    /**
+     * For better throughput when using TransactedMessageReceivers. This will create an number
+     * of receiver threads based on the ThreadingProfile configured fro the receiver. This property is
+     * user by transports that support transactions, specifically MessageReceivers that extend the
+     * TransactedPollingMessageReceiver.
+     * @param createMultipleTransactedReceivers true if multiple receiver threads will be created for
+     * receivers on this connection
+     */
+    public void setCreateMultipleTransactedReceivers(boolean createMultipleTransactedReceivers) {
+        this.createMultipleTransactedReceivers = createMultipleTransactedReceivers;
     }
 }
