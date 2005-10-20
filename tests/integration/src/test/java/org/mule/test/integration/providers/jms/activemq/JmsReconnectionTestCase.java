@@ -52,7 +52,7 @@ import java.util.Properties;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  *
  */
-public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase implements ConnectionEventListener {
+public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase implements ConnectionEventListener {
 
     private JmsConnector connector;
     private BlockingQueue events = new LinkedBlockingQueue();
