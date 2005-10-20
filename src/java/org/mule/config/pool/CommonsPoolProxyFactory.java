@@ -38,9 +38,9 @@ public class CommonsPoolProxyFactory extends AbstractProxyFactory implements Poo
      * @param descriptor the descriptor to use to construct a MuleProxy
      * @see MuleDescriptor
      */
-    public CommonsPoolProxyFactory(MuleDescriptor descriptor, ObjectPool pool)
+    public CommonsPoolProxyFactory(MuleDescriptor descriptor)
     {
-        super(descriptor, pool);
+        super(descriptor);
     }
 
     /*

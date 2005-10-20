@@ -915,6 +915,7 @@ public class MuleManager implements UMOManager
         message.add(" ");
         message.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(getStartDate()).toString()).getMessage());
         message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
+        message.add("OS: " + System.getProperty("os.name") + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
         message.add(" ");
         if (agents.size() == 0) {
             message.add(new Message(Messages.AGENTS_RUNNING).getMessage() + " "

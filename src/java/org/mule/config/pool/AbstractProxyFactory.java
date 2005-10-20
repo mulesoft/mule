@@ -17,8 +17,9 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.model.MuleProxy;
+import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOManager;
 import org.mule.util.ClassHelper;
@@ -48,10 +49,9 @@ public abstract class AbstractProxyFactory implements ObjectFactory
      * @param descriptor the descriptor to use to construct a MuleProxy
      * @see org.mule.umo.UMODescriptor
      */
-    public AbstractProxyFactory(MuleDescriptor descriptor, ObjectPool pool)
+    public AbstractProxyFactory(MuleDescriptor descriptor)
     {
         this.descriptor = descriptor;
-        this.pool = pool;
     }
 
     public Object create() throws UMOException
@@ -92,12 +92,22 @@ public abstract class AbstractProxyFactory implements ObjectFactory
         descriptor.fireInitialisationCallbacks(component);
 
         afterComponentCreate(component);
+        return createProxy(component);
+    }
 
-        MuleProxy proxy = new MuleProxy(component, descriptor, pool);
-        return proxy;
+    protected Object createProxy(Object component) throws UMOException {
+        return new DefaultMuleProxy(component, descriptor, pool);
     }
 
     protected void afterComponentCreate(Object component) throws InitialisationException
     {
+    }
+
+    public ObjectPool getPool() {
+        return pool;
+    }
+
+    public void setPool(ObjectPool pool) {
+        this.pool = pool;
     }
 }

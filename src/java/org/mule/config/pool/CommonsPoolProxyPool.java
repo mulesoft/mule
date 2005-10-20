@@ -19,8 +19,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.mule.impl.MuleDescriptor;
-import org.mule.impl.model.MuleProxy;
 import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.Stoppable;
+import org.mule.umo.lifecycle.Startable;
+import org.mule.umo.lifecycle.Disposable;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 
@@ -44,12 +46,12 @@ public class CommonsPoolProxyPool implements ObjectPool
     /**
      * The pool that holds the MuleProxy objects
      */
-    private GenericObjectPool pool;
+    protected GenericObjectPool pool;
 
     /**
      * the factory used to create objects for the pool
      */
-    private ObjectFactory factory;
+    protected ObjectFactory factory;
 
     private List components;
 
@@ -59,8 +61,9 @@ public class CommonsPoolProxyPool implements ObjectPool
      * @param descriptor the descriptor to use when constructing MuleProxy
      *            objects in the pool
      */
-    public CommonsPoolProxyPool(MuleDescriptor descriptor)
+    public CommonsPoolProxyPool(MuleDescriptor descriptor, ObjectFactory factory)
     {
+        this.factory = factory;
         GenericObjectPool.Config config = new GenericObjectPool.Config();
 
        // if(descriptor.isSingleton()) {
@@ -93,8 +96,11 @@ public class CommonsPoolProxyPool implements ObjectPool
     private void init(MuleDescriptor descriptor, GenericObjectPool.Config config)
     {
         components = new ArrayList();
-        setFactory(new CommonsPoolProxyFactory(descriptor, this));
+        if(factory==null) setFactory(new CommonsPoolProxyFactory(descriptor));
         pool = new GenericObjectPool((PoolableObjectFactory) factory, config);
+        if(factory instanceof CommonsPoolProxyFactory) {
+            ((CommonsPoolProxyFactory)factory).setPool(this);
+        }
     }
 
     /*
@@ -155,9 +161,9 @@ public class CommonsPoolProxyPool implements ObjectPool
     public void clearPool()
     {
         synchronized (components) {
-            MuleProxy proxy = null;
+            Disposable proxy = null;
             for (int i = 0; i < components.size(); i++) {
-                proxy = (MuleProxy) components.get(i);
+                proxy = (Disposable) components.get(i);
                 proxy.dispose();
             }
         }
@@ -183,7 +189,7 @@ public class CommonsPoolProxyPool implements ObjectPool
     {
         synchronized (components) {
             for (int i = 0; i < components.size(); i++) {
-                ((MuleProxy) components.get(i)).start();
+                ((Startable) components.get(i)).start();
             }
         }
     }
@@ -192,7 +198,7 @@ public class CommonsPoolProxyPool implements ObjectPool
     {
         synchronized (components) {
             for (int i = 0; i < components.size(); i++) {
-                ((MuleProxy) components.get(i)).stop();
+                ((Stoppable) components.get(i)).stop();
             }
         }
     }
