@@ -30,7 +30,7 @@ public class GroovyMessageBuilderTestCase extends FunctionalTestCase
     public void testFunctionBehaviour() throws Exception
     {
         MuleClient client = new MuleClient();
-        UMOMessage m = client.send("vm://localhost/groovy.1", "Test:", null);
+        UMOMessage m = client.send("vm://groovy.1", "Test:", null);
         assertNotNull(m);
         assertEquals("Test: A Received B Received", m.getPayloadAsString());
     }

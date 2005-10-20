@@ -7,13 +7,13 @@
 
     <model name="model">
         <mule-descriptor name="GroovyUMO1"
-                         inboundEndpoint="vm://localhost/groovy.1"
+                         inboundEndpoint="vm://groovy.1"
                          implementation="org.mule.components.script.jsr223.ScriptMessageBuilder">
 
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="vm://localhost/groovy.2"/>
-                    <endpoint address="vm://localhost/groovy.3"/>
+                    <endpoint address="vm://groovy.2"/>
+                    <endpoint address="vm://groovy.3"/>
                 </router>
             </outbound-router>
 
@@ -26,7 +26,7 @@ return request.getPayload() + response.getPayload() + " Received"
         </mule-descriptor>
 
         <mule-descriptor name="GroovyUMO2"
-                         inboundEndpoint="vm://localhost/groovy.2"
+                         inboundEndpoint="vm://groovy.2"
                          implementation="org.mule.components.script.jsr223.ScriptComponent">
             <properties>
                 <text-property name="scriptText">
@@ -37,7 +37,7 @@ return " A"
         </mule-descriptor>
 
         <mule-descriptor name="GroovyUMO3"
-                         inboundEndpoint="vm://localhost/groovy.3"
+                         inboundEndpoint="vm://groovy.3"
                          implementation="org.mule.components.script.jsr223.ScriptComponent">
             <properties>
                 <text-property name="scriptText">

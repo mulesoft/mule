@@ -23,6 +23,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.config.MuleProperties;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -64,9 +65,11 @@ public abstract class AbstractMessageBuilder implements UMODescriptorAware, Call
             }
             for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
                 UMOEndpoint endpoint = (UMOEndpoint) iterator.next();
-                if(!endpoint.isRemoteSync()) {
+                boolean rsync = eventContext.getBooleanProperty(
+                        MuleProperties.MULE_REMOTE_SYNC_PROPERTY, endpoint.isRemoteSync());
+                if(!rsync) {
                     logger.info("Endpoint: " + endpoint + " is not remoteSync enabled. Message builder finishing");
-                    if(endpoint.isSynchronous()) {
+                    if(eventContext.isSynchronous()) {
                         responseMessage = eventContext.sendEvent(requestMessage, endpoint);
                     } else {
                         eventContext.dispatchEvent(requestMessage, endpoint);
