@@ -13,16 +13,16 @@
  */
 package org.mule.providers.jms;
 
-import java.util.Collections;
-import java.util.Map;
+import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.umo.MessagingException;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 
-import org.apache.commons.collections.LRUMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.umo.MessagingException;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * <code>DefaultRedeliveryHandler</code> TODO
@@ -73,22 +73,24 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
         String id = message.getJMSMessageID();
         Integer i = (Integer) messages.remove(id);
         if (i == null) {
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("Message with id: " + id + " has been redelivered for the fist time");
-            messages.put(id, new Integer(1));
+            }
+            messages.put(id, Integer.valueOf(1));
             return;
         } else if (i.intValue() == connector.getMaxRedelivery()) {
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("Message with id: " + id + " has been redelivered " + (i.intValue() + 1)
                         + " times, which exceeds the maxRedelivery setting on the connector");
+            }
             JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
             throw new MessageRedeliveredException(adapter);
 
         } else {
-            messages.put(id, new Integer(i.intValue() + 1));
-            if (logger.isDebugEnabled())
+            messages.put(id, Integer.valueOf(i.intValue() + 1));
+            if (logger.isDebugEnabled()) {
                 logger.debug("Message with id: " + id + " has been redelivered " + i.intValue() + " times");
-
+            }
         }
     }
 }

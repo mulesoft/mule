@@ -85,7 +85,7 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
     public JmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException
     {
-        super(connector, component, endpoint, new Long(0));
+        super(connector, component, endpoint, Long.valueOf(0));
         this.connector = (JmsConnector) connector;
 
         this.frequency = PropertiesHelper.getLongProperty(endpoint.getProperties(), "frequency", 10000L);
@@ -261,7 +261,7 @@ public class JmsMessageReceiver extends TransactedPollingMessageReceiver
 	        } else if (endpoint.getProperties() != null) {
 	            // still allow the selector to be set as a property on the endpoint
 	            // to be backward compatable
-	            selector = (String) endpoint.getProperties().get(JmsConnector.JMS_SELECTOR_PROPERTY);
+	            selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
 	        }
 	        String tempDurable = (String) endpoint.getProperties().get("durable");
 	        boolean durable = connector.isDurable();

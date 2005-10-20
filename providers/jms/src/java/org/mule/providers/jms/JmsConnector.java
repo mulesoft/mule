@@ -65,10 +65,6 @@ import org.mule.util.ClassHelper;
 public class JmsConnector extends AbstractServiceEnabledConnector implements ConnectionEventListener
 {
 
-    public static final String JMS_SELECTOR_PROPERTY = "selector";
-    public static final String JMS_SPECIFICATION_102B = "1.0.2b";
-    public static final String JMS_SPECIFICATION_11 = "1.1";
-
     private String connectionFactoryJndiName;
 
     private ConnectionFactory connectionFactory;
@@ -93,7 +89,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     private Connection connection;
 
-    private String specification = JMS_SPECIFICATION_102B;
+    private String specification = JmsConstants.JMS_SPECIFICATION_102B;
 
     private JmsSupport jmsSupport;
 
@@ -137,7 +133,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
                 forceJndiDestinations = false;
             }
 
-            if (JMS_SPECIFICATION_102B.equals(specification)) {
+            if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification)) {
                 jmsSupport = new Jms102bSupport(this, jndiContext, jndiDestinations, forceJndiDestinations);
             } else {
                 jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);

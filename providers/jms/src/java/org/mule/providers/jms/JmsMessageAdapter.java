@@ -14,17 +14,16 @@
  */
 package org.mule.providers.jms;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.Destination;
+
 import java.util.Enumeration;
 
 /**
@@ -40,12 +39,8 @@ import java.util.Enumeration;
  */
 public class JmsMessageAdapter extends AbstractMessageAdapter
 {
-    /**
-     * The logger for this class
-     */
-    private static final transient Log logger = LogFactory.getLog(JmsMessageAdapter.class);
 
-    private Message message = null;
+	private Message message = null;
 
     public JmsMessageAdapter(Object message) throws MessagingException
     {
@@ -94,43 +89,43 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         }
 
         try {
-            properties.put("JMSCorrelationID", this.message.getJMSCorrelationID());
+            properties.put(JmsConstants.JMS_CORRELATION_ID, this.message.getJMSCorrelationID());
         } catch (JMSException e) {
         }
         try {
-            properties.put("JMSDeliveryMode", new Integer(this.message.getJMSDeliveryMode()));
+            properties.put(JmsConstants.JMS_DELIVERY_MODE, Integer.valueOf(this.message.getJMSDeliveryMode()));
         } catch (JMSException e) {
         }
         try {
-            properties.put("JMSDestination", this.message.getJMSDestination());
+            properties.put(JmsConstants.JMS_DESTINATION, this.message.getJMSDestination());
         } catch (JMSException e) {
         }
         try {
-            properties.put("JMSExpiration", new Long(this.message.getJMSExpiration()));
+            properties.put(JmsConstants.JMS_EXPIRATION, Long.valueOf(this.message.getJMSExpiration()));
         } catch (JMSException e) {
         }
         try {
-            properties.put("JMSMessageID", this.message.getJMSMessageID());
+            properties.put(JmsConstants.JMS_MESSAGE_ID, this.message.getJMSMessageID());
         } catch (JMSException e) {
         }
         try {
-            properties.put("JMSPriority", new Integer(this.message.getJMSPriority()));
+            properties.put(JmsConstants.JMS_PRIORITY, Integer.valueOf(this.message.getJMSPriority()));
         } catch (JMSException e) {
         }
         try {
-            properties.put("JMSRedelivered", new Boolean(this.message.getJMSRedelivered()));
+            properties.put(JmsConstants.JMS_REDELIVERED, Boolean.valueOf(this.message.getJMSRedelivered()));
         } catch (JMSException e) {
         }
         try {
-            properties.put("JMSReplyTo", this.message.getJMSReplyTo());
+            properties.put(JmsConstants.JMS_REPLY_TO, this.message.getJMSReplyTo());
         } catch (JMSException e) {
         }
         try {
-            properties.put("JMSTimestamp", new Long(this.message.getJMSTimestamp()));
+            properties.put(JmsConstants.JMS_TIMESTAMP, Long.valueOf(this.message.getJMSTimestamp()));
         } catch (JMSException e) {
         }
         try {
-            properties.put("JMSType", this.message.getJMSType());
+            properties.put(JmsConstants.JMS_TYPE, this.message.getJMSType());
         } catch (JMSException e) {
         }
 
@@ -151,7 +146,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
 
     public String getUniqueId() throws UniqueIdNotSupportedException
     {
-        return (String) properties.get("JMSMessageID");
+        return (String) properties.get(JmsConstants.JMS_MESSAGE_ID);
     }
 
     /**
@@ -167,7 +162,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      */
     public void setCorrelationId(String id)
     {
-        properties.put("JMSCorrelationID", id);
+        properties.put(JmsConstants.JMS_CORRELATION_ID, id);
     }
 
     /**
@@ -184,7 +179,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      */
     public String getCorrelationId()
     {
-        return (String) properties.get("JMSCorrelationID");
+        return (String) properties.get(JmsConstants.JMS_CORRELATION_ID);
     }
 
     /**
@@ -198,7 +193,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      public void setReplyTo(Object replyTo)
      {
         if(replyTo instanceof Destination) {
-            setProperty("JMSReplyTo", replyTo);
+            setProperty(JmsConstants.JMS_REPLY_TO, replyTo);
         } else {
             super.setReplyTo(replyTo);
         }
@@ -213,7 +208,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
      */
     public Object getReplyTo()
     {
-        Object replyTo = properties.get("JMSReplyTo");
+        Object replyTo = properties.get(JmsConstants.JMS_REPLY_TO);
         if (replyTo == null) {
             replyTo = properties.get(MuleProperties.MULE_REPLY_TO_PROPERTY);
         }
