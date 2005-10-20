@@ -24,13 +24,13 @@ import java.util.Map;
 public interface RouterStatsMBean
 {
 
-    int getCaughtMessages();
+	long getCaughtMessages();
 
-    int getNotRouted();
+	long getNotRouted();
 
-    int getTotalReceived();
+	long getTotalReceived();
 
-    int getTotalRouted();
+	long getTotalRouted();
 
-    Map getRouted();
+	Map getRouted();
 }

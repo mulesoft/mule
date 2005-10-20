@@ -38,7 +38,7 @@ public class RouterStats implements RouterStatsMBean
      * 
      * @see org.mule.management.mbeans.RouterStatsMBean#getCaughtMessages()
      */
-    public int getCaughtMessages()
+    public long getCaughtMessages()
     {
         return statistics.getCaughtMessages();
     }
@@ -48,7 +48,7 @@ public class RouterStats implements RouterStatsMBean
      * 
      * @see org.mule.management.mbeans.RouterStatsMBean#getNotRouted()
      */
-    public int getNotRouted()
+    public long getNotRouted()
     {
         return statistics.getNotRouted();
     }
@@ -58,7 +58,7 @@ public class RouterStats implements RouterStatsMBean
      * 
      * @see org.mule.management.mbeans.RouterStatsMBean#getTotalReceived()
      */
-    public int getTotalReceived()
+    public long getTotalReceived()
     {
         return statistics.getTotalReceived();
     }
@@ -68,7 +68,7 @@ public class RouterStats implements RouterStatsMBean
      * 
      * @see org.mule.management.mbeans.RouterStatsMBean#getTotalRouted()
      */
-    public int getTotalRouted()
+    public long getTotalRouted()
     {
         return statistics.getTotalRouted();
     }
