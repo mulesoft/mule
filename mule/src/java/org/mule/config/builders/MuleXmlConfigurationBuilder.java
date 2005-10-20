@@ -56,6 +56,7 @@ import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
+import org.mule.util.ClassHelper;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.xml.sax.Attributes;
 
@@ -521,7 +522,18 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
                 if(modelType==null) {
                     modelType = MuleManager.getConfiguration().getModelType();
                 }
-                digester.push(ModelFactory.createModel(modelType));
+                UMOModel model = null;
+                if(modelType.equalsIgnoreCase("custom")) {
+                    String className = attributes.getValue("className");
+                    if(className==null) {
+                        throw new IllegalArgumentException("Cannot use 'custom' model type without setting the 'className' for the model");
+                    } else {
+                        model = (UMOModel)ClassHelper.instanciateClass(className, ClassHelper.NO_ARGS, getClass());
+                    }
+                } else {
+                    model = ModelFactory.createModel(modelType);
+                }
+                digester.push(model);
             }
         });
 

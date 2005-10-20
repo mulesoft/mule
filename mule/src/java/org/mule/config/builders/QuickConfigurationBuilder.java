@@ -95,7 +95,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      * @throws UMOException if the manager is already started or it fails to
      *             start
      */
-    public UMOManager createStartedManager(boolean synchronous, String serverUrl) throws UMOException
+    public UMOManager createStartedManager(boolean synchronous, String serverUrl, String modeltype) throws UMOException
     {
         if (manager.isStarted()) {
             throw new InitialisationException(new Message(Messages.MANAGER_ALREADY_STARTED), this);
@@ -105,11 +105,26 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         }
         MuleManager.getConfiguration().setServerUrl(serverUrl);
         MuleManager.getConfiguration().setSynchronous(synchronous);
-        manager.setModel(ModelFactory.createModel(MuleManager.getConfiguration().getModelType()));
+        manager.setModel(ModelFactory.createModel(modeltype));
         manager.start();
         return manager;
     }
 
+    /**
+     * Configures a started manager. This method will throw
+     * InitialisationException if the current manager is already started
+     *
+     * @param synchronous whether to start the manager in synchronous mode
+     * @param serverUrl the url used to receive client requests, or null if the
+     *            server listening components should not be set up
+     * @return the configured manager
+     * @throws UMOException if the manager is already started or it fails to
+     *             start
+     */
+    public UMOManager createStartedManager(boolean synchronous, String serverUrl) throws UMOException
+    {
+        return createStartedManager(synchronous, serverUrl, MuleManager.getConfiguration().getModelType());
+    }
     /**
      * Configures a started manager. This method will throw
      * InitialisationException if the current manager is already started

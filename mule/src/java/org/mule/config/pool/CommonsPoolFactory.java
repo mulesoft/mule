@@ -17,6 +17,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.model.UMOPoolFactory;
 import org.mule.util.ObjectPool;
+import org.mule.util.ObjectFactory;
 
 /**
  * <code>CommonsPoolFactory</code> is a commons-pool pool implementation for
@@ -27,8 +28,13 @@ import org.mule.util.ObjectPool;
  */
 public class CommonsPoolFactory implements UMOPoolFactory
 {
-    public ObjectPool createPool(UMODescriptor descriptor)
+    public ObjectPool createPool(UMODescriptor descriptor, ObjectFactory factory)
     {
-        return new CommonsPoolProxyPool((MuleDescriptor) descriptor);
+        return new CommonsPoolProxyPool((MuleDescriptor) descriptor, factory);
+    }
+
+     public ObjectPool createPool(UMODescriptor descriptor)
+    {
+        return new CommonsPoolProxyPool((MuleDescriptor) descriptor, new CommonsPoolProxyFactory((MuleDescriptor)descriptor));
     }
 }

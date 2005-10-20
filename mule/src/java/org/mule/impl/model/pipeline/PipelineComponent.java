@@ -100,7 +100,7 @@ public class PipelineComponent extends DirectComponent {
     }
 
     protected void doDispatch(UMOEvent event) throws UMOException {
-        doSend(event);
+        sendEvent(event);
     }
 
     protected void doDispose() {

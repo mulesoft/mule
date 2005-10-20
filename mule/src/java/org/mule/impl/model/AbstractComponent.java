@@ -111,7 +111,7 @@ public abstract class AbstractComponent implements UMOComponent {
      * @throws org.mule.umo.lifecycle.InitialisationException if the component fails to initialise
      * @see org.mule.umo.UMODescriptor
      */
-    public synchronized void initialise() throws InitialisationException {
+    public final synchronized void initialise() throws InitialisationException {
         if (initialised.get()) {
             throw new InitialisationException(new Message(Messages.OBJECT_X_ALREADY_INITIALISED, "Component '"
                     + descriptor.getName() + "'"), this);
@@ -273,6 +273,7 @@ public abstract class AbstractComponent implements UMOComponent {
             logger.debug("Component: " + descriptor.getName() + " has received synchronous event on: "
                     + event.getEndpoint().getEndpointURI());
         }
+        RequestContext.setEvent(event);
         UMOMessage result = doSend(event);
         return result;
     }

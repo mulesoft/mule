@@ -52,16 +52,16 @@ public class SedaComponent extends AbstractComponent implements Work {
     /**
      * A pool of available Mule Proxies
      */
-    private ObjectPool proxyPool = null;
+    protected ObjectPool proxyPool = null;
 
-    private UMOWorkManager workManager;
+    protected UMOWorkManager workManager;
 
-    private String descriptorQueueName;
+    protected String descriptorQueueName;
 
     /**
      * The time out used for taking from the Seda Queue
      */
-    private int queueTimeout = 0;
+    protected int queueTimeout = 0;
 
     /**
      * Default constructor
@@ -97,7 +97,7 @@ public class SedaComponent extends AbstractComponent implements Work {
         }
     }
 
-    private void initialisePool() throws InitialisationException {
+    protected void initialisePool() throws InitialisationException {
         try {
             // Initialise the proxy pool
             proxyPool = descriptor.getPoolingProfile().getPoolFactory().createPool(descriptor);

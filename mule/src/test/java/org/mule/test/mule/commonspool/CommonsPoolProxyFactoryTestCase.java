@@ -32,7 +32,9 @@ public class CommonsPoolProxyFactoryTestCase extends AbstractProxyPoolFactoryTes
 {
     public ObjectFactory getProxyFactory(MuleDescriptor descriptor, ObjectPool pool)
     {
-        return new CommonsPoolProxyFactory(descriptor, pool);
+        CommonsPoolProxyFactory factory = new CommonsPoolProxyFactory(descriptor);
+        factory.setPool(pool);
+        return factory;
     }
 
     public void testLifeCycleMethods() throws Exception

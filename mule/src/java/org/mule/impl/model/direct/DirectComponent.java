@@ -21,6 +21,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.model.AbstractComponent;
+import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -29,6 +30,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.util.ClassHelper;
+import org.apache.commons.beanutils.BeanUtils;
 
 import java.util.List;
 
@@ -51,13 +53,15 @@ public class DirectComponent extends AbstractComponent {
 
         try {
             Object component = create();
-            proxy = new MuleProxy(component, descriptor, null);
+            proxy = new DefaultMuleProxy(component, descriptor, null);
+            proxy.setStatistics(getStatistics());
         } catch (UMOException e) {
             throw new InitialisationException(e, this);
         }
     }
 
     protected UMOMessage doSend(UMOEvent event) throws UMOException {
+
         Object obj = proxy.onCall(event);
         if(obj instanceof UMOMessage) {
             return (UMOMessage)obj;
@@ -101,8 +105,16 @@ public class DirectComponent extends AbstractComponent {
                     }
                 }
             }
+            if(descriptor.isSingleton()) descriptor.setImplementation(component);
         } else {
             component = impl;
+        }
+
+        try {
+            BeanUtils.populate(component, descriptor.getProperties());
+        } catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Component '"
+                    + descriptor.getName() + "'"), e, descriptor);
         }
         // Call any custom initialisers
         descriptor.fireInitialisationCallbacks(component);
