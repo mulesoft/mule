@@ -88,6 +88,9 @@ public abstract class AbstractProxyFactory implements ObjectFactory
         } else {
             component = impl;
         }
+        //If a singleton we can keep using the same instnace
+        if(descriptor.isSingleton()) descriptor.setImplementation(component);
+
         // Call any custom initialisers
         descriptor.fireInitialisationCallbacks(component);
 
