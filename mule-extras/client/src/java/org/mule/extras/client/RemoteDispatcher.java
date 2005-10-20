@@ -200,7 +200,7 @@ public class RemoteDispatcher implements Disposable
     {
         AdminEvent action = new AdminEvent(null, AdminEvent.ACTION_RECEIVE, endpoint);
         action.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
-        action.setProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, new Long(timeout));
+        action.setProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, Long.valueOf(timeout));
         UMOMessage result = dispatchAction(action, true, timeout);
         return result;
     }

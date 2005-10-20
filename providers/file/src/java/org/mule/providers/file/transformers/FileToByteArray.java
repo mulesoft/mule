@@ -47,7 +47,7 @@ public class FileToByteArray extends AbstractTransformer
         ByteArrayOutputStream baos = null;
         try {
             fis = new FileInputStream((File) src);
-            baos = new ByteArrayOutputStream(new Long(((File) src).length()).intValue());
+            baos = new ByteArrayOutputStream(Long.valueOf(((File) src).length()).intValue());
             int len = 0;
             while ((len = fis.read(buf)) != -1) {
                 baos.write(buf, 0, len);

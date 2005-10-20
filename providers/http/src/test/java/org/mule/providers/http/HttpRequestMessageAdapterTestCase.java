@@ -68,7 +68,7 @@ public class HttpRequestMessageAdapterTestCase extends AbstractMessageAdapterTes
                         } else if ("setAttribute".equals(method.getName())) {
                             props.put(args[0], args[1]);
                         } else if ("equals".equals(method.getName())) {
-                            return new Boolean(payload.equals(args[0]));
+                            return Boolean.valueOf(payload.equals(args[0]));
                         } else if ("toString".equals(method.getName())) {
                             return payload;
                         } else if ("getReader".equals(method.getName())) {

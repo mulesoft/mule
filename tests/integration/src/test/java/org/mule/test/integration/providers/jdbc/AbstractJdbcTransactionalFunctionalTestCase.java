@@ -86,7 +86,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         Object[] obj = execSqlQuery("SELECT COUNT(*) FROM TEST WHERE TYPE = 2");
         assertNotNull(obj);
         assertEquals(1, obj.length);
-        assertEquals(new Integer(0), obj[0]);
+        assertEquals(Integer.valueOf(0), obj[0]);
         obj = execSqlQuery("SELECT ACK FROM TEST WHERE TYPE = 1");
         assertNotNull(obj);
         assertEquals(1, obj.length);

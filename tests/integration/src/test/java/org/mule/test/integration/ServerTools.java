@@ -111,7 +111,7 @@ public class ServerTools
 
     static class JavaTask extends Java {
         public KillableWatchdog watchDog;
-        private Long timeout = new Long(Long.MAX_VALUE);
+        private Long timeout = Long.valueOf(Long.MAX_VALUE);
         public void setTimeout(Long value) {
             this.timeout = value;
             super.setTimeout(value);
@@ -126,14 +126,12 @@ public class ServerTools
     }
 
     static class KillableWatchdog extends ExecuteWatchdog {
-        private Process process;
         public KillableWatchdog(long timeout) {
             super(timeout);
         }
         public void timeoutOccured(Watchdog w) {
         }
         public synchronized void start(Process process) {
-            this.process = process;
             super.start(process);
         }
         public void kill() {

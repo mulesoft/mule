@@ -70,10 +70,10 @@ public class EventMetaDataProporgationTestCase extends FunctionalTestCase implem
             Map props = new HashMap();
             props.put("stringParam", "param1");
             props.put("objectParam", testObjectProperty);
-            props.put("doubleParam", new Double(12345.6));
-            props.put("integerParam", new Integer(12345));
-            props.put("longParam", new Long(123456789));
-            props.put("booleanParam", new Boolean(true));
+            props.put("doubleParam", Double.valueOf(12345.6));
+            props.put("integerParam", Integer.valueOf(12345));
+            props.put("longParam", Long.valueOf(123456789));
+            props.put("booleanParam", Boolean.TRUE);
             UMOMessage msg = new MuleMessage(context.getMessageAsString(), props);
             return msg;
         } else {

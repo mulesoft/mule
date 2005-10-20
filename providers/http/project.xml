@@ -12,15 +12,20 @@
     <shortDescription>http</shortDescription>
     <url>http://www.muleumo.org/doc/providers/http/</url>
     <dependencies>
-        <dependency>
-            <artifactId>commons-httpclient</artifactId>
-            <groupId>commons-httpclient</groupId>
-            <version>${commons_httpclient_version}</version>
-            <url>http://jakarta.apache.org/commons/httpclient/index.html</url>
-            <properties>
-                <war.bundle.jar>true</war.bundle.jar>
-            </properties>
-        </dependency>
+		<dependency>
+			<artifactId>commons-codec</artifactId>
+			<groupId>commons-codec</groupId>
+			<version>${commons_codec_version}</version>
+		</dependency>
+		<dependency>
+			<artifactId>commons-httpclient</artifactId>
+			<groupId>commons-httpclient</groupId>
+			<version>${commons_httpclient_version}</version>
+			<url>http://jakarta.apache.org/commons/httpclient/index.html</url>
+			<properties>
+				<war.bundle.jar>true</war.bundle.jar>
+			</properties>
+		</dependency>
         <dependency>
             <artifactId>org.mortbay.jetty</artifactId>
             <groupId>jetty</groupId>

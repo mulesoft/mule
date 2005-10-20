@@ -142,7 +142,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
         }
         try {
             return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[] { readDir, moveTo,
-                    moveToPattern, new Long(polling) });
+                    moveToPattern, Long.valueOf(polling) });
 
         } catch (Exception e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,

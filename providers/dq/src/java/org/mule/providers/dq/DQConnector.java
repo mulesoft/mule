@@ -43,7 +43,7 @@ public class DQConnector extends AbstractServiceEnabledConnector
      * Pooling frequency property name*
      */
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
-    private Long pollingFrequency = new Long(DEFAULT_POLLING);
+    private Long pollingFrequency = Long.valueOf(DEFAULT_POLLING);
     private String hostname;
     private String username;
     private String password;
@@ -63,11 +63,11 @@ public class DQConnector extends AbstractServiceEnabledConnector
             // Override properties on the provider for the specific endpoint
             String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null) {
-                pollingFrequency = new Long(tempPolling);
+                pollingFrequency = Long.valueOf(tempPolling);
             }
         }
         if (pollingFrequency.longValue() <= 0) {
-            pollingFrequency = new Long(DEFAULT_POLLING);
+            pollingFrequency = Long.valueOf(DEFAULT_POLLING);
         }
         logger.debug("set polling frequency to: " + pollingFrequency);
 

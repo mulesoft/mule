@@ -48,7 +48,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     public VMMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException
     {
-        super(connector, component, endpoint, new Long(10));
+        super(connector, component, endpoint, Long.valueOf(10));
         this.connector = (VMConnector) connector;
         receiveMessagesInTransaction = endpoint.getTransactionConfig().isTransacted();
     }

@@ -58,8 +58,8 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
         UMOMessageAdapter adapter = createAdapter(getValidMessage());
 
         adapter.setProperty("TestString", "Test1");
-        adapter.setProperty("TestLong", new Long(20000000));
-        adapter.setProperty("TestInt", new Integer(200000));
+        adapter.setProperty("TestLong", Long.valueOf(20000000));
+        adapter.setProperty("TestInt", Integer.valueOf(200000));
         Object prop;
         assertNotNull(adapter.getPropertyNames());
 
@@ -69,11 +69,11 @@ public abstract class AbstractMessageAdapterTestCase extends AbstractMuleTestCas
 
         prop = adapter.getProperty("TestLong");
         assertNotNull(prop);
-        assertEquals(new Long(20000000), prop);
+        assertEquals(Long.valueOf(20000000), prop);
 
         prop = adapter.getProperty("TestInt");
         assertNotNull(prop);
-        assertEquals(new Integer(200000), prop);
+        assertEquals(Integer.valueOf(200000), prop);
     }
 
     public Object getInvalidMessage()

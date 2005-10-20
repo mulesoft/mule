@@ -61,8 +61,8 @@ public class JXPathPropertyExtractorTestCase extends NamedTestCase{
 
         Map values = e.getProperties(exp, msg);
         assertNotNull(values);
-        assertEquals(new Boolean(true), values.get("apple/washed"));
-        assertEquals(new Boolean(false), values.get("apple/bitten"));
+        assertEquals(Boolean.TRUE, values.get("apple/washed"));
+        assertEquals(Boolean.FALSE, values.get("apple/bitten"));
         assertEquals("foo", values.get("Message-Property"));
         assertNull(values.get("bar"));
 

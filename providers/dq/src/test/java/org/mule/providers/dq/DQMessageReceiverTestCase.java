@@ -40,7 +40,7 @@ public class DQMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         return new DQMessageReceiver((AbstractConnector) endpoint.getConnector(),
                                      (UMOComponent) mockComponent.proxy(),
                                      endpoint,
-                                     new Long(1000),
+                                     Long.valueOf(1000),
                                      new DataQueue(system, "/QSYS.LIB/L701QUEUE.DTAQ"),
                                      system);
     }

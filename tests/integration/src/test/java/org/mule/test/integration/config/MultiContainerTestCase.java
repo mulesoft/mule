@@ -53,15 +53,15 @@ public class MultiContainerTestCase extends FunctionalTestCase
         assertNotNull(context);
         Orange o = (Orange) context.getComponent(new ContainerKeyPair("spring", "Orange"));
         assertNotNull(o);
-        assertEquals(new Integer(8), o.getSegments());
+        assertEquals(Integer.valueOf(8), o.getSegments());
 
         o = (Orange) context.getComponent(new ContainerKeyPair("plexus", "Orange"));
         assertNotNull(o);
-        assertEquals(new Integer(10), o.getSegments());
+        assertEquals(Integer.valueOf(10), o.getSegments());
 
         // gets the component from the first container
         o = (Orange) context.getComponent("Orange");
         assertNotNull(o);
-        assertEquals(new Integer(10), o.getSegments());
+        assertEquals(Integer.valueOf(10), o.getSegments());
     }
 }

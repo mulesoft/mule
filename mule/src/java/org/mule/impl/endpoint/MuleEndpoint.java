@@ -224,7 +224,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
      */
     public void setSynchronous(boolean synchronous)
     {
-        this.synchronous = new Boolean(synchronous);
+        this.synchronous = Boolean.valueOf(synchronous);
     }
 
     public void setCreateConnector(int action)
@@ -263,7 +263,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
      * @param timeout the timeout in milliseconds
      */
     public void setRemoteSyncTimeout(int timeout) {
-        this.remoteSyncTimeout = new Integer(timeout);
+        this.remoteSyncTimeout = Integer.valueOf(timeout);
     }
 
     /**

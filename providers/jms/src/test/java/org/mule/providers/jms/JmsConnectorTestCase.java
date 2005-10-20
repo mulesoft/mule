@@ -77,7 +77,7 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
         message.expectAndReturn("getJMSDeliveryMode", Integer.valueOf(1));
         message.expectAndReturn("getJMSDestination", null);
         message.expectAndReturn("getJMSPriority", Integer.valueOf(4));
-        message.expectAndReturn("getJMSRedelivered", Boolean.valueOf(false));
+        message.expectAndReturn("getJMSRedelivered", Boolean.FALSE);
         message.expectAndReturn("getJMSReplyTo", null);
         message.expectAndReturn("getJMSExpiration", Long.valueOf(0));
         message.expectAndReturn("getJMSTimestamp", Long.valueOf(0));

@@ -87,7 +87,7 @@ public class MuleBeanDefinitionReader extends XmlBeanDefinitionReader
         if (getXslResource() != null) {
             Transformer transformer = createTransformer(createXslSource());
             DOMResult result = new DOMResult();
-            transformer.setParameter("firstContext", new Boolean(isFirstContext()));
+            transformer.setParameter("firstContext", Boolean.valueOf(isFirstContext()));
             transformer.transform(new DOMSource(document), result);
             if (logger.isDebugEnabled()) {
                 try {

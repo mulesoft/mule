@@ -41,7 +41,7 @@ public class ForwardingMessageSplitterTestCase extends NamedTestCase
 
         List payload = new ArrayList();
         payload.add("hello");
-        payload.add(new Integer(3));
+        payload.add(Integer.valueOf(3));
         payload.add(new Exception());
         client.send("vm://in.queue", payload, null);
         UMOMessage m = client.receive("vm://component.1", 2000);

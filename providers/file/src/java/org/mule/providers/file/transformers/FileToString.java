@@ -43,7 +43,7 @@ public class FileToString extends AbstractTransformer
         if (src instanceof String)
             return src.toString();
 
-        StringBuffer sb = new StringBuffer(new Long(((File) src).length()).intValue());
+        StringBuffer sb = new StringBuffer(Long.valueOf(((File) src).length()).intValue());
         char[] buf = new char[1024 * 8];
         FileReader fr = null;
         try {

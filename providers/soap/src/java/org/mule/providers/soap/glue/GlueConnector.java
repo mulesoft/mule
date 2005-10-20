@@ -51,7 +51,7 @@ public class GlueConnector extends AbstractServiceEnabledConnector
         UMOMessageReceiver receiver = serviceDescriptor.createMessageReceiver(this,
                                                                               component,
                                                                               endpoint,
-                                                                              new Object[] { new Boolean(createServer) });
+                                                                              new Object[] { Boolean.valueOf(createServer) });
 
         if (createServer) {
             serverEndpoints.add(endpoint.getEndpointURI().getAddress());

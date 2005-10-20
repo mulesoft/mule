@@ -105,7 +105,7 @@ public class Pop3Connector extends AbstractServiceEnabledConnector implements Ma
      */ 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception 
     {
-        Object[] args = {new Long(checkFrequency), backupFolder};
+        Object[] args = {Long.valueOf(checkFrequency), backupFolder};
         return serviceDescriptor.createMessageReceiver(this, component, endpoint, args); 
     }
 

@@ -50,7 +50,7 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
     public SerializedUMOMessageTransformersTestCase() {
         Map props = new HashMap();
         props.put("object", new Apple());
-        props.put("number", new Integer(1));
+        props.put("number", Integer.valueOf(1));
         props.put("string", "hello");
         testObject = new MuleMessage("test", props);
     }

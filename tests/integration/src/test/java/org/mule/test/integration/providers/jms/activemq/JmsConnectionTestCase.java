@@ -27,6 +27,7 @@ import org.mule.impl.internal.events.ConnectionEvent;
 import org.mule.impl.internal.events.ConnectionEventListener;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.SimpleRetryConnectionStrategy;
+import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.test.integration.ServerTools;
@@ -89,7 +90,7 @@ public class JmsConnectionTestCase extends AbstractJmsFunctionalTestCase impleme
     public UMOConnector createConnector() throws Exception
     {
         connector = new JmsConnector();
-        connector.setSpecification(JmsConnector.JMS_SPECIFICATION_11);
+        connector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
         Properties props = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
         connector.setConnectionFactoryJndiName("JmsQueueConnectionFactory");
         Properties factoryProps = new Properties();
