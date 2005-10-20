@@ -129,21 +129,24 @@ public class OracleJmsConnector extends JmsConnector {
         }
     }
     
-	/** Iterate through the open connections and stop them one by one. */
-    public void doStop() throws UMOException {
-    	Connection jmsConnection = null;    	
-    	try {
-        	// Iterate through the open connections and stop them one by one.
-	        for (Iterator i = connections.iterator(); i.hasNext(); ) {
-	        	jmsConnection = (Connection) i.next();
-	            if (jmsConnection != null) {
-	            	jmsConnection.stop();
-	            }
-	        }
-        } catch (JMSException e) {
-            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jms Connection"), e);
-        }
-    }
+    // The following method is apparently no longer needed.  The open connections must 
+    // get stopped implicitly someplace else.
+    
+//	/** Iterate through the open connections and stop them one by one. */
+//    public void doStop() throws UMOException {
+//    	Connection jmsConnection = null;    	
+//    	try {
+//        	// Iterate through the open connections and stop them one by one.
+//	        for (Iterator i = connections.iterator(); i.hasNext(); ) {
+//	        	jmsConnection = (Connection) i.next();
+//	            if (jmsConnection != null) {
+//	            	jmsConnection.stop();
+//	            }
+//	        }
+//        } catch (JMSException e) {
+//            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jms Connection"), e);
+//        }
+//    }
 
 	/** Iterate through the open connections and start them one by one. */
     public void doStart() throws UMOException {
