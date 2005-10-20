@@ -544,7 +544,6 @@
                 <exclude>**/OpenJms*.*</exclude>
                 <exclude>**/Joram*.*</exclude>
                 <exclude>**/SpiritWave*.*</exclude>
-                <exclude>**/EmailEndpointsTestCase.*</exclude>
             </excludes>
             <resources>
                 <resource>
