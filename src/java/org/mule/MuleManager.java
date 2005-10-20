@@ -15,7 +15,6 @@ package org.mule;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.collections.SequencedHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
@@ -91,7 +90,7 @@ public class MuleManager implements UMOManager
     /**
      * Holds any registered agents
      */
-    private Map agents = new SequencedHashMap();
+    private Map agents = new LinkedHashMap();
 
     /**
      * Holds a list of global endpoints accessible to any client code

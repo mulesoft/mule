@@ -622,7 +622,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
     public boolean isRemoteSync() {
         if(remoteSync==null) {
             if(connector==null || connector.isRemoteSyncEnabled()) {
-                remoteSync = new Boolean(MuleManager.getConfiguration().isRemoteSync());
+                remoteSync = Boolean.valueOf(MuleManager.getConfiguration().isRemoteSync());
             } else {
                 remoteSync = Boolean.FALSE;
             }
@@ -637,7 +637,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public int getRemoteSyncTimeout() {
         if(remoteSyncTimeout==null) {
-            remoteSyncTimeout = new Integer(MuleManager.getConfiguration().getSynchronousEventTimeout());
+            remoteSyncTimeout = Integer.valueOf(MuleManager.getConfiguration().getSynchronousEventTimeout());
         }
         return remoteSyncTimeout.intValue();
     }

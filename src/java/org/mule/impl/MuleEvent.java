@@ -360,11 +360,11 @@ public class MuleEvent extends EventObject implements UMOEvent
         }
         if (message.getCorrelationGroupSize() != -1) {
             properties.put(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
-                           new Integer(message.getCorrelationGroupSize()));
+                           Integer.valueOf(message.getCorrelationGroupSize()));
         }
         if (message.getCorrelationSequence() != -1) {
             properties.put(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
-                           new Integer(message.getCorrelationSequence()));
+                           Integer.valueOf(message.getCorrelationSequence()));
         }
         if (message.getReplyTo() != null) {
             properties.put(MuleProperties.MULE_REPLY_TO_PROPERTY, message.getReplyTo());
@@ -517,22 +517,22 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     public void setBooleanProperty(String name, boolean value)
     {
-        properties.put(name, new Boolean(value));
+        properties.put(name, Boolean.valueOf(value));
     }
 
     public void setIntProperty(String name, int value)
     {
-        properties.put(name, new Integer(value));
+        properties.put(name, Integer.valueOf(value));
     }
 
     public void setLongProperty(String name, long value)
     {
-        properties.put(name, new Long(value));
+        properties.put(name, Long.valueOf(value));
     }
 
     public void setDoubleProperty(String name, double value)
     {
-        properties.put(name, new Double(value));
+        properties.put(name, Double.valueOf(value));
     }
 
     /**

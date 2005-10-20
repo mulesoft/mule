@@ -166,19 +166,19 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
     }
 
     public void setBooleanProperty(String name, boolean value) {
-        properties.put(name, new Boolean(value));
+        properties.put(name, Boolean.valueOf(value));
     }
 
     public void setIntProperty(String name, int value) {
-        properties.put(name, new Integer(value));
+        properties.put(name, Integer.valueOf(value));
     }
 
     public void setLongProperty(String name, long value) {
-        properties.put(name, new Long(value));
+        properties.put(name, Long.valueOf(value));
     }
 
     public void setDoubleProperty(String name, double value) {
-        properties.put(name, new Double(value));
+        properties.put(name, Double.valueOf(value));
     }
 
     public Object getReplyTo() {
