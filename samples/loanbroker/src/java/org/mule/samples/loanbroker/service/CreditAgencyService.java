@@ -18,13 +18,13 @@ import org.mule.samples.loanbroker.CreditProfile;
 import org.mule.samples.loanbroker.Customer;
 
 /**
- * <code>CreaditAgencyService</code> the service that provides a credit
+ * <code>CreditAgencyService</code> the service that provides a credit
  * score for a customer
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface CreaditAgencyService
+public interface CreditAgencyService
 {
     CreditProfile getCreditProfile(Customer customer);
 

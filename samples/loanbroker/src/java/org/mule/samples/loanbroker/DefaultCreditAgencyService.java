@@ -13,7 +13,7 @@
  */
 package org.mule.samples.loanbroker;
 
-import org.mule.samples.loanbroker.service.CreaditAgencyService;
+import org.mule.samples.loanbroker.service.CreditAgencyService;
 
 /**
  * <code>DefaultCreditAgencyService</code> the service that provides a credit
@@ -22,7 +22,7 @@ import org.mule.samples.loanbroker.service.CreaditAgencyService;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DefaultCreditAgencyService implements CreaditAgencyService
+public class DefaultCreditAgencyService implements CreditAgencyService
 {
     public int getCreditScore(int ssn)
   {
