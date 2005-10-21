@@ -150,29 +150,40 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         }
     }
 
-    protected void setHeaders(HttpMethod httpMethod, UMOEventContext context) {
-        // Standard requestHeaders
-            Map.Entry header;
-            String headerName;
-            Map p = context.getProperties();
-            for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();) {
-                header = (Map.Entry) iterator.next();
-                headerName = header.getKey().toString();
-                if (!HttpConstants.REQUEST_HEADER_NAMES.contains(headerName) && header.getValue() instanceof String) {
-                    if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX)) {
-                        headerName = "X-" + headerName;
-                    }
-                    //Make sure we have a valid header name otherwise we will corrupt the request
-                    if (headerName.startsWith(HttpConstants.HEADER_CONTENT_LENGTH) && httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH) == null) {
-                        httpMethod.addRequestHeader(headerName, (String) header.getValue());
-                    } else {
-                        httpMethod.addRequestHeader(headerName, (String) header.getValue());
-                    }
-                }
-            }
+    protected void setHeaders(HttpMethod httpMethod, UMOEventContext context)
+	{
+		// Standard requestHeaders
+		Map.Entry header;
+		String headerName;
+		Map p = context.getProperties();
+		for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();)
+		{
+			header = (Map.Entry)iterator.next();
+			headerName = header.getKey().toString();
+			if ((HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null)
+					&& header.getValue() instanceof String)
+			{
+				if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
+				{
+					headerName = "X-" + headerName;
+				}
+				//Make sure we have a valid header name otherwise we will corrupt the request
+				if (headerName.startsWith(HttpConstants.HEADER_CONTENT_LENGTH)
+						&& httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_LENGTH) == null)
+				{
+					httpMethod.addRequestHeader(headerName, (String)header.getValue());
+				}
+				else
+				{
+					httpMethod.addRequestHeader(headerName, (String)header.getValue());
+				}
+			}
+		}
 
-            if (context.getMessage().getPayload() instanceof InputStream) {
-                httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related"); // must set this for receiver to properly parse attachments
-            }
-    }
+		if (context.getMessage().getPayload() instanceof InputStream)
+		{
+			// must set this for receiver to properly parse attachments
+			httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related");
+		}
+	}
 }

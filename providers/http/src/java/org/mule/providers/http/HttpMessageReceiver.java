@@ -291,29 +291,45 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         return payload;
     }
 
-    private void readHeaders(RequestInputStream is, Properties p) throws IOException {
-        String currentKey = null;
-        while (true) {
-            String line = is.readline();
-            if ((line == null) || (line.length() == 0)) {
-                break;
-            }
+    private void readHeaders(RequestInputStream is, Properties p) throws IOException
+	{
+		String currentKey = null;
+		while (true)
+		{
+			String line = is.readline();
+			if ((line == null) || (line.length() == 0))
+			{
+				break;
+			}
 
-            if (!Character.isSpaceChar(line.charAt(0))) {
-                int index = line.indexOf(':');
-                if (index >= 0) {
-                    currentKey = line.substring(0, index).trim();
-                    if (currentKey.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
-                        currentKey = currentKey.substring(2);
-                    }
-                    String value = line.substring(index + 1).trim();
-                    p.setProperty(currentKey, value);
-                }
-            } else if (currentKey != null) {
-                String value = p.getProperty(currentKey);
-                p.setProperty(currentKey, value + "\r\n\t" + line.trim());
-            }
-        }
+			if (!Character.isSpaceChar(line.charAt(0)))
+			{
+				int index = line.indexOf(':');
+				if (index >= 0)
+				{
+					currentKey = line.substring(0, index).trim();
+					if (currentKey.startsWith("X-" + MuleProperties.PROPERTY_PREFIX))
+					{
+						currentKey = currentKey.substring(2);
+					}
+					else
+					{
+						String normalizedKey = (String)HttpConstants.REQUEST_HEADER_NAMES.get(currentKey);
+						if (normalizedKey != null)
+						{
+							currentKey = normalizedKey;
+						}
+					}
+					String value = line.substring(index + 1).trim();
+					p.setProperty(currentKey, value);
+				}
+			}
+			else if (currentKey != null)
+			{
+				String value = p.getProperty(currentKey);
+				p.setProperty(currentKey, value + "\r\n\t" + line.trim());
+			}
+		}
 
-    }
+	}
 }

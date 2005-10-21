@@ -110,7 +110,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 
         String headerName;
         String value;
-        for (Iterator iterator = HttpConstants.RESPONSE_HEADER_NAMES.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = HttpConstants.RESPONSE_HEADER_NAMES.values().iterator(); iterator.hasNext();) {
             headerName = (String) iterator.next();
             value = context.getStringProperty(headerName);
             if (value != null) {

@@ -13,10 +13,13 @@
  */
 package org.mule.providers.http;
 
+import org.apache.commons.collections.map.CaseInsensitiveMap;
+import org.mule.util.CollectionUtil;
+
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>HttpConstants</code> for request and response headers
@@ -25,7 +28,7 @@ import java.util.Set;
  * @version $Revision$
  */
 
-public interface HttpConstants
+public class HttpConstants
 {
     // HTTP prefix
     public static String HTTP10 = "HTTP/1.0";
@@ -95,23 +98,9 @@ public interface HttpConstants
     public static final String HEADER_WARNING = "Warning";// [General]
     public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";// [Response]
 
-    public static final Set REQUEST_HEADER_NAMES = Collections.unmodifiableSet(new HashSet(Arrays.asList(
-			new String[]{HEADER_ACCEPT,HEADER_ACCEPT_CHARSET,HEADER_ACCEPT_ENCODING,
-				HEADER_ACCEPT_LANGUAGE,HEADER_AUTHORIZATION,HEADER_CACHE_CONTROL,HEADER_CONNECTION,
-				HEADER_DATE,HEADER_EXPECT,HEADER_FROM,HEADER_HOST,HEADER_IF_MATCH,
-				HEADER_IF_MODIFIED_SINCE,HEADER_IF_NONE_MATCH,HEADER_IF_RANGE,
-				HEADER_IF_UNMODIFIED_SINCE,HEADER_MAX_FORWARDS,HEADER_PRAGMA,HEADER_PROXY_AUTHORIZATION,
-				HEADER_RANGE,HEADER_REFERER,HEADER_TE,HEADER_TRAILER,HEADER_TRANSFER_ENCODING,
-				HEADER_UPGRADE,HEADER_USER_AGENT,HEADER_VIA,HEADER_WARNING})));
-
-    public static final Set RESPONSE_HEADER_NAMES = Collections.unmodifiableSet(new HashSet(Arrays.asList(
- 			new String[]{HEADER_ACCEPT_RANGES,HEADER_AGE,HEADER_ALLOW,HEADER_CACHE_CONTROL,
-				HEADER_CONNECTION,HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE,
-				HEADER_CONTENT_LOCATION,HEADER_CONTENT_MD5,HEADER_CONTENT_RANGE,HEADER_DATE,HEADER_ETAG,
-				HEADER_EXPIRES,HEADER_LAST_MODIFIED,HEADER_LOCATION,HEADER_PRAGMA,
-				HEADER_PROXY_AUTHENTICATE,HEADER_RETRY_AFTER,HEADER_SERVER,HEADER_TRAILER,
-				HEADER_TRANSFER_ENCODING,HEADER_UPGRADE,HEADER_VARY,HEADER_VIA,HEADER_WARNING,
-				HEADER_WWW_AUTHENTICATE})));
+    // case-insenitive Maps of header names to their normalized representations
+    public static final Map REQUEST_HEADER_NAMES;
+    public static final Map RESPONSE_HEADER_NAMES;
 
     // Status codes
     public static final int SC_CONTINUE = 100;
@@ -162,4 +151,35 @@ public interface HttpConstants
     public static final int SC_GATEWAY_TIMEOUT = 504;
     public static final int SC_HTTP_VERSION_NOT_SUPPORTED = 505;
     public static final int SC_INSUFFICIENT_STORAGE = 507;
+
+    static
+	{
+		synchronized (HttpConstants.class)
+		{
+			List strings = Arrays.asList(new String[]{HEADER_ACCEPT,HEADER_ACCEPT_CHARSET,
+				HEADER_ACCEPT_ENCODING,HEADER_ACCEPT_LANGUAGE,HEADER_AUTHORIZATION,HEADER_CACHE_CONTROL,
+				HEADER_CONNECTION,HEADER_DATE,HEADER_EXPECT,HEADER_FROM,HEADER_HOST,HEADER_IF_MATCH,
+				HEADER_IF_MODIFIED_SINCE,HEADER_IF_NONE_MATCH,HEADER_IF_RANGE,
+				HEADER_IF_UNMODIFIED_SINCE,HEADER_MAX_FORWARDS,HEADER_PRAGMA,HEADER_PROXY_AUTHORIZATION,
+				HEADER_RANGE,HEADER_REFERER,HEADER_TE,HEADER_TRAILER,HEADER_TRANSFER_ENCODING,
+				HEADER_UPGRADE,HEADER_USER_AGENT,HEADER_VIA,HEADER_WARNING});
+
+			REQUEST_HEADER_NAMES = Collections.unmodifiableMap(
+					CollectionUtil.createMapWithKeysAndValues(CaseInsensitiveMap.class,
+							strings.iterator(), strings.iterator()));
+
+			strings = Arrays.asList(new String[]{HEADER_ACCEPT_RANGES,HEADER_AGE,HEADER_ALLOW,
+				HEADER_CACHE_CONTROL,HEADER_CONNECTION,HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE,
+				HEADER_CONTENT_LOCATION,HEADER_CONTENT_MD5,HEADER_CONTENT_RANGE,HEADER_DATE,HEADER_ETAG,
+				HEADER_EXPIRES,HEADER_LAST_MODIFIED,HEADER_LOCATION,HEADER_PRAGMA,
+				HEADER_PROXY_AUTHENTICATE,HEADER_RETRY_AFTER,HEADER_SERVER,HEADER_TRAILER,
+				HEADER_TRANSFER_ENCODING,HEADER_UPGRADE,HEADER_VARY,HEADER_VIA,HEADER_WARNING,
+				HEADER_WWW_AUTHENTICATE});
+
+			RESPONSE_HEADER_NAMES = Collections.unmodifiableMap(
+					CollectionUtil.createMapWithKeysAndValues(CaseInsensitiveMap.class,
+							strings.iterator(), strings.iterator()));
+		}
+	}
+
 }
