@@ -101,6 +101,7 @@ public class HttpConstants
     // case-insenitive Maps of header names to their normalized representations
     public static final Map REQUEST_HEADER_NAMES;
     public static final Map RESPONSE_HEADER_NAMES;
+    public static final Map ALL_HEADER_NAMES;
 
     // Status codes
     public static final int SC_CONTINUE = 100;
@@ -165,8 +166,8 @@ public class HttpConstants
 				HEADER_UPGRADE,HEADER_USER_AGENT,HEADER_VIA,HEADER_WARNING});
 
 			REQUEST_HEADER_NAMES = Collections.unmodifiableMap(
-					CollectionUtil.createMapWithKeysAndValues(CaseInsensitiveMap.class,
-							strings.iterator(), strings.iterator()));
+					CollectionUtil.createMapWithKeysAndValues(
+						CaseInsensitiveMap.class, strings.iterator(), strings.iterator()));
 
 			strings = Arrays.asList(new String[]{HEADER_ACCEPT_RANGES,HEADER_AGE,HEADER_ALLOW,
 				HEADER_CACHE_CONTROL,HEADER_CONNECTION,HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE,
@@ -177,8 +178,20 @@ public class HttpConstants
 				HEADER_WWW_AUTHENTICATE});
 
 			RESPONSE_HEADER_NAMES = Collections.unmodifiableMap(
-					CollectionUtil.createMapWithKeysAndValues(CaseInsensitiveMap.class,
-							strings.iterator(), strings.iterator()));
+					CollectionUtil.createMapWithKeysAndValues(
+						CaseInsensitiveMap.class,strings.iterator(), strings.iterator()));
+
+			strings = Arrays.asList(new String[]{HEADER_ALLOW,HEADER_CACHE_CONTROL,HEADER_CONNECTION,
+				HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE,HEADER_CONTENT_LENGTH,
+				HEADER_CONTENT_LOCATION,HEADER_CONTENT_MD5,HEADER_CONTENT_RANGE,HEADER_CONTENT_TYPE,
+				HEADER_DATE,HEADER_EXPIRES,HEADER_KEEP_ALIVE,HEADER_LAST_MODIFIED,HEADER_PRAGMA,
+				HEADER_TRAILER,HEADER_TRANSFER_ENCODING,HEADER_UPGRADE,HEADER_VIA,HEADER_WARNING});
+
+			Map allHeaders = CollectionUtil.createMapWithKeysAndValues(
+					CaseInsensitiveMap.class,strings.iterator(), strings.iterator());
+			allHeaders.putAll(REQUEST_HEADER_NAMES);
+			allHeaders.putAll(RESPONSE_HEADER_NAMES);
+			ALL_HEADER_NAMES = Collections.unmodifiableMap(allHeaders);
 		}
 	}
 

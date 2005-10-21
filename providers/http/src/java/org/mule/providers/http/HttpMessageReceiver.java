@@ -314,7 +314,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 					}
 					else
 					{
-						String normalizedKey = (String)HttpConstants.REQUEST_HEADER_NAMES.get(currentKey);
+						String normalizedKey = (String)HttpConstants.ALL_HEADER_NAMES.get(currentKey);
 						if (normalizedKey != null)
 						{
 							currentKey = normalizedKey;
