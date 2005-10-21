@@ -1,24 +1,25 @@
 package org.mule.tools.config.graph;
 
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphFactory;
+import com.oy.shared.lm.graph.GraphNode;
+import com.oy.shared.lm.out.GRAPHtoDOTtoGIF;
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
 import java.io.File;
-import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Attribute;
-import org.jdom.input.SAXBuilder;
-
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphFactory;
-import com.oy.shared.lm.graph.GraphNode;
-import com.oy.shared.lm.out.GRAPHtoDOTtoGIF;
 
 public class MuleGrapher {
     // colors http://www.graphviz.org/pub/scm/graphviz2/doc/info/colors.html
@@ -30,110 +31,136 @@ public class MuleGrapher {
     private static final String COLOR_FILTER = "gold";
     private static final String COLOR_ENDPOINT = "white";
 
+    private GraphConfig config = null;
     private Map endpoints = new HashMap();
-    private String file = "";
-    private static String exec = null;
 
-    private final String[] ignoredAttributes = new String[]{"className", "inboundEndpoint", "outboundEndpoint",
-     "responseEndpoint", "inboundTransformer", "outboundTransformer", "type", "singleton", "address",
-     "transformers", "name"};
+    public static void main(String[] args) {
 
-    public static void main(String[] args) throws IOException, JDOMException {
-
-        if(args.length==0 || args[0].equals("?")) {
+        if(args.length==0 || args[0].equals(GraphConfig.ARG_HELP)) {
             printUsage();
             System.exit(0);
         }
+        MuleGrapher grapher = null;
+        try {
+            grapher = new MuleGrapher(new GraphConfig(args));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        grapher.run();
+    }
 
-        String files = getOpt(args, "-files", null);
+    public MuleGrapher(GraphConfig config) {
+        this.config = config;
+    }
 
-        String outputDir = getOpt(args, "-outputdir", ".");
-        File f = new File(outputDir);
-        if(!f.exists()) f.mkdirs();
-        System.out.println("Outputting graphs to: " + f.getAbsolutePath());
+        public void run() {
+            try {
+                config.validate();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+                System.exit(0);
+            }
+            try {
+                String filename = config.getOutputFilename();
+            if(config.isCombineFiles()) {
+                if(filename==null) filename = config.getFiles().get(0).toString() + ".combined";
+                generateGraph(config.getFiles(), config.getOutputDirectory(), config.getCaption(), filename);
+            } else {
+                for (Iterator iterator = config.getFiles().iterator(); iterator.hasNext();) {
+                    String s = (String) iterator.next();
+                    List list = new ArrayList(1);
+                    list.add(s);
 
-        String caption = getOpt(args, "-caption", null);
+                    generateGraph(list, config.getOutputDirectory(), config.getCaption(), new File(s).getName());
+                }
+            }
 
-        exec = getOpt(args, "-exec", null);
-
-        if (files == null) {
-            System.out.println("-files arg not set");
+            if(!config.isKeepDotFiles()) {
+                File[] dotFiles = config.getOutputDirectory().listFiles(new FilenameFilter() {
+                    public boolean accept(File dir, String name) {
+                        return name.endsWith(".dot");
+                    }
+                });
+                for (int x = 0; x < dotFiles.length; x++) {
+                    dotFiles[x].delete();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(1);
         }
 
-        MuleGrapher grapher = null;
-        for (StringTokenizer stringTokenizer = new StringTokenizer(files, ","); stringTokenizer.hasMoreTokens();) {
-            String s = stringTokenizer.nextToken().trim();
-            grapher = new MuleGrapher(s);
-            grapher.generateGraph(outputDir, caption);
-        }
-
-
     }
 
-    private static String getOpt(String[] args, String name, String defaultValue) {
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(name)) {
-                if (i + 1 >= args.length) {
-                    return defaultValue;
-                } else {
-                    String arg = args[i + 1];
-                    if(arg.startsWith("-")){
-                        return defaultValue;
+
+
+    protected Graph generateGraph(List files, File outputDir, String caption, String fileName) throws JDOMException, IOException {
+        endpoints.clear();
+        SAXBuilder builder = new SAXBuilder();
+        builder.setValidation(true);
+        Graph graph = GraphFactory.newGraph();
+
+        builder.setIgnoringElementContentWhitespace(true);
+        for (Iterator iterator = files.iterator(); iterator.hasNext();) {
+            String s = (String) iterator.next();
+            File myFile = new File(s);
+            System.out.println("processing file " + myFile.getCanonicalPath());
+            Document doc = builder.build(myFile);
+
+
+            Element root = doc.getRootElement();
+            if(files.size() == 1) {
+                if(caption==null) {
+                    caption = root.getAttribute("id").getValue();
+                    if(caption!=null) {
+                        caption = caption.replaceAll("_", " ");
                     } else {
-                        return arg;
+                        caption = "Mule Configuration";
                     }
+                }
+                StringBuffer captionBuffer = new StringBuffer();
+                captionBuffer.append(caption);
+                appendDescription(root, captionBuffer);
+                graph.getInfo().setCaption(captionBuffer.toString());
+            }
+
+            parseEndpointIdentifiers(graph, root);
+            parseEndpoints(graph, root);
+
+            Element model = root.getChild("model");
+            if (model != null) {
+                parseModel(graph, model);
+
+            } else {
+                parseModel(graph, root);
+
+            }
+            parseConnectors(graph, root);
+        }
+        if(files.size() > 1) {
+            if(caption==null) caption = "(no caption set)";
+            graph.getInfo().setCaption(caption);
+        }
+
+        clearHiddenNodes(graph);
+        saveGraph(graph, fileName, outputDir);
+
+        return graph;
+    }
+
+    private void clearHiddenNodes(Graph graph) {
+        if(config.getMappings().size()>0) {
+            GraphNode[] nodes = graph.getNodes();
+            for (int i = 0; i < nodes.length; i++) {
+                GraphNode node = nodes[i];
+                boolean hide = Boolean.valueOf(config.getMappings().getProperty(node.getInfo().getHeader() + ".hide", "false")).booleanValue();
+                if(hide) {
+                    System.out.println("Hiding node '" + node.getInfo().getHeader() + "'");
+                    graph.removeNode(node);
                 }
             }
         }
-        return defaultValue;
-    }
-
-
-    public MuleGrapher(String file) {
-        this.file = file;
-    }
-
-    public Graph generateGraph(String outputDir, String caption) throws JDOMException, IOException {
-        SAXBuilder builder = new SAXBuilder();
-        builder.setValidation(true);
-        builder.setIgnoringElementContentWhitespace(true);
-        File myFile = new File(file);
-        Document doc = builder.build(myFile);
-        System.out.println("processing file " + myFile.getCanonicalPath());
-
-        Graph graph = GraphFactory.newGraph();
-
-
-        Element root = doc.getRootElement();
-
-        if(caption==null) {
-            caption = root.getAttribute("id").getValue();
-            if(caption!=null) {
-                caption = caption.replaceAll("_", " ");
-            } else {
-                caption = "Mule Configuration";
-            }
-        }
-        StringBuffer captionBuffer = new StringBuffer();
-        captionBuffer.append(caption);
-        appendDescription(root, captionBuffer);
-        graph.getInfo().setCaption(captionBuffer.toString());
-        parseEndpointIdentifiers(graph, root);
-        parseEndpoints(graph, root);
-
-        Element model = root.getChild("model");
-        if (model != null) {
-            parseModel(graph, model);
-
-        } else {
-            parseModel(graph, root);
-
-        }
-        parseConnectors(graph, root);
-        saveGraph(graph, outputDir);
-
-        return graph;
     }
 
     private void parseConnectors(Graph graph, Element root) {
@@ -177,10 +204,12 @@ public class MuleGrapher {
 
     private boolean ignoreAttribute(String name) {
         if(name==null || "".equals(name)) return true;
-        for (int i = 0; i < ignoredAttributes.length; i++) {
-            if(name.equals(ignoredAttributes[i])) {
+        for (Iterator iterator = config.getIgnoredAttributes().iterator(); iterator.hasNext();) {
+            String s = (String) iterator.next();
+            if(name.equals(s)) {
                 return true;
             }
+
         }
         return false;
     }
@@ -261,7 +290,7 @@ public class MuleGrapher {
             if (endpoint != null) {
                 String url = endpoint.getAttributeValue(TAG_ATTRIBUTE_ADDRESS);
                 if (url != null) {
-                    GraphNode out = (GraphNode) endpoints.get(url);
+                    GraphNode out = (GraphNode)getEndpoint(url, node.getInfo().getHeader());
                     if (out == null) {
                         out = graph.addNode();
                         out.getInfo().setCaption(url);
@@ -278,7 +307,7 @@ public class MuleGrapher {
                                          GraphNode node) {
         String inbound = descriptor.getAttributeValue("inboundEndpoint");
         if (inbound != null) {
-            GraphNode in = (GraphNode) endpoints.get(inbound);
+            GraphNode in = (GraphNode)getEndpoint(inbound, node.getInfo().getHeader());
             if (in == null) {
                 in = graph.addNode();
                 in.getInfo().setCaption(inbound);
@@ -288,7 +317,7 @@ public class MuleGrapher {
         }
         String outbound = descriptor.getAttributeValue("outboundEndpoint");
         if (outbound != null) {
-            GraphNode out = (GraphNode) endpoints.get(outbound);
+            GraphNode out = (GraphNode)getEndpoint(outbound, node.getInfo().getHeader());
             if (out == null) {
                 out = graph.addNode();
                 out.getInfo().setCaption(outbound);
@@ -308,6 +337,13 @@ public class MuleGrapher {
             }
             node.getInfo().setCaption(caption.toString());
         }
+
+        GraphNode[] virtual = getVirtualEndpoint(node.getInfo().getHeader());
+        if(virtual.length > 0) {
+            for (int i = 0; i < virtual.length; i++) {
+                graph.addEdge(node, virtual[i]).getInfo().setCaption("out (dynamic)");
+            }
+        }
     }
 
     private void processResponseRouter(Graph graph, Element descriptor,
@@ -323,7 +359,7 @@ public class MuleGrapher {
             graph.addEdge(responseRouter, node).getInfo().setCaption("response-router");
             Element endpoint = responseRouterElement.getChild(TAG_ENDPOINT);
             String endpointAdress = endpoint.getAttributeValue(TAG_ATTRIBUTE_ADDRESS);
-            GraphNode out = (GraphNode) endpoints.get(endpointAdress);
+            GraphNode out = (GraphNode)getEndpoint(endpointAdress, node.getInfo().getHeader());
             graph.addEdge(out, responseRouter).getInfo().setCaption("in");
         }
     }
@@ -333,6 +369,7 @@ public class MuleGrapher {
         Element outboundRouter = descriptor.getChild("outbound-router");
 
         if (outboundRouter != null) {
+            String componentName = node.getInfo().getHeader();
             List routers = outboundRouter.getChildren("router");
             processExceptionStrategy(graph, outboundRouter, node);
 
@@ -345,10 +382,24 @@ public class MuleGrapher {
                     routerNode.getInfo().setFillColor(COLOR_ROUTER);
                     graph.addEdge(node, routerNode).getInfo().setCaption("outbound router");
                     //processFilter(graph, router, routerNode);
-                    processOutBoundRouterEndpoints(graph, router, routerNode);
-                    processReplyTOasElement(graph, router, routerNode);
-                    proceeReplyTOasProperty(graph, router, routerNode);
+                    processOutBoundRouterEndpoints(graph, router, routerNode, componentName);
+                    processReplyTOasElement(graph, router, routerNode, componentName);
+                    proceeReplyTOasProperty(graph, router, routerNode, componentName);
 
+                    GraphNode[] virtual = getVirtualEndpoint(componentName + "." + router.getAttributeValue("className"));
+                    if(virtual.length > 0) {
+                        for (int i = 0; i < virtual.length; i++) {
+                            graph.addEdge(routerNode, virtual[i]).getInfo().setCaption("out (dynamic)");
+                        }
+                    }
+
+                }
+            }
+
+            GraphNode[] virtual = getVirtualEndpoint(componentName);
+            if(virtual.length > 0) {
+                for (int i = 0; i < virtual.length; i++) {
+                    graph.addEdge(node, virtual[i]).getInfo().setCaption("out (dynamic)");
                 }
             }
 
@@ -356,14 +407,14 @@ public class MuleGrapher {
     }
 
     private void processOutBoundRouterEndpoints(Graph graph, Element router,
-                                                GraphNode routerNode) {
+                                                GraphNode routerNode, String componentName) {
         List epList = router.getChildren(TAG_ENDPOINT);
         for (Iterator iterator = epList.iterator(); iterator.hasNext();) {
             Element outEndpoint = (Element) iterator.next();
 
             String url = outEndpoint.getAttributeValue(TAG_ATTRIBUTE_ADDRESS);
             if (url != null) {
-                GraphNode out = (GraphNode) endpoints.get(url);
+                GraphNode out = (GraphNode)getEndpoint(url, componentName);
                 if (out == null) {
                     out = graph.addNode();
                     StringBuffer caption = new StringBuffer();
@@ -375,6 +426,13 @@ public class MuleGrapher {
                     processOutboundFilter(graph, outEndpoint, out, routerNode);
                 } else {
                     graph.addEdge(routerNode, out).getInfo().setCaption("out");
+                }
+            }
+
+            GraphNode[] virtual = getVirtualEndpoint(componentName);
+            if(virtual.length > 0) {
+                for (int i = 0; i < virtual.length; i++) {
+                    graph.addEdge(routerNode, virtual[i]).getInfo().setCaption("out (dynamic)");
                 }
             }
         }
@@ -438,19 +496,19 @@ public class MuleGrapher {
     }
 
     private void processReplyTOasElement(Graph graph, Element router,
-                                         GraphNode routerNode) {
+                                         GraphNode routerNode, String componentName) {
         Element replyToElement = router.getChild("reply-to");
         if (replyToElement != null) {
             String replyTo = replyToElement.getAttributeValue(TAG_ATTRIBUTE_ADDRESS);
             if (replyTo != null) {
-                GraphNode out = (GraphNode) endpoints.get(replyTo);
-                graph.addEdge(routerNode, out);
+                GraphNode out = (GraphNode)getEndpoint(replyTo, componentName);
+                graph.addEdge(routerNode, out).getInfo().setCaption("sets");
             }
         }
     }
 
     private void proceeReplyTOasProperty(Graph graph, Element router,
-                                         GraphNode routerNode) {
+                                         GraphNode routerNode, String componentName) {
         Element propertiesEl = router.getChild("properties");
         if (propertiesEl != null) {
             List properties = propertiesEl.getChildren("property");
@@ -460,8 +518,8 @@ public class MuleGrapher {
                 if ("replyTo".equals(propertyName)) {
                     String replyTo = property.getAttributeValue("value");
                     if (replyTo != null) {
-                        GraphNode out = (GraphNode) endpoints.get(replyTo);
-                        graph.addEdge(routerNode, out);
+                        GraphNode out = (GraphNode)getEndpoint(replyTo, componentName);
+                        graph.addEdge(routerNode, out).getInfo().setCaption("sets");
                     }
                 }
             }
@@ -492,7 +550,7 @@ public class MuleGrapher {
                 Element inEndpoint = (Element) iterator.next();
                 String url = inEndpoint.getAttributeValue(TAG_ATTRIBUTE_ADDRESS);
                 if (url != null) {
-                    GraphNode in = (GraphNode) endpoints.get(url);
+                    GraphNode in = (GraphNode)getEndpoint(url, node.getInfo().getHeader());
                     StringBuffer caption = new StringBuffer();
                     if (in == null) {
                         in = graph.addNode();
@@ -519,11 +577,10 @@ public class MuleGrapher {
         }
     }
 
-    protected void saveGraph(Graph graph, String outFolder) throws IOException {
+    protected void saveGraph(Graph graph, String filename, File outFolder) throws IOException {
         // output graph to *.gif
-        String name = new File(file).getName();
-        final String dotFileName = outFolder + "\\" + name + ".dot";
-        final String gifFileName = outFolder + "\\" + name + ".gif";
+        final String dotFileName = outFolder + "\\" + filename + ".dot";
+        final String gifFileName = outFolder + "\\" + filename + ".gif";
         final String exeFile = getSaveExecutable();
         System.out.println("Executing: " + exeFile);
         GRAPHtoDOTtoGIF.transform(graph, dotFileName, gifFileName, exeFile);
@@ -580,20 +637,68 @@ public class MuleGrapher {
         }
 
     private String getSaveExecutable() throws FileNotFoundException {
-        if (exec == null) {
+        if (config.getExecuteCommand() == null) {
             String osName = System.getProperty("os.name").toLowerCase();
             if (osName.startsWith("windows")) {
                 File f = new File("win32/dot.exe");
-                exec = f.getAbsolutePath();
+                config.setExecuteCommand(f.getAbsolutePath());
             } else {
                 throw new UnsupportedOperationException("Mule Graph currently only works on Windows");
             }
         }
-        File f = new File(exec);
+        File f = new File(config.getExecuteCommand());
         if (!f.exists()) {
             throw new FileNotFoundException(f.getAbsolutePath());
         }
-        return exec;
+        return config.getExecuteCommand();
+    }
+
+    private GraphNode getEndpoint(String uri, String componentName) {
+        GraphNode n = getEqualsMapping(uri, componentName);
+        if(n==null) n = (GraphNode)endpoints.get(uri);
+        if(n==null) {
+            for (Iterator iterator = endpoints.keySet().iterator(); iterator.hasNext();) {
+                String s = (String) iterator.next();
+                if(s.startsWith(uri + "/" + componentName)) {
+                    n = (GraphNode)endpoints.get(s);
+                }
+            }
+        }
+        return n;
+    }
+
+    protected GraphNode getEqualsMapping(String uri, String componentName) {
+        String equalsMapping = config.getMappings().getProperty(uri + ".equals");
+        if(equalsMapping!=null) {
+            System.out.println("Mapping equivilent endpoint '" + equalsMapping + "' to '" + uri + "'");
+            return getEndpoint(equalsMapping, componentName);
+        }
+        return null;
+    }
+
+
+    protected GraphNode[] getVirtualEndpoint(String componentName) {
+
+        List nodesList = new ArrayList();
+        String mappedUri = config.getMappings().getProperty(componentName);
+        if(mappedUri!=null) {
+            StringTokenizer stringTokenizer = new StringTokenizer(mappedUri, ",");
+            while (stringTokenizer.hasMoreTokens()) {
+                String s = stringTokenizer.nextToken();
+                System.out.println("Mapping virtual endpoint '" + s + "' for component '" + componentName + "'");
+                GraphNode n = getEndpoint(s, componentName);
+                if(n!=null) nodesList.add(n);
+            }
+        }
+
+        GraphNode[] nodes = null;
+        if(nodesList.size() > 0) {
+            nodes = new GraphNode[nodesList.size()];
+            nodes = (GraphNode[])nodesList.toArray(nodes);
+        } else {
+            nodes = new GraphNode[]{};
+        }
+        return nodes;
     }
 
     public static void printUsage() {
@@ -604,7 +709,7 @@ public class MuleGrapher {
         System.out.println("-outputdir  The directory to write the generated graphs to. Defaults to the current directory (optional)");
         System.out.println("-exec       The executable file used for Graph generation. Defaults to ./win32/dot.exe (optional)");
         System.out.println("-caption    Default caption for the generated graphs. Defaults to the 'id' attribute in the config file (optional)");
-        System.out.println("?           Displays this help");
+        System.out.println("-?          Displays this help");
     }
 }
 
