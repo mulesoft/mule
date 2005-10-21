@@ -3,3 +3,4 @@
 target
 bin
 mule-extras-groovy.iml
+.mule*

@@ -23,6 +23,13 @@
         </dependency>
         <dependency>
             <groupId>jaxrpc</groupId>
+            <artifactId>jaxrpc-qname-patch</artifactId>
+            <version>${jaxrpc_version}</version>
+            <properties>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>jaxrpc</groupId>
             <artifactId>jaxrpc</artifactId>
             <version>${jaxrpc_version}</version>
         </dependency>
