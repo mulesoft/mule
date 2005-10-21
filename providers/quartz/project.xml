@@ -23,6 +23,9 @@
             <artifactId>mule-extras-client</artifactId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
+			<properties>
+				   <eclipse.dependency>true</eclipse.dependency>
+			</properties>>
         </dependency>
     </dependencies>
 </project>
