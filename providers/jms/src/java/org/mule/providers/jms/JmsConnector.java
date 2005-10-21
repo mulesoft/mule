@@ -425,23 +425,6 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         this.persistentDelivery = persistentDelivery;
     }
 
-    /**
-     * @return Returns the JNDI providerProperties.
-     * @deprecated use #getJndiProviderProperties
-     */
-    public Map getProviderProperties()
-    {
-        return jndiProviderProperties;
-    }
-
-    /**
-     * @param providerProperties The JNDI providerProperties to set.
-     * @deprecated use #setJndiProviderProperties
-     */
-    public void setProviderProperties(Map providerProperties)
-    {
-        this.jndiProviderProperties = providerProperties;
-    }
 
     /**
      * @return Returns the JNDI providerProperties.
