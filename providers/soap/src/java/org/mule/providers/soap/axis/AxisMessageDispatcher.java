@@ -465,10 +465,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
                 NamedParameter parameter = (NamedParameter) iterator.next();
                 call.addParameter(parameter.getName(), parameter.getType(), parameter.getMode());
             }
+
             if(soapMethod.getReturnType()!=null) {
                 call.setReturnType(soapMethod.getReturnType());
-            }
-            if(soapMethod.getReturnClass()!=null) {
+            } else if(soapMethod.getReturnClass()!=null) {
                 call.setReturnClass(soapMethod.getReturnClass());
             }
             call.setOperationName(soapMethod.getName());
