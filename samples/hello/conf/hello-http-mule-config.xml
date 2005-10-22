@@ -45,18 +45,6 @@
             returnClass="java.lang.String"/>    
     </transformers>
 
-<!--    <global-endpoints>-->
-<!--        <endpoint name="httpEndpointx" address="http://localhost:8888" transformers="HttpRequestToString StringToNameString" >-->
-            <!-- filter out the favicon request -->
-<!--            <filter className="org.mule.routing.filters.logic.NotFilter">-->
-<!--                <filter pattern="/favicon.ico" className="org.mule.providers.http.filters.HttpRequestWildcardFilter"/>-->
-<!--            </filter>-->
-<!--            <properties>-->
-<!--                <property name="Content-Type" value="text/plain"/>-->
-<!--            </properties>-->
-<!--        </endpoint>-->
-<!--    </global-endpoints>-->
-
     <!--
         An interceptor is a peice of code that can be configued to execute
         before and/or after an event is received for a component.
@@ -83,7 +71,7 @@
             <inbound-router>
                 <endpoint name="httpEndpoint" address="http://localhost:8888" transformers="HttpRequestToString StringToNameString" >
                     <!-- filter out the favicon request -->
-                    <filter className="org.mule.routing.filters.logic.AndFilter">
+                    <filter className="org.mule.routing.filters.logic.NotFilter">
                         <filter pattern="/favicon.ico" className="org.mule.providers.http.filters.HttpRequestWildcardFilter"/>
                     </filter>
                     <properties>
