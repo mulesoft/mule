@@ -9,8 +9,11 @@
     | Developer targets
     ======================================================================================
 
-    maven idea - will build an IDEA project and sub-modules for all sub-projects
-    (doesn't work with IDEA 5.0 :( )
+    maven idea		- will build an IDEA project and sub-modules for all sub-projects
+    			  (doesn't work with IDEA 5.0 :( ) 
+    			  This will preseve your current workspace
+    maven idea-new	- Will create a new multi-module project, overwriting your current workspace
+    
 
     maven eclipse - Creates an Eclipse project with sub modules and dependencies set up
 
@@ -562,58 +565,55 @@
         <attainGoal name="multiproject:goal"/>
     </goal>
 
-        <preGoal name="idea">
-        	<j:if test="${context.getVariable('newBuild')== null}">
-	        	<u:available file="${basedir}/mule.iws">
-	        	    <copy file="${basedir}/mule.iws" tofile="${basedir}/mule.iws-old" overwrite="true"/>
-	        	</u:available>
-	        	<u:available file="${basedir}/mule.ipr">
-	        	    <copy file="${basedir}/mule.ipr" tofile="${basedir}/mule.ipr-old" overwrite="true"/>
-	        	</u:available>
-	        	<u:available file="${basedir}/mule.iml">
-	        	    <copy file="${basedir}/mule.ipr" tofile="${basedir}/mule.iml-old" overwrite="true"/>
-	        	</u:available>
-	         </j:if>
-        	
-        <attainGoal name="idea:multiproject"/>
-        
-<!--        <copy todir="${basedir}" file="${basedir}/tools/idea/workspace/_root.iml"/>-->
+     <!-- Idea project generation 
+         We back up the root workspace and project so that the build doesn't blow away
+         the current environment. We then replace these files after the build has finished -->
+    
+    <postGoal name="idea">
+    	<attainGoal name="idea:multiproject"/>
+    </postGoal>
+    
+    <goal name="idea-new">
+        <j:set var="newBuild" value="true"/>
+    	<attainGoal name="idea"/>
+    </goal>
+    
+    <preGoal name="idea:idea">
+        <echo>Backing up root workspace and project</echo>
+        <j:if test="${context.getVariable('newBuild')== null}">
+		<u:available file="${basedir}/${pom.artifactId}.iws">
+	        	<copy file="${basedir}/${pom.artifactId}.iws" tofile="${basedir}/${pom.artifactId}.iws-old" overwrite="true"/>
+	        </u:available>
+	        <u:available file="${basedir}/${pom.artifactId}.ipr">
+	        	<copy file="${basedir}/${pom.artifactId}.ipr" tofile="${basedir}/${pom.artifactId}.ipr-old" overwrite="true"/>
+	        </u:available>
+	        <u:available file="${basedir}/${pom.artifactId}.iml">
+	        	<copy file="${basedir}/${pom.artifactId}.iml" tofile="${basedir}/${pom.artifactId}.iml-old" overwrite="true"/>
+	        </u:available>
+	</j:if>	
     </preGoal>
     
-    <goal name="mule:idea">
-    	<j:if test="${context.getVariable('newBuild')== null}">
-	        	<u:available file="${basedir}/mule.iws">
-	        	    <copy file="${basedir}/mule.iws" tofile="${basedir}/mule.iws-old" overwrite="true"/>
-	        	</u:available>
-	        	<u:available file="${basedir}/mule.ipr">
-	        	    <copy file="${basedir}/mule.ipr" tofile="${basedir}/mule.ipr-old" overwrite="true"/>
-	        	</u:available>
-	        	<u:available file="${basedir}/mule.iml">
-	        	    <copy file="${basedir}/mule.ipr" tofile="${basedir}/mule.iml-old" overwrite="true"/>
-	        	</u:available>
-	         </j:if>
-        	
-        <attainGoal name="idea:multiproject"/>
-        <attainGoal name="idea:module"/>
+    <postGoal name="idea:multiproject">
     	<!-- preserve workspace -->
+    	<echo>Restoring root workspace and project</echo>
     	<j:if test="${context.getVariable('newBuild')== null}">
-        <u:available file="${basedir}/mule.iws-old">
-        	<delete file="${basedir}/mule.iws"/>
-        	<copy file="${basedir}/mule.iws-old" tofile="${basedir}/mule.iws"/>
-        	<!--delete file="${basedir}/mule.iws-old"/-->
+        <u:available file="${basedir}/${pom.artifactId}.iws-old">
+        	<delete file="${basedir}/${pom.artifactId}.iws"/>
+        	<copy file="${basedir}/${pom.artifactId}.iws-old" tofile="${basedir}/${pom.artifactId}.iws"/>
+        	<delete file="${basedir}/${pom.artifactId}.iws-old"/>
         </u:available>
-        <u:available file="${basedir}/mule.ipr-old">
-        	<delete file="${basedir}/mule.ipr"/>
-        	<copy file="${basedir}/mule.ipr-old" tofile="${basedir}/mule.ipr"/>
-        	<!--delete file="${basedir}/mule.ipr-old"/-->
+        <u:available file="${basedir}/${pom.artifactId}.ipr-old">
+        	<delete file="${basedir}/${pom.artifactId}.ipr"/>
+        	<copy file="${basedir}/${pom.artifactId}.ipr-old" tofile="${basedir}/${pom.artifactId}.ipr"/>
+        	<delete file="${basedir}/${pom.artifactId}.ipr-old"/>
         </u:available>
-        <u:available file="${basedir}/mule.iml-old">
-        	<delete file="${basedir}/mule.iml"/>
-        	<copy file="${basedir}/mule.iml-old" tofile="${basedir}/mule.iml"/>
-        	<!--delete file="${basedir}/mule.iml-old"/-->
+        <u:available file="${basedir}/${pom.artifactId}.iml-old">
+        	<delete file="${basedir}/${pom.artifactId}.iml"/>
+        	<copy file="${basedir}/${pom.artifactId}.iml-old" tofile="${basedir}/${pom.artifactId}.iml"/>
+        	<delete file="${basedir}/${pom.artifactId}.iml-old"/>
         </u:available>
         </j:if>
-    </goal>
+    </postGoal>
 
     <preGoal name="eclipse">
         <j:set var="goal" value="eclipse"/>
