@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<!--
+ * $Header$
+ * $Revision$
+ * $Date$
+ *
+ * Copyright (c) Jesper Steen Møller. All rights reserved.
+ * http://www.selskabet.org/jesper/
+ * 
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+-->
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.mule.ide.ui.preferences.MulePreferencePage"
+            id="org.mule.ide.ui.preferences.MulePreferencePage"
+            name="Mule UMO">
+         <keywordReference id="org.mule.ide.ui.keyword.mule"/>
+      </page>
+   </extension>
+
+
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            adaptable="true"
+            class="org.mule.ide.ui.properties.MulePropertyPage"
+            icon="META-INF/icons/mule16.gif"
+            id="org.mule.ide.ui.properties.mulePropertyPage"
+            name="Mule UMO"
+            objectClass="org.eclipse.core.resources.IProject">
+         <keywordReference id="org.mule.ide.ui.keyword.mule"/>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.keywords">
+      <keyword
+            id="org.mule.ide.ui.keyword.mule"
+            label="Mule"/>
+   </extension>
+
+</plugin>

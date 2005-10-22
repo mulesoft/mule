@@ -60,6 +60,11 @@
 <!ATTLIST mule-environment-properties synchronousEventTimeout  		NMTOKEN                 #IMPLIED>
 
 <!--
+     Added default encoding to use for general parsing of strings
+-->
+<!ATTLIST mule-environment-properties encoding  		CDATA                 #IMPLIED>
+
+<!--
      Default transaction timeout
 -->
 <!ATTLIST mule-environment-properties transactionTimeout  		NMTOKEN                 #IMPLIED>
@@ -68,7 +73,13 @@
      Determines whether when running synchronously, return events are received before
      returning the call. i.e. in jms wait for a replyTo. Vm queues do this automatically
 -->
-<!ATTLIST mule-environment-properties synchronousReceive  		(true | false)          "false">
+<!ATTLIST mule-environment-properties remoteSync  		(true | false)          "false">
+
+<!--
+     Determines if Mule is running embedded and can be used to disable certain services and also hide the
+     start splash
+-->
+<!ATTLIST mule-environment-properties embedded  		(true | false)          "false">
 
 <!--
      Is the default endpointUri where Mule can receive Action requests such as running a
@@ -156,10 +167,10 @@ Implementations must implement org.mule.umo.UMOPoolFactory.
 <!ATTLIST pooling-profile factory  		NMTOKEN					"org.mule.config.pool.CommonsPoolFactory">
 
 
-
 <!ELEMENT threading-profile EMPTY>
 
-<!-- The threading profile system id.  This is used to identify which system
+<!--
+The threading profile system id.  This is used to identify which system
 component should use the profile. This attribute is only used when declaring profiles on
 the mule-evironment-properties element and on connector components where 'messageReciever'
 or 'messageSender' can be used. For all other cases it can be set to 'default'.
@@ -167,19 +178,19 @@ or 'messageSender' can be used. For all other cases it can be set to 'default'.
 <!ATTLIST threading-profile id  (receiver|dispatcher|component|default)  "default">
 
 <!--
-    Controls the maximum number of threads that can be executed at any one time in a thread
-    pool
+Controls the maximum number of threads that can be executed at any one time in a
+thread pool
 -->
 <!ATTLIST threading-profile maxThreadsActive        		NMTOKEN         		#IMPLIED>
 
 <!--
-	Controls the maximum number threads that can be inactive or idle in a thread pool before they
-    are destroyed.
+Controls the maximum number threads that can be inactive or idle in a thread pool before
+they are destroyed.
 -->
 
 <!ATTLIST threading-profile maxThreadsIdle          		NMTOKEN         		#IMPLIED>
 <!--
-	Detemines how long an inactive thread is kept in the pool before being discarded
+Detemines how long an inactive thread is kept in the pool before being discarded
 -->
 <!ATTLIST threading-profile threadTTL           		NMTOKEN         		#IMPLIED>
 <!--
@@ -187,9 +198,12 @@ If the maximum pool size or queue size is bounded, then it is possible for incom
 There are five supported policies for handling this situation.
 
 <ol>
-<li>RUN (the default) - The thread making the execute request runs the task itself. This policy helps guard against lockup.
+<li>RUN (the default) - The thread making the execute request runs the task itself.
+ This policy helps guard against lockup.
 </li>
-<li>WAIT - Wait until a thread becomes available. This policy should, in general, not be used if the minimum number of of threads is zero, in which case a thread may never become available.
+<li>WAIT - Wait until a thread becomes available (or until the configurable timeout expires).
+This policy should, in general, not be used if the minimum number of of threads is zero, in
+ which case a thread may never become available.
 </li>
 <li>ABORT - Throw a RuntimeException
 </li>
@@ -202,7 +216,13 @@ There are five supported policies for handling this situation.
 <!ATTLIST threading-profile poolExhaustedAction 	(WAIT | DISCARD | DISCARD_OLDEST | ABORT | RUN)       "RUN">
 
 <!--
-determines whether threading is enabled for a connector.  It's useful to set this to false
+Allows configuration of a waiting timeout for threads that are blocked when WAIT
+has been configured as poolExhaustedAction
+-->
+<!ATTLIST threading-profile threadWaitTimeout    NMTOKEN    #IMPLIED>
+
+<!--
+Determines whether threading is enabled for a connector.  It's useful to set this to false
 when testing.  Setting it on the defaultThreadingProfile on the Mule configuration will disable
 threading in every connector
 -->
@@ -546,6 +566,13 @@ Jndi
 -->	
 <!ATTLIST endpoint transformers	IDREFS			#IMPLIED>
 
+
+<!--
+    Is responsible for transforming data when it is returned from a request/response
+    invocation. If the endpoint is a receiver the responseTransformers is ignored.
+-->
+<!ATTLIST endpoint responseTransformers	IDREFS			#IMPLIED>
+
 <!--
     synchronous
     determines if requests received on this endpoint execute within a single thread
@@ -599,6 +626,12 @@ Jndi
     Used to override the transformers on the global endpoint
 -->
 <!ATTLIST global-endpoint transformers	IDREFS			#IMPLIED>
+
+<!--
+    Is responsible for transforming data when it is returned from a request/response
+    invocation. If the endpoint is a receiver the responseTransformers is ignored.
+-->
+<!ATTLIST endpoint responseTransformers	IDREFS			#IMPLIED>
 
 <!--
     synchronous
@@ -757,16 +790,13 @@ Jndi
 -->
 <!ATTLIST agent ref             		CDATA         		#IMPLIED>
 
-<![IGNORE[
-   <!ELEMENT configuration>
-]]>
 <!--
 	A Container context is used to retrieve object properties from the container.
     A container property is referenced using the container-property element.
     There are different implementations for different containers
 	such as PicoContainer or Spring
 -->
-<!ELEMENT container-context (properties?, configuration?)>
+<!ELEMENT container-context (properties?)>
 
 <!--
 
@@ -782,29 +812,6 @@ Jndi
     is usually the the name of the container implementation
 -->
 <!ATTLIST container-context name  	CDATA		#IMPLIED>
-
-<!--
-A blob of configuration of configration data that can be used to embed application
-specific configuration in a Mule Xml document
--->
-<!ELEMENT configuration (CDATA)>
-<!--
-The doctype declaration to use for the configuration fragment.
-can be null if no validation is to be performed or the fragment is not Xml
-the doc type can be in the form of :
-<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-  "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
-or
-mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
-"http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd"
--->
-<!ATTLIST configuration doctype         CDATA       #IMPLIED>
-
-<!--
-The ecoding to use in the Xml declaration for the configuration fragment.
-Can be null if fragment is not Xml.  If not set UTF-8 will be used.
--->
-<!ATTLIST configuration encoding         CDATA       #IMPLIED>
 
 <!--
 	The <i>model</i> defines the components and interations between components in the Mule
@@ -825,6 +832,20 @@ The ref name of this object if it is to be loaeded from a container such as spri
 Jndi
 -->
 <!ATTLIST model ref             		CDATA         		#IMPLIED>
+
+<!--
+The type of Model to use for component processing for this Mule instance.  The different types of model are described
+at http://mule.codehaus.org/Models
+The custom model can be used to specify a custom model type.  In which case you must supply a className.
+-->
+<!ATTLIST model type           (seda | direct | pipeline | jms | jms-clustered | jcyclone | custom)         	"seda">
+
+<!--
+	The class used for instanciate the model if a custom model type is being used.  The class must implement
+    org.mule.umo.model.UMOModel.
+-->
+
+<!ATTLIST model className  			NMTOKEN		#IMPLIED>
 <!--
 	An entry Point resolver is used to determine which method on a UMO object
 	should receive events
@@ -916,7 +937,7 @@ Jndi
 	If the implementation is an object reference then it will be resolved using the component resolver
 	configured on the model
 -->
-<!ATTLIST mule-descriptor implementation		    	NMTOKEN         #REQUIRED>
+<!ATTLIST mule-descriptor implementation		    	CDATA         #REQUIRED>
 <!--
 	The default subject that the Mule UMO sends events.
 -->
@@ -985,18 +1006,18 @@ Whether every configured router will be matched
    This attibute defines the response transformers (if any) that will be applied
    to the response message before returning to the client. Developers can define
    a response-router with only a transformer and no actual routers to configure a
-   response transformer
+   response transformer.  Note that the connector can have a default Response transformer
+   associated with it meaning that marshaling from transport specific MEssage types such as
+   Jms will be done automatically.
 -->
-<!ATTLIST response-router transformers              IDREFS           #IMPLIED>
+<!-- This has been removed as you can now set the response router on the endpoint -->
+<!--<!ATTLIST response-router transformers              IDREFS           #IMPLIED>-->
 
 <!--
-	This attribute can be used to change the default behavior of the respone router
-	regarding the processing of the received event. If set to false, the message
-	will be routed in the outbound router instead of being sent back to the
-	inbound router.
+	Defines the timeout for routers configure on this response-router
 -->
-<!ATTLIST response-router stopProcessing        (true | false)           "true">
-	
+<!ATTLIST response-router timeout        CDATA         #IMPLIED>
+
 <!--
 A catch-all-strategy is invoked to route an event when an event is not accepted by any of the configured
 routers.
@@ -1080,10 +1101,13 @@ Is a fully qualified class name of the catch all strategy class
 
 <!ATTLIST filter className                   NMTOKEN           #REQUIRED>
 
-<!-- 
-because I can't find a way of allowing arbitary attributes on an element, 
+<!--
+because I can't find a way of allowing arbitary attributes on an element,
 I am going to define a common set of attributes for filters but users can add their own
 or relax dtd validation on their parser
+Since Mule 1.1: Arbitary bean properties can be set on a filter using the
+<properties> element. The parameters listed below on the filter still work and provider a
+short hand way of setting these properties
 -->
 <!ATTLIST filter pattern                   CDATA           #IMPLIED>
 <!ATTLIST filter expression                CDATA           #IMPLIED>
@@ -1165,7 +1189,7 @@ or relax dtd validation on their parser
   		A collection of properties for the parent component
 -->
 
-<!ELEMENT properties ((property | factory-property | container-property | system-property | map | list | file-properties)*)>
+<!ELEMENT properties ((property | factory-property | container-property | system-property | map | list | file-properties | text-property)*)>
 
 <!--
   		An property element allows arbitrary name/value pairs.
@@ -1259,7 +1283,7 @@ The system property key to use when lookin up the property
 <!-- 
 	the name of the map property
 -->
-<!ATTLIST map name					NMTOKEN		#REQUIRED>
+<!ATTLIST map name					CDATA		#REQUIRED>
 
 <!--
 	Defines a list of properties for a list property	
@@ -1269,7 +1293,7 @@ The system property key to use when lookin up the property
 <!-- 
 	the name of the list property
 -->
-<!ATTLIST list name					NMTOKEN		#REQUIRED>
+<!ATTLIST list name					CDATA		#REQUIRED>
 
 <!--
 	Defines an entry for a list or array property	
@@ -1300,7 +1324,7 @@ The system property key to use when lookin up the property
 <!--
 	the reference of the object in the container
 -->
-<!ATTLIST container-entry reference					NMTOKEN		#REQUIRED>
+<!ATTLIST container-entry reference					CDATA		#REQUIRED>
 
 <!--
 	determines if the object must be present in the container for configuration to
@@ -1333,9 +1357,22 @@ The system property key to use when lookin up the property
 <!ATTLIST file-properties location					NMTOKEN		#REQUIRED>
 
 <!--
-Whether the properties in the file override properties already set on this object
+Whether the properties in the properties file override properties already set on this object
 -->
 <!ATTLIST file-properties override					(true | false)		"true">
+
+<!--
+  		An property element allows to embed arbitary text as a property, such as script or xml
+-->
+
+<!ELEMENT text-property (#PCDATA)>
+
+<!--
+	The name identifies the name of the attribute.
+-->
+
+<!ATTLIST text-property name 			CDATA		#REQUIRED>
+
 
 <!--
 	Optional description of the enclosing element.

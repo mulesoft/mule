@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Main UI Plug-in for MuleUMO
+Bundle-SymbolicName: org.mule.ide.ui; singleton:=true
+Bundle-Version: 1.1.0
+Bundle-Vendor: Mule UMO
+Bundle-ClassPath: .
+Bundle-Localization: plugin
+Bundle-Activator: org.mule.ide.ui.MulePlugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.mule.ide.core;visibility:=reexport
+Eclipse-AutoStart: true
