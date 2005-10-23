@@ -258,7 +258,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         // Set timeout
         int timeout = event.getIntProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, -1);
         if (timeout >= 0) {
-            call.setTimeout(Integer.valueOf(timeout));
+            call.setTimeout(new Integer(timeout));
         }
         // Add User Creds
         if (endpointUri.getUserInfo() != null) {

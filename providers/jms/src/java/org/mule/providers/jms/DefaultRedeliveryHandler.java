@@ -76,7 +76,7 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
             if (logger.isDebugEnabled()) {
                 logger.debug("Message with id: " + id + " has been redelivered for the fist time");
             }
-            messages.put(id, Integer.valueOf(1));
+            messages.put(id, new Integer(1));
             return;
         } else if (i.intValue() == connector.getMaxRedelivery()) {
             if (logger.isDebugEnabled()) {
@@ -87,7 +87,7 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
             throw new MessageRedeliveredException(adapter);
 
         } else {
-            messages.put(id, Integer.valueOf(i.intValue() + 1));
+            messages.put(id, new Integer(i.intValue() + 1));
             if (logger.isDebugEnabled()) {
                 logger.debug("Message with id: " + id + " has been redelivered " + i.intValue() + " times");
             }

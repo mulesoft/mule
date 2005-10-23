@@ -93,7 +93,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         } catch (JMSException e) {
         }
         try {
-            properties.put(JmsConstants.JMS_DELIVERY_MODE, Integer.valueOf(this.message.getJMSDeliveryMode()));
+            properties.put(JmsConstants.JMS_DELIVERY_MODE, new Integer(this.message.getJMSDeliveryMode()));
         } catch (JMSException e) {
         }
         try {
@@ -101,7 +101,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         } catch (JMSException e) {
         }
         try {
-            properties.put(JmsConstants.JMS_EXPIRATION, Long.valueOf(this.message.getJMSExpiration()));
+            properties.put(JmsConstants.JMS_EXPIRATION, new Long(this.message.getJMSExpiration()));
         } catch (JMSException e) {
         }
         try {
@@ -109,7 +109,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         } catch (JMSException e) {
         }
         try {
-            properties.put(JmsConstants.JMS_PRIORITY, Integer.valueOf(this.message.getJMSPriority()));
+            properties.put(JmsConstants.JMS_PRIORITY, new Integer(this.message.getJMSPriority()));
         } catch (JMSException e) {
         }
         try {
@@ -121,7 +121,7 @@ public class JmsMessageAdapter extends AbstractMessageAdapter
         } catch (JMSException e) {
         }
         try {
-            properties.put(JmsConstants.JMS_TIMESTAMP, Long.valueOf(this.message.getJMSTimestamp()));
+            properties.put(JmsConstants.JMS_TIMESTAMP, new Long(this.message.getJMSTimestamp()));
         } catch (JMSException e) {
         }
         try {

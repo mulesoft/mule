@@ -247,7 +247,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         if (count.intValue() > 1) {
             logger.warn("There are '" + count.intValue() + "' services registered on endpoint: " + endpointKey
                     + ". Not unregistering the endpoint at this time");
-            count = Integer.valueOf(count.intValue() - 1);
+            count = new Integer(count.intValue() - 1);
             endpointCounters.put(endpointKey, count);
             return;
         } else {
@@ -322,7 +322,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         Integer count = (Integer) endpointCounters.get(endpoint);
         if (count == null)
-            count = Integer.valueOf(0);
+            count = new Integer(0);
 
         if (count.intValue() == 0) {
             UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
@@ -334,7 +334,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         }
 
         // Update the counter for this endpoint
-        count = Integer.valueOf(count.intValue() + 1);
+        count = new Integer(count.intValue() + 1);
         endpointCounters.put(endpoint, count);
         axisDescriptor.getProperties().put(ENDPOINT_COUNTERS_PROPERTY, endpointCounters);
     }

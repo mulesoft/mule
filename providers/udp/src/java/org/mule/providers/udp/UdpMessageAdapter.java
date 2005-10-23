@@ -49,7 +49,7 @@ public class UdpMessageAdapter extends AbstractMessageAdapter
             }
 
             setProperty(ADDRESS_PROPERTY, dp.getAddress());
-            setProperty(PORT_PROPERTY, Integer.valueOf(dp.getPort()));
+            setProperty(PORT_PROPERTY, new Integer(dp.getPort()));
 
         } else {
             throw new MessageTypeNotSupportedException(message, getClass());

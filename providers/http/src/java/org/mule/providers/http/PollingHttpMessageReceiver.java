@@ -44,7 +44,7 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
     private int defaultBufferSize = 1024 * 32;
 
     public PollingHttpMessageReceiver(UMOConnector connector, UMOComponent component, final UMOEndpoint endpoint) throws InitialisationException {
-        this(connector, component, endpoint, Long.valueOf(1000));
+        this(connector, component, endpoint, new Long(1000));
     }
 
     public PollingHttpMessageReceiver(UMOConnector connector, UMOComponent component, final UMOEndpoint endpoint, Long frequency) throws InitialisationException {

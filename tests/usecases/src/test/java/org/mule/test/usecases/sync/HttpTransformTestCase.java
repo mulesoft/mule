@@ -52,7 +52,7 @@ public class HttpTransformTestCase extends NamedTestCase {
 	public void testBinary() throws Exception
 	{
         MuleClient client = new MuleClient();
-		Object payload = Arrays.asList(new Integer[] {Integer.valueOf(42)});
+		Object payload = Arrays.asList(new Integer[] {new Integer(42)});
         UMOMessage message = client.send("http://localhost:18081/RemoteService", payload, null);
         assertNotNull(message);
 		ByteArrayToSerializable bas = new ByteArrayToSerializable();
@@ -65,7 +65,7 @@ public class HttpTransformTestCase extends NamedTestCase {
 	public void testBinaryWithBridge() throws Exception
 	{
         MuleClient client = new MuleClient();
-		Object payload = Arrays.asList(new Integer[] {Integer.valueOf(42)});
+		Object payload = Arrays.asList(new Integer[] {new Integer(42)});
         UMOMessage message = client.send("vm://LocalService", payload, null);
         assertNotNull(message);
 		ByteArrayToSerializable bas = new ByteArrayToSerializable();

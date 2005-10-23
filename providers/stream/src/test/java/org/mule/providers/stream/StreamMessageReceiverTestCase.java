@@ -67,7 +67,7 @@ public class StreamMessageReceiverTestCase extends AbstractMessageReceiverTestCa
      */
     public UMOMessageReceiver getMessageReceiver() throws InitialisationException
     {
-        return new StreamMessageReceiver(endpoint.getConnector(), component, endpoint, System.in, Long.valueOf(1000));
+        return new StreamMessageReceiver(endpoint.getConnector(), component, endpoint, System.in, new Long(1000));
     }
 
     public UMOEndpoint getEndpoint() throws Exception

@@ -614,7 +614,7 @@ public class MuleHttpSender extends BasicHandler
                         tmp = tmp.substring(0, end);
                     }
                     returnCode = Integer.parseInt(tmp);
-                    msgContext.setProperty(HTTPConstants.MC_HTTP_STATUS_CODE, Integer.valueOf(returnCode));
+                    msgContext.setProperty(HTTPConstants.MC_HTTP_STATUS_CODE, new Integer(returnCode));
                     msgContext.setProperty(HTTPConstants.MC_HTTP_STATUS_MESSAGE, name.substring(start + end + 1));
                 } else {
                     headers.put(name.toLowerCase(), value);

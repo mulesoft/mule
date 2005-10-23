@@ -74,7 +74,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     {
         String timeoutString = servletConfig.getInitParameter(REQUEST_TIMEOUT_PROPERTY);
         if (timeoutString != null) {
-            timeout = Long.valueOf(timeoutString).longValue();
+            timeout = new Long(timeoutString).longValue();
         }
         logger.info("Default request timeout for GET methods is: " + timeout);
 

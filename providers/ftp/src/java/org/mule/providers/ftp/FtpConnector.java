@@ -83,7 +83,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector
             polling = 1000;
         }
         logger.debug("set polling frequency to: " + polling);
-        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[] { Long.valueOf(polling) });
+        return serviceDescriptor.createMessageReceiver(this, component, endpoint, new Object[] { new Long(polling) });
     }
 
     /**
