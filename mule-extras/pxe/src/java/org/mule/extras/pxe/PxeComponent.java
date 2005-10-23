@@ -181,8 +181,8 @@ public class PxeComponent implements Callable, Initialisable, Lifecycle, UMODesc
             this.server.setAttribute(modJdbcDS, new Attribute("Password", dbAttributes.get("Password")));
             this.server.setAttribute(modJdbcDS, new Attribute("Url", dbAttributes.get("Url")));
 
-            this.server.setAttribute(modJdbcDS, new Attribute("PoolMax", Integer.valueOf(descriptor.getPoolingProfile().getMaxActive())));
-            this.server.setAttribute(modJdbcDS, new Attribute("PoolMin", Integer.valueOf(descriptor.getPoolingProfile().getMaxIdle())));
+            this.server.setAttribute(modJdbcDS, new Attribute("PoolMax", new Integer(descriptor.getPoolingProfile().getMaxActive())));
+            this.server.setAttribute(modJdbcDS, new Attribute("PoolMin", new Integer(descriptor.getPoolingProfile().getMaxIdle())));
 
             ObjectName modDAO = new ObjectName("fivesight.pxe:mod=HibernateDAO");
             this.server.createMBean(ModHibernateDAO.class.getName(), modDAO);

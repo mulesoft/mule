@@ -46,7 +46,7 @@ public class EjbConnector extends RmiConnector
 
     public UMOMessageReceiver createReceiver(UMOComponent component, UMOEndpoint endpoint) throws Exception
     {
-        final Object[] args = new Object[]{Long.valueOf(pollingFrequency)};
+        final Object[] args = new Object[]{new Long(pollingFrequency)};
         return getServiceDescriptor().createMessageReceiver(this, component, endpoint, args);
     }
 

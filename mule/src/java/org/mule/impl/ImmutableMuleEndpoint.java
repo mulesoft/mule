@@ -637,7 +637,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     public int getRemoteSyncTimeout() {
         if(remoteSyncTimeout==null) {
-            remoteSyncTimeout = Integer.valueOf(MuleManager.getConfiguration().getSynchronousEventTimeout());
+            remoteSyncTimeout = new Integer(MuleManager.getConfiguration().getSynchronousEventTimeout());
         }
         return remoteSyncTimeout.intValue();
     }

@@ -62,7 +62,7 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
                                        read.getAbsolutePath(),
                                        move.getAbsolutePath(),
                                        null,
-                                       Long.valueOf(1000));
+                                       new Long(1000));
     }
 
 

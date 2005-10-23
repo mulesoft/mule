@@ -132,7 +132,7 @@ public class RouterStatistics implements Statistics
 
         // TODO we should probably use a MutableLong here,
         // but that might be problematic for remote MBean access (serialization)
-        routed.put(name, Long.valueOf(++count));
+        routed.put(name, new Long(++count));
 
         totalRouted++;
         totalReceived++;

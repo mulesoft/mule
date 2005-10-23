@@ -35,7 +35,7 @@ public class ReceiveException extends UMOException
     {
         super(message);
         addInfo("Endpoint", endpointUri.toString());
-        addInfo("Timeout", Long.valueOf(timeout).toString());
+        addInfo("Timeout", new Long(timeout).toString());
     }
 
     /**
@@ -46,7 +46,7 @@ public class ReceiveException extends UMOException
     {
         super(message, cause);
         addInfo("Endpoint", endpointUri.toString());
-        addInfo("Timeout", Long.valueOf(timeout).toString());
+        addInfo("Timeout", new Long(timeout).toString());
     }
 
     public ReceiveException(UMOEndpointURI endpointUri, long timeout, Throwable cause)
