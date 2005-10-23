@@ -263,7 +263,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
      * @param timeout the timeout in milliseconds
      */
     public void setRemoteSyncTimeout(int timeout) {
-        this.remoteSyncTimeout = Integer.valueOf(timeout);
+        this.remoteSyncTimeout = new Integer(timeout);
     }
 
     /**

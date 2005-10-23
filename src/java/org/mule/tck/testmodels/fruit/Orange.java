@@ -33,8 +33,8 @@ public class Orange implements Fruit, Callable
     private static transient Log logger = LogFactory.getLog(Orange.class);
 
     private boolean bitten = false;
-    private Integer segments = Integer.valueOf(10);
-    private Double radius = Double.valueOf(4.34);
+    private Integer segments = new Integer(10);
+    private Double radius = new Double(4.34);
     private String brand;
 
     private Map mapProperties;

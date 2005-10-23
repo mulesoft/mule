@@ -36,8 +36,8 @@ public class UtilTestCase extends TestCase
     {
         Orange orange = new Orange();
         orange.setBrand("Juicy");
-        orange.setRadius(Double.valueOf(2.2));
-        orange.setSegments(Integer.valueOf(10));
+        orange.setRadius(new Double(2.2));
+        orange.setSegments(new Integer(10));
 
         byte[] src = Utility.objectToByteArray(orange);
         assertNotNull(src);
@@ -49,8 +49,8 @@ public class UtilTestCase extends TestCase
 
         Orange newOrange = (Orange) result;
 
-        assertEquals(Double.valueOf(2.2), newOrange.getRadius());
-        assertEquals(Integer.valueOf(10), newOrange.getSegments());
+        assertEquals(new Double(2.2), newOrange.getRadius());
+        assertEquals(new Integer(10), newOrange.getSegments());
         assertEquals("Juicy", newOrange.getBrand());
     }
 

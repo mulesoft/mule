@@ -83,7 +83,7 @@ public class FileMonitor
     {
         if (!files.containsKey(file)) {
             long modifiedTime = file.exists() ? file.lastModified() : -1;
-            files.put(file, Long.valueOf(modifiedTime));
+            files.put(file, new Long(modifiedTime));
         }
     }
 
@@ -167,7 +167,7 @@ public class FileMonitor
                 // Chek if file has changed
                 if (newModifiedTime != lastModifiedTime) {
                     // Register new modified time
-                    files.put(file, Long.valueOf(newModifiedTime));
+                    files.put(file, new Long(newModifiedTime));
 
                     // Notify listeners
                     for (Iterator j = listeners.iterator(); j.hasNext();) {

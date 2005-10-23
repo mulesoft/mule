@@ -33,8 +33,8 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable
     private static transient Log logger = LogFactory.getLog(WaterMelon.class);
 
     private boolean bitten = false;
-    private Integer seeds = Integer.valueOf(100);
-    private Double radius = Double.valueOf(4.34);
+    private Integer seeds = new Integer(100);
+    private Double radius = new Double(4.34);
     private String brand;
     private String state = "void";
 
