@@ -106,6 +106,12 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-remote</artifactId>
+            <version>${mx4j_remote_version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
             <version>${wsdl4j_version}</version>
