@@ -13,12 +13,16 @@
  */
 package org.mule.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>TemplateParser</code> is a simple string parser that will substitute
@@ -55,6 +59,14 @@ public class TemplateParser
             pattern = Pattern.compile("\\[[^\\]]+\\]");
         }
     }
+
+    /**
+     * Matches one or more templates against a Map of key value pairs. If a value for a template
+     * is not found in the map the template is left as is in the return String
+     * @param props the key/value pairs to match against
+     * @param template the string containing the template place holders i.e. My name is ${name}
+     * @return the parsed String
+     */
     public String parse(Map props, String template)
     {
         String result = template;
@@ -73,6 +85,40 @@ public class TemplateParser
             result = result.replaceAll(match, value.toString());
         }
         return result;
+    }
+
+    /**
+     * Matches one or more templates against a Map of key value pairs. If a value for a template
+     * is not found in the map the template is left as is in the return String
+     * @param props the key/value pairs to match against
+     * @param templates A List of templates
+     * @return the parsed String
+     */
+    public List parse(Map props, List templates) {
+        if(templates==null) return new ArrayList();
+        List list = new ArrayList(templates.size());
+        for (Iterator iterator = templates.iterator(); iterator.hasNext();) {
+            list.add(parse(props, iterator.next().toString()));
+        }
+        return list;
+    }
+
+    /**
+     * Matches one or more templates against a Map of key value pairs. If a value for a template
+     * is not found in the map the template is left as is in the return String
+     * @param props the key/value pairs to match against
+     * @param templates A Map of templates.  The values for each map entry will be parsed
+     * @return the parsed String
+     */
+    public Map parse(Map props, Map templates) {
+        if(templates==null) return new HashMap();
+        Map map = new HashMap(templates.size());
+        Map.Entry entry;
+        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+            entry = (Map.Entry)iterator.next();
+            map.put(entry.getKey(), parse(props, entry.getValue().toString()));
+        }
+        return map;
     }
 
     private String escape(String string) {
