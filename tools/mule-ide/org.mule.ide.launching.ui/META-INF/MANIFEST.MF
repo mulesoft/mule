@@ -16,6 +16,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.ui,
  org.eclipse.jdt.launching,
  org.eclipse.jdt.core,
- org.mule.ide.runtime,
  org.mule.ide.core
 Eclipse-AutoStart: true

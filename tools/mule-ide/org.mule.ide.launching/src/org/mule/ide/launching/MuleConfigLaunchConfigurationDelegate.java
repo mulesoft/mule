@@ -41,7 +41,7 @@ public class MuleConfigLaunchConfigurationDelegate extends JavaLaunchDelegate {
 		super.launch(configuration, mode, launch, monitor);
 	}
 	
-	static void collectFiles(File under, FileFilter filter, Collection<String> into) {
+	static void collectFiles(File under, FileFilter filter, Collection into) {
 		File[] files = under.listFiles(filter);
 		for (int i=0; i<files.length; ++i) {
 			if (! files[i].isDirectory()) into.add(files[i].getAbsolutePath());
@@ -72,7 +72,7 @@ public class MuleConfigLaunchConfigurationDelegate extends JavaLaunchDelegate {
 		if (muleRoot == null)
 			return superClasspath;
 
-		List<String> l = new ArrayList<String>();
+		List l = new ArrayList();
 		for (int i = 0; i < superClasspath.length; ++i)
 			l.add(superClasspath[i]);
 		
@@ -82,7 +82,7 @@ public class MuleConfigLaunchConfigurationDelegate extends JavaLaunchDelegate {
 			}
 		}, l);
 		
-		return l.toArray(new String[l.size()]); 
+		return (String[])l.toArray(new String[l.size()]);
 		
 		/*
 		 *  This is how you might pull in the classpath of a specific plug-in, must it should be adjusted for the new .jar plug-in packaging

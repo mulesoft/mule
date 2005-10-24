@@ -37,6 +37,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
@@ -87,12 +88,18 @@ public class MuleConfigBuilder extends IncrementalProjectBuilder {
 	class DTDResolverHandler extends DefaultHandler {
 		private boolean seenRoot = false;
 
-		public InputSource resolveEntity(String publicId, String systemId) throws IOException, SAXException {
+		public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
 			if (publicId.equals(SYMPHONY_SOFT_DTD_MULE_CONFIGURATION_XML_V1_0_EN) ||
 				systemId.startsWith(HTTP_WWW_SYMPHONYSOFT_COM_DTDS_MULE)) {
 
 				URL dtdURL = findResourceURL("dtd/" + systemId.substring(HTTP_WWW_SYMPHONYSOFT_COM_DTDS_MULE.length()));
-				if (dtdURL != null) return new InputSource(dtdURL.openStream());
+				try {
+					if (dtdURL != null) {
+						return new InputSource(dtdURL.openStream());
+					}
+				} catch (IOException ioex) {
+					throw new SAXException(ioex);
+				}
 			}
 			throw new WrongRootException(systemId + " will not be loaded as part of build");
 		}
@@ -145,15 +152,15 @@ public class MuleConfigBuilder extends IncrementalProjectBuilder {
 		}
 
 		public void error(SAXParseException exception) throws SAXException {
-			throw new SAXException();
+			throw new SAXException(exception);
 		}
 
 		public void fatalError(SAXParseException exception) throws SAXException {
-			throw new SAXException();
+			throw new SAXException(exception);
 		}
 
 		public void warning(SAXParseException exception) throws SAXException {
-			throw new SAXException();
+			throw new SAXException(exception);
 		}
 	}
 

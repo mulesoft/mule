@@ -12,5 +12,6 @@ Export-Package: org.mule.ide.core,
  org.mule.ide.core.nature,
  org.mule.ide.core.preferences
 Require-Bundle: org.eclipse.core.resources,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.apache.xerces
 Eclipse-AutoStart: true
