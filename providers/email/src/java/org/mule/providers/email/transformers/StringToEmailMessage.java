@@ -16,19 +16,22 @@ package org.mule.providers.email.transformers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.providers.email.MailProperties;
 import org.mule.providers.email.MailUtils;
 import org.mule.providers.email.SmtpConnector;
-import org.mule.providers.email.MailProperties;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
+import org.mule.util.TemplateParser;
 import org.mule.util.Utility;
 
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
@@ -48,6 +51,8 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
      */
     protected final transient Log logger = LogFactory.getLog(getClass());
 
+    protected TemplateParser templateParser = TemplateParser.createAntStyleParser();
+
     public StringToEmailMessage()
     {
         registerSourceType(String.class);
@@ -61,8 +66,6 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
      */
     public Object transform(Object src, UMOEventContext context) throws TransformerException
     {
-        String contentType = context.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY, SmtpConnector.DEFAULT_CONTENT_TYPE);
-
         String endpointAddress = endpoint.getEndpointURI().getAddress();
         SmtpConnector connector = (SmtpConnector)endpoint.getConnector();
         String to = context.getStringProperty(MailProperties.TO_ADDRESSES_PROPERTY, endpointAddress);
@@ -72,10 +75,16 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         String replyTo = context.getStringProperty(MailProperties.REPLY_TO_ADDRESSES_PROPERTY, connector.getReplyToAddresses());
         String subject = context.getStringProperty(MailProperties.SUBJECT_PROPERTY, connector.getSubject());
 
+        String contentType = context.getStringProperty(MailProperties.CONTENT_TYPE_PROPERTY, connector.getContentType());
+
         Properties headers = new Properties();
         if(connector.getCustomHeaders()!=null) headers.putAll(connector.getCustomHeaders());
         Properties otherHeaders = (Properties)context.getProperty(MailProperties.CUSTOM_HEADERS_MAP_PROPERTY);
-        if(otherHeaders!=null) headers.putAll(otherHeaders);
+        if(otherHeaders!=null) {
+            Map props = new HashMap(MuleManager.getInstance().getProperties());
+            props.putAll(context.getProperties());
+            headers.putAll(templateParser.parse(props, otherHeaders));
+        }
 
         if(logger.isDebugEnabled()) {
             StringBuffer buf = new StringBuffer();

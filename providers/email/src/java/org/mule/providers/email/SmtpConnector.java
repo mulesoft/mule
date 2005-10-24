@@ -28,25 +28,26 @@
 
 package org.mule.providers.email;
 
-import java.util.Calendar;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Properties;
-
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
 import org.mule.MuleException;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import java.util.Calendar;
+import java.util.Properties;
 
 /**
  * <code>SmtpConnector</code> is used to connect to and send data to an SMTP
@@ -119,6 +120,8 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
      * This will only be used if user name credendtials are set on the endpoint
      */
     private Authenticator authenticator = null;
+
+    private String contentType = DEFAULT_CONTENT_TYPE;
 
     public SmtpConnector() throws InitialisationException
     {
@@ -407,5 +410,13 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
 
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 }
