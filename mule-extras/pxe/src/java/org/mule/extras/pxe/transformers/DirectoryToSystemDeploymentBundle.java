@@ -17,6 +17,7 @@ package org.mule.extras.pxe.transformers;
 import org.mule.util.ClassHelper;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -41,7 +42,7 @@ public class DirectoryToSystemDeploymentBundle extends AbstractSDBTransformer
             f = new File(src.toString());
             if(!f.exists()) {
                 URL url = ClassHelper.getResource(src.toString(), getClass());
-                f = new File(url.toURI());
+                f = new File(new URI(url.toString()));
                 return Arrays.asList(f.listFiles()).iterator();
             }
 
