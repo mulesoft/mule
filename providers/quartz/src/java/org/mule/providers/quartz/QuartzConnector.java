@@ -14,8 +14,6 @@
 
 package org.mule.providers.quartz;
 
-import java.util.Properties;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -26,6 +24,8 @@ import org.mule.util.ClassHelper;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
+
+import java.util.Properties;
 
 /**
  * Creates a connection to a Quartz sheduler.  This allows events to be sheduled
@@ -47,8 +47,9 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
     public static final String PROPERTY_JOB_RECEIVE_ENDPOINT = "jobReceiveEndpoint";
     public static final String PROPERTY_JOB_RECEIVE_TIMEOUT = "jobReceiveTimeout";
 
-    /** deprecated: use Payload reference */
+    /** deprecated: use PROPERTY_PAYLOAD_REFERENCE */
     public static final String PROPERTY_PAYLOAD_CLASS_NAME = "payloadClassName";
+
     public static final String PROPERTY_PAYLOAD_REFERENCE = "payloadRef";
     public static final String PROPERTY_GROUP_NAME = "groupName";
     public static final String PROPERTY_JOB_GROUP_NAME = "jobGroupName";
@@ -56,7 +57,7 @@ public class QuartzConnector extends AbstractServiceEnabledConnector
     public static final String PROPERTY_JOB_CLASS = "jobClass";
     public static final String PROPERTY_JOB_OBJECT = "jobObject";
 
-    public static final String DEFUALT_GROUP_NAME = "mule";
+    public static final String DEFAULT_GROUP_NAME = "mule";
 
     private String factoryClassName = StdSchedulerFactory.class.getName();
 

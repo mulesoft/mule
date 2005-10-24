@@ -14,13 +14,9 @@
 
 package org.mule.providers.quartz;
 
-import java.util.Date;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
-import org.mule.providers.DefaultMessageAdapter;
 import org.mule.providers.quartz.jobs.MuleReceiverJob;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -28,18 +24,14 @@ import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.ClassHelper;
-import org.mule.util.PropertiesHelper;
-import org.mule.MuleManager;
 import org.quartz.CronTrigger;
-import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+
+import java.util.Date;
 
 /**
  * Listens for Quartz sheduled events using the Receiver Job and fires events
@@ -88,7 +80,7 @@ public class QuartzMessageReceiver extends AbstractMessageReceiver
             String groupName = jobDataMap.getString(QuartzConnector.PROPERTY_GROUP_NAME);
             String jobGroupName = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_GROUP_NAME);
 
-            if(groupName==null) groupName = QuartzConnector.DEFUALT_GROUP_NAME;
+            if(groupName==null) groupName = QuartzConnector.DEFAULT_GROUP_NAME;
             if(jobGroupName==null) jobGroupName = groupName;
 
             jobDetail.setGroup(groupName);

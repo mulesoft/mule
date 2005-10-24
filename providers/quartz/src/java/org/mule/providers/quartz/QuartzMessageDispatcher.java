@@ -14,16 +14,16 @@
 package org.mule.providers.quartz;
 
 import org.mule.MuleManager;
-import org.mule.util.ClassHelper;
 import org.mule.config.i18n.Message;
-import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.AbstractConnector;
+import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.providers.quartz.jobs.DelegatingJob;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
+import org.mule.util.ClassHelper;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -100,7 +100,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher {
         String groupName = jobDataMap.getString(QuartzConnector.PROPERTY_GROUP_NAME);
         String jobGroupName = jobDataMap.getString(QuartzConnector.PROPERTY_JOB_GROUP_NAME);
 
-        if (groupName == null) groupName = QuartzConnector.DEFUALT_GROUP_NAME;
+        if (groupName == null) groupName = QuartzConnector.DEFAULT_GROUP_NAME;
         if (jobGroupName == null) jobGroupName = groupName;
 
         jobDetail.setGroup(groupName);
