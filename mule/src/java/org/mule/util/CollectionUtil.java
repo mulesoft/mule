@@ -13,6 +13,9 @@
  */
 package org.mule.util;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -24,6 +27,28 @@ public class CollectionUtil
 {
 
 	/**
+	 * Convenience method for CollectionUtil#mapWithKeysAndValues(Class, Iterator, Iterator);
+	 * keys and values can be null or empty.
+	 */
+	public static Map mapWithKeysAndValues(Class mapClass, Object[] keys, Object[] values)
+	{
+		Collection keyCollection = (keys != null ? Arrays.asList(keys) : Collections.EMPTY_LIST);
+		Collection valuesCollection = (values != null ? Arrays.asList(values) : Collections.EMPTY_LIST);
+		return mapWithKeysAndValues(mapClass, keyCollection.iterator(), valuesCollection.iterator());
+	}
+
+	/**
+	 * Convenience method for CollectionUtil#mapWithKeysAndValues(Class, Iterator, Iterator);
+	 * keys and values can be null or empty.
+	 */
+	public static Map mapWithKeysAndValues(Class mapClass, Collection keys, Collection values)
+	{
+		keys = (keys != null ? keys : Collections.EMPTY_LIST);
+		values = (values != null ? values : Collections.EMPTY_LIST);
+		return mapWithKeysAndValues(mapClass, keys.iterator(), values.iterator());
+	}
+
+	/**
 	 * Create & populate a Map of arbitrary class. Populating stops when either
 	 * the keys or values iterator is null or exhausted.
 	 * 
@@ -32,7 +57,7 @@ public class CollectionUtil
 	 * @param values iterator for Objects used as values
 	 * @return the instantiated Map
 	 */
-	public static Map createMapWithKeysAndValues(Class mapClass, Iterator keys, Iterator values)
+	public static Map mapWithKeysAndValues(Class mapClass, Iterator keys, Iterator values)
 	{
 		Map m = null;
 

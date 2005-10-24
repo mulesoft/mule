@@ -34,7 +34,7 @@ public class CollectionUtilTestCase extends TestCase
 	{
 		try
 		{
-			CollectionUtil.createMapWithKeysAndValues(null, null, null);
+			CollectionUtil.mapWithKeysAndValues(null, (String[])null, (String[])null);
 			fail();
 		}
 		catch (IllegalArgumentException ex)
@@ -45,7 +45,7 @@ public class CollectionUtilTestCase extends TestCase
 
 	public void testMapCreationWithoutElements()
 	{
-		Map m = CollectionUtil.createMapWithKeysAndValues(HashMap.class, null, null);
+		Map m = CollectionUtil.mapWithKeysAndValues(HashMap.class, (List)null, (List)null);
 		assertTrue(m.isEmpty());
 	}
 
@@ -53,7 +53,7 @@ public class CollectionUtilTestCase extends TestCase
 	{
 		List strings = Arrays.asList(new String[]{"foo"});
 
-		Map m = CollectionUtil.createMapWithKeysAndValues(CaseInsensitiveMap.class,
+		Map m = CollectionUtil.mapWithKeysAndValues(CaseInsensitiveMap.class,
 				strings.iterator(), strings.iterator());
 
 		assertEquals("foo", m.get("foo"));
