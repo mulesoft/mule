@@ -44,13 +44,8 @@ public class MuleMessage implements UMOMessage
 
     protected UMOExceptionPayload exceptionPayload;
 
-//    public MuleMessage(UMOMessageAdapter message)
-//    {
-//        adapter = message;
-//    }
     public MuleMessage(Object message)
     {
-        //this(message, (RequestContext.getEvent()!=null ? RequestContext.getEvent().getMessage() : null));
         this(message, new HashMap());
     }
 
@@ -365,20 +360,22 @@ public class MuleMessage implements UMOMessage
     public String toString()
     {
         String id = null;
+
         try {
             id = getUniqueId();
         } catch (UniqueIdNotSupportedException e) {
-            id = "[uniquieId not supported]";
+            id = "[uniqueId not supported]";
         }
+
         StringBuffer buf = new StringBuffer();
         buf.append("MuleMessage{");
         buf.append("id=").append(id);
         buf.append(", payload=").append(getPayload().getClass().getName());
         buf.append(", correlationId=").append(getCorrelationId());
-        buf.append(", correlation Group=").append(getCorrelationGroupSize());
-        buf.append(", correlation Seq=").append(getCorrelationSequence());
-        buf.append(", exception Payload=").append(exceptionPayload);
-        buf.append("/n").append(PropertiesHelper.propertiesToString(getProperties(), true));
+        buf.append(", correlationGroup=").append(getCorrelationGroupSize());
+        buf.append(", correlationSeq=").append(getCorrelationSequence());
+        buf.append(", exceptionPayload=").append(exceptionPayload);
+        buf.append(", properties=").append(PropertiesHelper.propertiesToString(getProperties(), false));
         buf.append("}");
         return buf.toString();
     }
