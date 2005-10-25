@@ -21,6 +21,8 @@ import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderResource;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.UMOManager;
 
 import javax.script.CompiledScript;
@@ -35,6 +37,7 @@ import java.io.IOException;
  */
 public class ScriptConfigurationBuilder extends Scriptable implements ConfigurationBuilder {
 
+    public static final String SCRIPT_ENGINE_NAME_PROPERTY = "org.mule.script.engine";
     /**
      * logger used by this class
      */
@@ -46,11 +49,18 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
     public ScriptConfigurationBuilder() {
         builder = new QuickConfigurationBuilder(false);
         manager = MuleManager.getInstance();
-
+        String scriptName = System.getProperty(SCRIPT_ENGINE_NAME_PROPERTY);
+        if(scriptName==null) {
+            throw new NullPointerException(new Message(
+                    Messages.SYSTEM_PROPERTY_X_NOT_SET, SCRIPT_ENGINE_NAME_PROPERTY).getMessage());
+        } else {
+            this.setScriptEngineName(scriptName);
+        }
     }
 
     public ScriptConfigurationBuilder(String scriptEngineName) {
-        this();
+        builder = new QuickConfigurationBuilder(false);
+        manager = MuleManager.getInstance();
         this.setScriptEngineName(scriptEngineName);
     }
 
