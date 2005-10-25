@@ -274,7 +274,7 @@ public interface UMOManager extends Lifecycle
      * @param name the agent name
      * @return the destroyed agent or null if the agent doesn't exist
      */
-    UMOAgent removeAgent(String name) throws UMOException;
+    UMOAgent unregisterAgent(String name) throws UMOException;
 
     /**
      * Registers an intenal server event listener. The listener will be notified

@@ -307,7 +307,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends NamedTestCase
 
     public void testAgentConfiguration() throws UMOException
     {
-        UMOAgent agent = MuleManager.getInstance().removeAgent("jmxAgent");
+        UMOAgent agent = MuleManager.getInstance().unregisterAgent("jmxAgent");
         assertNotNull(agent);
     }
 

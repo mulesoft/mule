@@ -39,7 +39,7 @@ public class MuleManagerTestCase extends AbstractMuleTestCase
 
     public void testRemoveNonExistentAgent() throws Exception
     {
-        manager.removeAgent("DOES_NOT_EXIST");
+        manager.unregisterAgent("DOES_NOT_EXIST");
 
         // should not throw NPE
     }
