@@ -81,7 +81,7 @@ public class StringMessageHelper
                 while (temp.length() > 0) {
                     len=(trimLength < temp.length() ? trimLength : temp.length());
                     String msg = temp.substring(0, len);
-                    x = msg.indexOf("\n");
+                    x = msg.indexOf((char)Character.LINE_SEPARATOR);
 
                     if(x > -1) {
                         msg = msg.substring(0, x);
@@ -101,11 +101,11 @@ public class StringMessageHelper
                 }
             }
         }
-        buf.append("\n");
+        buf.append((char)Character.LINE_SEPARATOR);
         buf.append(charString(c, maxlength));
 
         for (int i = 0; i < messages.size(); i++) {
-            buf.append("\n");
+            buf.append((char)Character.LINE_SEPARATOR);
             buf.append(c);
             buf.append(" ");
             buf.append(messages.get(i));
@@ -116,7 +116,7 @@ public class StringMessageHelper
             buf.append(" ");
             buf.append(c);
         }
-        buf.append("\n");
+        buf.append((char)Character.LINE_SEPARATOR);
         buf.append(charString(c, maxlength));
         return buf.toString();
     }

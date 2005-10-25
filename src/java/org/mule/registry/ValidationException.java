@@ -40,7 +40,7 @@ public class ValidationException extends RegistryException {
         buf.append("The following validation errors occurred");
         for (Iterator iterator = vaildationErrors.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
-            buf.append("\n").append(s);
+            buf.append((char)Character.LINE_SEPARATOR).append(s);
         }
         return buf.toString();
     }

@@ -80,7 +80,7 @@ public abstract class AbstractContainerContext implements UMOContainerContext
         } else {
             doctype = "";
         }
-        StringReader declaration = new StringReader(decl + "\n" + doctype);
+        StringReader declaration = new StringReader(decl + (char)Character.LINE_SEPARATOR + doctype);
         ChainedReader reader = new ChainedReader(declaration, configuration);
         configure(reader);
 

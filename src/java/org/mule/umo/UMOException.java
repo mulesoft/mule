@@ -145,11 +145,11 @@ public abstract class UMOException extends Exception
             return getMessage();
         }
         StringBuffer buf = new StringBuffer();
-        buf.append("\n").append(StringMessageHelper.charString('*', 80)).append("\n");
-        buf.append("Message          : ").append(message).append("\n");
-        buf.append("Type             : ").append(getClass().getName()).append("\n");
-        buf.append("Code             : ").append(getExceptionCode() + getMessageCode()).append("\n");
-        // buf.append("Msg Code : ").append(getMessageCode()).append("\n");
+        buf.append((char)Character.LINE_SEPARATOR).append(StringMessageHelper.charString('*', 80)).append((char)Character.LINE_SEPARATOR);
+        buf.append("Message          : ").append(message).append((char)Character.LINE_SEPARATOR);
+        buf.append("Type             : ").append(getClass().getName()).append((char)Character.LINE_SEPARATOR);
+        buf.append("Code             : ").append(getExceptionCode() + getMessageCode()).append((char)Character.LINE_SEPARATOR);
+        // buf.append("Msg Code : ").append(getMessageCode()).append((char)Character.LINE_SEPARATOR);
         for (Iterator iterator = info.keySet().iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
             int pad = 17 - s.length();
@@ -158,22 +158,22 @@ public abstract class UMOException extends Exception
                 buf.append(StringMessageHelper.charString(' ', pad));
             }
             buf.append(": ");
-            buf.append(info.get(s)).append("\n");
+            buf.append(info.get(s)).append((char)Character.LINE_SEPARATOR);
         }
 
         // print exception stack
-        buf.append(StringMessageHelper.charString('*', 80)).append("\n");
-        buf.append(new Message(Messages.EXCEPTION_STACK_IS)).append("\n");
+        buf.append(StringMessageHelper.charString('*', 80)).append((char)Character.LINE_SEPARATOR);
+        buf.append(new Message(Messages.EXCEPTION_STACK_IS)).append((char)Character.LINE_SEPARATOR);
         buf.append(ExceptionHelper.getExceptionStack(this));
 
-        buf.append(StringMessageHelper.charString('*', 80)).append("\n");
-        buf.append(new Message(Messages.ROOT_STACK_TRACE)).append("\n");
+        buf.append(StringMessageHelper.charString('*', 80)).append((char)Character.LINE_SEPARATOR);
+        buf.append(new Message(Messages.ROOT_STACK_TRACE)).append((char)Character.LINE_SEPARATOR);
         Throwable root = ExceptionHelper.getRootException(this);
         StringWriter w = new StringWriter();
         PrintWriter p = new PrintWriter(w);
         root.printStackTrace(p);
-        buf.append(w.toString()).append("\n");
-        buf.append(StringMessageHelper.charString('*', 80)).append("\n");
+        buf.append(w.toString()).append((char)Character.LINE_SEPARATOR);
+        buf.append(StringMessageHelper.charString('*', 80)).append((char)Character.LINE_SEPARATOR);
 
         return buf.toString();
     }
