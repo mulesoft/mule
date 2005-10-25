@@ -13,13 +13,15 @@
  */
 package org.mule.config.i18n;
 
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * <code>Messages</code> provides facilities for constructing
@@ -149,7 +151,12 @@ public class Messages implements CoreMessageConstants
         if (bundle == null) {
             String path = "META-INF.services.org.mule.i18n." + name + "-messages";
             logger.debug("Loading resource bundle: " + path);
-            bundle = ResourceBundle.getBundle(path);
+            try {
+                bundle = ResourceBundle.getBundle(path);
+            } catch (MissingResourceException e) {
+                logger.warn("Failed to find resource bundle using current Locale, defaulting to Locale.US. Error was: " + e.getMessage());
+                bundle = ResourceBundle.getBundle(path, Locale.US);
+            }
             bundles.put(name, bundle);
         }
         return bundle;
