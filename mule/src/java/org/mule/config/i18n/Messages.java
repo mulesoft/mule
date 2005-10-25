@@ -151,10 +151,11 @@ public class Messages implements CoreMessageConstants
         if (bundle == null) {
             String path = "META-INF.services.org.mule.i18n." + name + "-messages";
             logger.debug("Loading resource bundle: " + path);
+            Locale locale = Locale.getDefault();
             try {
-                bundle = ResourceBundle.getBundle(path);
+                bundle = ResourceBundle.getBundle(path, locale);
             } catch (MissingResourceException e) {
-                logger.warn("Failed to find resource bundle using current Locale, defaulting to Locale.US. Error was: " + e.getMessage());
+                logger.warn("Failed to find resource bundle using default Locale: " + locale.toString() + ", defaulting to Locale.US. Error was: " + e.getMessage());
                 bundle = ResourceBundle.getBundle(path, Locale.US);
             }
             bundles.put(name, bundle);
