@@ -631,7 +631,7 @@ Jndi
     Is responsible for transforming data when it is returned from a request/response
     invocation. If the endpoint is a receiver the responseTransformers is ignored.
 -->
-<!ATTLIST endpoint responseTransformers	IDREFS			#IMPLIED>
+<!ATTLIST global-endpoint responseTransformers	IDREFS			#IMPLIED>
 
 <!--
     synchronous
