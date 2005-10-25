@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <id>mule-extras-groovy</id>
+    <artifactId>mule-extras-groovy</artifactId>
+    <name>Groovy Support</name>
+    <shortDescription>groovy</shortDescription>
+    <description>Groovy support currently provides transformers to enable Mule users to transform their objects using groovy scripts. for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
+    <dependencies>
+        <dependency>
+            <artifactId>mule-vm-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+    	<dependency>
+            <groupId>groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>${groovy_version}</version>
+            <url>http://groovy.codehaus.org</url>
+        </dependency>
+        <dependency>
+            <artifactId>asm</artifactId>
+            <groupId>asm</groupId>
+            <version>${asm_version}</version>
+            <url></url>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm-util</artifactId>
+            <version>${asm_util_version}</version>
+            <url></url>
+        </dependency>
+         <dependency>
+            <id>mule:mule-extras-client</id>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+    </dependencies>
+</project>
