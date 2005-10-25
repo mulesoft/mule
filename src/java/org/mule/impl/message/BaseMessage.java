@@ -103,4 +103,12 @@ public class BaseMessage implements Serializable
     {
         return context.get(key);
     }
+
+
+    public String toString() {
+        return "BaseMessage{" +
+                "message=" + message +
+                ", context=" + context +
+                "}";
+    }
 }
