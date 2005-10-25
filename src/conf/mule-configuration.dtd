@@ -1354,7 +1354,7 @@ The system property key to use when lookin up the property
 <!--
 	The path to the properties file on the classpath or local file system
 -->
-<!ATTLIST file-properties location					NMTOKEN		#REQUIRED>
+<!ATTLIST file-properties location					CDATA		#REQUIRED>
 
 <!--
 Whether the properties in the properties file override properties already set on this object
