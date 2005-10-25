@@ -14,10 +14,14 @@
  */
 package org.mule.providers.http;
 
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.MuleProperties;
-import org.mule.impl.*;
+import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.MuleSession;
+import org.mule.impl.RequestContext;
+import org.mule.impl.ResponseOutputStream;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.tcp.TcpMessageReceiver;
@@ -27,11 +31,19 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.monitor.Expirable;
 
 import javax.resource.spi.work.Work;
-import java.io.*;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Properties;
@@ -314,6 +326,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 					}
 					else
 					{
+						// normalize incoming header if necessary
 						String normalizedKey = (String)HttpConstants.ALL_HEADER_NAMES.get(currentKey);
 						if (normalizedKey != null)
 						{

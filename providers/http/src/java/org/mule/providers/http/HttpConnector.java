@@ -1,35 +1,27 @@
 /* 
-
  * $Header$
-
  * $Revision$
-
  * $Date$
-
  * ------------------------------------------------------------------------------------------------------
-
  * 
-
  * Copyright (c) SymphonySoft Limited. All rights reserved.
-
  * http://www.symphonysoft.com
-
  * 
-
  * The software in this package is published under the terms of the BSD
-
  * style license a copy of which has been included with this distribution in
-
  * the LICENSE.txt file. 
-
  *
-
  */
-
 package org.mule.providers.http;
 
 import org.mule.providers.tcp.TcpConnector;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageReceiver;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -85,9 +77,34 @@ public class HttpConnector extends TcpConnector
 
     private boolean keepAlive = false;
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * @see UMOConnector#registerListener(UMOComponent, UMOEndpoint)
+     */
+    public UMOMessageReceiver registerListener(UMOComponent component, UMOEndpoint endpoint) throws Exception {
+    	if (endpoint != null) {
+    		Map endpointProperties = endpoint.getProperties();
+    		if (endpointProperties != null) {
+	    		// normalize properties for HTTP
+	    		Map newProperties = new HashMap(endpointProperties.size());
+	   			for (Iterator entries = endpointProperties.entrySet().iterator(); entries.hasNext();) {
+	   				Map.Entry entry = (Map.Entry)entries.next();
+	   				Object key = entry.getKey();
+	   				Object normalizedKey = HttpConstants.ALL_HEADER_NAMES.get(key);
+	   				if (normalizedKey != null) {
+	   					// normalized property exists
+	   					key = normalizedKey;
+	   				}
+	   				newProperties.put(key, entry.getValue());
+	   			}
+	   			// set normalized properties back on the endpoint
+	   			endpoint.setProperties(newProperties);
+    		}
+    	}
+    	// proceed as usual
+    	return super.registerListener(component, endpoint);
+    }
+
+    /**
      * @see org.mule.umo.provider.UMOConnector#getProtocol()
      */
     public String getProtocol()
