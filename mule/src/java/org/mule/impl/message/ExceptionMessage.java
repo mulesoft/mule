@@ -13,11 +13,11 @@
  */
 package org.mule.impl.message;
 
-import java.util.Date;
-
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+
+import java.util.Date;
 
 /**
  * <code>ExceptionMessage</code> is used by the
@@ -76,5 +76,17 @@ public class ExceptionMessage extends BaseMessage
     public Throwable getException()
     {
         return exception;
+    }
+
+
+    public String toString() {
+        return "ExceptionMessage{" +
+                 "message=" + message +
+                ", context=" + context +
+                "exception=" + exception +
+                ", componentName='" + componentName + "'" +
+                ", endpointUri=" + endpointUri +
+                ", timeStamp=" + timeStamp +
+                "}";
     }
 }
