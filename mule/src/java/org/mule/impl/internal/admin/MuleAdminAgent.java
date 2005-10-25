@@ -38,6 +38,8 @@ public class MuleAdminAgent implements UMOAgent
 {
     public static final String DEFAULT_MANAGER_PROVIDER = "_muleManagerProvider";
 
+    public static final String AGENT_NAME = "Mule Admin";
+
     /**
      * logger used by this class
      */
@@ -52,7 +54,7 @@ public class MuleAdminAgent implements UMOAgent
      */
     public String getName()
     {
-        return "Mule Admin";
+        return AGENT_NAME;
     }
 
     /**
@@ -107,7 +109,7 @@ public class MuleAdminAgent implements UMOAgent
                         "<mule-environment-properties serverUrl=\"tcp://example.com:60504\"/> ");
 
                 // abort the agent registration process
-                manager.removeAgent(this.getName());
+                manager.unregisterAgent(this.getName());
 
                 return;
             }

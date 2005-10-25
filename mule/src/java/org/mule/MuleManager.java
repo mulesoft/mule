@@ -14,7 +14,6 @@
 package org.mule;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ConfigurationException;
@@ -25,7 +24,23 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.internal.admin.MuleAdminAgent;
-import org.mule.impl.internal.events.*;
+import org.mule.impl.internal.events.AdminEvent;
+import org.mule.impl.internal.events.AdminEventListener;
+import org.mule.impl.internal.events.ComponentEvent;
+import org.mule.impl.internal.events.ComponentEventListener;
+import org.mule.impl.internal.events.ConnectionEvent;
+import org.mule.impl.internal.events.ConnectionEventListener;
+import org.mule.impl.internal.events.CustomEvent;
+import org.mule.impl.internal.events.CustomEventListener;
+import org.mule.impl.internal.events.ManagementEvent;
+import org.mule.impl.internal.events.ManagementEventListener;
+import org.mule.impl.internal.events.ManagerEvent;
+import org.mule.impl.internal.events.ManagerEventListener;
+import org.mule.impl.internal.events.ModelEvent;
+import org.mule.impl.internal.events.ModelEventListener;
+import org.mule.impl.internal.events.SecurityEvent;
+import org.mule.impl.internal.events.SecurityEventListener;
+import org.mule.impl.internal.events.ServerEventManager;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
@@ -34,7 +49,12 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.*;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerEventListener;
+import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -49,7 +69,14 @@ import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
 import javax.transaction.TransactionManager;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -632,7 +659,9 @@ public class MuleManager implements UMOManager
         }
 
         if (!disable) {
+            unregisterAgent(MuleAdminAgent.AGENT_NAME);
             registerAgent(new MuleAdminAgent());
+
         }
     }
 
@@ -963,19 +992,15 @@ public class MuleManager implements UMOManager
     /**
      * {@inheritDoc}
      */
-    public UMOAgent removeAgent(String name) throws UMOException
+    public UMOAgent unregisterAgent(String name) throws UMOException
     {
         if(name==null) return null;
-        for (Iterator iterator = agents.values().iterator(); iterator.hasNext();) {
-            UMOAgent agent = (UMOAgent) iterator.next();
-            if(name.equals(agent.getName())) {
-                agents.remove(agent);
-                agent.dispose();
-                agent.unregistered();
-                return agent;
-            }
+        UMOAgent agent = (UMOAgent)agents.remove(name);
+        if(agent!=null) {
+            agent.dispose();
+            agent.unregistered();
         }
-        return null;
+        return agent;
     }
 
     /**
