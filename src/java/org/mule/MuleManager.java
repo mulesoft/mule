@@ -375,7 +375,7 @@ public class MuleManager implements UMOManager
 
         if(!config.isEmbedded()) {
             if (logger.isInfoEnabled()) {
-                logger.info("\n" + getEndSplash());
+                logger.info(getEndSplash());
             } else {
                 System.out.println(getEndSplash());
             }
@@ -700,7 +700,7 @@ public class MuleManager implements UMOManager
             starting.set(false);
             if(!config.isEmbedded()) {
                 if (logger.isInfoEnabled()) {
-                    logger.info("\n" + getStartSplash());
+                    logger.info(getStartSplash());
                 } else {
                     System.out.println(getStartSplash());
                 }
