@@ -162,7 +162,7 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
                 StringBuffer buf = new StringBuffer();
                 buf.append("Setting Correlation info on Outbound router for endpoint: ")
                    .append(endpoint.getEndpointURI());
-                buf.append("\n").append("Id=").append(correlation);
+                buf.append((char)Character.LINE_SEPARATOR).append("Id=").append(correlation);
                 // buf.append(", ").append("Seq=").append(seq);
                 // buf.append(", ").append("Group Size=").append(group);
                 logger.debug(buf.toString());

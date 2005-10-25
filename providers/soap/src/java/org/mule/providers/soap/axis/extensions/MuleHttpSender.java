@@ -729,9 +729,9 @@ public class MuleHttpSender extends BasicHandler
         msgContext.setResponseMessage(outMsg);
         if (log.isDebugEnabled()) {
             if (null == contentLength) {
-                log.debug("\n" + Messages.getMessage("no00", "Content-Length"));
+                log.debug((char)Character.LINE_SEPARATOR + Messages.getMessage("no00", "Content-Length"));
             }
-            log.debug("\n" + Messages.getMessage("xmlRecd00"));
+            log.debug((char)Character.LINE_SEPARATOR + Messages.getMessage("xmlRecd00"));
             log.debug("-----------------------------------------------");
             log.debug(outMsg.getSOAPEnvelope().toString());
         }

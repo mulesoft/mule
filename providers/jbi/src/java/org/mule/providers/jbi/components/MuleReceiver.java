@@ -81,14 +81,13 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
         try {
             if (targetService == null) {
                 if(targetServiceName!=null) {
-                    //throw new NullPointerException("A targetService must be set on this component");
-                //} else {
                     targetService = (QName)new QNameConverter().convert(QName.class, targetServiceName);
                 }
             }
 
             UMOMessageReceiver receiver = muleEndpoint.getConnector().registerListener(
                     new NullUMOComponent(getName()), muleEndpoint);
+
             if(receiver==null) {
                 throw new NullPointerException(new Message("jbi", 1, getName()).toString());
             } else if(receiver instanceof AbstractMessageReceiver) {
@@ -100,6 +99,7 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
 
             this.receiver.setListener(this);
         } catch (Exception e) {
+        	// TODO fix me
             e.printStackTrace();
             throw new JBIException(e);
         }
@@ -126,11 +126,11 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
                 }
 
                 if(logger.isDebugEnabled()) {
-                    StringBuffer buf = new StringBuffer();
-                    buf.append("Found the following endpoints for: ").append(targetService).append("\n");
+                    StringBuffer buf = new StringBuffer("Found the following endpoints for: ");
+                   	buf.append(targetService).append((char)Character.LINE_SEPARATOR);
                     for (int i = 0; i < eps.length; i++) {
                         ServiceEndpoint ep = eps[i];
-                        buf.append(ep.getEndpointName()).append(";").append(ep.getServiceName()).append(";").append(ep.getInterfaces()).append("\n");
+                        buf.append(ep.getEndpointName()).append(";").append(ep.getServiceName()).append(";").append(ep.getInterfaces()).append((char)Character.LINE_SEPARATOR);
                     }
                     logger.debug(buf.toString());
                 }

@@ -59,7 +59,9 @@ public class Util {
         // Concatenate the array of strings into a single string.
         int numLines = lines.size();
         for (int i = 0; i < numLines; ++i) {
-            if (text.equals("") == false) text += "\n";
+            if (text.equals("") == false) {
+            	text += (char)Character.LINE_SEPARATOR;
+            }
             text += lines.get(i);
         }
         return (text);

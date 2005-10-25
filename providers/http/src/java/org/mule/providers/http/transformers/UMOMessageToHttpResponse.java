@@ -85,7 +85,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
             }
         }
 
-        StringBuffer httpMessage = new StringBuffer();
+        StringBuffer httpMessage = new StringBuffer(512);
 
         httpMessage.append(version).append(" ");
         httpMessage.append(status).append(HttpConstants.CRLF);
@@ -151,8 +151,9 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
             httpMessage.append(HttpConstants.CRLF);
         }
         if (m.getReplyTo() != null) {
-            httpMessage.append("X-" + MuleProperties.MULE_REPLY_TO_PROPERTY).append(": ").append(m.getReplyTo()
-                                                                                                  .toString());
+            httpMessage.append("X-" + MuleProperties.MULE_REPLY_TO_PROPERTY)
+            			.append(": ")
+            			.append(m.getReplyTo().toString());
             httpMessage.append(HttpConstants.CRLF);
         }
 

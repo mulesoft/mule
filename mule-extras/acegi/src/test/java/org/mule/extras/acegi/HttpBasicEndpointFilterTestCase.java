@@ -102,7 +102,7 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
             int status = client.executeMethod(get);
 
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            System.out.println(status + "\n" + get.getResponseBodyAsString());
+            System.out.println(status + (char)Character.LINE_SEPARATOR + get.getResponseBodyAsString());
 
         } finally {
             get.releaseConnection();
@@ -157,7 +157,7 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
             int status = client.executeMethod(get);
 
             assertEquals(result, status);
-            System.out.println(status + "\n" + get.getResponseBodyAsString());
+            System.out.println(status + (char)Character.LINE_SEPARATOR + get.getResponseBodyAsString());
 
         } finally {
             get.releaseConnection();

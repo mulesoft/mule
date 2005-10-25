@@ -125,7 +125,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         buffer.append(line);
-                        buffer.append("\n");
+                        buffer.append((char)Character.LINE_SEPARATOR);
                     }
                     this.message = buffer.toString();
                 } else {
