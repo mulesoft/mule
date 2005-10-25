@@ -488,7 +488,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         logger.info("registering listener: " + component.getDescriptor().getName() + " on endpointUri: "
                 + endpointUri.toString());
 
-        UMOMessageReceiver receiver = getReciever(component, endpoint);
+        UMOMessageReceiver receiver = getReceiver(component, endpoint);
         if (receiver != null) {
             throw new ConnectorException(new Message(Messages.LISTENER_ALREADY_REGISTERED, endpointUri), this);
         } else {
@@ -735,7 +735,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         return false;
     }
 
-    public AbstractMessageReceiver getReciever(UMOComponent component, UMOEndpoint endpoint) {
+    public AbstractMessageReceiver getReceiver(UMOComponent component, UMOEndpoint endpoint) {
         return (AbstractMessageReceiver) receivers.get(getReceiverKey(component, endpoint));
     }
 
