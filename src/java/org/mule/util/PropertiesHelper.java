@@ -264,28 +264,49 @@ public class PropertiesHelper
 
     public static String propertiesToString(Map props, boolean newline)
     {
-        StringBuffer buf = new StringBuffer();
-        buf.append("Properties{");
-        if(props==null || props.entrySet().size()==0) {
-            buf.append("none}");
+        StringBuffer buf = new StringBuffer(props.size()*32);
+        buf.append("{");
+
+        if (props == null || props.isEmpty()) {
+            buf.append("}");
             return buf.toString();
         }
+
         if (newline) {
-            buf.append("\n");
+            buf.append((char)Character.LINE_SEPARATOR);
         }
-        Map.Entry entry;
-        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
-            if (!newline) {
-                buf.append(", ");
-            }
-            buf.append(entry.getKey()).append("=").append((
-                    entry.getKey().toString().equalsIgnoreCase("password") ? "*****" : entry.getValue()));
-            if (newline) {
-                buf.append("\n");
-            }
-        }
+
+        Object[] entries = props.entrySet().toArray();
+        int i, numEntries = entries.length;
+        for (i = 0; i < numEntries - 1; i++) {
+			appendMaskedProperty(buf, (Map.Entry)entries[i]);
+			if (newline) {
+				buf.append((char)Character.LINE_SEPARATOR);
+			}
+			else {
+				buf.append(", ");
+			}
+		}
+
+        // don't forget the last one
+		appendMaskedProperty(buf, (Map.Entry)entries[i]);
+
+		if (newline) {
+			buf.append((char)Character.LINE_SEPARATOR);
+		}
+
         buf.append("}");
         return buf.toString();
+    }
+    
+    private static void appendMaskedProperty(StringBuffer buffer, Map.Entry property) {
+    	String key = property.getKey().toString();
+		buffer.append(key).append("=");
+		if (key.equalsIgnoreCase("password")) {
+			buffer.append("*****");
+		}
+		else {
+			buffer.append(property.getValue());
+		}
     }
 }

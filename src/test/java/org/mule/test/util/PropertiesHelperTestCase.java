@@ -20,6 +20,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.mule.util.CollectionUtil;
 import org.mule.util.PropertiesHelper;
 
 /**
@@ -116,4 +117,37 @@ public class PropertiesHelperTestCase extends TestCase
         assertEquals("name1", newProps.get("value1"));
         assertEquals("name2", newProps.get("value2"));
     }
+    
+    public void testMapEmpty() throws Exception
+    {
+    	Map props = new HashMap();
+    	assertEquals("{}", PropertiesHelper.propertiesToString(props, false));
+    	assertEquals("{}", PropertiesHelper.propertiesToString(props, true));
+    }
+
+    public void testMapSingleElement() throws Exception
+    {
+    	Map props = CollectionUtil.mapWithKeysAndValues(HashMap.class,
+    			new Object[]{"foo"}, new Object[]{"bar"});
+
+    	assertEquals("{foo=bar}", PropertiesHelper.propertiesToString(props, false));
+    	assertEquals("{" + (char)Character.LINE_SEPARATOR
+					+ "foo=bar" + (char)Character.LINE_SEPARATOR + "}",
+					PropertiesHelper.propertiesToString(props, true));
+    }
+
+    public void testMapTwoElements() throws Exception
+    {
+    	Map props = CollectionUtil.mapWithKeysAndValues(HashMap.class,
+    			new Object[]{"foo", "foozle"}, new Object[]{"bar", "doozle"});
+
+    	assertEquals("{foo=bar, foozle=doozle}",
+    			PropertiesHelper.propertiesToString(props, false));
+
+    	assertEquals("{" + (char)Character.LINE_SEPARATOR + "foo=bar"
+    			+ (char)Character.LINE_SEPARATOR + "foozle=doozle"
+    			+ (char)Character.LINE_SEPARATOR + "}",
+    			PropertiesHelper.propertiesToString(props, true));
+    }
+
 }
