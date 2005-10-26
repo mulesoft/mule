@@ -102,6 +102,7 @@ public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
         assertNotNull(d);
         assertNotNull(d.getInboundEndpoint());
         assertNotNull(d.getInboundTransformer());
+        assertNotNull(d.getInboundEndpoint().getResponseTransformer());
     }
 
     public void testTransformerConfig()

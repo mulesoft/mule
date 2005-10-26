@@ -117,7 +117,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
         responseTransformers = (String) properties.get(UMOEndpointURI.PROPERTY_RESPONSE_TRANSFORMERS);
         if (responseTransformers != null) {
-            responseTransformers = transformers.replaceAll(" ", ",");
+            responseTransformers = responseTransformers.replaceAll(" ", ",");
         }
         //If we have user info, decode it as it might contain '@' or other encodable characters
         userInfo = uri.getUserInfo();
