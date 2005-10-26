@@ -13,13 +13,6 @@
  */
 package org.mule.providers.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,6 +33,13 @@ import org.mule.util.MuleObjectHelper;
 import org.mule.util.ObjectFactory;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.SpiHelper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>ConnectorFactory</code> can be used for generically creating
@@ -112,19 +112,38 @@ public class ConnectorFactory
 
         if (type != null) {
             endpoint.setType(type);
-            UMOTransformer trans = getTransformer(uri, connector, UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type));
+            UMOTransformer trans = getTransformer(uri, connector, (UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type) ? 0 : 1));
             endpoint.setTransformer(trans);
+            if(UMOEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type)) {
+                //set the response transformer
+                trans = getTransformer(uri, connector, 2);
+                endpoint.setResponseTransformer(trans);
+            }
         }
         return endpoint;
     }
 
-    private static UMOTransformer getTransformer(UMOEndpointURI url, UMOConnector cnn, boolean inbound)
-            throws ConnectorFactoryException
+    /**
+     *
+     * @param url
+     * @param cnn
+     * @param type 0=inbound, 1=outbound, 2=response
+     * @return
+     * @throws ConnectorFactoryException
+     */
+    private static UMOTransformer getTransformer(UMOEndpointURI url, UMOConnector cnn, int type) throws ConnectorFactoryException
     {
         UMOTransformer trans = null;
-        if (url.getTransformers() != null) {
+        String transId = null;
+        if (type==2) {
+            transId = url.getResponseTransformers();
+        } else  {
+            transId = url.getResponseTransformers();
+        }
+
+        if (transId != null) {
             try {
-                trans = MuleObjectHelper.getTransformer(url.getTransformers(), ",");
+                trans = MuleObjectHelper.getTransformer(transId, ",");
             } catch (MuleException e) {
                 throw new ConnectorFactoryException(e);
             }
@@ -141,10 +160,12 @@ public class ConnectorFactory
             String scheme = url.getSchemeMetaInfo();
 
             ConnectorServiceDescriptor csd = getServiceDescriptor(scheme, overrides);
-            if (inbound) {
+            if (type==0) {
                 trans = csd.createInboundTransformer();
-            } else {
+            } else if(type==1) {
                 trans = csd.createOutboundTransformer();
+            } else {
+                trans = csd.createResponseTransformer();
             }
         }
         return trans;
