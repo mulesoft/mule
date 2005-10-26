@@ -7,23 +7,23 @@
 
     <mule-environment-properties serverUrl=""/>
 
-	<global-endpoints>
-		<endpoint name="quartz.in" address="quartz:/myService">
-			<properties>
-				<property name="repeatInterval" value="1000" />
-				<property name="payload" value="quartz test" />
-			</properties>
-		</endpoint>
-	</global-endpoints>
+    <global-endpoints>
+        <endpoint name="quartz.in" address="quartz:/myService">
+            <properties>
+                <property name="repeatInterval" value="1000" />
+                <property name="payload" value="quartz test" />
+            </properties>
+        </endpoint>
+    </global-endpoints>
 
-	<model name="quartz">
-	
-		<mule-descriptor 
-			name="quartzService"
-			implementation="org.mule.providers.quartz.TestComponent"
-			inboundEndpoint="quartz.in">
+    <model name="quartz">
 
-		</mule-descriptor>
-	</model>
+        <mule-descriptor
+            name="quartzService"
+            implementation="org.mule.providers.quartz.TestComponent"
+            inboundEndpoint="quartz.in">
+
+        </mule-descriptor>
+    </model>
 
 </mule-configuration>
