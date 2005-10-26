@@ -39,7 +39,7 @@ public class SenderAndReceiver
         }
     }
 
-    public SenderAndReceiver(RunnerConfig config) throws UMOException
+    public SenderAndReceiver(RunnerConfig config) throws Exception
     {
         sender = new Sender(config);
         receiver = new Receiver(config);

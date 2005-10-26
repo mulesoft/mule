@@ -14,13 +14,21 @@
 package org.mule.tools.benchmark;
 
 import org.mule.MuleManager;
+import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.util.timer.EventTimerTask;
 import org.mule.util.timer.TimeEvent;
 import org.mule.util.timer.TimeEventListener;
+import org.mule.util.PropertiesHelper;
 
 import java.text.NumberFormat;
 import java.util.Timer;
+import java.util.Properties;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>Runner</code> is responsible for running benchmark tests
@@ -56,13 +64,34 @@ public class Runner implements TimeEventListener
         }
     }
 
-    public Runner(RunnerConfig config) throws UMOException
+    public Runner(RunnerConfig config) throws Exception
     {
         this.config = config;
         System.out.println("Using config:");
         System.out.println(config.toString());
+        loadConnectors();
     }
 
+    protected void loadConnectors() throws Exception {
+        List protocols = new ArrayList();
+        if(config.getConnectorConfig()!=null) {
+            Properties props = PropertiesHelper.loadProperties(config.getConnectorConfig());
+            for (Iterator iterator = protocols.iterator(); iterator.hasNext();) {
+                Map.Entry entry = (Map.Entry) iterator.next();
+                String key = entry.getKey().toString();
+                String protocol = key.substring(0, key.indexOf("."));
+                if(!protocols.contains(protocol)) {
+                    protocols.add(protocol);
+                    Map pp = PropertiesHelper.getPropertiesWithPrefix(props, protocol);
+                    UMOConnector cnn = ConnectorFactory.getServiceDescriptor(protocol).createConnector(protocol);
+                    cnn.setName(cnn.toString());
+                    pp = PropertiesHelper.removeNamspaces(pp);
+                    org.mule.util.BeanUtils.populateWithoutFail(cnn, pp, true);
+                    MuleManager.getInstance().registerConnector(cnn);
+                }
+            }
+        }
+    }
 
     public void start() throws UMOException
     {

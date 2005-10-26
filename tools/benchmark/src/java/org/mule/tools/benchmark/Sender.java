@@ -14,7 +14,7 @@
 package org.mule.tools.benchmark;
 
 import org.mule.umo.UMOException;
-import org.mule.umo.UMOManager;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -29,7 +29,6 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.codehaus.activemq.ActiveMQConnectionFactory;
 
 import java.util.Arrays;
 
@@ -39,88 +38,74 @@ import java.util.Arrays;
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
  * @version $Revision$
  */
-public class Sender extends Runner
-{
-    public static void main(String[] args)
-    {
-        try
-        {
+public class Sender extends Runner {
+    public static void main(String[] args) {
+        try {
             Sender sender = new Sender(new RunnerConfig(args));
             sender.start();
             sender.send();
-        } catch (Throwable e)
-        {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    public Sender(RunnerConfig config) throws UMOException
-    {
+    public Sender(RunnerConfig config) throws Exception {
         super(config);
         init();
     }
 
-    protected void init() throws UMOException
-        {
-            QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
-            ThreadingProfile tp = new ThreadingProfile(config.getConnectorThreads(), config.getConnectorThreads(), -1, (byte)2, null, null);
-            MuleManager.getConfiguration().setMessageReceiverThreadingProfile(tp);
-            MuleManager.getConfiguration().setMessageDispatcherThreadingProfile(tp);
+    protected void init() throws UMOException {
+        QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
+        builder.setModel(config.getModel());
+        ThreadingProfile tp = new ThreadingProfile(config.getConnectorThreads(), config.getConnectorThreads(), -1, (byte) 2, null, null);
+        MuleManager.getConfiguration().setMessageReceiverThreadingProfile(tp);
+        MuleManager.getConfiguration().setMessageDispatcherThreadingProfile(tp);
 
-            UMOManager manager = builder.createStartedManager(config.isSynchronous(), "");
-            manager.stop();
-            if(config.isUsingJms()) {
-                JmsConnector c = new JmsConnector();
-                c.setName("jmsConnector");
-                c.setConnectionFactory(new ActiveMQConnectionFactory());
-                c.setSpecification(JmsConnector.JMS_SPECIFICATION_11);
-                manager.registerConnector(c);
-            }
-            if(config.getEndpointsArray().length > 1) {
+        UMOManager manager = builder.createStartedManager(config.isSynchronous(), "");
+        manager.stop();
 
-                int j=1;
-                String in;
-                String out;
-                String[] endpoints = config.getEndpointsArray();
-                for (int i=0;i < endpoints.length -1;i++)
-                {
-                    in = endpoints[i];
-                    if((i+1) <= endpoints.length) {
-                        out = endpoints[i+1];
-                    } else {
-                        break;
-                    }
-                    MuleDescriptor d = createDescriptor("benchmark"+j, in, out);
-                    builder.registerComponent(d);
-                    j++;
+        if (config.getEndpointsArray().length > 1) {
+
+            int j = 1;
+            String in;
+            String out;
+            String[] endpoints = config.getEndpointsArray();
+            for (int i = 0; i < endpoints.length - 1; i++) {
+                in = endpoints[i];
+                if ((i + 1) <= endpoints.length) {
+                    out = endpoints[i + 1];
+                } else {
+                    break;
                 }
+                MuleDescriptor d = createDescriptor("benchmark" + j, in, out);
+                builder.registerComponent(d);
+                j++;
             }
         }
+    }
 
-        protected MuleDescriptor createDescriptor(String name, String in, String out) throws EndpointException, MuleException
-        {
-            UMOEndpointURI inbound = null;
-            UMOEndpointURI outbound = null;
-            if(in!=null) inbound = new MuleEndpointURI(in);
-            if(out!=null) outbound = new MuleEndpointURI(out);
+    protected MuleDescriptor createDescriptor(String name, String in, String out) throws EndpointException, MuleException {
+        UMOEndpointURI inbound = null;
+        UMOEndpointURI outbound = null;
+        if (in != null) inbound = new MuleEndpointURI(in);
+        if (out != null) outbound = new MuleEndpointURI(out);
 
-            MuleDescriptor d = new MuleDescriptor(name);
-            d.setImplementation(BenchmarkComponent.class.getName());
-            d.setThreadingProfile(new ThreadingProfile(config.getThreads(), config.getThreads(), -1, (byte)4, null, null));
-            d.setQueueProfile(new QueueProfile(config.getQueue(), null));
-            d.setPoolingProfile(new PoolingProfile(config.getThreads(),config.getThreads(), 0, (byte)2, PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS));
-            d.setInboundEndpoint(ConnectorFactory.createEndpoint(inbound, UMOEndpoint.ENDPOINT_TYPE_RECEIVER));
+        MuleDescriptor d = new MuleDescriptor(name);
+        d.setImplementation(BenchmarkComponent.class.getName());
+        d.setThreadingProfile(new ThreadingProfile(config.getThreads(), config.getThreads(), -1, (byte) 4, null, null));
+        d.setQueueProfile(new QueueProfile(config.getQueue(), false));
+        d.setPoolingProfile(new PoolingProfile(config.getThreads(), config.getThreads(), 0, (byte) 2, PoolingProfile.POOL_INITIALISE_ALL_COMPONENTS));
+        d.setInboundEndpoint(ConnectorFactory.createEndpoint(inbound, UMOEndpoint.ENDPOINT_TYPE_RECEIVER));
 
-            if(outbound!=null) {
-                d.setOutboundEndpoint(ConnectorFactory.createEndpoint(outbound, UMOEndpoint.ENDPOINT_TYPE_SENDER));
-            }
-            return d;
+        if (outbound != null) {
+            d.setOutboundEndpoint(ConnectorFactory.createEndpoint(outbound, UMOEndpoint.ENDPOINT_TYPE_SENDER));
         }
+        return d;
+    }
 
-    public void send() throws UMOException
-    {
+    public void send() throws UMOException {
         byte[] msg = new byte[config.getMessageSize()];
-        Arrays.fill(msg,  (byte)0);
+        Arrays.fill(msg, (byte) 0);
         String message = new String(msg);
 
         MuleClient client = new MuleClient();
@@ -128,16 +113,14 @@ public class Sender extends Runner
 
         System.out.println("Starting sender on : " + endpoint);
         System.out.println("Message length: " + message.length());
-        for (int i = 0; i < config.getMessages(); i++)
-        {
+        for (int i = 0; i < config.getMessages(); i++) {
             client.dispatch(endpoint, message, null);
             count(1);
         }
         printReport();
     }
 
-    protected void printReport()
-    {
+    protected void printReport() {
         System.out.println("Sent : " + config.getMessages() + " Messages");
     }
 }

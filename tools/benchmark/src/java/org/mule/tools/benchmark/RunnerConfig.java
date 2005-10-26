@@ -31,6 +31,8 @@ public class RunnerConfig
     public static final String ARG_EXECUTION_TIME = "-execTime";
     public static final String ARG_SYNCHRONOUS = "-sync";
     public static final String ARG_ENDPOINTS = "-endpoints";
+    public static final String ARG_MODEL = "-model";
+    public static final String ARG_CONNECTOR_CONFIG = "-connectorConfig";
 
     private int messages = 1000;
     private int messageSize = 1024;
@@ -39,9 +41,11 @@ public class RunnerConfig
     private int queue = 1000;
     private long executionTime = 0;
     private boolean synchronous = false;
-    private boolean usingJms = false;
     private String endpoints = null;
     private String[] endpointsArray = new String[]{};
+
+    private String model = "default";
+    private String connectorConfig;
 
     public RunnerConfig() {}
 
@@ -60,6 +64,8 @@ public class RunnerConfig
         setExecutionTime(getLongOpt(args, ARG_EXECUTION_TIME, getExecutionTime()));
         setSynchronous(getBooleanOpt(args, ARG_SYNCHRONOUS));
         setEndpoints(getOpt(args, ARG_ENDPOINTS, getEndpoints()));
+        setModel(getOpt(args, ARG_MODEL, getModel()));
+        setConnectorConfig(getOpt(args, ARG_CONNECTOR_CONFIG, getConnectorConfig()));
     }
 
     private int getIntOpt(String[] args, String name, int defaultValue)
@@ -130,13 +136,6 @@ public class RunnerConfig
         this.endpoints = endpoints;
         if(endpoints!=null) {
             endpointsArray = Utility.split(endpoints,  ",");
-            for (int i = 0; i < endpointsArray.length; i++)
-            {
-                if(endpointsArray[i].startsWith("jms")) {
-                   usingJms = true;
-                    break;
-                }
-            }
         } else {
             throw new IllegalArgumentException("you must specify at least one endpoint");
         }
@@ -207,14 +206,20 @@ public class RunnerConfig
         this.executionTime = executionTime;
     }
 
-    public boolean isUsingJms()
-    {
-        return usingJms;
+    public String getModel() {
+        return model;
     }
 
-    public void setUsingJms(boolean usingJms)
-    {
-        this.usingJms = usingJms;
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getConnectorConfig() {
+        return connectorConfig;
+    }
+
+    public void setConnectorConfig(String connectorConfig) {
+        this.connectorConfig = connectorConfig;
     }
 
     public String toString() {
@@ -226,6 +231,8 @@ public class RunnerConfig
         buffer.append("Queue=").append(queue).append("\n");
         buffer.append("Synchronous=").append(synchronous).append("\n");
         buffer.append("Endpoints=").append(endpoints).append("\n");
+        buffer.append("Model=").append(model).append("\n");
+        buffer.append("Connector Config=").append(connectorConfig).append("\n");
         buffer.append("ExecTime=").append(executionTime);
         return buffer.toString();
     }
@@ -241,5 +248,7 @@ public class RunnerConfig
         System.out.println("-queue : event queue size");
         System.out.println("-execTime : Component execution time in ms");
         System.out.println("-synchronous : Run synchronously");
+        System.out.println("-model : The model type to use i.e. seda, jms, pipeline");
+        System.out.println("-connectorConfig : A Property file containing Connector information such as Jndi settings");
     }
 }

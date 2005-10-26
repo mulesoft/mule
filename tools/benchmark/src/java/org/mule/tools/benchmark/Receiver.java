@@ -46,7 +46,7 @@ public class Receiver extends Runner // implements Callable
         }
     }
 
-    public Receiver(RunnerConfig config) throws UMOException
+    public Receiver(RunnerConfig config) throws Exception
     {
         super(config);
     }
@@ -54,6 +54,8 @@ public class Receiver extends Runner // implements Callable
     public void register() throws UMOException
     {
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+
+        builder.setModel(config.getModel());
         String endpoint = config.getEndpointsArray()[config.getEndpointsArray().length-1];
         EventCallback callback = new EventCallback()
         {
