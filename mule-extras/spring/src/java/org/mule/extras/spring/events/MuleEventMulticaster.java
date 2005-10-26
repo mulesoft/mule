@@ -53,6 +53,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
@@ -258,9 +259,10 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
             } else {
                 initMule();
             }
-        }
-
-        if (e instanceof MuleApplicationEvent) {
+        } else if(e instanceof ContextClosedEvent) {
+            MuleManager.getInstance().dispose();
+            return;
+        }else if (e instanceof MuleApplicationEvent) {
             muleEvent = (MuleApplicationEvent) e;
             // If there is no Mule event the event didn't originate from Mule
             // so its an outbound event
