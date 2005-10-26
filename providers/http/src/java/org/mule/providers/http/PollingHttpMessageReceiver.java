@@ -24,6 +24,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.PropertiesHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -45,6 +46,11 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
 
     public PollingHttpMessageReceiver(UMOConnector connector, UMOComponent component, final UMOEndpoint endpoint) throws InitialisationException {
         this(connector, component, endpoint, new Long(1000));
+
+        long pollingFrequency = PropertiesHelper.getLongProperty(endpoint.getProperties(), "pollingFrequency", -1);
+        if(pollingFrequency > 0) {
+            setFrequency(pollingFrequency);
+        }
     }
 
     public PollingHttpMessageReceiver(UMOConnector connector, UMOComponent component, final UMOEndpoint endpoint, Long frequency) throws InitialisationException {
