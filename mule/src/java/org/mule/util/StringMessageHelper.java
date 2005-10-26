@@ -15,9 +15,15 @@
 
 package org.mule.util;
 
+import org.mule.MuleManager;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.CoreMessageConstants;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.UnsupportedEncodingException;
 
 /**
  * <code>StringMessageHelper</code> contains some useful methods for
@@ -28,6 +34,11 @@ import java.util.List;
  */
 public class StringMessageHelper
 {
+    /**
+     * TODO [aperepel] Will need to inject the UMOManager somehow
+     * after MuleManager is no longer a static singleton in v2.0
+     */
+    private static final String MULE_ENCODING = MuleManager.getConfiguration().getEncoding();
 
     public static String getFormattedMessage(String msg, Object[] arguments)
     {
@@ -66,7 +77,7 @@ public class StringMessageHelper
 
     public static String getBoilerPlate(List messages, char c, int maxlength)
     {
-        int size = 0;
+        int size;
         StringBuffer buf = new StringBuffer(messages.size() * maxlength);
         int trimLength = maxlength - 4;
 
@@ -109,7 +120,14 @@ public class StringMessageHelper
             buf.append(c);
             buf.append(" ");
             buf.append(messages.get(i));
-            int padding = trimLength - messages.get(i).toString().length();
+
+            int padding;
+            try {
+                padding = trimLength - messages.get(i).toString().getBytes(MULE_ENCODING).length;
+            } catch (UnsupportedEncodingException ueex) {
+                throw new MuleRuntimeException(
+                        new Message(CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING, MULE_ENCODING));
+            }
             if (padding > 0) {
                 buf.append(charString(' ', padding));
             }
