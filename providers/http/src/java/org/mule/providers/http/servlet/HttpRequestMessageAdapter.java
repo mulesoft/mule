@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * <code>HttpRequestMessageAdapter</code> is a MUle message adapter
@@ -46,8 +47,9 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter {
     public HttpRequestMessageAdapter(Object message) throws MessagingException {
         if (message instanceof HttpServletRequest) {
             setPayload((HttpServletRequest) message);
-            if (request.getParameterMap() != null) {
-                properties.putAll(request.getParameterMap());
+            final Map parameterMap = request.getParameterMap();
+            if (parameterMap != null && parameterMap.size() > 0) {
+                properties.putAll(parameterMap);
             }
             String key;
             for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
@@ -130,7 +132,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter {
                     this.message = buffer.toString();
                 } else {
                     InputStream is = request.getInputStream();
-                    ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     byte[] buffer = new byte[1024 * 32];
                     int len = 0;
                     while ((len = is.read(buffer, len, buffer.length)) != -1) {
