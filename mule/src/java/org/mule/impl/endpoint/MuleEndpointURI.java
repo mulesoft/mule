@@ -59,6 +59,7 @@ public class MuleEndpointURI implements UMOEndpointURI
     private String endpointName;
     private String connectorName;
     private String transformers;
+    private String responseTransformers;
     private int createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
     private Properties params = new Properties();
     private URI uri;
@@ -70,12 +71,13 @@ public class MuleEndpointURI implements UMOEndpointURI
                     String endpointName,
                     String connectorName,
                     String transformers,
+                    String responseTransformers,
                     int createConnector,
                     Properties properties,
                     URI uri,
                     String userInfo)
     {
-        this(address, endpointName, connectorName, transformers, createConnector, properties, uri);
+        this(address, endpointName, connectorName, responseTransformers, transformers, createConnector, properties, uri);
         if (userInfo != null) {
             this.userInfo = userInfo;
         }
@@ -85,6 +87,7 @@ public class MuleEndpointURI implements UMOEndpointURI
                            String endpointName,
                            String connectorName,
                            String transformers,
+                           String responseTransformers,
                            int createConnector,
                            Properties properties,
                            URI uri)
@@ -93,6 +96,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.endpointName = endpointName;
         this.connectorName = connectorName;
         this.transformers = transformers;
+        this.responseTransformers = responseTransformers;
         this.createConnector = createConnector;
         this.params = properties;
         this.uri = uri;
@@ -172,6 +176,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         this.endpointName = endpointUri.getEndpointName();
         this.connectorName = endpointUri.getConnectorName();
         this.transformers = endpointUri.getTransformers();
+        this.responseTransformers = endpointUri.getResponseTransformers();
         this.createConnector = endpointUri.getCreateConnector();
         this.params = endpointUri.getParams();
         this.uri = endpointUri.getUri();
@@ -211,6 +216,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         p.remove(PROPERTY_ENDPOINT_NAME);
         p.remove(PROPERTY_ENDPOINT_URI);
         p.remove(PROPERTY_CREATE_CONNECTOR);
+        p.remove(PROPERTY_TRANSFORMERS);
         p.remove(PROPERTY_TRANSFORMERS);
         return p;
     }
@@ -389,6 +395,10 @@ public class MuleEndpointURI implements UMOEndpointURI
         return null;
     }
 
+    public String getResponseTransformers() {
+        return responseTransformers;
+    }
+
     public String getPassword()
     {
         if (userInfo != null && !"".equals(userInfo)) {
@@ -444,6 +454,10 @@ public class MuleEndpointURI implements UMOEndpointURI
                 : muleEndpointURI.transformers != null) {
             return false;
         }
+        if (responseTransformers != null ? !responseTransformers.equals(muleEndpointURI.responseTransformers)
+                : muleEndpointURI.responseTransformers != null) {
+            return false;
+        }
         if (uri != null ? !uri.equals(muleEndpointURI.uri) : muleEndpointURI.uri != null) {
             return false;
         }
@@ -459,6 +473,7 @@ public class MuleEndpointURI implements UMOEndpointURI
         result = 29 * result + (endpointName != null ? endpointName.hashCode() : 0);
         result = 29 * result + (connectorName != null ? connectorName.hashCode() : 0);
         result = 29 * result + (transformers != null ? transformers.hashCode() : 0);
+        result = 29 * result + (responseTransformers != null ? responseTransformers.hashCode() : 0);
         result = 29 * result + createConnector;
         result = 29 * result + (params != null ? params.hashCode() : 0);
         result = 29 * result + (uri != null ? uri.hashCode() : 0);

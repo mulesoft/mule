@@ -13,17 +13,16 @@
  */
 package org.mule.impl.endpoint;
 
-import java.net.URI;
-import java.net.URLDecoder;
-import java.util.Properties;
-import java.io.UnsupportedEncodingException;
-
+import org.mule.MuleManager;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.util.PropertiesHelper;
-import org.mule.util.SgmlCodec;
-import org.mule.MuleManager;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.util.Properties;
 
 /**
  * <code>UrlEndpointBuilder</code> is the default endpointUri strategy
@@ -35,15 +34,11 @@ import org.mule.MuleManager;
 
 public abstract class AbstractEndpointBuilder implements EndpointBuilder
 {
-    public static final String PROPERTY_ENDPOINT_NAME = "endpointName";
-    public static final String PROPERTY_ENDPOINT_URI = "address";
-    public static final String PROPERTY_CREATE_CONNECTOR = "createConnector";
-    public static final String PROPERTY_CONNECTOR_NAME = "connector";
-    public static final String PROPERTY_TRANSFORMERS = "transformers";
     protected String address;
     protected String endpointName;
     protected String connectorName;
     protected String transformers;
+    protected String responseTransformers;
     protected String userInfo;
 
 
@@ -60,6 +55,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                                                 endpointName,
                                                 connectorName,
                                                 transformers,
+                                                responseTransformers,
                                                 createConnector,
                                                 props,
                                                 uri,
@@ -68,6 +64,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         endpointName = null;
         connectorName = null;
         transformers = null;
+        responseTransformers = null;
         createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
         return ep;
     }
@@ -77,23 +74,23 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected Properties getPropertiesForURI(URI uri) throws MalformedEndpointException {
         Properties properties = PropertiesHelper.getPropertiesFromQueryString(uri.getQuery());
 
-        String tempEndpointName = (String) properties.get(PROPERTY_ENDPOINT_NAME);
+        String tempEndpointName = (String) properties.get(UMOEndpointURI.PROPERTY_ENDPOINT_NAME);
         if (tempEndpointName != null) {
             this.endpointName = tempEndpointName;
         }
         // override the endpointUri if set
-        String endpoint = (String) properties.get(PROPERTY_ENDPOINT_URI);
+        String endpoint = (String) properties.get(UMOEndpointURI.PROPERTY_ENDPOINT_URI);
         if (endpoint != null) {
             this.address = endpoint;
             address = decode(address, uri);
         }
 
-        String cnnName = (String) properties.get(PROPERTY_CONNECTOR_NAME);
+        String cnnName = (String) properties.get(UMOEndpointURI.PROPERTY_CONNECTOR_NAME);
         if (cnnName != null) {
             this.connectorName = cnnName;
         }
 
-        String create = (String) properties.get(PROPERTY_CREATE_CONNECTOR);
+        String create = (String) properties.get(UMOEndpointURI.PROPERTY_CREATE_CONNECTOR);
         if (create != null) {
             if ("0".equals(create)) {
                 this.createConnector = ConnectorFactory.GET_OR_CREATE_CONNECTOR;
@@ -114,9 +111,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         }
 
-        transformers = (String) properties.get(PROPERTY_TRANSFORMERS);
+        transformers = (String) properties.get(UMOEndpointURI.PROPERTY_TRANSFORMERS);
         if (transformers != null) {
             transformers = transformers.replaceAll(" ", ",");
+        }
+        responseTransformers = (String) properties.get(UMOEndpointURI.PROPERTY_RESPONSE_TRANSFORMERS);
+        if (responseTransformers != null) {
+            responseTransformers = transformers.replaceAll(" ", ",");
         }
         //If we have user info, decode it as it might contain '@' or other encodable characters
         userInfo = uri.getUserInfo();
