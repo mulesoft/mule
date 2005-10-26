@@ -84,7 +84,9 @@ public class StringMessageHelperTestCase extends TestCase
         msgs.add("Boiler Plate");
 
         String plate = StringMessageHelper.getBoilerPlate(msgs, '*', 12);
-        assertEquals("\n************\n* This     *\n* is a     *\n* Boiler   *\n* Plate    *\n************", plate);
+        assertEquals((char) Character.LINE_SEPARATOR + "************" + (char) Character.LINE_SEPARATOR + "* This     *" +
+                     (char) Character.LINE_SEPARATOR + "* is a     *" + (char) Character.LINE_SEPARATOR + "* Boiler   *" +
+                     (char) Character.LINE_SEPARATOR + "* Plate    *" + (char) Character.LINE_SEPARATOR + "************", plate);
 
     }
 
@@ -96,7 +98,15 @@ public class StringMessageHelperTestCase extends TestCase
         msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
 
         String plate = StringMessageHelper.getBoilerPlate(msgs, '*', 12);
-        assertEquals("\n************\n* This     *\n* is a     *\n* Boiler   *\n* Plate    *\n* Message  *\n* that     *\n* should   *\n* get      *\n* wrapped  *\n* to the   *\n* next     *\n* line if  *\n* it is    *\n* working  *\n* properly *\n************",
+        assertEquals((char) Character.LINE_SEPARATOR + "************" + (char) Character.LINE_SEPARATOR +
+                     "* This     *" + (char) Character.LINE_SEPARATOR + "* is a     *" + (char) Character.LINE_SEPARATOR +
+                     "* Boiler   *" + (char) Character.LINE_SEPARATOR + "* Plate    *" + (char) Character.LINE_SEPARATOR +
+                     "* Message  *" + (char) Character.LINE_SEPARATOR + "* that     *" + (char) Character.LINE_SEPARATOR +
+                     "* should   *" + (char) Character.LINE_SEPARATOR + "* get      *" + (char) Character.LINE_SEPARATOR +
+                     "* wrapped  *" + (char) Character.LINE_SEPARATOR + "* to the   *" + (char) Character.LINE_SEPARATOR +
+                     "* next     *" + (char) Character.LINE_SEPARATOR + "* line if  *" + (char) Character.LINE_SEPARATOR +
+                     "* it is    *" + (char) Character.LINE_SEPARATOR + "* working  *" + (char) Character.LINE_SEPARATOR +
+                     "* properly *" + (char) Character.LINE_SEPARATOR + "************",
                      plate);
     }
 
