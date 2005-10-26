@@ -445,14 +445,18 @@
         <j:if test="${pom.artifactId!='mule'}">
             <echo>Copying src for ${pom.artifactId} dir is ${maven.src.dir}</echo>
             <j:if test="${pom.artifactId=='mule-core'}">
-                <copy todir="${basedir}/../target/release/src/">
-                    <fileset dir="${maven.src.dir}"/>
-                </copy>
+                <u:available file="${maven.src.dir}">
+                    <copy todir="${basedir}/../target/release/src/">
+                        <fileset dir="${maven.src.dir}"/>
+                    </copy>
+                </u:available>
             </j:if>
             <j:if test="${pom.artifactId!='mule-core'}">
-                <copy todir="${basedir}/../../target/release/src/">
-                    <fileset dir="${maven.src.dir}"/>
-                </copy>
+                <u:available file="${maven.src.dir}">
+                    <copy todir="${basedir}/../../target/release/src/">
+                        <fileset dir="${maven.src.dir}"/>
+                    </copy>
+                </u:available>
             </j:if>
         </j:if>
     </goal>
