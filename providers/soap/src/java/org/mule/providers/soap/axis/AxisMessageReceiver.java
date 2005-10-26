@@ -16,7 +16,6 @@ package org.mule.providers.soap.axis;
 import org.apache.axis.AxisProperties;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
-import org.apache.axis.description.ServiceDesc;
 import org.apache.axis.encoding.TypeMappingRegistryImpl;
 import org.apache.axis.encoding.ser.BeanDeserializerFactory;
 import org.apache.axis.encoding.ser.BeanSerializerFactory;
@@ -152,17 +151,6 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             setOptionIfNotset(service, RPCProvider.OPTION_ALLOWEDMETHODS, methodNames);
         }
 
-        /*
-         * Create a service description. This tells Axis that this service
-         * exists and also what it can execute on this service. It is created
-         * with all the options we set above.
-         */
-        ServiceDesc sd = service.getInitializedServiceDesc(null);
-        sd.setName(serviceName);
-        if(uri.getScheme().equalsIgnoreCase("servlet")) {
-            connector.addServletService(service);
-        }
-        sd.setEndpointURL(uri.getAddress() + "/" + serviceName);
 
         String style = (String) descriptor.getProperties().get("style");
         String use = (String) descriptor.getProperties().get("use");
@@ -176,7 +164,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             if(s==null) {
                 throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, style, "style"), this);
             } else {
-                sd.setStyle(s);
+                service.setStyle(s);
             }
         }
         // Set use: Endcoded/Literal
@@ -185,10 +173,10 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             if(u==null) {
                 throw new InitialisationException(new Message(Messages.VALUE_X_IS_INVALID_FOR_X, use, "use"), this);
             } else {
-                sd.setUse(u);
+                service.setUse(u);
             }
         }
-        sd.setDocumentation(doc);
+        service.getServiceDescription().setDocumentation(doc);
 
         // Tell Axis to try and be intelligent about serialization.
         TypeMappingRegistryImpl registry = (TypeMappingRegistryImpl) service.getTypeMappingRegistry();
@@ -205,9 +193,19 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         registerTypes(registry, connector.getBeanTypes());
 
         service.setName(serviceName);
-        service.stop();
+
         // Add initialisation callback for the Axis service
         descriptor.addInitialisationCallback(new AxisInitialisationCallback(service));
+
+        if(uri.getScheme().equalsIgnoreCase("servlet")) {
+            connector.addServletService(service);
+            String endpointUrl = uri.getAddress() + "/" + serviceName;
+            endpointUrl.replaceFirst("servlet:", "http:");
+            service.getServiceDescription().setEndpointURL(endpointUrl);
+        } else {
+            service.getServiceDescription().setEndpointURL(uri.getAddress() + "/" + serviceName);
+        }
+        service.stop();
     }
 
     public void doConnect() throws Exception
