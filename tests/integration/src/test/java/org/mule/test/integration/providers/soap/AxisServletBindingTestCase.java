@@ -20,6 +20,13 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.util.InetAddrPort;
 import org.mule.providers.http.servlet.MuleReceiverServlet;
+import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.HttpConnector;
+import org.mule.extras.client.MuleClient;
+import org.mule.umo.UMOMessage;
+
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -88,5 +95,14 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 
     protected String getTestExceptionEndpoint() {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
+    }
+
+    public void testLocationUrlInWSDL() throws Exception {
+        Map props = new HashMap();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.send("http://localhost:" + HTTP_PORT + "/services/mycomponent?wsdl", null, props);
+        assertNotNull(result);
+        assertTrue(result.getPayloadAsString().indexOf("location=\"http://localhost:" + HTTP_PORT + "/services/mycomponent") > -1);
     }
 }
