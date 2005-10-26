@@ -555,6 +555,13 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             transformer.setEndpoint(this);
         }
 
+        if (endpointUri.getResponseTransformers() != null) {
+            try {
+                responseTransformer = MuleObjectHelper.getTransformer(endpointUri.getResponseTransformers(), ",");
+            } catch (MuleException e) {
+                throw new InitialisationException(e, this);
+            }
+        }
         if (responseTransformer == null) {
             if (connector instanceof AbstractConnector) {
                 responseTransformer = ((AbstractConnector) connector).getDefaultResponseTransformer();

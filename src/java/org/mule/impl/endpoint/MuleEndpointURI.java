@@ -77,7 +77,7 @@ public class MuleEndpointURI implements UMOEndpointURI
                     URI uri,
                     String userInfo)
     {
-        this(address, endpointName, connectorName, responseTransformers, transformers, createConnector, properties, uri);
+        this(address, endpointName, connectorName, transformers, responseTransformers, createConnector, properties, uri);
         if (userInfo != null) {
             this.userInfo = userInfo;
         }
