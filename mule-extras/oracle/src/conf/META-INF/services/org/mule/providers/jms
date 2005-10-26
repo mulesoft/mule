@@ -1,7 +1,0 @@
-connector=org.mule.extras.oracle.jms.OracleJmsConnector
-dispatcher.factory=org.mule.extras.oracle.jms.OracleJmsMessageDispatcherFactory
-message.receiver=org.mule.extras.oracle.jms.OracleJmsMessageReceiver
-message.adapter=org.mule.extras.oracle.jms.OracleJmsMessageAdapter
-inbound.transformer=org.mule.providers.jms.transformers.JMSMessageToObject
-outbound.transformer=org.mule.providers.jms.transformers.ObjectToJMSMessage
-endpoint.builder=org.mule.impl.endpoint.ResourceNameEndpointBuilder
