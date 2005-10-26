@@ -527,6 +527,39 @@
             <version>${quartz_version}</version>
             <url>http://www.opensymphony.com/quartz/</url>
         </dependency>
+        <!-- Oracle deps -->
+        <dependency>
+            <groupId>oracle-jdbc</groupId>
+            <artifactId>ojdbc</artifactId>
+            <jar>ojdbc14.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>aqapi</artifactId>
+            <jar>aqapi13.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-jms</groupId>
+            <artifactId>jmscommon</artifactId>
+            <jar>jmscommon.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+
+		<!-- For XMLType support only -->
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xdb</artifactId>
+            <jar>xdb.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
+        <dependency>
+            <groupId>oracle-xdb</groupId>
+            <artifactId>xmlparserv2</artifactId>
+            <jar>xmlparserv2.jar</jar>
+			<url>http://www.oracle.com</url>
+        </dependency>
     </dependencies>
      <build>
         <sourceDirectory>${basedir}/src/test/java</sourceDirectory>
