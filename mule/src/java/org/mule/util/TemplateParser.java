@@ -114,7 +114,7 @@ public class TemplateParser
         if(templates==null) return new HashMap();
         Map map = new HashMap(templates.size());
         Map.Entry entry;
-        for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = templates.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry)iterator.next();
             map.put(entry.getKey(), parse(props, entry.getValue().toString()));
         }
