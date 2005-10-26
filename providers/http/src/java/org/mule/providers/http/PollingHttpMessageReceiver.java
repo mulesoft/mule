@@ -33,7 +33,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * todo document
+ * Will poll an http URL and use the response as the input for a service
+ * request.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
