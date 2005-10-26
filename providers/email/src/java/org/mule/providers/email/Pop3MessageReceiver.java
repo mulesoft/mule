@@ -291,7 +291,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
         try {
             if (folder != null)
                 folder.close(false);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             logger.error("Failed to close pop3  inbox: " + e.getMessage());
         }
     }
