@@ -18,7 +18,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobDataMap;
 import org.mule.providers.quartz.QuartzConnector;
-import org.mule.providers.NullPayload;
 import org.mule.config.i18n.Message;
 import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;

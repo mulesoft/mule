@@ -17,7 +17,6 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobDataMap;
-import org.mule.umo.provider.DispatchException;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.config.i18n.Message;
 import org.mule.MuleManager;
@@ -34,7 +33,7 @@ import org.mule.providers.quartz.QuartzConnector;
  * @version $Revision$
  */
 public class DelegatingJob implements Job 
- {
+{
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         Object tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_OBJECT);

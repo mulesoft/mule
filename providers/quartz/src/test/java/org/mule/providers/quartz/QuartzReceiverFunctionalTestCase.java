@@ -18,13 +18,8 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.extras.client.MuleClient;
-import org.mule.providers.quartz.jobs.MuleClientReceiveJob;
 import org.mule.tck.NamedTestCase;
 import org.mule.util.concurrent.CountDownLatch;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 
