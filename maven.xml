@@ -245,7 +245,6 @@
         <attainGoal name="mule:samples"/>
         <attainGoal name="mule:src"/>
         <attainGoal name="mule:tools"/>
-        <attainGoal name="mule:i18n"/>
 
         <copy todir="${mule.release.dir}" file="${basedir}/LICENSE.txt"/>
         <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
@@ -306,21 +305,28 @@
         <j:set var="mule.release.tools.dir" value="${mule.release.dir}\tools"/>
         <mkdir dir="${mule.release.tools.dir}"/>
 
-        <mkdir dir="${mule.release.tools.dir}/benchmark"/>
-        <copy todir="${mule.release.tools.dir}/benchmark">
-            <fileset dir="${basedir}/tools/benchmark">
+        <mkdir dir="${mule.release.tools.dir}/config-graph"/>
+        <copy todir="${mule.release.tools.dir}/config-graph">
+            <fileset dir="${basedir}/tools/config-graph">
                 <exclude name="target/"/>
                 <exclude name="*.iml"/>
             </fileset>
         </copy>
-    </goal>
-    
-    <goal name="mule:i18n" prereqs="setvars">
-        <j:set var="mule.release.i18n.dir" value="${mule.release.lib.opt.dir}"/>
-        <mkdir dir="${mule.release.i18n.dir}"/>
-	
-	<copy todir="${mule.release.i18n.dir}">
-            <fileset dir="${basedir}/etc/i18n" includes="**/*.jar"/>
+
+        <mkdir dir="${mule.release.tools.dir}/mule-ide"/>
+        <copy todir="${mule.release.tools.dir}/mule-ide">
+            <fileset dir="${basedir}/tools/mule-ide">
+                <exclude name="target/"/>
+                <exclude name="*.iml"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${mule.release.tools.dir}/launcher"/>
+        <copy todir="${mule.release.tools.dir}/launcher">
+            <fileset dir="${basedir}/tools/launcher">
+                <exclude name="target/"/>
+                <exclude name="*.iml"/>
+            </fileset>
         </copy>
     </goal>
 

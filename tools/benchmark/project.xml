@@ -13,7 +13,7 @@
     <description>
     Tools for benchmarking Mule
     </description>
-    <url>http://wiki.muleumo.org/display/MULEPROJ/Benchmark+Tests</url>
+    <url>http://mule.codehaus.org/Benchmark+Tests</url>
     <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
     <siteAddress>www.muleumo.org</siteAddress>
     <siteDirectory>/var/www/html/muleumo.org</siteDirectory>
