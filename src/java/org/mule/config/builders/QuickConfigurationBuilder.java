@@ -23,6 +23,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.ModelFactory;
+import org.mule.impl.model.ModelServiceNotFoundException;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -84,6 +85,9 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         }
     }
 
+    public void setModel(String model) throws UMOException {
+        manager.setModel(ModelFactory.createModel(model));
+    }
     /**
      * Configures a started manager. This method will throw
      * InitialisationException if the current manager is already started
