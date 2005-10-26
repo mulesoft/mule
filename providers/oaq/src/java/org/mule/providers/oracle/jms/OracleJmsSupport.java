@@ -101,7 +101,7 @@ public class OracleJmsSupport extends Jms102bSupport {
 		}
     	
     	// Add the connection to the list of open JMS connections maintained by the connector. 
-    	// @see org.mule.extras.oracle.jms.OracleJmsConnector#connections */
+    	// @see org.mule.providers.oracle.jms.OracleJmsConnector#connections */
 		((OracleJmsConnector) connector).getConnections().add(jmsConnection);
 
 		return jmsConnection;

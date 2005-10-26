@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-
     <extend>${basedir}/../mule/project.xml</extend>
     <pomVersion>3</pomVersion>
     <name>Mule Tests</name>
@@ -149,7 +148,7 @@
 
         <!-- Oracle tests -->
         <dependency>
-            <artifactId>mule-extras-oracle</artifactId>
+            <artifactId>mule-oracle-jms-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
             <url>http://www.muleumo.org</url>
@@ -526,39 +525,6 @@
             <artifactId>quartz</artifactId>
             <version>${quartz_version}</version>
             <url>http://www.opensymphony.com/quartz/</url>
-        </dependency>
-        <!-- Oracle deps -->
-        <dependency>
-            <groupId>oracle-jdbc</groupId>
-            <artifactId>ojdbc</artifactId>
-            <jar>ojdbc14.jar</jar>
-			<url>http://www.oracle.com</url>
-        </dependency>
-        <dependency>
-            <groupId>oracle-jms</groupId>
-            <artifactId>aqapi</artifactId>
-            <jar>aqapi13.jar</jar>
-			<url>http://www.oracle.com</url>
-        </dependency>
-        <dependency>
-            <groupId>oracle-jms</groupId>
-            <artifactId>jmscommon</artifactId>
-            <jar>jmscommon.jar</jar>
-			<url>http://www.oracle.com</url>
-        </dependency>
-
-		<!-- For XMLType support only -->
-        <dependency>
-            <groupId>oracle-xdb</groupId>
-            <artifactId>xdb</artifactId>
-            <jar>xdb.jar</jar>
-			<url>http://www.oracle.com</url>
-        </dependency>
-        <dependency>
-            <groupId>oracle-xdb</groupId>
-            <artifactId>xmlparserv2</artifactId>
-            <jar>xmlparserv2.jar</jar>
-			<url>http://www.oracle.com</url>
         </dependency>
     </dependencies>
      <build>

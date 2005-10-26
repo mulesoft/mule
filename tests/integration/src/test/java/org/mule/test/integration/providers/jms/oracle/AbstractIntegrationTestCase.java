@@ -8,7 +8,7 @@ import org.mule.config.ReaderResource;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.umo.manager.UMOManager;
 
-import org.mule.extras.oracle.jms.*;
+import org.mule.providers.oracle.jms.*;
 
 /**
  * Configures and starts the Mule server for integration testing.
@@ -41,7 +41,7 @@ public class AbstractIntegrationTestCase extends AbstractXmlTestCase {
     	return 
     	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<!DOCTYPE mule-configuration PUBLIC \"-//SymphonySoft //DTD mule-configuration XML V1.0//EN\" \"http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd\">" +
     	"<mule-configuration id=\"TestConfiguration\" version=\"1.0\">" +
-    	"<connector name=\"TestConnector\" className=\"org.mule.extras.oracle.jms.OracleJmsConnector\">" +
+    	"<connector name=\"TestConnector\" className=\"org.mule.providers.oracle.jms.OracleJmsConnector\">" +
     	    "<properties>" +
     			"<property name=\"url\" value=\"" + TestConfig.DB_URL + "\" />" + 
     	        "<property name=\"username\" value=\"" + TestConfig.DB_USER + "\" />" +
@@ -51,10 +51,10 @@ public class AbstractIntegrationTestCase extends AbstractXmlTestCase {
         "<transformers>" +
             "<transformer name=\"ObjectToJMSMessage\" className=\"org.mule.providers.jms.transformers.ObjectToJMSMessage\" returnClass=\"javax.jms.Message\" />" +
             "<transformer name=\"JMSMessageToObject\" className=\"org.mule.providers.jms.transformers.JMSMessageToObject\" returnClass=\"java.lang.Object\" />" +
-            "<transformer name=\"StringToXMLMessage\" className=\"org.mule.extras.oracle.jms.transformers.StringToXMLMessage\" returnClass=\"oracle.jms.AdtMessage\" />" +
-            "<transformer name=\"XMLMessageToString\" className=\"org.mule.extras.oracle.jms.transformers.XMLMessageToString\" returnClass=\"java.lang.String\" />" +
-            "<transformer name=\"XMLMessageToDOM\" className=\"org.mule.extras.oracle.jms.transformers.XMLMessageToDOM\" returnClass=\"org.w3c.dom.Document\" />" +
-            "<transformer name=\"XMLMessageToStream\" className=\"org.mule.extras.oracle.jms.transformers.XMLMessageToStream\" returnClass=\"java.io.InputStream\" />" +
+            "<transformer name=\"StringToXMLMessage\" className=\"org.mule.providers.oracle.jms.transformers.StringToXMLMessage\" returnClass=\"oracle.jms.AdtMessage\" />" +
+            "<transformer name=\"XMLMessageToString\" className=\"org.mule.providers.oracle.jms.transformers.XMLMessageToString\" returnClass=\"java.lang.String\" />" +
+            "<transformer name=\"XMLMessageToDOM\" className=\"org.mule.providers.oracle.jms.transformers.XMLMessageToDOM\" returnClass=\"org.w3c.dom.Document\" />" +
+            "<transformer name=\"XMLMessageToStream\" className=\"org.mule.providers.oracle.jms.transformers.XMLMessageToStream\" returnClass=\"java.io.InputStream\" />" +
         "</transformers>" +
         "</mule-configuration>";
     }

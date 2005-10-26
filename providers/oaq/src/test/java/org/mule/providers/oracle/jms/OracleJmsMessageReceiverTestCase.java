@@ -45,7 +45,7 @@ public class OracleJmsMessageReceiverTestCase extends AbstractMessageReceiverTes
 
     public UMOMessageReceiver getMessageReceiver() throws Exception {
     	getConnector();
-        endpoint = new MuleEndpoint("jms://TEST_QUEUE", true);
+        endpoint = new MuleEndpoint("oaq://TEST_QUEUE", true);
         endpoint.setConnector(getConnector());
         Mock mockComponent = new Mock(UMOComponent.class);
         return new OracleJmsMessageReceiver((AbstractConnector) endpoint.getConnector(),
@@ -54,7 +54,7 @@ public class OracleJmsMessageReceiverTestCase extends AbstractMessageReceiverTes
     }
 
     public UMOEndpoint getEndpoint() throws Exception {
-        endpoint = new MuleEndpoint("jms://TEST_QUEUE", true);
+        endpoint = new MuleEndpoint("oaq://TEST_QUEUE", true);
         endpoint.setConnector(getConnector());
         return endpoint;
     }

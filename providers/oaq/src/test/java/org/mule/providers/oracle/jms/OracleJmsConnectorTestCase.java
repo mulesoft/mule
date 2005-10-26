@@ -55,7 +55,7 @@ public class OracleJmsConnectorTestCase extends AbstractConnectorTestCase {
 	}
 
 	public String getTestEndpointURI() {
-		return "jms://TEST_QUEUE";
+		return "oaq://TEST_QUEUE";
 	}
 
 	public Object getValidMessage() throws Exception {

@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.extras.client.MuleClient;
 import org.mule.umo.UMOException;
-import org.mule.extras.oracle.jms.OracleJmsConnector;
+import org.mule.providers.oracle.jms.OracleJmsConnector;
 import org.w3c.dom.Document;
 
 /**
@@ -18,17 +18,17 @@ import org.w3c.dom.Document;
 public class MuleUtil {
 
     public static void sendXmlMessageToQueue(String queue, String xml) throws UMOException {
-    	sendMessage("jms://" + queue + "?transformers=StringToXMLMessage", xml);
+    	sendMessage("oaq://" + queue + "?transformers=StringToXMLMessage", xml);
     }
 
     public static String receiveXmlMessageAsString(String queue) throws UMOException {
-		return (String) receiveMessage("jms://" + queue + "?"
+		return (String) receiveMessage("oaq://" + queue + "?"
 				+ OracleJmsConnector.PAYLOADFACTORY_PROPERTY + "=oracle.xdb.XMLTypeFactory", 
 				"XMLMessageToString");
 	}
     
     public static Document receiveXmlMessageAsDOM(String queue) throws UMOException {
-		return (Document) receiveMessage("jms://" + queue + "?"
+		return (Document) receiveMessage("oaq://" + queue + "?"
 				+ OracleJmsConnector.PAYLOADFACTORY_PROPERTY + "=oracle.xdb.XMLTypeFactory", 
 				"XMLMessageToDOM");
 	}

@@ -23,8 +23,8 @@ public class StandardPayloadIntegrationTestCase extends AbstractIntegrationTestC
 	public void testTextMessage() throws JMSException, AQException, UMOException {
 	    AQUtil.createOrReplaceTextQueue(session, connector.getUsername(), TestConfig.QUEUE_TEXT);
 
-	    MuleUtil.sendMessage("jms://" + TestConfig.QUEUE_TEXT, TestConfig.TEXT_MESSAGE);
-        assertEquals(TestConfig.TEXT_MESSAGE, MuleUtil.receiveMessage("jms://" + TestConfig.QUEUE_TEXT, "JMSMessageToObject"));
+	    MuleUtil.sendMessage("oaq://" + TestConfig.QUEUE_TEXT, TestConfig.TEXT_MESSAGE);
+        assertEquals(TestConfig.TEXT_MESSAGE, MuleUtil.receiveMessage("oaq://" + TestConfig.QUEUE_TEXT, "JMSMessageToObject"));
  	    
         AQUtil.dropQueue(session, connector.getUsername(), TestConfig.QUEUE_TEXT, /*force*/false);
     }
