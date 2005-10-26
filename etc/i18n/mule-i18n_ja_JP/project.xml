@@ -1,0 +1,6 @@
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <name>Mule Internationalisation Pack for Japanese</name>
+    <id>mule-i18n_ja_JP</id>
+    <package>META-INF.services.org.mule.i18n</package>
+</project>

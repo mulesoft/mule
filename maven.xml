@@ -210,7 +210,6 @@
     <goal name="mule:release" description="Creates and zips build for distribution">
         <attainGoal name="base-release"/>
         <attainGoal name="mule:site"/>
-        <attainGoal name="mule:tools"/>
         <attainGoal name="mule:javadoc"/>
 
         <!-- copy the full javadocs to the site docs -->
@@ -245,6 +244,8 @@
         <attainGoal name="mule:libs"/>
         <attainGoal name="mule:samples"/>
         <attainGoal name="mule:src"/>
+        <attainGoal name="mule:tools"/>
+        <attainGoal name="mule:i18n"/>
 
         <copy todir="${mule.release.dir}" file="${basedir}/LICENSE.txt"/>
         <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
@@ -311,6 +312,15 @@
                 <exclude name="target/"/>
                 <exclude name="*.iml"/>
             </fileset>
+        </copy>
+    </goal>
+    
+    <goal name="mule:i18n" prereqs="setvars">
+        <j:set var="mule.release.i18n.dir" value="${mule.release.lib.opt.dir}"/>
+        <mkdir dir="${mule.release.i18n.dir}"/>
+	
+	<copy todir="${mule.release.i18n.dir}">
+            <fileset dir="${basedir}/etc/i18n" includes="**/*.jar"/>
         </copy>
     </goal>
 
