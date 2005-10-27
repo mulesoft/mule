@@ -40,9 +40,15 @@ import java.util.zip.ZipFile;
 public class Utility
 {
     /**
+     * The current platform's CR/LF delimiter
+     */
+    public static final String CRLF = System.getProperty("line.separator");
+
+    /**
      * Saves creation of unecessary string creation
      */
     public static final String EMPTY_STRING = "";
+
     /**
      * The default buffer size to use.
      */
