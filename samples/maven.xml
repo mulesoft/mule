@@ -8,9 +8,9 @@
     <goal name="setvars">
         <j:if test="${samples.vars.overriden!='true'}">
             <echo>Samples vars are not overriden</echo>
-            <j:set var="root.dir" value="${basedir}\.."/>
-            <j:set var="samples.release.dir" value="${root.dir}\target\release"/>
-            <j:set var="samples.release.lib.dir" value="${samples.release.dir}\lib"/>
+            <j:set var="root.dir" value="${basedir}/.."/>
+            <j:set var="samples.release.dir" value="${root.dir}/target/release"/>
+            <j:set var="samples.release.lib.dir" value="${samples.release.dir}/lib"/>
             <j:set var="samples.dist" value="${samples.release.dir}/samples"/>
         </j:if>
         <echo>Root dir is ${root.dir}</echo>

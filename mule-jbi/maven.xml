@@ -1,4 +1,4 @@
-<project default="multiproject:install-snapshot"
+<project default="multiproject:install"
     xmlns:j="jelly:core"
     xmlns:u="jelly:util"
     xmlns:ant="jelly:ant"
