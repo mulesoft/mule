@@ -87,7 +87,7 @@ public class StreamMessageReceiver extends PollingMessageReceiver
 
             StringBuffer message = new StringBuffer(new String(buf, 0, len));
             //remove the trailing CR/LF
-            if (message.charAt(message.length()) == (char)Character.LINE_SEPARATOR) {
+            if (message.charAt(message.length()-1) == '\n') {
             	message.setLength(message.length()-1);
             }
 
