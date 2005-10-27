@@ -38,7 +38,7 @@ public class LogComponent implements Callable, LogService
         if (contents.length() > 100) {
             msg = StringMessageHelper.getBoilerPlate(msg + ". Content length is: " + contents.length());
         } else {
-            msg = StringMessageHelper.getBoilerPlate(msg + ". Content is: " + contents);
+            msg = StringMessageHelper.getBoilerPlate(msg + ". Content is: '" + contents + "'");
         }
         log(msg);
         return null;
