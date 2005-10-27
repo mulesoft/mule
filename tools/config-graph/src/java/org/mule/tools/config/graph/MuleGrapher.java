@@ -9,6 +9,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.mule.config.MuleDtdResolver;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -99,6 +100,7 @@ public class MuleGrapher {
         endpoints.clear();
         SAXBuilder builder = new SAXBuilder();
         builder.setValidation(true);
+        builder.setEntityResolver(new MuleDtdResolver());
         Graph graph = GraphFactory.newGraph();
 
         builder.setIgnoringElementContentWhitespace(true);

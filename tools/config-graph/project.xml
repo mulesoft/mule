@@ -9,16 +9,14 @@
     <package>org.mule.tools.config.graph</package>
     <logo>http://www.muleumo.org/images/mule-logo.gif</logo>
     <shortDescription>mule-grapher</shortDescription>
-    <description>
-        A tool for generating configuration graphs for Xml config files
-    </description>
+    <description>A tool for generating configuration graphs for Xml config files</description>
     <url>http://mule.codehaus.org/ConfigGraph</url>
     <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
     <siteAddress>www.muleumo.org</siteAddress>
     <siteDirectory>/var/www/html/muleumo.org</siteDirectory>
     <distributionDirectory>/var/www/html/muleumo.org/dist/</distributionDirectory>
     <dependencies>
-    	<dependency>
+        <dependency>
             <groupId>oy-lm</groupId>
             <artifactId>oy-lm</artifactId>
             <version>1.1</version>
@@ -32,6 +30,17 @@
             <groupId>ant</groupId>
             <artifactId>ant</artifactId>
             <version>1.6.5</version>
+        </dependency>
+        <!-- TODO switch to a release version for Mule v1.2 -->
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule</artifactId>
+            <version>SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
         </dependency>
     </dependencies>
      <build>
