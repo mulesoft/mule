@@ -1,8 +1,7 @@
 /*
- * $Header:
- * /cvsroot/mule/mule/src/java/org/mule/providers/vm/VMMessageReceiver.java,v
- * 1.8 2003/11/10 21:05:47 rossmason Exp $ $Revision$ $Date: 2003/11/10
- * 21:05:47 $
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
