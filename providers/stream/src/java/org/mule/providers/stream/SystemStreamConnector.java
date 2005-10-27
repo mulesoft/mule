@@ -164,7 +164,7 @@ public class SystemStreamConnector extends StreamConnector
             }
 
             outputStream.println();
-            outputStream.println(promptMessage);
+            outputStream.print(promptMessage);
         }
     }
 
