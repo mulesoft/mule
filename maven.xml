@@ -378,8 +378,18 @@
             <zipfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
         </zip>
         <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-dist.tar.gz" longfile="gnu">
-            <tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
-        </tar>
+            <!--tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/-->
+
+            <tarfileset dir="${mule.release.dir}" mode="755" prefix="${maven.final.name}">
+                <include name="**/bin/*.sh"/>
+                <include name="./bin/mule"/>
+              </tarfileset>
+              <tarfileset dir="$${mule.release.dir}"  prefix="${maven.final.name}">
+                <include name="${mule.release.dir}/**"/>
+                <exclude name="**/bin/*.sh"/>
+                <exclude name="./bin/mule"/>
+              </tarfileset>
+            </tar>
 
         <!-- tar up site if it is available-->
         <u:available file="${maven.build.dir}/docs">
