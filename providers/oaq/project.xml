@@ -24,37 +24,52 @@
             <groupId>oracle-jdbc</groupId>
             <artifactId>ojdbc</artifactId>
             <jar>ojdbc14.jar</jar>
-			<url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
         </dependency>
         <dependency>
             <groupId>oracle-jms</groupId>
             <artifactId>aqapi</artifactId>
             <jar>aqapi13.jar</jar>
-			<url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
         </dependency>
         <dependency>
             <groupId>oracle-jms</groupId>
             <artifactId>jmscommon</artifactId>
             <jar>jmscommon.jar</jar>
-			<url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
         </dependency>
 
-		<!-- For XMLType support only -->
+        <!-- For XMLType support only -->
         <dependency>
             <groupId>oracle-xdb</groupId>
             <artifactId>xdb</artifactId>
             <jar>xdb.jar</jar>
-			<url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
         </dependency>
         <dependency>
             <groupId>oracle-xdb</groupId>
             <artifactId>xmlparserv2</artifactId>
             <jar>xmlparserv2.jar</jar>
-	    <url>http://www.oracle.com</url>
+            <url>http://www.oracle.com</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
         </dependency>
     </dependencies>
     <build>
-         <unitTest>
+        <unitTest>
             <excludes>
                 <!-- TODO How can we unit test this without a real AQjmsSession? -->
                 <exclude>**/OracleJmsTransformersTestCase.*</exclude>

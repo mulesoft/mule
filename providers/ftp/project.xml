@@ -25,6 +25,7 @@
             <version>${commons_pool_version}</version>
             <url>http://jakarta.apache.org/commons/pool/index.html</url>
             <properties>
+                <mule.core.jar>true</mule.core.jar>
                 <war.bundle.jar>true</war.bundle.jar>
             </properties>
         </dependency>

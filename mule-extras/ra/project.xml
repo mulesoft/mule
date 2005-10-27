@@ -108,7 +108,7 @@
             <url>http://java.sun.com/products/javamail/</url>
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>
-                <mule.core.jar>true</mule.core.jar>
+                <mule.core.jar>false</mule.core.jar>
                 <rar.bundle>true</rar.bundle>
             </properties>
         </dependency>
@@ -142,7 +142,7 @@
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>
                 <rar.bundle>true</rar.bundle>
-                <mule.core.jar>true</mule.core.jar>
+                <mule.core.jar>false</mule.core.jar>
             </properties>
         </dependency>
     </dependencies>

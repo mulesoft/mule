@@ -22,18 +22,7 @@
                 <war.bundle>true</war.bundle>
             </properties>
         </dependency>
-        <dependency>
-            <groupId>concurrent</groupId>
-            <artifactId>concurrent</artifactId>
-            <version>${concurrent_version}</version>
-            <url>http://www.oswego.edu</url>
-            <properties>
-                <rar.bundle>true</rar.bundle>
-                <war.bundle>true</war.bundle>
-                <mule.core.jar>true</mule.core.jar>
-                <mule.mini>true</mule.mini>
-            </properties>
-        </dependency>
+
         <!-- required used by the core server -->
         <dependency>
             <groupId>commons-beanutils</groupId>
@@ -340,7 +329,7 @@
             <properties>
                 <rar.bundle>false</rar.bundle>
                 <war.bundle>true</war.bundle>
-                <mule.core.jar>true</mule.core.jar>
+                <mule.core.jar>false</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
         </dependency>
@@ -352,7 +341,7 @@
                 <ignore>true</ignore>
                 <rar.bundle>false</rar.bundle>
                 <war.bundle>true</war.bundle>
-                <mule.core.jar>true</mule.core.jar>
+                <mule.core.jar>false</mule.core.jar>
                 <mule.mini>false</mule.mini>
             </properties>
         </dependency>
@@ -401,6 +390,13 @@
                 <rar.bundle>false</rar.bundle>
                 <war.bundle>false</war.bundle>
             </properties>
+        </dependency>
+        <!-- Active IO uses this -->
+         <dependency>
+            <groupId>concurrent</groupId>
+            <artifactId>concurrent</artifactId>
+            <version>${concurrent_version}</version>
+            <url>http://www.oswego.edu</url>
         </dependency>
         <dependency>
             <groupId>activation</groupId>
