@@ -20,6 +20,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.Utility;
 
 import java.io.InputStream;
 
@@ -78,19 +79,25 @@ public class StreamMessageReceiver extends PollingMessageReceiver
     public void poll()
     {
         try {
+            // anything to read?
+            if (inputStream.available() == 0) {
+                return;
+            }
+
             byte[] buf = new byte[getBufferSize()];
             int len = inputStream.read(buf);
             if (len == -1) {
                 return;
             }
 
-            StringBuffer message = new StringBuffer(new String(buf, 0, len));
-            //remove the trailing CR/LF
-            if (message.charAt(message.length()-1) == '\n') {
-            	message.setLength(message.length()-1);
+            String message = new String(buf, 0, len);
+
+            //remove any trailing CR/LF
+            if (message.endsWith(Utility.CRLF)) {
+            	message = message.substring(0, message.length() - Utility.CRLF.length());
             }
 
-            UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(message.toString()));
+            UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(message));
             routeMessage(umoMessage, endpoint.isSynchronous());
 
             ((StreamConnector) endpoint.getConnector()).reinitialise();

@@ -13,8 +13,6 @@
  */
 package org.mule.providers.stream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.providers.AbstractMessageDispatcher;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -31,10 +29,6 @@ import org.mule.umo.provider.UMOConnector;
 
 public class StreamMessageDispatcher extends AbstractMessageDispatcher
 {
-    /**
-     * logger used by this class
-     */
-    private static transient Log logger = LogFactory.getLog(StreamMessageDispatcher.class);
 
     private StreamConnector connector;
 
