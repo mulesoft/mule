@@ -15,13 +15,14 @@
 
 package org.mule.test.util;
 
+import org.mule.util.CollectionUtil;
+import org.mule.util.PropertiesHelper;
+import org.mule.util.Utility;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
-
-import org.mule.util.CollectionUtil;
-import org.mule.util.PropertiesHelper;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -131,8 +132,7 @@ public class PropertiesHelperTestCase extends TestCase
     			new Object[]{"foo"}, new Object[]{"bar"});
 
     	assertEquals("{foo=bar}", PropertiesHelper.propertiesToString(props, false));
-    	assertEquals("{" + (char)Character.LINE_SEPARATOR
-					+ "foo=bar" + (char)Character.LINE_SEPARATOR + "}",
+    	assertEquals("{" + Utility.CRLF + "foo=bar" + Utility.CRLF + "}",
 					PropertiesHelper.propertiesToString(props, true));
     }
 
@@ -144,9 +144,10 @@ public class PropertiesHelperTestCase extends TestCase
     	assertEquals("{foo=bar, foozle=doozle}",
     			PropertiesHelper.propertiesToString(props, false));
 
-    	assertEquals("{" + (char)Character.LINE_SEPARATOR + "foo=bar"
-    			+ (char)Character.LINE_SEPARATOR + "foozle=doozle"
-    			+ (char)Character.LINE_SEPARATOR + "}",
+    	assertEquals("{"
+                + Utility.CRLF + "foo=bar"
+                + Utility.CRLF + "foozle=doozle"
+                + Utility.CRLF + "}",
     			PropertiesHelper.propertiesToString(props, true));
     }
 

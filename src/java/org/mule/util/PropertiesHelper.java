@@ -273,7 +273,7 @@ public class PropertiesHelper
         }
 
         if (newline) {
-            buf.append((char)Character.LINE_SEPARATOR);
+            buf.append(Utility.CRLF);
         }
 
         Object[] entries = props.entrySet().toArray();
@@ -281,7 +281,7 @@ public class PropertiesHelper
         for (i = 0; i < numEntries - 1; i++) {
 			appendMaskedProperty(buf, (Map.Entry)entries[i]);
 			if (newline) {
-				buf.append((char)Character.LINE_SEPARATOR);
+				buf.append(Utility.CRLF);
 			}
 			else {
 				buf.append(", ");
@@ -292,7 +292,7 @@ public class PropertiesHelper
 		appendMaskedProperty(buf, (Map.Entry)entries[i]);
 
 		if (newline) {
-			buf.append((char)Character.LINE_SEPARATOR);
+			buf.append(Utility.CRLF);
 		}
 
         buf.append("}");

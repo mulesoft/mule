@@ -15,8 +15,6 @@ package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -30,6 +28,9 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
+import org.mule.util.Utility;
+
+import java.util.List;
 
 /**
  * <code>AbstractOutboundRouter</code> is a base router class that tracks
@@ -162,7 +163,7 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
                 StringBuffer buf = new StringBuffer();
                 buf.append("Setting Correlation info on Outbound router for endpoint: ")
                    .append(endpoint.getEndpointURI());
-                buf.append((char)Character.LINE_SEPARATOR).append("Id=").append(correlation);
+                buf.append(Utility.CRLF).append("Id=").append(correlation);
                 // buf.append(", ").append("Seq=").append(seq);
                 // buf.append(", ").append("Group Size=").append(group);
                 logger.debug(buf.toString());
