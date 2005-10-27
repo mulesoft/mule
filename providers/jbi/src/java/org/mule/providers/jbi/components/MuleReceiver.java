@@ -22,10 +22,16 @@ import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.InternalMessageListener;
 import org.mule.providers.jbi.JbiMessageAdapter;
 import org.mule.providers.jbi.JbiUtils;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.util.Utility;
 
 import javax.jbi.JBIException;
 import javax.jbi.messaging.MessageExchange;
@@ -33,6 +39,7 @@ import javax.jbi.messaging.MessagingException;
 import javax.jbi.messaging.NormalizedMessage;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.xml.namespace.QName;
+
 import java.io.OutputStream;
 
 /**
@@ -127,10 +134,10 @@ public class MuleReceiver extends AbstractEndpointComponent implements InternalM
 
                 if(logger.isDebugEnabled()) {
                     StringBuffer buf = new StringBuffer("Found the following endpoints for: ");
-                   	buf.append(targetService).append((char)Character.LINE_SEPARATOR);
+                   	buf.append(targetService).append(Utility.CRLF);
                     for (int i = 0; i < eps.length; i++) {
                         ServiceEndpoint ep = eps[i];
-                        buf.append(ep.getEndpointName()).append(";").append(ep.getServiceName()).append(";").append(ep.getInterfaces()).append((char)Character.LINE_SEPARATOR);
+                        buf.append(ep.getEndpointName()).append(";").append(ep.getServiceName()).append(";").append(ep.getInterfaces()).append(Utility.CRLF);
                     }
                     logger.debug(buf.toString());
                 }

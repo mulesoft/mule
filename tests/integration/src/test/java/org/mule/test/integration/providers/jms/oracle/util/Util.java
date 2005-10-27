@@ -1,10 +1,19 @@
 package org.mule.test.integration.providers.jms.oracle.util;
 
+import org.mule.util.ClassHelper;
+import org.mule.util.Utility;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,15 +22,6 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.mule.util.ClassHelper;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Miscellaneous convenience methods.
@@ -60,7 +60,7 @@ public class Util {
         int numLines = lines.size();
         for (int i = 0; i < numLines; ++i) {
             if (text.equals("") == false) {
-            	text += (char)Character.LINE_SEPARATOR;
+            	text += Utility.CRLF;
             }
             text += lines.get(i);
         }

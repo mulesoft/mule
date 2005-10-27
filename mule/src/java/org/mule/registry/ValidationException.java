@@ -15,9 +15,10 @@
 package org.mule.registry;
 
 import org.mule.config.i18n.Message;
+import org.mule.util.Utility;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Is thrown when an object loaded from a descriptor is invalid
@@ -40,7 +41,7 @@ public class ValidationException extends RegistryException {
         buf.append("The following validation errors occurred");
         for (Iterator iterator = vaildationErrors.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
-            buf.append((char)Character.LINE_SEPARATOR).append(s);
+            buf.append(Utility.CRLF).append(s);
         }
         return buf.toString();
     }

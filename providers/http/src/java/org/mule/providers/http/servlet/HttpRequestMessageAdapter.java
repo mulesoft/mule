@@ -21,9 +21,11 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
+import org.mule.util.Utility;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -127,7 +129,7 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         buffer.append(line);
-                        buffer.append((char)Character.LINE_SEPARATOR);
+                        buffer.append(Utility.CRLF);
                     }
                     this.message = buffer.toString();
                 } else {

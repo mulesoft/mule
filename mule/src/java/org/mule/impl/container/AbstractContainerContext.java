@@ -13,16 +13,17 @@
  */
 package org.mule.impl.container;
 
-import java.io.Reader;
-import java.io.StringReader;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.UMOContainerContext;
 import org.mule.util.ChainedReader;
-import org.mule.MuleManager;
+import org.mule.util.Utility;
+
+import java.io.Reader;
+import java.io.StringReader;
 
 /**
  * <code>AbstractContainerContext</code> provides base container configuration
@@ -80,7 +81,7 @@ public abstract class AbstractContainerContext implements UMOContainerContext
         } else {
             doctype = "";
         }
-        StringReader declaration = new StringReader(decl + (char)Character.LINE_SEPARATOR + doctype);
+        StringReader declaration = new StringReader(decl + Utility.CRLF + doctype);
         ChainedReader reader = new ChainedReader(declaration, configuration);
         configure(reader);
 

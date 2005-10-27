@@ -14,17 +14,18 @@
  */
 package org.mule.umo;
 
+import org.mule.config.ExceptionHelper;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.util.StringMessageHelper;
+import org.mule.util.Utility;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.util.StringMessageHelper;
 
 /**
  * <code>UMOException</code> is the base exception type for the Mule server
@@ -144,12 +145,12 @@ public abstract class UMOException extends Exception
         if (!e.equals(this)) {
             return getMessage();
         }
-        StringBuffer buf = new StringBuffer();
-        buf.append((char)Character.LINE_SEPARATOR).append(StringMessageHelper.charString('*', 80)).append((char)Character.LINE_SEPARATOR);
-        buf.append("Message          : ").append(message).append((char)Character.LINE_SEPARATOR);
-        buf.append("Type             : ").append(getClass().getName()).append((char)Character.LINE_SEPARATOR);
-        buf.append("Code             : ").append(getExceptionCode() + getMessageCode()).append((char)Character.LINE_SEPARATOR);
-        // buf.append("Msg Code : ").append(getMessageCode()).append((char)Character.LINE_SEPARATOR);
+        StringBuffer buf = new StringBuffer(1024);
+        buf.append(Utility.CRLF).append(StringMessageHelper.charString('*', 80)).append(Utility.CRLF);
+        buf.append("Message          : ").append(message).append(Utility.CRLF);
+        buf.append("Type             : ").append(getClass().getName()).append(Utility.CRLF);
+        buf.append("Code             : ").append(getExceptionCode() + getMessageCode()).append(Utility.CRLF);
+        // buf.append("Msg Code : ").append(getMessageCode()).append(Utility.CRLF);
         for (Iterator iterator = info.keySet().iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
             int pad = 17 - s.length();
@@ -158,22 +159,22 @@ public abstract class UMOException extends Exception
                 buf.append(StringMessageHelper.charString(' ', pad));
             }
             buf.append(": ");
-            buf.append(info.get(s)).append((char)Character.LINE_SEPARATOR);
+            buf.append(info.get(s)).append(Utility.CRLF);
         }
 
         // print exception stack
-        buf.append(StringMessageHelper.charString('*', 80)).append((char)Character.LINE_SEPARATOR);
-        buf.append(new Message(Messages.EXCEPTION_STACK_IS)).append((char)Character.LINE_SEPARATOR);
+        buf.append(StringMessageHelper.charString('*', 80)).append(Utility.CRLF);
+        buf.append(new Message(Messages.EXCEPTION_STACK_IS)).append(Utility.CRLF);
         buf.append(ExceptionHelper.getExceptionStack(this));
 
-        buf.append(StringMessageHelper.charString('*', 80)).append((char)Character.LINE_SEPARATOR);
-        buf.append(new Message(Messages.ROOT_STACK_TRACE)).append((char)Character.LINE_SEPARATOR);
+        buf.append(StringMessageHelper.charString('*', 80)).append(Utility.CRLF);
+        buf.append(new Message(Messages.ROOT_STACK_TRACE)).append(Utility.CRLF);
         Throwable root = ExceptionHelper.getRootException(this);
         StringWriter w = new StringWriter();
         PrintWriter p = new PrintWriter(w);
         root.printStackTrace(p);
-        buf.append(w.toString()).append((char)Character.LINE_SEPARATOR);
-        buf.append(StringMessageHelper.charString('*', 80)).append((char)Character.LINE_SEPARATOR);
+        buf.append(w.toString()).append(Utility.CRLF);
+        buf.append(StringMessageHelper.charString('*', 80)).append(Utility.CRLF);
 
         return buf.toString();
     }
