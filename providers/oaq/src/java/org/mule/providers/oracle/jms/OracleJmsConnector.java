@@ -18,6 +18,7 @@ import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -29,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.MuleProperties;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
@@ -53,7 +55,10 @@ public class OracleJmsConnector extends JmsConnector {
      * payload factory must be specified in the endpoint's properties. 
      * Note: if <u>all</u> queues are of the same payload type, this property may be 
      * set globally for the connector instead of for each endpoint. */
-	public static final String PAYLOADFACTORY_PROPERTY = "payloadFactory";	
+	public static final String PAYLOADFACTORY_PROPERTY = "payloadFactory";
+
+    public static final String OAQ_PROTOCOL = "oaq";
+
 	private String payloadFactory = null;
 	
     /** The JDBC URL for the Oracle database.  For example, {@code jdbc:oracle:oci:@myhost} */
@@ -69,6 +74,34 @@ public class OracleJmsConnector extends JmsConnector {
      * open connections. 
      * @see #multipleSessionsPerConnection  */
     private List connections = new ArrayList();
+
+    /**
+     * Default constructor automatically initialises the serviceOverrides for the Oracle
+     * connector.  This allows users to configure the Oracle connector in their configuration
+     * and use jms:// URIs instread of oaq:// URIs without having to explicitly configure the
+     * service overrides.
+     */
+    public OracleJmsConnector() {
+        serviceOverrides = new Properties();
+        serviceOverrides.setProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, OracleJmsMessageDispatcherFactory.class.getName());
+        serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, OracleJmsMessageReceiver.class.getName());
+        serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, OracleJmsMessageAdapter.class.getName());
+    }
+
+    /*
+     * The protocol for this connector differs depending on whether is
+     * was configured explicitly or configured via a oaq:// uri.
+     */
+    public String getProtocol() {
+        if(serviceDescriptor==null) {
+            return OAQ_PROTOCOL;
+        }
+        if(serviceDescriptor.getConnector().equals(getClass().getName())) {
+            return OAQ_PROTOCOL;
+        } else {
+            return super.getProtocol();
+        }
+    }
 
     /** Oracle has two different factory classes:
      * {@code AQjmsQueueConnectionFactory} which implements {@code javax.jms.QueueConnectionFactory} 
