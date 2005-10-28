@@ -80,6 +80,26 @@
         </dependency>
         <dependency>
             <groupId>mule</groupId>
+            <artifactId>mule-rmi-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <type>jar</type>
+             <properties>
+                <mule.mini>true</mule.mini>
+            </properties>
+            <url>http://www.muleumo.org</url>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-ejb-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <type>jar</type>
+             <properties>
+                <mule.mini>true</mule.mini>
+            </properties>
+            <url>http://www.muleumo.org</url>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
             <artifactId>mule-multicast-provider</artifactId>
             <version>${pom.currentVersion}</version>
             <type>jar</type>

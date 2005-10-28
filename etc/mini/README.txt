@@ -5,10 +5,10 @@ http://www.muleumo.org
 Mule is a highly scalable Enterprise Services framework and messaging broker.\
 
 You have downloaded a light-weight distribution of Mule. All core services are packaged with
-Mini Mule plus jms, vm, file, tcp, http, https, ssl/tls, multicast, udp, stream and
+Mini Mule plus jms, vm, file, tcp, http, https, ssl/tls, multicast, udp, stream, rmi, ejb and
 servlet transports and the mule client are included to get you started.
 If you want the full version of Mule (includes Axis/Glue web services, Spring integration, etc)
-you can download it here http://www.muleumo.org/downloads.
+you can download it here http://www.muleumo.org/Downloads.
 
 To get you started here is some useful information.
 

@@ -99,16 +99,6 @@
         </j:if>
     </postGoal>
 
-    <goal name="mule:tools" prereqs="setvars">
-        <mkdir dir="${mule.release.tools.dir}/benchmark"/>
-        <copy todir="${mule.release.tools.dir}/benchmark">
-            <fileset dir="${root.dir}/tools/benchmark">
-                <exclude name="target/"/>
-                <exclude name="*.iml"/>
-            </fileset>
-        </copy>
-    </goal>
-
     <goal name="mule:samples" prereqs="setvars">
 
         <echo>copying samples from ${basedir}/../../target/release/samples to ${mule.release.samples.dir}</echo>
@@ -116,6 +106,8 @@
             <fileset dir="${basedir}/../../target/release/samples"/>
         </copy>
         <delete dir="${mule.release.samples.dir}/errorhandler"/>
+        <delete dir="${mule.release.samples.dir}/voipservice"/>
+        <delete dir="${mule.release.samples.dir}/stockquote"/>
 
         <!-- copy config overrides that do not use non-mini-mule jars -->
         <echo>Copying smple config overrides from ${basedir}/samples</echo>
@@ -158,8 +150,17 @@
         </ant:chmod>
 
         <tar compression="gzip" tarfile="${maven.build.dir}/distributions/${maven.final.name}-dist.tar.gz" longfile="gnu">
-            <tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>
+            <tarfileset dir="${mule.release.dir}" mode="755" prefix="${maven.final.name}">
+                <include name="samples/*/bin/*.sh"/>
+                <include name="bin/mule"/>
+            </tarfileset>
+            <tarfileset dir="${mule.release.dir}" prefix="${maven.final.name}">
+                <include name="**"/>
+                <exclude name="samples/*/bin/*.sh"/>
+                <exclude name="bin/mule"/>
+            </tarfileset>
         </tar>
+
         <!-- zip up  -->
         <zip zipfile="${maven.build.dir}/distributions/${maven.final.name}-dist.zip">
             <zipfileset dir="${mule.release.dir}" prefix="${maven.final.name}"/>

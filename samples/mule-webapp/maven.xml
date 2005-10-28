@@ -35,7 +35,7 @@
         </copy>
 
 
-        <copy todir="webapp/WEB-INF/classes" file="../stockquote/conf/stock.xsl"/>
+        <copy todir="webapp/WEB-INF/classes" file="../stockquote/conf/*.xsl"/>
 
 
         <!-- create the war -->

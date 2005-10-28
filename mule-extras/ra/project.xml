@@ -79,6 +79,28 @@
             </properties>
         </dependency>
         <dependency>
+            <artifactId>mule-ejb-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <rar.bundle>true</rar.bundle>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <artifactId>mule-rmi-provider</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+                <rar.bundle>true</rar.bundle>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
             <artifactId>mule-vm-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
@@ -109,16 +131,6 @@
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>
                 <mule.core.jar>false</mule.core.jar>
-                <rar.bundle>true</rar.bundle>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>${activation_version}</version>
-            <properties>
-                <war.bundle.jar>true</war.bundle.jar>
-                <mule.core.jar>true</mule.core.jar>
                 <rar.bundle>true</rar.bundle>
             </properties>
         </dependency>
