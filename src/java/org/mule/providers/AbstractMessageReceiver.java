@@ -16,17 +16,19 @@
 package org.mule.providers;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
-import java.io.OutputStream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.*;
+import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.MuleSession;
+import org.mule.impl.RequestContext;
+import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.internal.events.ConnectionEvent;
+import org.mule.impl.internal.events.MessageEvent;
 import org.mule.impl.internal.events.SecurityEvent;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
@@ -35,8 +37,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransaction;
-import org.mule.umo.transformer.UMOTransformer;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -45,8 +45,11 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.security.SecurityException;
+import org.mule.umo.transformer.TransformerException;
+import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.WaitableBoolean;
-import org.mule.util.Utility;
+
+import java.io.OutputStream;
 
 /**
  * <code>AbstractMessageReceiver</code> provides common methods for all
@@ -135,10 +138,10 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
             }
         }
         connectionStrategy = this.connector.getConnectionStrategy();
-        // if(connectionStrategy instanceof AbstractConnectionStrategy) {
-        // ((AbstractConnectionStrategy)connectionStrategy).setDoThreading(
-        // this.connector.getReceiverThreadingProfile().isDoThreading());
-        // }
+//         if(connectionStrategy instanceof AbstractConnectionStrategy) {
+//         ((AbstractConnectionStrategy)connectionStrategy).setDoThreading(
+//         this.connector.getReceiverThreadingProfile().isDoThreading());
+//         }
     }
 
     /*
@@ -247,6 +250,11 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                                          UMOTransaction trans,
                                          boolean synchronous,
                                          OutputStream outputStream) throws UMOException {
+
+        if(connector.isEnableMessageEvents()) {
+            connector.fireEvent(new MessageEvent(message, endpoint, component.getDescriptor().getName(), MessageEvent.MESSAGE_RECEIVED));
+        }
+
         if (logger.isDebugEnabled()) {
             logger.debug("Message Received from: " + endpoint.getEndpointURI());
             logger.debug(message);
@@ -484,7 +492,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     protected String getConnectEventId()
     {
-        return connector.getName() + ".receiver";
+        return connector.getName() + ".receiver (" + endpoint.getEndpointURI() + ")";
     }
 
     protected UMOMessage applyResponseTransformer(UMOMessage returnMessage) throws TransformerException {

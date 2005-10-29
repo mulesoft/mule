@@ -13,11 +13,6 @@
  */
 package org.mule.impl.internal.admin;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -33,6 +28,11 @@ import org.mule.umo.manager.UMOServerEvent;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.Utility;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * <code>AbstractEventLoggerAgent</code> Receives Mule server events and logs
  * them and can optionally route them to an endpoint
@@ -40,11 +40,11 @@ import org.mule.util.Utility;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class Log4jAbstractEventLoggerAgent extends AbstractEventLoggerAgent
+public class Log4jEventLoggerAgent extends AbstractEventLoggerAgent
 {
 
     protected Logger eventLogger;
-    private String logName = Log4jAbstractEventLoggerAgent.class.getName();
+    private String logName = Log4jEventLoggerAgent.class.getName();
     private String logFile = null;
     private String logConfigFile = null;
     private String chainsawHost = "localhost";
@@ -114,7 +114,8 @@ public class Log4jAbstractEventLoggerAgent extends AbstractEventLoggerAgent
     protected void logEvent(UMOServerEvent e)
     {
         if (eventLogger != null) {
-            String level = (String) PropertiesHelper.getProperty(levelMappings, String.valueOf(e.getAction()), "info");
+            String actionKey = e.EVENT_NAME + "." + e.getActionName();
+            String level = (String) PropertiesHelper.getProperty(levelMappings, actionKey, e.getType());
 
             eventLogger.log(getPriority(level), e);
         }

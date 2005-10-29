@@ -13,10 +13,11 @@
  */
 package org.mule.umo.manager;
 
-import java.util.EventObject;
-
+import org.mule.MuleManager;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.util.ClassHelper;
+
+import java.util.EventObject;
 
 /**
  * <code>UMOServerEvent</code> is an event triggered by something happening in
@@ -27,6 +28,11 @@ import org.mule.util.ClassHelper;
  */
 public abstract class UMOServerEvent extends EventObject
 {
+    public static final String TYPE_INFO = "info";
+    public static final String TYPE_WARNING = "warn";
+    public static final String TYPE_ERROR = "error";
+    public static final String TYPE_FATAL = "fatal";
+
     public static final int MANAGER_EVENT_ACTION_START_RANGE = 100;
     public static final int MODEL_EVENT_ACTION_START_RANGE = 200;
     public static final int COMPONENT_EVENT_ACTION_START_RANGE = 300;
@@ -34,10 +40,17 @@ public abstract class UMOServerEvent extends EventObject
     public static final int MANAGEMENT_EVENT_ACTION_START_RANGE = 500;
     public static final int ADMIN_EVENT_ACTION_START_RANGE = 600;
     public static final int CONNECTION_EVENT_ACTION_START_RANGE = 700;
+    public static final int MESSAGE_EVENT_ACTION_START_RANGE = 800;
     public static final int CUSTOM_EVENT_ACTION_START_RANGE = 100000;
 
     public static final int NULL_ACTION = 0;
     public static final Object NULL_MESSAGE = new Object();
+
+    public final String EVENT_NAME = ClassHelper.getClassName(getClass());
+
+    protected String serverId;
+
+    protected long timestamp;
 
     protected int action = NULL_ACTION;
 
@@ -54,6 +67,8 @@ public abstract class UMOServerEvent extends EventObject
     {
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
+        serverId = MuleManager.getInstance().getId();
+        timestamp = System.currentTimeMillis();
     }
 
     public UMOServerEvent(Object message, int action, String resourceIdentifier)
@@ -61,6 +76,8 @@ public abstract class UMOServerEvent extends EventObject
         super((message == null ? NULL_MESSAGE : message));
         this.action = action;
         this.resourceIdentifier = resourceIdentifier;
+        serverId = MuleManager.getInstance().getId();
+        timestamp = System.currentTimeMillis();
     }
 
     public int getAction()
@@ -68,9 +85,17 @@ public abstract class UMOServerEvent extends EventObject
         return action;
     }
 
+    public String getServerId() {
+        return serverId;
+    }
+
     public String getResourceIdentifier()
     {
         return resourceIdentifier;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
     }
 
     public boolean isResourceIdentifierAnUri()
@@ -80,13 +105,21 @@ public abstract class UMOServerEvent extends EventObject
 
     public String toString()
     {
-        return ClassHelper.getClassName(getClass()) + "{" + "action=" + getActionName(action)
-                + ", resourceIdentifier='" + resourceIdentifier + "'" + "}";
+        return EVENT_NAME + "{" + "action=" + getActionName(action)
+                + ", resourceId=" + resourceIdentifier + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
     }
 
     protected String getPayloadToString()
     {
         return source.toString();
+    }
+
+    public String getType() {
+        return TYPE_INFO;
+    }
+
+    public String getActionName() {
+        return getActionName(action);
     }
 
     protected abstract String getActionName(int action);

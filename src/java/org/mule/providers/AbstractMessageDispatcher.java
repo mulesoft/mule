@@ -20,6 +20,8 @@ import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
+import org.mule.impl.internal.events.MessageEvent;
+import org.mule.impl.internal.events.SecurityEvent;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -100,6 +102,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     endpoint.getSecurityFilter().authenticate(event);
                 } catch (org.mule.umo.security.SecurityException e) {
                     logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
+                    connector.fireEvent(new SecurityEvent(e, SecurityEvent.ADMIN_EVENT_ACTION_START_RANGE));
                     connector.handleException(e);
                     return;
                 } catch (UMOException e) {
@@ -117,6 +120,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     workManager.scheduleWork(new Worker(event));
                 } else {
                     doDispatch(event);
+                    if(connector.isEnableMessageEvents()) {
+                        connector.fireEvent(new MessageEvent(event.getMessage(), event.getEndpoint(), event.getComponent().getDescriptor().getName(), MessageEvent.MESSAGE_DISPATCHED));
+                    }
                 }
             } catch (DispatchException e) {
                 dispose();
@@ -145,6 +151,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     endpoint.getSecurityFilter().authenticate(event);
                 } catch (org.mule.umo.security.SecurityException e) {
                     logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
+                    connector.fireEvent(new SecurityEvent(e, SecurityEvent.SECURITY_AUTHENTICATION_FAILED));
                     connector.handleException(e);
                     return event.getMessage();
                 } catch (UMOException e) {
@@ -157,6 +164,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             event = RequestContext.getEvent();
             try {
                 UMOMessage result = doSend(event);
+                if(connector.isEnableMessageEvents()) {
+                    connector.fireEvent(new MessageEvent(event.getMessage(), event.getEndpoint(), event.getComponent().getDescriptor().getName(), MessageEvent.MESSAGE_SENT));
+                }
                 //Once a dispatcher has done its work we need to romve this property so that
                 //it is not propagated to the next request
                 if(result!=null) result.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY);
@@ -245,6 +255,9 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             try {
                 RequestContext.setEvent(event);
                 doDispatch(event);
+                if(connector.isEnableMessageEvents()) {
+                    connector.fireEvent(new MessageEvent(event.getMessage(), event.getEndpoint(), event.getComponent().getDescriptor().getName(), MessageEvent.MESSAGE_DISPATCHED));
+                }
             } catch (Exception e) {
                 getConnector().handleException(e);
             }

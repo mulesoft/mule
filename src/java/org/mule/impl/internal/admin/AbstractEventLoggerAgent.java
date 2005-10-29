@@ -13,10 +13,8 @@
  */
 package org.mule.impl.internal.admin;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.internal.events.AdminEventListener;
 import org.mule.impl.internal.events.ComponentEventListener;
@@ -24,6 +22,7 @@ import org.mule.impl.internal.events.ConnectionEventListener;
 import org.mule.impl.internal.events.CustomEventListener;
 import org.mule.impl.internal.events.ManagementEventListener;
 import org.mule.impl.internal.events.ManagerEventListener;
+import org.mule.impl.internal.events.MessageEventListener;
 import org.mule.impl.internal.events.ModelEventListener;
 import org.mule.impl.internal.events.SecurityEventListener;
 import org.mule.umo.UMOException;
@@ -32,6 +31,10 @@ import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.manager.UMOServerEventListener;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>AbstractEventLoggerAgent</code> Receives Mule server events and logs
@@ -42,6 +45,11 @@ import org.mule.umo.manager.UMOServerEventListener;
  */
 public abstract class AbstractEventLoggerAgent implements UMOAgent
 {
+    /**
+     * The logger used for this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
+
 
     private String name;
 
@@ -53,6 +61,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
     private boolean ignoreManagementEvents = false;
     private boolean ignoreCustomEvents = false;
     private boolean ignoreAdminEvents = false;
+    private boolean ignoreMessageEvents = false;
 
     private Set listeners = new HashSet();
 
@@ -260,6 +269,19 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
 
         if (!ignoreAdminEvents) {
             UMOServerEventListener l = new AdminEventListener() {
+                public void onEvent(UMOServerEvent event)
+                {
+                    logEvent(event);
+                }
+            };
+            manager.registerListener(l);
+            listeners.add(l);
+        }
+
+        if(!ignoreMessageEvents && !MuleManager.getConfiguration().isEnableMessageEvents()) {
+            logger.warn("EventLogger agent has been asked to log message events, but the MuleManager is configured not to fire Message events");
+        } else if (!ignoreMessageEvents) {
+            UMOServerEventListener l = new MessageEventListener() {
                 public void onEvent(UMOServerEvent event)
                 {
                     logEvent(event);

@@ -107,6 +107,11 @@
 <!ATTLIST mule-environment-properties clientMode   		(true | false)          "false">
 
 <!--
+    Whether mule should fire message events for every message sent and received
+-->
+<!ATTLIST mule-environment-properties enableMessageEvents   		(true | false)          "false">
+
+<!--
 A pooling profile is used to configure the pooling behaviour of UMO components.
 each descriptor can set it's own pooling profile or a default one can be set
 on the mule-configuration.

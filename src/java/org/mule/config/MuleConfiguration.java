@@ -109,6 +109,11 @@ public class MuleConfiguration
     private boolean synchronous = DEFAULT_SYNCHRONOUS;
 
     /**
+     * Whether Mule should fire message events for every message sent and received
+     */
+    private boolean enableMessageEvents = false;
+
+    /**
      * Name of the model to use. If blank the first model will be used
      */
     private String model = null;
@@ -510,5 +515,13 @@ public class MuleConfiguration
 
     public void setEncoding(String encoding) {
         this.encoding = encoding;
+    }
+
+    public boolean isEnableMessageEvents() {
+        return enableMessageEvents;
+    }
+
+    public void setEnableMessageEvents(boolean enableMessageEvents) {
+        this.enableMessageEvents = enableMessageEvents;
     }
 }

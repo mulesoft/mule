@@ -51,4 +51,8 @@ public class SecurityEvent extends UMOServerEvent
         }
         return ACTIONS[i - 1];
     }
+
+    public String getType() {
+        return TYPE_WARNING;
+    }
 }

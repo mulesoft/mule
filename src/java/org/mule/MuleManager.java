@@ -36,6 +36,8 @@ import org.mule.impl.internal.events.ManagementEvent;
 import org.mule.impl.internal.events.ManagementEventListener;
 import org.mule.impl.internal.events.ManagerEvent;
 import org.mule.impl.internal.events.ManagerEventListener;
+import org.mule.impl.internal.events.MessageEvent;
+import org.mule.impl.internal.events.MessageEventListener;
 import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ModelEventListener;
 import org.mule.impl.internal.events.SecurityEvent;
@@ -206,6 +208,8 @@ public class MuleManager implements UMOManager
      */
     private static transient Log logger = LogFactory.getLog(MuleManager.class);
 
+    private ShutdownContext shutdownContext = new ShutdownContext(true, null);
+
     /**
      * Default Constructor
      */
@@ -216,6 +220,7 @@ public class MuleManager implements UMOManager
         }
         containerContext = new MultiContainerContext();
         securityManager = new MuleSecurityManager();
+        Runtime.getRuntime().addShutdownHook(new ShutdownThread());
     }
 
     /**
@@ -611,6 +616,9 @@ public class MuleManager implements UMOManager
             eventManager.registerEventType(AdminEvent.class, AdminEventListener.class);
             eventManager.registerEventType(CustomEvent.class, CustomEventListener.class);
             eventManager.registerEventType(ConnectionEvent.class, ConnectionEventListener.class);
+            if(config.isEnableMessageEvents()) {
+                eventManager.registerEventType(MessageEvent.class, MessageEventListener.class);
+            }
 
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_INITIALISNG));
             if (id == null) {
@@ -805,7 +813,7 @@ public class MuleManager implements UMOManager
      */
     public void shutdown(Throwable e, boolean aggressive)
     {
-        Runtime.getRuntime().addShutdownHook(new ShutdownThread(e, aggressive));
+        shutdownContext = new ShutdownContext(aggressive, e);
         System.exit(0);
     }
 
@@ -1165,53 +1173,6 @@ public class MuleManager implements UMOManager
         // }
     }
 
-    /**
-     * The shutdown thread used by the server when its main thread is terminated
-     */
-    private class ShutdownThread extends Thread
-    {
-        Throwable t;
-        boolean aggressive = true;
-
-        public ShutdownThread(Throwable t, boolean aggressive)
-        {
-            super();
-            this.t = t;
-            this.aggressive = aggressive;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Runnable#run()
-         */
-        public void run()
-        {
-            dispose();
-            if (!aggressive) {
-                // FIX need to check if there are any outstanding
-                // operations to be done?
-            }
-
-            if (server != null) {
-                if (t != null) {
-                    server.shutdown(t);
-                } else {
-                    server.shutdown();
-                }
-            } else {
-                List msgs = new ArrayList();
-                if (t != null) {
-                    msgs.add("Mule is shutting down due to exception: " + t.getMessage());
-                } else {
-                    msgs.add("Mule is shutting down due to normal shutdown request.");
-                }
-                msgs.add("Shutdown time is: " + new Date().toString());
-                StringMessageHelper.getBoilerPlate(msgs, '*', 76);
-            }
-        }
-    }
-
     public void setId(String id)
     {
         if (this.id == null) {
@@ -1312,5 +1273,71 @@ public class MuleManager implements UMOManager
     public void setQueueManager(QueueManager queueManager)
     {
         this.queueManager = queueManager;
+    }
+
+    /**
+     * The shutdown thread used by the server when its main thread is terminated
+     */
+    private class ShutdownThread extends Thread
+    {
+        Throwable t;
+        boolean aggressive = true;
+
+        public ShutdownThread()
+        {
+            super();
+            this.t = shutdownContext.getException();
+            this.aggressive = shutdownContext.isAggressive();
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see java.lang.Runnable#run()
+         */
+        public void run()
+        {
+            dispose();
+            if (!aggressive) {
+                // FIX need to check if there are any outstanding
+                // operations to be done?
+            }
+
+            if (server != null) {
+                if (t != null) {
+                    server.shutdown(t);
+                } else {
+                    server.shutdown();
+                }
+            } else {
+                List msgs = new ArrayList();
+                if (t != null) {
+                    msgs.add("Mule is shutting down due to exception: " + t.getMessage());
+                } else {
+                    msgs.add("Mule is shutting down due to normal shutdown request.");
+                }
+                msgs.add("Shutdown time is: " + new Date().toString());
+                StringMessageHelper.getBoilerPlate(msgs, '*', 76);
+            }
+        }
+    }
+
+    private class ShutdownContext
+    {
+        private boolean aggressive = false;
+        private Throwable exception = null;
+
+        public ShutdownContext(boolean aggressive, Throwable exception) {
+            this.aggressive = aggressive;
+            this.exception = exception;
+        }
+
+        public boolean isAggressive() {
+            return aggressive;
+        }
+
+        public Throwable getException() {
+            return exception;
+        }
     }
 }

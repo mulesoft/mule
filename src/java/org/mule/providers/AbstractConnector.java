@@ -35,12 +35,21 @@ import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerEvent;
-import org.mule.umo.provider.*;
+import org.mule.umo.provider.ConnectorException;
+import org.mule.umo.provider.UMOConnectable;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOMessageDispatcherFactory;
+import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all
@@ -157,7 +166,12 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     protected WaitableBoolean connecting = new WaitableBoolean(false);
 
+    /** keeps arecord of whether the connecter should be started once it is reconnected */
     protected WaitableBoolean startedBeforeDisconnect = new WaitableBoolean(false);
+
+    /** Whether to fire message events for every message that is sent or received from this connector */
+    private boolean enableMessageEvents = false;
+
 
     public AbstractConnector()
     {
@@ -166,6 +180,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         dispatchers = new ConcurrentHashMap();
         receivers = new ConcurrentHashMap();
         connectionStrategy = MuleManager.getConfiguration().getConnectionStrategy();
+        enableMessageEvents = MuleManager.getConfiguration().isEnableMessageEvents();
     }
 
     /*
@@ -884,5 +899,21 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     public void setCreateMultipleTransactedReceivers(boolean createMultipleTransactedReceivers) {
         this.createMultipleTransactedReceivers = createMultipleTransactedReceivers;
+    }
+
+    /**
+     * Whether to fire message events for every message that is sent or received from this connector
+     * @return
+     */
+    public boolean isEnableMessageEvents() {
+        return enableMessageEvents;
+    }
+
+    /**
+     * Whether to fire message events for every message that is sent or received from this connector
+     * @param enableMessageEvents
+     */
+    public void setEnableMessageEvents(boolean enableMessageEvents) {
+        this.enableMessageEvents = enableMessageEvents;
     }
 }
