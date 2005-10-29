@@ -217,7 +217,6 @@ public class MuleEndpointURI implements UMOEndpointURI
         p.remove(PROPERTY_ENDPOINT_URI);
         p.remove(PROPERTY_CREATE_CONNECTOR);
         p.remove(PROPERTY_TRANSFORMERS);
-        p.remove(PROPERTY_TRANSFORMERS);
         return p;
     }
 
