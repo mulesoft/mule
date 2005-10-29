@@ -28,14 +28,14 @@ import java.util.List;
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a> $Revision$
  */
-public class XABridgeTestCase extends FunctionalTestCase
+public class XABridgeJmsJdbcTestCase extends FunctionalTestCase
 {
     private static ClassPathXmlApplicationContext context;
 
-    private static final Log logger = LogFactory.getLog(XABridgeTestCase.class);
+    private static final Log logger = LogFactory.getLog(XABridgeJmsJdbcTestCase.class);
 
     protected String getConfigResources() {
-        return "org/mule/test/integration/transaction/xabridge-mule.xml";
+        return "org/mule/test/integration/transaction/xabridge-jms-jdbc-mule.xml";
     }
 
     protected void doPostFunctionalSetUp() throws Exception {

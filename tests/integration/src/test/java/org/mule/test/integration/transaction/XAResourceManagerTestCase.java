@@ -31,7 +31,7 @@ import javax.transaction.xa.XAResource;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class AbstractXAResourceManagerTestCase extends AbstractMuleTestCase
+public class XAResourceManagerTestCase extends AbstractMuleTestCase
 {
 
     private Jotm jotm;
@@ -50,7 +50,7 @@ public class AbstractXAResourceManagerTestCase extends AbstractMuleTestCase
         tm = null;
     }
 
-    public void test1() throws Exception
+    public void testTxBehaviour() throws Exception
     {
         TestXAResourceManager rm = new TestXAResourceManager();
         rm.start();
