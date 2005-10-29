@@ -1,3 +1,16 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
 package org.mule.providers.ejb;
 
 import org.apache.commons.logging.Log;
@@ -101,7 +114,7 @@ public class EjbConnectorUtil
         // Attempt to init params
         if (clazz.equals(EjbMessageReceiver.class)) {
             try {
-                EjbAble object = (EjbAble) Class.forName(connector.getReceiverArgumentClass()).newInstance();
+                EjbAble object = (EjbAble) ClassHelper.instanciateClass(connector.getReceiverArgumentClass(), ClassHelper.NO_ARGS);
 
                 argumentClasses = object.argumentClasses();
 

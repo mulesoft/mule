@@ -1,3 +1,17 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ * ------------------------------------------------------------------------------------------------------
+ *
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
+ *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
+ */
+
 package org.mule.samples.voipservice.client;
 
 import org.apache.commons.logging.Log;
@@ -16,6 +30,9 @@ import org.mule.util.StringMessageHelper;
 
 import java.io.IOException;
 
+/**
+ * @author Binildas Christudas
+ */
 public class VoipConsumer {
 
     protected static transient Log logger = LogFactory.getLog(VoipConsumer.class);
@@ -55,11 +72,11 @@ public class VoipConsumer {
         VoipConsumer voipConsumer = null;
         int response = 0;
         try {
-                voipConsumer = new VoipConsumer("voip-broker-sync-config.xml");
+            voipConsumer = new VoipConsumer("voip-broker-sync-config.xml");
 
-                System.out.println(StringMessageHelper.getBoilerPlate("Welcome to the Mule Voip Services Provisioning Example. This examples was published" +
-                        "\nas a part of a featured article on java.net titled Service Provisioning Through ESB" +
-                        "\nhttp://today.java.net/pub/a/today/2005/10/18/service-provisioning-through-esb.html.", '*', 90));
+            System.out.println(StringMessageHelper.getBoilerPlate("Welcome to the Mule Voip Services Provisioning Example. This examples was published" +
+                    "\nas a part of a featured article on java.net titled Service Provisioning Through ESB" +
+                    "\nhttp://today.java.net/pub/a/today/2005/10/18/service-provisioning-through-esb.html.", '*', 90));
 
             while (response != 'q') {
                 System.out.println("\n[1] make a service request");
