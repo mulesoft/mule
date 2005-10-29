@@ -138,7 +138,7 @@ public class ConnectorFactory
         if (type==2) {
             transId = url.getResponseTransformers();
         } else  {
-            transId = url.getResponseTransformers();
+            transId = url.getTransformers();
         }
 
         if (transId != null) {
@@ -312,7 +312,7 @@ public class ConnectorFactory
         Map connectors = MuleManager.getInstance().getConnectors();
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();) {
             connector = (UMOConnector) iterator.next();
-            if (connector.getProtocol().equalsIgnoreCase(protocol)) {
+            if (connector.supportsProtocol(protocol)) {
                 return connector;
             }
         }
