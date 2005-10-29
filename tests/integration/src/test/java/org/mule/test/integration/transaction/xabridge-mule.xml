@@ -21,14 +21,9 @@
 
 	<connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
-	        <property name="specification" value="1.1"/>
-	        <property name="connectionFactoryJndiName" value="XAJmsQueueConnectionFactory"/>
-	        <property name="jndiInitialFactory" value="com.sun.jndi.fscontext.RefFSContextFactory"/>
-	        <property name="jndiProviderUrl" value="file:src/test/conf/jndi/activemq"/>
-			<map name="connectionFactoryProperties">
-				<property name="brokerURL" value="tcp://localhost:61616"/>
-			</map>
-		</properties>
+            <container-property name="connectionFactory" reference="jmsConnectionFactoryXa"/>
+            <property name="specification" value="1.1"/>
+        </properties>
     </connector>
 
     <connector name="jdbcConnector" className="org.mule.providers.jdbc.JdbcConnector">
