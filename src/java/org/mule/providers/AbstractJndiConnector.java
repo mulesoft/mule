@@ -8,10 +8,11 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Code by (c) 2005 P.Oikari.
- *
+ * <p/>
  * This class acts as common baseclass for both Rmi & EjbConnector
  * Resolves Jndi root for connector usage
  *
@@ -20,83 +21,85 @@ import java.util.Hashtable;
  */
 
 
-public abstract class AbstractJndiConnector extends AbstractServiceEnabledConnector
-{
-  protected String jndiInitialFactory;
+public abstract class AbstractJndiConnector extends AbstractServiceEnabledConnector {
+    protected String jndiInitialFactory;
 
-  protected String jndiUrlPkgPrefixes;
+    protected String jndiUrlPkgPrefixes;
 
-  protected String jndiProviderUrl;
+    protected String jndiProviderUrl;
 
-  protected Context jndiContext;
+    protected Context jndiContext;
 
-   protected void initJndiContext() throws NamingException, InitialisationException
-  {
-    if (null == jndiContext)
-    {
-      Hashtable props = new Hashtable();
+    protected Map jndiProviderProperties = null;
 
-      if (null != jndiInitialFactory)
-        props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
+    protected void initJndiContext() throws NamingException, InitialisationException {
+        if (null == jndiContext) {
+            Hashtable props = new Hashtable();
 
-      if (jndiProviderUrl != null)
-        props.put(Context.PROVIDER_URL, jndiProviderUrl);
+            if (null != jndiInitialFactory) {
+                props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
+            }
 
-      if (jndiUrlPkgPrefixes != null)
-        props.put(Context.URL_PKG_PREFIXES, jndiUrlPkgPrefixes);
+            if (jndiProviderUrl != null) {
+                props.put(Context.PROVIDER_URL, jndiProviderUrl);
+            }
 
-      jndiContext = new InitialContext(props);
-    }
-  }
+            if (jndiUrlPkgPrefixes != null) {
+                props.put(Context.URL_PKG_PREFIXES, jndiUrlPkgPrefixes);
+            }
 
-  public Context getJndiContext(String jndiProviderUrl) throws InitialisationException
-  {
-    try
-    {
-      setJndiProviderUrl(jndiProviderUrl);
-
-      initJndiContext();
-    }
-    catch (Exception e)
-    {
-      throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "AbstractJndiConnector"), e, this);
+            if(jndiProviderProperties!=null) {
+                props.putAll(jndiProviderProperties);
+            }
+            jndiContext = new InitialContext(props);
+        }
     }
 
-    return jndiContext;
-  }
+    public Context getJndiContext(String jndiProviderUrl) throws InitialisationException {
+        try {
+            setJndiProviderUrl(jndiProviderUrl);
 
-  public void setJndiContext(Context jndiContext)
-  {
-    this.jndiContext = jndiContext;
-  }
+            initJndiContext();
+        } catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "AbstractJndiConnector"), e, this);
+        }
 
-  public void setJndiInitialFactory(String jndiInitialFactory)
-  {
-    this.jndiInitialFactory = jndiInitialFactory;
-  }
+        return jndiContext;
+    }
 
-  public String getJndiInitialFactory()
-  {
-    return jndiInitialFactory;
-  }
+    public void setJndiContext(Context jndiContext) {
+        this.jndiContext = jndiContext;
+    }
 
-  public void setJndiUrlPkgPrefixes(String jndiUrlPkgPrefixes)
-  {
-    this.jndiUrlPkgPrefixes = jndiUrlPkgPrefixes;
-  }
+    public void setJndiInitialFactory(String jndiInitialFactory) {
+        this.jndiInitialFactory = jndiInitialFactory;
+    }
 
-  public String getJndiUrlPkgPrefixes()
-  {
-    return jndiUrlPkgPrefixes;
-  }
+    public String getJndiInitialFactory() {
+        return jndiInitialFactory;
+    }
 
-  public String getJndiProviderUrl()
-  {
-    return jndiProviderUrl;
-  }
+    public void setJndiUrlPkgPrefixes(String jndiUrlPkgPrefixes) {
+        this.jndiUrlPkgPrefixes = jndiUrlPkgPrefixes;
+    }
 
-  public void setJndiProviderUrl(String jndiProviderUrl)
-  {
-    this.jndiProviderUrl = jndiProviderUrl;
-  }
+    public String getJndiUrlPkgPrefixes() {
+        return jndiUrlPkgPrefixes;
+    }
+
+    public String getJndiProviderUrl() {
+        return jndiProviderUrl;
+    }
+
+    public void setJndiProviderUrl(String jndiProviderUrl) {
+        this.jndiProviderUrl = jndiProviderUrl;
+    }
+
+    public Map getJndiProviderProperties() {
+        return jndiProviderProperties;
+    }
+
+    public void setJndiProviderProperties(Map jndiProviderProperties) {
+        this.jndiProviderProperties = jndiProviderProperties;
+    }
 }
