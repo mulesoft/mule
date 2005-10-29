@@ -15,7 +15,8 @@
     Instead of using an ejb Connector as in the other configuration (see mule-config.xml in this directory)
     We configure an EJB container context and reference the EJB session bean directly as a Mule Managed component
     The advantage of using an EjbContainerContext over an Ejb Connector is that the container is early binding where as
-    connector is only invoked once an event is received for the referenced Ejb.</description>
+    connector is only invoked once an event is received for the referenced Ejb.
+    </description>
 
     <container-context className="org.mule.impl.container.EjbContainerContext">
         <properties>
@@ -29,16 +30,6 @@
             </map>
         </properties>
     </container-context>
-
-    <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level
-    bean types for the objects you're passing around -->
-    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
-        <properties>
-            <list name="beanTypes">
-                <entry value="org.mule.samples.loanbroker.esb.message.LoanQuoteRequest"/>
-            </list>
-        </properties>
-    </connector>
 
     <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>

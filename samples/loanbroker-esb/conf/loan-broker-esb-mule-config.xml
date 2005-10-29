@@ -36,16 +36,6 @@
         </properties>
     </connector>
 
-    <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level
-    bean types for the objects you're passing around -->
-    <connector name="axisConnector" className="org.mule.providers.soap.axis.AxisConnector">
-        <properties>
-            <list name="beanTypes">
-                <entry value="org.mule.samples.loanbroker.esb.message.LoanQuoteRequest"/>
-            </list>
-        </properties>
-    </connector>
-
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequestsREST" value="jetty:rest://localhost:8080/loanbroker"/>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://loan.broker.requests"/>
