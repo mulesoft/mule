@@ -60,8 +60,15 @@ public class ChainingRouter extends FilteringOutboundRouter
                 // if it's not the last endpoint in the chain,
                 // enforce the synchronous call, otherwise we lose response
                 boolean lastEndpointInChain = (i == endpointsCount - 1);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Sending Chained message '" + i + "': " + (intermediaryResult==null ? "null" : intermediaryResult.toString()));
+                }
                 if (!lastEndpointInChain) {
+
                     intermediaryResult = send(session, intermediaryResult, endpoint);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Received Chain result '" + i + "': " + (intermediaryResult==null ? "null" : intermediaryResult.toString()));
+                    }
                     if (intermediaryResult == null) {
                         logger.warn("Chaining router cannot process any further endpoints. " +
                                     "There was no result returned from endpoint invocation: " + endpoint);
@@ -72,6 +79,9 @@ public class ChainingRouter extends FilteringOutboundRouter
                     // use the 'sync/async' method parameter
                     if (synchronous) {
                         resultToReturn = send(session, intermediaryResult, endpoint);
+                        if (logger.isDebugEnabled()) {
+                        logger.debug("Received final Chain result '" + i + "': " + (resultToReturn==null ? "null" : resultToReturn.toString()));
+                    }
                     } else {
                         // reset the previous call result to avoid confusion
                         resultToReturn = null;
