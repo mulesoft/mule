@@ -61,4 +61,9 @@ public class ManagerEvent extends UMOServerEvent implements BlockingServerEvent
         }
         return ACTIONS[i - 1];
     }
+
+    public String toString() {
+        return EVENT_NAME + "{" + "action=" + getActionName(action)
+                + ", resourceId=" + resourceIdentifier + ", timestamp=" + timestamp + "}";
+    }
 }

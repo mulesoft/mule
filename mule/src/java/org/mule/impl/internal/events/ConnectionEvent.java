@@ -18,7 +18,8 @@ import org.mule.umo.manager.UMOServerEvent;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
- * todo document
+ * Is fired by a connector when a connection is made, or disconnected of the connection
+ * fails.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -53,4 +54,11 @@ public class ConnectionEvent extends UMOServerEvent
         }
         return ACTIONS[i - 1];
     }
+
+    public String getType() {
+        if(action == CONNECTION_DISCONNECTED) return TYPE_WARNING;
+        if(action == CONNECTION_FAILED) return TYPE_ERROR;
+        return TYPE_INFO;
+    }
+
 }

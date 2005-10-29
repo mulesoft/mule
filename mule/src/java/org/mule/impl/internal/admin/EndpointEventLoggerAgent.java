@@ -13,8 +13,8 @@
  */
 package org.mule.impl.internal.admin;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
@@ -33,13 +33,9 @@ import org.mule.umo.provider.UMOMessageDispatcher;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EndpointAbstractEventLoggerAgent extends AbstractEventLoggerAgent
+public class EndpointEventLoggerAgent extends AbstractEventLoggerAgent
 {
-    /**
-     * logger used by this class
-     */
-    private static transient Log LOGGER = LogFactory.getLog(AbstractEventLoggerAgent.class);
-    
+
     private String endpointAddress;
     private UMOEndpoint logEndpoint = null;
     private UMOSession session = null;
@@ -50,9 +46,11 @@ public class EndpointAbstractEventLoggerAgent extends AbstractEventLoggerAgent
         try {
             if (endpointAddress != null) {
                 logEndpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointAddress, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-                // Create a dummy session for sending events
+                // Create a session for sending events
                 session = new MuleSession();
-            }
+            } else {
+                throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "endpointAddress"), this);
+                    }
         } catch (Exception e) {
             throw new InitialisationException(e, this);
         }
@@ -66,7 +64,7 @@ public class EndpointAbstractEventLoggerAgent extends AbstractEventLoggerAgent
                 UMOEvent event = new MuleEvent(new MuleMessage(e.toString()), logEndpoint, session, false);
                 dispatcher.dispatch(event);
             } catch (Exception e1) {
-                LOGGER.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + logEndpoint
+                logger.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + logEndpoint
                         + ". Error is: " + e1.getMessage(), e1);
             }
         }
@@ -83,9 +81,15 @@ public class EndpointAbstractEventLoggerAgent extends AbstractEventLoggerAgent
         buf.append(getName()).append(": ");
         if (endpointAddress != null) {
             buf.append("Forwarding events to: " + endpointAddress);
-        } else {
-            buf.append("No log forwarding endpoint is configured!");
         }
         return buf.toString();
+    }
+
+    public String getEndpointAddress() {
+        return endpointAddress;
+    }
+
+    public void setEndpointAddress(String endpointAddress) {
+        this.endpointAddress = endpointAddress;
     }
 }
