@@ -66,7 +66,7 @@ public class MuleMessage implements UMOMessage
             adapter = new DefaultMessageAdapter(message);
         }
         if(properties!=null) {
-            addProperties(previous.getProperties());
+            addProperties(properties);
         }
         if(previous!=null) {
             for (Iterator iterator = previous.getAttachmentNames().iterator(); iterator.hasNext();) {
@@ -375,7 +375,7 @@ public class MuleMessage implements UMOMessage
         buf.append(", correlationGroup=").append(getCorrelationGroupSize());
         buf.append(", correlationSeq=").append(getCorrelationSequence());
         buf.append(", exceptionPayload=").append(exceptionPayload);
-        buf.append(", properties=").append(PropertiesHelper.propertiesToString(getProperties(), false));
+        buf.append(", properties=").append(PropertiesHelper.propertiesToString(getProperties(), true));
         buf.append("}");
         return buf.toString();
     }
