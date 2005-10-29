@@ -107,10 +107,12 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
             boolean correlationSet = message.getCorrelationId() != null;
             if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
-                logger.debug("CorrelationId is already set, not setting it again");
+                if(logger.isDebugEnabled()) logger.debug("CorrelationId is already set to '" + message.getCorrelationId() + "' , not setting it again");
                 return;
             } else if (correlationSet) {
-                logger.debug("CorrelationId is already set, but router is configured to overwrite it");
+                if(logger.isDebugEnabled()) logger.debug("CorrelationId is already set to '" + message.getCorrelationId() + "', but router is configured to overwrite it");
+            } else {
+                if(logger.isDebugEnabled()) logger.debug("No CorrelationId is set on the message, will net new Id");
             }
 
             String correlation = null;
