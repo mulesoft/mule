@@ -26,13 +26,13 @@ public class OracleJmsEndpointTestCase extends NamedTestCase
 {
     public void testWithoutPayloadFactory() throws Exception {
     	UMOEndpointURI url = 
-    		new MuleEndpointURI("oaq://XML_QUEUE?transformers=XMLMessageToString");
+    		new MuleEndpointURI("jms://XML_QUEUE?transformers=XMLMessageToString");
         assertNull(url.getParams().getProperty(OracleJmsConnector.PAYLOADFACTORY_PROPERTY));
     }
 
     public void testWithPayloadFactory() throws Exception {
     	UMOEndpointURI url = 
-    		new MuleEndpointURI("oaq://XML_QUEUE" +
+    		new MuleEndpointURI("jms://XML_QUEUE" +
 				"?" + OracleJmsConnector.PAYLOADFACTORY_PROPERTY + "=oracle.xdb.XMLTypeFactory" +
 	            "&transformers=XMLMessageToString");
         assertEquals("oracle.xdb.XMLTypeFactory", url.getParams().getProperty(OracleJmsConnector.PAYLOADFACTORY_PROPERTY));

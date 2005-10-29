@@ -27,7 +27,7 @@ public class GlobalPayloadFactoryTestCase extends AbstractIntegrationTestCase {
 
 	    MuleUtil.sendXmlMessageToQueue(TestConfig.QUEUE_XML, TestConfig.XML_MESSAGE);
         assertXMLEqual(TestConfig.XML_MESSAGE, 
-        		(String) MuleUtil.receiveMessage("oaq://" + TestConfig.QUEUE_XML, "XMLMessageToString"));
+        		(String) MuleUtil.receiveMessage("jms://" + TestConfig.QUEUE_XML, "XMLMessageToString"));
 
         AQUtil.dropQueue(session, connector.getUsername(), TestConfig.QUEUE_XML, /*force*/false);
     }

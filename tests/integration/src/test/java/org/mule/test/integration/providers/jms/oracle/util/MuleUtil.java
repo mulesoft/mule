@@ -18,17 +18,17 @@ import org.w3c.dom.Document;
 public class MuleUtil {
 
     public static void sendXmlMessageToQueue(String queue, String xml) throws UMOException {
-    	sendMessage("oaq://" + queue + "?transformers=StringToXMLMessage", xml);
+    	sendMessage("jms://" + queue + "?transformers=StringToXMLMessage", xml);
     }
 
     public static String receiveXmlMessageAsString(String queue) throws UMOException {
-		return (String) receiveMessage("oaq://" + queue + "?"
+		return (String) receiveMessage("jms://" + queue + "?"
 				+ OracleJmsConnector.PAYLOADFACTORY_PROPERTY + "=oracle.xdb.XMLTypeFactory", 
 				"XMLMessageToString");
 	}
     
     public static Document receiveXmlMessageAsDOM(String queue) throws UMOException {
-		return (Document) receiveMessage("oaq://" + queue + "?"
+		return (Document) receiveMessage("jms://" + queue + "?"
 				+ OracleJmsConnector.PAYLOADFACTORY_PROPERTY + "=oracle.xdb.XMLTypeFactory", 
 				"XMLMessageToDOM");
 	}
