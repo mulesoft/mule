@@ -18,7 +18,7 @@ import java.net.URI;
 import java.util.Properties;
 
 /**
- * <code>UMOEndpointURI</code> is used to determine how a message is sent of
+ * <code>UMOEndpointURI</code> is used to determine how a message is sent or
  * received. The url defines the protocol, the endpointUri destination of the
  * message and optionally the endpoint to use when dispatching the event. Mule
  * urls take the form of -

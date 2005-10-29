@@ -4,9 +4,9 @@
     <extend>${basedir}/../project.xml</extend>
     <id>mule-oracle-jms-provider</id>
     <artifactId>mule-oracle-jms-provider</artifactId>
-    <name>Mule Oracle Anvanced Queuing Provider</name>
+    <name>Mule Oracle Advanced Queuing Provider</name>
     <shortDescription>mule-oracle-jms-provider</shortDescription>
-    <description>Mule Oracle Support adds Oracle-specific functionality to the standard Mule providers such as JMS and JDBC.  For more information see
+    <description>Adds Oracle-specific functionality to the standard Mule JMS provider.  For more information see:
         <a href="http://mule.codehaus.org/Oracle+Integration">Oracle Integration</a>.
     </description>
     <dependencies>
