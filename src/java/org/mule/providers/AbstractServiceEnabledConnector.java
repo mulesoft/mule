@@ -34,7 +34,7 @@ import java.util.Properties;
 
 /**
  * <code>AbstractServiceEnabledConnector</code> initialises a connector from a
- * sercive descriptor. using this method greatly reduces the code required to
+ * service descriptor.  Using this method greatly reduces the code required to
  * implement a connector and means that Mule can create connectors and endpoints
  * from a url if the connector has a service descriptor.
  * 
@@ -60,8 +60,8 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
 
     public void initialiseFromUrl(UMOEndpointURI endpointUri) throws InitialisationException
     {
-        if (!getProtocol().equalsIgnoreCase(endpointUri.getScheme())
-                && !getProtocol().equalsIgnoreCase(endpointUri.getSchemeMetaInfo())) {
+        if (!supportsProtocol(endpointUri.getScheme())
+                && !supportsProtocol(endpointUri.getSchemeMetaInfo())) {
             throw new InitialisationException(new Message(Messages.SCHEME_X_NOT_COMPATIBLE_WITH_CONNECTOR_X,
                                                           getProtocol(),
                                                           getClass().getName()), this);

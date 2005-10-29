@@ -98,6 +98,11 @@ public interface UMOConnector extends Disposable, Initialisable
     String getProtocol();
 
     /**
+     * @return true if the protocol is supported by this connector.
+     */
+    boolean supportsProtocol(String protocol);
+
+    /**
      * The connector can pool dispatchers based on their endpointUri or can
      * ingnore the endpointUri altogether and use a ThreadLocal or always create
      * new.
