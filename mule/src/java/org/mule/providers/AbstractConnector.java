@@ -217,6 +217,13 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     public abstract String getProtocol();
 
+    /**
+     * @return true if the protocol is supported by this connector.
+     */
+    public boolean supportsProtocol(String protocol) {
+    	return getProtocol().equalsIgnoreCase(protocol);
+    }
+
     /*
      * (non-Javadoc)
      * 

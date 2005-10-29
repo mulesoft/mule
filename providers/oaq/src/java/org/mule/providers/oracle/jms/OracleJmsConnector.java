@@ -57,8 +57,6 @@ public class OracleJmsConnector extends JmsConnector {
      * set globally for the connector instead of for each endpoint. */
 	public static final String PAYLOADFACTORY_PROPERTY = "payloadFactory";
 
-    public static final String OAQ_PROTOCOL = "oaq";
-
 	private String payloadFactory = null;
 	
     /** The JDBC URL for the Oracle database.  For example, {@code jdbc:oracle:oci:@myhost} */
@@ -76,31 +74,18 @@ public class OracleJmsConnector extends JmsConnector {
     private List connections = new ArrayList();
 
     /**
-     * Default constructor automatically initialises the serviceOverrides for the Oracle
-     * connector.  This allows users to configure the Oracle connector in their configuration
-     * and use jms:// URIs instread of oaq:// URIs without having to explicitly configure the
-     * service overrides.
-     */
-    public OracleJmsConnector() {
-        serviceOverrides = new Properties();
-        serviceOverrides.setProperty(MuleProperties.CONNECTOR_DISPATCHER_FACTORY, OracleJmsMessageDispatcherFactory.class.getName());
-        serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS, OracleJmsMessageReceiver.class.getName());
-        serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, OracleJmsMessageAdapter.class.getName());
-    }
-
-    /*
-     * The protocol for this connector differs depending on whether is
-     * was configured explicitly or configured via a oaq:// uri.
+     * The Oracle AQ connector supports both the oaq:// and the jms:// protocols.
      */
     public String getProtocol() {
-        if(serviceDescriptor==null) {
-            return OAQ_PROTOCOL;
-        }
-        if(serviceDescriptor.getConnector().equals(getClass().getName())) {
-            return OAQ_PROTOCOL;
-        } else {
-            return super.getProtocol();
-        }
+    	return "oaq";
+    }
+    
+    /**
+     * The Oracle AQ connector supports both the oaq:// and the jms:// protocols.
+     */
+    public boolean supportsProtocol(String protocol) {
+    	return getProtocol().equalsIgnoreCase(protocol) 
+    			|| super.getProtocol().equalsIgnoreCase(protocol);
     }
 
     /** Oracle has two different factory classes:
