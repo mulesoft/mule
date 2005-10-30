@@ -22,6 +22,7 @@ import org.mule.providers.http.jetty.JettyConnector;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.Utility;
 
 import java.net.URI;
 
@@ -85,6 +86,6 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
         String msg = new String(buf, 0, len);
 
         assertNotNull(msg);
-        assertTrue(msg.endsWith(TEST_MESSAGE + (char) Character.LINE_SEPARATOR + " Received"));
+        assertTrue(msg.endsWith(TEST_MESSAGE + Utility.CRLF + " Received"));
     }
 }
