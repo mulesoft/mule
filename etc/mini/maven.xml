@@ -108,6 +108,7 @@
         <delete dir="${mule.release.samples.dir}/errorhandler"/>
         <delete dir="${mule.release.samples.dir}/voipservice"/>
         <delete dir="${mule.release.samples.dir}/stockquote"/>
+        <delete dir="${mule.release.samples.dir}/loanborker-esb"/>
 
         <!-- copy config overrides that do not use non-mini-mule jars -->
         <echo>Copying smple config overrides from ${basedir}/samples</echo>

@@ -9,7 +9,6 @@
 package org.mule.test.config;
 
 import junit.framework.TestCase;
-
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.transformers.NoActionTransformer;
 import org.mule.umo.UMOException;
@@ -24,8 +23,17 @@ public class EndpointTransformerTestCase extends TestCase {
 		QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         builder.getManager().registerTransformer(new NoActionTransformer());
 		UMOEndpoint endpoint = 
-			builder.registerEndpoint("file:///tmp?transformers=NoActionTransformer", 
-									 "test", /*inbound*/false);
+			builder.registerEndpoint("test:///tmp?transformers=NoActionTransformer",
+									 "test", false);
 		assertEquals("NoActionTransformer", endpoint.getTransformer().getName());
+	}
+
+    public void testResponseTransformerProperty() throws UMOException {
+		QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
+        builder.getManager().registerTransformer(new NoActionTransformer());
+		UMOEndpoint endpoint =
+			builder.registerEndpoint("test:///tmp?responseTransformers=NoActionTransformer",
+									 "test", false);
+		assertEquals("NoActionTransformer", endpoint.getResponseTransformer().getName());
 	}
 }
