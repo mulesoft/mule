@@ -15,12 +15,12 @@
 
 package org.mule.test.util;
 
+import junit.framework.TestCase;
+import org.mule.util.StringMessageHelper;
+import org.mule.util.Utility;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.mule.util.StringMessageHelper;
 
 /**
  * <code>StringMessageHelperTest</code> test the methods of the
@@ -84,9 +84,9 @@ public class StringMessageHelperTestCase extends TestCase
         msgs.add("Boiler Plate");
 
         String plate = StringMessageHelper.getBoilerPlate(msgs, '*', 12);
-        assertEquals((char) Character.LINE_SEPARATOR + "************" + (char) Character.LINE_SEPARATOR + "* This     *" +
-                     (char) Character.LINE_SEPARATOR + "* is a     *" + (char) Character.LINE_SEPARATOR + "* Boiler   *" +
-                     (char) Character.LINE_SEPARATOR + "* Plate    *" + (char) Character.LINE_SEPARATOR + "************", plate);
+        assertEquals(Utility.CRLF + "************" + Utility.CRLF + "* This     *" +
+                     Utility.CRLF + "* is a     *" + Utility.CRLF + "* Boiler   *" +
+                     Utility.CRLF + "* Plate    *" + Utility.CRLF + "************", plate);
 
     }
 
@@ -98,15 +98,15 @@ public class StringMessageHelperTestCase extends TestCase
         msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
 
         String plate = StringMessageHelper.getBoilerPlate(msgs, '*', 12);
-        assertEquals((char) Character.LINE_SEPARATOR + "************" + (char) Character.LINE_SEPARATOR +
-                     "* This     *" + (char) Character.LINE_SEPARATOR + "* is a     *" + (char) Character.LINE_SEPARATOR +
-                     "* Boiler   *" + (char) Character.LINE_SEPARATOR + "* Plate    *" + (char) Character.LINE_SEPARATOR +
-                     "* Message  *" + (char) Character.LINE_SEPARATOR + "* that     *" + (char) Character.LINE_SEPARATOR +
-                     "* should   *" + (char) Character.LINE_SEPARATOR + "* get      *" + (char) Character.LINE_SEPARATOR +
-                     "* wrapped  *" + (char) Character.LINE_SEPARATOR + "* to the   *" + (char) Character.LINE_SEPARATOR +
-                     "* next     *" + (char) Character.LINE_SEPARATOR + "* line if  *" + (char) Character.LINE_SEPARATOR +
-                     "* it is    *" + (char) Character.LINE_SEPARATOR + "* working  *" + (char) Character.LINE_SEPARATOR +
-                     "* properly *" + (char) Character.LINE_SEPARATOR + "************",
+        assertEquals(Utility.CRLF + "************" + Utility.CRLF +
+                     "* This     *" + Utility.CRLF + "* is a     *" + Utility.CRLF +
+                     "* Boiler   *" + Utility.CRLF + "* Plate    *" + Utility.CRLF +
+                     "* Message  *" + Utility.CRLF + "* that     *" + Utility.CRLF +
+                     "* should   *" + Utility.CRLF + "* get      *" + Utility.CRLF +
+                     "* wrapped  *" + Utility.CRLF + "* to the   *" + Utility.CRLF +
+                     "* next     *" + Utility.CRLF + "* line if  *" + Utility.CRLF +
+                     "* it is    *" + Utility.CRLF + "* working  *" + Utility.CRLF +
+                     "* properly *" + Utility.CRLF + "************",
                      plate);
     }
 
