@@ -28,18 +28,17 @@ import org.mule.umo.UMOMessage;
  */
 public class HttpRequestWildcardFilter extends WildcardFilter
 {
-    public HttpRequestWildcardFilter()
-    {
+    public HttpRequestWildcardFilter() {
     }
 
-    public HttpRequestWildcardFilter(String pattern)
-    {
+    public HttpRequestWildcardFilter(String pattern) {
         super(pattern);
     }
 
-    public boolean accept(Object object)
-    {
-        String request = (String) ((UMOMessage) object).getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
-        return super.accept(request);
+    public boolean accept(Object object) {
+        if (object instanceof UMOMessage) {
+            object = ((UMOMessage)object).getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+        }
+        return super.accept(object);
     }
 }
