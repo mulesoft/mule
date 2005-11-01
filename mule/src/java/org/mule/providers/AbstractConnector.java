@@ -915,13 +915,13 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * Registers other protocols 'understood' by this connector
-     * These must container scheme meta info. Any protocol registered
-     * Must begin with the protocol of this connector i.e. If the connector is axis
+     * Registers other protocols 'understood' by this connector.
+     * These must contain scheme meta info. Any protocol registered
+     * must begin with the protocol of this connector, i.e. If the connector is axis
      * the protocol for jms over axis will be axis:jms.  Here, 'axis' is the
      * scheme meta info and 'jms' is the protocol.
      * If the protocol argument does not start with the connector's protocol, it
-     * will be appended
+     * will be appended.
      * @param protocol the supported protocol to register
      */
     public void registerSupportedProtocol(String protocol) {

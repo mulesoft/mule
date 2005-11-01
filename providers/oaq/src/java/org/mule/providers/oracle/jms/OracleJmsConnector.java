@@ -85,8 +85,9 @@ public class OracleJmsConnector extends JmsConnector {
      * The Oracle AQ connector supports both the oaq:// and the jms:// protocols.
      */
     public boolean supportsProtocol(String protocol) {
-        //The aoq protocol handling breaks the model a bit a you do not need to qualify the jms protocol with aoq
-        //hence we need to override the default supportsProtocol method
+        // The oaq:// protocol handling breaks the model a bit; you do _not_ need to 
+    	// qualify the jms protocol with oaq (oaq:jms://) hence we need to override the 
+    	// default supportsProtocol() method.
     	return getProtocol().equalsIgnoreCase(protocol)
     			|| super.getProtocol().equalsIgnoreCase(protocol);
     }
