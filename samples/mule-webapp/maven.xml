@@ -34,9 +34,11 @@
             <fileset dir="../stockquote/classes"/>
         </copy>
 
-
-        <copy todir="webapp/WEB-INF/classes" file="../stockquote/conf/*.xsl"/>
-
+        <copy todir="webapp/WEB-INF/classes">
+            <fileset dir="../stockquote/conf">
+                <includes name="*.xsl"/>
+            </fileset>
+	    </copy>
 
         <!-- create the war -->
         <zip zipfile="mule.war">

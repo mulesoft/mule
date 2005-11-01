@@ -113,7 +113,7 @@
         <!-- copy config overrides that do not use non-mini-mule jars -->
         <echo>Copying smple config overrides from ${basedir}/samples</echo>
         <j:set var="samples.dist" value="${maven.build.dir}/release/samples"/>
-        <copy overwrite="true" todir="${samples.dist}/echo/conf" file="${basedir}/samples/echo/mule-config.xml"/>
+        <copy overwrite="true" todir="${samples.dist}/echo/conf" file="${basedir}/samples/echo/echo-mule-config.xml"/>
 
         <copy overwrite="true" todir="${samples.dist}/loanbroker/conf" file="${basedir}/samples/loanbroker/loan-broker-async-config.xml"/>
         <copy overwrite="true" todir="${samples.dist}/loanbroker/conf" file="${basedir}/samples/loanbroker/loan-broker-sync-config.xml"/>
