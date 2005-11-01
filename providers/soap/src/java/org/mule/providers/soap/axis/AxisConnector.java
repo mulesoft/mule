@@ -20,7 +20,6 @@ import org.apache.axis.deployment.wsdd.WSDDConstants;
 import org.apache.axis.deployment.wsdd.WSDDProvider;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.server.AxisServer;
-import org.apache.axis.transport.http.HTTPTransport;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -37,7 +36,6 @@ import org.mule.providers.soap.axis.extensions.MuleTransport;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
-import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -50,7 +48,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AxisConnector</code> is used to maintain one or more Services for
@@ -105,18 +107,36 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
      */
     private List servletServices = new ArrayList();
 
+    private List supportedSchemes;
+
     public AxisConnector() {
         super();
-        axisTransportProtocols = new HashMap();
-        //axisTransportProtocols.put("http", MuleTransport.class);
-        axisTransportProtocols.put("smtp", MuleTransport.class);
-        axisTransportProtocols.put("pop3", MuleTransport.class);
-        axisTransportProtocols.put("jms", MuleTransport.class);
-        axisTransportProtocols.put("vm", MuleTransport.class);
+        supportedSchemes = new ArrayList();
+        supportedSchemes.add("http");
+        supportedSchemes.add("https");
+        //supportedSchemes.add("servlet");
+        supportedSchemes.add("vm");
+        supportedSchemes.add("jms");
+        //supportedSchemes.add("xmpp");
+        supportedSchemes.add("smtp");
+        //supportedSchemes.add("smtps");
+        supportedSchemes.add("pop3");
+        //supportedSchemes.add("pop3s");
+
     }
 
     public void doInitialise() throws InitialisationException {
         super.doInitialise();
+
+        axisTransportProtocols = new HashMap();
+
+        for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();) {
+            String s = (String) iterator.next();
+            if(!(s.equalsIgnoreCase("http") || s.equalsIgnoreCase("https") || s.equalsIgnoreCase("servlet"))) {
+                axisTransportProtocols.put(s, MuleTransport.class);
+            }
+        }
+
         MuleManager.getInstance().registerListener(this);
 
         if (serverConfig == null)
@@ -480,5 +500,26 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     void addServletService(SOAPService service) {
         servletServices.add(service);
+    }
+
+    public List getSupportedSchemes() {
+        return supportedSchemes;
+    }
+
+    public void setSupportedSchemes(List supportedSchemes) {
+        this.supportedSchemes = supportedSchemes;
+    }
+
+    public boolean supportsProtocol(String protocol) {
+        if(super.supportsProtocol(protocol)) return true;
+
+        if(protocol.toLowerCase().startsWith(getProtocol())) {
+            int i = protocol.indexOf(":");
+            if(i > -1) {
+                return supportedSchemes.contains(protocol.substring(i + 1).toLowerCase());
+            }
+        }
+        return false;
+
     }
 }
