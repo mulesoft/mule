@@ -40,6 +40,7 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     private Map context;
 
     public GlueConnector() {
+        super();
         registerSupportedProtocol("http");
     }
 

@@ -71,6 +71,7 @@ public class OracleJmsConnector extends JmsConnector {
     private List connections = new ArrayList();
 
     public OracleJmsConnector() {
+        super();
         registerSupportedProtocol("jms");
     }
 
