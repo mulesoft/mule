@@ -13,13 +13,15 @@
  */
 package org.mule.providers;
 
+import org.mule.umo.provider.MessageTypeNotSupportedException;
+
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.mule.umo.provider.MessageTypeNotSupportedException;
-
 /**
- * <code>WriterMessageAdapter</code> TODO
+ * <code>WriterMessageAdapter</code> wraps a java.io.StringWriter and allows meta information
+ * to be associated with the writer
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -86,4 +88,11 @@ public class WriterMessageAdapter extends AbstractMessageAdapter
         return writer;
     }
 
+    public void flush() {
+        writer.flush();
+    }
+
+    public void close() throws IOException {
+        writer.close();
+    }
 }
