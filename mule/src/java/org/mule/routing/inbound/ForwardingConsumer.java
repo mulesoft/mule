@@ -46,7 +46,7 @@ public class ForwardingConsumer extends SelectiveConsumer
                 return new UMOEvent[] { event };
             } else {
                 try {
-                    UMOMessage msg = router.route(new MuleMessage(event.getTransformedMessage(), event.getProperties()), event.getSession(), event.isSynchronous());
+                    UMOMessage msg = router.route(new MuleMessage(event.getTransformedMessage(), event.getProperties(), event.getMessage()), event.getSession(), event.isSynchronous());
                     // what's the correct behaviour for async endpoints?
                     // maybe let router.route() return a Future for the returned
                     // msg?
