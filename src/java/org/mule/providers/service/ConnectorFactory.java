@@ -69,7 +69,7 @@ public class ConnectorFactory
 
     public static UMOEndpoint createEndpoint(UMOEndpointURI uri, String type) throws EndpointException
     {
-        String scheme = uri.getSchemeMetaInfo();
+        String scheme = uri.getFullScheme();
         UMOConnector connector = null;
         try {
             if (uri.getCreateConnector() == ALWAYS_CREATE_CONNECTOR) {
@@ -288,7 +288,7 @@ public class ConnectorFactory
     private static UMOConnector getOrCreateConnectorByProtocol(UMOEndpointURI uri, int create)
             throws ConnectorFactoryException
     {
-        UMOConnector connector = getConnectorByProtocol(uri.getSchemeMetaInfo());
+        UMOConnector connector = getConnectorByProtocol(uri.getFullScheme());
         if (ConnectorFactory.ALWAYS_CREATE_CONNECTOR == create
                 || (connector == null && create == ConnectorFactory.GET_OR_CREATE_CONNECTOR)) {
             connector = ConnectorFactory.createConnector(uri);

@@ -60,8 +60,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
 
     public void initialiseFromUrl(UMOEndpointURI endpointUri) throws InitialisationException
     {
-        if (!supportsProtocol(endpointUri.getScheme())
-                && !supportsProtocol(endpointUri.getSchemeMetaInfo())) {
+        if (!supportsProtocol(endpointUri.getFullScheme())) {
             throw new InitialisationException(new Message(Messages.SCHEME_X_NOT_COMPATIBLE_WITH_CONNECTOR_X,
                                                           getProtocol(),
                                                           getClass().getName()), this);

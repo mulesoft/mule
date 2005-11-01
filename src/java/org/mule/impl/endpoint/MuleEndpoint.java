@@ -77,7 +77,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setEndpointURI(UMOEndpointURI endpointUri) throws EndpointException
     {
         if (connector != null && endpointUri != null
-                && !connector.supportsProtocol(endpointUri.getScheme())) {
+                && !connector.supportsProtocol(endpointUri.getFullScheme())) {
             throw new IllegalArgumentException("Endpoint scheme must be compatible with the connector scheme. Connector is: "
                     + connector.getProtocol() + ", endpoint is: " + endpointUri);
         }
@@ -102,7 +102,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setConnector(UMOConnector connector)
     {
         if (connector != null && endpointUri != null
-                && !connector.supportsProtocol(endpointUri.getScheme())) {
+                && !connector.supportsProtocol(endpointUri.getFullScheme())) {
             throw new IllegalArgumentException("Endpoint scheme must be compatible with the connector scheme. Connector is: "
                     + connector.getProtocol() + ", endpoint is: " + endpointUri);
         }
