@@ -31,6 +31,11 @@ public class ServletConnector extends AbstractServiceEnabledConnector
     //If this is not set the wsdl may not be generated correctly
     protected String servletUrl;
 
+    public ServletConnector() {
+        registerSupportedProtocol("http");
+        registerSupportedProtocol("https");
+    }
+
     public String getProtocol()
     {
         return "servlet";

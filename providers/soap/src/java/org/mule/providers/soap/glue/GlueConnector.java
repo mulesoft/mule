@@ -13,17 +13,17 @@
  */
 package org.mule.providers.soap.glue;
 
+import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.provider.UMOMessageReceiver;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.mule.providers.AbstractServiceEnabledConnector;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOMessageReceiver;
 
 /**
  * <code>GlueConnector</code> instanciates a Glue soap server and allows beans
@@ -38,6 +38,10 @@ public class GlueConnector extends AbstractServiceEnabledConnector
 {
     private List serverEndpoints = new ArrayList();
     private Map context;
+
+    public GlueConnector() {
+        registerSupportedProtocol("http");
+    }
 
     public String getProtocol()
     {
@@ -88,5 +92,9 @@ public class GlueConnector extends AbstractServiceEnabledConnector
     public void setContext(Map context)
     {
         this.context = context;
+    }
+
+    public boolean supportsProtocol(String protocol) {
+        return super.supportsProtocol(protocol) || protocol.toLowerCase().equals("glue:http");
     }
 }

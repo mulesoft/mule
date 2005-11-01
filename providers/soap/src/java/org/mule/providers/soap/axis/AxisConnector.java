@@ -111,17 +111,24 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public AxisConnector() {
         super();
+        //Default supported schemes, these can be restricted
+        //through configuration
         supportedSchemes = new ArrayList();
         supportedSchemes.add("http");
         supportedSchemes.add("https");
-        //supportedSchemes.add("servlet");
+        supportedSchemes.add("servlet");
         supportedSchemes.add("vm");
         supportedSchemes.add("jms");
-        //supportedSchemes.add("xmpp");
+        supportedSchemes.add("xmpp");
         supportedSchemes.add("smtp");
-        //supportedSchemes.add("smtps");
+        supportedSchemes.add("smtps");
         supportedSchemes.add("pop3");
-        //supportedSchemes.add("pop3s");
+        supportedSchemes.add("pop3s");
+
+        for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();) {
+            String s = (String) iterator.next();
+            registerSupportedProtocol(s);
+        }
 
     }
 
@@ -135,6 +142,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             if(!(s.equalsIgnoreCase("http") || s.equalsIgnoreCase("https") || s.equalsIgnoreCase("servlet"))) {
                 axisTransportProtocols.put(s, MuleTransport.class);
             }
+            registerSupportedProtocol(s);
         }
 
         MuleManager.getInstance().registerListener(this);
@@ -508,18 +516,5 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public void setSupportedSchemes(List supportedSchemes) {
         this.supportedSchemes = supportedSchemes;
-    }
-
-    public boolean supportsProtocol(String protocol) {
-        if(super.supportsProtocol(protocol)) return true;
-
-        if(protocol.toLowerCase().startsWith(getProtocol())) {
-            int i = protocol.indexOf(":");
-            if(i > -1) {
-                return supportedSchemes.contains(protocol.substring(i + 1).toLowerCase());
-            }
-        }
-        return false;
-
     }
 }

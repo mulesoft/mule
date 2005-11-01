@@ -14,23 +14,10 @@
  */
 package org.mule.providers.oracle.jms;
 
-import java.sql.DriverManager;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import javax.naming.NamingException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.MuleProperties;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
@@ -38,6 +25,16 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.naming.NamingException;
+import java.sql.DriverManager;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's 
@@ -73,6 +70,10 @@ public class OracleJmsConnector extends JmsConnector {
      * @see #multipleSessionsPerConnection  */
     private List connections = new ArrayList();
 
+    public OracleJmsConnector() {
+        registerSupportedProtocol("jms");
+    }
+
     /**
      * The Oracle AQ connector supports both the oaq:// and the jms:// protocols.
      */
@@ -84,7 +85,9 @@ public class OracleJmsConnector extends JmsConnector {
      * The Oracle AQ connector supports both the oaq:// and the jms:// protocols.
      */
     public boolean supportsProtocol(String protocol) {
-    	return getProtocol().equalsIgnoreCase(protocol) 
+        //The aoq protocol handling breaks the model a bit a you do not need to qualify the jms protocol with aoq
+        //hence we need to override the default supportsProtocol method
+    	return getProtocol().equalsIgnoreCase(protocol)
     			|| super.getProtocol().equalsIgnoreCase(protocol);
     }
 

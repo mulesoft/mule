@@ -172,6 +172,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /** Whether to fire message events for every message that is sent or received from this connector */
     private boolean enableMessageEvents = false;
 
+    private List supportedProtocols;
 
     public AbstractConnector()
     {
@@ -181,6 +182,9 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         receivers = new ConcurrentHashMap();
         connectionStrategy = MuleManager.getConfiguration().getConnectionStrategy();
         enableMessageEvents = MuleManager.getConfiguration().isEnableMessageEvents();
+        supportedProtocols = new ArrayList();
+        //Always add the default protocol
+        supportedProtocols.add(getProtocol().toLowerCase());
     }
 
     /*
@@ -231,13 +235,6 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     public abstract String getProtocol();
-
-    /**
-     * @return true if the protocol is supported by this connector.
-     */
-    public boolean supportsProtocol(String protocol) {
-    	return getProtocol().equalsIgnoreCase(protocol);
-    }
 
     /*
      * (non-Javadoc)
@@ -915,5 +912,31 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     public void setEnableMessageEvents(boolean enableMessageEvents) {
         this.enableMessageEvents = enableMessageEvents;
+    }
+
+    /**
+     * Registers other protocols 'understood' by this connector
+     * These must container scheme meta info. Any protocol registered
+     * Must begin with the protocol of this connector i.e. If the connector is axis
+     * the protocol for jms over axis will be axis:jms.  Here, 'axis' is the
+     * scheme meta info and 'jms' is the protocol.
+     * If the protocol argument does not start with the connector's protocol, it
+     * will be appended
+     * @param protocol the supported protocol to register
+     */
+    public void registerSupportedProtocol(String protocol) {
+        protocol = protocol.toLowerCase();
+        if(protocol.startsWith(getProtocol().toLowerCase())) {
+            supportedProtocols.add(protocol);
+        } else {
+            supportedProtocols.add(getProtocol().toLowerCase() + ":" + protocol);
+        }
+    }
+
+    /**
+     * @return true if the protocol is supported by this connector.
+     */
+    public boolean supportsProtocol(String protocol) {
+    	return supportedProtocols.contains(protocol.toLowerCase());
     }
 }
