@@ -25,6 +25,11 @@ import org.mule.providers.AbstractServiceEnabledConnector;
 
 public class JettyConnector extends AbstractServiceEnabledConnector
 {
+    public JettyConnector() {
+        registerSupportedProtocol("http");
+        registerSupportedProtocol("https");
+    }
+
     public String getProtocol()
     {
         return "jetty";
