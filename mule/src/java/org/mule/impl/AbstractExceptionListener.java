@@ -14,11 +14,6 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
-import java.beans.ExceptionListener;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
@@ -35,6 +30,10 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.routing.RoutingException;
+
+import java.beans.ExceptionListener;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>AbstractExceptionListener</code> is a base implementation that custom
@@ -171,7 +170,7 @@ public abstract class AbstractExceptionListener implements ExceptionListener, In
                 UMOEventContext ctx = RequestContext.getEventContext();
                 ExceptionMessage msg = null;
                 if (failedEndpoint != null) {
-                    msg = new ExceptionMessage(getErrorMessagePayload(message), endpoint, t, ctx);
+                    msg = new ExceptionMessage(getErrorMessagePayload(message), failedEndpoint, t, ctx);
                 } else {
                     msg = new ExceptionMessage(getErrorMessagePayload(message), t, ctx);
                 }
