@@ -15,15 +15,15 @@
 
 package org.mule.util;
 
-import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessageConstants;
+import org.mule.config.i18n.Message;
 
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.UnsupportedEncodingException;
 
 /**
  * <code>StringMessageHelper</code> contains some useful methods for
@@ -34,11 +34,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class StringMessageHelper
 {
-    /**
-     * TODO [aperepel] Will need to inject the UMOManager somehow
-     * after MuleManager is no longer a static singleton in v2.0
-     */
-    private static final String MULE_ENCODING = MuleManager.getConfiguration().getEncoding();
+
 
     public static String getFormattedMessage(String msg, Object[] arguments)
     {
@@ -123,10 +119,10 @@ public class StringMessageHelper
 
             int padding;
             try {
-                padding = trimLength - messages.get(i).toString().getBytes(MULE_ENCODING).length;
+                padding = trimLength - messages.get(i).toString().getBytes(getEncoding()).length;
             } catch (UnsupportedEncodingException ueex) {
                 throw new MuleRuntimeException(
-                        new Message(CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING, MULE_ENCODING));
+                        new Message(CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING, getEncoding()));
             }
             if (padding > 0) {
                 buf.append(charString(' ', padding));
@@ -161,5 +157,27 @@ public class StringMessageHelper
             result += "[" + length + " of " + message.length() + "]";
         }
         return result;
+    }
+
+    public static byte[] getBytes(String string) {
+        try {
+            return string.getBytes(getEncoding());
+        } catch (UnsupportedEncodingException e) {
+            //We can ignore this as the encoding is validated on start up
+            return null;
+        }
+    }
+
+    public static String getString(byte[] bytes) {
+        try {
+            return new String(bytes, getEncoding());
+        } catch (UnsupportedEncodingException e) {
+            //We can ignore this as the encoding is validated on start up
+            return null;
+        }
+    }
+
+    private static String getEncoding() {
+        return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
     }
 }
