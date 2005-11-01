@@ -30,8 +30,8 @@
             Please refer to the Configuration Guide for a full description of all the parameters.
         -->
         <mule-descriptor name="EchoUMO"
-            inboundEndpoint="stream://localhost"
-            outboundEndpoint="stream://localhost"
+            inboundEndpoint="stream://System.in"
+            outboundEndpoint="stream://System.out"
             implementation="org.mule.components.simple.EchoComponent">
         </mule-descriptor>
     </model>

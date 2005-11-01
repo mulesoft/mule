@@ -130,4 +130,9 @@ if "%OS%"=="Windows_NT" @endlocal
 
 :mainEnd
 if exist "%HOME%\mulerc_post.bat" call "%HOME%\mulerc_post.bat"
+SET MULE_OPTS=
+SET MULE_DEBUG_OPTS=
+SET MULE_MAIN=
+SET CUSTOM_LIB=
+SET CLASSPATH=
 

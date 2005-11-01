@@ -16,7 +16,7 @@ that receives the results form each of the banks and selects the lowest quote.
 
      <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
-        <endpoint-identifier name="LoanQuotes" value="vm://LoanQuotes"/>
+        <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>
         <endpoint-identifier name="CreditAgency" value="vm://CreditAgencyService"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="vm://CreditAgencyService"/>
         <endpoint-identifier name="LenderService" value="vm://LenderService"/>
@@ -44,7 +44,7 @@ that receives the results form each of the banks and selects the lowest quote.
                 <filter expectedType="org.mule.samples.loanbroker.BankQuoteRequest" className="org.mule.routing.filters.PayloadTypeFilter"/>
             </router>
         </outbound-router>
-        <response-router timeout="100000">
+        <response-router timeout="10000">
             <endpoint address="LoanBrokerQuotes"/>
             <router className="org.mule.samples.loanbroker.routers.BankQuotesResponseAggregator"/>
         </response-router>

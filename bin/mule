@@ -309,3 +309,9 @@ if $mule_exec_debug ; then
     echo $mule_exec_command
 fi
 eval $mule_exec_command
+
+export MULE_OPTS=
+export MULE_DEBUG_OPTS=
+export MULE_MAIN=
+export CUSTOM_LIB=
+export CLASSPATH=

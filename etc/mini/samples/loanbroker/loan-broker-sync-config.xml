@@ -9,7 +9,7 @@
 
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
-        <endpoint-identifier name="LoanQuotes" value="vm://LoanQuotes"/>
+        <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>
         <endpoint-identifier name="CreditAgency" value="vm://CreditAgencyService"/>
         <endpoint-identifier name="LenderService" value="vm://LenderService"/>
         <endpoint-identifier name="Bank1" value="vm://Bank1"/>

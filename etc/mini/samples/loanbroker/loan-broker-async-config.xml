@@ -26,7 +26,7 @@ the different components are made from the loan broker component (a la hub and s
     -->
     <endpoint-identifiers>
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
-        <endpoint-identifier name="LoanBroker" value="vm://LoanBrokerQuotes"/>
+        <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>
         <endpoint-identifier name="CreditAgency" value="vm://CreditAgencyService"/>
         <endpoint-identifier name="CreditAgencyReceiver" value="vm://CreditAgencyService"/>
         <endpoint-identifier name="LenderService" value="vm://LenderService"/>
@@ -46,13 +46,6 @@ the different components are made from the loan broker component (a la hub and s
         The Mule model initialises and manages your UMO components
     -->
     <model name="loan-broker">
-        <!-- by declaring the Axis service component we can overload its default
-        configuration to add more threads or pooled resources -->
-        <mule-descriptor name="_axisServiceComponent"
-            implementation="org.mule.providers.soap.axis.AxisServiceComponent">
-            <threading-profile maxBufferSize="100" threadTTL="600000" maxThreadsActive="30" maxThreadsIdle="20"/>
-            <pooling-profile exhaustedAction="WAIT" maxActive="20" maxIdle="20" maxWait="20000"/>
-        </mule-descriptor>
         <!--
         The loan broker is used to receive loan requests
         -->
@@ -72,9 +65,6 @@ the different components are made from the loan broker component (a la hub and s
                     <filter expectedType="org.mule.samples.loanbroker.LoanQuote" className="org.mule.routing.filters.PayloadTypeFilter"/>
                 </router>
             </inbound-router>
-            <!--            <queue-profile maxOutstandingMessages="150" blockWait="3000" />-->
-            <!--            <pooling-profile maxActive="20" maxIdle="10" exhaustedAction="GROW" maxWait="10000" />-->
-            <!--            <threading-profile maxBufferSize="100" maxThreadsActive="20" maxThreadsIdle="5" poolExhaustedAction="RUN" threadTTL="60000" />-->
         </mule-descriptor>
 
         <!--
