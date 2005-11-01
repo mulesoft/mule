@@ -226,7 +226,7 @@
             </properties>
         </dependency>
         <dependency>
-            <groupId>xpp3</groupId>
+            <groupId>xpp3-xstream</groupId>
             <artifactId>xpp3</artifactId>
             <version>${xpp3_version}</version>
             <properties>
