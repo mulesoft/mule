@@ -334,7 +334,8 @@ public class FileConnector extends AbstractServiceEnabledConnector
         if (!autoDelete) {
             if (serviceOverrides == null)
                 serviceOverrides = new Properties();
-            serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, FileMessageAdapter.class.getName());
+            if (serviceOverrides.getProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER) == null)
+            	serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER, FileMessageAdapter.class.getName());
         }
     }
 
