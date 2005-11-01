@@ -32,6 +32,7 @@ public class ServletConnector extends AbstractServiceEnabledConnector
     protected String servletUrl;
 
     public ServletConnector() {
+        super();
         registerSupportedProtocol("http");
         registerSupportedProtocol("https");
     }
