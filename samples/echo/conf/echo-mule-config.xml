@@ -10,6 +10,10 @@
 
     To invoke the EchoUMO component as a webservice hit the following URL -
     http://localhost:8081/services/EchoUMO?method=echo&amp;param=Is there an echo?
+    (remember to replace the '&amp;' with an ampersand)
+
+    To view the WSDL for the EchoUMO service go to -
+    http://localhost:8081/services/EchoUMO?wsdl
     </description>
 
     <!--
