@@ -53,9 +53,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
     protected abstract String getTestExceptionEndpoint();
 
-    protected String getProtocol() {
-        return "axis";
-    }
+    abstract String getProtocol();
 
     public void testRequestResponse() throws Throwable
     {

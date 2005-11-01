@@ -19,14 +19,13 @@ import org.mortbay.http.SocketListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.util.InetAddrPort;
-import org.mule.providers.http.servlet.MuleReceiverServlet;
-import org.mule.providers.http.HttpConstants;
-import org.mule.providers.http.HttpConnector;
 import org.mule.extras.client.MuleClient;
+import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.servlet.MuleReceiverServlet;
 import org.mule.umo.UMOMessage;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -51,6 +50,10 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 
         context.addHandler(handler);
         httpServer.start();
+    }
+
+    String getProtocol() {
+        return "axis";
     }
 
     protected void doFunctionalTearDown() throws Exception {

@@ -41,6 +41,10 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapFunctionalT
         }
     }
 
+    String getProtocol() {
+        return "axis";
+    }
+
     public String getConfigResources() {
         return "org/mule/test/integration/providers/soap/axis-http-mule-config.xml";
     }

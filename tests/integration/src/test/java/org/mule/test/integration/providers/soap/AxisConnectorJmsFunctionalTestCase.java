@@ -25,6 +25,10 @@ public class AxisConnectorJmsFunctionalTestCase extends AbstractSoapFunctionalTe
         return "org/mule/test/integration/providers/soap/axis-jms-mule-config.xml";
     }
 
+    String getProtocol() {
+        return "axis";
+    }
+
     protected String getRequestResponseEndpoint() {
         return "axis:jms://mycomponent?method=echo";
     }

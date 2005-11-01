@@ -25,6 +25,10 @@ public class AxisConnectorVMFunctionalTestCase extends AbstractSoapFunctionalTes
         return "org/mule/test/integration/providers/soap/axis-vm-mule-config.xml";
     }
 
+    String getProtocol() {
+        return "axis";
+    }
+
     protected String getRequestResponseEndpoint() {
         return "axis:vm://mycomponent?method=echo";
     }
