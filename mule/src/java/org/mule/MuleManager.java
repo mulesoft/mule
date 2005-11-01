@@ -50,6 +50,7 @@ import org.mule.management.stats.AllStatistics;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOContainerContext;
@@ -71,6 +72,7 @@ import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
 import javax.transaction.TransactionManager;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -595,6 +597,8 @@ public class MuleManager implements UMOManager
      */
     public synchronized void initialise() throws UMOException
     {
+        validateEncoding();
+
         if (!initialised.get()) {
             initialising.set(true);
             startDate = System.currentTimeMillis();
@@ -650,6 +654,21 @@ public class MuleManager implements UMOManager
                 initialising.set(false);
                 fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_INITIALISED));
             }
+        }
+    }
+
+    protected void validateEncoding() throws FatalException
+    {
+        String encoding = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+        if(encoding==null) {
+            encoding = config.getEncoding();
+            System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, encoding);
+        } else {
+            config.setEncoding(encoding);
+        }
+        //Check we have a valid and supported encoding
+        if(!Charset.isSupported(config.getEncoding())) {
+            throw new FatalException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "encoding", config.getEncoding()), this);
         }
     }
 

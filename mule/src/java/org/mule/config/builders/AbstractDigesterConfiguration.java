@@ -17,6 +17,7 @@ package org.mule.config.builders;
 import org.apache.commons.digester.Digester;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.config.ConfigurationException;
 import org.mule.config.MuleDtdResolver;
 import org.mule.config.MuleProperties;
@@ -26,7 +27,6 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MuleContainerContext;
 import org.mule.umo.UMOFilter;
 import org.mule.util.ClassHelper;
-import org.mule.MuleManager;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -73,7 +73,7 @@ public abstract class AbstractDigesterConfiguration
             }
         };
 
-        configEncoding = System.getProperty(MuleProperties.CONFIG_ENCODING_SYS_PROPERTY, MuleManager.getConfiguration().getEncoding());
+        configEncoding = System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, MuleManager.getConfiguration().getEncoding());
 
         digester.setValidating(validate);
         digester.setEntityResolver(new MuleDtdResolver(dtd));

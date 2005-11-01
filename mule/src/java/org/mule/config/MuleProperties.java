@@ -34,9 +34,10 @@ public interface MuleProperties
     String DISABLE_SERVER_CONNECTIONS = "org.mule.disable.server.connections";
 
     /** Configuration parsing properties */
-    String XML_VALIDATE_SYS_PROPERTY = "org.mule.xml.validate";
-    String XML_DTD_SYS_PROPERTY = "org.mule.xml.dtd";
-    String CONFIG_ENCODING_SYS_PROPERTY = "org.mule.config.encoding";
+    String XML_VALIDATE_SYSTEM_PROPERTY = "org.mule.xml.validate";
+    String XML_DTD_SYSTEM_PROPERTY = "org.mule.xml.dtd";
+    /** Default Ecoding used by the server */
+    String MULE_ENCODING_SYSTEM_PROPERTY = "org.mule.encoding";
 
     // Generic Event properties
     String MULE_EVENT_PROPERTY = PROPERTY_PREFIX + "EVENT";
