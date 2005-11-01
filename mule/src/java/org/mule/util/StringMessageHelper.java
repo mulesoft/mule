@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class StringMessageHelper
 {
-
+    public static final String DEFAULT_ENCODING = "UTF-8";
 
     public static String getFormattedMessage(String msg, Object[] arguments)
     {
@@ -178,6 +178,9 @@ public class StringMessageHelper
     }
 
     private static String getEncoding() {
-        return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY);
+        //Note that the org.mule.encoding property will not be set by Mule until the MuleManager.initialise
+        //method is called, thus if you need to set an encoding other than UTF-8 before the Manager is invoked,
+        //you can set this property on the JVM
+        return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, DEFAULT_ENCODING);
     }
 }
