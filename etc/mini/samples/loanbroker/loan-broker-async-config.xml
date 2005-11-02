@@ -28,7 +28,6 @@ the different components are made from the loan broker component (a la hub and s
         <endpoint-identifier name="LoanBrokerRequests" value="vm://LoanBrokerRequests"/>
         <endpoint-identifier name="LoanBrokerQuotes" value="vm://LoanBrokerQuotes"/>
         <endpoint-identifier name="CreditAgency" value="vm://CreditAgencyService"/>
-        <endpoint-identifier name="CreditAgencyReceiver" value="vm://CreditAgencyService"/>
         <endpoint-identifier name="LenderService" value="vm://LenderService"/>
         <endpoint-identifier name="Bank1" value="vm://Bank1"/>
         <endpoint-identifier name="Bank2" value="vm://Bank2"/>
@@ -71,7 +70,7 @@ the different components are made from the loan broker component (a la hub and s
         The credit agency service will get the credit profile for a customer
         -->
         <mule-descriptor name="CreditAgencyService"
-            inboundEndpoint="CreditAgencyReceiver"
+            inboundEndpoint="CreditAgency"
             outboundEndpoint="LenderService"
             implementation="org.mule.samples.loanbroker.DefaultCreditAgencyService">
         </mule-descriptor>

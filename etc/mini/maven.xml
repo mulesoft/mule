@@ -107,8 +107,7 @@
         </copy>
         <delete dir="${mule.release.samples.dir}/errorhandler"/>
         <delete dir="${mule.release.samples.dir}/voipservice"/>
-        <delete dir="${mule.release.samples.dir}/stockquote"/>
-        <delete dir="${mule.release.samples.dir}/loanborker-esb"/>
+        <delete dir="${mule.release.samples.dir}/loanbroker-esb"/>
 
         <!-- copy config overrides that do not use non-mini-mule jars -->
         <echo>Copying smple config overrides from ${basedir}/samples</echo>
@@ -129,6 +128,11 @@
             <fileset dir="${samples.dist}/hello">
                 <include name="**/*spring*"/>
                 <include name="**/*http*"/>
+            </fileset>
+        </delete>
+        <delete includeemptydirs="true">
+            <fileset dir="${samples.dist}/stockqoute">
+                <include name="**/*soap*"/>
             </fileset>
         </delete>
 
