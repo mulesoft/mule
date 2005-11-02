@@ -6,10 +6,10 @@
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.providers.jms;
@@ -25,6 +25,7 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.PropertiesHelper;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -38,7 +39,7 @@ import javax.jms.Topic;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
- * 
+ *
  */
 public class JmsMessageReceiver extends AbstractMessageReceiver implements MessageListener
 {
@@ -129,7 +130,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
 
     /**
      * Create a consumer for the jms destination
-     * 
+     *
      * @throws Exception
      */
     protected void createConsumer() throws Exception
@@ -140,12 +141,16 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
 	        if (session == null) {
 	    		session = this.connector.getSession(endpoint);
 	        }
-	
+
 	        // Create destination
 	        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
 	        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+
+            //todo MULE20 remove resource Info support
+            if(!topic) topic = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "topic", false);
+
 	        Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
-	
+
 	        // Extract jms selector
 	        String selector = null;
 	        if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter) {
@@ -159,7 +164,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
 	        boolean durable = connector.isDurable();
 	        if (tempDurable != null)
 	            durable = Boolean.valueOf(tempDurable).booleanValue();
-	
+
 	        // Get the durable subscriber name if there is one
 	        String durableName = (String) endpoint.getProperties().get("durableName");
 	        if (durableName == null && durable && dest instanceof Topic) {
@@ -167,7 +172,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
 	            logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
 	                    + durableName);
 	        }
-	
+
 	        // Create consumer
 	        consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName);
     	} catch (JMSException e) {

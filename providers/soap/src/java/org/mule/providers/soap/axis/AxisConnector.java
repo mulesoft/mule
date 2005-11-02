@@ -326,13 +326,18 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         }
         String serviceName = receiver.getComponent().getDescriptor().getName();
         // No determine if the endpointUri requires a new connector to be
-        // registed
-        // in the case of http we only need to register the new endpointUri if
-        // the
-        // port is different
-        String endpoint = receiver.getEndpointURI().getAddress() + "/" + serviceName;
-
+        // registed in the case of http we only need to register the new endpointUri if
+        // the port is different
+        //If we're using VM or Jms we just use the resource infor directly without appending a service name
+        String endpoint = null;
         String scheme = ep.getScheme().toLowerCase();
+         if( scheme.equals("jms") || scheme.equals("vm")) {
+             endpoint = ep.toString();
+         } else {
+            endpoint = receiver.getEndpointURI().getAddress() + "/" + serviceName;
+         }
+         if(logger.isDebugEnabled()) logger.debug("Modified endpoint with " + scheme + " scheme to " + endpoint);
+
         boolean sync = receiver.getEndpoint().isSynchronous();
         if (scheme.equals("http") || scheme.equals("tcp")) {
             // if we are using a socket based endpointUri make sure it is
@@ -358,6 +363,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
             // set the filter on the axis endpoint on the real receiver endpoint
             serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
+            //propagate properties to the service endpoint
+            serviceEndpoint.getProperties().putAll(receiver.getEndpoint().getProperties());
+
             axisDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
         }
 

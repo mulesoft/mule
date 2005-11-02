@@ -14,6 +14,7 @@
  */
 package org.mule.providers.jms;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.mule.MuleException;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -25,27 +26,33 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.PropertiesHelper;
+import org.mule.util.concurrent.Latch;
 
-import javax.jms.*;
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching messages
  * to Jms destinations. All Jms sematics apply and settings such as replyTo and
  * QoS properties are read from the event properties or defaults are used
  * (according to the Jms specification)
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class JmsMessageDispatcher extends AbstractMessageDispatcher
-{
+public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     private JmsConnector connector;
     private Session delegateSession;
 
-    public JmsMessageDispatcher(JmsConnector connector)
-    {
+    public JmsMessageDispatcher(JmsConnector connector) {
         super(connector);
         this.connector = connector;
     }
@@ -56,13 +63,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
      * @see org.mule.providers.UMOConnector#dispatchEvent(org.mule.MuleEvent,
      *      org.mule.providers.MuleEndpoint)
      */
-    public void doDispatch(UMOEvent event) throws Exception
-    {
+    public void doDispatch(UMOEvent event) throws Exception {
         dispatchMessage(event);
     }
 
-    private UMOMessage dispatchMessage(UMOEvent event) throws Exception
-    {
+    private UMOMessage dispatchMessage(UMOEvent event) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI() + ". Event id is: "
                     + event.getId());
@@ -93,17 +98,20 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             boolean topic = false;
             String resourceInfo = endpointUri.getResourceInfo();
             topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
+            //todo MULE20 remove resource info support
+            if(!topic) topic = PropertiesHelper.getBooleanProperty(event.getEndpoint().getProperties(), "topic", false);
+
             Destination dest = connector.getJmsSupport().createDestination(session, endpointUri.getAddress(), topic);
             producer = connector.getJmsSupport().createProducer(session, dest);
 
             Object message = event.getTransformedMessage();
             if (!(message instanceof Message)) {
                 throw new DispatchException(new org.mule.config.i18n.Message(Messages.MESSAGE_NOT_X_IT_IS_TYPE_X_CHECK_TRANSFORMER_ON_X,
-                                                                             "JMS message",
-                                                                             message.getClass().getName(),
-                                                                             connector.getName()),
-                                            event.getMessage(),
-                                            event.getEndpoint());
+                        "JMS message",
+                        message.getClass().getName(),
+                        connector.getName()),
+                        event.getMessage(),
+                        event.getEndpoint());
             }
 
             Message msg = (Message) message;
@@ -147,29 +155,34 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             String priorityString = (String) event.removeProperty("Priority");
             String persistentDeliveryString = (String) event.removeProperty("PersistentDelivery");
 
-            if (ttlString == null && priorityString == null && persistentDeliveryString == null) {
-                connector.getJmsSupport().send(producer, msg);
-            } else {
-                long ttl = Message.DEFAULT_TIME_TO_LIVE;
-                int priority = Message.DEFAULT_PRIORITY;
-                boolean persistent = Message.DEFAULT_DELIVERY_MODE == DeliveryMode.PERSISTENT;
+            long ttl = Message.DEFAULT_TIME_TO_LIVE;
+            int priority = Message.DEFAULT_PRIORITY;
+            boolean persistent = Message.DEFAULT_DELIVERY_MODE == DeliveryMode.PERSISTENT;
 
-                if (ttlString != null) {
-                    ttl = Long.parseLong(ttlString);
-                }
-                if (priorityString != null) {
-                    priority = Integer.parseInt(priorityString);
-                }
-                if (persistentDeliveryString != null) {
-                    persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
-                }
-                connector.getJmsSupport().send(producer, msg, persistent, priority, ttl);
+            if (ttlString != null) {
+                ttl = Long.parseLong(ttlString);
+            }
+            if (priorityString != null) {
+                priority = Integer.parseInt(priorityString);
+            }
+            if (persistentDeliveryString != null) {
+                persistent = Boolean.valueOf(persistentDeliveryString).booleanValue();
             }
 
-            if (consumer != null) {
+            if (consumer != null && topic) {
+                //need to register a listener for a topic
+                Latch l = new Latch();
+                ReplyToListener listener = new ReplyToListener(l);
+                consumer.setMessageListener(listener);
+
+                connector.getJmsSupport().send(producer, msg, persistent, priority, ttl);
+
                 int timeout = event.getEndpoint().getRemoteSyncTimeout();
                 logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
-                Message result = consumer.receive(timeout);
+                l.await(timeout, TimeUnit.MILLISECONDS);
+                consumer.setMessageListener(null);
+                listener.release();
+                Message result = listener.getMessage();
                 if (result == null) {
                     logger.debug("No message was returned via replyTo destination");
                     return null;
@@ -177,8 +190,21 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     Object resultObject = JmsMessageUtils.getObjectForMessage(result);
                     return new MuleMessage(resultObject);
                 }
+            } else {
+                connector.getJmsSupport().send(producer, msg, persistent, priority, ttl);
+                if (consumer != null) {
+                    int timeout = event.getEndpoint().getRemoteSyncTimeout();
+                    logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
+                    Message result = consumer.receive(timeout);
+                    if (result == null) {
+                        logger.debug("No message was returned via replyTo destination");
+                        return null;
+                    } else {
+                        Object resultObject = JmsMessageUtils.getObjectForMessage(result);
+                        return new MuleMessage(resultObject);
+                    }
+                }
             }
-
             return null;
         } finally {
             JmsUtils.closeQuietly(consumer);
@@ -195,8 +221,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
      * @see org.mule.providers.UMOConnector#sendEvent(org.mule.MuleEvent,
      *      org.mule.providers.MuleEndpoint)
      */
-    public UMOMessage doSend(UMOEvent event) throws Exception
-    {
+    public UMOMessage doSend(UMOEvent event) throws Exception {
         UMOMessage message = dispatchMessage(event);
         return message;
     }
@@ -207,8 +232,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
      * @see org.mule.providers.UMOConnector#sendEvent(org.mule.MuleEvent,
      *      org.mule.providers.MuleEndpoint)
      */
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
+    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
         Session session = null;
         Destination dest = null;
         MessageConsumer consumer = null;
@@ -249,8 +273,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOMessageDispatcher#getDelegateSession()
      */
-    public synchronized Object getDelegateSession() throws UMOException
-    {
+    public synchronized Object getDelegateSession() throws UMOException {
         try {
             // Return the session bound to the current transaction
             // if possible
@@ -274,14 +297,44 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOMessageDispatcher#getConnector()
      */
-    public UMOConnector getConnector()
-    {
+    public UMOConnector getConnector() {
         return connector;
     }
 
-    public void doDispose()
-    {
+    public void doDispose() {
         logger.debug("Disposing");
         JmsUtils.closeQuietly(delegateSession);
+    }
+
+    private class ReplyToListener implements MessageListener {
+        private Latch latch;
+        private Message message;
+        private boolean released = false;
+
+        public ReplyToListener(Latch latch) {
+            this.latch = latch;
+        }
+
+        public Message getMessage() {
+            return message;
+        }
+
+        public void release() {
+            released = true;
+        }
+
+        public void onMessage(Message message) {
+            this.message = message;
+            latch.unlock();
+            while (!released) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }
+
+
     }
 }

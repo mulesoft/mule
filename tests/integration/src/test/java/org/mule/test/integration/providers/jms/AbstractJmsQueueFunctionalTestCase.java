@@ -14,20 +14,8 @@
 package org.mule.test.integration.providers.jms;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import java.util.List;
-
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.QueueConnection;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
-
 import org.mule.MuleManager;
 import org.mule.providers.jms.JmsMessageReceiver;
-import org.mule.providers.jms.TransactedJmsMessageReceiver;
 import org.mule.tck.functional.EventCallback;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOComponent;
@@ -36,6 +24,14 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.concurrent.CountDownLatch;
+
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.QueueConnection;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.TopicConnection;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -145,7 +141,7 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
         return false;
     }
 
-    protected static class JmsMessageReceiverSynchronous extends TransactedJmsMessageReceiver
+    protected static class JmsMessageReceiverSynchronous extends JmsMessageReceiver
     {
         public JmsMessageReceiverSynchronous(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
                 throws InitialisationException
@@ -153,13 +149,12 @@ public abstract class AbstractJmsQueueFunctionalTestCase extends AbstractJmsFunc
             super(connector, component, endpoint);
         }
 
-        protected List getMessages() throws Exception
-        {
+        public void doConnect() throws Exception {
+            super.doConnect();
             if (receiverIsUp != null) {
                 logger.debug("Releasing coutdown isReceiverUp");
                 receiverIsUp.countDown();
             }
-            return super.getMessages();
         }
     }
 }

@@ -13,8 +13,8 @@
  */
 package org.mule.test.integration.providers.jms.activemq;
 
-import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.JmsConnector;
+import org.mule.providers.jms.JmsConstants;
 import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.provider.UMOConnector;
@@ -49,7 +49,7 @@ public class ActiveMQJmsTopicFunctionalTestCase extends AbstractJmsQueueFunction
         connector.getDispatcherThreadingProfile().setDoThreading(false);
 
         HashMap overrides = new HashMap();
-        overrides.put("transacted.message.receiver", JmsMessageReceiverSynchronous.class.getName());
+        overrides.put("message.receiver", JmsMessageReceiverSynchronous.class.getName());
         connector.setServiceOverrides(overrides);
         return connector;
     }
