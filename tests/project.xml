@@ -278,13 +278,13 @@
         </dependency>
 
         <dependency>
-            <groupId>smack</groupId>
+            <groupId>jivesoftware</groupId>
             <artifactId>smack</artifactId>
             <version>${smack_version}</version>
             <url>http://www.jivesoftware.org</url>
         </dependency>
         <dependency>
-            <groupId>smack</groupId>
+            <groupId>jivesoftware</groupId>
             <artifactId>smackx</artifactId>
             <version>${smackx_version}</version>
             <url>http://www.jivesoftware.org</url>
