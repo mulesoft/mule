@@ -58,7 +58,7 @@
         <attainGoal name="base-release"/>
         <attainGoal name="mule:zip-release"/>
     </goal>
-    
+
     <goal name="copy-resources">
         <j:set var="goal" value="java:jar-resources"/>
         <attainGoal name="multiproject:goal"/>
@@ -523,6 +523,12 @@
             <copy todir="${pom.siteDirectory}/../dist/nightly">
                 <fileset file="${pom.siteDirectory}/../dist/dtds/*.*"/>
             </copy>
+            <!-- unzip doc site if there is one -->
+            <u:available file="${maven.build.dir}/distributions/mule-${pom.currentVersion}-site.tar.gz">
+                <delete dir="${pom.siteDirectory}/doc"/>
+                <untar src="${maven.build.dir}/distributions/mule-${pom.currentVersion}-site.tar.gz"
+                    dest="${pom.siteDirectory}" compression="gzip"/>
+            </u:available>
 
             <j:set var="deploy.remote" value="false"/>
         </u:available>
