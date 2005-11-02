@@ -13,8 +13,6 @@
  */
 package org.mule.providers.service;
 
-import java.util.Properties;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -25,6 +23,7 @@ import org.mule.impl.endpoint.UrlEndpointBuilder;
 import org.mule.providers.NullPayload;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
+import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
@@ -34,6 +33,8 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 import org.mule.util.ObjectFactory;
+
+import java.util.Properties;
 
 /**
  * <code>ConnectorServiceDescriptor</code> describes the necessery information
@@ -292,11 +293,13 @@ public class ConnectorServiceDescriptor
                                                     Object[] args) throws UMOException
     {
         String receiverClass = messageReceiver;
-        if(endpoint.getTransactionConfig()!=null) {
+
+        if(endpoint.getTransactionConfig()!=null && endpoint.getTransactionConfig().getAction() != UMOTransactionConfig.ACTION_NONE ) {
             if(transactedMessageReceiver!=null) {
                 receiverClass = transactedMessageReceiver;
             }
         }
+
 
         if (receiverClass != null) {
             Object[] newArgs = null;
