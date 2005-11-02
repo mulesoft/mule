@@ -12,7 +12,7 @@
             Enable this endpoint to expose the Echo component as a webservice and bind it
             to the local servlet container.
             -->
-            <endpoint address="servlet:axis://localhost/services"/>
+            <endpoint address="axis:servlet://localhost/services"/>
         </inbound-router>
     </mule-descriptor>
 
