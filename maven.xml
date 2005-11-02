@@ -50,15 +50,83 @@
     -->
     <goal name="build" prereqs="start-build, complete-build"/>
 
-    <goal name="start-build" prereqs="setvars, clean, multiproject:clean, multiproject:install-snapshot"/>
+    <goal name="start-build" prereqs="setvars, clean, multiproject:clean, multiproject:install"/>
 
     <goal name="complete-build" prereqs="mule:night-release"/>
 
+    <goal name="mule:night-release" description="Creates and zips build for distribution">
+        <attainGoal name="base-release"/>
+        <attainGoal name="mule:zip-release"/>
+    </goal>
+    
     <goal name="copy-resources">
         <j:set var="goal" value="java:jar-resources"/>
         <attainGoal name="multiproject:goal"/>
     </goal>
 
+    <goal name="mule:release-prepare" prereqs="clean, setvars, multiproject:clean">
+        <echo>About to create lib and bin directories in ${mule.release.dir}</echo>
+        <delete dir="${mule.release.dist.dir}"/>
+        <mkdir dir="${mule.release.dir}"/>
+        <mkdir dir="${mule.release.dir}/bin"/>
+        <mkdir dir="${mule.release.dist.dir}"/>
+    </goal>
+
+    <goal name="mule:start-release" prereqs="mule:release-prepare,multiproject:install"
+            description="Creates and zips build for distribution">
+    </goal>
+
+    <goal name="mule:release" description="Creates and zips build for distribution">
+        <attainGoal name="base-release"/>
+        <attainGoal name="mule:site"/>
+        <attainGoal name="mule:javadoc"/>
+
+        <!-- copy the full javadocs to the site docs -->
+        <copy todir="${maven.build.dir}/docs">
+            <fileset dir="${mule.release.dir}/docs"/>
+        </copy>
+
+        <attainGoal name="mule:zip-release"/>
+    </goal>
+
+    <goal name="base-release" description="Creates and zips build for distribution">
+
+        <!-- right now the release has to be run using two goals -
+        1. mule:start-release
+        2. release or night-release
+
+        This is because the maven reactor gets confused after building the artifacts so when mule:lib
+        is run there are multiproject callbacks left over from the when the artifacts are jared
+        -->
+        <!--<attainGoal name="mule:release-prepare"/>-->
+        <!--<attainGoal name="multiproject:install"/>-->
+        <attainGoal name="mule:libs"/>
+        <attainGoal name="mule:samples"/>
+        <attainGoal name="mule:src"/>
+        <attainGoal name="mule:tools"/>
+
+        <copy todir="${mule.release.dir}" file="${basedir}/LICENSE.txt"/>
+        <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
+
+        <!-- copy bin directory and set permissions -->
+        <copy todir="${mule.release.dir}/bin">
+            <fileset dir="${basedir}/bin"/>
+        </copy>
+        <ant:fixcrlf srcdir="${mule.release.dir}/bin" eol="crlf" eof="doc" includes="*.bat" excludes="*.jar"/>
+        <ant:fixcrlf srcdir="${mule.release.dir}/bin" eol="lf" eof="unix" includes="mule" excludes="*.bat"/>
+
+        <ant:fixcrlf srcdir="${mule.release.dir}/samples" eol="crlf" eof="doc" includes="**/bin/*.bat"/>
+        <ant:fixcrlf srcdir="${mule.release.dir}/samples" eol="lf" eof="unix" includes="**/bin/*.sh" excludes="*.bat"/>
+
+        <ant:chmod perm="ugo+rx">
+            <ant:fileset dir="${mule.release.dir}/bin" file="mule"/>
+        </ant:chmod>
+
+        <ant:chmod perm="ugo+rx">
+            <ant:fileset dir="${mule.release.dir}/samples" includes="**/bin/*" excludes="**/bin/*.bat"/>
+        </ant:chmod>
+
+    </goal>
 
     <goal name="dist:nightly" prereqs="build, deploy:nightly"/>
 
@@ -187,13 +255,6 @@
         <echo>Samples release dir is ${mule.samples.dist}</echo>
     </goal>
 
-    <goal name="mule:release-prepare" prereqs="clean, setvars">
-        <echo>About to create lib and bin directories in ${mule.release.dir}</echo>
-        <delete dir="${mule.release.dist.dir}"/>
-        <mkdir dir="${mule.release.dir}"/>
-        <mkdir dir="${mule.release.dir}/bin"/>
-        <mkdir dir="${mule.release.dist.dir}"/>
-    </goal>
 
     <postGoal name="test:test">
         <j:if test="${context.getVariable('maven.test.skip') == null || context.getVariable('maven.test.skip') == 'false'}">
@@ -201,73 +262,6 @@
             <j:expr value="${context.setVariable('maven.test.skip', 'true')}"/>
         </j:if>
     </postGoal>
-
-    <goal name="mule:start-release" prereqs="mule:release-prepare,multiproject:install"
-        description="Creates and zips build for distribution">
-
-    </goal>
-
-    <goal name="mule:release" description="Creates and zips build for distribution">
-        <attainGoal name="base-release"/>
-        <attainGoal name="mule:site"/>
-        <attainGoal name="mule:javadoc"/>
-
-        <!-- copy the full javadocs to the site docs -->
-        <copy todir="${maven.build.dir}/docs">
-            <fileset dir="${mule.release.dir}/docs"/>
-        </copy>
-
-        <attainGoal name="mule:zip-release"/>
-        <!-- Mini Mule Build -->
-        <!--        <attainGoal name="mini:mule"/>-->
-        <!--        <ant:copy todir="${maven.build.dir}/distributions">-->
-        <!--            <ant:fileset dir="${basedir}/etc/mini/target/distributions" includes="mini-mule*"/>-->
-        <!--        </ant:copy>-->
-    </goal>
-
-    <goal name="mule:night-release" description="Creates and zips build for distribution">
-        <attainGoal name="base-release"/>
-        <attainGoal name="mule:zip-release"/>
-    </goal>
-
-    <goal name="base-release" description="Creates and zips build for distribution">
-
-        <!-- right now the release has to be run using two goals -
-        1. mule:start-release
-        2. release or night-release
-
-        This is because the maven reactor gets confused after building the artifacts so when mule:lib
-        is run there are multiproject callbacks left over from the when the artifacts are jared
-        -->
-        <!--<attainGoal name="mule:release-prepare"/>-->
-        <!--<attainGoal name="multiproject:install"/>-->
-        <attainGoal name="mule:libs"/>
-        <attainGoal name="mule:samples"/>
-        <attainGoal name="mule:src"/>
-        <attainGoal name="mule:tools"/>
-
-        <copy todir="${mule.release.dir}" file="${basedir}/LICENSE.txt"/>
-        <copy todir="${mule.release.dir}" file="${basedir}/README.txt"/>
-
-        <!-- copy bin directory and set permissions -->
-        <copy todir="${mule.release.dir}/bin">
-            <fileset dir="${basedir}/bin"/>
-        </copy>
-        <ant:fixcrlf srcdir="${mule.release.dir}/bin" eol="crlf" eof="doc" includes="*.bat" excludes="*.jar"/>
-        <ant:fixcrlf srcdir="${mule.release.dir}/bin" eol="lf" eof="unix" includes="mule" excludes="*.bat"/>
-
-        <ant:fixcrlf srcdir="${mule.release.dir}/samples" eol="crlf" eof="doc" includes="**/bin/*.bat"/>
-        <ant:fixcrlf srcdir="${mule.release.dir}/samples" eol="lf" eof="unix" includes="**/bin/*.sh" excludes="*.bat"/>
-
-        <ant:chmod perm="ugo+rx">
-            <ant:fileset dir="${mule.release.dir}/bin" file="mule"/>
-        </ant:chmod>
-
-        <ant:chmod perm="ugo+rx">
-            <ant:fileset dir="${mule.release.dir}/samples" includes="**/bin/*" excludes="**/bin/*.bat"/>
-        </ant:chmod>
-
-    </goal>
 
     <goal name="build-classpath" prereqs="setvars">
         <echo>Building classpath from ${mule.release.lib.dir}</echo>
