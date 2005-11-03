@@ -39,7 +39,7 @@ import java.util.Map;
 public interface UMOManager extends Lifecycle
 {
     /**
-     * Getter for the envionment parameters declared in the nule-config.xml
+     * Getter for the envionment parameters declared in the mule-config.xml
      * 
      * @param key the propery name
      * @return the property value
