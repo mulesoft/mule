@@ -1334,15 +1334,6 @@ public class MuleManager implements UMOManager
                 } else {
                     server.shutdown();
                 }
-            } else {
-                List msgs = new ArrayList();
-                if (t != null) {
-                    msgs.add("Mule is shutting down due to exception: " + t.getMessage());
-                } else {
-                    msgs.add("Mule is shutting down due to normal shutdown request.");
-                }
-                msgs.add("Shutdown time is: " + new Date().toString());
-                StringMessageHelper.getBoilerPlate(msgs, '*', 76);
             }
         }
     }
