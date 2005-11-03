@@ -785,14 +785,20 @@ public class MuleManager implements UMOManager
         started.set(false);
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STOPPING));
 
-        logger.debug("Stopping connectors...");
         stopConnectors();
         stopAgents();
-        queueManager.stop();
+
+        if (queueManager != null)
+        {
+            queueManager.stop();
+        }
+
         logger.debug("Stopping model...");
-        if (model != null) {
+        if (model != null)
+        {
             model.stop();
         }
+
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STOPPED));
     }
 
@@ -803,6 +809,7 @@ public class MuleManager implements UMOManager
      */
     private void stopConnectors() throws UMOException
     {
+        logger.debug("Stopping connectors...");
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();) {
             UMOConnector c = (UMOConnector) iterator.next();
             c.stopConnector();
@@ -1068,10 +1075,9 @@ public class MuleManager implements UMOManager
      */
     protected void stopAgents() throws UMOException
     {
-        UMOAgent umoAgent;
         logger.info("Stopping agents...");
         for (Iterator iterator = agents.values().iterator(); iterator.hasNext();) {
-            umoAgent = (UMOAgent) iterator.next();
+            UMOAgent umoAgent = (UMOAgent) iterator.next();
             logger.debug("Stopping agent: " + umoAgent.getName());
             umoAgent.stop();
         }
