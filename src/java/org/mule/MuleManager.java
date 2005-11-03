@@ -376,9 +376,6 @@ public class MuleManager implements UMOManager
         if (workManager != null) {
             workManager.dispose();
         }
-        config = null;
-        config = new MuleConfiguration();
-        instance = null;
 
         if(!config.isEmbedded()) {
             if (logger.isInfoEnabled()) {
@@ -387,6 +384,9 @@ public class MuleManager implements UMOManager
                 System.out.println(getEndSplash());
             }
         }
+
+        config = new MuleConfiguration();
+        instance = null;
     }
 
     /**
