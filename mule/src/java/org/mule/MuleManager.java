@@ -558,7 +558,7 @@ public class MuleManager implements UMOManager
     {
         transformer.initialise();
         transformers.put(transformer.getName(), transformer);
-        logger.info("Transformer" + transformer.getName() + " has been initialised successfully");
+        logger.info("Transformer " + transformer.getName() + " has been initialised successfully");
     }
 
     /**
