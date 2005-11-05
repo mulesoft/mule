@@ -107,8 +107,5 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         assertEquals(1024, c.getBufferSize());
         c.setBufferSize(0);
         assertEquals(SslConnector.DEFAULT_BUFFER_SIZE, c.getBufferSize());
-        c.setTimeout(-1);
-        assertEquals(SslConnector.DEFAULT_SOCKET_TIMEOUT, c.getTimeout());
-
     }
 }

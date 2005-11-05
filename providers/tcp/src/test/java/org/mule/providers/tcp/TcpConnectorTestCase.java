@@ -83,11 +83,21 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         assertEquals(1024, c.getBufferSize());
         c.setBufferSize(0);
         assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getBufferSize());
-        c.setTimeout(-1);
-        assertEquals(TcpConnector.DEFAULT_SOCKET_TIMEOUT, c.getTimeout());
+
+        // timeouts
+        c.setReceiveTimeout(-1);
+        assertEquals(TcpConnector.DEFAULT_SOCKET_TIMEOUT, c.getReceiveTimeout());
+        c.setSendTimeout(-1);
+        assertEquals(TcpConnector.DEFAULT_SOCKET_TIMEOUT, c.getSendTimeout());
+        c.setTimeout(1000); // set both
+        assertEquals(1000, c.getReceiveTimeout());
+        assertEquals(1000, c.getSendTimeout());
+
 
         assertEquals("Default should be retry forever.", TcpConnector.KEEP_RETRYING_INDEFINETLY, c.getMaxRetryCount());
         c.setMaxRetryCount(100);
         assertEquals(100, c.getMaxRetryCount());
+
+        c.dispose();
     }
 }

@@ -46,13 +46,14 @@ import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.umo.transformer.UMOTransformer;
 
 /**
  * <code>TcpMessageReceiver</code> acts like a tcp server to receive socket
  * requests.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
+ *
  * @version $Revision$
  */
 public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
@@ -96,12 +97,11 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
     protected ServerSocket createSocket(URI uri) throws Exception
     {
         String host = uri.getHost();
-        InetAddress inetAddress = null;
         int backlog = ((TcpConnector) connector).getBacklog();
         if (host == null || host.length() == 0) {
             host = "localhost";
         }
-        inetAddress = InetAddress.getByName(host);
+        InetAddress inetAddress = InetAddress.getByName(host);
         if (inetAddress.equals(InetAddress.getLocalHost()) || inetAddress.isLoopbackAddress()
                 || host.trim().equals("localhost")) {
             return new ServerSocket(uri.getPort(), backlog);
@@ -128,7 +128,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                     TcpConnector connector = (TcpConnector) this.connector;
                     socket.setReceiveBufferSize(connector.getBufferSize());
                     socket.setSendBufferSize(connector.getBufferSize());
-                    socket.setSoTimeout(connector.getTimeout());
+                    socket.setSoTimeout(connector.getReceiveTimeout());
                     logger.trace("Server socket Accepted on: " + serverSocket.getLocalPort());
                 } catch (java.io.InterruptedIOException iie) {
                     logger.debug("Interupted IO doing serverSocket.accept: " + iie.getMessage());
@@ -139,9 +139,8 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                     }
                 }
                 if (socket != null) {
-                    Work work = null;
                     try {
-                        work = createWork(socket);
+                        Work work = createWork(socket);
                         try {
                             getWorkManager().scheduleWork(work, WorkManager.IMMEDIATE, null, null);
                         } catch (WorkException e) {
@@ -188,7 +187,10 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         public TcpWorker(Socket socket)
         {
             this.socket = socket;
-            this.protocol = ((TcpConnector) connector).getTcpProtocol();
+
+            final TcpConnector tcpConnector = ((TcpConnector) connector);
+            this.protocol = tcpConnector.getTcpProtocol();
+            tcpConnector.updateReceiveSocketsCount(true);
         }
 
         public void release()
@@ -208,6 +210,9 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
                 }
             } catch (IOException e) {
                 logger.error("Socket close failed with: " + e);
+            }
+            finally {
+                ((TcpConnector) connector).updateReceiveSocketsCount(false);
             }
         }
 

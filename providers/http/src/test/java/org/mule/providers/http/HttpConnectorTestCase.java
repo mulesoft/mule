@@ -88,8 +88,8 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         c.setBufferSize(0);
         assertEquals(TcpConnector.DEFAULT_BUFFER_SIZE, c.getBufferSize());
 
-        c.setTimeout(-1);
-        assertEquals(TcpConnector.DEFAULT_SOCKET_TIMEOUT, c.getTimeout());
         c.dispose();
+
+        // all kinds of timeouts are now being tested in TcpConnectorTestCase
     }
 }

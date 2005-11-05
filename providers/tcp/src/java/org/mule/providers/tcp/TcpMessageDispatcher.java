@@ -75,7 +75,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         socket.setReuseAddress(true);
         socket.setReceiveBufferSize(connector.getBufferSize());
         socket.setSendBufferSize(connector.getBufferSize());
-        socket.setSoTimeout(connector.getTimeout());
+        socket.setSoTimeout(connector.getSendTimeout());
         return socket;
     }
 
@@ -244,15 +244,20 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                 connectedSocket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
 
                 success = true;
+
+                connector.setSendSocketValid(true);
             }
             catch (Exception e) {
                 success = false;
+
+                connector.setSendSocketValid(false);
 
                 if (maxRetries != TcpConnector.KEEP_RETRYING_INDEFINETLY) {
                     retryCount++;
                 }
 
-                logger.warn("run() warning at host: '" + event.getEndpoint().getEndpointURI().getAddress() + "'. Reason: " + e.getMessage());
+                logger.warn("run() warning at host: '" + event.getEndpoint().getEndpointURI().getAddress() +
+                            "'. Reason: " + e.getMessage());
 
                 if (retryCount < maxRetries) {
                     try {

@@ -38,7 +38,9 @@ public class TcpConnector extends AbstractServiceEnabledConnector
 
     public static final int DEFAULT_BACKLOG = 256;
 
-    private int timeout = DEFAULT_SOCKET_TIMEOUT;
+    private int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
+
+    private int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
 
     private int bufferSize = DEFAULT_BUFFER_SIZE;
 
@@ -47,6 +49,13 @@ public class TcpConnector extends AbstractServiceEnabledConnector
     private String tcpProtocolClassName = DefaultProtocol.class.getName();
 
     private TcpProtocol tcpProtocol;
+
+    ///////////////////////////////////////////////
+    // Does this protocol have any connected sockets?
+    ///////////////////////////////////////////////
+    private boolean sendSocketValid = false;
+
+    private int receiveSocketsCount = 0;
 
     ////////////////////////////////////////////////////////////////////////
     //  Properties for 'keepSocketConnected' TcpMessageDispatcher
@@ -112,17 +121,73 @@ public class TcpConnector extends AbstractServiceEnabledConnector
         return "TCP";
     }
 
-    public int getTimeout()
-    {
-        return timeout;
+    /**
+     * A shorthand property setting timeout for
+     * both SEND and RECEIVE sockets.
+     */
+    public void setTimeout(int timeout) {
+        setSendTimeout(timeout);
+        setReceiveTimeout(timeout);
     }
 
-    public void setTimeout(int timeout)
+    public int getSendTimeout()
+    {
+        return this.sendTimeout;
+    }
+
+    public void setSendTimeout(int timeout)
+    {
+        if (timeout < 0) {
+            timeout = DEFAULT_SOCKET_TIMEOUT;
+        }
+        this.sendTimeout = timeout;
+    }
+
+    //////////////////////////////////////////////
+    //  New independednt Socket timeout for receiveSocket
+    //////////////////////////////////////////////
+    public int getReceiveTimeout()
+    {
+        return receiveTimeout;
+    }
+
+    public void setReceiveTimeout(int timeout)
     {
         if (timeout < 0)
             timeout = DEFAULT_SOCKET_TIMEOUT;
-        this.timeout = timeout;
+        this.receiveTimeout = timeout;
     }
+
+    public boolean isSendSocketValid()
+    {
+        return sendSocketValid;
+    }
+
+    public void setSendSocketValid(boolean validity)
+    {
+        this.sendSocketValid = validity;
+    }
+
+    public boolean hasReceiveSockets()
+    {
+        return receiveSocketsCount > 0;
+    }
+
+    /**
+     * Update the number of receive sockets.
+     *
+     * @param addSocket increase the number if true, decrement otherwise
+     */
+    public synchronized void updateReceiveSocketsCount(boolean addSocket)
+    {
+        if (addSocket) {
+            this.receiveSocketsCount++;
+        }
+        else {
+            this.receiveSocketsCount--;
+        }
+    }
+
 
     public int getBufferSize()
     {
