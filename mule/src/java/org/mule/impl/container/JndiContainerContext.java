@@ -94,8 +94,12 @@ public class JndiContainerContext extends AbstractContainerContext
     public void initialise() throws InitialisationException
     {
         try {
-            if(context==null) {
-                context = new InitialContext(new Hashtable(environment));
+            if (context == null) {
+                if (environment != null && environment.size() > 0) {
+                    context = new InitialContext(new Hashtable(environment));
+                } else {
+                    context = new InitialContext();
+                }
             }
         } catch (NamingException e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), e, this);

@@ -21,11 +21,13 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.UMODescriptor;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -60,15 +62,42 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         ic.bind(Apple.class.getName(), new Apple());
     }
 
-//    public void testExternalUMOReference() throws Exception
-//    {
-//        UMOContainerContext ctx = getContainerContext();
-//        assertNotNull(ctx);
-//
-//        UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
-//        FruitBowl fruitBowl = (FruitBowl) ctx.getComponent(descriptor.getImplementation());
-//
-//        assertNotNull(fruitBowl);
-//    }
+    public void testExternalUMOReference() throws Exception
+    {
+        UMOContainerContext ctx = getContainerContext();
+        assertNotNull(ctx);
 
+        UMODescriptor descriptor = getTestDescriptor("fruit Bowl", "org.mule.tck.testmodels.fruit.FruitBowl");
+        FruitBowl fruitBowl = (FruitBowl) ctx.getComponent(descriptor.getImplementation());
+
+        assertNotNull(fruitBowl);
+    }
+
+
+    /**
+     * If no 'environment' is specified, shall use the default
+     * jndi config via 'new InitialContext()'.
+     */
+    public void testDefaultInitialContext() throws Exception
+    {
+        InitialContext icEnv = context.getContext();
+        assertNotNull(icEnv);
+
+        // reset initial context
+        context.setEnvironment(null);
+        context.setContext(null);
+        context.initialise();
+        InitialContext icDefault = context.getContext();
+        assertNotNull(icDefault);
+        assertNotSame(icEnv, icDefault);
+
+        // reset initial context (same, but empty map)
+        context.setEnvironment(Collections.EMPTY_MAP);
+        context.setContext(null);
+        context.initialise();
+        icDefault = context.getContext();
+        assertNotNull(icDefault);
+
+        assertNotSame(icEnv, icDefault);
+    }
 }
