@@ -26,7 +26,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 
 /**
- * This code is based on code comming from the <a
+ * This code is based on code coming from the <a
  * href="http://jakarta.apache.org/commons/transaction/">commons-transaction</a>
  * project.
  * 
