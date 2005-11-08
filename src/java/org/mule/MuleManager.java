@@ -165,6 +165,11 @@ public class MuleManager implements UMOManager
     private AtomicBoolean starting = new AtomicBoolean(false);
 
     /**
+     * Determines in the manager is in the process of stopping.
+     */
+    private AtomicBoolean stopping = new AtomicBoolean(false);
+
+    /**
      * Determines if the manager has been disposed
      */
     private AtomicBoolean disposed = new AtomicBoolean(false);
@@ -231,7 +236,7 @@ public class MuleManager implements UMOManager
     protected static synchronized UMOManager createInstance()
     {
         Class clazz = SpiHelper.findService(UMOManager.class, MuleManager.class.getName(), MuleManager.class);
-        Object obj = null;
+        Object obj;
         try {
             obj = clazz.newInstance();
         } catch (Exception e) {
@@ -783,6 +788,7 @@ public class MuleManager implements UMOManager
     public synchronized void stop() throws UMOException
     {
         started.set(false);
+        stopping.set(true);
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STOPPING));
 
         stopConnectors();
@@ -941,6 +947,14 @@ public class MuleManager implements UMOManager
     public boolean isInitialising()
     {
         return initialising.get();
+    }
+
+    /**
+     * Determines in the manager is in the process of stopping.
+     */
+    public boolean isStopping()
+    {
+        return stopping.get();
     }
 
     /**
