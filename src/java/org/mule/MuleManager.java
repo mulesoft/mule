@@ -805,6 +805,7 @@ public class MuleManager implements UMOManager
             model.stop();
         }
 
+        stopping.set(false);
         fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STOPPED));
     }
 
