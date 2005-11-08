@@ -4,6 +4,9 @@ import javax.transaction.TransactionManager;
 
 import org.mule.umo.manager.UMOTransactionManagerFactory;
 
+/**
+ * @author <a href="mailto:groups1@memelet.com">Barry Kaplan</a>
+ */
 public class SpringTransactionManagerFactory implements UMOTransactionManagerFactory {
 
     private TransactionManager transactionManager;

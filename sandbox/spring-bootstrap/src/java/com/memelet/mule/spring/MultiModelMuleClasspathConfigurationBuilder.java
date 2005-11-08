@@ -9,6 +9,9 @@ import org.mule.impl.MuleModel;
 import org.mule.umo.model.UMOModel;
 import org.xml.sax.Attributes;
 
+/**
+ * @author <a href="mailto:groups1@memelet.com">Barry Kaplan</a>
+ */
 class MultiModelMuleClasspathConfigurationBuilder extends MuleClasspathConfigurationBuilder {
     
     public MultiModelMuleClasspathConfigurationBuilder() throws ConfigurationException {

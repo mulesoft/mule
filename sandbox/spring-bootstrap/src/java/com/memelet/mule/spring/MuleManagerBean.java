@@ -17,6 +17,9 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+/**
+ * @author <a href="mailto:groups1@memelet.com">Barry Kaplan</a>
+ */
 public class MuleManagerBean implements InitializingBean, DisposableBean, ApplicationContextAware, ApplicationListener {
 
     private Resource[] configResources;

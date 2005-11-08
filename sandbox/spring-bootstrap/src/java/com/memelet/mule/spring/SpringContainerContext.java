@@ -7,6 +7,9 @@ import org.mule.umo.manager.ObjectNotFoundException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 
+/**
+ * @author <a href="mailto:groups1@memelet.com">Barry Kaplan</a>
+ */
 class SpringContainerContext extends AbstractContainerContext {
 
     private final BeanFactory beanFactory;
