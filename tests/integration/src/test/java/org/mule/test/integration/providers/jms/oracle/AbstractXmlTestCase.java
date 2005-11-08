@@ -15,8 +15,7 @@ public abstract class AbstractXmlTestCase extends XMLTestCase {
 	/** Ignore "ignorable whitespace" when comparing XMLs. */
     public void setUp() throws Exception {  
     	super.setUp();    	
-    	XMLUnit.getControlDocumentBuilderFactory().setIgnoringElementContentWhitespace(true);
-    	XMLUnit.getTestDocumentBuilderFactory().setIgnoringElementContentWhitespace(true);
+    	XMLUnit.setIgnoreWhitespace(true);
     }
 
     private static Log log = LogFactory.getLog(AbstractXmlTestCase.class);
