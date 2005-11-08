@@ -719,7 +719,7 @@ public class MuleManager implements UMOManager
             starting.set(true);
             fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STARTING));
             registerAdminAgent();
-            queueManager.start();
+            if (queueManager != null) { queueManager.start(); }
             startConnectors();
             startAgents();
             if(model!=null) model.start();
