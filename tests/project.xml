@@ -443,6 +443,13 @@
                 <ignore>true</ignore>
             </properties>
         </dependency>
+		<!-- required my ActiveMQ 3.x -->
+        <dependency>
+            <groupId>concurrent</groupId>
+            <artifactId>concurrent</artifactId>
+            <version>${concurrent_version}</version>
+            <url>http://www.oswego.edu</url>
+        </dependency>
         <dependency>
             <artifactId>activemq</artifactId>
             <groupId>activemq</groupId>
