@@ -1,0 +1,17 @@
+
+#include( "./src/resources/template/header.html" )
+
+  <div id="Content">
+      <h1>Description :</h1>          	
+    	  ${graph.info.caption.replaceAll("-------------------","").replaceAll("\n","<br>")}
+      <h1>Graph :</h1>
+      <ul>
+      <p> click on mule component to navigate the javadoc or java code</b>
+      </p>
+      </ul>
+	<img src="${gifFileName}" usemap="#LinguineMap" border="0" class="mulegraph">
+	#include( ${mapFileName})
+  </div>
+
+#include( "./src/resources/template/footer.html" )
+  

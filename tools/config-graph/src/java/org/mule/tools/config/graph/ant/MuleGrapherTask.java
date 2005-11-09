@@ -1,17 +1,17 @@
 package org.mule.tools.config.graph.ant;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.DirectoryScanner;
-import org.apache.tools.ant.taskdefs.MatchingTask;
-import org.apache.tools.ant.types.FileSet;
-import org.mule.tools.config.graph.MuleGrapher;
-import org.mule.tools.config.graph.GraphConfig;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Vector;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DirectoryScanner;
+import org.apache.tools.ant.taskdefs.MatchingTask;
+import org.apache.tools.ant.types.FileSet;
+import org.mule.tools.config.graph.MuleGrapher;
+import org.mule.tools.config.graph.config.GraphConfig;
 
 public class MuleGrapherTask extends MatchingTask {
     private Vector filesets = new Vector();

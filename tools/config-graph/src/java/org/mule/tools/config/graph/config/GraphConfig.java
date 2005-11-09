@@ -11,7 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.tools.config.graph;
+package org.mule.tools.config.graph.config;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,18 +40,21 @@ public class GraphConfig {
     public static final String ARG_HELP = "-?";
     public static final String ARG_KEEP_DOT_FILES = "-keepdotfiles";
     public static final String ARG_COMBINE_FILES = "-combinefiles";
-
+    public static final String ARG_URLS = "-urls";
+    
     private List files;
     private String executeCommand;
     private File outputDirectory;
     private String outputFilename;
     private String caption;
     private File mappingsFile;
+    private File urlsFile;
     private boolean combineFiles = false;
     private boolean keepDotFiles = false;
     private List ignoredAttributes = null;
 
     private Properties mappings = new Properties();
+    private Properties urls = new Properties();
 
     public GraphConfig() {
         init();
@@ -97,6 +100,20 @@ public class GraphConfig {
             System.out.println("No mappings file set");
         }
 
+        temp = getOpt(args, ARG_URLS, null);
+        if (temp != null) {
+            urlsFile = new File(temp);
+            System.out.println("Using urls file: " + urlsFile.getAbsolutePath());
+            if (urlsFile.exists()) {
+                urls = new Properties();
+                urls.load(new FileInputStream(urlsFile));
+                System.out.println("Using urls: ");
+                urls.list(System.out);
+            } 
+        } else {
+            System.out.println("No urls file set");
+        }
+        
     }
 
     protected void init() {
@@ -218,5 +235,21 @@ public class GraphConfig {
     public void setOutputFilename(String outputFilename) {
         this.outputFilename = outputFilename;
     }
+
+	public Properties getUrls() {
+		return urls;
+	}
+
+	public void setUrls(Properties urls) {
+		this.urls = urls;
+	}
+
+	public File getUrlsFile() {
+		return urlsFile;
+	}
+
+	public void setUrlsFile(File urlsFile) {
+		this.urlsFile = urlsFile;
+	}
 
 }
