@@ -42,9 +42,43 @@
             <artifactId>commons-logging</artifactId>
             <version>1.0.4</version>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>2.1</version>
+        </dependency>  
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.1</version>
+        </dependency>               
+     <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.0</version>
+        </dependency>          
+        <dependency>
+            <groupId>velocity</groupId>
+            <artifactId>velocity</artifactId>
+            <version>1.4-dev</version>
+        </dependency>        
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.9</version>
+        </dependency>         
+        <dependency>
+            <groupId>springframework</groupId>
+            <artifactId>spring</artifactId>
+            <version>1.2.5</version>
+        </dependency>     </dependencies>
      <build>
         <sourceDirectory>${basedir}/src/java</sourceDirectory>
+        <resources>
+			<resource>
+		       <directory>src/resources</directory>
+		    </resource>
+        </resources>
         <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
          <unitTest>
             <includes>

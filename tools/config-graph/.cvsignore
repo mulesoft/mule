@@ -1,2 +1,5 @@
 mule-tools-config-graph.iml
 target
+build.properties
+.classpath
+.project

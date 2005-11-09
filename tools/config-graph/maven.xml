@@ -45,6 +45,9 @@
       <arg value="${mappings}"/>
       <arg value="-keepdotfiles"/>
       <arg value="${keepdotfiles}"/>
+      <arg value="-urls"/>
+      <arg value="${urls}"/>
+      
     </java>
   </goal>
 
@@ -67,10 +70,11 @@
     
     <goal name="generate-samples" prereqs="setclasspath"
         description="Generates a Configuration graphs for the Mule sample applications">
-        <j:set var="files" value="../../samples/errorhandler/conf/eh-mule-config.xml,../../samples/echo/conf/echo-mule-config.xml,../../samples/hello/conf/hello-mule-config.xml,../../samples/hello/conf/hello-http-mule-config.xml,../../samples/loanbroker/conf/loan-broker-async-config.xml,../../samples/loanbroker/conf/loan-broker-sync-config.xml,../../samples/loanbroker-esb/conf/loan-broker-esb-mule-config.xml,../../samples/loanbroker-esb/conf/loan-broker-esb-mule-config-with-ejb-container.xml,../../samples/stockquote/conf/rest-mule-config.xml,../../samples/stockquote/conf/soap-mule-config.xml,../../samples/voipservice/conf/voip-broker-sync-config.xml"/>
+        <j:set var="files" value="${samples.dir}/errorhandler/conf/eh-mule-config.xml,${samples.dir}/echo/conf/echo-mule-config.xml,${samples.dir}/hello/conf/hello-mule-config.xml,${samples.dir}/hello/conf/hello-http-mule-config.xml,${samples.dir}/loanbroker/conf/loan-broker-async-config.xml,${samples.dir}/loanbroker/conf/loan-broker-sync-config.xml,${samples.dir}/loanbroker-esb/conf/loan-broker-esb-mule-config.xml,${samples.dir}/loanbroker-esb/conf/loan-broker-esb-mule-config-with-ejb-container.xml,${samples.dir}/stockquote/conf/rest-mule-config.xml,${samples.dir}/stockquote/conf/soap-mule-config.xml,${samples.dir}/voipservice/conf/voip-broker-sync-config.xml"/>
         <j:set var="outputdir" value="samples"/>
         <j:set var="mappings" value="samples/mappings.properties"/>
         <j:set var="keepdotfiles" value="false"/>
+        <j:set var="urls" value="samples/urls.properties"/>
         <attainGoal name="generate"/>
     </goal>
 
