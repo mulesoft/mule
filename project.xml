@@ -391,13 +391,6 @@
                 <war.bundle>false</war.bundle>
             </properties>
         </dependency>
-        <!-- Active IO uses this -->
-         <dependency>
-            <groupId>concurrent</groupId>
-            <artifactId>concurrent</artifactId>
-            <version>${concurrent_version}</version>
-            <url>http://www.oswego.edu</url>
-        </dependency>
         <dependency>
             <groupId>activation</groupId>
             <artifactId>activation</artifactId>
