@@ -27,7 +27,7 @@ public class PassThroughComponent implements Callable
 {
     public Object onCall(UMOEventContext context) throws Exception
     {
-        return context.getTransformedMessageAsString();
+        return context.getTransformedMessage();
     }
 
 }
