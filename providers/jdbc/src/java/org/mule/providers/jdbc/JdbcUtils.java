@@ -115,6 +115,16 @@ public abstract class JdbcUtils
                 } catch (Exception ignored) {
 		    value = null;
 		} 
+            } else if (root instanceof org.dom4j.Node) {
+		org.dom4j.Node dom4jNode = (org.dom4j.Node) root;
+		try {
+		    Node node = dom4jNode.selectSingleNode(name);
+		    if (node != null) {
+			value = node.getText();
+		    }
+                } catch (Exception ignored) {
+		    value = null;
+		} 
             } else {
                 try {
                     value = BeanUtils.getProperty(root, name);
