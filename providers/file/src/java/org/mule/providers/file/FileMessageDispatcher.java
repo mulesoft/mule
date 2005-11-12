@@ -136,6 +136,16 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 result = getNextFile(endpointUri.getAddress(), filenameFilter);
             }
             if (result != null) {
+		boolean checkFileAge = connector.getCheckFileAge();
+		if (checkFileAge) {
+		    long fileAge = connector.getFileAge();
+		    long lastMod = result.lastModified();
+		    long now = (new java.util.Date()).getTime();
+		    if ((now - lastMod) < fileAge) {
+			return null;
+		    }
+		}
+
                 MuleMessage message = new MuleMessage(connector.getMessageAdapter(result));
                 if (connector.getMoveToDirectory() != null) {
                     {

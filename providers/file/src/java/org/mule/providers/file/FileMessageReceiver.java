@@ -112,6 +112,14 @@ public class FileMessageReceiver extends PollingMessageReceiver
 
     public synchronized void processFile(File file) throws UMOException
     {
+	boolean checkFileAge = ((FileConnector) connector).getCheckFileAge();
+	if (checkFileAge) {
+	    long fileAge = ((FileConnector) connector).getFileAge();
+	    long lastMod = file.lastModified();
+	    long now = (new java.util.Date()).getTime();
+	    if ((now - lastMod) < fileAge) return;
+	}
+
         File destinationFile = null;
         String orginalFilename = file.getName();
         UMOMessageAdapter msgAdapter = connector.getMessageAdapter(file);

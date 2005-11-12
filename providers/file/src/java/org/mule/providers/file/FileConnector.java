@@ -64,6 +64,7 @@ public class FileConnector extends AbstractServiceEnabledConnector
     // endpoint
     // declaration
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
+    public static final String PROPERTY_FILE_AGE = "fileAge";
     public static final String PROPERTY_FILENAME = "filename";
     public static final String PROPERTY_ORIGINAL_FILENAME = "originalFilename";
     public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern";
@@ -90,6 +91,10 @@ public class FileConnector extends AbstractServiceEnabledConnector
     private boolean outputAppend = false;
 
     private boolean autoDelete = true;
+
+    private boolean checkFileAge = false;
+
+    private long fileAge = 0;
 
     private FileOutputStream outputStream = null;
 
@@ -140,6 +145,10 @@ public class FileConnector extends AbstractServiceEnabledConnector
             String tempPolling = (String) props.get(PROPERTY_POLLING_FREQUENCY);
             if (tempPolling != null) {
                 polling = Long.parseLong(tempPolling);
+            }
+            Long tempFileAge = (Long) props.get(PROPERTY_FILE_AGE);
+            if (tempFileAge != null) {
+                setFileAge(tempFileAge.longValue());
             }
         }
         if (polling <= 0) {
@@ -287,6 +296,27 @@ public class FileConnector extends AbstractServiceEnabledConnector
     public void setPollingFrequency(long pollingFrequency)
     {
         this.pollingFrequency = pollingFrequency;
+    }
+
+    /**
+     * @return Returns the fileAge.
+     */
+    public long getFileAge()
+    {
+        return fileAge;
+    }
+
+    public boolean getCheckFileAge() {
+	return checkFileAge;
+    }
+
+    /**
+     * @param fileAge The fileAge in seconds to set.
+     */
+    public void setFileAge(long fileAge)
+    {
+        this.fileAge = fileAge;
+	this.checkFileAge = true;
     }
 
     /**
