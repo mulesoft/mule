@@ -475,35 +475,68 @@
     <!--                DEPLOY TARGETS                   -->
     <!--=================================================-->
     <goal name="deploy-release" prereqs="setvars">
-        <echo>connecting to ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}</echo>
-        <echo>SCP is ${maven.scp.executable} args are ${maven.scp.args}</echo>
-        <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
-            <arg line="${maven.scp.args} mule-${pom.currentVersion}-site.tar.gz ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}"/>
-        </exec>
 
-        <echo>Command line is ${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory} &amp;&amp; rm -fr doc &amp;&amp; tar zxvf mule-${pom.currentVersion}-site.tar.gz'</echo>
-        <exec dir="." executable="${maven.ssh.executable}">
-            <arg line="${maven.ssh.args} ${maven.username}@${pom.siteAddress} 'cd ${pom.siteDirectory} &amp;&amp; rm -fr doc &amp;&amp; tar zxvf mule-${pom.currentVersion}-site.tar.gz'"/>
-        </exec>
+        <j:set var="deploy.remote" value="true"/>
+        <u:available file="${pom.siteDirectory}">
+            
+            <!-- unzip doc site if there is one -->
+            <u:available file="${maven.build.dir}/distributions/mule-${pom.currentVersion}-site.tar.gz">
+                <delete dir="${pom.siteDirectory}/doc"/>
+                <untar src="${maven.build.dir}/distributions/mule-${pom.currentVersion}-site.tar.gz"
+                    dest="${pom.siteDirectory}" compression="gzip"/>
+            </u:available>
+            
+            <echo> Copying jars from ${mule.release.dist.dir}</echo>
+            <copy todir="${pom.siteDirectory}/../dist/jars">
+                <fileset file="${mule.release.dist.dir}/*.jar"/>
+            </copy>
 
-        <echo> Copying jars from ${mule.release.dist.dir}</echo>
-        <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
-            <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.jar ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/jars/"/>
-        </exec>
+            <echo> Copying rars from ${mule.release.dist.dir}</echo>
+            <copy todir="${pom.siteDirectory}/../dist/rars">
+                <fileset file="${mule.release.dist.dir}/*.rar"/>
+            </copy>
 
-        <echo> Copying rars from ${mule.release.dist.dir}</echo>
-        <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
-            <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.rar ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/rars/"/>
-        </exec>
+            <echo> Copying dtds from ${mule.release.dist.dir}</echo>
+            <copy todir="${pom.siteDirectory}/../dist/dtds">
+                <fileset file="${mule.release.dist.dir}/*.dtd"/>
+            </copy>
 
-        <echo> Copying dtds from ${mule.release.dist.dir}</echo>
-        <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
-            <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.dtd ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/dtds/"/>
-        </exec>
+            <echo> Copying distributions from ${mule.release.dist.dir}</echo>
+            <copy todir="${pom.siteDirectory}/../dist/distributions">
+                <fileset file="${maven.build.dir}/distributions/${maven.final.name}-dist.*"/>
+            </copy>
 
-        <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
-            <arg line="${maven.scp.args} *mule-${pom.currentVersion}-dist.* ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/distributions/"/>
-        </exec>
+            <j:set var="deploy.remote" value="false"/>
+        </u:available>
+
+        <j:if test="deploy.remote">
+            <echo>connecting to ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}</echo>
+            <echo>SCP is ${maven.scp.executable} args are ${maven.scp.args}</echo>
+            <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
+                <arg line="${maven.scp.args} mule-${pom.currentVersion}-site.tar.gz ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}"/>
+            </exec>
+
+
+
+            <echo> Copying jars from ${mule.release.dist.dir}</echo>
+            <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
+                <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.jar ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/jars/"/>
+            </exec>
+
+            <echo> Copying rars from ${mule.release.dist.dir}</echo>
+            <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
+                <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.rar ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/rars/"/>
+            </exec>
+
+            <echo> Copying dtds from ${mule.release.dist.dir}</echo>
+            <exec dir="${mule.release.dist.dir}" executable="${maven.scp.executable}">
+                <arg line="${maven.scp.args} ${mule.release.dist.dir}/*.dtd ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/dtds/"/>
+            </exec>
+
+            <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
+                <arg line="${maven.scp.args} *mule-${pom.currentVersion}-dist.* ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}/../dist/distributions/"/>
+            </exec>
+        </j:if>
     </goal>
 
     <goal name="deploy:nightly" prereqs="setvars">
