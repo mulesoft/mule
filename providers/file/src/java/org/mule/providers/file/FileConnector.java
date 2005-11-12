@@ -28,6 +28,7 @@ import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.UMOComponent;
@@ -104,6 +105,13 @@ public class FileConnector extends AbstractServiceEnabledConnector
     public FileConnector()
     {
         filenameParser = new SimpleFilenameParser();
+    }
+
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
+        if(endpoint.getFilter()!=null) {
+            return endpoint.getEndpointURI().getAddress() + "/" + ((FilenameWildcardFilter)endpoint.getFilter()).getPattern();
+        }
+        return endpoint.getEndpointURI().getAddress();
     }
 
     /**
