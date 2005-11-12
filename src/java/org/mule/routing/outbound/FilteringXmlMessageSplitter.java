@@ -42,7 +42,7 @@ import org.mule.routing.outbound.AbstractMessageSplitter;
  */
 public class FilteringXmlMessageSplitter extends AbstractMessageSplitter {
     private Map properties;
-    private List nodes;
+    private List nodes = null;
     private org.dom4j.Document dom4jDoc;
     private String splitExpression = "";
     private Map namespaces = null;
@@ -71,13 +71,33 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter {
             logger.debug("splitExpression is " + splitExpression);
     	}
     	
-        if (message.getPayload() instanceof org.dom4j.Document) {
-        	 dom4jDoc = (org.dom4j.Document) message.getPayload();
-        	 XPath xpath = dom4jDoc.createXPath(splitExpression);
-        	 if (namespaces != null) xpath.setNamespaceURIs( namespaces ); 
-        	 nodes = xpath.selectNodes( dom4jDoc );
-        } else {
-        	logger.error("Message is not a dom4j.Document! It is: " + message.getPayload().getClass().toString());
+	Object src = message.getPayload();
+
+	try {
+	    if(src instanceof byte[]) {
+		src = new String((byte[])src);
+	    }
+
+	    Document dom4jDoc = null;
+
+	    if (src instanceof String) {
+		String xml = (String) src;
+		dom4jDoc = DocumentHelper.parseText(xml);
+	    } else if (src instanceof org.dom4j.Document) {
+		dom4jDoc = (org.dom4j.Document) src;
+	    } else {
+		logger.error("Non-xml message payload: " + 
+			src.getClass().toString());
+		return;
+	    }
+
+	    if (dom4jDoc != null) {
+		XPath xpath = dom4jDoc.createXPath(splitExpression);
+		if (namespaces != null) xpath.setNamespaceURIs( namespaces ); 
+		nodes = xpath.selectNodes( dom4jDoc );
+	    }
+        } catch (Exception e) {
+	    logger.error("Error spliting document with " + splitExpression, e);
         }
         
         properties = message.getProperties();
@@ -94,6 +114,10 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter {
      */
     protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
     {
+	if (nodes == null) {
+	    return null;
+	}
+
         for (int i = 0; i < nodes.size(); i++) {
             Node node = (Node)nodes.get(i);
             
