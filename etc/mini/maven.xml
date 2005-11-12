@@ -127,11 +127,11 @@
         <delete includeemptydirs="true">
             <fileset dir="${samples.dist}/hello">
                 <include name="**/*spring*"/>
-                <include name="**/*http*"/>
+                <!--include name="**/*http*"/-->
             </fileset>
         </delete>
         <delete includeemptydirs="true">
-            <fileset dir="${samples.dist}/stockqoute">
+            <fileset dir="${samples.dist}/stockquote">
                 <include name="**/*soap*"/>
             </fileset>
         </delete>

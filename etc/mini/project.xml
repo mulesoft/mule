@@ -128,6 +128,33 @@
             </properties>
             <url>http://www.muleumo.org</url>
         </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-http-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <type>jar</type>
+             <properties>
+                <mule.mini>true</mule.mini>
+            </properties>
+            <url>http://www.muleumo.org</url>
+        </dependency>
+        <dependency>
+			<artifactId>commons-codec</artifactId>
+			<groupId>commons-codec</groupId>
+			<version>${commons_codec_version}</version>
+            <properties>
+                <mule.mini>true</mule.mini>
+            </properties>
+		</dependency>
+		<dependency>
+			<artifactId>commons-httpclient</artifactId>
+			<groupId>commons-httpclient</groupId>
+			<version>${commons_httpclient_version}</version>
+			<url>http://jakarta.apache.org/commons/httpclient/index.html</url>
+			<properties>
+                <mule.mini>true</mule.mini>
+            </properties>
+		</dependency>
     </dependencies>
 </project>
 
