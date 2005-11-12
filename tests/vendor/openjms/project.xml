@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-tests-openjms-integration</artifactId>
+    <name>Mule OpenJms Vendor Integration Tests</name>
+    <description>Mule functional and integration tests for specific vendor implementations
+    </description>
+    <shortDescription>mule-tests-vendor-openjms-integration</shortDescription>
+    <url>http://www.muleumo.org/</url>
+    <dependencies>
+    <dependency>
+            <artifactId>mule-tests-integration-shared</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>openjms</groupId>
+            <artifactId>openjms-client</artifactId>
+            <version>${openjms_client_version}</version>
+            <type>jar</type>
+            <url>http://openjms.sourceforge.net/</url>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+    </dependencies>
+</project>

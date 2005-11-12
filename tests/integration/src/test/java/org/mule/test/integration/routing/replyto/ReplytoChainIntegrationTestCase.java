@@ -29,9 +29,9 @@ import java.util.Map;
 
 public class ReplytoChainIntegrationTestCase extends IntegrationTestCase
 {
-//    public ReplytoChainIntegrationTestCase() {
-//        embbededActiveMQ=true;
-//    }
+    public ReplytoChainIntegrationTestCase() {
+        embbededActiveMQ=true;
+    }
 
     protected String getConfigResources() {
         return "org/mule/test/integration/routing/replyto/injection-test.xml";

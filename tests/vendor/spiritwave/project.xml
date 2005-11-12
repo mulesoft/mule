@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-tests-wave-integration</artifactId>
+    <name>Mule Wave Vendor Integration Tests</name>
+    <description>Mule functional and integration tests for specific vendor implementations
+    </description>
+    <shortDescription>mule-tests-vendor-wave-integration</shortDescription>
+    <url>http://www.muleumo.org/</url>
+    <dependencies>
+    <dependency>
+            <artifactId>mule-tests-integration-shared</artifactId>
+            <groupId>mule</groupId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+    <!-- todo insert Wave Open deps -->
+        <!--dependency>
+            <groupId>spiritwave</groupId>
+            <artifactId>spiritwave</artifactId>
+            <version>${spiritwave_version}</version>
+            <type>jar</type>
+            <properties>
+                <ignore>true</ignore>
+            </properties>
+        </dependency-->
+    </dependencies>
+</project>

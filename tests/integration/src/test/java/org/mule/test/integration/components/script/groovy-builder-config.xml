@@ -8,7 +8,7 @@
     <model name="model">
         <mule-descriptor name="GroovyUMO1"
                          inboundEndpoint="vm://groovy.1"
-                         implementation="org.mule.components.script.jsr223.ScriptScriptMessageBuilder">
+                         implementation="org.mule.components.script.jsr223.ScriptMessageBuilder">
 
             <outbound-router>
                 <router className="org.mule.routing.outbound.FilteringOutboundRouter">

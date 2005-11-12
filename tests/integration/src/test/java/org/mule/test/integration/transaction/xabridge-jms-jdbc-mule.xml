@@ -11,7 +11,7 @@
     <!-- Container context -->
 	<container-context name="spring"  className="org.mule.extras.spring.SpringContainerContext">
 		<properties>
-			<property name="configFile" value="org/mule/test/integration/transaction/xabridge-spring.xml"/>
+			<property name="configFile" value="org/mule/test/integration/transaction/xabridge-jms-jdbc-spring.xml"/>
 		</properties>
 	</container-context>
 

@@ -32,9 +32,9 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38000");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
         try {
-            UMOMessage result = dispatcher.sendRemote("axis:http://localhost:38004/mule/services/mycomponent2?method=echo", "test", null);
+            UMOMessage result = dispatcher.sendRemote("axis:http://localhost:38104/mule/services/mycomponent2?method=echo", "test", null);
             assertNotNull(result);
             assertEquals("test", result.getPayloadAsString());
         } finally {
@@ -45,9 +45,9 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     public void testRequestResponseComplex() throws Exception
     {
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38000");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
         try {
-            UMOMessage result = dispatcher.sendRemote("axis:http://localhost:38004/mule/services/mycomponent3?method=getPerson", "Fred", null);
+            UMOMessage result = dispatcher.sendRemote("axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Fred", null);
             assertNotNull(result);
             System.out.println(result.getPayload());
             assertTrue(result.getPayload() instanceof Person);
@@ -61,17 +61,17 @@ public class MuleClientRemotingAxisTestCase extends FunctionalTestCase
     public void testRequestResponseComplex2() throws Exception
     {
         MuleClient client = new MuleClient();
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38000");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("tcp://localhost:38100");
         try {
             String[] args = new String[] { "Ross", "Mason" };
-            UMOMessage result = dispatcher.sendRemote("axis:http://localhost:38004/mule/services/mycomponent3?method=addPerson", args, null);
+            UMOMessage result = dispatcher.sendRemote("axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson", args, null);
             assertNotNull(result);
             assertTrue(result.getPayload() instanceof Person);
             assertEquals("Ross", ((Person) result.getPayload()).getFirstName());
             assertEquals("Mason", ((Person) result.getPayload()).getLastName());
     
             // do a receive
-            result = client.send("axis:http://localhost:38004/mule/services/mycomponent3?method=getPerson", "Ross", null);
+            result = client.send("axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Ross", null);
             assertNotNull(result);
             assertTrue(result.getPayload() instanceof Person);
             assertEquals("Ross", ((Person) result.getPayload()).getFirstName());

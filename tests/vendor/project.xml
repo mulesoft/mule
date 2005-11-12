@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-tests-vendor-integration</artifactId>
+    <name>Mule Vendor Integration Tests</name>
+    <description>Mule functional and integration tests for specific vendor implementations
+    </description>
+    <shortDescription>mule-tests-vendor-integration</shortDescription>
+    <url>http://www.muleumo.org/</url>
+    <build>
+        <unitTest>
+            <excludes>
+                <exclude>**/Abstract*.*</exclude>
+                <!-- need to have a Server instance running for these to work -->
+                <exclude>**/Joram*.*</exclude>
+                <exclude>**/SpiritWave*.*</exclude>
+                <exclude>**/OpenJms*.*</exclude>
+            </excludes>
+        </unitTest>
+    </build>
+</project>

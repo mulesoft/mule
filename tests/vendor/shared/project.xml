@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-tests-integration-shared</artifactId>
+    <name>Mule Shared Vendor Integration Tests</name>
+    <description>Mule functional and integration tests for specific vendor implementations
+    </description>
+    <shortDescription>mule-tests-vendor-shared-integration</shortDescription>
+    <url>http://www.muleumo.org/</url>
+    <dependencies>
+    </dependencies>
+</project>
