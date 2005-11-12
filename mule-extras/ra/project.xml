@@ -149,12 +149,18 @@
 
         <dependency>
             <id>commons-httpclient</id>
-            <version>2.0.2</version>
+            <version>${commons_httpclient_version}</version>
             <url>http://jakarta.apache.org/commons/httpclient/index.html</url>
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>
-                <rar.bundle>true</rar.bundle>
-                <mule.core.jar>false</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>commons-codec</id>
+            <version>${commons_codec_version}</version>
+            <url>http://jakarta.apache.org/commons/codec/index.html</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
             </properties>
         </dependency>
     </dependencies>

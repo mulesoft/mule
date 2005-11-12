@@ -384,6 +384,14 @@
             </properties>
         </dependency>
         <dependency>
+            <id>commons-codec</id>
+            <version>${commons_codec_version}</version>
+            <url>http://jakarta.apache.org/commons/codec/index.html</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+            </properties>
+        </dependency>
+        <dependency>
             <artifactId>acegi-security</artifactId>
             <groupId>acegisecurity</groupId>
             <version>${acegisecurity_version}</version>
