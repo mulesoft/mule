@@ -40,9 +40,10 @@
                                 maven.ssh.args=-1
                                 maven.username=rossmason
 
-     maven mule:release -       Runs a full release build.  This contains everything in the nightly build
+    maven start-release -       Runs a full release build.
+    maven complete-release -    Packages up the release distribution. This contains everything in the nightly build
                                 plus source code and docs/javadocs and creates a site distribution too.
-    maven mule:release-deploy - will upload the site and distributions to codehaus and update the site.
+    maven deploy-release -      will upload the site and distributions to codehaus and update the site.
                                 Only run this once you have check the distribution, i.e. tested the samples
     copy-resources              Useful for copying all jar resources to the target directories
 
@@ -54,7 +55,7 @@
 
     <goal name="complete-build" prereqs="mule:night-release"/>
 
-    <goal name="mule:night-release" description="Creates and zips build for distribution">
+    <goal name="night-release" description="Creates and zips build for distribution">
         <attainGoal name="base-release"/>
         <attainGoal name="mule:zip-release"/>
     </goal>
@@ -64,7 +65,7 @@
         <attainGoal name="multiproject:goal"/>
     </goal>
 
-    <goal name="mule:release-prepare" prereqs="clean, setvars, multiproject:clean">
+    <goal name="release-prepare" prereqs="clean, setvars">
         <echo>About to create lib and bin directories in ${mule.release.dir}</echo>
         <delete dir="${mule.release.dist.dir}"/>
         <mkdir dir="${mule.release.dir}"/>
@@ -72,11 +73,11 @@
         <mkdir dir="${mule.release.dist.dir}"/>
     </goal>
 
-    <goal name="mule:start-release" prereqs="mule:release-prepare,multiproject:install"
+    <goal name="start-release" prereqs="release-prepare,multiproject:install"
             description="Creates and zips build for distribution">
     </goal>
 
-    <goal name="mule:release" description="Creates and zips build for distribution">
+    <goal name="complete-release" description="Creates and zips build for distribution">
         <attainGoal name="base-release"/>
         <attainGoal name="mule:site"/>
         <attainGoal name="mule:javadoc"/>
@@ -473,7 +474,7 @@
     <!--=================================================-->
     <!--                DEPLOY TARGETS                   -->
     <!--=================================================-->
-    <goal name="mule:release-deploy" prereqs="setvars">
+    <goal name="deploy-release" prereqs="setvars">
         <echo>connecting to ${maven.username}@${pom.siteAddress}:${pom.siteDirectory}</echo>
         <echo>SCP is ${maven.scp.executable} args are ${maven.scp.args}</echo>
         <exec dir="${maven.build.dir}/distributions" executable="${maven.scp.executable}">
