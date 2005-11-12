@@ -53,7 +53,7 @@
 
     <goal name="start-build" prereqs="setvars, clean, multiproject:clean, multiproject:install"/>
 
-    <goal name="complete-build" prereqs="mule:night-release"/>
+    <goal name="complete-build" prereqs="night-release"/>
 
     <goal name="night-release" description="Creates and zips build for distribution">
         <attainGoal name="base-release"/>
