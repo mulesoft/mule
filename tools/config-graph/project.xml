@@ -34,7 +34,7 @@
         <!-- TODO switch to a release version for Mule v1.2 -->
         <dependency>
             <groupId>mule</groupId>
-            <artifactId>mule</artifactId>
+            <artifactId>mule-core</artifactId>
             <version>SNAPSHOT</version>
         </dependency>
         <dependency>

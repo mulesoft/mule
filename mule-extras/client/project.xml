@@ -22,6 +22,14 @@
             </properties>
         </dependency>
         <dependency>
+            <id>commons-codec</id>
+            <version>${commons_codec_version}</version>
+            <url>http://jakarta.apache.org/commons/codec/index.html</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            </properties>
+        </dependency>
+        <dependency>
             <artifactId>mule-http-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
