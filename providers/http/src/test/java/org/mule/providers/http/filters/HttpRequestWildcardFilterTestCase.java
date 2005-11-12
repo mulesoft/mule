@@ -15,10 +15,11 @@ package org.mule.providers.http.filters;
 
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpRecoverableException;
 import org.apache.commons.httpclient.HttpState;
+import org.apache.commons.httpclient.NoHttpResponseException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.mule.MuleManager;
 import org.mule.components.simple.EchoComponent;
 import org.mule.config.PoolingProfile;
@@ -97,36 +98,37 @@ public class HttpRequestWildcardFilterTestCase extends NamedTestCase {
 	}
 
 	
-	public void testHttpPost() throws URISyntaxException, HttpRecoverableException, HttpException, IOException {
+	public void testHttpPost() throws URISyntaxException, HttpException, IOException {
         URI uri = new URI(HTTP_LOCALHOST_60198);
         PostMethod postMethod = new PostMethod(uri.toString());
-        postMethod.setRequestBody(TEST_MESSAGE);
-        postMethod.setRequestContentLength(TEST_MESSAGE.length());
+        postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE));
         HttpConnection cnn = new HttpConnection(uri.getHost(), uri.getPort());
+        cnn.open();
         postMethod.execute(new HttpState(), cnn);
 		System.out.println("PostResponse: " + 
         		postMethod.getResponseBodyAsString());
 	}
 	
-	public void testHttpGetNotFilter() throws HttpRecoverableException, HttpException, URISyntaxException, IOException {
+	public void testHttpGetNotFilter() throws HttpException, URISyntaxException, IOException {
 		String result = doHttpGet("hello"); 
 		assertTrue(result.indexOf("hello") > -1);
 	}
 
-	public void testHttpGetFilter() throws HttpRecoverableException, HttpException, URISyntaxException, IOException {
+	public void testHttpGetFilter() throws HttpException, URISyntaxException, IOException {
 		try {
 			doHttpGet("xyz");
 			fail("The response should be invalid as the filter has discarded the request");
-		} catch (HttpRecoverableException e) {
+		} catch (NoHttpResponseException e) {
 			// This is ok
 		}
 	}
 
-	protected String doHttpGet(String param) throws URISyntaxException, HttpRecoverableException, HttpException, IOException {
+	protected String doHttpGet(String param) throws URISyntaxException, HttpException, IOException {
         URI uri = new URI(HTTP_LOCALHOST_60198);
         GetMethod getMethod = new GetMethod(uri.toString());
 		getMethod.setQueryString("param=" + param);
         HttpConnection cnn = new HttpConnection(uri.getHost(), uri.getPort());
+        cnn.open();
         getMethod.execute(new HttpState(), cnn);
         System.out.println("GetResponse: " + 
         		getMethod.getResponseBodyAsString());

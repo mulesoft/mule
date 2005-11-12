@@ -13,9 +13,6 @@
  */
 package org.mule.providers.http.transformers;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 import org.mule.config.MuleProperties;
@@ -24,6 +21,10 @@ import org.mule.providers.http.HttpConstants;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <code>HttpClientMethodResponseToObject</code> transforms a http client
@@ -46,10 +47,14 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
         Object msg;
         HttpMethod httpMethod = (HttpMethod) src;
         Header contentType = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
-        if (contentType != null && !contentType.getValue().startsWith("text/")) {
-            msg = httpMethod.getResponseBody();
-        } else {
-            msg = httpMethod.getResponseBodyAsString();
+        try {
+            if (contentType != null && !contentType.getValue().startsWith("text/")) {
+                msg = httpMethod.getResponseBody();
+            } else {
+                msg = httpMethod.getResponseBodyAsString();
+            }
+        } catch (IOException e) {
+            throw new TransformerException(this, e);
         }
         // Standard headers
         Map headerProps = new HashMap();

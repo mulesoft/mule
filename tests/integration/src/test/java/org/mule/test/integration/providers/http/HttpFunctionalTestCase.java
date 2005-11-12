@@ -14,11 +14,10 @@
 
 package org.mule.test.integration.providers.http;
 
-import java.net.URI;
-
 import org.apache.commons.httpclient.HttpConnection;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.NullPayload;
@@ -31,6 +30,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
+
+import java.net.URI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -74,9 +75,9 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
     {
         URI uri = getInDest().getUri();
         PostMethod postMethod = new PostMethod(uri.toString());
-        postMethod.setRequestBody(TEST_MESSAGE);
-        postMethod.setRequestContentLength(TEST_MESSAGE.length());
+        postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE));
         cnn = new HttpConnection(uri.getHost(), uri.getPort());
+        cnn.open();
         postMethod.execute(new HttpState(), cnn);
     }
 

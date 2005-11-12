@@ -14,7 +14,9 @@
 package org.mule.providers.http.transformers;
 
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
@@ -27,10 +29,10 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a UMOMessage into a
@@ -121,7 +123,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 PostMethod postMethod = new PostMethod(uri.toString());
                 setHeaders(postMethod, context);
                 String paramName = (String) context.getProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
-                postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
+                //postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
                 if (paramName == null) {
                     //Call method to manage the parameter array
                     addParameters(uri.getQuery(), postMethod);
@@ -129,13 +131,12 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     //can control if a POST body is posted explicitly
                     if(!(context.getMessage().getPayload() instanceof NullPayload)) {
                         if (src instanceof String) {
-                            postMethod.setRequestBody(new ByteArrayInputStream(src.toString().getBytes()));
+                            postMethod.setRequestEntity(new ByteArrayRequestEntity(src.toString().getBytes()));
                         } else if (src instanceof InputStream) {
-	                        postMethod.setRequestBody((InputStream) src);
-	                        postMethod.setRequestContentLength(Integer.parseInt((String) context.getProperty(HttpConstants.HEADER_CONTENT_LENGTH))); // must set this for httpclient to stream
+	                        postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream) src));
                         } else {
                             byte[] buffer = Utility.objectToByteArray(src);
-                            postMethod.setRequestBody(new ByteArrayInputStream(buffer));
+                            postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer));
                         }
                     }
                 } else {

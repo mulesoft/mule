@@ -16,6 +16,8 @@
 package org.mule.providers.http;
 
 import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -36,7 +38,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
 import sun.misc.BASE64Encoder;
 
-import java.io.ByteArrayInputStream;
 import java.net.BindException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,7 +64,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         state = new HttpState();
         if (connector.getProxyUsername() != null) {
-            state.setProxyCredentials(null, null, new UsernamePasswordCredentials(connector.getProxyUsername(),
+            state.setProxyCredentials(new AuthScope( null, -1, null, null), new UsernamePasswordCredentials(connector.getProxyUsername(),
                                                                                   connector.getProxyPassword()));
         }
     }
@@ -122,8 +123,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         HttpConnection connection = null;
         try {
             connection = getConnection(endpointUri.getUri());
+            connection.open();
             if (connection.isProxied() && connection.isSecure()) {
-                httpMethod = new ConnectMethod(httpMethod);
+                httpMethod = new ConnectMethod();
             }
             httpMethod.setDoAuthentication(true);
             if (endpointUri.getUserInfo() != null) {
@@ -173,8 +175,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 httpMethod = (HttpMethod) body;
             } else {
                 byte[] buffer = event.getTransformedMessageAsBytes();
-                postMethod.setRequestBody(new ByteArrayInputStream(buffer));
-                postMethod.setRequestContentLength(PostMethod.CONTENT_LENGTH_AUTO);
+                //todo MULE20 Encoding
+                postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer));
                 httpMethod = postMethod;
             }
 
@@ -183,9 +185,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         HttpConnection connection = null;
         try {
             connection = getConnection(uri);
-
+            connection.open();
             if (connection.isProxied() && connection.isSecure()) {
-                httpMethod = new ConnectMethod(httpMethod);
+                httpMethod = new ConnectMethod();
             }
             httpMethod.setDoAuthentication(true);
 
@@ -199,13 +201,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             }
 
             try {
-                connection.open();
                 httpMethod.execute(state, connection);
             } catch (BindException e) {
                 //retry
                 Thread.sleep(100);
                 httpMethod.execute(state, connection);
-            } catch(HttpRecoverableException e) {
+            } catch(HttpException e) {
                 logger.error(e, e);
             }
             return httpMethod;
@@ -235,6 +236,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 h.setProperty(headers[i].getName(), headers[i].getValue());
             }
             String status = String.valueOf(httpMethod.getStatusCode());
+
             h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
             logger.debug("Http response is: " + status);
             ExceptionPayload ep = null;

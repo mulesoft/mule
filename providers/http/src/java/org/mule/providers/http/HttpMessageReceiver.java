@@ -14,14 +14,11 @@
  */
 package org.mule.providers.http;
 
+import org.apache.commons.httpclient.ChunkedInputStream;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
-import org.mule.impl.RequestContext;
-import org.mule.impl.ResponseOutputStream;
+import org.mule.impl.*;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
 import org.mule.providers.tcp.TcpMessageReceiver;
@@ -31,19 +28,11 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.PropertiesHelper;
 import org.mule.util.monitor.Expirable;
 
 import javax.resource.spi.work.Work;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Properties;
@@ -107,7 +96,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         public HttpWorker(Socket socket) throws SocketException {
             super(socket);
             boolean keepAlive = ((HttpConnector) connector).isKeepAlive();
-            if(keepAlive) {
+            if (keepAlive) {
                 socket.setKeepAlive(true);
                 socket.setSoTimeout(((HttpConnector) connector).getKeepAliveTimeout());
             }
@@ -150,24 +139,31 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                     AbstractMessageReceiver receiver = getTargetReceiver(message, endpoint);
 
                     UMOMessage returnMessage = null;
-                    if(receiver!=null) {
+                    //the respone only needs to be transformed explicitly if A) the request was not served or a null result was returned
+                    boolean transformResponse = false;
+                    if (receiver != null) {
                         returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), os);
                         if (returnMessage == null) {
                             returnMessage = new MuleMessage("");
+                            transformResponse = true;
+                            RequestContext.rewriteEvent(returnMessage);
                         }
-                        RequestContext.rewriteEvent(returnMessage);
                     } else {
+                        transformResponse = true;
                         String failedPath = endpoint.getEndpointURI().getScheme() + "://" +
                                 endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort() +
                                 getRequestPath(message);
-                        
+
                         logger.debug("Failed to bind to " + failedPath);
-                        returnMessage = new MuleMessage(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, failedPath));
+                        returnMessage = new MuleMessage(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, failedPath).toString());
                         returnMessage.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_FOUND);
                         RequestContext.setEvent(new MuleEvent(returnMessage, endpoint, new MuleSession(), true));
                     }
-
                     Object response = returnMessage.getPayload();
+                    if(transformResponse) {
+                        response = connector.getDefaultResponseTransformer().transform(response);
+                    }
+
                     if (response instanceof byte[]) {
                         dataOut.write((byte[]) response);
                     } else {
@@ -232,8 +228,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         return receiver;
     }
 
-    protected Object parseRequest(InputStream is, Properties p) throws IOException
-    {
+    protected Object parseRequest(InputStream is, Properties p) throws IOException {
         RequestInputStream req = new RequestInputStream(is);
         Object payload = null;
         String startLine = null;
@@ -261,84 +256,96 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         if (method.equals(HttpConstants.METHOD_GET)) {
             payload = request.getBytes();
         } else {
-            boolean multipart = p.getProperty(HttpConstants.HEADER_CONTENT_TYPE, "").indexOf("multipart/related") > -1; 
+            boolean multipart = p.getProperty(HttpConstants.HEADER_CONTENT_TYPE, "").indexOf("multipart/related") > -1;
             String contentLengthHeader = p.getProperty(HttpConstants.HEADER_CONTENT_LENGTH, null);
-            if (contentLengthHeader == null) throw new IllegalStateException(HttpConstants.HEADER_CONTENT_LENGTH + " header must be set");
+            String chunkedString = PropertiesHelper.getStringProperty(p, HttpConstants.HEADER_TRANSFER_ENCODING, null);
+            boolean chunked = "chunked".equalsIgnoreCase(chunkedString);
+            if (contentLengthHeader == null && !chunked) {
+                throw new IllegalStateException(HttpConstants.HEADER_CONTENT_LENGTH + " header must be set");
+            }
 
-            int contentLength = Integer.parseInt(contentLengthHeader);
-
-            if (multipart) {
-                byte[] buffer = new byte[1024];
-
-                payload = File.createTempFile("mime", ".att");
-                ((File) payload).deleteOnExit();
-                FileOutputStream os = new FileOutputStream((File) payload);
-
+            if (chunked) {
+                byte[] buffer = new byte[1024 * 32];
                 int length = -1;
-                int offset = 0;
-                while (offset != contentLength) {
-                    buffer = new byte[1024];
-                    length = is.read(buffer);
-                    if (length != -1) {
-                        os.write(buffer, 0, length);
-                        offset += length;
-                    }
-                }
-                os.close();
-            } else {
-                byte[] buffer = new byte[ contentLength ];
-
-                int length = -1;
-                int offset = req.read(buffer);
-                while (offset >= 0 && offset < buffer.length) {
-                    length = req.read(buffer, offset, buffer.length - offset);
+                ChunkedInputStream cis = new ChunkedInputStream(req);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                int offset = cis.read(buffer);
+                if(offset==-1) return null;
+                baos.write(buffer, 0, offset);
+                while (offset >= 0) {
+                    length = cis.read(buffer, offset, buffer.length);
                     if (length == -1) {
                         break;
                     }
+                    baos.write(buffer, offset, length);
                     offset += length;
                 }
-                payload = buffer;
+                payload = baos.toByteArray();
+            } else {
+                int contentLength = Integer.parseInt(contentLengthHeader);
+
+                if (multipart) {
+                    byte[] buffer = new byte[1024];
+
+                    payload = File.createTempFile("mime", ".att");
+                    ((File) payload).deleteOnExit();
+                    FileOutputStream os = new FileOutputStream((File) payload);
+
+                    int length = -1;
+                    int offset = 0;
+                    while (offset != contentLength) {
+                        buffer = new byte[1024];
+                        length = is.read(buffer);
+                        if (length != -1) {
+                            os.write(buffer, 0, length);
+                            offset += length;
+                        }
+                    }
+                    os.close();
+                } else {
+                    byte[] buffer = new byte[contentLength];
+
+                    int length = -1;
+                    int offset = req.read(buffer);
+                    while (offset >= 0 && offset < buffer.length) {
+                        length = req.read(buffer, offset, buffer.length - offset);
+                        if (length == -1) {
+                            break;
+                        }
+                        offset += length;
+                    }
+                    payload = buffer;
+                }
             }
         }
         return payload;
     }
 
-    private void readHeaders(RequestInputStream is, Properties p) throws IOException
-    {
+    private void readHeaders(RequestInputStream is, Properties p) throws IOException {
         String currentKey = null;
-        while (true)
-        {
+        while (true) {
             String line = is.readline();
-            if ((line == null) || (line.length() == 0))
-            {
+            if ((line == null) || (line.length() == 0)) {
                 break;
             }
 
-            if (!Character.isSpaceChar(line.charAt(0)))
-            {
+            if (!Character.isSpaceChar(line.charAt(0))) {
                 int index = line.indexOf(':');
-                if (index >= 0)
-                {
+                if (index >= 0) {
                     currentKey = line.substring(0, index).trim();
-                    if (currentKey.startsWith("X-" + MuleProperties.PROPERTY_PREFIX))
-                    {
+                    if (currentKey.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
                         currentKey = currentKey.substring(2);
-                    }
-                    else
-                    {
+                    } else {
                         // normalize incoming header if necessary
-                        String normalizedKey = (String)HttpConstants.ALL_HEADER_NAMES.get(currentKey);
-                        if (normalizedKey != null)
-                        {
+                        String normalizedKey = (String) HttpConstants.ALL_HEADER_NAMES.get(currentKey);
+                        if (normalizedKey != null) {
                             currentKey = normalizedKey;
                         }
                     }
                     String value = line.substring(index + 1).trim();
                     p.setProperty(currentKey, value);
                 }
-            }
-            else if (currentKey != null)
-            {
+            } else if (currentKey != null) {
                 String value = p.getProperty(currentKey);
                 p.setProperty(currentKey, value + "\r\n\t" + line.trim());
             }
