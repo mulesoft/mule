@@ -25,6 +25,8 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueReceiver;
+import javax.jms.QueueSender;
 import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.jms.TopicConnection;
@@ -65,7 +67,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.jms.ConnectionFactory#createConnection()
      */
     public Connection createConnection() throws JMSException
@@ -79,7 +81,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.jms.ConnectionFactory#createConnection(java.lang.String,
      *      java.lang.String)
      */
@@ -94,7 +96,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.jms.QueueConnectionFactory#createQueueConnection()
      */
     public QueueConnection createQueueConnection() throws JMSException
@@ -108,7 +110,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.jms.QueueConnectionFactory#createQueueConnection(java.lang.String,
      *      java.lang.String)
      */
@@ -123,7 +125,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.jms.TopicConnectionFactory#createTopicConnection()
      */
     public TopicConnection createTopicConnection() throws JMSException
@@ -137,7 +139,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.jms.TopicConnectionFactory#createTopicConnection(java.lang.String,
      *      java.lang.String)
      */
@@ -162,7 +164,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
          *      java.lang.reflect.Method, java.lang.Object[])
          */
@@ -209,7 +211,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
             /*
              * (non-Javadoc)
-             * 
+             *
              * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
              *      java.lang.reflect.Method, java.lang.Object[])
              */
@@ -219,10 +221,18 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
                     logger.debug("Invoking " + method);
                 }
                 Object result = method.invoke(session, args);
-                if (result instanceof MessageConsumer) {
+                if (result instanceof QueueReceiver) {
+                  result = Proxy.newProxyInstance(Session.class.getClassLoader(),
+                                                  new Class[] { QueueReceiver.class },
+                                                  new ConsumerProducerInvocationHandler(result));
+                } else if (result instanceof MessageConsumer) {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
                                                     new Class[] { MessageConsumer.class },
                                                     new ConsumerProducerInvocationHandler(result));
+                } else if (result instanceof QueueSender) {
+                  result = Proxy.newProxyInstance(Session.class.getClassLoader(),
+                                                  new Class[] { QueueSender.class },
+                                                  new ConsumerProducerInvocationHandler(result));
                 } else if (result instanceof MessageProducer) {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
                                                     new Class[] { MessageProducer.class },
@@ -255,7 +265,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
                 /*
                  * (non-Javadoc)
-                 * 
+                 *
                  * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
                  *      java.lang.reflect.Method, java.lang.Object[])
                  */
@@ -287,7 +297,7 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
 
                 /*
                  * (non-Javadoc)
-                 * 
+                 *
                  * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object,
                  *      java.lang.reflect.Method, java.lang.Object[])
                  */
