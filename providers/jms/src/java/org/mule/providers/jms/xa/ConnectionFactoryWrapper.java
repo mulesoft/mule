@@ -31,7 +31,9 @@ import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.jms.TopicConnection;
 import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
+import javax.jms.TopicSubscriber;
 import javax.jms.XAConnection;
 import javax.jms.XAConnectionFactory;
 import javax.jms.XAQueueConnection;
@@ -221,18 +223,27 @@ public class ConnectionFactoryWrapper implements ConnectionFactory, QueueConnect
                     logger.debug("Invoking " + method);
                 }
                 Object result = method.invoke(session, args);
-                if (result instanceof QueueReceiver) {
-                  result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                  new Class[] { QueueReceiver.class },
-                                                  new ConsumerProducerInvocationHandler(result));
+                
+                if (result instanceof TopicSubscriber) {
+                    result = Proxy.newProxyInstance(Session.class.getClassLoader(),
+                                                    new Class[] { TopicSubscriber.class },
+                                                    new ConsumerProducerInvocationHandler(result));
+                } else if (result instanceof QueueReceiver) {
+                    result = Proxy.newProxyInstance(Session.class.getClassLoader(),
+                                                    new Class[] { QueueReceiver.class },
+                                                    new ConsumerProducerInvocationHandler(result));
                 } else if (result instanceof MessageConsumer) {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
                                                     new Class[] { MessageConsumer.class },
                                                     new ConsumerProducerInvocationHandler(result));
+                } else if (result instanceof TopicPublisher) {
+                    result = Proxy.newProxyInstance(Session.class.getClassLoader(),
+                                                    new Class[] { TopicPublisher.class },
+                                                    new ConsumerProducerInvocationHandler(result));
                 } else if (result instanceof QueueSender) {
-                  result = Proxy.newProxyInstance(Session.class.getClassLoader(),
-                                                  new Class[] { QueueSender.class },
-                                                  new ConsumerProducerInvocationHandler(result));
+                    result = Proxy.newProxyInstance(Session.class.getClassLoader(),
+                                                    new Class[] { QueueSender.class },
+                                                    new ConsumerProducerInvocationHandler(result));
                 } else if (result instanceof MessageProducer) {
                     result = Proxy.newProxyInstance(Session.class.getClassLoader(),
                                                     new Class[] { MessageProducer.class },
