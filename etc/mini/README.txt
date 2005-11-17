@@ -29,7 +29,7 @@ The distribution you have downloaded contains the following -
 Getting Started
 ---------------
 To get started:
-http://www.muleumo.org/Getting+Started
+http://www.muleumo.org/Getting+Started+Guide
 
 Mule User Documentation:
 http://www.muleumo.org/User+Guide
