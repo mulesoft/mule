@@ -13,7 +13,7 @@
  */
 package org.mule.impl.space;
 
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.space.UMOSpace;
 
 /**
@@ -22,7 +22,7 @@ import org.mule.umo.space.UMOSpace;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SpaceMonitorEvent extends UMOServerEvent {
+public class SpaceMonitorNotification extends UMOServerNotification {
 
     public static final int SPACE_CREATED = SPACE_EVENT_ACTION_START_RANGE + 1;
     public static final int SPACE_ITEM_ADDED = SPACE_EVENT_ACTION_START_RANGE + 2;
@@ -38,7 +38,7 @@ public class SpaceMonitorEvent extends UMOServerEvent {
 
     private Object item;
 
-    public SpaceMonitorEvent(UMOSpace space, int action, Object item)
+    public SpaceMonitorNotification(UMOSpace space, int action, Object item)
     {
         super(space, action);
         resourceIdentifier = space.getName();

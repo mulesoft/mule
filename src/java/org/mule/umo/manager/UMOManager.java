@@ -316,11 +316,11 @@ public interface UMOManager extends Lifecycle
     void unregisterListener(UMOServerEventListener l);
 
     /**
-     * Fires a server event to all regiistered listeners
+     * Fires a server notification to all regiistered listeners
      * 
-     * @param event the event to fire
+     * @param notification the notification to fire
      */
-    void fireEvent(UMOServerEvent event);
+    void fireNotification(UMOServerNotification notification);
 
     /**
      * associates a Dependency Injector container with Mule. This can be used to

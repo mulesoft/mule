@@ -15,10 +15,10 @@ package org.mule.impl.internal.events;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMODescriptor;
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 
 /**
- * <code>ComponentEvent</code> is fired when an event such as the component
+ * <code>ComponentNotification</code> is fired when an event such as the component
  * starting occurs. The payload of this event will always be a reference to the
  * component Descriptor.
  * 
@@ -27,7 +27,7 @@ import org.mule.umo.manager.UMOServerEvent;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ComponentEvent extends UMOServerEvent
+public class ComponentNotification extends UMOServerNotification
 {
     public static final int COMPONENT_INITIALISED = COMPONENT_EVENT_ACTION_START_RANGE + 1;
     public static final int COMPONENT_STARTED = COMPONENT_EVENT_ACTION_START_RANGE + 2;
@@ -40,7 +40,7 @@ public class ComponentEvent extends UMOServerEvent
     private static final transient String[] ACTIONS = new String[] { "initialised", "started", "stopped", "paused",
             "resumed", "disposed", "stopping"};
 
-    public ComponentEvent(UMODescriptor message, int action)
+    public ComponentNotification(UMODescriptor message, int action)
     {
         super(message, action);
         resourceIdentifier = message.getName();

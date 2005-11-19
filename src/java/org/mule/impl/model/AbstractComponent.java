@@ -15,9 +15,6 @@
 package org.mule.impl.model;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
-import java.beans.ExceptionListener;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -26,19 +23,16 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
-import org.mule.impl.internal.events.ComponentEvent;
+import org.mule.impl.internal.events.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.ComponentException;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
+import org.mule.umo.*;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.util.concurrent.WaitableBoolean;
+
+import java.beans.ExceptionListener;
 
 /**
  * todo document
@@ -132,12 +126,12 @@ public abstract class AbstractComponent implements UMOComponent {
 
         doInitialise();
         initialised.set(true);
-        fireComponentEvent(ComponentEvent.COMPONENT_INITIALISED);
+        fireComponentNotification(ComponentNotification.COMPONENT_INITIALISED);
 
     }
 
-    protected void fireComponentEvent(int action) {
-        MuleManager.getInstance().fireEvent(new ComponentEvent(descriptor, action));
+    protected void fireComponentNotification(int action) {
+        MuleManager.getInstance().fireNotification(new ComponentNotification(descriptor, action));
     }
 
     void finaliseEvent(UMOEvent event) {
@@ -150,11 +144,11 @@ public abstract class AbstractComponent implements UMOComponent {
         if (!stopped.get()) {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
-            fireComponentEvent(ComponentEvent.COMPONENT_STOPPING);
+            fireComponentNotification(ComponentNotification.COMPONENT_STOPPING);
             doForceStop();
             stopped.set(true);
             stopping.set(false);
-            fireComponentEvent(ComponentEvent.COMPONENT_STOPPED);
+            fireComponentNotification(ComponentNotification.COMPONENT_STOPPED);
         }
     }
 
@@ -162,7 +156,7 @@ public abstract class AbstractComponent implements UMOComponent {
         if (!stopped.get()) {
             logger.debug("Stopping UMOComponent");
             stopping.set(true);
-            fireComponentEvent(ComponentEvent.COMPONENT_STOPPING);
+            fireComponentNotification(ComponentNotification.COMPONENT_STOPPING);
             if (MuleManager.getInstance().getQueueManager().getQueueSession().getQueue(descriptor.getName() + ".component").size() > 0) {
                 try {
                     stopping.whenFalse(null);
@@ -173,7 +167,7 @@ public abstract class AbstractComponent implements UMOComponent {
 
             doStop();
             stopped.set(true);
-            fireComponentEvent(ComponentEvent.COMPONENT_STOPPED);
+            fireComponentNotification(ComponentNotification.COMPONENT_STOPPED);
         }
     }
 
@@ -182,19 +176,19 @@ public abstract class AbstractComponent implements UMOComponent {
             stopped.set(false);
             doStart();
         }
-        fireComponentEvent(ComponentEvent.COMPONENT_STARTED);
+        fireComponentNotification(ComponentNotification.COMPONENT_STARTED);
     }
 
     public final void pause() {
         doPause();
         paused.set(true);
-        fireComponentEvent(ComponentEvent.COMPONENT_PAUSED);
+        fireComponentNotification(ComponentNotification.COMPONENT_PAUSED);
     }
 
     public final void resume() {
         doResume();
         paused.set(false);
-        fireComponentEvent(ComponentEvent.COMPONENT_RESUMED);
+        fireComponentNotification(ComponentNotification.COMPONENT_RESUMED);
     }
 
     public final void dispose() {
@@ -206,7 +200,7 @@ public abstract class AbstractComponent implements UMOComponent {
             logger.error("Failed to stop component: " + descriptor.getName(), e);
         }
         doDispose();
-        fireComponentEvent(ComponentEvent.COMPONENT_DISPOSED);
+        fireComponentNotification(ComponentNotification.COMPONENT_DISPOSED);
         ((MuleManager) MuleManager.getInstance()).getStatistics().remove(stats);
     }
 

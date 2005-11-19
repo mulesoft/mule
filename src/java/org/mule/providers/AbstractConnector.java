@@ -24,7 +24,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
-import org.mule.impl.internal.events.ConnectionEvent;
+import org.mule.impl.internal.events.ConnectionNotification;
 import org.mule.management.mbeans.EndpointService;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOComponent;
@@ -34,22 +34,13 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOServerEvent;
-import org.mule.umo.provider.ConnectorException;
-import org.mule.umo.provider.UMOConnectable;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
-import org.mule.umo.provider.UMOMessageDispatcherFactory;
-import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.provider.*;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all
@@ -691,29 +682,18 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * Fires a server event to all registered
+     * Fires a server notification to all registered
      * {@link org.mule.impl.internal.events.CustomEventListener} eventManager.
      * 
-     * @param event the event to fire. This must be of type
-     *            {@link org.mule.impl.internal.events.CustomEvent} otherwise an
+     * @param notification the notification to fire. This must be of type
+     *            {@link org.mule.impl.internal.events.CustomNotification} otherwise an
      *            exception will be thrown.
-     * @throws UnsupportedOperationException if the event fired is not a
-     *             {@link org.mule.impl.internal.events.CustomEvent}
+     * @throws UnsupportedOperationException if the notification fired is not a
+     *             {@link org.mule.impl.internal.events.CustomNotification}
      */
-    public void fireEvent(UMOServerEvent event)
+    public void fireNotification(UMOServerNotification notification)
     {
-        MuleManager.getInstance().fireEvent(event);
-        // if(event instanceof CustomEvent) {
-        // if(eventManager!=null) {
-        // eventManager.fireEvent(event);
-        // } else if(logger.isDebugEnabled()) {
-        // logger.debug("Event Manager is not enabled, ignoring event: " +
-        // event);
-        // }
-        // } else {
-        // throw new UnsupportedOperationException(new
-        // Message(Messages.ONLY_CUSTOM_EVENTS_CAN_BE_FIRED).getMessage());
-        // }
+        MuleManager.getInstance().fireNotification(notification);
     }
 
     public ConnectionStrategy getConnectionStrategy()
@@ -793,9 +773,9 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
         try {
             doConnect();
-            fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_CONNECTED));
+            fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_CONNECTED));
         } catch (Exception e) {
-            fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_FAILED));
+            fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_FAILED));
             if (e instanceof ConnectException) {
                 throw (ConnectException) e;
             } else {
@@ -811,7 +791,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     public void disconnect() throws Exception {
         startedBeforeDisconnect.set(isStarted());
-        fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_DISCONNECTED));
+        fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_DISCONNECTED));
         connected.set(false);
         doDisconnect();
         stopConnector();

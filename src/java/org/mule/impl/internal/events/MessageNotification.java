@@ -15,7 +15,7 @@ package org.mule.impl.internal.events;
 
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
@@ -25,7 +25,7 @@ import org.mule.umo.provider.UMOConnectable;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MessageEvent extends UMOServerEvent
+public class MessageNotification extends UMOServerNotification
 {
     public static final int MESSAGE_RECEIVED = MESSAGE_EVENT_ACTION_START_RANGE + 1;
     public static final int MESSAGE_DISPATCHED = MESSAGE_EVENT_ACTION_START_RANGE + 2;
@@ -36,7 +36,7 @@ public class MessageEvent extends UMOServerEvent
 
     private UMOEndpoint endpoint;
 
-    public MessageEvent(UMOMessage resource, UMOEndpoint endpoint, String identifier, int action)
+    public MessageNotification(UMOMessage resource, UMOEndpoint endpoint, String identifier, int action)
     {
         super(resource, action);
         resourceIdentifier = identifier;

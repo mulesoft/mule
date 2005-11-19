@@ -13,20 +13,20 @@
  */
 package org.mule.impl.internal.events;
 
+import org.mule.umo.UMOMessage;
+import org.mule.umo.manager.UMOServerNotification;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mule.umo.UMOMessage;
-import org.mule.umo.manager.UMOServerEvent;
-
 /**
- * <code>AdminEvent</code> is used to invoke actions on a remote mule server
+ * <code>AdminNotification</code> is used to invoke actions on a remote mule server
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class AdminEvent extends UMOServerEvent
+public class AdminNotification extends UMOServerNotification
 {
     public static final int ACTION_RECEIVE = ADMIN_EVENT_ACTION_START_RANGE + 1;
     public static final int ACTION_DISPATCH = ADMIN_EVENT_ACTION_START_RANGE + 2;
@@ -39,7 +39,7 @@ public class AdminEvent extends UMOServerEvent
     private Map properties = new HashMap();
     private UMOMessage message;
 
-    public AdminEvent(UMOMessage message, int action, String resourceIdentifier)
+    public AdminNotification(UMOMessage message, int action, String resourceIdentifier)
     {
         super(message, action, resourceIdentifier);
         this.message = message;

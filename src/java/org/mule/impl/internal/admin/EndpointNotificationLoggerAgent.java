@@ -33,7 +33,7 @@ import org.mule.umo.provider.UMOMessageDispatcher;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EndpointEventLoggerAgent extends AbstractEventLoggerAgent
+public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerAgent
 {
 
     private String endpointAddress;

@@ -20,8 +20,8 @@ import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
-import org.mule.impl.internal.events.MessageEvent;
-import org.mule.impl.internal.events.SecurityEvent;
+import org.mule.impl.internal.events.MessageNotification;
+import org.mule.impl.internal.events.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -102,7 +102,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     endpoint.getSecurityFilter().authenticate(event);
                 } catch (org.mule.umo.security.SecurityException e) {
                     logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                    connector.fireEvent(new SecurityEvent(e, SecurityEvent.ADMIN_EVENT_ACTION_START_RANGE));
+                    connector.fireNotification(new SecurityNotification(e, SecurityNotification.ADMIN_EVENT_ACTION_START_RANGE));
                     connector.handleException(e);
                     return;
                 } catch (UMOException e) {
@@ -121,7 +121,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 } else {
                     doDispatch(event);
                     if(connector.isEnableMessageEvents()) {
-                        connector.fireEvent(new MessageEvent(event.getMessage(), event.getEndpoint(), event.getComponent().getDescriptor().getName(), MessageEvent.MESSAGE_DISPATCHED));
+                        connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(), event.getComponent().getDescriptor().getName(), MessageNotification.MESSAGE_DISPATCHED));
                     }
                 }
             } catch (DispatchException e) {
@@ -151,7 +151,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                     endpoint.getSecurityFilter().authenticate(event);
                 } catch (org.mule.umo.security.SecurityException e) {
                     logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                    connector.fireEvent(new SecurityEvent(e, SecurityEvent.SECURITY_AUTHENTICATION_FAILED));
+                    connector.fireNotification(new SecurityNotification(e, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                     connector.handleException(e);
                     return event.getMessage();
                 } catch (UMOException e) {
@@ -165,7 +165,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             try {
                 UMOMessage result = doSend(event);
                 if(connector.isEnableMessageEvents()) {
-                    connector.fireEvent(new MessageEvent(event.getMessage(), event.getEndpoint(), event.getComponent().getDescriptor().getName(), MessageEvent.MESSAGE_SENT));
+                    connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(), event.getComponent().getDescriptor().getName(), MessageNotification.MESSAGE_SENT));
                 }
                 //Once a dispatcher has done its work we need to romve this property so that
                 //it is not propagated to the next request
@@ -256,7 +256,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
                 RequestContext.setEvent(event);
                 doDispatch(event);
                 if(connector.isEnableMessageEvents()) {
-                    connector.fireEvent(new MessageEvent(event.getMessage(), event.getEndpoint(), event.getComponent().getDescriptor().getName(), MessageEvent.MESSAGE_DISPATCHED));
+                    connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(), event.getComponent().getDescriptor().getName(), MessageNotification.MESSAGE_DISPATCHED));
                 }
             } catch (Exception e) {
                 getConnector().handleException(e);

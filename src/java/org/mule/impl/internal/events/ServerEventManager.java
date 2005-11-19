@@ -17,26 +17,24 @@ import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.routing.filters.WildcardFilter;
+import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.manager.UMOServerEventListener;
+import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.manager.UMOWorkManager;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleRuntimeException;
-import org.mule.routing.filters.WildcardFilter;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.manager.UMOServerEvent;
-import org.mule.umo.manager.UMOServerEventListener;
-import org.mule.umo.manager.UMOWorkManager;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * <code>ServerEventManager</code> manages all server listeners for a Mule
@@ -85,7 +83,7 @@ public class ServerEventManager implements Work, Disposable
 
     public void registerEventType(Class eventType, Class listenerType)
     {
-        if (UMOServerEvent.class.isAssignableFrom(eventType)) {
+        if (UMOServerNotification.class.isAssignableFrom(eventType)) {
             if (!listenersMap.containsKey(eventType)) {
                 listenersMap.put(eventType, new TreeMap(comparator));
                 eventsMap.put(listenerType, eventType);
@@ -97,7 +95,7 @@ public class ServerEventManager implements Work, Disposable
         } else {
             throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X,
                                                            "eventType",
-                                                           UMOServerEvent.class.getName(),
+                                                           UMOServerNotification.class.getName(),
                                                            eventType.getName()).getMessage());
         }
     }
@@ -173,19 +171,19 @@ public class ServerEventManager implements Work, Disposable
         }
     }
 
-    public void fireEvent(UMOServerEvent event)
+    public void fireEvent(UMOServerNotification notification)
     {
         if (disposed) {
             return;
         }
-        if (event instanceof BlockingServerEvent) {
-            notifyListeners(event);
+        if (notification instanceof BlockingServerEvent) {
+            notifyListeners(notification);
             return;
         }
         try {
-            eventQueue.put(event);
+            eventQueue.put(notification);
         } catch (InterruptedException e) {
-            logger.error("Failed to queue event: " + event, e);
+            logger.error("Failed to queue notification: " + notification, e);
         }
     }
 
@@ -195,25 +193,25 @@ public class ServerEventManager implements Work, Disposable
         clear();
     }
 
-    protected void notifyListeners(UMOServerEvent event)
+    protected void notifyListeners(UMOServerNotification notification)
     {
         TreeMap listeners;
         String subscription = null;
         Class listenerClass = null;
 
-        // determine the listewner class type for the current event
+        // determine the listewner class type for the current notification
         Map.Entry entry = null;
         for (Iterator iterator = eventsMap.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
             Class eventClass = (Class) entry.getValue();
-            if (event.getClass().isAssignableFrom(eventClass)) {
+            if (notification.getClass().isAssignableFrom(eventClass)) {
                 listenerClass = (Class) entry.getKey();
                 break;
             }
         }
 
         if (listenerClass == null) {
-            throw new IllegalArgumentException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, event.getClass()
+            throw new IllegalArgumentException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, notification.getClass()
                                                                                                       .getName()).getMessage());
         }
 
@@ -227,16 +225,16 @@ public class ServerEventManager implements Work, Disposable
                     subscription = NULL_SUBSCRIPTION;
                 }
                 // If the listener has a resource id associated with it, make
-                // sure the event
-                // is only fired if the event resource id and listener resource
+                // sure the notification
+                // is only fired if the notification resource id and listener resource
                 // id match
                 if (NULL_SUBSCRIPTION.equals(subscription)
-                        || new WildcardFilter(subscription).accept(event.getResourceIdentifier())) {
-                    l.onEvent(event);
+                        || new WildcardFilter(subscription).accept(notification.getResourceIdentifier())) {
+                    l.onEvent(notification);
                 } else {
                     logger.trace("Resource id '" + subscription + "' for listener " + l.getClass().getName()
-                            + " does not match Resource id '" + event.getResourceIdentifier()
-                            + "' for event, not firing event for this listener");
+                            + " does not match Resource id '" + notification.getResourceIdentifier()
+                            + "' for notificationication, not firing notificationication for this listener");
                 }
             }
         }
@@ -258,22 +256,22 @@ public class ServerEventManager implements Work, Disposable
      */
     public void run()
 	{
-		UMOServerEvent event;
+		UMOServerNotification notification;
 		while (!disposed)
 		{
 			try
 			{
-				event = (UMOServerEvent)eventQueue.poll(5000, TimeUnit.MILLISECONDS);
-				if (event != null)
+				notification = (UMOServerNotification)eventQueue.poll(5000, TimeUnit.MILLISECONDS);
+				if (notification != null)
 				{
-					notifyListeners(event);
+					notifyListeners(notification);
 				}
 			}
 			catch (InterruptedException e)
 			{
 				if (!disposed)
 				{
-					logger.error("Failed to take event from server event queue", e);
+					logger.error("Failed to take notificationication from server notificationication queue", e);
 				}
 			}
 		}
