@@ -208,4 +208,8 @@ public interface CoreMessageConstants
     int SYSTEM_PROPERTY_X_NOT_SET=187;
     int FAILED_TO_CONVERT_STRING_USING_X_ENCODING=188;
     int PROPERTY_X_HAS_INVALID_VALUE_X=189;
+
+    //Post 1.2 message
+    int SPACE_ACTION_X_INTERRUPTED=190;
+    int SPACE_FAILED_TO_CREATE=191;
 }

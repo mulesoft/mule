@@ -14,8 +14,6 @@
  */
 package org.mule.test.util.queue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.util.queue.MemoryPersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
@@ -25,14 +23,6 @@ import org.mule.util.queue.TransactionalQueueManager;
  */
 public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCase
 {
-
-    private static final Log logger = LogFactory.getLog(FilePersistenceTestCase.class);
-
-    protected Log getLogger()
-    {
-        return logger;
-    }
-
     /*
      * (non-Javadoc)
      * 
