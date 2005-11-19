@@ -27,15 +27,10 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.internal.events.AdminEvent;
+import org.mule.impl.internal.events.AdminNotification;
 import org.mule.providers.AbstractConnector;
 import org.mule.transformers.xml.XmlToObject;
-import org.mule.umo.UMODescriptor;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
@@ -74,7 +69,7 @@ public class MuleManagerComponent implements Callable, Initialisable
     {
         xstream = new XStream(new XppDriver());
         remoteTransformer = new XmlToObject();
-        remoteTransformer.setReturnClass(AdminEvent.class);
+        remoteTransformer.setReturnClass(AdminNotification.class);
     }
 
     public Object onCall(UMOEventContext context) throws Exception
@@ -82,22 +77,22 @@ public class MuleManagerComponent implements Callable, Initialisable
         Object result = null;
         String xml = context.getMessageAsString();
         logger.debug("Message received by MuleManagerComponent");
-        AdminEvent action = (AdminEvent) remoteTransformer.transform(xml);
-        if (AdminEvent.ACTION_INVOKE == action.getAction()) {
+        AdminNotification action = (AdminNotification) remoteTransformer.transform(xml);
+        if (AdminNotification.ACTION_INVOKE == action.getAction()) {
             result = invokeAction(action, context);
-        } else if (AdminEvent.ACTION_SEND == action.getAction()) {
+        } else if (AdminNotification.ACTION_SEND == action.getAction()) {
             result = sendAction(action, context);
-        } else if (AdminEvent.ACTION_DISPATCH == action.getAction()) {
+        } else if (AdminNotification.ACTION_DISPATCH == action.getAction()) {
             result = sendAction(action, context);
-        } else if (AdminEvent.ACTION_RECEIVE == action.getAction()) {
+        } else if (AdminNotification.ACTION_RECEIVE == action.getAction()) {
             result = receiveAction(action, context);
         } else {
-            logger.error(new MuleException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, "AdminEvent:" + action.getAction())));
+            logger.error(new MuleException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, "AdminNotification:" + action.getAction())));
         }
         return result;
     }
 
-    protected Object invokeAction(AdminEvent action, UMOEventContext context) throws UMOException
+    protected Object invokeAction(AdminNotification action, UMOEventContext context) throws UMOException
     {
         String destComponent = null;
         String endpoint = action.getResourceIdentifier();
@@ -129,12 +124,12 @@ public class MuleManagerComponent implements Callable, Initialisable
         }
     }
 
-    protected Object sendAction(AdminEvent action, UMOEventContext context) throws UMOException
+    protected Object sendAction(AdminNotification action, UMOEventContext context) throws UMOException
     {
         UMOEndpoint endpoint = new MuleEndpoint(action.getResourceIdentifier(), false);
 
         try {
-            if (AdminEvent.ACTION_DISPATCH == action.getAction()) {
+            if (AdminNotification.ACTION_DISPATCH == action.getAction()) {
                 context.dispatchEvent(action.getMessage(), endpoint);
                 return null;
             } else {
@@ -152,7 +147,7 @@ public class MuleManagerComponent implements Callable, Initialisable
 
     }
 
-    protected Object receiveAction(AdminEvent action, UMOEventContext context) throws UMOException
+    protected Object receiveAction(AdminNotification action, UMOEventContext context) throws UMOException
     {
         UMOEndpointURI endpointUri = new MuleEndpointURI(action.getResourceIdentifier());
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointUri, UMOEndpoint.ENDPOINT_TYPE_SENDER);

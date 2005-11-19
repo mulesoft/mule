@@ -15,7 +15,6 @@ package org.mule.test.integration.providers.jms.activemq;
 
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
-
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -23,12 +22,12 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.internal.events.ConnectionEvent;
 import org.mule.impl.internal.events.ConnectionEventListener;
+import org.mule.impl.internal.events.ConnectionNotification;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.SimpleRetryConnectionStrategy;
-import org.mule.providers.jms.JmsConstants;
 import org.mule.providers.jms.JmsConnector;
+import org.mule.providers.jms.JmsConstants;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.test.integration.ServerTools;
 import org.mule.test.integration.providers.jms.AbstractJmsFunctionalTestCase;
@@ -37,11 +36,10 @@ import org.mule.test.integration.service.TestReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.jms.Connection;
-
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -138,8 +136,8 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         // Check that connection fails
         t0 = System.currentTimeMillis();
         while (true) {
-            ConnectionEvent event = (ConnectionEvent) events.take();
-            if (event.getAction() == ConnectionEvent.CONNECTION_FAILED) {
+            ConnectionNotification event = (ConnectionNotification) events.take();
+            if (event.getAction() == ConnectionNotification.CONNECTION_FAILED) {
                 break;
             }
             t1 = System.currentTimeMillis() -t0;
@@ -153,8 +151,8 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         // Check that connection succeed
         t0 = System.currentTimeMillis();
         while (true) {
-            ConnectionEvent event = (ConnectionEvent) events.take();
-            if (event.getAction() == ConnectionEvent.CONNECTION_CONNECTED) {
+            ConnectionNotification event = (ConnectionNotification) events.take();
+            if (event.getAction() == ConnectionNotification.CONNECTION_CONNECTED) {
                 break;
             }
             t1 = System.currentTimeMillis() -t0;
@@ -175,8 +173,8 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         // Check that the connection is lost
         t0 = System.currentTimeMillis();
         while (true) {
-            ConnectionEvent event = (ConnectionEvent) events.take();
-            if (event.getAction() == ConnectionEvent.CONNECTION_DISCONNECTED) {
+            ConnectionNotification event = (ConnectionNotification) events.take();
+            if (event.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED) {
                 break;
             }
             t1 = System.currentTimeMillis() -t0;
@@ -189,8 +187,8 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         // Check that connection succeed
         t0 = System.currentTimeMillis();
         while (true) {
-            ConnectionEvent event = (ConnectionEvent) events.take();
-            if (event.getAction() == ConnectionEvent.CONNECTION_CONNECTED) {
+            ConnectionNotification event = (ConnectionNotification) events.take();
+            if (event.getAction() == ConnectionNotification.CONNECTION_CONNECTED) {
                 break;
             }
             t1 = System.currentTimeMillis() -t0;
@@ -211,9 +209,9 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
 
 
 
-    public void onEvent(UMOServerEvent event) {
+    public void onEvent(UMOServerNotification notification) {
         try {
-            events.put(event);
+            events.put(notification);
         } catch (InterruptedException e) {
         }
     }

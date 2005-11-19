@@ -24,25 +24,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.internal.admin.MuleAdminAgent;
-import org.mule.impl.internal.events.AdminEvent;
-import org.mule.impl.internal.events.AdminEventListener;
-import org.mule.impl.internal.events.ComponentEvent;
-import org.mule.impl.internal.events.ComponentEventListener;
-import org.mule.impl.internal.events.ConnectionEvent;
-import org.mule.impl.internal.events.ConnectionEventListener;
-import org.mule.impl.internal.events.CustomEvent;
-import org.mule.impl.internal.events.CustomEventListener;
-import org.mule.impl.internal.events.ManagementEvent;
-import org.mule.impl.internal.events.ManagementEventListener;
-import org.mule.impl.internal.events.ManagerEvent;
-import org.mule.impl.internal.events.ManagerEventListener;
-import org.mule.impl.internal.events.MessageEvent;
-import org.mule.impl.internal.events.MessageEventListener;
-import org.mule.impl.internal.events.ModelEvent;
-import org.mule.impl.internal.events.ModelEventListener;
-import org.mule.impl.internal.events.SecurityEvent;
-import org.mule.impl.internal.events.SecurityEventListener;
-import org.mule.impl.internal.events.ServerEventManager;
+import org.mule.impl.internal.events.*;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
@@ -52,12 +34,7 @@ import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOContainerContext;
-import org.mule.umo.manager.UMOManager;
-import org.mule.umo.manager.UMOServerEvent;
-import org.mule.umo.manager.UMOServerEventListener;
-import org.mule.umo.manager.UMOWorkManager;
+import org.mule.umo.manager.*;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -73,14 +50,7 @@ import org.mule.util.queue.TransactionalQueueManager;
 
 import javax.transaction.TransactionManager;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -368,7 +338,7 @@ public class MuleManager implements UMOManager
         containerContext.dispose();
         containerContext = null;
         // props.clear();
-        fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_DISPOSED));
+        fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_DISPOSED));
 
         transformers = null;
         endpoints = null;
@@ -399,12 +369,12 @@ public class MuleManager implements UMOManager
      */
     private synchronized void disposeConnectors()
     {
-        fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_DISPOSING_CONNECTORS));
+        fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_DISPOSING_CONNECTORS));
         for (Iterator iterator = connectors.values().iterator(); iterator.hasNext();) {
             UMOConnector c = (UMOConnector) iterator.next();
             c.dispose();
         }
-        fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_DISPOSED_CONNECTORS));
+        fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_DISPOSED_CONNECTORS));
     }
 
     /**
@@ -617,19 +587,19 @@ public class MuleManager implements UMOManager
 
             // create the event manager
             eventManager = new ServerEventManager(workManager);
-            eventManager.registerEventType(ManagerEvent.class, ManagerEventListener.class);
-            eventManager.registerEventType(ModelEvent.class, ModelEventListener.class);
-            eventManager.registerEventType(ComponentEvent.class, ComponentEventListener.class);
-            eventManager.registerEventType(SecurityEvent.class, SecurityEventListener.class);
-            eventManager.registerEventType(ManagementEvent.class, ManagementEventListener.class);
-            eventManager.registerEventType(AdminEvent.class, AdminEventListener.class);
-            eventManager.registerEventType(CustomEvent.class, CustomEventListener.class);
-            eventManager.registerEventType(ConnectionEvent.class, ConnectionEventListener.class);
+            eventManager.registerEventType(ManagerNotification.class, ManagerEventListener.class);
+            eventManager.registerEventType(ModelNotification.class, ModelEventListener.class);
+            eventManager.registerEventType(ComponentNotification.class, ComponentEventListener.class);
+            eventManager.registerEventType(SecurityNotification.class, SecurityEventListener.class);
+            eventManager.registerEventType(ManagementNotification.class, ManagementEventListener.class);
+            eventManager.registerEventType(AdminNotification.class, AdminEventListener.class);
+            eventManager.registerEventType(CustomNotification.class, CustomEventListener.class);
+            eventManager.registerEventType(ConnectionNotification.class, ConnectionEventListener.class);
             if(config.isEnableMessageEvents()) {
-                eventManager.registerEventType(MessageEvent.class, MessageEventListener.class);
+                eventManager.registerEventType(MessageNotification.class, MessageEventListener.class);
             }
 
-            fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_INITIALISNG));
+            fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_INITIALISNG));
             if (id == null) {
                 logger.warn("No unique id has been set on this manager");
             }
@@ -657,7 +627,7 @@ public class MuleManager implements UMOManager
             } finally {
                 initialised.set(true);
                 initialising.set(false);
-                fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_INITIALISED));
+                fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_INITIALISED));
             }
         }
     }
@@ -722,7 +692,7 @@ public class MuleManager implements UMOManager
 
         if (!started.get()) {
             starting.set(true);
-            fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STARTING));
+            fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STARTING));
             registerAdminAgent();
             if (queueManager != null) { queueManager.start(); }
             startConnectors();
@@ -737,7 +707,7 @@ public class MuleManager implements UMOManager
                     System.out.println(getStartSplash());
                 }
             }
-            fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STARTED));
+            fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STARTED));
         }
     }
 
@@ -789,7 +759,7 @@ public class MuleManager implements UMOManager
     {
         started.set(false);
         stopping.set(true);
-        fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STOPPING));
+        fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STOPPING));
 
         stopConnectors();
         stopAgents();
@@ -806,7 +776,7 @@ public class MuleManager implements UMOManager
         }
 
         stopping.set(false);
-        fireSystemEvent(new ManagerEvent(this, ManagerEvent.MANAGER_STOPPED));
+        fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_STOPPED));
     }
 
     /**
@@ -1180,7 +1150,7 @@ public class MuleManager implements UMOManager
      * 
      * @param e the event that occurred
      */
-    protected void fireSystemEvent(UMOServerEvent e)
+    protected void fireSystemEvent(UMOServerNotification e)
     {
         if (eventManager != null) {
             eventManager.fireEvent(e);
@@ -1190,22 +1160,22 @@ public class MuleManager implements UMOManager
     }
 
     /**
-     * Fires a server event to all registered
+     * Fires a server notification to all registered
      * {@link org.mule.impl.internal.events.CustomEventListener} eventManager.
      * 
-     * @param event the event to fire. This must be of type
-     *            {@link org.mule.impl.internal.events.CustomEvent} otherwise an
+     * @param notification the notification to fire. This must be of type
+     *            {@link org.mule.impl.internal.events.CustomNotification} otherwise an
      *            exception will be thrown.
-     * @throws UnsupportedOperationException if the event fired is not a
-     *             {@link org.mule.impl.internal.events.CustomEvent}
+     * @throws UnsupportedOperationException if the notification fired is not a
+     *             {@link org.mule.impl.internal.events.CustomNotification}
      */
-    public void fireEvent(UMOServerEvent event)
+    public void fireNotification(UMOServerNotification notification)
     {
-        // if(event instanceof CustomEvent) {
+        // if(notification instanceof CustomNotification) {
         if (eventManager != null) {
-            eventManager.fireEvent(event);
+            eventManager.fireEvent(notification);
         } else if (logger.isDebugEnabled()) {
-            logger.debug("Event Manager is not enabled, ignoring event: " + event);
+            logger.debug("Event Manager is not enabled, ignoring notification: " + notification);
         }
         // } else {
         // throw new UnsupportedOperationException(new

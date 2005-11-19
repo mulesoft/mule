@@ -13,10 +13,10 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 
 /**
- * <code>CustomEvent</code> Custom events can be used by components and other
+ * <code>CustomNotification</code> Custom events can be used by components and other
  * objects such as routers, transformers, agents, etc to communicate a change of
  * state to each other. The Action value for the event is abitary. However care
  * should be taken not to set the action code to an existing action code. To
@@ -27,7 +27,7 @@ import org.mule.umo.manager.UMOServerEvent;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class CustomEvent extends UMOServerEvent
+public class CustomNotification extends UMOServerNotification
 {
     /**
      * Creates a custom action event
@@ -37,7 +37,7 @@ public class CustomEvent extends UMOServerEvent
      * @throws IllegalArgumentException if the action value is less than
      *             CUSTOM_ACTION_START_RANGE
      */
-    public CustomEvent(Object message, int action)
+    public CustomNotification(Object message, int action)
     {
         super(message, action);
         if (action < CUSTOM_EVENT_ACTION_START_RANGE) {

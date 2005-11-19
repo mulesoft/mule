@@ -13,18 +13,18 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.UMOModel;
 
 /**
- * <code>ModelEvent</code> is fired when an event such as the model starting
+ * <code>ModelNotification</code> is fired when an event such as the model starting
  * occurs. The payload of this event will always be a reference to the model.
  * 
  * @see org.mule.umo.model.UMOModel
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ModelEvent extends UMOServerEvent implements BlockingServerEvent
+public class ModelNotification extends UMOServerNotification implements BlockingServerEvent
 {
     public static final int MODEL_INITIALISING = MODEL_EVENT_ACTION_START_RANGE + 1;
     public static final int MODEL_INITIALISED = MODEL_EVENT_ACTION_START_RANGE + 2;
@@ -41,7 +41,7 @@ public class ModelEvent extends UMOServerEvent implements BlockingServerEvent
             "initialising listeners", "initialised listeners", "starting", "started", "stopping", "stopped",
             "disposing", "disposed" };
 
-    public ModelEvent(UMOModel message, int action)
+    public ModelNotification(UMOModel message, int action)
     {
         super(message, action);
         resourceIdentifier = message.getName();

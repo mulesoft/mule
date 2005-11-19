@@ -14,10 +14,10 @@
 package org.mule.impl.internal.events;
 
 import org.mule.umo.manager.UMOManager;
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 
 /**
- * <code>ManagerEvent</code> is fired when an event such as the manager
+ * <code>ManagerNotification</code> is fired when an event such as the manager
  * starting occurs. The payload of this event will always be a reference to the
  * manager.
  * 
@@ -26,7 +26,7 @@ import org.mule.umo.manager.UMOServerEvent;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ManagerEvent extends UMOServerEvent implements BlockingServerEvent
+public class ManagerNotification extends UMOServerNotification implements BlockingServerEvent
 {
     public static final int MANAGER_INITIALISNG = MANAGER_EVENT_ACTION_START_RANGE + 1;
     public static final int MANAGER_INITIALISED = MANAGER_EVENT_ACTION_START_RANGE + 2;
@@ -42,7 +42,7 @@ public class ManagerEvent extends UMOServerEvent implements BlockingServerEvent
     private static final transient String[] ACTIONS = new String[] { "initialising", "initialised", "starting",
             "started", "stopping", "stopped", "disposing", "disposed", "disposing connectors", "disposed connectors" };
 
-    public ManagerEvent(UMOManager message, int action)
+    public ManagerNotification(UMOManager message, int action)
     {
         super(message, action);
         resourceIdentifier = message.getId();

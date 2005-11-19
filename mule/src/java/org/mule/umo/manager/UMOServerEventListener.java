@@ -24,5 +24,5 @@ package org.mule.umo.manager;
  */
 public interface UMOServerEventListener
 {
-    void onEvent(UMOServerEvent event);
+    void onEvent(UMOServerNotification notification);
 }

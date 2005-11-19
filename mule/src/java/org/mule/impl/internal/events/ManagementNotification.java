@@ -13,10 +13,10 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 
 /**
- * <code>ManagementEvent</code> is fired when monitored resources such as
+ * <code>ManagementNotification</code> is fired when monitored resources such as
  * internal queues reach capacity
  * 
  * @see org.mule.MuleManager
@@ -24,7 +24,7 @@ import org.mule.umo.manager.UMOServerEvent;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ManagementEvent extends UMOServerEvent
+public class ManagementNotification extends UMOServerNotification
 {
     // todo resource status events here i.e.
     public static final int MANAGEMENT_COMPONENT_QUEUE_EXHAUSTED = MANAGEMENT_EVENT_ACTION_START_RANGE + 1;
@@ -32,7 +32,7 @@ public class ManagementEvent extends UMOServerEvent
 
     private static final transient String[] ACTIONS = new String[] {};
 
-    public ManagementEvent(Object message, int action)
+    public ManagementNotification(Object message, int action)
     {
         super(message, action);
     }

@@ -15,13 +15,6 @@ package org.mule.impl.model;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -31,7 +24,7 @@ import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultLifecycleAdapterFactory;
 import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleSession;
-import org.mule.impl.internal.events.ModelEvent;
+import org.mule.impl.internal.events.ModelNotification;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
@@ -42,10 +35,16 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.UMOLifecycleAdapterFactory;
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.model.ModelException;
 import org.mule.umo.model.UMOEntryPointResolver;
 import org.mule.umo.model.UMOModel;
+
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * <code>MuleModel</code> is the default implementation of the UMOModel. The
@@ -285,7 +284,7 @@ public abstract class AbstractModel implements UMOModel
      */
     public void dispose()
     {
-        fireEvent(new ModelEvent(this, ModelEvent.MODEL_DISPOSING));
+        fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSING));
         UMOComponent temp = null;
         Object key = null;
         for (Iterator i = components.keySet().iterator(); i.hasNext();) {
@@ -307,7 +306,7 @@ public abstract class AbstractModel implements UMOModel
         descriptors.clear();
         components = null;
         descriptors = null;
-        fireEvent(new ModelEvent(this, ModelEvent.MODEL_DISPOSED));
+        fireNotification(new ModelNotification(this, ModelNotification.MODEL_DISPOSED));
     }
 
     /**
@@ -334,13 +333,13 @@ public abstract class AbstractModel implements UMOModel
      */
     public void stop() throws UMOException
     {
-        fireEvent(new ModelEvent(this, ModelEvent.MODEL_STOPPING));
+        fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPING));
         for (Iterator i = components.values().iterator(); i.hasNext();) {
             UMOComponent temp = (UMOComponent) i.next();
             temp.stop();
             logger.info("Component " + temp + " has been stopped successfully");
         }
-        fireEvent(new ModelEvent(this, ModelEvent.MODEL_STOPPED));
+        fireNotification(new ModelNotification(this, ModelNotification.MODEL_STOPPED));
     }
 
     /**
@@ -355,7 +354,7 @@ public abstract class AbstractModel implements UMOModel
         }
 
         if (!started.get()) {
-            fireEvent(new ModelEvent(this, ModelEvent.MODEL_STARTING));
+            fireNotification(new ModelNotification(this, ModelNotification.MODEL_STARTING));
 
             for (Iterator i = components.values().iterator(); i.hasNext();) {
                 UMOComponent temp = (UMOComponent) i.next();
@@ -375,7 +374,7 @@ public abstract class AbstractModel implements UMOModel
 
             }
             started.set(true);
-            fireEvent(new ModelEvent(this, ModelEvent.MODEL_STARTED));
+            fireNotification(new ModelNotification(this, ModelNotification.MODEL_STARTED));
         } else {
             logger.debug("Model already started");
         }
@@ -473,7 +472,7 @@ public abstract class AbstractModel implements UMOModel
     public void initialise() throws InitialisationException
     {
         if (!initialised.get()) {
-            fireEvent(new ModelEvent(this, ModelEvent.MODEL_INITIALISING));
+            fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISING));
 
             if (exceptionListener instanceof Initialisable) {
                 ((Initialisable) exceptionListener).initialise();
@@ -486,7 +485,7 @@ public abstract class AbstractModel implements UMOModel
                 logger.info("Component " + temp.getDescriptor().getName() + " has been started successfully");
             }
             initialised.set(true);
-            fireEvent(new ModelEvent(this, ModelEvent.MODEL_INITIALISED));
+            fireNotification(new ModelNotification(this, ModelNotification.MODEL_INITIALISED));
         } else {
             logger.debug("Model already initialised");
         }
@@ -517,9 +516,9 @@ public abstract class AbstractModel implements UMOModel
         return components.keySet().iterator();
     }
 
-    void fireEvent(UMOServerEvent event)
+    void fireNotification(UMOServerNotification notification)
     {
-        MuleManager.getInstance().fireEvent(event);
+        MuleManager.getInstance().fireNotification(notification);
     }
 
     protected abstract UMOComponent createComponent(UMODescriptor descriptor);

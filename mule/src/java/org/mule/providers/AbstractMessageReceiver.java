@@ -22,21 +22,12 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.MuleEvent;
-import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
-import org.mule.impl.RequestContext;
-import org.mule.impl.ResponseOutputStream;
-import org.mule.impl.internal.events.ConnectionEvent;
-import org.mule.impl.internal.events.MessageEvent;
-import org.mule.impl.internal.events.SecurityEvent;
+import org.mule.impl.*;
+import org.mule.impl.internal.events.ConnectionNotification;
+import org.mule.impl.internal.events.MessageNotification;
+import org.mule.impl.internal.events.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
-import org.mule.umo.UMOTransaction;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -252,7 +243,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                                          OutputStream outputStream) throws UMOException {
 
         if(connector.isEnableMessageEvents()) {
-            connector.fireEvent(new MessageEvent(message, endpoint, component.getDescriptor().getName(), MessageEvent.MESSAGE_RECEIVED));
+            connector.fireNotification(new MessageNotification(message, endpoint, component.getDescriptor().getName(), MessageNotification.MESSAGE_RECEIVED));
         }
 
         if (logger.isDebugEnabled()) {
@@ -364,9 +355,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
         try {
             doConnect();
-            connector.fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_CONNECTED));
+            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_CONNECTED));
         } catch (Exception e) {
-            connector.fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_FAILED));
+            connector.fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_FAILED));
             if (e instanceof ConnectException) {
                 throw (ConnectException) e;
             } else {
@@ -381,7 +372,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         if (logger.isDebugEnabled()) {
             logger.debug("Disconnecting from: " + endpoint.getEndpointURI());
         }
-        connector.fireEvent(new ConnectionEvent(this, getConnectEventId(), ConnectionEvent.CONNECTION_DISCONNECTED));
+        connector.fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_DISCONNECTED));
         connected.set(false);
         doDisconnect();
         logger.info("Disconnected from: " + endpoint.getEndpointURI());
@@ -465,7 +456,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                     authorised=true;
                 } catch (SecurityException e) {
                     logger.warn("Request was made but was not authenticated: " + e.getMessage(), e);
-                    connector.fireEvent(new SecurityEvent(e, SecurityEvent.SECURITY_AUTHENTICATION_FAILED));
+                    connector.fireNotification(new SecurityNotification(e, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
                     handleException(e);
                     resultMessage = message;
                 }

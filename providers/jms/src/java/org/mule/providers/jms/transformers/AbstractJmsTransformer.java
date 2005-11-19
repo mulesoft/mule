@@ -19,12 +19,12 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
-import org.mule.impl.internal.events.ConnectionEvent;
 import org.mule.impl.internal.events.ConnectionEventListener;
+import org.mule.impl.internal.events.ConnectionNotification;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.PropertiesHelper;
 import org.mule.util.compression.CompressionHelper;
@@ -220,8 +220,8 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
         this.session = session;
     }
 
-    public void onEvent(UMOServerEvent event) {
-        if(event.getAction() == ConnectionEvent.CONNECTION_DISCONNECTED) {
+    public void onEvent(UMOServerNotification notification) {
+        if(notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED) {
             session = null;
             requireNewSession = true;
         }

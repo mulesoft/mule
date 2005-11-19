@@ -29,13 +29,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <code>AbstractEventLoggerAgent</code> Receives Mule server events and logs
+ * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications and logs
  * them and can optionally route them to an endpoint
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractEventLoggerAgent implements UMOAgent
+public abstract class AbstractNotificationLoggerAgent implements UMOAgent
 {
     /**
      * The logger used for this class
@@ -45,15 +45,15 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
 
     private String name;
 
-    private boolean ignoreManagerEvents = false;
-    private boolean ignoreModelEvents = false;
-    private boolean ignoreComponentEvents = false;
-    private boolean ignoreConnectionEvents = false;
-    private boolean ignoreSecurityEvents = false;
-    private boolean ignoreManagementEvents = false;
-    private boolean ignoreCustomEvents = false;
-    private boolean ignoreAdminEvents = false;
-    private boolean ignoreMessageEvents = false;
+    private boolean ignoreManagerNotifications = false;
+    private boolean ignoreModelNotifications = false;
+    private boolean ignoreComponentNotifications = false;
+    private boolean ignoreConnectionNotifications = false;
+    private boolean ignoreSecurityNotifications = false;
+    private boolean ignoreManagementNotifications = false;
+    private boolean ignoreCustomNotifications = false;
+    private boolean ignoreAdminNotifications = false;
+    private boolean ignoreMessageNotifications = false;
 
     private Set listeners = new HashSet();
 
@@ -101,91 +101,91 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
         }
     }
 
-    public boolean isIgnoreManagerEvents()
+    public boolean isIgnoreManagerNotifications()
     {
-        return ignoreManagerEvents;
+        return ignoreManagerNotifications;
     }
 
-    public void setIgnoreManagerEvents(boolean ignoreManagerEvents)
+    public void setIgnoreManagerNotifications(boolean ignoreManagerNotifications)
     {
-        this.ignoreManagerEvents = ignoreManagerEvents;
+        this.ignoreManagerNotifications = ignoreManagerNotifications;
     }
 
-    public boolean isIgnoreModelEvents()
+    public boolean isIgnoreModelNotifications()
     {
-        return ignoreModelEvents;
+        return ignoreModelNotifications;
     }
 
-    public void setIgnoreModelEvents(boolean ignoreModelEvents)
+    public void setIgnoreModelNotifications(boolean ignoreModelNotifications)
     {
-        this.ignoreModelEvents = ignoreModelEvents;
+        this.ignoreModelNotifications = ignoreModelNotifications;
     }
 
-    public boolean isIgnoreComponentEvents()
+    public boolean isIgnoreComponentNotifications()
     {
-        return ignoreComponentEvents;
+        return ignoreComponentNotifications;
     }
 
-    public void setIgnoreComponentEvents(boolean ignoreComponentEvents)
+    public void setIgnoreComponentNotifications(boolean ignoreComponentNotifications)
     {
-        this.ignoreComponentEvents = ignoreComponentEvents;
+        this.ignoreComponentNotifications = ignoreComponentNotifications;
     }
 
-    public boolean isIgnoreSecurityEvents()
+    public boolean isIgnoreSecurityNotifications()
     {
-        return ignoreSecurityEvents;
+        return ignoreSecurityNotifications;
     }
 
-    public void setIgnoreSecurityEvents(boolean ignoreSecurityEvents)
+    public void setIgnoreSecurityNotifications(boolean ignoreSecurityNotifications)
     {
-        this.ignoreSecurityEvents = ignoreSecurityEvents;
+        this.ignoreSecurityNotifications = ignoreSecurityNotifications;
     }
 
-    public boolean isIgnoreManagementEvents()
+    public boolean isIgnoreManagementNotifications()
     {
-        return ignoreManagementEvents;
+        return ignoreManagementNotifications;
     }
 
-    public void setIgnoreManagementEvents(boolean ignoreManagementEvents)
+    public void setIgnoreManagementNotifications(boolean ignoreManagementNotifications)
     {
-        this.ignoreManagementEvents = ignoreManagementEvents;
+        this.ignoreManagementNotifications = ignoreManagementNotifications;
     }
 
-    public boolean isIgnoreCustomEvents()
+    public boolean isIgnoreCustomNotifications()
     {
-        return ignoreCustomEvents;
+        return ignoreCustomNotifications;
     }
 
-    public void setIgnoreCustomEvents(boolean ignoreCustomEvents)
+    public void setIgnoreCustomNotifications(boolean ignoreCustomNotifications)
     {
-        this.ignoreCustomEvents = ignoreCustomEvents;
+        this.ignoreCustomNotifications = ignoreCustomNotifications;
     }
 
-    public boolean isIgnoreAdminEvents()
+    public boolean isIgnoreAdminNotifications()
     {
-        return ignoreAdminEvents;
+        return ignoreAdminNotifications;
     }
 
-    public void setIgnoreAdminEvents(boolean ignoreAdminEvents)
+    public void setIgnoreAdminNotifications(boolean ignoreAdminNotifications)
     {
-        this.ignoreAdminEvents = ignoreAdminEvents;
+        this.ignoreAdminNotifications = ignoreAdminNotifications;
     }
 
-    public boolean isIgnoreConnectionEvents()
+    public boolean isIgnoreConnectionNotifications()
     {
-        return ignoreConnectionEvents;
+        return ignoreConnectionNotifications;
     }
 
-    public void setIgnoreConnectionEvents(boolean ignoreConnectionEvents)
+    public void setIgnoreConnectionNotifications(boolean ignoreConnectionNotifications)
     {
-        this.ignoreConnectionEvents = ignoreConnectionEvents;
+        this.ignoreConnectionNotifications = ignoreConnectionNotifications;
     }
 
     public final void initialise() throws InitialisationException
     {
         doInitialise();
         UMOManager manager = MuleManager.getInstance();
-        if (!ignoreManagerEvents) {
+        if (!ignoreManagerNotifications) {
             UMOServerEventListener l = new ManagerEventListener() {
                 public void onEvent(UMOServerNotification notification)
                 {
@@ -195,7 +195,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
             manager.registerListener(l);
             listeners.add(l);
         }
-        if (!ignoreModelEvents) {
+        if (!ignoreModelNotifications) {
             UMOServerEventListener l = new ModelEventListener() {
                 public void onEvent(UMOServerNotification notification)
                 {
@@ -205,7 +205,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
             manager.registerListener(l);
             listeners.add(l);
         }
-        if (!ignoreComponentEvents) {
+        if (!ignoreComponentNotifications) {
             UMOServerEventListener l = new ComponentEventListener() {
                 public void onEvent(UMOServerNotification notification)
                 {
@@ -215,7 +215,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
             manager.registerListener(l);
             listeners.add(l);
         }
-        if (!ignoreSecurityEvents) {
+        if (!ignoreSecurityNotifications) {
             UMOServerEventListener l = new SecurityEventListener() {
                 public void onEvent(UMOServerNotification notification)
                 {
@@ -226,7 +226,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
             listeners.add(l);
         }
 
-        if (!ignoreManagementEvents) {
+        if (!ignoreManagementNotifications) {
             UMOServerEventListener l = new ManagementEventListener() {
                 public void onEvent(UMOServerNotification notification)
                 {
@@ -237,7 +237,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
             listeners.add(l);
         }
 
-        if (!ignoreCustomEvents) {
+        if (!ignoreCustomNotifications) {
             UMOServerEventListener l = new CustomEventListener() {
                 public void onEvent(UMOServerNotification notification)
                 {
@@ -248,7 +248,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
             listeners.add(l);
         }
 
-        if (!ignoreConnectionEvents) {
+        if (!ignoreConnectionNotifications) {
             UMOServerEventListener l = new ConnectionEventListener() {
                 public void onEvent(UMOServerNotification notification)
                 {
@@ -259,7 +259,7 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
             listeners.add(l);
         }
 
-        if (!ignoreAdminEvents) {
+        if (!ignoreAdminNotifications) {
             UMOServerEventListener l = new AdminEventListener() {
                 public void onEvent(UMOServerNotification notification)
                 {
@@ -270,9 +270,9 @@ public abstract class AbstractEventLoggerAgent implements UMOAgent
             listeners.add(l);
         }
 
-        if(!ignoreMessageEvents && !MuleManager.getConfiguration().isEnableMessageEvents()) {
+        if(!ignoreMessageNotifications && !MuleManager.getConfiguration().isEnableMessageEvents()) {
             logger.warn("EventLogger agent has been asked to log message events, but the MuleManager is configured not to fire Message events");
-        } else if (!ignoreMessageEvents) {
+        } else if (!ignoreMessageNotifications) {
             UMOServerEventListener l = new MessageEventListener() {
                 public void onEvent(UMOServerNotification notification)
                 {

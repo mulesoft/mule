@@ -29,17 +29,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>AbstractEventLoggerAgent</code> Receives Mule server events and logs
+ * <code>AbstractNotificationLoggerAgent</code> Receives Mule server events and logs
  * them and can optionally route them to an endpoint
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class Log4jEventLoggerAgent extends AbstractEventLoggerAgent
+public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgent
 {
 
     protected Logger eventLogger;
-    private String logName = Log4jEventLoggerAgent.class.getName();
+    private String logName = Log4jNotificationLoggerAgent.class.getName();
     private String logFile = null;
     private String logConfigFile = null;
     private String chainsawHost = "localhost";

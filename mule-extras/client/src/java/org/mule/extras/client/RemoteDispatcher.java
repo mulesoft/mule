@@ -15,9 +15,7 @@ package org.mule.extras.client;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.XppDriver;
-
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -26,14 +24,10 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.internal.events.AdminEvent;
+import org.mule.impl.internal.events.AdminNotification;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.umo.FutureMessageResult;
-import org.mule.umo.UMOEvent;
-import org.mule.umo.UMOException;
-import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
+import org.mule.umo.*;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -198,7 +192,7 @@ public class RemoteDispatcher implements Disposable
 
     public UMOMessage receiveRemote(String endpoint, int timeout) throws UMOException
     {
-        AdminEvent action = new AdminEvent(null, AdminEvent.ACTION_RECEIVE, endpoint);
+        AdminNotification action = new AdminNotification(null, AdminNotification.ACTION_RECEIVE, endpoint);
         action.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
         action.setProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, new Long(timeout));
         UMOMessage result = dispatchAction(action, true, timeout);
@@ -227,7 +221,7 @@ public class RemoteDispatcher implements Disposable
         UMOMessage message = new MuleMessage(payload, messageProperties);
         message.setBooleanProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, synchronous);
         setCredentials(message);
-        AdminEvent action = new AdminEvent(message, AdminEvent.ACTION_INVOKE, "mule://" + component);
+        AdminNotification action = new AdminNotification(message, AdminNotification.ACTION_INVOKE, "mule://" + component);
         UMOMessage result = dispatchAction(action, synchronous, MuleManager.getConfiguration()
                                                                            .getSynchronousEventTimeout());
         return result;
@@ -239,15 +233,15 @@ public class RemoteDispatcher implements Disposable
         UMOMessage message = new MuleMessage(payload, messageProperties);
         message.setProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, String.valueOf(synchronous));
         setCredentials(message);
-        AdminEvent action = new AdminEvent(message,
-                                           (synchronous ? AdminEvent.ACTION_SEND : AdminEvent.ACTION_DISPATCH),
+        AdminNotification action = new AdminNotification(message,
+                                           (synchronous ? AdminNotification.ACTION_SEND : AdminNotification.ACTION_DISPATCH),
                                            endpoint);
 
         UMOMessage result = dispatchAction(action, synchronous, timeout);
         return result;
     }
 
-    protected UMOMessage dispatchAction(AdminEvent action, boolean synchronous, int timeout) throws UMOException
+    protected UMOMessage dispatchAction(AdminNotification action, boolean synchronous, int timeout) throws UMOException
     {
         String xml = xstream.toXML(action);
 
@@ -282,8 +276,8 @@ public class RemoteDispatcher implements Disposable
                     // System.out.println("Remote dispatcher received result:\n"
                     // + resultXml);
                     Object obj = xstream.fromXML(resultXml);
-                    if(obj instanceof AdminEvent) {
-                        result = ((AdminEvent)obj).getMessage();
+                    if(obj instanceof AdminNotification) {
+                        result = ((AdminNotification)obj).getMessage();
                     } else {
                         result = (UMOMessage)obj;
                     }

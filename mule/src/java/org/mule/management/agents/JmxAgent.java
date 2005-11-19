@@ -19,34 +19,17 @@ import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.internal.events.ModelEvent;
 import org.mule.impl.internal.events.ModelEventListener;
-import org.mule.management.mbeans.ComponentService;
-import org.mule.management.mbeans.ComponentServiceMBean;
-import org.mule.management.mbeans.ConnectorService;
-import org.mule.management.mbeans.ConnectorServiceMBean;
-import org.mule.management.mbeans.EndpointServiceMBean;
-import org.mule.management.mbeans.ModelService;
-import org.mule.management.mbeans.ModelServiceMBean;
-import org.mule.management.mbeans.MuleConfigurationService;
-import org.mule.management.mbeans.MuleConfigurationServiceMBean;
-import org.mule.management.mbeans.MuleService;
-import org.mule.management.mbeans.MuleServiceMBean;
-import org.mule.management.mbeans.StatisticsService;
+import org.mule.impl.internal.events.ModelNotification;
+import org.mule.management.mbeans.*;
 import org.mule.providers.AbstractConnector;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnector;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
+import javax.management.*;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
@@ -153,9 +136,9 @@ public class JmxAgent implements UMOAgent
 
         // We need to register all the services once the server has initialised
         MuleManager.getInstance().registerListener(new ModelEventListener() {
-            public void onEvent(UMOServerEvent event)
+            public void onEvent(UMOServerNotification notification)
             {
-                if (event.getAction() == ModelEvent.MODEL_STARTED) {
+                if (notification.getAction() == ModelNotification.MODEL_STARTED) {
                     try {
                         registerStatisticsService();
                         registerMuleService();

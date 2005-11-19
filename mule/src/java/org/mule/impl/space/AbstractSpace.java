@@ -45,7 +45,7 @@ public abstract class AbstractSpace implements UMOSpace {
 
     protected AbstractSpace(String name) {
         this.name = name;
-        fireMonitorEvent(SpaceMonitorEvent.SPACE_CREATED, this);
+        fireMonitorEvent(SpaceMonitorNotification.SPACE_CREATED, this);
     }
 
     protected AbstractSpace(String name, boolean enableMonitorEvents) {
@@ -55,12 +55,12 @@ public abstract class AbstractSpace implements UMOSpace {
 
     public void addListener(UMOSpaceEventListener listener) {
         listeners.add(listener);
-        fireMonitorEvent(SpaceMonitorEvent.SPACE_LISTENER_ADDED, listener);
+        fireMonitorEvent(SpaceMonitorNotification.SPACE_LISTENER_ADDED, listener);
     }
 
     public void removeListener(UMOSpaceEventListener listener) {
         moniterListeners.remove(listener);
-        fireMonitorEvent(SpaceMonitorEvent.SPACE_LISTENER_REMOVED, listener);
+        fireMonitorEvent(SpaceMonitorNotification.SPACE_LISTENER_REMOVED, listener);
     }
 
     public void addMonitorListener(SpaceMonitorEventListener listener) {
@@ -81,22 +81,22 @@ public abstract class AbstractSpace implements UMOSpace {
     public final void put(Object value)  throws UMOSpaceException {
         doPut(value);
         fireListeners();
-        fireMonitorEvent(SpaceMonitorEvent.SPACE_ITEM_ADDED, value);
+        fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_ADDED, value);
     }
 
     public void put(Object value, long lease) throws UMOSpaceException {
         doPut(value, lease);
         fireListeners();
-        fireMonitorEvent(SpaceMonitorEvent.SPACE_ITEM_ADDED, value);
+        fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_ADDED, value);
 
     }
 
     public Object take() throws UMOSpaceException {
         Object item = doTake();
         if(item==null) {
-            fireMonitorEvent(SpaceMonitorEvent.SPACE_ITEM_MISS, item);
+            fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_MISS, item);
         } else {
-            fireMonitorEvent(SpaceMonitorEvent.SPACE_ITEM_REMOVED, item);
+            fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_REMOVED, item);
         }
         return item;
     }
@@ -104,9 +104,9 @@ public abstract class AbstractSpace implements UMOSpace {
     public Object take(long timeout) throws UMOSpaceException {
         Object item = doTake(timeout);
         if(item==null) {
-            fireMonitorEvent(SpaceMonitorEvent.SPACE_ITEM_MISS, item);
+            fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_MISS, item);
         } else {
-            fireMonitorEvent(SpaceMonitorEvent.SPACE_ITEM_REMOVED, item);
+            fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_REMOVED, item);
         }
         return item;
     }
@@ -114,9 +114,9 @@ public abstract class AbstractSpace implements UMOSpace {
     public Object takeNoWait() throws UMOSpaceException {
         Object item = doTakeNoWait();
         if(item==null) {
-            fireMonitorEvent(SpaceMonitorEvent.SPACE_ITEM_MISS, item);
+            fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_MISS, item);
         } else {
-            fireMonitorEvent(SpaceMonitorEvent.SPACE_ITEM_REMOVED, item);
+            fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_REMOVED, item);
         }
         return item;
     }
@@ -142,13 +142,13 @@ public abstract class AbstractSpace implements UMOSpace {
 
     protected void fireMonitorEvent(int action, Object item) {
         if(enableMonitorEvents) {
-            MuleManager.getInstance().fireEvent(new SpaceMonitorEvent(this, action, item));
+            MuleManager.getInstance().fireNotification(new SpaceMonitorNotification(this, action, item));
         }
     }
 
     public void dispose() {
         doDispose();
-        fireMonitorEvent(SpaceMonitorEvent.SPACE_DISPOSED, this);
+        fireMonitorEvent(SpaceMonitorNotification.SPACE_DISPOSED, this);
     }
 
     public abstract void doPut(Object value) throws UMOSpaceException;

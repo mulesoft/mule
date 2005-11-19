@@ -14,7 +14,7 @@
  */
 package org.mule.impl.internal.events;
 
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
@@ -24,7 +24,7 @@ import org.mule.umo.provider.UMOConnectable;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ConnectionEvent extends UMOServerEvent
+public class ConnectionNotification extends UMOServerNotification
 {
     public static final int CONNECTION_CONNECTED = CONNECTION_EVENT_ACTION_START_RANGE + 1;
     public static final int CONNECTION_FAILED = CONNECTION_EVENT_ACTION_START_RANGE + 2;
@@ -32,7 +32,7 @@ public class ConnectionEvent extends UMOServerEvent
 
     private static final transient String[] ACTIONS = new String[] { "connected", "connect failed", "disconnected" };
 
-    public ConnectionEvent(UMOConnectable resource, String identifier, int action)
+    public ConnectionNotification(UMOConnectable resource, String identifier, int action)
     {
         super(resource, action);
         resourceIdentifier = identifier;
