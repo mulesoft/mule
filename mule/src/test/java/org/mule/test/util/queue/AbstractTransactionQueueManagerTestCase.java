@@ -14,11 +14,11 @@
  */
 package org.mule.test.util.queue;
 
-import java.util.Random;
-
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
+import org.mule.tck.NamedTestCase;
+import org.mule.util.Utility;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueConfiguration;
@@ -26,27 +26,31 @@ import org.mule.util.queue.QueueSession;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.xa.AbstractResourceManager;
 
+import java.io.File;
+import java.util.Random;
+
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
+public abstract class AbstractTransactionQueueManagerTestCase extends NamedTestCase
 {
 
-    private Log logger = getLogger();
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     protected abstract TransactionalQueueManager createQueueManager() throws Exception;
 
     protected abstract boolean isPersistent();
 
-    protected abstract Log getLogger();
+    protected void setUp() throws Exception {
+        Utility.deleteTree(new File(MuleManager.getConfiguration().getWorkingDirectory()));
+    }
 
     public void testPutTake() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
-
         TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
 
@@ -68,10 +72,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testTakePut() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
-
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
 
@@ -110,10 +110,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testTakePutRollbackPut() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
-
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
 
@@ -157,10 +153,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testTakePutOverCapacity() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
-
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
         mgr.setDefaultQueueConfiguration(new QueueConfiguration(2));
@@ -200,9 +192,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testPutWithPersistence() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
         if (isPersistent()) {
             TransactionalQueueManager mgr = createQueueManager();
 
@@ -236,9 +225,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testTransactedPutCommitWithPersistence() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
         if (isPersistent()) {
             TransactionalQueueManager mgr = createQueueManager();
 
@@ -274,9 +260,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testTransactedPutRollbackWithPersistence() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
         if (isPersistent()) {
             TransactionalQueueManager mgr = createQueueManager();
 
@@ -315,9 +298,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testTransactionsOnMultipleQueues() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
 
         TransactionalQueueManager mgr = createQueueManager();
 
@@ -385,9 +365,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testPoll() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
 
         final TransactionalQueueManager mgr = createQueueManager();
 
@@ -434,9 +411,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testPeek() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
 
         TransactionalQueueManager mgr = createQueueManager();
 
@@ -463,9 +437,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testOffer() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
 
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.setDefaultQueueConfiguration(new QueueConfiguration(1));
@@ -503,9 +474,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends TestCase
 
     public void testBench() throws Exception
     {
-        logger.info("================================");
-        logger.info("Running test: " + this.getName());
-        logger.info("================================");
 
         TransactionalQueueManager mgr = createQueueManager();
 

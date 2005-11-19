@@ -14,16 +14,15 @@
  */
 package org.mule.util.xa;
 
+import org.apache.commons.logging.Log;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+
+import javax.transaction.Status;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-
-import javax.transaction.Status;
-
-import org.apache.commons.logging.Log;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 /**
  * This code is based on code coming from the <a

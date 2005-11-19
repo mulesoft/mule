@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
-import org.mule.util.xa.AbstractXAResourceManager.AbstractSession;
+import org.mule.util.xa.DefaultXASession;
 import org.mule.util.xa.ResourceManagerException;
 import org.objectweb.jotm.Jotm;
 
@@ -54,7 +54,7 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
     {
         TestXAResourceManager rm = new TestXAResourceManager();
         rm.start();
-        AbstractSession s = rm.createSession();
+        DefaultXASession s = rm.createSession();
 
         tm.begin();
         Transaction tx = tm.getTransaction();
@@ -70,9 +70,9 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
 
         private static Log logger = LogFactory.getLog(TestXAResourceManager.class);
 
-        public AbstractSession createSession()
+        public DefaultXASession createSession()
         {
-            return new AbstractSession();
+            return new DefaultXASession(this);
         }
 
         /*

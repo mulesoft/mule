@@ -14,11 +14,6 @@
  */
 package org.mule.test.util.queue;
 
-import java.io.File;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
 import org.mule.util.queue.JournalPersistenceStrategy;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.TransactionalQueueManager;
@@ -29,35 +24,6 @@ import org.mule.util.queue.TransactionalQueueManager;
  */
 public class JournalPersistenceTestCase extends AbstractTransactionQueueManagerTestCase
 {
-
-    private static final Log logger = LogFactory.getLog(JournalPersistenceTestCase.class);
-
-    protected void deleteWholeDir(File f)
-    {
-        if (f.exists()) {
-            File[] files = f.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isDirectory()) {
-                    deleteWholeDir(files[i]);
-                } else {
-                    logger.info("Deleting " + files[i]);
-                    files[i].delete();
-                }
-            }
-            f.delete();
-        }
-    }
-
-    protected void setUp() throws Exception
-    {
-        deleteWholeDir(new File(MuleManager.getConfiguration().getWorkingDirectory()));
-    }
-
-    protected Log getLogger()
-    {
-        return logger;
-    }
-
     protected TransactionalQueueManager createQueueManager() throws Exception
     {
         TransactionalQueueManager mgr = new TransactionalQueueManager();

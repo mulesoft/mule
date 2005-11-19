@@ -14,14 +14,10 @@
  */
 package org.mule.util.queue;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.doomdark.uuid.UUIDGenerator;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -102,4 +98,7 @@ public class MemoryPersistenceStrategy implements QueuePersistenceStrategy
     {
     }
 
+    public boolean isTransient() {
+        return true;
+    }
 }
