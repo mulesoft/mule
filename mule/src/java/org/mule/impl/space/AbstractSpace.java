@@ -63,14 +63,14 @@ public abstract class AbstractSpace implements UMOSpace {
         fireMonitorEvent(SpaceMonitorNotification.SPACE_LISTENER_REMOVED, listener);
     }
 
-    public void addMonitorListener(SpaceMonitorEventListener listener) {
+    public void addMonitorListener(SpaceMonitorNotificationListener listener) {
         if(enableMonitorEvents==false) {
-            logger.warn("Space monitor events for " + name + " space are currently disabled");
+            logger.warn("Space monitor notifications for " + name + " space are currently disabled");
         }
         moniterListeners.add(listener);
     }
 
-    public void removeMonitorListener(SpaceMonitorEventListener listener) {
+    public void removeMonitorListener(SpaceMonitorNotificationListener listener) {
         listeners.remove(listener);
     }
 

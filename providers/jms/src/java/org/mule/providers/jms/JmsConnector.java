@@ -19,8 +19,8 @@ import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.internal.events.ConnectionEventListener;
-import org.mule.impl.internal.events.ConnectionNotification;
+import org.mule.impl.internal.notifications.ConnectionNotification;
+import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.ConnectException;
 import org.mule.providers.ReplyToHandler;
@@ -56,7 +56,7 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class JmsConnector extends AbstractServiceEnabledConnector implements ConnectionEventListener
+public class JmsConnector extends AbstractServiceEnabledConnector implements ConnectionNotificationListener
 {
 
     private String connectionFactoryJndiName;
@@ -619,7 +619,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         return true;
     }
 
-    public void onEvent(UMOServerNotification notification) {
+    public void onNotification(UMOServerNotification notification) {
         if(notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED) {
             //Remove all dispatchers as any cached session will be invalidated
             disposeDispatchers();

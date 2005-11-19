@@ -19,8 +19,8 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.RequestContext;
-import org.mule.impl.internal.events.ConnectionEventListener;
-import org.mule.impl.internal.events.ConnectionNotification;
+import org.mule.impl.internal.notifications.ConnectionNotification;
+import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.providers.jms.JmsMessageUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEventContext;
@@ -43,7 +43,7 @@ import java.util.Map;
  * @version 1.2
  */
 
-public abstract class AbstractJmsTransformer extends AbstractTransformer implements ConnectionEventListener
+public abstract class AbstractJmsTransformer extends AbstractTransformer implements ConnectionNotificationListener
 {
     public static final char REPLACEMENT_CHAR = '_';
 
@@ -220,7 +220,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
         this.session = session;
     }
 
-    public void onEvent(UMOServerNotification notification) {
+    public void onNotification(UMOServerNotification notification) {
         if(notification.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED) {
             session = null;
             requireNewSession = true;

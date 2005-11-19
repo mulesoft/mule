@@ -24,7 +24,7 @@ import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.internal.events.AdminNotification;
+import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.*;

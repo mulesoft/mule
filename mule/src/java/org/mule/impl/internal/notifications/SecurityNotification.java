@@ -11,14 +11,14 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.impl.internal.events;
+package org.mule.impl.internal.notifications;
 
 import org.mule.umo.manager.UMOServerNotification;
 
 /**
  * <code>SecurityNotification</code> is fired when a request for authorisation
  * occurs. The event may denote successful access or denied access depending on
- * the type of event. Subscribing to these events developers can maintain an
+ * the type of event. Subscribing to these notifications developers can maintain an
  * access log, block clients, etc.
  * 
  * @see org.mule.MuleManager

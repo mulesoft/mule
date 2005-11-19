@@ -12,7 +12,7 @@
  * the LICENSE.txt file. 
  *
  */
-package org.mule.impl.internal.events;
+package org.mule.impl.internal.notifications;
 
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnectable;

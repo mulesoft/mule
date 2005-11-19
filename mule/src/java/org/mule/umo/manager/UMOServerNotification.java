@@ -57,8 +57,8 @@ public abstract class UMOServerNotification extends EventObject
     protected int action = NULL_ACTION;
 
     /**
-     * The resourceIdentifier is used when firing inbound server events such as
-     * Admin events or other action events triggered by an external source Used
+     * The resourceIdentifier is used when firing inbound server notifications such as
+     * Admin notifications or other action notifications triggered by an external source Used
      * to associate the event with a particular resource. For example, if the
      * event was a ComponentNotification the resourceIdentifier could be the name of a
      * particular component

@@ -22,8 +22,8 @@ import org.mule.extras.client.MuleClient;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.impl.internal.events.ConnectionEventListener;
-import org.mule.impl.internal.events.ConnectionNotification;
+import org.mule.impl.internal.notifications.ConnectionNotification;
+import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.providers.jms.JmsConnector;
@@ -50,7 +50,7 @@ import java.util.Properties;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  *
  */
-public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase implements ConnectionEventListener {
+public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase implements ConnectionNotificationListener {
 
     private JmsConnector connector;
     private BlockingQueue events = new LinkedBlockingQueue();
@@ -209,7 +209,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
 
 
 
-    public void onEvent(UMOServerNotification notification) {
+    public void onNotification(UMOServerNotification notification) {
         try {
             events.put(notification);
         } catch (InterruptedException e) {

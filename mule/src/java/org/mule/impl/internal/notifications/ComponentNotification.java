@@ -11,7 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file. 
  */
-package org.mule.impl.internal.events;
+package org.mule.impl.internal.notifications;
 
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMODescriptor;

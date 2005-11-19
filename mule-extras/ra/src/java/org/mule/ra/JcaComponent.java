@@ -23,7 +23,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
-import org.mule.impl.internal.events.ComponentNotification;
+import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.*;
 import org.mule.umo.lifecycle.InitialisationException;

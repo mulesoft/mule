@@ -24,7 +24,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
-import org.mule.impl.internal.events.ConnectionNotification;
+import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.management.mbeans.EndpointService;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOComponent;
@@ -160,7 +160,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     /** keeps arecord of whether the connecter should be started once it is reconnected */
     protected WaitableBoolean startedBeforeDisconnect = new WaitableBoolean(false);
 
-    /** Whether to fire message events for every message that is sent or received from this connector */
+    /** Whether to fire message notifications for every message that is sent or received from this connector */
     private boolean enableMessageEvents = false;
 
     private List supportedProtocols;
@@ -683,13 +683,13 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     /**
      * Fires a server notification to all registered
-     * {@link org.mule.impl.internal.events.CustomEventListener} eventManager.
+     * {@link org.mule.impl.internal.notifications.CustomNotificationListener} eventManager.
      * 
      * @param notification the notification to fire. This must be of type
-     *            {@link org.mule.impl.internal.events.CustomNotification} otherwise an
+     *            {@link org.mule.impl.internal.notifications.CustomNotification} otherwise an
      *            exception will be thrown.
      * @throws UnsupportedOperationException if the notification fired is not a
-     *             {@link org.mule.impl.internal.events.CustomNotification}
+     *             {@link org.mule.impl.internal.notifications.CustomNotification}
      */
     public void fireNotification(UMOServerNotification notification)
     {
@@ -879,7 +879,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * Whether to fire message events for every message that is sent or received from this connector
+     * Whether to fire message notifications for every message that is sent or received from this connector
      * @return
      */
     public boolean isEnableMessageEvents() {
@@ -887,7 +887,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     }
 
     /**
-     * Whether to fire message events for every message that is sent or received from this connector
+     * Whether to fire message notifications for every message that is sent or received from this connector
      * @param enableMessageEvents
      */
     public void setEnableMessageEvents(boolean enableMessageEvents) {

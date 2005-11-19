@@ -16,13 +16,13 @@ package org.mule.impl.internal.admin;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.impl.internal.events.*;
+import org.mule.impl.internal.notifications.*;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
 import org.mule.umo.manager.UMOManager;
-import org.mule.umo.manager.UMOServerEventListener;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.manager.UMOServerNotificationListener;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -96,7 +96,7 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
     public void unregistered()
     {
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-            UMOServerEventListener listener = (UMOServerEventListener) iterator.next();
+            UMOServerNotificationListener listener = (UMOServerNotificationListener) iterator.next();
             MuleManager.getInstance().unregisterListener(listener);
         }
     }
@@ -186,8 +186,8 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
         doInitialise();
         UMOManager manager = MuleManager.getInstance();
         if (!ignoreManagerNotifications) {
-            UMOServerEventListener l = new ManagerEventListener() {
-                public void onEvent(UMOServerNotification notification)
+            UMOServerNotificationListener l = new ManagerNotificationListener() {
+                public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -196,8 +196,8 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             listeners.add(l);
         }
         if (!ignoreModelNotifications) {
-            UMOServerEventListener l = new ModelEventListener() {
-                public void onEvent(UMOServerNotification notification)
+            UMOServerNotificationListener l = new ModelNotificationListener() {
+                public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -206,8 +206,8 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             listeners.add(l);
         }
         if (!ignoreComponentNotifications) {
-            UMOServerEventListener l = new ComponentEventListener() {
-                public void onEvent(UMOServerNotification notification)
+            UMOServerNotificationListener l = new ComponentNotificationListener() {
+                public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -216,8 +216,8 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             listeners.add(l);
         }
         if (!ignoreSecurityNotifications) {
-            UMOServerEventListener l = new SecurityEventListener() {
-                public void onEvent(UMOServerNotification notification)
+            UMOServerNotificationListener l = new SecurityNotificationListener() {
+                public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -227,8 +227,8 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
         }
 
         if (!ignoreManagementNotifications) {
-            UMOServerEventListener l = new ManagementEventListener() {
-                public void onEvent(UMOServerNotification notification)
+            UMOServerNotificationListener l = new ManagementNotificationListener() {
+                public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -238,8 +238,8 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
         }
 
         if (!ignoreCustomNotifications) {
-            UMOServerEventListener l = new CustomEventListener() {
-                public void onEvent(UMOServerNotification notification)
+            UMOServerNotificationListener l = new CustomNotificationListener() {
+                public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -249,8 +249,8 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
         }
 
         if (!ignoreConnectionNotifications) {
-            UMOServerEventListener l = new ConnectionEventListener() {
-                public void onEvent(UMOServerNotification notification)
+            UMOServerNotificationListener l = new ConnectionNotificationListener() {
+                public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -260,8 +260,8 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
         }
 
         if (!ignoreAdminNotifications) {
-            UMOServerEventListener l = new AdminEventListener() {
-                public void onEvent(UMOServerNotification notification)
+            UMOServerNotificationListener l = new AdminNotificationListener() {
+                public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }
@@ -271,10 +271,10 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
         }
 
         if(!ignoreMessageNotifications && !MuleManager.getConfiguration().isEnableMessageEvents()) {
-            logger.warn("EventLogger agent has been asked to log message events, but the MuleManager is configured not to fire Message events");
+            logger.warn("EventLogger agent has been asked to log message notifications, but the MuleManager is configured not to fire Message notifications");
         } else if (!ignoreMessageNotifications) {
-            UMOServerEventListener l = new MessageEventListener() {
-                public void onEvent(UMOServerNotification notification)
+            UMOServerNotificationListener l = new MessageNotificationListener() {
+                public void onNotification(UMOServerNotification notification)
                 {
                     logEvent(notification);
                 }

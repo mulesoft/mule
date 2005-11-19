@@ -11,7 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.impl.internal.events;
+package org.mule.impl.internal.notifications;
 
 import org.mule.umo.manager.UMOServerNotification;
 
@@ -26,7 +26,7 @@ import org.mule.umo.manager.UMOServerNotification;
  */
 public class ManagementNotification extends UMOServerNotification
 {
-    // todo resource status events here i.e.
+    // todo resource status notifications here i.e.
     public static final int MANAGEMENT_COMPONENT_QUEUE_EXHAUSTED = MANAGEMENT_EVENT_ACTION_START_RANGE + 1;
     public static final int MANAGEMENT_NODE_PING = MANAGEMENT_EVENT_ACTION_START_RANGE + 2;
 

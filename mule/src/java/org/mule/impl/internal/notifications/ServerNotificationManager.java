@@ -11,7 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.impl.internal.events;
+package org.mule.impl.internal.notifications;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
@@ -24,8 +24,8 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.lifecycle.Disposable;
-import org.mule.umo.manager.UMOServerEventListener;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
 
 import javax.resource.spi.work.Work;
@@ -37,18 +37,18 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * <code>ServerEventManager</code> manages all server listeners for a Mule
+ * <code>ServerNotificationManager</code> manages all server listeners for a Mule
  * Instance
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ServerEventManager implements Work, Disposable
+public class ServerNotificationManager implements Work, Disposable
 {
     /**
      * logger used by this class
      */
-    protected static transient Log logger = LogFactory.getLog(ServerEventManager.class);
+    protected static transient Log logger = LogFactory.getLog(ServerNotificationManager.class);
 
     public static final String NULL_SUBSCRIPTION = "NULL";
 
@@ -64,7 +64,7 @@ public class ServerEventManager implements Work, Disposable
         }
     };
 
-    public ServerEventManager(UMOWorkManager workManager)
+    public ServerNotificationManager(UMOWorkManager workManager)
     {
         init();
         try {
@@ -100,12 +100,12 @@ public class ServerEventManager implements Work, Disposable
         }
     }
 
-    public void registerListener(UMOServerEventListener listener)
+    public void registerListener(UMOServerNotificationListener listener)
     {
         registerListener(listener, null);
     }
 
-    public void registerListener(UMOServerEventListener listener, String subscription)
+    public void registerListener(UMOServerNotificationListener listener, String subscription)
     {
         if (subscription == null) {
             subscription = NULL_SUBSCRIPTION;
@@ -116,7 +116,7 @@ public class ServerEventManager implements Work, Disposable
         }
     }
 
-    public void unregisterListener(UMOServerEventListener listener)
+    public void unregisterListener(UMOServerNotificationListener listener)
     {
         TreeMap listeners = getListeners(listener.getClass());
         synchronized (listeners) {
@@ -216,10 +216,10 @@ public class ServerEventManager implements Work, Disposable
         }
 
         listeners = getListeners(listenerClass);
-        UMOServerEventListener l;
+        UMOServerNotificationListener l;
         synchronized (listeners) {
             for (Iterator iterator = listeners.keySet().iterator(); iterator.hasNext();) {
-                l = (UMOServerEventListener) iterator.next();
+                l = (UMOServerNotificationListener) iterator.next();
                 subscription = (String) listeners.get(l);
                 if (subscription == null) {
                     subscription = NULL_SUBSCRIPTION;
@@ -230,7 +230,7 @@ public class ServerEventManager implements Work, Disposable
                 // id match
                 if (NULL_SUBSCRIPTION.equals(subscription)
                         || new WildcardFilter(subscription).accept(notification.getResourceIdentifier())) {
-                    l.onEvent(notification);
+                    l.onNotification(notification);
                 } else {
                     logger.trace("Resource id '" + subscription + "' for listener " + l.getClass().getName()
                             + " does not match Resource id '" + notification.getResourceIdentifier()

@@ -26,8 +26,8 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.internal.events.ModelEvent;
-import org.mule.impl.internal.events.ModelEventListener;
+import org.mule.impl.internal.notifications.ModelNotification;
+import org.mule.impl.internal.notifications.ModelNotificationListener;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.providers.service.ConnectorFactory;
@@ -39,7 +39,7 @@ import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOServerEvent;
+import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassHelper;
 
@@ -48,11 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <code>AxisConnector</code> is used to maintain one or more Services for
@@ -64,7 +60,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AxisConnector extends AbstractServiceEnabledConnector implements ModelEventListener {
+public class AxisConnector extends AbstractServiceEnabledConnector implements ModelNotificationListener {
     public static final QName QNAME_MULERPC_PROVIDER = new QName(WSDDConstants.URI_WSDD_JAVA, "Mule");
     public static final QName QNAME_MULE_TYPE_MAPPINGS = new QName("http://www.muleumo.org/ws/mappings", "Mule");
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
@@ -74,6 +70,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public static final String AXIS_SERVICE_COMPONENT_NAME = "_axisServiceComponent";
     public static final String METHOD_NAMESPACE_PROPERTY = "methodNamespace";
     public static final String SOAP_ACTION_PROPERTY = "soapAction";
+    public static final String AXIS_SERVICE_PROPERTY = "_axisService";
 
     public static final String SERVICE_PROPERTY_COMPONENT_NAME = "componentName";
     public static final String SERVICE_PROPERTY_SERVCE_PATH = "servicePath";
@@ -434,8 +431,8 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         this.beanTypes = beanTypes;
     }
 
-    public void onEvent(UMOServerEvent event) {
-        if (event.getAction() == ModelEvent.MODEL_STARTED) {
+    public void onNotification(UMOServerNotification notification) {
+        if (notification.getAction() == ModelNotification.MODEL_STARTED) {
             // We need to register the Axis service component once the model
             // starts because
             // when the model starts listeners on components are started, thus

@@ -283,12 +283,12 @@ public interface UMOManager extends Lifecycle
      * stopping the implementation of this class triggering listeners when a
      * UMOEvent is received).
      * 
-     * The types of events fired is entirely defined by the implementation of
+     * The types of notifications fired is entirely defined by the implementation of
      * this class
      * 
      * @param l the listener to register
      */
-    void registerListener(UMOServerEventListener l);
+    void registerListener(UMOServerNotificationListener l);
 
     /**
      * Registers an intenal server event listener. The listener will be notified
@@ -297,15 +297,15 @@ public interface UMOManager extends Lifecycle
      * stopping the implementation of this class triggering listeners when a
      * UMOEvent is received).
      * 
-     * The types of events fired is entirely defined by the implementation of
+     * The types of notifications fired is entirely defined by the implementation of
      * this class
      * 
      * @param l the listener to register
      * @param resourceIdentifier a particular resource name for the given type
      *            of listener For example, the resourceName could be the name of
-     *            a component if the listener was a ComponentEventListener
+     *            a component if the listener was a ComponentNotificationListener
      */
-    void registerListener(UMOServerEventListener l, String resourceIdentifier);
+    void registerListener(UMOServerNotificationListener l, String resourceIdentifier);
 
     /**
      * Unregisters a previously registered listener. If the listener has not
@@ -313,7 +313,7 @@ public interface UMOManager extends Lifecycle
      * 
      * @param l the listener to unregister
      */
-    void unregisterListener(UMOServerEventListener l);
+    void unregisterListener(UMOServerNotificationListener l);
 
     /**
      * Fires a server notification to all regiistered listeners
@@ -411,7 +411,7 @@ public interface UMOManager extends Lifecycle
      * Gets the queue manager used by mule for queuing events. This is used by
      * both components and vm provider.
      * 
-     * @param queueManager
+     * @return
      */
     QueueManager getQueueManager();
 }
