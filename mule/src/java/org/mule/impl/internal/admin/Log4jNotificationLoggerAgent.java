@@ -13,7 +13,12 @@
  */
 package org.mule.impl.internal.admin;
 
-import org.apache.log4j.*;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.net.SocketAppender;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.mule.config.i18n.Message;
@@ -112,22 +117,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
             String actionKey = e.EVENT_NAME + "." + e.getActionName();
             String level = (String) PropertiesHelper.getProperty(levelMappings, actionKey, e.getType());
 
-            eventLogger.log(getPriority(level), e);
-        }
-    }
-
-    private Priority getPriority(String level)
-    {
-        if (level.equalsIgnoreCase("debug")) {
-            return Priority.DEBUG;
-        } else if (level.equalsIgnoreCase("warn")) {
-            return Priority.WARN;
-        } else if (level.equalsIgnoreCase("error")) {
-            return Priority.ERROR;
-        } else if (level.equalsIgnoreCase("fatal")) {
-            return Priority.FATAL;
-        } else {
-            return Priority.INFO;
+            eventLogger.log(Level.toLevel(level, Level.INFO), e);
         }
     }
 
