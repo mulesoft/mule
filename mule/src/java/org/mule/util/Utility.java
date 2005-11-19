@@ -318,14 +318,16 @@ public class Utility
             return true;
         }
         File[] files = dir.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
-                if (!deleteTree(files[i])) {
-                    return false;
-                }
-            } else {
-                if (!files[i].delete()) {
-                    return false;
+        if(files!=null) {
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    if (!deleteTree(files[i])) {
+                        return false;
+                    }
+                } else {
+                    if (!files[i].delete()) {
+                        return false;
+                    }
                 }
             }
         }
