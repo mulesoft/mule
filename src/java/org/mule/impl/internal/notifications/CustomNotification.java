@@ -11,19 +11,19 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.impl.internal.events;
+package org.mule.impl.internal.notifications;
 
 import org.mule.umo.manager.UMOServerNotification;
 
 /**
- * <code>CustomNotification</code> Custom events can be used by components and other
+ * <code>CustomNotification</code> Custom notifications can be used by components and other
  * objects such as routers, transformers, agents, etc to communicate a change of
  * state to each other. The Action value for the event is abitary. However care
  * should be taken not to set the action code to an existing action code. To
  * ensure this doesn't happen always set the action code greater than the
  * CUSTOM_ACTION_START_RANGE.
  * 
- * @see CustomEventListener
+ * @see CustomNotificationListener
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */

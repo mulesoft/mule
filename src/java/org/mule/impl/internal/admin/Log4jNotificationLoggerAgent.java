@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>AbstractNotificationLoggerAgent</code> Receives Mule server events and logs
+ * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications and logs
  * them and can optionally route them to an endpoint
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -56,7 +56,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     {
         StringBuffer buf = new StringBuffer();
         if (logFile != null && !"".equals(logFile)) {
-            buf.append("Logging events to: ").append(logFile);
+            buf.append("Logging notifications to: ").append(logFile);
         }
         if (enableChainsaw) {
             buf.append(" Chainsaw: ").append(chainsawHost).append(":").append(chainsawPort);

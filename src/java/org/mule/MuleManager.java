@@ -24,7 +24,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.internal.admin.MuleAdminAgent;
-import org.mule.impl.internal.events.*;
+import org.mule.impl.internal.notifications.*;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
@@ -165,9 +165,9 @@ public class MuleManager implements UMOManager
     private AllStatistics stats = new AllStatistics();
 
     /**
-     * Manages all Server event eventManager
+     * Manages all Server event notificationManager
      */
-    private ServerEventManager eventManager = null;
+    private ServerNotificationManager notificationManager = null;
 
     private MultiContainerContext containerContext = null;
 
@@ -345,8 +345,8 @@ public class MuleManager implements UMOManager
         endpointIdentifiers = null;
         // props = null;
         initialised.set(false);
-        if (eventManager != null) {
-            eventManager.dispose();
+        if (notificationManager != null) {
+            notificationManager.dispose();
         }
         if (workManager != null) {
             workManager.dispose();
@@ -586,17 +586,17 @@ public class MuleManager implements UMOManager
             }
 
             // create the event manager
-            eventManager = new ServerEventManager(workManager);
-            eventManager.registerEventType(ManagerNotification.class, ManagerEventListener.class);
-            eventManager.registerEventType(ModelNotification.class, ModelEventListener.class);
-            eventManager.registerEventType(ComponentNotification.class, ComponentEventListener.class);
-            eventManager.registerEventType(SecurityNotification.class, SecurityEventListener.class);
-            eventManager.registerEventType(ManagementNotification.class, ManagementEventListener.class);
-            eventManager.registerEventType(AdminNotification.class, AdminEventListener.class);
-            eventManager.registerEventType(CustomNotification.class, CustomEventListener.class);
-            eventManager.registerEventType(ConnectionNotification.class, ConnectionEventListener.class);
+            notificationManager = new ServerNotificationManager(workManager);
+            notificationManager.registerEventType(ManagerNotification.class, ManagerNotificationListener.class);
+            notificationManager.registerEventType(ModelNotification.class, ModelNotificationListener.class);
+            notificationManager.registerEventType(ComponentNotification.class, ComponentNotificationListener.class);
+            notificationManager.registerEventType(SecurityNotification.class, SecurityNotificationListener.class);
+            notificationManager.registerEventType(ManagementNotification.class, ManagementNotificationListener.class);
+            notificationManager.registerEventType(AdminNotification.class, AdminNotificationListener.class);
+            notificationManager.registerEventType(CustomNotification.class, CustomNotificationListener.class);
+            notificationManager.registerEventType(ConnectionNotification.class, ConnectionNotificationListener.class);
             if(config.isEnableMessageEvents()) {
-                eventManager.registerEventType(MessageNotification.class, MessageEventListener.class);
+                notificationManager.registerEventType(MessageNotification.class, MessageNotificationListener.class);
             }
 
             fireSystemEvent(new ManagerNotification(this, ManagerNotification.MANAGER_INITIALISNG));
@@ -1120,31 +1120,31 @@ public class MuleManager implements UMOManager
     /**
      * {@inheritDoc}
      */
-    public void registerListener(UMOServerEventListener l)
+    public void registerListener(UMOServerNotificationListener l)
     {
         registerListener(l, null);
     }
 
-    public void registerListener(UMOServerEventListener l, String resourceIdentifier)
+    public void registerListener(UMOServerNotificationListener l, String resourceIdentifier)
     {
-        if (eventManager == null) {
+        if (notificationManager == null) {
             throw new MuleRuntimeException(new Message(Messages.SERVER_EVENT_MANAGER_NOT_ENABLED));
         }
-        eventManager.registerListener(l, resourceIdentifier);
+        notificationManager.registerListener(l, resourceIdentifier);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void unregisterListener(UMOServerEventListener l)
+    public void unregisterListener(UMOServerNotificationListener l)
     {
-        if (eventManager != null) {
-            eventManager.unregisterListener(l);
+        if (notificationManager != null) {
+            notificationManager.unregisterListener(l);
         }
     }
 
     /**
-     * Fires a mule 'system' event. These are events that are fired because
+     * Fires a mule 'system' event. These are notifications that are fired because
      * something within the Mule instance happened such as the Model started or
      * the server is being disposed.
      * 
@@ -1152,8 +1152,8 @@ public class MuleManager implements UMOManager
      */
     protected void fireSystemEvent(UMOServerNotification e)
     {
-        if (eventManager != null) {
-            eventManager.fireEvent(e);
+        if (notificationManager != null) {
+            notificationManager.fireEvent(e);
         } else if (logger.isDebugEnabled()) {
             logger.debug("Event Manager is not enabled, ignoring event: " + e);
         }
@@ -1161,19 +1161,19 @@ public class MuleManager implements UMOManager
 
     /**
      * Fires a server notification to all registered
-     * {@link org.mule.impl.internal.events.CustomEventListener} eventManager.
+     * {@link org.mule.impl.internal.notifications.CustomNotificationListener} notificationManager.
      * 
      * @param notification the notification to fire. This must be of type
-     *            {@link org.mule.impl.internal.events.CustomNotification} otherwise an
+     *            {@link org.mule.impl.internal.notifications.CustomNotification} otherwise an
      *            exception will be thrown.
      * @throws UnsupportedOperationException if the notification fired is not a
-     *             {@link org.mule.impl.internal.events.CustomNotification}
+     *             {@link org.mule.impl.internal.notifications.CustomNotification}
      */
     public void fireNotification(UMOServerNotification notification)
     {
         // if(notification instanceof CustomNotification) {
-        if (eventManager != null) {
-            eventManager.fireEvent(notification);
+        if (notificationManager != null) {
+            notificationManager.fireEvent(notification);
         } else if (logger.isDebugEnabled()) {
             logger.debug("Event Manager is not enabled, ignoring notification: " + notification);
         }

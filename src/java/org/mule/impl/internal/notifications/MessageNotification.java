@@ -11,7 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.impl.internal.events;
+package org.mule.impl.internal.notifications;
 
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -19,7 +19,7 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
- * These events are fire when either a message is recieved via an endpoint, or dispatcher of if
+ * These notifications are fire when either a message is recieved via an endpoint, or dispatcher of if
  * a receive call is made on a dispatcher.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

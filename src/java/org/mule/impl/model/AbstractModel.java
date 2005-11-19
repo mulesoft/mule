@@ -24,7 +24,7 @@ import org.mule.impl.DefaultComponentExceptionStrategy;
 import org.mule.impl.DefaultLifecycleAdapterFactory;
 import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleSession;
-import org.mule.impl.internal.events.ModelNotification;
+import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.model.DynamicEntryPointResolver;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
