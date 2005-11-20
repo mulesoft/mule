@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-
-  <public publicId="-//W3C//DTD XMLSCHEMA 200102//EN"
-          uri="XMLSchema.dtd"/>
-  <public publicId="datatypes"
-          uri="datatypes.dtd"/>
-</catalog>
