@@ -48,7 +48,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AxisConnector</code> is used to maintain one or more Services for
@@ -106,6 +110,8 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     private List supportedSchemes;
 
+    private boolean doAutoTypes = true;
+
     public AxisConnector() {
         super();
         //Default supported schemes, these can be restricted
@@ -121,6 +127,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         supportedSchemes.add("smtps");
         supportedSchemes.add("pop3");
         supportedSchemes.add("pop3s");
+        supportedSchemes.add("ssl");
 
         for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
@@ -153,7 +160,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         // Create the AxisServer
         axisServer = new AxisServer(serverProvider);
-        axisServer.setOption("axis.doAutoTypes", Boolean.TRUE);
+        axisServer.setOption("axis.doAutoTypes", new Boolean(doAutoTypes));
 
         // Register the Mule service serverProvider
         WSDDProvider.registerProvider(QNAME_MULERPC_PROVIDER, new WSDDJavaMuleProvider(this));
@@ -521,5 +528,13 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public void setSupportedSchemes(List supportedSchemes) {
         this.supportedSchemes = supportedSchemes;
+    }
+
+    public boolean isDoAutoTypes() {
+        return doAutoTypes;
+    }
+
+    public void setDoAutoTypes(boolean doAutoTypes) {
+        this.doAutoTypes = doAutoTypes;
     }
 }

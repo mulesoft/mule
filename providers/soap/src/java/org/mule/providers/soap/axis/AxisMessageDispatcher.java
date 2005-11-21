@@ -15,7 +15,12 @@
  */
 package org.mule.providers.soap.axis;
 
-import org.apache.axis.*;
+import org.apache.axis.AxisProperties;
+import org.apache.axis.Handler;
+import org.apache.axis.Message;
+import org.apache.axis.MessageContext;
+import org.apache.axis.SimpleChain;
+import org.apache.axis.SimpleTargetedChain;
 import org.apache.axis.client.AxisClient;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
@@ -53,7 +58,14 @@ import org.mule.util.TemplateParser;
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPEnvelope;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * <code>AxisMessageDispatcher</code> is used to make soap requests via the
@@ -70,9 +82,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected SimpleProvider clientConfig;
 
-    public AxisMessageDispatcher(AxisConnector connector) throws UMOException {
+    public AxisMessageDispatcher(AxisConnector connector) {
         super(connector);
-        AxisProperties.setProperty("axis.doAutoTypes", "true");
+        AxisProperties.setProperty("axis.doAutoTypes", Boolean.toString(connector.isDoAutoTypes()));
         services = new HashMap();
         //Should be loading this from a WSDD but for some reason it is not working for me??
         createClientConfig();
@@ -170,7 +182,6 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     public void doDispatch(UMOEvent event) throws Exception
     {
-        AxisProperties.setProperty("axis.doAutoTypes", "true");
         Object[] args = getArgs(event);
         Call call = getCall(event, args);
         // dont use invokeOneWay here as we are already in a thread pool.
@@ -185,11 +196,11 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
-        AxisProperties.setProperty("axis.doAutoTypes", "true");
+        Call call;
+        Object result;
         Object[] args = getArgs(event);
-        Call call = getCall(event, args);
-
-        Object result = call.invoke(args);
+        call = getCall(event, args);
+        result = call.invoke(args);
         if (result == null) {
             return null;
         } else {

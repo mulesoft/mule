@@ -20,7 +20,7 @@ import org.apache.axis.encoding.TypeMappingRegistryImpl;
 import org.apache.axis.encoding.ser.BeanDeserializerFactory;
 import org.apache.axis.encoding.ser.BeanSerializerFactory;
 import org.apache.axis.handlers.soap.SOAPService;
-import org.apache.axis.providers.java.RPCProvider;
+import org.apache.axis.providers.java.JavaProvider;
 import org.apache.axis.wsdl.fromJava.Namespaces;
 import org.apache.axis.wsdl.fromJava.Types;
 import org.mule.config.i18n.Message;
@@ -28,6 +28,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.soap.ServiceProxy;
+import org.mule.providers.soap.axis.extensions.MuleMsgProvider;
 import org.mule.providers.soap.axis.extensions.MuleProvider;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -45,7 +46,7 @@ import java.util.Map;
 /**
  * <code>AxisMessageReceiver</code> is used to register a component as a
  * service with a Axis server.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -70,8 +71,17 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected void init() throws Exception
     {
         AxisProperties.setProperty("axis.doAutoTypes", "true");
-        service = new SOAPService(new MuleProvider(connector));
         MuleDescriptor descriptor = (MuleDescriptor) component.getDescriptor();
+        String style = (String) descriptor.getProperties().get("style");
+        //Check if the style is message. If so, we need to create
+        //a message oriented provider
+        if (style != null && style.equalsIgnoreCase("message")) {
+            logger.debug("Creating Message Provider");
+            service = new SOAPService(new MuleMsgProvider(connector));
+        } else {
+            logger.debug("Creating RPC Provider");
+            service = new SOAPService(new MuleProvider(connector));
+        }
 
         service.setEngine(connector.getAxisServer());
 
@@ -118,47 +128,47 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
         /*
          * Now we set up the various options for the SOAPService. We set:
-         * 
+         *
          * RPCProvider.OPTION_WSDL_SERVICEPORT In essense, this is our service
          * name
-         * 
+         *
          * RPCProvider.OPTION_CLASSNAME This tells the serverProvider (whether
          * it be an AvalonProvider or just JavaProvider) what class to load via
          * "makeNewServiceObject".
-         * 
+         *
          * RPCProvider.OPTION_SCOPE How long the object loaded via
          * "makeNewServiceObject" will persist - either request, session, or
          * application. We use the default for now.
-         * 
+         *
          * RPCProvider.OPTION_WSDL_TARGETNAMESPACE A namespace created from the
          * package name of the service.
-         * 
+         *
          * RPCProvider.OPTION_ALLOWEDMETHODS What methods the service can
          * execute on our class.
-         * 
+         *
          * We don't set: RPCProvider.OPTION_WSDL_PORTTYPE
          * RPCProvider.OPTION_WSDL_SERVICEELEMENT
          */
-        setOptionIfNotset(service, RPCProvider.OPTION_WSDL_SERVICEPORT, serviceName);
-        setOptionIfNotset(service, RPCProvider.OPTION_CLASSNAME, className);
-        setOptionIfNotset(service, RPCProvider.OPTION_SCOPE, "Request");
-        setOptionIfNotset(service, RPCProvider.OPTION_WSDL_TARGETNAMESPACE, namespace);
+        setOptionIfNotset(service, JavaProvider.OPTION_WSDL_SERVICEPORT, serviceName);
+        setOptionIfNotset(service, JavaProvider.OPTION_CLASSNAME, className);
+        setOptionIfNotset(service, JavaProvider.OPTION_SCOPE, "Request");
+        setOptionIfNotset(service, JavaProvider.OPTION_WSDL_TARGETNAMESPACE, namespace);
 
         // Set the allowed methods, allow all if there are none specified.
         if (methodNames == null) {
-            setOptionIfNotset(service, RPCProvider.OPTION_ALLOWEDMETHODS, "*");
+            setOptionIfNotset(service, JavaProvider.OPTION_ALLOWEDMETHODS, "*");
         } else {
-            setOptionIfNotset(service, RPCProvider.OPTION_ALLOWEDMETHODS, methodNames);
+            setOptionIfNotset(service, JavaProvider.OPTION_ALLOWEDMETHODS, methodNames);
         }
 
 
-        String style = (String) descriptor.getProperties().get("style");
+        //String style = (String) descriptor.getProperties().get("style");
         String use = (String) descriptor.getProperties().get("use");
         String doc = (String) descriptor.getProperties().get("documentation");
-
         // Note that Axis has specific rules to how these two variables are
         // combined. This is handled for us
         // Set style: RPC/wrapped/Doc/Message
+
         if (style != null) {
             Style s = Style.getStyle(style);
             if(s==null) {
@@ -243,8 +253,9 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     protected void setOptionIfNotset(SOAPService service, String option, Object value)
     {
         Object val = service.getOption(option);
-        if (val == null)
+        if (val == null) {
             service.setOption(option, value);
+        }
     }
 
     protected void registerTypes(TypeMappingRegistryImpl registry, List types) throws ClassNotFoundException
@@ -265,7 +276,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    SOAPService getService() {
+    public SOAPService getService() {
         return service;
     }
 }

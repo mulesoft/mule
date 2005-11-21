@@ -48,6 +48,10 @@ public class WSDDJavaMuleProvider extends WSDDProvider
     public org.apache.axis.Handler newProviderInstance(WSDDService wsddService, EngineConfiguration engineConfiguration)
             throws Exception
     {
+        String serviceStyle = wsddService.getStyle().toString();
+        if (serviceStyle.equals("message")) {
+            return new MuleMsgProvider(connector);
+        }
         return new MuleProvider(connector);
     }
 
