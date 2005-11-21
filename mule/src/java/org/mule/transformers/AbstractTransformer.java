@@ -87,7 +87,7 @@ public abstract class AbstractTransformer implements UMOTransformer
     protected void registerSourceType(Class aClass)
     {
         if (aClass.equals(Object.class)) {
-            logger.warn("java.lang.Object has been added as an exceptable sourcetype to this transformer, there will no source type checking on this transformer");
+            logger.warn("java.lang.Object has been added as an acceptable sourcetype for this transformer, there will be no source type checking performed");
         }
         sourceTypes.add(aClass);
     }
@@ -103,7 +103,7 @@ public abstract class AbstractTransformer implements UMOTransformer
     }
 
     /**
-     * @return
+     * @return transformer name
      */
     public String getName()
     {
@@ -150,13 +150,9 @@ public abstract class AbstractTransformer implements UMOTransformer
     public boolean isSourceTypeSupported(Class aClass, boolean exactMatch)
     {
         if (sourceTypes.isEmpty()) {
-            if(exactMatch) {
-                return false;
-            } else {
-                return true;
-            }
+            return !exactMatch;
         }
-        Class anotherClass = null;
+        Class anotherClass;
         for (Iterator i = getSourceTypeClassesIterator(); i.hasNext();) {
             anotherClass = (Class) i.next();
             if(exactMatch) {
@@ -178,7 +174,7 @@ public abstract class AbstractTransformer implements UMOTransformer
      */
     public final Object transform(Object src) throws TransformerException
     {
-        Object result = null;
+        Object result;
         if (src instanceof UMOMessage) {
             src = ((UMOMessage) src).getPayload();
         }
@@ -296,8 +292,6 @@ public abstract class AbstractTransformer implements UMOTransformer
             name = name.substring(i + 1);
         }
         return name;
-        // String temp = name.substring(0,3).toLowerCase();
-        // return temp + name.substring(3);
     }
 
     /**
