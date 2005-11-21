@@ -411,9 +411,16 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
     {
         // Create and reqister endpoints
         path += "/endpoint-identifiers/endpoint-identifier";
-        digester.addCallMethod(path, "registerEndpointIdentifier", 2);
-        digester.addCallParam(path, 0, "name");
-        digester.addCallParam(path, 1, "value");
+        digester.addRule(path, new Rule() {
+            private  PlaceholderProcessor processor = new PlaceholderProcessor();
+
+            public void begin(String s, String s1, Attributes attributes) throws Exception {
+                attributes = processor.processAttributes(attributes, s1);
+                String name = attributes.getValue("name");
+                String value = attributes.getValue("value");
+                ((UMOManager)digester.getRoot()).registerEndpointIdentifier(name, value);
+            }
+        });
     }
 
     protected void addTransactionManagerRules(Digester digester, String path) throws ConfigurationException
