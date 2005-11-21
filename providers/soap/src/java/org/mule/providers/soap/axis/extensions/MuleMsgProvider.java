@@ -94,11 +94,11 @@ public class MuleMsgProvider extends MsgProvider
         }
         OperationDesc operation = msgContext.getOperation();
         String methodSignature = operation.getMethod().toString().toLowerCase();
-        if (methodSignature.contains(METHOD_BODYARRAY)) {
+        if (methodSignature.indexOf(METHOD_BODYARRAY) != -1) {
             methodType = OperationDesc.MSG_METHOD_BODYARRAY;
-        } else if (methodSignature.contains(METHOD_ELEMENTARRAY)) {
+        } else if (methodSignature.indexOf(METHOD_ELEMENTARRAY) != -1) {
             methodType = OperationDesc.MSG_METHOD_ELEMENTARRAY;
-        } else if (methodSignature.contains(METHOD_DOCUMENT)) {
+        } else if (methodSignature.indexOf(METHOD_DOCUMENT) != -1) {
             methodType = OperationDesc.MSG_METHOD_DOCUMENT;
         } else {
             methodType = OperationDesc.MSG_METHOD_SOAPENVELOPE;
