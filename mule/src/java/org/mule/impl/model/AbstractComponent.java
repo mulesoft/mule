@@ -15,6 +15,7 @@
 package org.mule.impl.model;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -25,11 +26,18 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.RequestContext;
 import org.mule.impl.internal.notifications.ComponentNotification;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.umo.*;
+import org.mule.umo.ComponentException;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.util.ClassHelper;
 import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
@@ -308,6 +316,59 @@ public abstract class AbstractComponent implements UMOComponent {
             }
         }
         exceptionListener.exceptionThrown(e);
+    }
+
+    /**
+     * Provides a consistent mechanism for custom models to create components.
+     * @return
+     * @throws UMOException
+     */
+    protected Object createComponent() throws UMOException
+    {
+        UMOManager manager = MuleManager.getInstance();
+        Object impl = descriptor.getImplementation();
+        Object component = null;
+
+        if (impl instanceof String) {
+            String reference = impl.toString();
+
+            if (reference.startsWith(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL)) {
+                String refName = reference.substring(MuleDescriptor.IMPLEMENTATION_TYPE_LOCAL.length());
+                component = descriptor.getProperties().get(refName);
+                if (component == null) {
+                    throw new InitialisationException(new Message(Messages.NO_LOCAL_IMPL_X_SET_ON_DESCRIPTOR_X,
+                                                                  refName,
+                                                                  descriptor.getName()), this);
+                }
+            }
+
+            if (component == null) {
+                if (descriptor.isContainerManaged()) {
+                    component = manager.getContainerContext().getComponent(reference);
+                } else {
+                    try {
+                        component = ClassHelper.instanciateClass(reference, new Object[] {});
+                    } catch (Exception e) {
+                        throw new InitialisationException(new Message(Messages.CANT_INSTANCIATE_NON_CONTAINER_REF_X,
+                                                                      reference), e, descriptor);
+                    }
+                }
+            }
+            if(descriptor.isSingleton()) descriptor.setImplementation(component);
+        } else {
+            component = impl;
+        }
+
+        try {
+            BeanUtils.populate(component, descriptor.getProperties());
+        } catch (Exception e) {
+            throw new InitialisationException(new Message(Messages.FAILED_TO_SET_PROPERTIES_ON_X, "Component '"
+                    + descriptor.getName() + "'"), e, descriptor);
+        }
+        // Call any custom initialisers
+        descriptor.fireInitialisationCallbacks(component);
+
+        return component;
     }
 
     protected void doForceStop() throws UMOException {

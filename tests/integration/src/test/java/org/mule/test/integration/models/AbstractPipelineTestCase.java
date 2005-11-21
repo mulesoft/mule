@@ -13,22 +13,21 @@
  */
 package org.mule.test.integration.models;
 
-import org.mule.test.integration.IntegrationTestCase;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.QuickConfigurationBuilder;
+import org.mule.MuleManager;
 import org.mule.components.simple.EchoComponent;
 import org.mule.components.simple.StaticComponent;
+import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.umo.UMOMessage;
-import org.mule.tck.NamedTestCase;
-import org.mule.MuleManager;
 import org.mule.providers.vm.VMConnector;
+import org.mule.tck.NamedTestCase;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.model.UMOModel;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -55,6 +54,7 @@ public abstract class AbstractPipelineTestCase extends NamedTestCase
 
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder(true);
         builder.createStartedManager(true, "", getModelType());
+        configureModel(builder.getManager().getModel());
         builder.registerComponent(EchoComponent.class.getName(), "component1", "vm://component1", "vm://component2", null);
         builder.registerComponent(EchoComponent.class.getName(), "component2", "vm://component2", "vm://component3", null);
         Map props = new HashMap();
@@ -113,5 +113,9 @@ public abstract class AbstractPipelineTestCase extends NamedTestCase
             UMOMessage umoMessage = (UMOMessage) iterator.next();
             assertEquals("request received by component 3", umoMessage.getPayloadAsString());
         }
+    }
+
+    protected void configureModel(UMOModel model) {
+        
     }
 }
