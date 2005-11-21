@@ -23,6 +23,7 @@ import org.mule.impl.FailedToQueueEventException;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.model.AbstractComponent;
+import org.mule.impl.model.DefaultMuleProxy;
 import org.mule.impl.model.MuleProxy;
 import org.mule.umo.ComponentException;
 import org.mule.umo.UMOEvent;
@@ -50,9 +51,17 @@ import java.util.NoSuchElementException;
 public class SedaComponent extends AbstractComponent implements Work {
 
     /**
-     * A pool of available Mule Proxies
+     * A pool of available Mule Proxies. Component pooling has been disabled on the
+     * SEDAModel, this pool will be null anf the 'componentProxy' will be used.
      */
     protected ObjectPool proxyPool = null;
+
+    /**
+     * Is created only if component pooling is turned off on the SEDAModel.  in this
+     * scenario all requests are serviced by this component, unless 'componentPerRequest'
+     * flag is set on the model
+     */
+    protected MuleProxy componentProxy = null;
 
     protected UMOWorkManager workManager;
 
@@ -64,12 +73,24 @@ public class SedaComponent extends AbstractComponent implements Work {
     protected int queueTimeout = 0;
 
     /**
+     * Whether component objects should be pooled or a single instance should be used
+     */
+    protected boolean enablePooling = true;
+
+    /**
+     * If this is set to true a new component will be created for every request
+     */
+    protected boolean componentPerRequest = false;
+
+    /**
      * Default constructor
      */
     public SedaComponent(MuleDescriptor descriptor, SedaModel model) {
         super(descriptor, model);
         descriptorQueueName = descriptor.getName() + ".component";
         queueTimeout = model.getQueueTimeout();
+        enablePooling = model.isEnablePooling();
+        componentPerRequest = model.isComponentPerRequest();
     }
 
     /**
@@ -116,13 +137,37 @@ public class SedaComponent extends AbstractComponent implements Work {
         }
     }
 
+    protected MuleProxy createComponentProxy() throws InitialisationException {
+
+        try {
+            Object component = createComponent();
+            MuleProxy componentProxy = new DefaultMuleProxy(component, descriptor, null);
+            getStatistics().setComponentPoolSize(-1);
+            componentProxy.setStatistics(getStatistics());
+            componentProxy.start();
+            return componentProxy;
+        } catch (UMOException e) {
+            throw new InitialisationException(e, this);
+        }
+    }
 
     public void doForceStop() throws UMOException {
-        workManager.stop();
+        doStop();
     }
 
     public void doStop() throws UMOException {
         workManager.stop();
+        if(proxyPool!=null) {
+            try {
+                proxyPool.stop();
+                proxyPool.clearPool();
+            } catch (Exception e) {
+                logger.error("Failed to stop compoent pool: " + e.getMessage(), e);
+            }
+            poolInitialised.set(false);
+        } else if(componentProxy!=null) {
+            componentProxy.stop();
+        }
     }
 
     public void doStart() throws UMOException {
@@ -131,10 +176,12 @@ public class SedaComponent extends AbstractComponent implements Work {
             // Need to initialise the pool only after all listerner have
             // been
             // registed and initialised so we need to delay until now
-            if (!poolInitialised.get()) {
+            if (!poolInitialised.get() && enablePooling) {
                 initialisePool();
+                proxyPool.start();
+            } else if (!componentPerRequest) {
+                componentProxy = createComponentProxy();
             }
-            proxyPool.start();
             workManager.start();
             workManager.scheduleWork(this, WorkManager.INDEFINITE, null, null);
         } catch (Exception e) {
@@ -157,6 +204,8 @@ public class SedaComponent extends AbstractComponent implements Work {
         try {
             if (proxyPool != null) {
                 proxyPool.clearPool();
+            } else if (componentProxy!=null) {
+                componentProxy.dispose();
             }
         } catch (Exception e) {
             logger.error("Proxy Pool did not close properly: " + e);
@@ -199,8 +248,15 @@ public class SedaComponent extends AbstractComponent implements Work {
         UMOMessage result = null;
         MuleProxy proxy = null;
         try {
-            proxy = (MuleProxy) proxyPool.borrowObject();
-            getStatistics().setComponentPoolSize(proxyPool.getSize());
+            if(proxyPool!=null) {
+                proxy = (MuleProxy) proxyPool.borrowObject();
+                getStatistics().setComponentPoolSize(proxyPool.getSize());
+            } else if (componentPerRequest) {
+                proxy = createComponentProxy();
+            } else {
+                proxy = componentProxy;
+            }
+
             proxy.setStatistics(getStatistics());
 
             if (logger.isDebugEnabled()) {
@@ -213,13 +269,17 @@ public class SedaComponent extends AbstractComponent implements Work {
             throw new ComponentException(event.getMessage(), this, e);
         } finally {
             try {
-                if (proxy != null) {
+                if (proxy != null && proxyPool!=null) {
                     proxyPool.returnObject(proxy);
+                } else if (componentPerRequest) {
+                    proxy.dispose();
                 }
             } catch (Exception e) {
                 throw new ComponentException(event.getMessage(), this, e);
             }
-            getStatistics().setComponentPoolSize(proxyPool.getSize());
+            if(proxyPool!=null) {
+                getStatistics().setComponentPoolSize(proxyPool.getSize());
+            }
         }
         return result;
     }
@@ -269,15 +329,22 @@ public class SedaComponent extends AbstractComponent implements Work {
                                 + event.getEndpoint().getEndpointURI());
                     }
 
-                    proxy = (MuleProxy) proxyPool.borrowObject();
-                    getStatistics().setComponentPoolSize(proxyPool.getSize());
+                    if(proxyPool!=null) {
+                        proxy = (MuleProxy) proxyPool.borrowObject();
+                        getStatistics().setComponentPoolSize(proxyPool.getSize());
+                    } else if(componentPerRequest) {
+                        proxy = createComponentProxy();
+                    } else {
+                        proxy = componentProxy;
+                    }
+
                     proxy.setStatistics(getStatistics());
                     proxy.start();
                     proxy.onEvent(queueSession, event);
                     workManager.scheduleWork(proxy, WorkManager.INDEFINITE, null, null);
                 }
             } catch (Exception e) {
-                if (proxy != null) {
+                if (proxy != null && proxyPool!=null) {
                     try {
                         proxyPool.returnObject(proxy);
                     } catch (Exception e2) {
@@ -309,6 +376,9 @@ public class SedaComponent extends AbstractComponent implements Work {
                 }
             } finally {
             	stopping.set(false);
+                if(componentPerRequest) {
+                    proxy.dispose();
+                }
             }
         }
     }

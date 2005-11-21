@@ -51,7 +51,7 @@ public class PipelineComponent extends DirectComponent {
         super.doInitialise();
         Object component = null;
         try {
-            component = create();
+            component = createComponent();
         } catch (UMOException e) {
             throw new InitialisationException(e, this);
         }
