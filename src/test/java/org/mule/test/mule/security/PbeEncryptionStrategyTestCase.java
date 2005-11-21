@@ -30,29 +30,8 @@ public class PbeEncryptionStrategyTestCase extends NamedTestCase
 
         byte[] b = pbe.encrypt("hello".getBytes(), null);
 
+        assertNotSame(new String(b), "hello");
         String s = new String(pbe.decrypt(b, null), "UTF-8");
         assertEquals("hello", s);
-    }
-
-    public void testRoundTripEncryptionWithCharsetConversion() throws Exception
-    {
-        // PasswordBasedEncryptionStrategy pbe = new
-        // PasswordBasedEncryptionStrategy();
-        // pbe.setPassword("test");
-        // pbe.initialise();
-        //
-        // CharsetEncoder ce = new UnicodeEncoder(Charset)
-        // {
-        // protected CoderResult encodeLoop(CharBuffer in, ByteBuffer out)
-        // {
-        // return null;
-        // }
-        // };
-        // byte[] b = pbe.encrypt("hello".getBytes());
-        //
-        // String s1 = new String(b);
-        //
-        // String s= new String(pbe.decrypt(s1.getBytes()));
-        // assertEquals("hello", s);
     }
 }
