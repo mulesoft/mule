@@ -1,9 +1,9 @@
 /*
-* $Header: 
-* $Revision: 
-* $Date: 
+* $Header:
+* $Revision:
+* $Date:
 * ------------------------------------------------------------------------------------------------------
-* 
+*
  * Copyright (c) Lajos Moczar. All rights reserved.
  * http://www.galatea.com
  *
@@ -13,52 +13,51 @@
  */
 package org.mule.routing.outbound;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 import org.dom4j.XPath;
-import org.dom4j.DocumentHelper;
-
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.routing.outbound.AbstractMessageSplitter;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>FilteringXmlMessageSplitter</code> will split a DOM4J document
  * into nodes based on the "splitExpression" property.
- *
+ * <p/>
  * Optionally, you can specify a "namespaces" property map that contain
  * prefix/ns mappings
- *
+ * <p/>
  * Note that each part returned is actually returned as a new Document
- * 
+ *
  * @author <a href="mailto:lajos@galatea.com">Lajos Moczar</a>
- * @version 
  */
-public class FilteringXmlMessageSplitter extends AbstractMessageSplitter {
+public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
+{
     private Map properties;
-    private List nodes = null;
-    private org.dom4j.Document dom4jDoc;
+    private List nodes;
     private String splitExpression = "";
     private Map namespaces = null;
 
-    public void setSplitExpression(String splitExpression) {
-    	this.splitExpression = splitExpression;
+    public void setSplitExpression(String splitExpression)
+    {
+        this.splitExpression = splitExpression;
     }
-    
-    public void setNamespaces(Map namespaces) {
-    	this.namespaces = namespaces;
+
+    public void setNamespaces(Map namespaces)
+    {
+        this.namespaces = namespaces;
     }
-    
-    public String getSplitExpression() {
-    	return splitExpression;
+
+    public String getSplitExpression()
+    {
+        return splitExpression;
     }
-    
+
     /**
      * Template method can be used to split the message up before the
      * getMessagePart method is called .
@@ -67,39 +66,42 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter {
      */
     protected void initialise(UMOMessage message)
     {
-    	if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("splitExpression is " + splitExpression);
-    	}
-    	
-	Object src = message.getPayload();
-
-	try {
-	    if(src instanceof byte[]) {
-		src = new String((byte[])src);
-	    }
-
-	    Document dom4jDoc = null;
-
-	    if (src instanceof String) {
-		String xml = (String) src;
-		dom4jDoc = DocumentHelper.parseText(xml);
-	    } else if (src instanceof org.dom4j.Document) {
-		dom4jDoc = (org.dom4j.Document) src;
-	    } else {
-		logger.error("Non-xml message payload: " + 
-			src.getClass().toString());
-		return;
-	    }
-
-	    if (dom4jDoc != null) {
-		XPath xpath = dom4jDoc.createXPath(splitExpression);
-		if (namespaces != null) xpath.setNamespaceURIs( namespaces ); 
-		nodes = xpath.selectNodes( dom4jDoc );
-	    }
-        } catch (Exception e) {
-	    logger.error("Error spliting document with " + splitExpression, e);
         }
-        
+
+        Object src = message.getPayload();
+
+        try {
+            if (src instanceof byte[]) {
+                src = new String((byte[]) src);
+            }
+
+            Document dom4jDoc;
+
+            if (src instanceof String) {
+                String xml = (String) src;
+                dom4jDoc = DocumentHelper.parseText(xml);
+            } else if (src instanceof org.dom4j.Document) {
+                dom4jDoc = (org.dom4j.Document) src;
+            } else {
+                logger.error("Non-xml message payload: " + src.getClass().toString());
+                return;
+            }
+
+            if (dom4jDoc != null) {
+                XPath xpath = dom4jDoc.createXPath(splitExpression);
+                if (namespaces != null) xpath.setNamespaceURIs(namespaces);
+                {
+                    nodes = xpath.selectNodes(dom4jDoc);
+                }
+            } else {
+                logger.warn("Unsupported message type, ignoring");
+            }
+        } catch (Exception e) {
+            logger.error("Error spliting document with " + splitExpression, e);
+        }
+
         properties = message.getProperties();
     }
 
@@ -114,27 +116,27 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter {
      */
     protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
     {
-	if (nodes == null) {
-	    return null;
-	}
+        if (nodes == null) {
+            return null;
+        }
 
         for (int i = 0; i < nodes.size(); i++) {
-            Node node = (Node)nodes.get(i);
-            
+            Node node = (Node) nodes.get(i);
+
             try {
-	            UMOMessage result = new MuleMessage(DocumentHelper.parseText(node.asXML()), new HashMap(properties));
-	
-	            if (endpoint.getFilter() == null || endpoint.getFilter().accept(result)) {
-	                if (logger.isDebugEnabled()) {
-	                    logger.debug("Endpoint filter matched. Routing message over: "
-	                                 + endpoint.getEndpointURI().toString());
-	                }
-	                nodes.remove(i);
-	                return result;
-	            }
+                UMOMessage result = new MuleMessage(DocumentHelper.parseText(node.asXML()), new HashMap(properties));
+
+                if (endpoint.getFilter() == null || endpoint.getFilter().accept(result)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Endpoint filter matched. Routing message over: "
+                                + endpoint.getEndpointURI().toString());
+                    }
+                    nodes.remove(i);
+                    return result;
+                }
             } catch (Exception e) {
-            	logger.error("Unable to create message for node as position " + i, e);
-            	return null;
+                logger.error("Unable to create message for node as position " + i, e);
+                return null;
             }
         }
         return null;
