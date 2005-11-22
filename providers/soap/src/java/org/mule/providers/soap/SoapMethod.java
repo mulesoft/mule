@@ -77,7 +77,11 @@ public class SoapMethod {
                 String name = tokenizer.nextToken();
                 String type = tokenizer.nextToken();
                 if(name.equalsIgnoreCase("return")) {
-                    returnType = NamedParameter.createQName(type);
+                    if(type.startsWith("qname{")) {
+                        returnType = (QName)converter.convert(QName.class, type);
+                    } else {
+                        returnType = NamedParameter.createQName(type);
+                    }
                 } else if(name.equalsIgnoreCase("returnClass")) {
                     returnClass = ClassHelper.loadClass(type, getClass());
                 } else {
