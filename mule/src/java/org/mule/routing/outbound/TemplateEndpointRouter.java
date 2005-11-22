@@ -37,6 +37,8 @@ import java.util.Map;
  *
  * axis:http://localhost:8082/MyService?method=[SOAP_METHOD]
  *
+ * Note that Ant style property templates cannot be used in valid URI strings, so we must use Square braces instead
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
