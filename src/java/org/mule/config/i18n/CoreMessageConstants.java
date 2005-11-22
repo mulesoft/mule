@@ -212,4 +212,5 @@ public interface CoreMessageConstants
     //Post 1.2 message
     int SPACE_ACTION_X_INTERRUPTED=190;
     int SPACE_FAILED_TO_CREATE=191;
+    int SCHEME_CANT_CHANGE_FOR_ROUTER_X_X=192;
 }

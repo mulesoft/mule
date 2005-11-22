@@ -33,6 +33,8 @@ import java.util.regex.Pattern;
  */
 public class TemplateParser
 {
+    public static final String ANT_TEMPLATE_STYLE = "ant";
+    public static final String SQUARE_TEMPLATE_STYLE = "square";
     /**
      * logger used by this class
      */
@@ -41,23 +43,27 @@ public class TemplateParser
     private Pattern pattern = null;
     private int pre = 1;
     private int post = 1;
+    private String style = null;
 
 
     public static TemplateParser createAntStyleParser() {
-        return new TemplateParser("ant");
+        return new TemplateParser(ANT_TEMPLATE_STYLE);
     }
 
     public static TemplateParser createSquareBracesStyleParser() {
-        return new TemplateParser("square");
+        return new TemplateParser(SQUARE_TEMPLATE_STYLE);
     }
 
-    private TemplateParser(String type) {
-        if("ant".equals(type)) {
+    private TemplateParser(String style) {
+        if(ANT_TEMPLATE_STYLE.equals(style)) {
             pattern = Pattern.compile("\\$\\{[^\\}]+\\}");
             pre = 2;
-        } else if("square".equals(type)) {
+        } else if(SQUARE_TEMPLATE_STYLE.equals(style)) {
             pattern = Pattern.compile("\\[[^\\]]+\\]");
+        } else {
+            throw new IllegalArgumentException("Unknown template style: " + style);
         }
+        this.style = style;
     }
 
     /**
@@ -146,5 +152,9 @@ public class TemplateParser
 			return buffer.toString();
 		}
 	}
+
+    public String getStyle() {
+        return style;
+    }
 
 }
