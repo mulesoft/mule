@@ -1,4 +1,4 @@
-package org.mule.test.integration.providers.jms.oracle.util;
+package org.mule.providers.oracle.jms.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

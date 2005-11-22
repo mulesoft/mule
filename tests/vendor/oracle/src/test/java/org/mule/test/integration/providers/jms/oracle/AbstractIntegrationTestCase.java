@@ -3,6 +3,7 @@ package org.mule.test.integration.providers.jms.oracle;
 import oracle.jms.AQjmsSession;
 import org.mule.config.ReaderResource;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
+import org.mule.providers.oracle.jms.OracleJmsConnector;
 import org.mule.umo.manager.UMOManager;
 
 import java.io.StringReader;

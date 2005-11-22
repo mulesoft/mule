@@ -1,8 +1,10 @@
 package org.mule.test.integration.providers.jms.oracle;
 
 import oracle.AQ.AQException;
-import org.mule.test.integration.providers.jms.oracle.util.AQUtil;
-import org.mule.test.integration.providers.jms.oracle.util.MuleUtil;
+
+import org.mule.providers.oracle.jms.OracleJmsConnector;
+import org.mule.providers.oracle.jms.util.AQUtil;
+import org.mule.providers.oracle.jms.util.MuleUtil;
 import org.mule.umo.UMOException;
 import org.xml.sax.SAXException;
 

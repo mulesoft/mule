@@ -1,8 +1,8 @@
 package org.mule.test.integration.providers.jms.oracle;
 
-import org.mule.test.integration.providers.jms.oracle.util.AQUtil;
-import org.mule.test.integration.providers.jms.oracle.util.MuleUtil;
-import org.mule.test.integration.providers.jms.oracle.util.Util;
+import org.mule.providers.oracle.jms.util.AQUtil;
+import org.mule.providers.oracle.jms.util.MuleUtil;
+import org.mule.providers.oracle.jms.util.Util;
 
 /**
  * Tests the connector against a live Oracle database using native XML messages.
@@ -17,7 +17,7 @@ public class XmlPayloadIntegrationTestCase extends AbstractIntegrationTestCase {
 
 	    MuleUtil.sendXmlMessageToQueue(TestConfig.QUEUE_XML, TestConfig.XML_MESSAGE);
         assertXMLEqual(TestConfig.XML_MESSAGE, 
-        			 MuleUtil.receiveXmlMessageAsString(TestConfig.QUEUE_XML).trim());
+        			 MuleUtil.receiveXmlMessageAsString(TestConfig.QUEUE_XML));
 
         AQUtil.dropQueue(session, connector.getUsername(), TestConfig.QUEUE_XML, /*force*/false);
     }
