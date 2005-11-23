@@ -63,4 +63,6 @@ public interface JmsSupport
 
     void send(MessageProducer producer, Message message, Destination dest, boolean persistent, int priority, long ttl)
             throws JMSException;
+    
+    boolean supportsProperty(String property);
 }

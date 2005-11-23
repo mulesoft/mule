@@ -216,4 +216,11 @@ public class Jms11Support implements JmsSupport
                       priority,
                       ttl);
     }
+    
+    /** 
+     * This method may be overridden in case a certain JMS implementation does not support all the standard JMS properties.
+     */
+    public boolean supportsProperty(String property) {
+    	return true;
+    }
 }

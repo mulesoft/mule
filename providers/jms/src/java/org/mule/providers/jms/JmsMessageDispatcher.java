@@ -120,34 +120,38 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             }
 
             Destination replyTo = null;
-            Object tempReplyTo = event.removeProperty("JMSReplyTo");
-            if (tempReplyTo != null) {
-                if (tempReplyTo instanceof Destination) {
-                    replyTo = (Destination) tempReplyTo;
-                } else {
-                    boolean replyToTopic = false;
-                    String reply = tempReplyTo.toString();
-                    int i = reply.indexOf(":");
-                    if (i > -1) {
-                        String qtype = reply.substring(0, i);
-                        replyToTopic = "topic".equalsIgnoreCase(qtype);
-                        reply = reply.substring(i + 1);
-                    }
-                    replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
-                }
-            }
-            // Are we going to wait for a return event ?
-            if (remoteSync && replyTo == null) {
-                replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
-            }
-            // Set the replyTo property
-            if (replyTo != null) {
-                msg.setJMSReplyTo(replyTo);
-            }
-            
-            // Are we going to wait for a return event ?
-            if (remoteSync) {
-                consumer = connector.getJmsSupport().createConsumer(session, replyTo);
+            // Some JMS implementations might not support the ReplyTo property.
+            if (connector.getJmsSupport().supportsProperty("ReplyTo")) {
+
+            	Object tempReplyTo = event.removeProperty("JMSReplyTo");
+	            if (tempReplyTo != null) {
+	                if (tempReplyTo instanceof Destination) {
+	                    replyTo = (Destination) tempReplyTo;
+	                } else {
+	                    boolean replyToTopic = false;
+	                    String reply = tempReplyTo.toString();
+	                    int i = reply.indexOf(":");
+	                    if (i > -1) {
+	                        String qtype = reply.substring(0, i);
+	                        replyToTopic = "topic".equalsIgnoreCase(qtype);
+	                        reply = reply.substring(i + 1);
+	                    }
+	                    replyTo = connector.getJmsSupport().createDestination(session, reply, replyToTopic);
+	                }
+	            }
+	            // Are we going to wait for a return event ?
+	            if (remoteSync && replyTo == null) {
+	                replyTo = connector.getJmsSupport().createTemporaryDestination(session, topic);
+	            }
+	            // Set the replyTo property
+	            if (replyTo != null) {
+	                msg.setJMSReplyTo(replyTo);
+	            }
+	            
+	            // Are we going to wait for a return event ?
+	            if (remoteSync) {
+	                consumer = connector.getJmsSupport().createConsumer(session, replyTo);
+	            }
             }
 
             // QoS support

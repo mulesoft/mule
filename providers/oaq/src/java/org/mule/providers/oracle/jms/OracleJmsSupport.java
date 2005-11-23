@@ -63,6 +63,14 @@ public class OracleJmsSupport extends Jms102bSupport {
     						boolean jndiDestinations, boolean forceJndiDestinations) {
         super(connector, context, jndiDestinations, forceJndiDestinations);
     }
+
+    /** 
+     * Oracle throws a "JMS-102: Feature not supported" error if any of these
+     * "standard" properties are used.
+     */
+    public boolean supportsProperty(String property) {
+    	return (property.equalsIgnoreCase("ReplyTo") == false);
+    }
     
 	/** The Oracle JMS implementation requires a JDBC Connection to be created prior to 
      * creating the JMS Connection.
