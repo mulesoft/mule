@@ -1,23 +1,18 @@
 package org.mule.test.integration.providers.jms.oracle;
 
 /**
- * Contains the settings used for integration testing.  
- * You need to set these according to your Oracle database.
+ * Contains the settings used for testing against a live Oracle database.
  * 
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
 public abstract class TestConfig {
-
-	// Set these constants for your Oracle database.
-	public static String DB_URL = "jdbc:oracle:oci:@eaid";
-	public static String DB_USER = "eai";
-	public static String DB_PASSWORD = "eai";
 
 	// The following queues are created and dropped automatically by the integration
 	// tests.  You only need to change them if these names will create a conflict for 
 	// you.
 	public static String QUEUE_RAW = "TEST_RAW";
 	public static String QUEUE_TEXT = "TEST_TEXT";
+	public static String QUEUE_TEXT2 = "TEST_TEXT2";
     public static String QUEUE_XML = "TEST_XML";
 
     public static String TEXT_MESSAGE = "This is a text message.";

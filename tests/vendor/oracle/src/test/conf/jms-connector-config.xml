@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="TestConfiguration" version="1.0">
+		
+	<connector name="oracleJmsConnector" className="org.mule.providers.oracle.jms.OracleJmsConnector">
+	    <properties>
+			<property name="url" value="jdbc:oracle:oci:@eaid" /> 
+	        <property name="username" value="eai" />
+	        <property name="password" value="eai" />
+	    </properties>
+	</connector>
+
+    <transformers>
+        <transformer name="ObjectToJMSMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage"
+            returnClass="javax.jms.Message" />
+        <transformer name="JMSMessageToObject" className="org.mule.providers.jms.transformers.JMSMessageToObject"
+            returnClass="java.lang.Object" />
+    </transformers>
+</mule-configuration>

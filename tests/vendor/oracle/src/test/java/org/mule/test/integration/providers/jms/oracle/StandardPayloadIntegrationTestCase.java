@@ -15,6 +15,10 @@ import javax.jms.JMSException;
  */
 public class StandardPayloadIntegrationTestCase extends AbstractIntegrationTestCase {
     
+    protected String getConfigurationFiles() {
+    	return "jms-connector-config.xml";
+    }
+
     public void testCreateAndDropQueue() throws AQException, JMSException {	    
 	   AQUtil.createOrReplaceQueue(session, connector.getUsername(), TestConfig.QUEUE_RAW, "RAW");
 	   AQUtil.dropQueue(session, connector.getUsername(), TestConfig.QUEUE_RAW, /*force*/false);

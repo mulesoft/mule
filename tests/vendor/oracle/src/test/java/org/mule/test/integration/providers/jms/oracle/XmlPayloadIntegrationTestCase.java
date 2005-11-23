@@ -12,6 +12,10 @@ import org.mule.providers.oracle.jms.util.Util;
  */
 public class XmlPayloadIntegrationTestCase extends AbstractIntegrationTestCase {
     
+    protected String getConfigurationFiles() {
+    	return "jms-connector-config.xml, xml-transformers-config.xml";
+    }
+
     public void testSmallXmlMessage() throws Exception {
 	    AQUtil.createOrReplaceXmlQueue(session, connector.getUsername(), TestConfig.QUEUE_XML);
 
