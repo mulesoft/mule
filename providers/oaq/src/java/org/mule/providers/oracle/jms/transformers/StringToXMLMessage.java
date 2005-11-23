@@ -24,10 +24,10 @@ import oracle.jms.AdtMessage;
 import oracle.xdb.XMLType;
 
 import org.mule.config.i18n.Message;
+import org.mule.providers.oracle.jms.OracleJmsConnector;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOException;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.providers.oracle.jms.OracleJmsConnector;
 
 /**
  * Transformer for use with the Oracle Jms Connector.
@@ -44,6 +44,7 @@ public class StringToXMLMessage extends AbstractTransformer {
     public StringToXMLMessage() {
         super();
         registerSourceType(String.class);
+        registerSourceType(byte[].class);
         setReturnClass(AdtMessage.class);
     }
 
@@ -69,6 +70,9 @@ public class StringToXMLMessage extends AbstractTransformer {
             if (xml instanceof String) {
                 xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(),
                             		  		(String) xml);
+            } else if (xml instanceof byte[]) {
+                    xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(),
+                                		  		new String((byte[]) xml));
             } else {
             	throw new TransformerException(Message.createStaticMessage("Object to transform is not one of the supported types for this transformer."), this);
             }
