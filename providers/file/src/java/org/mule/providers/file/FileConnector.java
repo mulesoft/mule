@@ -146,9 +146,11 @@ public class FileConnector extends AbstractServiceEnabledConnector
             if (tempPolling != null) {
                 polling = Long.parseLong(tempPolling);
             }
-            Long tempFileAge = (Long) props.get(PROPERTY_FILE_AGE);
+            String tempFileAge = (String) props.get(PROPERTY_FILE_AGE);
             if (tempFileAge != null) {
-                setFileAge(tempFileAge.longValue());
+		try {
+		    setFileAge(Long.parseLong(tempFileAge));
+		} catch (Exception ex1) { }
             }
         }
         if (polling <= 0) {
