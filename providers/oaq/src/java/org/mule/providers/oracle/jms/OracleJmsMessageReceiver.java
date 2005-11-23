@@ -14,8 +14,10 @@
  */
 package org.mule.providers.oracle.jms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.providers.jms.JmsConnector;
-import org.mule.providers.jms.JmsMessageReceiver;
+import org.mule.providers.jms.TransactedJmsMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -24,7 +26,7 @@ import org.mule.umo.provider.UMOConnector;
 /**
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
-public class OracleJmsMessageReceiver extends JmsMessageReceiver {
+public class OracleJmsMessageReceiver extends TransactedJmsMessageReceiver {
 	
 	public OracleJmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint) throws InitialisationException {
 		super(connector, component, endpoint);
@@ -36,4 +38,11 @@ public class OracleJmsMessageReceiver extends JmsMessageReceiver {
     	((OracleJmsSupport) ((JmsConnector) getConnector()).getJmsSupport()).setEndpointProperties(endpoint.getProperties());
 		super.createConsumer();
 	}
+
+    public void poll() throws Exception {
+    	log.debug("Polling...");
+    	super.poll();
+    }
+
+    private static Log log = LogFactory.getLog(OracleJmsMessageReceiver.class);
 }
