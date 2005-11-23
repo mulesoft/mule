@@ -429,7 +429,7 @@ public class ConnectorServiceDescriptor
             return outboundTransformer;
         }
         if (getDefaultOutboundTransformer() != null) {
-            logger.info("Loading default outbound transformer: " + getDefaultInboundTransformer());
+            logger.info("Loading default outbound transformer: " + getDefaultOutboundTransformer());
             try {
                 outboundTransformer = (UMOTransformer) ClassHelper.instanciateClass(getDefaultOutboundTransformer(),
                                                                                     ClassHelper.NO_ARGS);
