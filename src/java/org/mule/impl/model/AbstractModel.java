@@ -358,11 +358,12 @@ public abstract class AbstractModel implements UMOModel
 
             for (Iterator i = components.values().iterator(); i.hasNext();) {
                 UMOComponent temp = (UMOComponent) i.next();
-                registerListeners(temp);
                 if(temp.getDescriptor().getInitialState().equals(ImmutableMuleDescriptor.INITIAL_STATE_STARTED)) {
+                    registerListeners(temp);
                     temp.start();
                     logger.info("Component " + temp + " has been started successfully");
                 } else if(temp.getDescriptor().getInitialState().equals(ImmutableMuleDescriptor.INITIAL_STATE_PAUSED)) {
+                    registerListeners(temp);
                     temp.start();
                     temp.pause();
                     logger.info("Component " + temp + " has an initial state of 'paused'");
