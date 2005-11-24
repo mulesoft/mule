@@ -32,7 +32,7 @@ public class HttpPostTestCase extends NamedTestCase {
     {
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/usecases/http/http-post.xml");
+        builder.configure("http-post.xml");
     }
 	
     public void testPost() throws Exception

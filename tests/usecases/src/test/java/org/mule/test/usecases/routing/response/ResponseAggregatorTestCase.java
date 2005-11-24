@@ -29,7 +29,7 @@ import java.util.Map;
 public class ResponseAggregatorTestCase extends FunctionalTestCase {
 
     protected String getConfigResources() {
-        return "org/mule/test/usecases/routing/response/response-router.xml";
+        return "response-router.xml";
     }
 
     public void testSyncResponse() throws Exception

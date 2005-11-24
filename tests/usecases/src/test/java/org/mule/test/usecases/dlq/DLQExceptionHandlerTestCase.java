@@ -32,7 +32,7 @@ public class DLQExceptionHandlerTestCase extends NamedTestCase
     {
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/usecases/dlq/exception-dlq.xml");
+        builder.configure("exception-dlq.xml");
     }
     public void testDLQ() throws Exception
     {

@@ -6,7 +6,7 @@
 <mule-configuration id="axis_test" version="1.0">
     <model name="test">
         <mule-descriptor name="BackOfficeImplBindingImplUMO"
-            implementation="org.mule.samples.hello.BackOfficeImplBindingImpl">
+            implementation="org.mule.test.usecases.axis.BackOfficeImplBindingImpl">
             <inbound-router>
                 <endpoint address="axis:http://localhost:8081/services"/>
             </inbound-router>

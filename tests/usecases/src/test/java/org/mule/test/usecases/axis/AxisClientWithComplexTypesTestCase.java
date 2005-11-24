@@ -43,7 +43,7 @@ public class AxisClientWithComplexTypesTestCase extends NamedTestCase
     {
         if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/usecases/axis/axis-client-test.xml");
+        builder.configure("axis-client-test.xml");
 
         trade = new Trade();
         trade.setAccountID(11);

@@ -27,7 +27,7 @@
                     <reply-to address="jms://queue_out"/>
 				</router>
 			</outbound-router>
-			<response-router stopProcessing="false" >
+			<response-router>
 				<endpoint address="jms://queue_out"/>
 				<router className="org.mule.test.usecases.service.DummyResponseAggregator"/>
 			</response-router>

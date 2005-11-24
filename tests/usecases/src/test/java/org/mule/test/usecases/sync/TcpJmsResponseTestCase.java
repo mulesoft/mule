@@ -29,7 +29,7 @@ public class TcpJmsResponseTestCase extends NamedTestCase {
     {
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/usecases/sync/tcp-jms-response.xml");
+        builder.configure("tcp-jms-response.xml");
     }
 
     public void testSyncResponse() throws Exception

@@ -29,7 +29,7 @@ public class TcpToFileTestCase extends NamedTestCase {
     {
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/usecases/sync/tcp-to-file.xml");
+        builder.configure("tcp-to-file.xml");
     }
 	
     public void testSyncResponse() throws Exception

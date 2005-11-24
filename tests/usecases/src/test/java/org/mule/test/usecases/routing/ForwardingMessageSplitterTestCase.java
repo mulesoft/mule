@@ -32,7 +32,7 @@ public class ForwardingMessageSplitterTestCase extends NamedTestCase
     {
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/usecases/routing/forwarding-message-splitter.xml");
+        builder.configure("forwarding-message-splitter.xml");
     }
 
     public void testSyncResponse() throws Exception

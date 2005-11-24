@@ -29,7 +29,7 @@ public class TcpSyncTestCase extends NamedTestCase {
     {
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/usecases/sync/tcp-sync.xml");
+        builder.configure("tcp-sync.xml");
     }
 	
     public void testSyncResponse() throws Exception

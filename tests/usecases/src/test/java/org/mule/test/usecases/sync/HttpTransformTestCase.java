@@ -33,7 +33,7 @@ public class HttpTransformTestCase extends NamedTestCase {
     {
         if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("org/mule/test/usecases/sync/http-transform.xml");
+        builder.configure("http-transform.xml");
     }
 	
     public void testTransform() throws Exception

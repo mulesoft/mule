@@ -68,7 +68,7 @@
                     </properties>
                 </router>
             </outbound-router>
-            <response-router stopProcessing="false" >
+            <response-router>
                 <endpoint address="vm://W10Response"></endpoint>
                 <router className="org.mule.test.usecases.service.DummyResponseAggregator">
                 </router>
