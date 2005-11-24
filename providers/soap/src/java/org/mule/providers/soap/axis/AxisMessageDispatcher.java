@@ -82,8 +82,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected SimpleProvider clientConfig;
 
+    protected AxisConnector connector;
     public AxisMessageDispatcher(AxisConnector connector) {
         super(connector);
+        this.connector = connector;
         AxisProperties.setProperty("axis.doAutoTypes", Boolean.toString(connector.isDoAutoTypes()));
         services = new HashMap();
         //Should be loading this from a WSDD but for some reason it is not working for me??
@@ -107,28 +109,25 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     }
 
     protected void createClientConfig() {
-        clientConfig = new SimpleProvider();
+        //clientConfig = connector.getClientProvider();
+        clientConfig = new SimpleProvider(connector.getClientProvider());
         Handler muleHandler = new MuleSoapHeadersHandler();
         SimpleChain reqHandler = new SimpleChain();
         SimpleChain respHandler = new SimpleChain();
         reqHandler.addHandler(muleHandler);
         respHandler.addHandler(muleHandler);
 
-        //Htpp
+        //Http
         Handler httppivot = new MuleHttpSender();
         Handler httptransport = new SimpleTargetedChain(reqHandler, httppivot, respHandler);
         clientConfig.deployTransport(HTTPTransport.DEFAULT_TRANSPORT_NAME, httptransport);
+        //all other
         Handler pivot = new UniversalSender();
         Handler transport = new SimpleTargetedChain(reqHandler, pivot, respHandler);
         clientConfig.deployTransport("MuleTransport", transport);
-//        Handler universalpivot = new UniversalSender();
-//        Handler universaltransport = new SimpleTargetedChain(reqHandler, universalpivot, respHandler);
-//        clientConfig.deployTransport("https", universaltransport);
-//        clientConfig.deployTransport("jms", universaltransport);
-//        clientConfig.deployTransport("xmpp", universaltransport);
-//        clientConfig.deployTransport("vm", universaltransport);
-//        clientConfig.deployTransport("smtp", universaltransport);
-//        clientConfig.deployTransport("pop3", universaltransport);
+//        SimpleProvider clientConfig2 = clientConfig;
+//        connector.getClientProvider()
+//        System.out.println("");
     }
 
     protected Service createService(UMOEvent event) throws Exception
@@ -224,8 +223,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             }
         }
 
-        Call call = (Call) getService(event).createCall();
-
+        Service service = getService(event);
+        Call call = (Call) service.createCall();
 
         String style = (String) event.getProperties().get("style");
         String use = (String) event.getProperties().get("use");
@@ -253,7 +252,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
         // set properties on the call from the endpoint properties
         BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
-        call.setTargetEndpointAddress(endpointUri.toString());
+        call.setTargetEndpointAddress(endpointUri.getAddress());
 
         //Set a custome method namespace if one is set.  This will be used forthe parameters too
         String methodNamespace = (String)event.getProperty(AxisConnector.METHOD_NAMESPACE_PROPERTY);

@@ -17,12 +17,9 @@ import org.apache.axis.AxisProperties;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.apache.axis.encoding.TypeMappingRegistryImpl;
-import org.apache.axis.encoding.ser.BeanDeserializerFactory;
-import org.apache.axis.encoding.ser.BeanSerializerFactory;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.providers.java.JavaProvider;
 import org.apache.axis.wsdl.fromJava.Namespaces;
-import org.apache.axis.wsdl.fromJava.Types;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
@@ -36,9 +33,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.ClassHelper;
 
-import javax.xml.namespace.QName;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +65,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
     protected void init() throws Exception
     {
-        AxisProperties.setProperty("axis.doAutoTypes", "true");
+        AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
         MuleDescriptor descriptor = (MuleDescriptor) component.getDescriptor();
         String style = (String) descriptor.getProperties().get("style");
         //Check if the style is message. If so, we need to create
@@ -194,13 +189,11 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // Handle complex bean type automatically
         // registry.setDoAutoTypes( true );
         // Axis 1.2 fix to handle autotypes properly
-        AxisProperties.setProperty("axis.doAutoTypes", "true");
+        AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
 
         // Load any explicitly defined bean types
         List types = (List) descriptor.getProperties().get("beanTypes");
-        registerTypes(registry, types);
-        // register any beantypes set on the connector for this service
-        registerTypes(registry, connector.getBeanTypes());
+        connector.registerTypes(registry, types);
 
         service.setName(serviceName);
 
@@ -255,24 +248,6 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         Object val = service.getOption(option);
         if (val == null) {
             service.setOption(option, value);
-        }
-    }
-
-    protected void registerTypes(TypeMappingRegistryImpl registry, List types) throws ClassNotFoundException
-    {
-        if (types != null) {
-            Class clazz;
-            for (Iterator iterator = types.iterator(); iterator.hasNext();) {
-                clazz = ClassHelper.loadClass(iterator.next().toString(), getClass());
-                String localName = Types.getLocalNameFromFullName(clazz.getName());
-                QName xmlType = new QName(Namespaces.makeNamespace(clazz.getName()),
-                                          localName);
-
-                registry.getDefaultTypeMapping().register(clazz,
-                                                          xmlType,
-                                                          new BeanSerializerFactory(clazz, xmlType),
-                                                          new BeanDeserializerFactory(clazz, xmlType));
-            }
         }
     }
 

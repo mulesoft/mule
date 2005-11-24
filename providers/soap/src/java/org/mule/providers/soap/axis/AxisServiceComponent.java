@@ -534,6 +534,8 @@ public class AxisServiceComponent implements Initialisable, Callable
             if (responseMsg == null)
                 throw new Exception(Messages.getMessage("noResponse01"));
         } catch (AxisFault fault) {
+            logger.error(fault, fault);
+            fault.printStackTrace(System.err);
             processAxisFault(fault);
             configureResponseFromAxisFault(response, fault);
             responseMsg = msgContext.getResponseMessage();

@@ -18,8 +18,13 @@ import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.deployment.wsdd.WSDDConstants;
 import org.apache.axis.deployment.wsdd.WSDDProvider;
+import org.apache.axis.encoding.TypeMappingRegistryImpl;
+import org.apache.axis.encoding.ser.BeanDeserializerFactory;
+import org.apache.axis.encoding.ser.BeanSerializerFactory;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.server.AxisServer;
+import org.apache.axis.wsdl.fromJava.Namespaces;
+import org.apache.axis.wsdl.fromJava.Types;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -33,6 +38,7 @@ import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.soap.axis.extensions.MuleConfigProvider;
 import org.mule.providers.soap.axis.extensions.MuleTransport;
+import org.mule.providers.soap.axis.extensions.WSDDFileProvider;
 import org.mule.providers.soap.axis.extensions.WSDDJavaMuleProvider;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
@@ -65,7 +71,7 @@ import java.util.Map;
  * @version $Revision$
  */
 public class AxisConnector extends AbstractServiceEnabledConnector implements ModelNotificationListener {
-    public static final QName QNAME_MULERPC_PROVIDER = new QName(WSDDConstants.URI_WSDD_JAVA, "Mule");
+    public static final QName QNAME_MULE_PROVIDER = new QName(WSDDConstants.URI_WSDD_JAVA, "Mule");
     public static final QName QNAME_MULE_TYPE_MAPPINGS = new QName("http://www.muleumo.org/ws/mappings", "Mule");
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
 
@@ -163,7 +169,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         axisServer.setOption("axis.doAutoTypes", new Boolean(doAutoTypes));
 
         // Register the Mule service serverProvider
-        WSDDProvider.registerProvider(QNAME_MULERPC_PROVIDER, new WSDDJavaMuleProvider(this));
+        WSDDProvider.registerProvider(QNAME_MULE_PROVIDER, new WSDDJavaMuleProvider(this));
 
         try {
             registerTransportTypes();
@@ -179,6 +185,12 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             handlerPkgs = "org.mule.providers.soap.axis.transport|" + handlerPkgs;
             System.setProperty("java.protocol.handler.pkgs", handlerPkgs);
             logger.debug("Setting java.protocol.handler.pkgs to: " + handlerPkgs);
+        }
+
+        try {
+            registerTypes((TypeMappingRegistryImpl)axisServer.getTypeMappingRegistry(), beanTypes);
+        } catch (ClassNotFoundException e) {
+            throw new InitialisationException(e, this);
         }
     }
 
@@ -211,7 +223,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         } else {
             is = ClassHelper.getResourceAsStream(config, getClass());
         }
-        FileProvider fileProvider = new FileProvider(config);
+        //Use our custom file provider that does not require services to be declared ni the WSDD.  Thi only affects the
+        //client side as the client will fallback to the FileProvider when invoking a service.
+        FileProvider fileProvider = new WSDDFileProvider(config);
         if (is != null) {
             fileProvider.setInputStream(is);
         } else {
@@ -536,5 +550,23 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     public void setDoAutoTypes(boolean doAutoTypes) {
         this.doAutoTypes = doAutoTypes;
+    }
+
+    void registerTypes(TypeMappingRegistryImpl registry, List types) throws ClassNotFoundException
+    {
+        if (types != null) {
+            Class clazz;
+            for (Iterator iterator = types.iterator(); iterator.hasNext();) {
+                clazz = ClassHelper.loadClass(iterator.next().toString(), getClass());
+                String localName = Types.getLocalNameFromFullName(clazz.getName());
+                QName xmlType = new QName(Namespaces.makeNamespace(clazz.getName()),
+                                          localName);
+
+                registry.getDefaultTypeMapping().register(clazz,
+                                                          xmlType,
+                                                          new BeanSerializerFactory(clazz, xmlType),
+                                                          new BeanDeserializerFactory(clazz, xmlType));
+            }
+        }
     }
 }
