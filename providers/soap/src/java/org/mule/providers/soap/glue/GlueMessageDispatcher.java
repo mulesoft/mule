@@ -13,6 +13,7 @@
  */
 package org.mule.providers.soap.glue;
 
+import electric.glue.context.ProxyContext;
 import electric.glue.context.ThreadContext;
 import electric.proxy.IProxy;
 import electric.registry.Registry;
@@ -34,25 +35,21 @@ import java.util.Map;
 /**
  * <code>GlueMessageDispatcher</code> will make web services calls using the
  * Glue inoking mechanism.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class GlueMessageDispatcher extends AbstractMessageDispatcher
-{
-    public GlueMessageDispatcher(AbstractConnector connector)
-    {
+public class GlueMessageDispatcher extends AbstractMessageDispatcher {
+    public GlueMessageDispatcher(AbstractConnector connector) {
         super(connector);
     }
 
-    public void doDispatch(UMOEvent event) throws Exception
-    {
+    public void doDispatch(UMOEvent event) throws Exception {
         doSend(event);
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception
-    {
+    public UMOMessage doSend(UMOEvent event) throws Exception {
         UMOEndpointURI endpointUri = event.getEndpoint().getEndpointURI();
         // if(!endpoint.startsWith("glue:")) {
         // endpoint = "glue:" + endpoint;
@@ -65,24 +62,33 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
             bindAddress = bindAddress.replaceAll("/" + method, ".wsdl/" + method);
         }
         int i = bindAddress.indexOf("?");
-        if(i > -1) {
-            bindAddress = bindAddress.substring(0,i);
+        if (i > -1) {
+            bindAddress = bindAddress.substring(0, i);
         }
-        proxy = Registry.bind(bindAddress);
+
+        //add credentials to the request
+        if (event.getCredentials() != null) {
+            ProxyContext context = new ProxyContext();
+            context.setAuthUser(event.getCredentials().getUsername());
+            context.setAuthPassword(new String(event.getCredentials().getPassword()));
+            proxy = Registry.bind(bindAddress, context);
+        } else {
+            proxy = Registry.bind(bindAddress);
+        }
 
         Object payload = event.getTransformedMessage();
         Object[] args;
         if (payload instanceof Object[]) {
             args = (Object[]) payload;
         } else {
-            args = new Object[] { payload };
+            args = new Object[]{payload};
         }
         if (event.getMessage().getReplyTo() != null) {
             ThreadContext.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, event.getMessage().getReplyTo());
         }
         if (event.getMessage().getCorrelationId() != null) {
             ThreadContext.setProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, event.getMessage()
-                                                                                        .getCorrelationId());
+                    .getCorrelationId());
         }
         try {
             Object result = proxy.invoke(method, args);
@@ -96,16 +102,15 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
+    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
         UMOEndpointURI ep = new MuleEndpointURI(endpointUri);
         Map params = ep.getParams();
         String method = (String) params.remove("method");
 
         String bindAddress = ep.getAddress();
         int i = bindAddress.indexOf("?");
-        if(i > -1) {
-            bindAddress = bindAddress.substring(0,i);
+        if (i > -1) {
+            bindAddress = bindAddress.substring(0, i);
         }
         IProxy proxy = Registry.bind(bindAddress);
         try {
@@ -116,17 +121,14 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    public Object getDelegateSession() throws UMOException
-    {
+    public Object getDelegateSession() throws UMOException {
         return null;
     }
 
-    public void doDispose()
-    {
+    public void doDispose() {
     }
 
-    protected String getMethod(String endpoint) throws MalformedEndpointException
-    {
+    protected String getMethod(String endpoint) throws MalformedEndpointException {
         int i = endpoint.lastIndexOf("/");
         String method = endpoint.substring(i + 1);
         if (method.indexOf(".wsdl") != -1) {
@@ -138,8 +140,7 @@ public class GlueMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected void setContext(UMOEvent event)
-    {
+    protected void setContext(UMOEvent event) {
         Object replyTo = event.getMessage().getReplyTo();
         if (replyTo != null) {
             ThreadContext.setProperty(MuleProperties.MULE_REPLY_TO_PROPERTY, replyTo);
