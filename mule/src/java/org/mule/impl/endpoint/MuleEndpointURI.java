@@ -338,7 +338,8 @@ public class MuleEndpointURI implements UMOEndpointURI
 
     public String toString()
     {
-        return (schemeMetaInfo == null ? "" : schemeMetaInfo + ":") + uri.toASCIIString();
+        return uri.toASCIIString();
+        //return (schemeMetaInfo == null ? "" : schemeMetaInfo + ":") + uri.toASCIIString();
     }
 
     public String getTransformers()
