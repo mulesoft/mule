@@ -25,6 +25,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.ObjectFilter;
@@ -416,13 +417,14 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     applicationEvent.getMuleEventContext().setStopFurtherProcessing(true);
                     applicationEvent.getMuleEventContext().dispatchEvent(message, endpoint);
                 } else {
+                    UMOSession session = new MuleSession(component, null);
+                    RequestContext.setEvent(new MuleEvent(message, endpoint, session, false));
                     // transform if necessary
                     if (endpoint.getTransformer() != null) {
                         message = new MuleMessage(endpoint.getTransformer().transform(applicationEvent.getSource()),
                                                   applicationEvent.getProperties());
                     }
                     UMOMessageDispatcher dispatcher = endpoint.getConnector().getDispatcher(endpoint.getEndpointURI().getAddress());
-                    UMOSession session = new MuleSession(component, null);
                     dispatcher.dispatch(new MuleEvent(message, endpoint, session, false));
                 }
             } catch (Exception e1) {
