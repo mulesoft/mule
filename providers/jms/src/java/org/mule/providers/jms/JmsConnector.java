@@ -37,7 +37,11 @@ import org.mule.umo.manager.UMOServerNotification;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassHelper;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.jms.XAConnectionFactory;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -115,36 +119,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     {
         super.doInitialise();
         MuleManager.getInstance().registerListener(this, getName());
-        try {
-            // If we have a connection factory, there is no need to initialise
-            // the JndiContext
-            if (connectionFactory == null || (connectionFactory != null && jndiInitialFactory != null)) {
-                initJndiContext();
-            } else {
-                // Set these to false so that the jndiContext
-                // will not be used by the JmsSupport classes
-                jndiDestinations = false;
-                forceJndiDestinations = false;
-            }
-
-            if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification)) {
-                jmsSupport = new Jms102bSupport(this, jndiContext, jndiDestinations, forceJndiDestinations);
-            } else {
-                jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);
-            }
-            if (connectionFactory == null) {
-            	connectionFactory = createConnectionFactory();
-            }
-            if (connectionFactoryProperties != null && !connectionFactoryProperties.isEmpty()) {
-                // apply connection factory properties
-                BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
-            }
-        } catch (Exception e) {
-            throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jms Connector"), e, this);
-        }
     }
-    
-    
+
     protected void initJndiContext() throws NamingException, InitialisationException
     {
         if (jndiContext == null) {
@@ -212,6 +188,34 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     public void doConnect() throws ConnectException 
     {
+        try {
+            // If we have a connection factory, there is no need to initialise
+            // the JndiContext
+            if (connectionFactory == null || (connectionFactory != null && jndiInitialFactory != null)) {
+                initJndiContext();
+            } else {
+                // Set these to false so that the jndiContext
+                // will not be used by the JmsSupport classes
+                jndiDestinations = false;
+                forceJndiDestinations = false;
+            }
+
+            if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification)) {
+                jmsSupport = new Jms102bSupport(this, jndiContext, jndiDestinations, forceJndiDestinations);
+            } else {
+                jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);
+            }
+            if (connectionFactory == null) {
+            	connectionFactory = createConnectionFactory();
+            }
+            if (connectionFactoryProperties != null && !connectionFactoryProperties.isEmpty()) {
+                // apply connection factory properties
+                BeanUtils.populateWithoutFail(connectionFactory, connectionFactoryProperties, true);
+            }
+        } catch (Exception e) {
+            throw new ConnectException(new Message(Messages.FAILED_TO_CREATE_X, "Jms Connector"), e, this);
+        }
+
     	try {
             connection = createConnection();
             if (started.get()) {
