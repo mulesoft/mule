@@ -68,4 +68,24 @@ public class DirectComponent extends AbstractComponent {
     protected void doDispatch(UMOEvent event) throws UMOException {
         proxy.onCall(event);
     }
+
+    protected void doStop() throws UMOException {
+        proxy.stop();
+    }
+
+    protected void doStart() throws UMOException {
+        proxy.start();
+    }
+
+    protected void doPause() {
+        proxy.suspend();
+    }
+
+    protected void doResume() {
+        proxy.resume();
+    }
+
+    protected void doDispose() {
+        proxy.dispose();
+    }
 }
