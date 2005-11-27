@@ -11,10 +11,11 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-package org.mule.test.integration.providers.jms;
+package org.mule.test.integration.providers.jms.activemq;
 
 import org.mule.providers.jms.JmsClientAcknowledgeTransactionFactory;
 import org.mule.providers.jms.JmsConnector;
+import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.provider.UMOConnector;

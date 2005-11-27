@@ -20,13 +20,22 @@ import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.testmodels.mule.TestConnector;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOSession;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.Utility;
+
+import java.io.File;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
@@ -54,7 +63,13 @@ public abstract class AbstractMuleTestCase extends NamedTestCase
         if (MuleManager.isInstanciated())
             MuleManager.getInstance().dispose();
 
+        try {
+            Utility.deleteTree(new File(MuleManager.getConfiguration().getWorkingDirectory()));
+        } catch (Exception e) {
+            
+        }
         MuleManager.setConfiguration(new MuleConfiguration());
+
     }
 
     protected void doSetUp() throws Exception {

@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
+    <bean id="jmsConnectionFactory" class="org.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL"><value>vm://localhost</value></property>
+		<property name="useEmbeddedBroker"><value>true</value></property>
+	</bean>
+
     <!-- the jms server connector config -->
 	<bean id="jmsConnector" class="org.mule.providers.jms.JmsConnector">
-       	<property name="connectionFactoryJndiName"><value>ConnectionFactory</value></property>
-       	<property name="jndiInitialFactory"><value>org.activemq.jndi.ActiveMQInitialContextFactory</value></property>
+       	<property name="connectionFactory"><ref local="jmsConnectionFactory"/></property>
        	<property name="specification"><value>1.1</value></property>
 		<property name="jndiProviderProperties">
 			<map>
-				<entry key="brokerURL"><value>tcp://localhost:61616</value></entry>
+				<entry key="brokerURL"><value>vm://localhost</value></entry>
 			</map>
 		</property>
 	</bean>

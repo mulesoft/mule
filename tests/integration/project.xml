@@ -13,6 +13,9 @@
     </dependencies>
     <build>
         <unitTest>
+            <includes>
+                <include>**/*TestCase.*</include>
+            </includes>
             <excludes>
                 <exclude>**/Abstract*.*</exclude>
                 <!-- requires a server -->
@@ -28,11 +31,19 @@
                 <!-- Seems to be a problem with the endpoint: TODO investigate -->
                 <exclude>**/JdbcTransactionalXAFunctionalTestCase.*</exclude>
 
-                <!-- The following tests fail is there is an ActiveMQ instance Running, otherwise they pass -->
-                <!-- XAJmsJdbcBridgeTestCase
-                     ReplyToChainIntegrationTestCase
-                     ReplyToChainIntegration2TestCase -->
+                <!-- requires a Jms server running -->
+                <exclude>**/ActiveMQJmsTransactionalFunctionalTestCase.*</exclude>
+                <exclude>**/ActiveMQJmsXATransactionFunctionalTestCase.*</exclude>
+                <exclude>**/JmsClientAcknowledgeTransactionFunctionalTestCase.*</exclude>
             </excludes>
+            <resources>
+                <resource>
+                    <directory>${basedir}/src/test/java</directory>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </resource>
+            </resources>
         </unitTest>
     </build>
 </project>

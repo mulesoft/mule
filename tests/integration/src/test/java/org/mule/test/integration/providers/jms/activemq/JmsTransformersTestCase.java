@@ -26,8 +26,9 @@
 
  */
 
-package org.mule.test.integration.providers.jms;
+package org.mule.test.integration.providers.jms.activemq;
 
+import org.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.RequestContext;
@@ -35,9 +36,13 @@ import org.mule.providers.jms.transformers.AbstractJmsTransformer;
 import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 
-import javax.jms.*;
+import javax.jms.BytesMessage;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.ObjectMessage;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 import java.io.File;
 import java.util.Map;
 import java.util.Properties;
@@ -59,18 +64,28 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
      */
     private static transient Log logger = LogFactory.getLog(JmsTransformersTestCase.class);
 
-    protected void doSetUp() throws Exception
-    {
-        if (session == null) {
-            session = JmsTestUtils.getSession(JmsTestUtils.getQueueConnection());
-        }
-    }
+    protected ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
 
-    protected void doTearDown() throws Exception
-    {
-        RequestContext.setEvent(null);
-        super.doTearDown();
-    }
+        protected void doSetUp() throws Exception {
+            factory = new ActiveMQConnectionFactory();
+            factory.setBrokerURL("vm://localhost");
+            factory.setUseEmbeddedBroker(false);
+            factory.start();
+
+            session = factory.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
+        }
+
+        protected void doTearDown() throws Exception {
+            RequestContext.setEvent(null);
+            try {
+                session.close();
+            } catch (JMSException e) {
+
+            }
+            factory.stop();
+            factory=null;
+            super.doTearDown();
+        }
 
     public void testTransObjectMessage() throws Exception
     {

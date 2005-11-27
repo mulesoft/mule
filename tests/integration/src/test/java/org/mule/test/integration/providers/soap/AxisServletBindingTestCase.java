@@ -107,5 +107,6 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
         UMOMessage result = client.send("http://localhost:" + HTTP_PORT + "/services/mycomponent?wsdl", null, props);
         assertNotNull(result);
         assertTrue(result.getPayloadAsString().indexOf("location=\"http://localhost:" + HTTP_PORT + "/services/mycomponent") > -1);
+        System.out.println(result.getPayloadAsString());
     }
 }

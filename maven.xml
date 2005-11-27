@@ -550,6 +550,20 @@
                 <fileset file="${mule.release.dist.dir}/mule-ra-${pom.currentVersion}.rar"/>
             </copy>
 
+            <!-- copy snapshot to the repo -->
+            <copy todir="${pom.siteDirectory}/../dist/jars">
+                <fileset file="${maven.build.dir}/mule-${pom.currentVersion}.jar"/>
+                <fileset file="${mule.release.dist.dir}/*.jar"/>
+            </copy>
+            <copy todir="${pom.siteDirectory}/../dist/rars">
+                <fileset file="${mule.release.dist.dir}/*.rar"/>
+            </copy>
+            <u:available file="${maven.build.dir}/distributions/mule-${pom.currentVersion}-site.tar.gz">
+                <delete dir="${pom.siteDirectory}/doc"/>
+                <untar src="${maven.build.dir}/distributions/mule-${pom.currentVersion}-site.tar.gz"
+                    dest="${pom.siteDirectory}" compression="gzip"/>
+            </u:available>
+
             <copy todir="${pom.siteDirectory}/../dist/dtds">
                 <fileset file="${mule.release.dist.dir}/*.dtd"/>
             </copy>

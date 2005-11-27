@@ -13,15 +13,14 @@
  */
 package org.mule.test.integration.providers.jms.activemq;
 
+import org.activemq.ActiveMQConnectionFactory;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsConstants;
 import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.jms.Connection;
 import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -30,21 +29,20 @@ import java.util.Properties;
 
 public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunctionalTestCase
 {
+    protected ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+
     public Connection getConnection() throws Exception
     {
-        // default to ActiveMq for Jms 1.1 support
-        Properties p = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
-        return JmsTestUtils.getQueueConnection(p);
+        factory.setUseEmbeddedBroker(true);
+        factory.setBrokerURL("vm://localhost");
+        return factory.createQueueConnection();
     }
 
     public UMOConnector createConnector() throws Exception
     {
         JmsConnector connector = new JmsConnector();
         connector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
-        Properties props = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
-
-        connector.setConnectionFactoryJndiName("JmsQueueConnectionFactory");
-        connector.setJndiProviderProperties(props);
+        connector.setConnectionFactory(factory);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
 

@@ -13,10 +13,9 @@
  */
 package org.mule.test.integration.client;
 
+import org.activemq.ActiveMQConnectionFactory;
 import org.mule.extras.client.MuleClient;
 import org.mule.tck.AbstractMuleTestCase;
-
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@cubis.co.uk">Ross Mason</a>
@@ -26,14 +25,11 @@ public class MultipleJmsConnectorsTestCase extends AbstractMuleTestCase
 {
     public void testMultipleJmsClientConnections() throws Exception
     {
+        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+        factory.setBrokerURL("vm://localhost");
         MuleClient client = new MuleClient();
-        client.setProperty("jms.connectionFactoryJndiName", "ConnectionFactory");
-        client.setProperty("jms.jndiInitialFactory", "org.activemq.jndi.ActiveMQInitialContextFactory");
+        client.setProperty("jms.connectionFactory", factory);
         client.setProperty("jms.specification", "1.1");
-        Properties props = new Properties();
-        props.put("brokerURL", "tcp://localhost:61616");
-        client.setProperty("jms.jndiProviderProperties", props);
-
         client.dispatch("jms://admin:admin@admin.queue?createConnector=ALWAYS", "testing", null);
         client.dispatch("jms://ross:ross@ross.queue?createConnector=ALWAYS", "testing", null);
 

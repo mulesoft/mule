@@ -516,7 +516,7 @@
             </excludes>
             <resources>
                 <resource>
-                    <directory>${basedir}/src/test/conf</directory>
+                    <directory>${basedir}/src/test</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>

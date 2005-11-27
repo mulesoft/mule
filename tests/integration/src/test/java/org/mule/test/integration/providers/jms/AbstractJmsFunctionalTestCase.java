@@ -13,14 +13,6 @@
  */
 package org.mule.test.integration.providers.jms;
 
-import java.util.HashMap;
-
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.QueueConnection;
-import javax.jms.TopicConnection;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -35,6 +27,13 @@ import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.QueueConnection;
+import javax.jms.TopicConnection;
+import java.util.HashMap;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -78,7 +77,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         callbackCalled = false;
         cnn = getConnection();
         cnn.start();
-        drainDestinations();
+        //drainDestinations();
         connector = createConnector();
         MuleManager.getInstance().registerConnector(connector);
         currentMsg = null;
@@ -93,17 +92,17 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         }
     }
 
-    protected void drainDestinations() throws Exception
-    {
-        if (!useTopics()) {
-            System.out.println("@@@@ Draining Queues @@@@");
-            JmsTestUtils.drainQueue((QueueConnection) cnn, getInDest().getAddress());
-            assertNull(receive(getInDest().getAddress(), 10));
-            JmsTestUtils.drainQueue((QueueConnection) cnn, getOutDest().getAddress());
-            assertNull(receive(getOutDest().getAddress(), 10));
-        }
-
-    }
+//    protected void drainDestinations() throws Exception
+//    {
+//        if (!useTopics()) {
+//            System.out.println("@@@@ Draining Queues @@@@");
+//            JmsTestUtils.drainQueue((QueueConnection) cnn, getInDest().getAddress());
+//            assertNull(receive(getInDest().getAddress(), 10));
+//            JmsTestUtils.drainQueue((QueueConnection) cnn, getOutDest().getAddress());
+//            assertNull(receive(getOutDest().getAddress(), 10));
+//        }
+//
+//    }
 
     public abstract Connection getConnection() throws Exception;
 

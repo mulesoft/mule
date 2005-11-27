@@ -32,7 +32,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage result = client.send("axis:http://localhost:38004/mule/services/mycomponent2?method=echo", "test", null);
+        UMOMessage result = client.send("axis:http://localhost:38104/mule/services/mycomponent2?method=echo", "test", null);
         assertNotNull(result);
         assertEquals("test", result.getPayloadAsString());
     }
@@ -41,7 +41,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        UMOMessage result = client.send("axis:http://localhost:38004/mule/services/mycomponent3?method=getPerson", "Fred", null);
+        UMOMessage result = client.send("axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Fred", null);
         assertNotNull(result);
         System.out.println(result.getPayload());
         assertTrue(result.getPayload() instanceof Person);
@@ -54,14 +54,14 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient();
 
         String[] args = new String[] { "Ross", "Mason" };
-        UMOMessage result = client.send("axis:http://localhost:38004/mule/services/mycomponent3?method=addPerson", args, null);
+        UMOMessage result = client.send("axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson", args, null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Ross", ((Person) result.getPayload()).getFirstName());
         assertEquals("Mason", ((Person) result.getPayload()).getLastName());
 
         // do a receive
-        result = client.send("axis:http://localhost:38004/mule/services/mycomponent3?method=getPerson", "Ross", null);
+        result = client.send("axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Ross", null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Ross", ((Person) result.getPayload()).getFirstName());
@@ -74,9 +74,9 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
         Person person = new Person( "Joe", "Blow");
-        String uri = "axis:http://localhost:38004/mule/services/mycomponent3?method=addPerson";
+        String uri = "axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson";
         client.send(uri, person, null);
-        uri = "axis:http://localhost:38004/mule/services/mycomponent3?method=getPerson";
+        uri = "axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson";
         UMOMessage result = client.send(uri, "Joe", null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
