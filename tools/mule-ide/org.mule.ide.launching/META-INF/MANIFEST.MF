@@ -1,19 +1,16 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Mule Configuration Launcher Plug-in
+Bundle-Name: Mule IDE Launching Plugin
 Bundle-SymbolicName: org.mule.ide.launching; singleton:=true
 Bundle-Version: 1.1.0
-Bundle-Vendor: Mule UMO
-Bundle-ClassPath: .
-Bundle-Localization: plugin
+Bundle-ClassPath: mule-launching.jar
 Bundle-Activator: org.mule.ide.launching.MuleLaunchPlugin
+Bundle-Vendor: Mule UMO
+Bundle-Localization: plugin
 Export-Package: org.mule.ide.launching
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.runtime.compatibility;resolution:=optional,
+Require-Bundle: org.eclipse.debug.core,
+ org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.core.resources,
- org.eclipse.debug.core,
- org.eclipse.jdt.debug,
  org.eclipse.jdt.launching,
  org.mule.ide.core
 Eclipse-AutoStart: true
