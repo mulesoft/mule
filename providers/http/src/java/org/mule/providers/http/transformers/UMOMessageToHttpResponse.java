@@ -17,9 +17,9 @@ import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
-import org.mule.providers.NullPayload;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
@@ -28,7 +28,9 @@ import org.mule.util.Utility;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>UMOMessageToHttpResponse</code> converts a UMOMEssage into an Http
@@ -66,10 +68,10 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         //connector if a response transformer is present
         if(src instanceof NullPayload) src = Utility.EMPTY_STRING;
         int status = context.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
-        String version = (String) context.getProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
+        String version = context.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
         String date = format.format(new Date());
         byte[] response = null;
-        String contentType = (String) context.getProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConnector.DEFAULT_CONTENT_TYPE);
+        String contentType = context.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConnector.DEFAULT_CONTENT_TYPE);
 
         if (src instanceof byte[]) {
             response = (byte[]) src;
