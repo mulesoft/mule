@@ -14,7 +14,6 @@
 -->
 
 <plugin>
-
      <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType

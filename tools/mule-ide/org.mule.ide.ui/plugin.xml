@@ -13,8 +13,7 @@
  * the LICENSE.txt file.
 -->
 <plugin>
-
-   <extension
+     <extension
          point="org.eclipse.ui.preferencePages">
       <page
             class="org.mule.ide.ui.preferences.MulePreferencePage"
