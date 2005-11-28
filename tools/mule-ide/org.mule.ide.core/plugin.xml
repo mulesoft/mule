@@ -14,7 +14,7 @@
 -->
 
 <plugin>
-   <extension
+     <extension
          id="xmlProblem"
          name="Mule Configuration File Problem"
          point="org.eclipse.core.resources.markers">
