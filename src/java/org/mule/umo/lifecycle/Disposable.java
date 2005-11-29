@@ -26,9 +26,9 @@ package org.mule.umo.lifecycle;
 public interface Disposable
 {
     /**
-     * A lifecycle method where implementor should fee up any resources If an
+     * A lifecycle method where implementor should free up any resources. If an
      * exception is thrown it should just be logged and processing should
-     * continue. This method should not throw Runtime exceptions
+     * continue. This method should not throw Runtime exceptions.
      */
     void dispose();
 }
