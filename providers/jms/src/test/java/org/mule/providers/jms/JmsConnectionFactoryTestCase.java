@@ -6,6 +6,8 @@ import org.mule.tck.AbstractMuleTestCase;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,6 +65,7 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
         connector.setConnectionFactory(cf);
 
         connector.initialise();
+        connector.startConnector();
 
         assertEquals(
                 "ConnectionFactory properties should be passed to the ConnectionFactory.",
@@ -70,7 +73,7 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
                 ((TestConnectionFactory) cf).getConnectionFactoryProperty());
     }
 
-    public static final class TestConnectionFactory implements ConnectionFactory
+    public static final class TestConnectionFactory implements QueueConnectionFactory
     {
         private String providerProperty = "NOT_SET";
         private String connectionFactoryProperty = "NOT_SET";
@@ -109,6 +112,16 @@ public class JmsConnectionFactoryTestCase extends AbstractMuleTestCase
         public void setConnectionFactoryProperty(final String connectionFactoryProperty)
         {
             this.connectionFactoryProperty = connectionFactoryProperty;
+        }
+
+        public QueueConnection createQueueConnection() throws JMSException
+        {
+            return null;
+        }
+
+        public QueueConnection createQueueConnection(String string, String string1) throws JMSException
+        {
+            return null;
         }
     }
 }
