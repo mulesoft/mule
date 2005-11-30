@@ -187,7 +187,7 @@ public abstract class AbstractResourceManager
             doBegin(context);
             context.status = Status.STATUS_ACTIVE;
             if (logger.isDebugEnabled()) {
-                logger.debug("Begun transaction " + context);
+                logger.debug("Began transaction " + context);
             }
         }
         globalTransactions.add(context);
