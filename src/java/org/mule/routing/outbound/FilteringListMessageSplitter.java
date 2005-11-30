@@ -57,7 +57,7 @@ public class FilteringListMessageSplitter extends AbstractMessageSplitter
             }
         } else
         {
-            throw new IllegalArgumentException("The payload for this router must be of type java.util.list");
+            throw new IllegalArgumentException("The payload for this router must be of type java.util.List");
         }
         // Cache the properties here because for some message types getting the
         // properties
