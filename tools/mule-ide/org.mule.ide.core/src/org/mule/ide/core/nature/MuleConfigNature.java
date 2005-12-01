@@ -15,21 +15,56 @@
 
 package org.mule.ide.core.nature;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Collections;
+import java.util.Iterator;
+
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.mule.ide.ConfigFileType;
+import org.mule.ide.DocumentRoot;
+import org.mule.ide.MuleIDEFactory;
+import org.mule.ide.MuleIdeConfigType;
+import org.mule.ide.core.IMuleDefaults;
+import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.builder.MuleConfigBuilder;
+import org.mule.ide.core.model.IMuleModel;
+import org.mule.ide.internal.core.model.MuleConfiguration;
+import org.mule.ide.internal.core.model.MuleModel;
+import org.mule.ide.util.MuleIDEResourceFactoryImpl;
 
 public class MuleConfigNature implements IProjectNature {
 
-	/**
-	 * ID of this project nature
-	 */
-	public static final String NATURE_ID = "org.mule.ide.core.muleConfigNature";
-
+	/** The parent project */
 	private IProject project;
+
+	/** The mule model for this project */
+	private IMuleModel muleModel;
+
+	/** Error message for marker when config file can not be created */
+	private static final String ERROR_CREATING_CONFIG_FILE = "Could not create Mule IDE configuration file.";
+
+	/** Error message for marker when config file can not be read */
+	private static final String ERROR_READING_CONFIG_FILE = "Could not read Mule IDE configuration file.";
+
+	/** Error message for marker when config file elements can not be loaded */
+	private static final String ERROR_LOADING_CONFIGS = "One or more configuration elements could not be loaded.";
+
+	/** ID of this project nature */
+	public static final String NATURE_ID = "org.mule.ide.core.muleConfigNature";
 
 	/*
 	 * (non-Javadoc)
@@ -67,12 +102,111 @@ public class MuleConfigNature implements IProjectNature {
 			if (commands[i].getBuilderName().equals(MuleConfigBuilder.BUILDER_ID)) {
 				ICommand[] newCommands = new ICommand[commands.length - 1];
 				System.arraycopy(commands, 0, newCommands, 0, i);
-				System.arraycopy(commands, i + 1, newCommands, i,
-						commands.length - i - 1);
+				System.arraycopy(commands, i + 1, newCommands, i, commands.length - i - 1);
 				description.setBuildSpec(newCommands);
 				return;
 			}
 		}
+	}
+
+	/**
+	 * Get the Mule IDE model (lazy init)
+	 * 
+	 * @return the model
+	 */
+	public IMuleModel getMuleModel() {
+		if (muleModel == null) {
+			reloadModel();
+		}
+		return muleModel;
+	}
+
+	/**
+	 * If the Mule IDE config file does not exist, create it.
+	 */
+	protected void createConfigFileIfNeeded() {
+		IFile file = getProject().getFile(IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
+		if (!file.exists()) {
+			try {
+				URI uri = URI.createFileURI(getProject().getLocation().toString() + IPath.SEPARATOR
+						+ IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
+				Resource resource = (new MuleIDEResourceFactoryImpl()).createResource(uri);
+				DocumentRoot root = MuleIDEFactory.eINSTANCE.createDocumentRoot();
+				MuleIdeConfigType config = MuleIDEFactory.eINSTANCE.createMuleIdeConfigType();
+				root.setMuleIdeConfig(config);
+				resource.getContents().add(root);
+				ByteArrayOutputStream output = new ByteArrayOutputStream();
+				resource.save(output, Collections.EMPTY_MAP);
+				ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+				file.create(input, true, new NullProgressMonitor());
+			} catch (Exception e) {
+				MuleCorePlugin.getDefault().createMarker(getProject(), IMarker.SEVERITY_ERROR,
+						ERROR_CREATING_CONFIG_FILE);
+				MuleCorePlugin.getDefault().logException(ERROR_CREATING_CONFIG_FILE, e);
+			}
+		}
+	}
+
+	/**
+	 * Reloads the model from the config file.
+	 */
+	public void reloadModel() {
+		IFile file = getProject().getFile(IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
+		if (file.exists()) {
+			try {
+				URI uri = URI.createFileURI(getProject().getLocation().toString() + IPath.SEPARATOR
+						+ IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
+				Resource resource = (new MuleIDEResourceFactoryImpl()).createResource(uri);
+				resource.load(Collections.EMPTY_MAP);
+				if (resource.getContents().isEmpty()) {
+					MuleCorePlugin.getDefault().createMarker(getProject(), IMarker.SEVERITY_ERROR,
+							ERROR_READING_CONFIG_FILE);
+				} else {
+					DocumentRoot root = (DocumentRoot) resource.getContents().get(0);
+					MuleIdeConfigType config = root.getMuleIdeConfig();
+					if (config != null) {
+						this.muleModel = refreshModel(config);
+					}
+				}
+			} catch (Exception e) {
+				MuleCorePlugin.getDefault().createMarker(getProject(), IMarker.SEVERITY_ERROR,
+						ERROR_READING_CONFIG_FILE);
+				MuleCorePlugin.getDefault().logException(ERROR_READING_CONFIG_FILE, e);
+			}
+		}
+	}
+
+	/**
+	 * Refreshes the contents of the model using the given EMF model.
+	 * 
+	 * @param emfModel the EMF model.
+	 * @return the wrapped model
+	 */
+	protected IMuleModel refreshModel(MuleIdeConfigType emfModel) {
+		MultiStatus multi = MuleCorePlugin.getDefault().createMultiStatus(ERROR_LOADING_CONFIGS);
+		MuleModel model = new MuleModel(getProject());
+		EList configFiles = emfModel.getConfigFile();
+		MuleCorePlugin.getDefault().clearMarkers(getProject());
+		Iterator it = configFiles.iterator();
+		while (it.hasNext()) {
+			ConfigFileType configFile = (ConfigFileType) it.next();
+			MuleConfiguration modelConfig = new MuleConfiguration(model, configFile.getId(),
+					configFile.getDescription(), configFile.getPath());
+			IStatus status = modelConfig.refresh();
+			model.addMuleConfiguration(modelConfig);
+
+			// Create an error marker on the project.
+			if (!status.isOK()) {
+				multi.add(status);
+				MuleCorePlugin.getDefault().createMarker(getProject(), IMarker.SEVERITY_ERROR,
+						status.getMessage());
+			}
+		}
+		// Add all errors and stack traces to error log.
+		if (!multi.isOK()) {
+			MuleCorePlugin.getDefault().getLog().log(multi);
+		}
+		return model;
 	}
 
 	/*
@@ -91,6 +225,6 @@ public class MuleConfigNature implements IProjectNature {
 	 */
 	public void setProject(IProject project) {
 		this.project = project;
+		createConfigFileIfNeeded();
 	}
-
 }

@@ -15,6 +15,14 @@
 
 package org.mule.ide.core.builder;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -27,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.mule.ide.core.MuleCorePlugin;
 import org.osgi.framework.Bundle;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -34,20 +43,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Map;
-
 public class MuleConfigBuilder extends IncrementalProjectBuilder {
 
 	public static final String BUILDER_ID = "org.mule.ide.core.muleConfig";
 	public static final String PLUGIN_ID = "org.mule.ide.core";
 
-	private static final String MARKER_TYPE = "org.mule.ide.core.xmlProblem";
 	private static final String SYMPHONY_SOFT_DTD_MULE_CONFIGURATION_XML_V1_0_EN = "-//SymphonySoft //DTD mule-configuration XML V1.0//EN";
 	private static final String HTTP_WWW_SYMPHONYSOFT_COM_DTDS_MULE = "http://www.symphonysoft.com/dtds/mule/";
 	
@@ -189,7 +189,7 @@ public class MuleConfigBuilder extends IncrementalProjectBuilder {
 	private void addMarker(IFile file, String message, int lineNumber,
 			int severity) {
 		try {
-			IMarker marker = file.createMarker(MARKER_TYPE);
+			IMarker marker = file.createMarker(MuleCorePlugin.MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, severity);
 			if (lineNumber == -1) {
@@ -247,7 +247,7 @@ public class MuleConfigBuilder extends IncrementalProjectBuilder {
 
 	private void deleteMarkers(IFile file) {
 		try {
-			file.deleteMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
+			file.deleteMarkers(MuleCorePlugin.MARKER_TYPE, false, IResource.DEPTH_ZERO);
 		} catch (CoreException ce) {
 		}
 	}

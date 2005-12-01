@@ -1,0 +1,189 @@
+/*
+ * $Header$
+ * $Revision$
+ * $Date$
+ */
+package org.mule.ide.internal.core.model;
+
+import java.util.Collections;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.mule.ide.core.MuleCorePlugin;
+import org.mule.ide.core.model.IMuleConfiguration;
+import org.mule.ide.core.model.IMuleModel;
+import org.mule.schema.DocumentRoot;
+import org.mule.schema.MuleConfigurationType;
+import org.mule.schema.util.SchemaResourceFactoryImpl;
+
+/**
+ * Default Mule configuration implementation.
+ */
+public class MuleConfiguration implements IMuleConfiguration {
+
+	/** The parent model */
+	private IMuleModel parent;
+
+	/** Unique id */
+	private String id;
+
+	/** Description */
+	private String description;
+
+	/** The relative path to the config file */
+	private String relativePath;
+
+	/** Project relative path to config file */
+	private IPath filePath;
+
+	/** The resource handle for the EMF config */
+	private Resource resource;
+
+	/** Indicates whether the config was resolved and loaded */
+	private IStatus status = Status.OK_STATUS;
+
+	/** Error indicating that a config file was not found */
+	private static final String ERROR_CONFIG_NOT_FOUND = "The configuration file was not found: ";
+
+	/** Error indicating that a config file was not able to be loaded */
+	private static final String ERROR_LOADING_CONFIG = "Unable to load config file: ";
+
+	/**
+	 * Create a new Mule configuration.
+	 * 
+	 * @param parent the parent model
+	 * @param id the unique id
+	 * @param description the description
+	 * @param relativePath the project-relative path to the config file
+	 */
+	public MuleConfiguration(IMuleModel parent, String id, String description, String relativePath) {
+		this.parent = parent;
+		this.setId(id);
+		this.setDescription(description);
+		this.relativePath = relativePath;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfiguration#refresh()
+	 */
+	public IStatus refresh() {
+		setStatus(Status.OK_STATUS);
+		IFile configFile = parent.getProject().getFile(relativePath);
+		setFilePath(configFile.getFullPath());
+		if (!configFile.exists()) {
+			setResource(null);
+			setStatus(MuleCorePlugin.getDefault().createErrorStatus(
+					ERROR_CONFIG_NOT_FOUND + relativePath, null));
+		} else {
+			try {
+				// Only load the EMF resource once, after that just call load()
+				if (getResource() == null) {
+					URI uri = URI.createFileURI(parent.getProject().getLocation().toString()
+							+ IPath.SEPARATOR + relativePath);
+					setResource((new SchemaResourceFactoryImpl()).createResource(uri));
+				}
+				getResource().load(Collections.EMPTY_MAP);
+			} catch (Exception e) {
+				setStatus(MuleCorePlugin.getDefault().createErrorStatus(
+						ERROR_LOADING_CONFIG + relativePath, e));
+			}
+		}
+		return getStatus();
+	}
+
+	/**
+	 * Sets the 'id' field.
+	 * 
+	 * @param id The 'id' value.
+	 */
+	protected void setId(String id) {
+		this.id = id;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfiguration#getId()
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * Sets the 'description' field.
+	 * 
+	 * @param description The 'description' value.
+	 */
+	protected void setDescription(String description) {
+		this.description = description;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfiguration#getDescription()
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * Sets the 'filePath' field.
+	 * 
+	 * @param filePath The 'filePath' value.
+	 */
+	protected void setFilePath(IPath filePath) {
+		this.filePath = filePath;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfiguration#getFilePath()
+	 */
+	public IPath getFilePath() {
+		return filePath;
+	}
+
+	/**
+	 * Sets the 'status' field.
+	 * 
+	 * @param status The 'status' value.
+	 */
+	protected void setStatus(IStatus status) {
+		this.status = status;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfiguration#getStatus()
+	 */
+	public IStatus getStatus() {
+		return status;
+	}
+
+	/**
+	 * Sets the 'resource' field.
+	 * 
+	 * @param resource The 'resource' value.
+	 */
+	protected void setResource(Resource resource) {
+		this.resource = resource;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfiguration#getResource()
+	 */
+	public Resource getResource() {
+		return resource;
+	}
+}
