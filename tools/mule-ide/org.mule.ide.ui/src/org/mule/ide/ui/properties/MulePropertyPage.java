@@ -37,10 +37,11 @@ import org.mule.ide.ui.MulePlugin;
 public class MulePropertyPage extends PropertyPage {
 
 	private static final String PATH_TITLE = "Path:";
+
 	private static final String NATURE_TITLE = "&Mule UMO project";
 
 	private Button hasNatureButton;
-	
+
 	/**
 	 * Constructor for SamplePropertyPage.
 	 */
@@ -51,7 +52,7 @@ public class MulePropertyPage extends PropertyPage {
 	private void addFirstSection(Composite parent) {
 		Composite composite = createDefaultComposite(parent);
 
-		//Label for path field
+		// Label for path field
 		Label pathLabel = new Label(composite, SWT.NONE);
 		pathLabel.setText(PATH_TITLE);
 
@@ -115,11 +116,12 @@ public class MulePropertyPage extends PropertyPage {
 		// Populate the owner text field with the default value
 		hasNatureButton.setSelection(hasMuleNature());
 	}
-	
+
 	public boolean hasMuleNature() {
 		try {
-			IProject project = getProject(getElement()); 
-			if (project == null) return false;
+			IProject project = getProject(getElement());
+			if (project == null)
+				return false;
 			return project.hasNature(MuleConfigNature.NATURE_ID);
 		} catch (CoreException e) {
 			log("Can't determine nature of project", e);
@@ -133,20 +135,21 @@ public class MulePropertyPage extends PropertyPage {
 	 * @param excep
 	 */
 	private void log(String message, CoreException excep) {
-		MulePlugin.getDefault().getLog().log(new Status(IStatus.ERROR, MulePlugin.PLUGIN_ID, IStatus.OK, 
-				message, excep));
+		MulePlugin.getDefault().getLog().log(
+				new Status(IStatus.ERROR, MulePlugin.PLUGIN_ID, IStatus.OK, message, excep));
 	}
-	
+
 	protected IProject getProject(IAdaptable element) {
 		if (element instanceof IProject) {
 			return (IProject) element;
-		} else  {
+		} else {
 			return (IProject) (element.getAdapter(IProject.class));
 		}
 	}
-	
+
 	/**
-	 * Sets or clears the Mule UMO Configuration nature to this project 
+	 * Sets or clears the Mule UMO Configuration nature to this project
+	 * 
 	 * @param setIt True if the nature should be added, false if it should be removed
 	 * @throws CoreException
 	 */
@@ -154,17 +157,18 @@ public class MulePropertyPage extends PropertyPage {
 
 		try {
 			IProject project = getProject(getElement());
-			if (project == null) return;
+			if (project == null)
+				return;
 			MuleCorePlugin.getDefault().setMuleNature(project, setIt);
 		} catch (CoreException e) {
 			log("Can't set the project description", e);
 		}
 	}
-	
+
 	public boolean performOk() {
 		// store the value in the owner text field
 		setMuleNature(hasNatureButton.getSelection());
+		MuleCorePlugin.getDefault().getMuleModel(getProject(getElement()));
 		return true;
 	}
-
 }
