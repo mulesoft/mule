@@ -208,4 +208,13 @@ public class MuleModel implements IMuleModel {
 	public IProject getProject() {
 		return this.project;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleModelElement#getMuleModel()
+	 */
+	public IMuleModel getMuleModel() {
+		return this;
+	}
 }

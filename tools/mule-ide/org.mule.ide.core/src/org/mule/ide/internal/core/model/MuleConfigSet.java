@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mule.ide.core.model.IMuleConfigSet;
+import org.mule.ide.core.model.IMuleModel;
 
 /**
  * Default Mule config set implementation.
@@ -65,5 +66,14 @@ public class MuleConfigSet implements IMuleConfigSet {
 	 */
 	public List getMuleConfigurations() {
 		return this.muleConfigurations;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleModelElement#getMuleModel()
+	 */
+	public IMuleModel getMuleModel() {
+		return this.parent;
 	}
 }

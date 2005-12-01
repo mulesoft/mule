@@ -9,6 +9,7 @@ Bundle-Vendor: Mule UMO
 Bundle-Localization: plugin
 Export-Package: org.mule.ide.core,
  org.mule.ide.core.builder,
+ org.mule.ide.core.model,
  org.mule.ide.core.nature,
  org.mule.ide.core.preferences
 Require-Bundle: org.eclipse.core.resources,

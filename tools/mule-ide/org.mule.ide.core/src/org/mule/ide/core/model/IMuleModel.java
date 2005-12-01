@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.IPath;
  * Represents the model for a single Mule project. The model consists of zero or more Mule
  * configurations and zero or more Mule config sets.
  */
-public interface IMuleModel {
+public interface IMuleModel extends IMuleModelElement {
 
 	/**
 	 * Gets the project that contains this model.

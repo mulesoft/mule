@@ -12,7 +12,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 /**
  * Wraps the details of a single mule configuration file.
  */
-public interface IMuleConfiguration {
+public interface IMuleConfiguration extends IMuleModelElement {
 
 	/**
 	 * Get the unique configuration id.
@@ -27,6 +27,13 @@ public interface IMuleConfiguration {
 	 * @return the description
 	 */
 	public String getDescription();
+
+	/**
+	 * Get the label that is shown in various views.
+	 * 
+	 * @return the label
+	 */
+	public String getLabel();
 
 	/**
 	 * Get the project-relative path to the configuration file.

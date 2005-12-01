@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * An ordered list of related IMuleConfiguration objects.
  */
-public interface IMuleConfigSet {
+public interface IMuleConfigSet extends IMuleModelElement {
 
 	/**
 	 * Get the unique id.

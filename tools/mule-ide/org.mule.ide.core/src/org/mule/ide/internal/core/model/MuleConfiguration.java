@@ -16,8 +16,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.model.IMuleConfiguration;
 import org.mule.ide.core.model.IMuleModel;
-import org.mule.schema.DocumentRoot;
-import org.mule.schema.MuleConfigurationType;
 import org.mule.schema.util.SchemaResourceFactoryImpl;
 
 /**
@@ -47,10 +45,10 @@ public class MuleConfiguration implements IMuleConfiguration {
 	private IStatus status = Status.OK_STATUS;
 
 	/** Error indicating that a config file was not found */
-	private static final String ERROR_CONFIG_NOT_FOUND = "The configuration file was not found: ";
+	private static final String ERROR_CONFIG_NOT_FOUND = "The Mule configuration file was not found: ";
 
 	/** Error indicating that a config file was not able to be loaded */
-	private static final String ERROR_LOADING_CONFIG = "Unable to load config file: ";
+	private static final String ERROR_LOADING_CONFIG = "Unable to load Mule configuration file: ";
 
 	/**
 	 * Create a new Mule configuration.
@@ -95,6 +93,15 @@ public class MuleConfiguration implements IMuleConfiguration {
 			}
 		}
 		return getStatus();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfiguration#getLabel()
+	 */
+	public String getLabel() {
+		return getFilePath().removeFirstSegments(1) + " [" + getDescription() + "]";
 	}
 
 	/**
@@ -185,5 +192,14 @@ public class MuleConfiguration implements IMuleConfiguration {
 	 */
 	public Resource getResource() {
 		return resource;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleModelElement#getMuleModel()
+	 */
+	public IMuleModel getMuleModel() {
+		return this.parent;
 	}
 }
