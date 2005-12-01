@@ -116,7 +116,9 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
 
     public void doStop()
     {
-        folder.removeMessageCountListener(this);
+        if (folder != null) {
+            folder.removeMessageCountListener(this);
+        }
     }
 
     public void doStart() throws UMOException
