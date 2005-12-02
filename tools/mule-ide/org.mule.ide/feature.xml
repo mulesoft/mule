@@ -2,7 +2,7 @@
 <feature
       id="org.mule.ide"
       label="org.mule.ide"
-      version="1.1.0"
+      version="1.2.0"
       provider-name="Mule UMO">
 
    <description url="http://mule.codehaus.org">
@@ -72,35 +72,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
          id="org.mule.ide.core"
          download-size="0"
          install-size="0"
-         version="1.1.0"
+         version="1.2.0"
          unpack="false"/>
 
    <plugin
          id="org.mule.ide.launching"
          download-size="0"
          install-size="0"
-         version="1.1.0"
+         version="1.2.0"
          unpack="false"/>
 
    <plugin
          id="org.mule.ide.launching.ui"
          download-size="0"
          install-size="0"
-         version="1.1.0"
+         version="1.2.0"
          unpack="false"/>
 
    <plugin
          id="org.mule.ide.ui"
          download-size="0"
          install-size="0"
-         version="1.1.0"
+         version="1.2.0"
          unpack="false"/>
 
    <plugin
          id="org.mule.ide.emf"
          download-size="0"
          install-size="0"
-         version="1.1.0"
+         version="1.2.0"
          unpack="false"/>
 
 </feature>
