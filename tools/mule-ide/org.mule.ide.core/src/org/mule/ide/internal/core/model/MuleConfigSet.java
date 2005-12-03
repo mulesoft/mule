@@ -8,13 +8,15 @@ package org.mule.ide.internal.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.mule.ide.core.model.IMuleConfigSet;
 import org.mule.ide.core.model.IMuleModel;
 
 /**
  * Default Mule config set implementation.
  */
-public class MuleConfigSet implements IMuleConfigSet {
+public class MuleConfigSet extends MuleModelElement implements IMuleConfigSet {
 
 	/** The parent model */
 	private MuleModel parent;
@@ -75,5 +77,14 @@ public class MuleConfigSet implements IMuleConfigSet {
 	 */
 	public IMuleModel getMuleModel() {
 		return this.parent;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleModelElement#refresh()
+	 */
+	public IStatus refresh() {
+		return Status.OK_STATUS;
 	}
 }

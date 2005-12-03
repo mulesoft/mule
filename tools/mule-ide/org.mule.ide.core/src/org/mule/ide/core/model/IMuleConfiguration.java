@@ -6,13 +6,12 @@
 package org.mule.ide.core.model;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.ecore.resource.Resource;
 
 /**
  * Wraps the details of a single mule configuration file.
  */
-public interface IMuleConfiguration extends IMuleModelElement {
+public interface IMuleConfiguration extends IMuleModelElement, Comparable {
 
 	/**
 	 * Get the unique configuration id.
@@ -36,7 +35,14 @@ public interface IMuleConfiguration extends IMuleModelElement {
 	public String getLabel();
 
 	/**
-	 * Get the project-relative path to the configuration file.
+	 * Gets the project-relative path to the config file.
+	 * 
+	 * @return the path
+	 */
+	public String getRelativePath();
+
+	/**
+	 * Get the project-relative IPath to the configuration file.
 	 * 
 	 * @return the project-relative path
 	 */
@@ -48,19 +54,4 @@ public interface IMuleConfiguration extends IMuleModelElement {
 	 * @return the EMF resource
 	 */
 	public Resource getResource();
-
-	/**
-	 * Refresh the contents of the configuration from the filesystem.
-	 * 
-	 * @return a status indicator
-	 */
-	public IStatus refresh();
-
-	/**
-	 * Indicates the status of the configuration. Any status other than IStatus.SUCCESS indicates a
-	 * problem loading the configuration.
-	 * 
-	 * @return the status
-	 */
-	public IStatus getStatus();
 }

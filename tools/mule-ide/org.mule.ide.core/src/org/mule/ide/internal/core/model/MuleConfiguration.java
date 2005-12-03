@@ -21,7 +21,7 @@ import org.mule.schema.util.SchemaResourceFactoryImpl;
 /**
  * Default Mule configuration implementation.
  */
-public class MuleConfiguration implements IMuleConfiguration {
+public class MuleConfiguration extends MuleModelElement implements IMuleConfiguration {
 
 	/** The parent model */
 	private IMuleModel parent;
@@ -40,9 +40,6 @@ public class MuleConfiguration implements IMuleConfiguration {
 
 	/** The resource handle for the EMF config */
 	private Resource resource;
-
-	/** Indicates whether the config was resolved and loaded */
-	private IStatus status = Status.OK_STATUS;
 
 	/** Error indicating that a config file was not found */
 	private static final String ERROR_CONFIG_NOT_FOUND = "The Mule configuration file was not found: ";
@@ -158,22 +155,13 @@ public class MuleConfiguration implements IMuleConfiguration {
 		return filePath;
 	}
 
-	/**
-	 * Sets the 'status' field.
-	 * 
-	 * @param status The 'status' value.
-	 */
-	protected void setStatus(IStatus status) {
-		this.status = status;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.mule.ide.core.model.IMuleConfiguration#getStatus()
+	 * @see org.mule.ide.core.model.IMuleConfiguration#getRelativePath()
 	 */
-	public IStatus getStatus() {
-		return status;
+	public String getRelativePath() {
+		return relativePath;
 	}
 
 	/**
@@ -201,5 +189,15 @@ public class MuleConfiguration implements IMuleConfiguration {
 	 */
 	public IMuleModel getMuleModel() {
 		return this.parent;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	public int compareTo(Object o) {
+		IMuleConfiguration other = (IMuleConfiguration) o;
+		return getRelativePath().compareTo(other.getRelativePath());
 	}
 }
