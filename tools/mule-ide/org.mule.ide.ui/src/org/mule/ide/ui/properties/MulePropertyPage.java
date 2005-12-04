@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -27,6 +26,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.model.IMuleModel;
@@ -47,43 +48,91 @@ public class MulePropertyPage extends PropertyPage {
 	}
 
 	private void addNatureCheckboxSection(Composite parent) {
-		Composite composite = createDefaultComposite(parent);
+		Composite composite = new Composite(parent, SWT.NULL);
+		composite.setLayout(new GridLayout());
+		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
 		hasNatureButton = new Button(composite, SWT.CHECK);
 		hasNatureButton.setText(NATURE_TITLE);
 		hasNatureButton.setSelection(hasMuleNature());
 		hasNatureButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 
-	private void addConfigurationsSection(IMuleModel model, Composite parent) {
-		Composite composite = createDefaultComposite(parent);
-		Label label = new Label(composite, SWT.NULL);
-		label.setText("Configuration Files:");
-		TableViewer viewer = new TableViewer(composite);
-		viewer.setLabelProvider(MuleModelLabelProvider.getDecoratingMuleModelLabelProvider());
-		viewer.setContentProvider(new MuleModelContentProvider(true, false));
-		viewer.setInput(model);
-		GridData gridData = new GridData(GridData.FILL_BOTH);
-		gridData.heightHint = 80;
-		viewer.getTable().setLayoutData(gridData);
+	protected void createTabSection(Composite parent) {
+		IMuleModel model = getMuleModel();
+		if (model != null) {
+			addSeparator(parent);
+			TabFolder tabs = new TabFolder(parent, SWT.NULL);
+			tabs.setLayoutData(new GridData(GridData.FILL_BOTH));
+			TabItem configsTab = new TabItem(tabs, SWT.NULL);
+			configsTab.setControl(createConfigurationsSection(model, tabs));
+			configsTab.setText("Config Files");
+			TabItem configSetsTab = new TabItem(tabs, SWT.NULL);
+			configSetsTab.setControl(createConfigSetsSection(model, tabs));
+			configSetsTab.setText("Config Sets");
+		}
 	}
 
-	private void addConfigSetsSection(IMuleModel model, Composite parent) {
-		Composite composite = createDefaultComposite(parent);
-		Label label = new Label(composite, SWT.NULL);
-		label.setText("Configuration Sets:");
+	protected Composite createConfigurationsSection(IMuleModel model,
+			Composite parent) {
+		Composite composite = new Composite(parent, SWT.NULL);
+		GridLayout mainLayout = new GridLayout();
+		mainLayout.numColumns = 2;
+		composite.setLayout(mainLayout);
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
 		TableViewer viewer = new TableViewer(composite);
-		viewer.setLabelProvider(MuleModelLabelProvider.getDecoratingMuleModelLabelProvider());
+		viewer.setLabelProvider(MuleModelLabelProvider
+				.getDecoratingMuleModelLabelProvider());
+		viewer.setContentProvider(new MuleModelContentProvider(true, false));
+		viewer.setInput(model);
+		viewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		Composite buttons = new Composite(composite, SWT.NULL);
+		GridLayout layout = new GridLayout();
+		layout.verticalSpacing = 10;
+		layout.marginWidth = 10;
+		layout.marginHeight = 10;
+		buttons.setLayout(new GridLayout());
+		GridData data = new GridData(GridData.VERTICAL_ALIGN_FILL
+				| GridData.HORIZONTAL_ALIGN_END);
+		buttons.setLayoutData(data);
+		createSideButton("Add", buttons);
+		createSideButton("Delete", buttons);
+
+		return composite;
+	}
+
+	protected Composite createConfigSetsSection(IMuleModel model,
+			Composite parent) {
+		Composite composite = new Composite(parent, SWT.NULL);
+		composite.setLayout(new GridLayout());
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		TableViewer viewer = new TableViewer(composite);
+		viewer.setLabelProvider(MuleModelLabelProvider
+				.getDecoratingMuleModelLabelProvider());
 		viewer.setContentProvider(new MuleModelContentProvider(false, true));
 		viewer.setInput(model);
-		GridData gridData = new GridData(GridData.FILL_BOTH);
-		gridData.heightHint = 80;
-		viewer.getTable().setLayoutData(gridData);
+		viewer.getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		return composite;
+	}
+
+	protected Button createSideButton(String label, Composite parent) {
+		Button button = new Button(parent, SWT.FLAT);
+		button.setText(label);
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.widthHint = 100;
+		button.setLayoutData(data);
+		return button;
 	}
 
 	/**
 	 * Add a separator to the composite.
 	 * 
-	 * @param parent the parent composite
+	 * @param parent
+	 *            the parent composite
 	 */
 	private void addSeparator(Composite parent) {
 		Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -102,26 +151,7 @@ public class MulePropertyPage extends PropertyPage {
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		addNatureCheckboxSection(composite);
-		IMuleModel model = getMuleModel();
-		if (model != null) {
-			addSeparator(composite);
-			addConfigurationsSection(model, composite);
-			addSeparator(composite);
-			addConfigSetsSection(model, composite);
-		}
-		return composite;
-	}
-
-	/**
-	 * Create a composite with standardized defaults.
-	 * 
-	 * @param parent the parent compostite
-	 * @return the created composite
-	 */
-	protected Composite createDefaultComposite(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NULL);
-		composite.setLayout(new GridLayout());
-		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		createTabSection(composite);
 		return composite;
 	}
 
@@ -131,7 +161,6 @@ public class MulePropertyPage extends PropertyPage {
 	 * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
 	 */
 	protected void performDefaults() {
-		// Populate the owner text field with the default value
 		hasNatureButton.setSelection(hasMuleNature());
 	}
 
@@ -142,7 +171,8 @@ public class MulePropertyPage extends PropertyPage {
 				return false;
 			return project.hasNature(MuleConfigNature.NATURE_ID);
 		} catch (CoreException e) {
-			MuleCorePlugin.getDefault().logException("Can't determine nature of project", e);
+			MuleCorePlugin.getDefault().logException(
+					"Can't determine nature of project", e);
 			return false;
 		}
 	}
@@ -158,7 +188,9 @@ public class MulePropertyPage extends PropertyPage {
 	/**
 	 * Sets or clears the Mule UMO Configuration nature to this project
 	 * 
-	 * @param setIt True if the nature should be added, false if it should be removed
+	 * @param setIt
+	 *            True if the nature should be added, false if it should be
+	 *            removed
 	 * @throws CoreException
 	 */
 	public void setMuleNature(boolean setIt) {
@@ -169,7 +201,8 @@ public class MulePropertyPage extends PropertyPage {
 				return;
 			MuleCorePlugin.getDefault().setMuleNature(project, setIt);
 		} catch (CoreException e) {
-			MuleCorePlugin.getDefault().logException("Can't set the project description", e);
+			MuleCorePlugin.getDefault().logException(
+					"Can't set the project description", e);
 		}
 	}
 
@@ -179,7 +212,8 @@ public class MulePropertyPage extends PropertyPage {
 	 * @return the model
 	 */
 	protected IMuleModel getMuleModel() {
-		return MuleCorePlugin.getDefault().getMuleModel(getProject(getElement()));
+		return MuleCorePlugin.getDefault().getMuleModel(
+				getProject(getElement()));
 	}
 
 	/*
