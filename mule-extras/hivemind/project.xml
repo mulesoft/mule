@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+    <extend>${basedir}/../project.xml</extend>
+    <groupId>mule</groupId>
+    <id>mule-extras-hivemind</id>
+    <artifactId>mule-extras-hivemind</artifactId>
+    <name>HiveMind Extensions</name>
+    <shortDescription>hivemind</shortDescription>
+    <description>Provides extensions to use HiveMind with Mule, such as using the container as a factory for Mule managed objects.</description>
+    <dependencies>
+        <dependency>
+            <groupId>hivemind</groupId>
+            <artifactId>hivemind</artifactId>
+            <version>${hivemind_version}</version>
+            <url>http://jakarta.apache.org/hivemind</url>
+        </dependency>
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>oro</groupId>
+            <artifactId>oro</artifactId>
+            <version>${oro_version}</version>
+        </dependency>
+    </dependencies>
+</project>
