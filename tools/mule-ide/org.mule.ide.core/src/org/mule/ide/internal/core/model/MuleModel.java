@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -29,6 +30,7 @@ import org.mule.ide.MuleIDEFactory;
 import org.mule.ide.MuleIdeConfigType;
 import org.mule.ide.core.IMuleDefaults;
 import org.mule.ide.core.MuleCorePlugin;
+import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.model.IMuleConfigSet;
 import org.mule.ide.core.model.IMuleConfiguration;
 import org.mule.ide.core.model.IMuleModel;
@@ -52,7 +54,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	private static final String ERROR_READING_CONFIG_FILE = "Could not read Mule IDE configuration file.";
 
 	/** Error message for marker when config file elements can not be loaded */
-	private static final String ERROR_LOADING_CONFIGS = "One or more configuration elements could not be loaded.";
+	private static final String ERROR_LOADING_CONFIGS = "One or more configuration elements were not resolved.";
 
 	/**
 	 * Create a Mule IDE model for the given project.
@@ -61,6 +63,35 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	 */
 	public MuleModel(IProject project) {
 		this.project = project;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleModel#createWorkingCopy()
+	 */
+	public IMuleModel createWorkingCopy() throws MuleModelException {
+		// Create a new model and config wrapper.
+		MuleModel model = new MuleModel(getProject());
+		MuleIdeConfigType config = MuleIDEFactory.eINSTANCE.createMuleIdeConfigType();
+		saveTo(config);
+		model.loadFrom(config);
+		return model;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleModel#commitWorkingCopy(org.mule.ide.core.model.IMuleModel)
+	 */
+	public void commitWorkingCopy(IMuleModel workingCopy) throws MuleModelException {
+		MuleIdeConfigType config = MuleIDEFactory.eINSTANCE.createMuleIdeConfigType();
+		((MuleModel) workingCopy).saveTo(config);
+		IStatus result = loadFrom(config);
+		updateTopLevelMarkers(result);
+		if (!result.isOK()) {
+			throw new MuleModelException(result);
+		}
 	}
 
 	/*
@@ -224,6 +255,26 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 		}
 	}
 
+	/**
+	 * Update the markers that are at the model level (associated with the project).
+	 * 
+	 * @param status the status
+	 */
+	protected void updateTopLevelMarkers(IStatus status) {
+		MuleCorePlugin.getDefault().clearMarkers(getProject());
+		if (status.isMultiStatus()) {
+			MultiStatus multi = (MultiStatus) status;
+			IStatus[] children = multi.getChildren();
+			for (int i = 0; i < children.length; i++) {
+				MuleCorePlugin.getDefault().createMarker(getProject(), IMarker.SEVERITY_ERROR,
+						children[i].getMessage());
+			}
+		} else {
+			MuleCorePlugin.getDefault().createMarker(getProject(), IMarker.SEVERITY_ERROR,
+					status.getMessage());
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -241,6 +292,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 					MuleIdeConfigType config = root.getMuleIdeConfig();
 					if (config != null) {
 						setStatus(loadFrom(config));
+						updateTopLevelMarkers(getStatus());
 						return getStatus();
 					}
 				}

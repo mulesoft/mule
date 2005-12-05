@@ -98,7 +98,7 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 	 * @see org.mule.ide.core.model.IMuleConfiguration#getLabel()
 	 */
 	public String getLabel() {
-		return getFilePath().removeFirstSegments(1) + " [" + getDescription() + "]";
+		return getRelativePath() + " [" + getDescription() + "]";
 	}
 
 	/**

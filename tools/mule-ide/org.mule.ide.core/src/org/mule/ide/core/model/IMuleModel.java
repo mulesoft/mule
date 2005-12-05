@@ -9,6 +9,7 @@ import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.mule.ide.core.exception.MuleModelException;
 
 /**
  * Represents the model for a single Mule project. The model consists of zero or more Mule
@@ -22,6 +23,22 @@ public interface IMuleModel extends IMuleModelElement {
 	 * @return the project
 	 */
 	public IProject getProject();
+
+	/**
+	 * Creates a duplicate copy of the model that may be modified without changing the real model.
+	 * 
+	 * @return a copy of the model
+	 * @throws MuleModelException if problem duplicating the model
+	 */
+	public IMuleModel createWorkingCopy() throws MuleModelException;
+
+	/**
+	 * Commit the changes in the working copy to the model.
+	 * 
+	 * @param workingCopy the working copy that contains changes
+	 * @throws MuleModelException if the working copy could not be committed
+	 */
+	public void commitWorkingCopy(IMuleModel workingCopy) throws MuleModelException;
 
 	/**
 	 * Creates a new Mule configuration.
