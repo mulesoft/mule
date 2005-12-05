@@ -44,8 +44,8 @@ public class FruitBowl
 
     public FruitBowl(Apple apple, Banana banana)
     {
-        bowl.put(apple.getClass(), apple);
-        bowl.put(banana.getClass(), banana);
+        bowl.put(Apple.class, apple);
+        bowl.put(Banana.class, banana);
     }
 
     public boolean hasApple()
@@ -81,7 +81,7 @@ public class FruitBowl
 
     public void setApple(Apple apple)
     {
-        bowl.put(apple.getClass(), apple);
+        bowl.put(Apple.class, apple);
     }
 
     public Banana getBanana()
@@ -91,6 +91,6 @@ public class FruitBowl
 
     public void setBanana(Banana banana)
     {
-        bowl.put(banana.getClass(), banana);
+        bowl.put(Banana.class, banana);
     }
 }
