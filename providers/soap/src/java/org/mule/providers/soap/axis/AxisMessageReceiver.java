@@ -16,6 +16,8 @@ package org.mule.providers.soap.axis;
 import org.apache.axis.AxisProperties;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
+import org.apache.axis.description.OperationDesc;
+import org.apache.axis.description.ParameterDesc;
 import org.apache.axis.encoding.TypeMappingRegistryImpl;
 import org.apache.axis.handlers.soap.SOAPService;
 import org.apache.axis.providers.java.JavaProvider;
@@ -24,7 +26,9 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleDescriptor;
 import org.mule.providers.AbstractMessageReceiver;
+import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.ServiceProxy;
+import org.mule.providers.soap.SoapMethod;
 import org.mule.providers.soap.axis.extensions.MuleMsgProvider;
 import org.mule.providers.soap.axis.extensions.MuleProvider;
 import org.mule.umo.UMOComponent;
@@ -37,6 +41,8 @@ import org.mule.umo.provider.UMOConnector;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.rpc.ParameterMode;
 
 /**
  * <code>AxisMessageReceiver</code> is used to register a component as a
@@ -109,16 +115,45 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         // or specify the 'allowedMethods' property in the axisOptions property
         String methodNames = "*";
 
-        String[] methods = ServiceProxy.getMethodNames(interfaces);
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < methods.length; i++) {
-            buf.append(methods[i]).append(",");
+        if (endpoint.getProperties().get("soapMethods") != null) {
+            Map methods = (Map) endpoint.getProperties().get("soapMethods");
+            Iterator i = methods.keySet().iterator();
+            StringBuffer buf = new StringBuffer();
+            while (i.hasNext()) {
+                String name = (String) i.next();
+                SoapMethod method = new SoapMethod(name, (String) methods.get(name));
+
+                List namedParameters = method.getNamedParameters();
+                ParameterDesc[] parameters = new ParameterDesc[namedParameters.size()];
+                for (int j = 0; j < namedParameters.size(); j++) {
+                    NamedParameter parameter = (NamedParameter) namedParameters.get(j);
+                    byte mode = ParameterDesc.INOUT;
+                    if (parameter.getMode().equals(ParameterMode.IN)) {
+                        mode = ParameterDesc.IN;
+                    } else if (parameter.getMode().equals(ParameterMode.OUT)) {
+                        mode = ParameterDesc.OUT;
+                    }
+
+                    parameters[j] = new ParameterDesc(parameter.getName(), mode, parameter.getType());
+                }
+
+                service.getServiceDescription().addOperationDesc(new OperationDesc(name, parameters, method.getReturnType()));
+                buf.append(name + ",");
+            }
+            methodNames = buf.toString();
+            methodNames = methodNames.substring(0, methodNames.length() - 1);
+        } else {
+            String[] methods = ServiceProxy.getMethodNames(interfaces);
+            StringBuffer buf = new StringBuffer();
+            for (int i = 0; i < methods.length; i++) {
+                buf.append(methods[i]).append(",");
+            }
+            methodNames = buf.toString();
+            methodNames = methodNames.substring(0, methodNames.length() - 1);
         }
-        String className = interfaces[0].getName();
-        methodNames = buf.toString();
-        methodNames = methodNames.substring(0, methodNames.length() - 1);
 
         // The namespace of the service.
+        String className = interfaces[0].getName();
         String namespace = Namespaces.makeNamespace(className);
 
         /*
