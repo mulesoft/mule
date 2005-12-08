@@ -1,6 +1,7 @@
 package org.mule.ide.ui.properties;
 
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -14,6 +15,7 @@ import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.ui.IMuleImages;
 import org.mule.ide.ui.MulePlugin;
 import org.mule.ide.ui.MuleUIUtils;
+import org.mule.ide.ui.dialogs.MuleConfigurationDialog;
 import org.mule.ide.ui.model.MuleModelContentProvider;
 import org.mule.ide.ui.model.MuleModelLabelProvider;
 import org.mule.ide.ui.model.MuleModelViewerSorter;
@@ -131,10 +133,14 @@ public class MuleConfigurationsPanel implements IMulePropertyPanel {
 	 * Add button was clicked.
 	 */
 	protected void addClicked() {
-		IMuleConfiguration config = muleModel.createNewMuleConfiguration("New Test Config",
-				"test/sample123.xml");
-		muleModel.addMuleConfiguration(config);
-		getConfigsTable().refresh();
+		MuleConfigurationDialog dialog = new MuleConfigurationDialog(muleModel.getProject(),
+				getConfigsTable().getTable().getShell());
+		if (dialog.open() == Window.OK) {
+			IMuleConfiguration config = muleModel.createNewMuleConfiguration(dialog
+					.getDescription(), dialog.getPath());
+			muleModel.addMuleConfiguration(config);
+			getConfigsTable().refresh();
+		}
 	}
 
 	/**
