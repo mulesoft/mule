@@ -46,7 +46,7 @@ public class MuleConfigurationsPanel implements IMulePropertyPanel {
 	 * @see org.mule.ide.ui.properties.IMulePropertyPanel#getDisplayName()
 	 */
 	public String getDisplayName() {
-		return "Config Files";
+		return "Configuration Files";
 	}
 
 	/*

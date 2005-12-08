@@ -28,7 +28,7 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	 * @see org.mule.ide.ui.properties.IMulePropertyPanel#getDisplayName()
 	 */
 	public String getDisplayName() {
-		return "Config Sets";
+		return "Configuration Sets";
 	}
 
 	/*
