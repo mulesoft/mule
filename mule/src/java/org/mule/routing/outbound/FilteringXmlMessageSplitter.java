@@ -39,7 +39,8 @@ import java.util.Map;
 public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
 {
     private Map properties;
-    private List nodes;
+    private static ThreadLocal tlNodes = new ThreadLocal();
+    private org.dom4j.Document dom4jDoc;
     private String splitExpression = "";
     private Map namespaces = null;
 
@@ -68,36 +69,40 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
     {
         if (logger.isDebugEnabled()) {
             logger.debug("splitExpression is " + splitExpression);
-        }
+    	}
+    	
+	Object src = message.getPayload();
 
-        Object src = message.getPayload();
+	try {
+	    if(src instanceof byte[]) {
+		src = new String((byte[])src);
+	    }
 
-        try {
-            if (src instanceof byte[]) {
-                src = new String((byte[]) src);
-            }
+	    Document dom4jDoc = null;
 
-            Document dom4jDoc;
+	    if (src instanceof String) {
+		String xml = (String)src;
+                logger.debug("Incoming payload size " + xml.length());
+		dom4jDoc = DocumentHelper.parseText(xml);
+	    } else if (src instanceof org.dom4j.Document) {
+		dom4jDoc = (org.dom4j.Document) src;
+	    } else {
+		logger.error("Non-xml message payload: " + 
+			src.getClass().toString());
+		return;
+	    }
 
-            if (src instanceof String) {
-                String xml = (String) src;
-                dom4jDoc = DocumentHelper.parseText(xml);
-            } else if (src instanceof org.dom4j.Document) {
-                dom4jDoc = (org.dom4j.Document) src;
-            } else {
-                logger.error("Non-xml message payload: " + src.getClass().toString());
-                return;
-            }
-
-            if (dom4jDoc != null) {
-                XPath xpath = dom4jDoc.createXPath(splitExpression);
-                if (namespaces != null) xpath.setNamespaceURIs(namespaces);
-                {
-                    nodes = xpath.selectNodes(dom4jDoc);
-                }
-            } else {
-                logger.warn("Unsupported message type, ignoring");
-            }
+	    if (dom4jDoc != null) {
+		XPath xpath = dom4jDoc.createXPath(splitExpression);
+		if (namespaces != null) xpath.setNamespaceURIs( namespaces ); 
+		List nodes = xpath.selectNodes( dom4jDoc );
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Split into " + nodes.size());
+		}
+		tlNodes.set(nodes);
+	    } else {
+                logger.error("Unable to create dom4j document from payload");
+	    }
         } catch (Exception e) {
             logger.error("Error spliting document with " + splitExpression, e);
         }
@@ -116,29 +121,39 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
      */
     protected UMOMessage getMessagePart(UMOMessage message, UMOEndpoint endpoint)
     {
-        if (nodes == null) {
-            return null;
-        }
+	List nodes = (List)tlNodes.get();
+
+	if (nodes == null) {
+	    logger.error("Error: nodes are null");
+	    return null;
+	}
 
         for (int i = 0; i < nodes.size(); i++) {
             Node node = (Node) nodes.get(i);
 
             try {
-                UMOMessage result = new MuleMessage(DocumentHelper.parseText(node.asXML()), new HashMap(properties));
-
-                if (endpoint.getFilter() == null || endpoint.getFilter().accept(result)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Endpoint filter matched. Routing message over: "
-                                + endpoint.getEndpointURI().toString());
-                    }
-                    nodes.remove(i);
-                    return result;
-                }
+	            UMOMessage result = new MuleMessage((Document)DocumentHelper.parseText(node.asXML()), new HashMap(properties));
+	
+	            if (endpoint.getFilter() == null || endpoint.getFilter().accept(result)) {
+	                if (logger.isDebugEnabled()) {
+	                    logger.debug("Endpoint filter matched for node " + 
+				    i + " of " + nodes.size() + 
+				    ". Routing message over: " +
+	                            endpoint.getEndpointURI().toString());
+	                }
+	                nodes.remove(i);
+	                return result;
+	            } else {
+	                if (logger.isDebugEnabled()) {
+	                    logger.debug("Endpoint filter did not match, returning null");
+			}
+		    }
             } catch (Exception e) {
                 logger.error("Unable to create message for node as position " + i, e);
                 return null;
             }
         }
+
         return null;
     }
 }
