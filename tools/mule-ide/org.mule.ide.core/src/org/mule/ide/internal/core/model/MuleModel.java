@@ -379,13 +379,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 		while (it.hasNext()) {
 			ConfigFileType configFile = (ConfigFileType) it.next();
 			IMuleConfiguration modelConfig = MuleModelFactory.convert(this, configFile);
-			IStatus status = modelConfig.refresh();
 			addMuleConfiguration(modelConfig);
-
-			// Store any errors or warnings.
-			if (!status.isOK()) {
-				multi.add(status);
-			}
 		}
 		return multi;
 	}

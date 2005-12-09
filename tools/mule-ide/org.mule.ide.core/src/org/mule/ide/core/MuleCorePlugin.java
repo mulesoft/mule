@@ -152,6 +152,18 @@ public class MuleCorePlugin extends Plugin {
 	}
 
 	/**
+	 * Create a status of a given type.
+	 * 
+	 * @param type the IStatus constant
+	 * @param message the message
+	 * @param exception the exception (may be null)
+	 * @return the status
+	 */
+	public IStatus createStatus(int type, String message, Throwable exception) {
+		return new Status(type, PLUGIN_ID, 0, message, exception);
+	}
+
+	/**
 	 * Create an error status.
 	 * 
 	 * @param message the error message
@@ -159,7 +171,7 @@ public class MuleCorePlugin extends Plugin {
 	 * @return the status
 	 */
 	public IStatus createErrorStatus(String message, Throwable exception) {
-		return new Status(IStatus.ERROR, PLUGIN_ID, 0, message, exception);
+		return createStatus(IStatus.ERROR, message, exception);
 	}
 
 	/**
@@ -170,6 +182,16 @@ public class MuleCorePlugin extends Plugin {
 	 */
 	public void logException(String message, Throwable exception) {
 		IStatus status = createErrorStatus(message, exception);
+		this.getLog().log(status);
+	}
+
+	/**
+	 * Log an info message to the Eclipse log.
+	 * 
+	 * @param message the message
+	 */
+	public void logInfo(String message) {
+		IStatus status = createStatus(IStatus.INFO, message, null);
 		this.getLog().log(status);
 	}
 

@@ -11,10 +11,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.mule.ide.core.MuleCorePlugin;
+import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.model.IMuleConfiguration;
 import org.mule.ide.core.model.IMuleModel;
+import org.mule.schema.DocumentRoot;
 import org.mule.schema.util.MuleResourceFactoryImpl;
 
 /**
@@ -37,8 +40,8 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 	/** Project relative path to config file */
 	private IPath filePath;
 
-	/** The resource handle for the EMF config */
-	private Resource resource;
+	/** The EMF model wrapped by this object */
+	private DocumentRoot configDocument;
 
 	/** Error indicating that a config file was not found */
 	private static final String ERROR_CONFIG_NOT_FOUND = "The Mule configuration file was not found: ";
@@ -64,6 +67,21 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.mule.ide.core.model.IMuleConfiguration#getConfigDocument()
+	 */
+	public DocumentRoot getConfigDocument() throws MuleModelException {
+		if (configDocument == null) {
+			IStatus refreshed = refresh();
+			if (!refreshed.isOK()) {
+				throw new MuleModelException(refreshed);
+			}
+		}
+		return configDocument;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mule.ide.core.model.IMuleConfiguration#refresh()
 	 */
 	public IStatus refresh() {
@@ -71,14 +89,20 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 		IFile configFile = parent.getProject().getFile(relativePath);
 		setFilePath(configFile.getFullPath());
 		if (!configFile.exists()) {
-			setResource(null);
+			this.configDocument = null;
 			setStatus(MuleCorePlugin.getDefault().createErrorStatus(
 					ERROR_CONFIG_NOT_FOUND + relativePath, null));
 		} else {
 			try {
 				Resource.Factory factory = new MuleResourceFactoryImpl();
-				setResource(factory.createResource(null));
-				getResource().load(configFile.getContents(), Collections.EMPTY_MAP);
+				Resource resource = factory.createResource(null);
+				resource.load(configFile.getContents(), Collections.EMPTY_MAP);
+				EList contents = resource.getContents();
+				if (!contents.isEmpty()) {
+					this.configDocument = (DocumentRoot) contents.get(0);
+				} else {
+					this.configDocument = null;
+				}
 			} catch (Exception e) {
 				setStatus(MuleCorePlugin.getDefault().createErrorStatus(
 						ERROR_LOADING_CONFIG + relativePath, e));
@@ -157,24 +181,6 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 	 */
 	public String getRelativePath() {
 		return relativePath;
-	}
-
-	/**
-	 * Sets the 'resource' field.
-	 * 
-	 * @param resource The 'resource' value.
-	 */
-	protected void setResource(Resource resource) {
-		this.resource = resource;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.ide.core.model.IMuleConfiguration#getResource()
-	 */
-	public Resource getResource() {
-		return resource;
 	}
 
 	/*

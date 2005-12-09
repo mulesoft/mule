@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.mule.ide.DocumentRoot;
 import org.mule.ide.MuleIDEFactory;
@@ -35,6 +36,7 @@ import org.mule.ide.MuleIdeConfigType;
 import org.mule.ide.core.IMuleDefaults;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.builder.MuleConfigBuilder;
+import org.mule.ide.core.jobs.RefreshMuleConfigurationsJob;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.internal.core.model.MuleModel;
 import org.mule.ide.util.MuleIDEResourceFactoryImpl;
@@ -105,8 +107,12 @@ public class MuleConfigNature implements IProjectNature {
 		if (muleModel == null) {
 			muleModel = new MuleModel(getProject());
 			IStatus status = muleModel.refresh();
-			if (!status.isOK()) {
-				// TODO: Create markers.
+
+			// If the model loaded, refresh the config files asynchronously.
+			if (status.isOK()) {
+				Job job = new RefreshMuleConfigurationsJob(muleModel);
+				job.setPriority(Job.SHORT);
+				job.schedule();
 			}
 		}
 		return muleModel;
