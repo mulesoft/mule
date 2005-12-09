@@ -20,17 +20,17 @@ import org.mule.schema.*;
  * The <b>Adapter Factory</b> for the model.
  * It provides an adapter <code>createXXX</code> method for each class of the model.
  * <!-- end-user-doc -->
- * @see org.mule.schema.SchemaPackage
+ * @see org.mule.schema.MulePackage
  * @generated
  */
-public class SchemaAdapterFactory extends AdapterFactoryImpl {
+public class MuleAdapterFactory extends AdapterFactoryImpl {
 	/**
 	 * The cached model package.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected static SchemaPackage modelPackage;
+	protected static MulePackage modelPackage;
 
 	/**
 	 * Creates an instance of the adapter factory.
@@ -38,9 +38,9 @@ public class SchemaAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public SchemaAdapterFactory() {
+	public MuleAdapterFactory() {
 		if (modelPackage == null) {
-			modelPackage = SchemaPackage.eINSTANCE;
+			modelPackage = MulePackage.eINSTANCE;
 		}
 	}
 
@@ -68,8 +68,8 @@ public class SchemaAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected SchemaSwitch modelSwitch =
-		new SchemaSwitch() {
+	protected MuleSwitch modelSwitch =
+		new MuleSwitch() {
 			public Object caseAgentsType(AgentsType object) {
 				return createAgentsTypeAdapter();
 			}
@@ -739,7 +739,7 @@ public class SchemaAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link org.mule.schema.MuleConfigurationType <em>Mule Configuration Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link org.mule.schema.MuleConfigurationType <em>Configuration Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
@@ -753,7 +753,7 @@ public class SchemaAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link org.mule.schema.MuleDescriptorType <em>Mule Descriptor Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link org.mule.schema.MuleDescriptorType <em>Descriptor Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
@@ -767,7 +767,7 @@ public class SchemaAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link org.mule.schema.MuleEnvironmentPropertiesType <em>Mule Environment Properties Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link org.mule.schema.MuleEnvironmentPropertiesType <em>Environment Properties Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
@@ -1086,4 +1086,4 @@ public class SchemaAdapterFactory extends AdapterFactoryImpl {
 		return null;
 	}
 
-} //SchemaAdapterFactory
+} //MuleAdapterFactory

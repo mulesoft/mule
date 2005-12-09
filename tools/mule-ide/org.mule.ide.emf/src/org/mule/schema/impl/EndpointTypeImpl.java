@@ -26,11 +26,11 @@ import org.eclipse.emf.ecore.util.InternalEList;
 import org.mule.schema.CreateConnectorType;
 import org.mule.schema.EndpointType;
 import org.mule.schema.FilterType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 import org.mule.schema.SecurityFilterType;
 import org.mule.schema.TransactionType;
-import org.mule.schema.TypeType;
+import org.mule.schema.TypeType1;
 
 /**
  * <!-- begin-user-doc -->
@@ -51,6 +51,7 @@ import org.mule.schema.TypeType;
  *   <li>{@link org.mule.schema.impl.EndpointTypeImpl#getRef <em>Ref</em>}</li>
  *   <li>{@link org.mule.schema.impl.EndpointTypeImpl#isRemoteSync <em>Remote Sync</em>}</li>
  *   <li>{@link org.mule.schema.impl.EndpointTypeImpl#getRemoteSyncTimeout <em>Remote Sync Timeout</em>}</li>
+ *   <li>{@link org.mule.schema.impl.EndpointTypeImpl#getResponseTransformers <em>Response Transformers</em>}</li>
  *   <li>{@link org.mule.schema.impl.EndpointTypeImpl#isSynchronous <em>Synchronous</em>}</li>
  *   <li>{@link org.mule.schema.impl.EndpointTypeImpl#getTransformers <em>Transformers</em>}</li>
  *   <li>{@link org.mule.schema.impl.EndpointTypeImpl#getType <em>Type</em>}</li>
@@ -229,6 +230,26 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	protected String remoteSyncTimeout = REMOTE_SYNC_TIMEOUT_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getResponseTransformers() <em>Response Transformers</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getResponseTransformers()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final List RESPONSE_TRANSFORMERS_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getResponseTransformers() <em>Response Transformers</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getResponseTransformers()
+	 * @generated
+	 * @ordered
+	 */
+	protected List responseTransformers = RESPONSE_TRANSFORMERS_EDEFAULT;
+
+	/**
 	 * The default value of the '{@link #isSynchronous() <em>Synchronous</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -265,7 +286,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final List TRANSFORMERS_EDEFAULT = null;
+	protected static final String TRANSFORMERS_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getTransformers() <em>Transformers</em>}' attribute.
@@ -275,7 +296,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 * @ordered
 	 */
-	protected List transformers = TRANSFORMERS_EDEFAULT;
+	protected String transformers = TRANSFORMERS_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getType() <em>Type</em>}' attribute.
@@ -285,7 +306,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final TypeType TYPE_EDEFAULT = TypeType.SENDER_AND_RECEIVER_LITERAL;
+	protected static final TypeType1 TYPE_EDEFAULT = TypeType1.SENDER_AND_RECEIVER_LITERAL;
 
 	/**
 	 * The cached value of the '{@link #getType() <em>Type</em>}' attribute.
@@ -295,7 +316,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 * @ordered
 	 */
-	protected TypeType type = TYPE_EDEFAULT;
+	protected TypeType1 type = TYPE_EDEFAULT;
 
 	/**
 	 * This is true if the Type attribute has been set.
@@ -321,7 +342,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getEndpointType();
+		return MulePackage.eINSTANCE.getEndpointType();
 	}
 
 	/**
@@ -331,7 +352,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.ENDPOINT_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.ENDPOINT_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -342,7 +363,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public TransactionType getTransaction() {
-		return (TransactionType)getMixed().get(SchemaPackage.eINSTANCE.getEndpointType_Transaction(), true);
+		return (TransactionType)getMixed().get(MulePackage.eINSTANCE.getEndpointType_Transaction(), true);
 	}
 
 	/**
@@ -351,7 +372,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public NotificationChain basicSetTransaction(TransactionType newTransaction, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getEndpointType_Transaction(), newTransaction, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getEndpointType_Transaction(), newTransaction, msgs);
 	}
 
 	/**
@@ -360,7 +381,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public void setTransaction(TransactionType newTransaction) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getEndpointType_Transaction(), newTransaction);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getEndpointType_Transaction(), newTransaction);
 	}
 
 	/**
@@ -369,7 +390,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public FilterType getFilter() {
-		return (FilterType)getMixed().get(SchemaPackage.eINSTANCE.getEndpointType_Filter(), true);
+		return (FilterType)getMixed().get(MulePackage.eINSTANCE.getEndpointType_Filter(), true);
 	}
 
 	/**
@@ -378,7 +399,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public NotificationChain basicSetFilter(FilterType newFilter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getEndpointType_Filter(), newFilter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getEndpointType_Filter(), newFilter, msgs);
 	}
 
 	/**
@@ -387,7 +408,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public void setFilter(FilterType newFilter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getEndpointType_Filter(), newFilter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getEndpointType_Filter(), newFilter);
 	}
 
 	/**
@@ -396,7 +417,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public SecurityFilterType getSecurityFilter() {
-		return (SecurityFilterType)getMixed().get(SchemaPackage.eINSTANCE.getEndpointType_SecurityFilter(), true);
+		return (SecurityFilterType)getMixed().get(MulePackage.eINSTANCE.getEndpointType_SecurityFilter(), true);
 	}
 
 	/**
@@ -405,7 +426,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public NotificationChain basicSetSecurityFilter(SecurityFilterType newSecurityFilter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getEndpointType_SecurityFilter(), newSecurityFilter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getEndpointType_SecurityFilter(), newSecurityFilter, msgs);
 	}
 
 	/**
@@ -414,7 +435,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public void setSecurityFilter(SecurityFilterType newSecurityFilter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getEndpointType_SecurityFilter(), newSecurityFilter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getEndpointType_SecurityFilter(), newSecurityFilter);
 	}
 
 	/**
@@ -423,7 +444,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getEndpointType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getEndpointType_Properties(), true);
 	}
 
 	/**
@@ -432,7 +453,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getEndpointType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getEndpointType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -441,7 +462,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getEndpointType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getEndpointType_Properties(), newProperties);
 	}
 
 	/**
@@ -462,7 +483,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		String oldAddress = address;
 		address = newAddress;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__ADDRESS, oldAddress, address));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__ADDRESS, oldAddress, address));
 	}
 
 	/**
@@ -483,7 +504,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		String oldConnector = connector;
 		connector = newConnector;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__CONNECTOR, oldConnector, connector));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__CONNECTOR, oldConnector, connector));
 	}
 
 	/**
@@ -506,7 +527,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		boolean oldCreateConnectorESet = createConnectorESet;
 		createConnectorESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__CREATE_CONNECTOR, oldCreateConnector, createConnector, !oldCreateConnectorESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__CREATE_CONNECTOR, oldCreateConnector, createConnector, !oldCreateConnectorESet));
 	}
 
 	/**
@@ -520,7 +541,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		createConnector = CREATE_CONNECTOR_EDEFAULT;
 		createConnectorESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.ENDPOINT_TYPE__CREATE_CONNECTOR, oldCreateConnector, CREATE_CONNECTOR_EDEFAULT, oldCreateConnectorESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.ENDPOINT_TYPE__CREATE_CONNECTOR, oldCreateConnector, CREATE_CONNECTOR_EDEFAULT, oldCreateConnectorESet));
 	}
 
 	/**
@@ -550,7 +571,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -571,7 +592,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		String oldRef = ref;
 		ref = newRef;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__REF, oldRef, ref));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__REF, oldRef, ref));
 	}
 
 	/**
@@ -594,7 +615,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		boolean oldRemoteSyncESet = remoteSyncESet;
 		remoteSyncESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC, oldRemoteSync, remoteSync, !oldRemoteSyncESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__REMOTE_SYNC, oldRemoteSync, remoteSync, !oldRemoteSyncESet));
 	}
 
 	/**
@@ -608,7 +629,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		remoteSync = REMOTE_SYNC_EDEFAULT;
 		remoteSyncESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC, oldRemoteSync, REMOTE_SYNC_EDEFAULT, oldRemoteSyncESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.ENDPOINT_TYPE__REMOTE_SYNC, oldRemoteSync, REMOTE_SYNC_EDEFAULT, oldRemoteSyncESet));
 	}
 
 	/**
@@ -638,7 +659,28 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		String oldRemoteSyncTimeout = remoteSyncTimeout;
 		remoteSyncTimeout = newRemoteSyncTimeout;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT, oldRemoteSyncTimeout, remoteSyncTimeout));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT, oldRemoteSyncTimeout, remoteSyncTimeout));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public List getResponseTransformers() {
+		return responseTransformers;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setResponseTransformers(List newResponseTransformers) {
+		List oldResponseTransformers = responseTransformers;
+		responseTransformers = newResponseTransformers;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__RESPONSE_TRANSFORMERS, oldResponseTransformers, responseTransformers));
 	}
 
 	/**
@@ -661,7 +703,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		boolean oldSynchronousESet = synchronousESet;
 		synchronousESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__SYNCHRONOUS, oldSynchronous, synchronous, !oldSynchronousESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__SYNCHRONOUS, oldSynchronous, synchronous, !oldSynchronousESet));
 	}
 
 	/**
@@ -675,7 +717,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		synchronous = SYNCHRONOUS_EDEFAULT;
 		synchronousESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.ENDPOINT_TYPE__SYNCHRONOUS, oldSynchronous, SYNCHRONOUS_EDEFAULT, oldSynchronousESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.ENDPOINT_TYPE__SYNCHRONOUS, oldSynchronous, SYNCHRONOUS_EDEFAULT, oldSynchronousESet));
 	}
 
 	/**
@@ -692,7 +734,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List getTransformers() {
+	public String getTransformers() {
 		return transformers;
 	}
 
@@ -701,11 +743,11 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTransformers(List newTransformers) {
-		List oldTransformers = transformers;
+	public void setTransformers(String newTransformers) {
+		String oldTransformers = transformers;
 		transformers = newTransformers;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__TRANSFORMERS, oldTransformers, transformers));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__TRANSFORMERS, oldTransformers, transformers));
 	}
 
 	/**
@@ -713,7 +755,7 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public TypeType getType() {
+	public TypeType1 getType() {
 		return type;
 	}
 
@@ -722,13 +764,13 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setType(TypeType newType) {
-		TypeType oldType = type;
+	public void setType(TypeType1 newType) {
+		TypeType1 oldType = type;
 		type = newType == null ? TYPE_EDEFAULT : newType;
 		boolean oldTypeESet = typeESet;
 		typeESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENDPOINT_TYPE__TYPE, oldType, type, !oldTypeESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENDPOINT_TYPE__TYPE, oldType, type, !oldTypeESet));
 	}
 
 	/**
@@ -737,12 +779,12 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 * @generated
 	 */
 	public void unsetType() {
-		TypeType oldType = type;
+		TypeType1 oldType = type;
 		boolean oldTypeESet = typeESet;
 		type = TYPE_EDEFAULT;
 		typeESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.ENDPOINT_TYPE__TYPE, oldType, TYPE_EDEFAULT, oldTypeESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.ENDPOINT_TYPE__TYPE, oldType, TYPE_EDEFAULT, oldTypeESet));
 	}
 
 	/**
@@ -762,15 +804,15 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.ENDPOINT_TYPE__MIXED:
+				case MulePackage.ENDPOINT_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.ENDPOINT_TYPE__TRANSACTION:
+				case MulePackage.ENDPOINT_TYPE__TRANSACTION:
 					return basicSetTransaction(null, msgs);
-				case SchemaPackage.ENDPOINT_TYPE__FILTER:
+				case MulePackage.ENDPOINT_TYPE__FILTER:
 					return basicSetFilter(null, msgs);
-				case SchemaPackage.ENDPOINT_TYPE__SECURITY_FILTER:
+				case MulePackage.ENDPOINT_TYPE__SECURITY_FILTER:
 					return basicSetSecurityFilter(null, msgs);
-				case SchemaPackage.ENDPOINT_TYPE__PROPERTIES:
+				case MulePackage.ENDPOINT_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -786,35 +828,37 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENDPOINT_TYPE__MIXED:
+			case MulePackage.ENDPOINT_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.ENDPOINT_TYPE__TRANSACTION:
+			case MulePackage.ENDPOINT_TYPE__TRANSACTION:
 				return getTransaction();
-			case SchemaPackage.ENDPOINT_TYPE__FILTER:
+			case MulePackage.ENDPOINT_TYPE__FILTER:
 				return getFilter();
-			case SchemaPackage.ENDPOINT_TYPE__SECURITY_FILTER:
+			case MulePackage.ENDPOINT_TYPE__SECURITY_FILTER:
 				return getSecurityFilter();
-			case SchemaPackage.ENDPOINT_TYPE__PROPERTIES:
+			case MulePackage.ENDPOINT_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.ENDPOINT_TYPE__ADDRESS:
+			case MulePackage.ENDPOINT_TYPE__ADDRESS:
 				return getAddress();
-			case SchemaPackage.ENDPOINT_TYPE__CONNECTOR:
+			case MulePackage.ENDPOINT_TYPE__CONNECTOR:
 				return getConnector();
-			case SchemaPackage.ENDPOINT_TYPE__CREATE_CONNECTOR:
+			case MulePackage.ENDPOINT_TYPE__CREATE_CONNECTOR:
 				return getCreateConnector();
-			case SchemaPackage.ENDPOINT_TYPE__NAME:
+			case MulePackage.ENDPOINT_TYPE__NAME:
 				return getName();
-			case SchemaPackage.ENDPOINT_TYPE__REF:
+			case MulePackage.ENDPOINT_TYPE__REF:
 				return getRef();
-			case SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC:
+			case MulePackage.ENDPOINT_TYPE__REMOTE_SYNC:
 				return isRemoteSync() ? Boolean.TRUE : Boolean.FALSE;
-			case SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
+			case MulePackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
 				return getRemoteSyncTimeout();
-			case SchemaPackage.ENDPOINT_TYPE__SYNCHRONOUS:
+			case MulePackage.ENDPOINT_TYPE__RESPONSE_TRANSFORMERS:
+				return getResponseTransformers();
+			case MulePackage.ENDPOINT_TYPE__SYNCHRONOUS:
 				return isSynchronous() ? Boolean.TRUE : Boolean.FALSE;
-			case SchemaPackage.ENDPOINT_TYPE__TRANSFORMERS:
+			case MulePackage.ENDPOINT_TYPE__TRANSFORMERS:
 				return getTransformers();
-			case SchemaPackage.ENDPOINT_TYPE__TYPE:
+			case MulePackage.ENDPOINT_TYPE__TYPE:
 				return getType();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -827,51 +871,54 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENDPOINT_TYPE__MIXED:
+			case MulePackage.ENDPOINT_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__TRANSACTION:
+			case MulePackage.ENDPOINT_TYPE__TRANSACTION:
 				setTransaction((TransactionType)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__FILTER:
+			case MulePackage.ENDPOINT_TYPE__FILTER:
 				setFilter((FilterType)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__SECURITY_FILTER:
+			case MulePackage.ENDPOINT_TYPE__SECURITY_FILTER:
 				setSecurityFilter((SecurityFilterType)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__PROPERTIES:
+			case MulePackage.ENDPOINT_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__ADDRESS:
+			case MulePackage.ENDPOINT_TYPE__ADDRESS:
 				setAddress((String)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__CONNECTOR:
+			case MulePackage.ENDPOINT_TYPE__CONNECTOR:
 				setConnector((String)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__CREATE_CONNECTOR:
+			case MulePackage.ENDPOINT_TYPE__CREATE_CONNECTOR:
 				setCreateConnector((CreateConnectorType)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__NAME:
+			case MulePackage.ENDPOINT_TYPE__NAME:
 				setName((String)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__REF:
+			case MulePackage.ENDPOINT_TYPE__REF:
 				setRef((String)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC:
+			case MulePackage.ENDPOINT_TYPE__REMOTE_SYNC:
 				setRemoteSync(((Boolean)newValue).booleanValue());
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
+			case MulePackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
 				setRemoteSyncTimeout((String)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__SYNCHRONOUS:
+			case MulePackage.ENDPOINT_TYPE__RESPONSE_TRANSFORMERS:
+				setResponseTransformers((List)newValue);
+				return;
+			case MulePackage.ENDPOINT_TYPE__SYNCHRONOUS:
 				setSynchronous(((Boolean)newValue).booleanValue());
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__TRANSFORMERS:
-				setTransformers((List)newValue);
+			case MulePackage.ENDPOINT_TYPE__TRANSFORMERS:
+				setTransformers((String)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__TYPE:
-				setType((TypeType)newValue);
+			case MulePackage.ENDPOINT_TYPE__TYPE:
+				setType((TypeType1)newValue);
 				return;
 		}
 		eDynamicSet(eFeature, newValue);
@@ -884,49 +931,52 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENDPOINT_TYPE__MIXED:
+			case MulePackage.ENDPOINT_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__TRANSACTION:
+			case MulePackage.ENDPOINT_TYPE__TRANSACTION:
 				setTransaction((TransactionType)null);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__FILTER:
+			case MulePackage.ENDPOINT_TYPE__FILTER:
 				setFilter((FilterType)null);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__SECURITY_FILTER:
+			case MulePackage.ENDPOINT_TYPE__SECURITY_FILTER:
 				setSecurityFilter((SecurityFilterType)null);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__PROPERTIES:
+			case MulePackage.ENDPOINT_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__ADDRESS:
+			case MulePackage.ENDPOINT_TYPE__ADDRESS:
 				setAddress(ADDRESS_EDEFAULT);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__CONNECTOR:
+			case MulePackage.ENDPOINT_TYPE__CONNECTOR:
 				setConnector(CONNECTOR_EDEFAULT);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__CREATE_CONNECTOR:
+			case MulePackage.ENDPOINT_TYPE__CREATE_CONNECTOR:
 				unsetCreateConnector();
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__NAME:
+			case MulePackage.ENDPOINT_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__REF:
+			case MulePackage.ENDPOINT_TYPE__REF:
 				setRef(REF_EDEFAULT);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC:
+			case MulePackage.ENDPOINT_TYPE__REMOTE_SYNC:
 				unsetRemoteSync();
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
+			case MulePackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
 				setRemoteSyncTimeout(REMOTE_SYNC_TIMEOUT_EDEFAULT);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__SYNCHRONOUS:
+			case MulePackage.ENDPOINT_TYPE__RESPONSE_TRANSFORMERS:
+				setResponseTransformers(RESPONSE_TRANSFORMERS_EDEFAULT);
+				return;
+			case MulePackage.ENDPOINT_TYPE__SYNCHRONOUS:
 				unsetSynchronous();
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__TRANSFORMERS:
+			case MulePackage.ENDPOINT_TYPE__TRANSFORMERS:
 				setTransformers(TRANSFORMERS_EDEFAULT);
 				return;
-			case SchemaPackage.ENDPOINT_TYPE__TYPE:
+			case MulePackage.ENDPOINT_TYPE__TYPE:
 				unsetType();
 				return;
 		}
@@ -940,35 +990,37 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENDPOINT_TYPE__MIXED:
+			case MulePackage.ENDPOINT_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.ENDPOINT_TYPE__TRANSACTION:
+			case MulePackage.ENDPOINT_TYPE__TRANSACTION:
 				return getTransaction() != null;
-			case SchemaPackage.ENDPOINT_TYPE__FILTER:
+			case MulePackage.ENDPOINT_TYPE__FILTER:
 				return getFilter() != null;
-			case SchemaPackage.ENDPOINT_TYPE__SECURITY_FILTER:
+			case MulePackage.ENDPOINT_TYPE__SECURITY_FILTER:
 				return getSecurityFilter() != null;
-			case SchemaPackage.ENDPOINT_TYPE__PROPERTIES:
+			case MulePackage.ENDPOINT_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.ENDPOINT_TYPE__ADDRESS:
+			case MulePackage.ENDPOINT_TYPE__ADDRESS:
 				return ADDRESS_EDEFAULT == null ? address != null : !ADDRESS_EDEFAULT.equals(address);
-			case SchemaPackage.ENDPOINT_TYPE__CONNECTOR:
+			case MulePackage.ENDPOINT_TYPE__CONNECTOR:
 				return CONNECTOR_EDEFAULT == null ? connector != null : !CONNECTOR_EDEFAULT.equals(connector);
-			case SchemaPackage.ENDPOINT_TYPE__CREATE_CONNECTOR:
+			case MulePackage.ENDPOINT_TYPE__CREATE_CONNECTOR:
 				return isSetCreateConnector();
-			case SchemaPackage.ENDPOINT_TYPE__NAME:
+			case MulePackage.ENDPOINT_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case SchemaPackage.ENDPOINT_TYPE__REF:
+			case MulePackage.ENDPOINT_TYPE__REF:
 				return REF_EDEFAULT == null ? ref != null : !REF_EDEFAULT.equals(ref);
-			case SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC:
+			case MulePackage.ENDPOINT_TYPE__REMOTE_SYNC:
 				return isSetRemoteSync();
-			case SchemaPackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
+			case MulePackage.ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
 				return REMOTE_SYNC_TIMEOUT_EDEFAULT == null ? remoteSyncTimeout != null : !REMOTE_SYNC_TIMEOUT_EDEFAULT.equals(remoteSyncTimeout);
-			case SchemaPackage.ENDPOINT_TYPE__SYNCHRONOUS:
+			case MulePackage.ENDPOINT_TYPE__RESPONSE_TRANSFORMERS:
+				return RESPONSE_TRANSFORMERS_EDEFAULT == null ? responseTransformers != null : !RESPONSE_TRANSFORMERS_EDEFAULT.equals(responseTransformers);
+			case MulePackage.ENDPOINT_TYPE__SYNCHRONOUS:
 				return isSetSynchronous();
-			case SchemaPackage.ENDPOINT_TYPE__TRANSFORMERS:
+			case MulePackage.ENDPOINT_TYPE__TRANSFORMERS:
 				return TRANSFORMERS_EDEFAULT == null ? transformers != null : !TRANSFORMERS_EDEFAULT.equals(transformers);
-			case SchemaPackage.ENDPOINT_TYPE__TYPE:
+			case MulePackage.ENDPOINT_TYPE__TYPE:
 				return isSetType();
 		}
 		return eDynamicIsSet(eFeature);
@@ -999,6 +1051,8 @@ public class EndpointTypeImpl extends EObjectImpl implements EndpointType {
 		if (remoteSyncESet) result.append(remoteSync); else result.append("<unset>");
 		result.append(", remoteSyncTimeout: ");
 		result.append(remoteSyncTimeout);
+		result.append(", responseTransformers: ");
+		result.append(responseTransformers);
 		result.append(", synchronous: ");
 		if (synchronousESet) result.append(synchronous); else result.append("<unset>");
 		result.append(", transformers: ");

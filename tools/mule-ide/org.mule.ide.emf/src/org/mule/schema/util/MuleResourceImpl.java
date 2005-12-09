@@ -14,10 +14,10 @@ import org.eclipse.emf.ecore.xmi.impl.XMLResourceImpl;
  * <!-- begin-user-doc -->
  * The <b>Resource </b> associated with the package.
  * <!-- end-user-doc -->
- * @see org.mule.schema.util.SchemaResourceFactoryImpl
+ * @see org.mule.schema.util.MuleResourceFactoryImpl
  * @generated
  */
-public class SchemaResourceImpl extends XMLResourceImpl {
+public class MuleResourceImpl extends XMLResourceImpl {
 	/**
 	 * Creates an instance of the resource.
 	 * <!-- begin-user-doc -->
@@ -25,8 +25,8 @@ public class SchemaResourceImpl extends XMLResourceImpl {
 	 * @param uri the URI of the new resource.
 	 * @generated
 	 */
-	public SchemaResourceImpl(URI uri) {
+	public MuleResourceImpl(URI uri) {
 		super(uri);
 	}
 
-} //SchemaResourceImpl
+} //MuleResourceImpl

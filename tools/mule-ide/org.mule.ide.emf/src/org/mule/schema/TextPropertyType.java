@@ -21,7 +21,7 @@ import org.eclipse.emf.ecore.EObject;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getTextPropertyType()
+ * @see org.mule.schema.MulePackage#getTextPropertyType()
  * @model extendedMetaData="name='text-propertyType' kind='simple'"
  * @generated
  */
@@ -36,7 +36,7 @@ public interface TextPropertyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Value</em>' attribute.
 	 * @see #setValue(String)
-	 * @see org.mule.schema.SchemaPackage#getTextPropertyType_Value()
+	 * @see org.mule.schema.MulePackage#getTextPropertyType_Value()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="name=':0' kind='simple'"
 	 * @generated
@@ -63,9 +63,9 @@ public interface TextPropertyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getTextPropertyType_Name()
+	 * @see org.mule.schema.MulePackage#getTextPropertyType_Name()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();

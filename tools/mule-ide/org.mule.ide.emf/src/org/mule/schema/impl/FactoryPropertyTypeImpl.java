@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.FactoryPropertyType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -106,7 +106,7 @@ public class FactoryPropertyTypeImpl extends EObjectImpl implements FactoryPrope
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getFactoryPropertyType();
+		return MulePackage.eINSTANCE.getFactoryPropertyType();
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class FactoryPropertyTypeImpl extends EObjectImpl implements FactoryPrope
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.FACTORY_PROPERTY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.FACTORY_PROPERTY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -139,7 +139,7 @@ public class FactoryPropertyTypeImpl extends EObjectImpl implements FactoryPrope
 		String oldFactory = factory;
 		factory = newFactory;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.FACTORY_PROPERTY_TYPE__FACTORY, oldFactory, factory));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.FACTORY_PROPERTY_TYPE__FACTORY, oldFactory, factory));
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class FactoryPropertyTypeImpl extends EObjectImpl implements FactoryPrope
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.FACTORY_PROPERTY_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.FACTORY_PROPERTY_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class FactoryPropertyTypeImpl extends EObjectImpl implements FactoryPrope
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.FACTORY_PROPERTY_TYPE__MIXED:
+				case MulePackage.FACTORY_PROPERTY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -187,11 +187,11 @@ public class FactoryPropertyTypeImpl extends EObjectImpl implements FactoryPrope
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__MIXED:
+			case MulePackage.FACTORY_PROPERTY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__FACTORY:
+			case MulePackage.FACTORY_PROPERTY_TYPE__FACTORY:
 				return getFactory();
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__NAME:
+			case MulePackage.FACTORY_PROPERTY_TYPE__NAME:
 				return getName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -204,14 +204,14 @@ public class FactoryPropertyTypeImpl extends EObjectImpl implements FactoryPrope
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__MIXED:
+			case MulePackage.FACTORY_PROPERTY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__FACTORY:
+			case MulePackage.FACTORY_PROPERTY_TYPE__FACTORY:
 				setFactory((String)newValue);
 				return;
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__NAME:
+			case MulePackage.FACTORY_PROPERTY_TYPE__NAME:
 				setName((String)newValue);
 				return;
 		}
@@ -225,13 +225,13 @@ public class FactoryPropertyTypeImpl extends EObjectImpl implements FactoryPrope
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__MIXED:
+			case MulePackage.FACTORY_PROPERTY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__FACTORY:
+			case MulePackage.FACTORY_PROPERTY_TYPE__FACTORY:
 				setFactory(FACTORY_EDEFAULT);
 				return;
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__NAME:
+			case MulePackage.FACTORY_PROPERTY_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
 		}
@@ -245,11 +245,11 @@ public class FactoryPropertyTypeImpl extends EObjectImpl implements FactoryPrope
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__MIXED:
+			case MulePackage.FACTORY_PROPERTY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__FACTORY:
+			case MulePackage.FACTORY_PROPERTY_TYPE__FACTORY:
 				return FACTORY_EDEFAULT == null ? factory != null : !FACTORY_EDEFAULT.equals(factory);
-			case SchemaPackage.FACTORY_PROPERTY_TYPE__NAME:
+			case MulePackage.FACTORY_PROPERTY_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return eDynamicIsSet(eFeature);

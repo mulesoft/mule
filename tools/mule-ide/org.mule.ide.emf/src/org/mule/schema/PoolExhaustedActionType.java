@@ -17,7 +17,7 @@ import org.eclipse.emf.common.util.AbstractEnumerator;
  * A representation of the literals of the enumeration '<em><b>Pool Exhausted Action Type</b></em>',
  * and utility methods for working with them.
  * <!-- end-user-doc -->
- * @see org.mule.schema.SchemaPackage#getPoolExhaustedActionType()
+ * @see org.mule.schema.MulePackage#getPoolExhaustedActionType()
  * @model
  * @generated
  */

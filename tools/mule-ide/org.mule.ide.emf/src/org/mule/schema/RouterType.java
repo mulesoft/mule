@@ -33,7 +33,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getRouterType()
+ * @see org.mule.schema.MulePackage#getRouterType()
  * @model extendedMetaData="name='routerType' kind='mixed'"
  * @generated
  */
@@ -48,7 +48,7 @@ public interface RouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getRouterType_Mixed()
+	 * @see org.mule.schema.MulePackage#getRouterType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -65,7 +65,7 @@ public interface RouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Endpoint</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getRouterType_Endpoint()
+	 * @see org.mule.schema.MulePackage#getRouterType_Endpoint()
 	 * @model type="org.mule.schema.EndpointType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -82,7 +82,7 @@ public interface RouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Global Endpoint</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getRouterType_GlobalEndpoint()
+	 * @see org.mule.schema.MulePackage#getRouterType_GlobalEndpoint()
 	 * @model type="org.mule.schema.GlobalEndpointType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='global-endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -99,7 +99,7 @@ public interface RouterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Reply To</em>' containment reference.
 	 * @see #setReplyTo(ReplyToType)
-	 * @see org.mule.schema.SchemaPackage#getRouterType_ReplyTo()
+	 * @see org.mule.schema.MulePackage#getRouterType_ReplyTo()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='reply-to' namespace='##targetNamespace'"
 	 * @generated
@@ -126,7 +126,7 @@ public interface RouterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Transaction</em>' containment reference.
 	 * @see #setTransaction(TransactionType)
-	 * @see org.mule.schema.SchemaPackage#getRouterType_Transaction()
+	 * @see org.mule.schema.MulePackage#getRouterType_Transaction()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='transaction' namespace='##targetNamespace'"
 	 * @generated
@@ -153,7 +153,7 @@ public interface RouterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Filter</em>' containment reference.
 	 * @see #setFilter(FilterType)
-	 * @see org.mule.schema.SchemaPackage#getRouterType_Filter()
+	 * @see org.mule.schema.MulePackage#getRouterType_Filter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='filter' namespace='##targetNamespace'"
 	 * @generated
@@ -180,7 +180,7 @@ public interface RouterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getRouterType_Properties()
+	 * @see org.mule.schema.MulePackage#getRouterType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -207,9 +207,9 @@ public interface RouterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Class Name</em>' attribute.
 	 * @see #setClassName(String)
-	 * @see org.mule.schema.SchemaPackage#getRouterType_ClassName()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='className'"
+	 * @see org.mule.schema.MulePackage#getRouterType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getClassName();
@@ -239,9 +239,9 @@ public interface RouterType extends EObject {
 	 * @see #isSetEnableCorrelation()
 	 * @see #unsetEnableCorrelation()
 	 * @see #setEnableCorrelation(EnableCorrelationType)
-	 * @see org.mule.schema.SchemaPackage#getRouterType_EnableCorrelation()
+	 * @see org.mule.schema.MulePackage#getRouterType_EnableCorrelation()
 	 * @model default="IF_NOT_SET" unique="false" unsettable="true"
-	 *        extendedMetaData="kind='attribute' name='enableCorrelation'"
+	 *        extendedMetaData="kind='attribute' name='enableCorrelation' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	EnableCorrelationType getEnableCorrelation();
@@ -292,9 +292,9 @@ public interface RouterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Property Extractor</em>' attribute.
 	 * @see #setPropertyExtractor(String)
-	 * @see org.mule.schema.SchemaPackage#getRouterType_PropertyExtractor()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='propertyExtractor'"
+	 * @see org.mule.schema.MulePackage#getRouterType_PropertyExtractor()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='propertyExtractor' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getPropertyExtractor();

@@ -19,13 +19,14 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * The following features are supported:
  * <ul>
  *   <li>{@link org.mule.schema.ContainerPropertyType#getMixed <em>Mixed</em>}</li>
- *   <li>{@link org.mule.schema.ContainerPropertyType#isContainer <em>Container</em>}</li>
+ *   <li>{@link org.mule.schema.ContainerPropertyType#getContainer <em>Container</em>}</li>
  *   <li>{@link org.mule.schema.ContainerPropertyType#getName <em>Name</em>}</li>
  *   <li>{@link org.mule.schema.ContainerPropertyType#getReference <em>Reference</em>}</li>
+ *   <li>{@link org.mule.schema.ContainerPropertyType#isRequired <em>Required</em>}</li>
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getContainerPropertyType()
+ * @see org.mule.schema.MulePackage#getContainerPropertyType()
  * @model extendedMetaData="name='container-propertyType' kind='mixed'"
  * @generated
  */
@@ -40,7 +41,7 @@ public interface ContainerPropertyType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getContainerPropertyType_Mixed()
+	 * @see org.mule.schema.MulePackage#getContainerPropertyType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -49,7 +50,6 @@ public interface ContainerPropertyType extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Container</b></em>' attribute.
-	 * The default value is <code>"true"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Container</em>' attribute isn't clear,
@@ -57,50 +57,23 @@ public interface ContainerPropertyType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Container</em>' attribute.
-	 * @see #isSetContainer()
-	 * @see #unsetContainer()
-	 * @see #setContainer(boolean)
-	 * @see org.mule.schema.SchemaPackage#getContainerPropertyType_Container()
-	 * @model default="true" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='container'"
+	 * @see #setContainer(String)
+	 * @see org.mule.schema.MulePackage#getContainerPropertyType_Container()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='container' namespace='##targetNamespace'"
 	 * @generated
 	 */
-	boolean isContainer();
+	String getContainer();
 
 	/**
-	 * Sets the value of the '{@link org.mule.schema.ContainerPropertyType#isContainer <em>Container</em>}' attribute.
+	 * Sets the value of the '{@link org.mule.schema.ContainerPropertyType#getContainer <em>Container</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Container</em>' attribute.
-	 * @see #isSetContainer()
-	 * @see #unsetContainer()
-	 * @see #isContainer()
+	 * @see #getContainer()
 	 * @generated
 	 */
-	void setContainer(boolean value);
-
-	/**
-	 * Unsets the value of the '{@link org.mule.schema.ContainerPropertyType#isContainer <em>Container</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isSetContainer()
-	 * @see #isContainer()
-	 * @see #setContainer(boolean)
-	 * @generated
-	 */
-	void unsetContainer();
-
-	/**
-	 * Returns whether the value of the '{@link org.mule.schema.ContainerPropertyType#isContainer <em>Container</em>}' attribute is set.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return whether the value of the '<em>Container</em>' attribute is set.
-	 * @see #unsetContainer()
-	 * @see #isContainer()
-	 * @see #setContainer(boolean)
-	 * @generated
-	 */
-	boolean isSetContainer();
+	void setContainer(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
@@ -112,9 +85,9 @@ public interface ContainerPropertyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getContainerPropertyType_Name()
+	 * @see org.mule.schema.MulePackage#getContainerPropertyType_Name()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();
@@ -139,9 +112,9 @@ public interface ContainerPropertyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Reference</em>' attribute.
 	 * @see #setReference(String)
-	 * @see org.mule.schema.SchemaPackage#getContainerPropertyType_Reference()
+	 * @see org.mule.schema.MulePackage#getContainerPropertyType_Reference()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='reference'"
+	 *        extendedMetaData="kind='attribute' name='reference' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getReference();
@@ -155,5 +128,60 @@ public interface ContainerPropertyType extends EObject {
 	 * @generated
 	 */
 	void setReference(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Required</b></em>' attribute.
+	 * The default value is <code>"true"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Required</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Required</em>' attribute.
+	 * @see #isSetRequired()
+	 * @see #unsetRequired()
+	 * @see #setRequired(boolean)
+	 * @see org.mule.schema.MulePackage#getContainerPropertyType_Required()
+	 * @model default="true" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 *        extendedMetaData="kind='attribute' name='required' namespace='##targetNamespace'"
+	 * @generated
+	 */
+	boolean isRequired();
+
+	/**
+	 * Sets the value of the '{@link org.mule.schema.ContainerPropertyType#isRequired <em>Required</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Required</em>' attribute.
+	 * @see #isSetRequired()
+	 * @see #unsetRequired()
+	 * @see #isRequired()
+	 * @generated
+	 */
+	void setRequired(boolean value);
+
+	/**
+	 * Unsets the value of the '{@link org.mule.schema.ContainerPropertyType#isRequired <em>Required</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isSetRequired()
+	 * @see #isRequired()
+	 * @see #setRequired(boolean)
+	 * @generated
+	 */
+	void unsetRequired();
+
+	/**
+	 * Returns whether the value of the '{@link org.mule.schema.ContainerPropertyType#isRequired <em>Required</em>}' attribute is set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return whether the value of the '<em>Required</em>' attribute is set.
+	 * @see #unsetRequired()
+	 * @see #isRequired()
+	 * @see #setRequired(boolean)
+	 * @generated
+	 */
+	boolean isSetRequired();
 
 } // ContainerPropertyType

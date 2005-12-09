@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getTransformersType()
+ * @see org.mule.schema.MulePackage#getTransformersType()
  * @model extendedMetaData="name='transformersType' kind='mixed'"
  * @generated
  */
@@ -40,7 +40,7 @@ public interface TransformersType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getTransformersType_Mixed()
+	 * @see org.mule.schema.MulePackage#getTransformersType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -57,7 +57,7 @@ public interface TransformersType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Transformer</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getTransformersType_Transformer()
+	 * @see org.mule.schema.MulePackage#getTransformersType_Transformer()
 	 * @model type="org.mule.schema.TransformerType" containment="true" resolveProxies="false" required="true" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='transformer' namespace='##targetNamespace'"
 	 * @generated

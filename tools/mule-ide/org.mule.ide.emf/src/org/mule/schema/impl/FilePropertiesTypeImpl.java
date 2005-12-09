@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.FilePropertiesType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -115,7 +115,7 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getFilePropertiesType();
+		return MulePackage.eINSTANCE.getFilePropertiesType();
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.FILE_PROPERTIES_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.FILE_PROPERTIES_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -148,7 +148,7 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 		String oldLocation = location;
 		location = newLocation;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.FILE_PROPERTIES_TYPE__LOCATION, oldLocation, location));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.FILE_PROPERTIES_TYPE__LOCATION, oldLocation, location));
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 		boolean oldOverrideESet = overrideESet;
 		overrideESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.FILE_PROPERTIES_TYPE__OVERRIDE, oldOverride, override, !oldOverrideESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.FILE_PROPERTIES_TYPE__OVERRIDE, oldOverride, override, !oldOverrideESet));
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 		override = OVERRIDE_EDEFAULT;
 		overrideESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.FILE_PROPERTIES_TYPE__OVERRIDE, oldOverride, OVERRIDE_EDEFAULT, oldOverrideESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.FILE_PROPERTIES_TYPE__OVERRIDE, oldOverride, OVERRIDE_EDEFAULT, oldOverrideESet));
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.FILE_PROPERTIES_TYPE__MIXED:
+				case MulePackage.FILE_PROPERTIES_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -221,11 +221,11 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FILE_PROPERTIES_TYPE__MIXED:
+			case MulePackage.FILE_PROPERTIES_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.FILE_PROPERTIES_TYPE__LOCATION:
+			case MulePackage.FILE_PROPERTIES_TYPE__LOCATION:
 				return getLocation();
-			case SchemaPackage.FILE_PROPERTIES_TYPE__OVERRIDE:
+			case MulePackage.FILE_PROPERTIES_TYPE__OVERRIDE:
 				return isOverride() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -238,14 +238,14 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FILE_PROPERTIES_TYPE__MIXED:
+			case MulePackage.FILE_PROPERTIES_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.FILE_PROPERTIES_TYPE__LOCATION:
+			case MulePackage.FILE_PROPERTIES_TYPE__LOCATION:
 				setLocation((String)newValue);
 				return;
-			case SchemaPackage.FILE_PROPERTIES_TYPE__OVERRIDE:
+			case MulePackage.FILE_PROPERTIES_TYPE__OVERRIDE:
 				setOverride(((Boolean)newValue).booleanValue());
 				return;
 		}
@@ -259,13 +259,13 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FILE_PROPERTIES_TYPE__MIXED:
+			case MulePackage.FILE_PROPERTIES_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.FILE_PROPERTIES_TYPE__LOCATION:
+			case MulePackage.FILE_PROPERTIES_TYPE__LOCATION:
 				setLocation(LOCATION_EDEFAULT);
 				return;
-			case SchemaPackage.FILE_PROPERTIES_TYPE__OVERRIDE:
+			case MulePackage.FILE_PROPERTIES_TYPE__OVERRIDE:
 				unsetOverride();
 				return;
 		}
@@ -279,11 +279,11 @@ public class FilePropertiesTypeImpl extends EObjectImpl implements FilePropertie
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FILE_PROPERTIES_TYPE__MIXED:
+			case MulePackage.FILE_PROPERTIES_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.FILE_PROPERTIES_TYPE__LOCATION:
+			case MulePackage.FILE_PROPERTIES_TYPE__LOCATION:
 				return LOCATION_EDEFAULT == null ? location != null : !LOCATION_EDEFAULT.equals(location);
-			case SchemaPackage.FILE_PROPERTIES_TYPE__OVERRIDE:
+			case MulePackage.FILE_PROPERTIES_TYPE__OVERRIDE:
 				return isSetOverride();
 		}
 		return eDynamicIsSet(eFeature);

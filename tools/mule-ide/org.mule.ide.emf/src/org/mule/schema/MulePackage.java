@@ -24,11 +24,11 @@ import org.eclipse.emf.ecore.EReference;
  *   <li>and each data type</li>
  * </ul>
  * <!-- end-user-doc -->
- * @see org.mule.schema.SchemaFactory
+ * @see org.mule.schema.MuleFactory
  * @model kind="package"
  * @generated
  */
-public interface SchemaPackage extends EPackage {
+public interface MulePackage extends EPackage {
 	/**
 	 * The package name.
 	 * <!-- begin-user-doc -->
@@ -43,7 +43,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	String eNS_URI = "http://mule.org/schema";
+	String eNS_URI = "platform:/resource/org.mule.ide.emf/xml/mule.xsd";
 
 	/**
 	 * The package namespace name.
@@ -51,7 +51,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	String eNS_PREFIX = "schema";
+	String eNS_PREFIX = "Mule";
 
 	/**
 	 * The singleton instance of the package.
@@ -59,14 +59,14 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	SchemaPackage eINSTANCE = org.mule.schema.impl.SchemaPackageImpl.init();
+	MulePackage eINSTANCE = org.mule.schema.impl.MulePackageImpl.init();
 
 	/**
 	 * The meta object id for the '{@link org.mule.schema.impl.AgentsTypeImpl <em>Agents Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.AgentsTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getAgentsType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getAgentsType()
 	 * @generated
 	 */
 	int AGENTS_TYPE = 0;
@@ -103,7 +103,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.AgentTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getAgentType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getAgentType()
 	 * @generated
 	 */
 	int AGENT_TYPE = 1;
@@ -167,7 +167,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.CatchAllStrategyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getCatchAllStrategyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getCatchAllStrategyType()
 	 * @generated
 	 */
 	int CATCH_ALL_STRATEGY_TYPE = 2;
@@ -231,7 +231,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ComponentFactoryTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getComponentFactoryType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getComponentFactoryType()
 	 * @generated
 	 */
 	int COMPONENT_FACTORY_TYPE = 3;
@@ -268,7 +268,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ComponentLifecycleAdapterFactoryTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getComponentLifecycleAdapterFactoryType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getComponentLifecycleAdapterFactoryType()
 	 * @generated
 	 */
 	int COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE = 4;
@@ -305,7 +305,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ComponentPoolFactoryTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getComponentPoolFactoryType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getComponentPoolFactoryType()
 	 * @generated
 	 */
 	int COMPONENT_POOL_FACTORY_TYPE = 5;
@@ -351,7 +351,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ConnectionStrategyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getConnectionStrategyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getConnectionStrategyType()
 	 * @generated
 	 */
 	int CONNECTION_STRATEGY_TYPE = 6;
@@ -397,7 +397,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ConnectorTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getConnectorType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getConnectorType()
 	 * @generated
 	 */
 	int CONNECTOR_TYPE = 7;
@@ -488,7 +488,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ConstraintTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getConstraintType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getConstraintType()
 	 * @generated
 	 */
 	int CONSTRAINT_TYPE = 8;
@@ -606,7 +606,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ContainerContextTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getContainerContextType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getContainerContextType()
 	 * @generated
 	 */
 	int CONTAINER_CONTEXT_TYPE = 9;
@@ -661,7 +661,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ContainerEntryTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getContainerEntryType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getContainerEntryType()
 	 * @generated
 	 */
 	int CONTAINER_ENTRY_TYPE = 10;
@@ -707,7 +707,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ContainerPropertyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getContainerPropertyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getContainerPropertyType()
 	 * @generated
 	 */
 	int CONTAINER_PROPERTY_TYPE = 11;
@@ -749,20 +749,29 @@ public interface SchemaPackage extends EPackage {
 	int CONTAINER_PROPERTY_TYPE__REFERENCE = 3;
 
 	/**
+	 * The feature id for the '<em><b>Required</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONTAINER_PROPERTY_TYPE__REQUIRED = 4;
+
+	/**
 	 * The number of structural features of the the '<em>Container Property Type</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CONTAINER_PROPERTY_TYPE_FEATURE_COUNT = 4;
+	int CONTAINER_PROPERTY_TYPE_FEATURE_COUNT = 5;
 
 	/**
 	 * The meta object id for the '{@link org.mule.schema.impl.DocumentRootImpl <em>Document Root</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.DocumentRootImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getDocumentRoot()
+	 * @see org.mule.schema.impl.MulePackageImpl#getDocumentRoot()
 	 * @generated
 	 */
 	int DOCUMENT_ROOT = 12;
@@ -817,7 +826,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.EncryptionStrategyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getEncryptionStrategyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getEncryptionStrategyType()
 	 * @generated
 	 */
 	int ENCRYPTION_STRATEGY_TYPE = 13;
@@ -872,7 +881,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.EndpointIdentifiersTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getEndpointIdentifiersType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getEndpointIdentifiersType()
 	 * @generated
 	 */
 	int ENDPOINT_IDENTIFIERS_TYPE = 14;
@@ -909,7 +918,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.EndpointIdentifierTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getEndpointIdentifierType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getEndpointIdentifierType()
 	 * @generated
 	 */
 	int ENDPOINT_IDENTIFIER_TYPE = 15;
@@ -955,7 +964,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.EndpointTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getEndpointType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getEndpointType()
 	 * @generated
 	 */
 	int ENDPOINT_TYPE = 16;
@@ -1069,13 +1078,22 @@ public interface SchemaPackage extends EPackage {
 	int ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT = 11;
 
 	/**
+	 * The feature id for the '<em><b>Response Transformers</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ENDPOINT_TYPE__RESPONSE_TRANSFORMERS = 12;
+
+	/**
 	 * The feature id for the '<em><b>Synchronous</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ENDPOINT_TYPE__SYNCHRONOUS = 12;
+	int ENDPOINT_TYPE__SYNCHRONOUS = 13;
 
 	/**
 	 * The feature id for the '<em><b>Transformers</b></em>' attribute.
@@ -1084,7 +1102,7 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENDPOINT_TYPE__TRANSFORMERS = 13;
+	int ENDPOINT_TYPE__TRANSFORMERS = 14;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' attribute.
@@ -1093,7 +1111,7 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENDPOINT_TYPE__TYPE = 14;
+	int ENDPOINT_TYPE__TYPE = 15;
 
 	/**
 	 * The number of structural features of the the '<em>Endpoint Type</em>' class.
@@ -1102,14 +1120,14 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int ENDPOINT_TYPE_FEATURE_COUNT = 15;
+	int ENDPOINT_TYPE_FEATURE_COUNT = 16;
 
 	/**
 	 * The meta object id for the '{@link org.mule.schema.impl.EntryPointResolverTypeImpl <em>Entry Point Resolver Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.EntryPointResolverTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getEntryPointResolverType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getEntryPointResolverType()
 	 * @generated
 	 */
 	int ENTRY_POINT_RESOLVER_TYPE = 17;
@@ -1146,7 +1164,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.EntryTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getEntryType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getEntryType()
 	 * @generated
 	 */
 	int ENTRY_TYPE = 18;
@@ -1183,7 +1201,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.EnvironmentPropertiesTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getEnvironmentPropertiesType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getEnvironmentPropertiesType()
 	 * @generated
 	 */
 	int ENVIRONMENT_PROPERTIES_TYPE = 19;
@@ -1274,7 +1292,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ExceptionStrategyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getExceptionStrategyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getExceptionStrategyType()
 	 * @generated
 	 */
 	int EXCEPTION_STRATEGY_TYPE = 20;
@@ -1338,7 +1356,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.FactoryEntryTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getFactoryEntryType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getFactoryEntryType()
 	 * @generated
 	 */
 	int FACTORY_ENTRY_TYPE = 21;
@@ -1375,7 +1393,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.FactoryPropertyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getFactoryPropertyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getFactoryPropertyType()
 	 * @generated
 	 */
 	int FACTORY_PROPERTY_TYPE = 22;
@@ -1421,7 +1439,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.FilePropertiesTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getFilePropertiesType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getFilePropertiesType()
 	 * @generated
 	 */
 	int FILE_PROPERTIES_TYPE = 23;
@@ -1467,7 +1485,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.FilterTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getFilterType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getFilterType()
 	 * @generated
 	 */
 	int FILTER_TYPE = 24;
@@ -1585,7 +1603,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.GlobalEndpointsTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getGlobalEndpointsType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getGlobalEndpointsType()
 	 * @generated
 	 */
 	int GLOBAL_ENDPOINTS_TYPE = 25;
@@ -1622,7 +1640,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.GlobalEndpointTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getGlobalEndpointType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getGlobalEndpointType()
 	 * @generated
 	 */
 	int GLOBAL_ENDPOINT_TYPE = 26;
@@ -1709,13 +1727,22 @@ public interface SchemaPackage extends EPackage {
 	int GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT = 8;
 
 	/**
+	 * The feature id for the '<em><b>Response Transformers</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GLOBAL_ENDPOINT_TYPE__RESPONSE_TRANSFORMERS = 9;
+
+	/**
 	 * The feature id for the '<em><b>Synchronous</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS = 9;
+	int GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS = 10;
 
 	/**
 	 * The feature id for the '<em><b>Transformers</b></em>' attribute.
@@ -1724,7 +1751,7 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_ENDPOINT_TYPE__TRANSFORMERS = 10;
+	int GLOBAL_ENDPOINT_TYPE__TRANSFORMERS = 11;
 
 	/**
 	 * The number of structural features of the the '<em>Global Endpoint Type</em>' class.
@@ -1733,14 +1760,14 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int GLOBAL_ENDPOINT_TYPE_FEATURE_COUNT = 11;
+	int GLOBAL_ENDPOINT_TYPE_FEATURE_COUNT = 12;
 
 	/**
 	 * The meta object id for the '{@link org.mule.schema.impl.InboundRouterTypeImpl <em>Inbound Router Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.InboundRouterTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getInboundRouterType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getInboundRouterType()
 	 * @generated
 	 */
 	int INBOUND_ROUTER_TYPE = 27;
@@ -1813,7 +1840,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.InterceptorStackTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getInterceptorStackType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getInterceptorStackType()
 	 * @generated
 	 */
 	int INTERCEPTOR_STACK_TYPE = 28;
@@ -1859,7 +1886,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.InterceptorTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getInterceptorType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getInterceptorType()
 	 * @generated
 	 */
 	int INTERCEPTOR_TYPE = 29;
@@ -1914,7 +1941,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.LeftFilterTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getLeftFilterType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getLeftFilterType()
 	 * @generated
 	 */
 	int LEFT_FILTER_TYPE = 30;
@@ -2032,7 +2059,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ListTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getListType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getListType()
 	 * @generated
 	 */
 	int LIST_TYPE = 31;
@@ -2114,7 +2141,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.MapTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getMapType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getMapType()
 	 * @generated
 	 */
 	int MAP_TYPE = 32;
@@ -2223,7 +2250,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ModelTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getModelType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getModelType()
 	 * @generated
 	 */
 	int MODEL_TYPE = 33;
@@ -2301,13 +2328,22 @@ public interface SchemaPackage extends EPackage {
 	int MODEL_TYPE__MULE_DESCRIPTOR = 7;
 
 	/**
+	 * The feature id for the '<em><b>Class Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int MODEL_TYPE__CLASS_NAME = 8;
+
+	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int MODEL_TYPE__NAME = 8;
+	int MODEL_TYPE__NAME = 9;
 
 	/**
 	 * The feature id for the '<em><b>Ref</b></em>' attribute.
@@ -2316,7 +2352,16 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MODEL_TYPE__REF = 9;
+	int MODEL_TYPE__REF = 10;
+
+	/**
+	 * The feature id for the '<em><b>Type</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int MODEL_TYPE__TYPE = 11;
 
 	/**
 	 * The number of structural features of the the '<em>Model Type</em>' class.
@@ -2325,14 +2370,14 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MODEL_TYPE_FEATURE_COUNT = 10;
+	int MODEL_TYPE_FEATURE_COUNT = 12;
 
 	/**
-	 * The meta object id for the '{@link org.mule.schema.impl.MuleConfigurationTypeImpl <em>Mule Configuration Type</em>}' class.
+	 * The meta object id for the '{@link org.mule.schema.impl.MuleConfigurationTypeImpl <em>Configuration Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.MuleConfigurationTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getMuleConfigurationType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getMuleConfigurationType()
 	 * @generated
 	 */
 	int MULE_CONFIGURATION_TYPE = 34;
@@ -2491,7 +2536,7 @@ public interface SchemaPackage extends EPackage {
 	int MULE_CONFIGURATION_TYPE__VERSION = 16;
 
 	/**
-	 * The number of structural features of the the '<em>Mule Configuration Type</em>' class.
+	 * The number of structural features of the the '<em>Configuration Type</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2500,11 +2545,11 @@ public interface SchemaPackage extends EPackage {
 	int MULE_CONFIGURATION_TYPE_FEATURE_COUNT = 17;
 
 	/**
-	 * The meta object id for the '{@link org.mule.schema.impl.MuleDescriptorTypeImpl <em>Mule Descriptor Type</em>}' class.
+	 * The meta object id for the '{@link org.mule.schema.impl.MuleDescriptorTypeImpl <em>Descriptor Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.MuleDescriptorTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getMuleDescriptorType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getMuleDescriptorType()
 	 * @generated
 	 */
 	int MULE_DESCRIPTOR_TYPE = 35;
@@ -2708,7 +2753,7 @@ public interface SchemaPackage extends EPackage {
 	int MULE_DESCRIPTOR_TYPE__VERSION = 21;
 
 	/**
-	 * The number of structural features of the the '<em>Mule Descriptor Type</em>' class.
+	 * The number of structural features of the the '<em>Descriptor Type</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -2717,11 +2762,11 @@ public interface SchemaPackage extends EPackage {
 	int MULE_DESCRIPTOR_TYPE_FEATURE_COUNT = 22;
 
 	/**
-	 * The meta object id for the '{@link org.mule.schema.impl.MuleEnvironmentPropertiesTypeImpl <em>Mule Environment Properties Type</em>}' class.
+	 * The meta object id for the '{@link org.mule.schema.impl.MuleEnvironmentPropertiesTypeImpl <em>Environment Properties Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.MuleEnvironmentPropertiesTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getMuleEnvironmentPropertiesType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getMuleEnvironmentPropertiesType()
 	 * @generated
 	 */
 	int MULE_ENVIRONMENT_PROPERTIES_TYPE = 36;
@@ -2790,13 +2835,40 @@ public interface SchemaPackage extends EPackage {
 	int MULE_ENVIRONMENT_PROPERTIES_TYPE__CLIENT_MODE = 6;
 
 	/**
+	 * The feature id for the '<em><b>Embedded</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__EMBEDDED = 7;
+
+	/**
+	 * The feature id for the '<em><b>Enable Message Events</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__ENABLE_MESSAGE_EVENTS = 8;
+
+	/**
+	 * The feature id for the '<em><b>Encoding</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__ENCODING = 9;
+
+	/**
 	 * The feature id for the '<em><b>Model</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int MULE_ENVIRONMENT_PROPERTIES_TYPE__MODEL = 7;
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__MODEL = 10;
 
 	/**
 	 * The feature id for the '<em><b>Recoverable Mode</b></em>' attribute.
@@ -2805,7 +2877,16 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MULE_ENVIRONMENT_PROPERTIES_TYPE__RECOVERABLE_MODE = 8;
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__RECOVERABLE_MODE = 11;
+
+	/**
+	 * The feature id for the '<em><b>Remote Sync</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__REMOTE_SYNC = 12;
 
 	/**
 	 * The feature id for the '<em><b>Server Url</b></em>' attribute.
@@ -2814,7 +2895,7 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MULE_ENVIRONMENT_PROPERTIES_TYPE__SERVER_URL = 9;
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__SERVER_URL = 13;
 
 	/**
 	 * The feature id for the '<em><b>Synchronous</b></em>' attribute.
@@ -2823,7 +2904,7 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MULE_ENVIRONMENT_PROPERTIES_TYPE__SYNCHRONOUS = 10;
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__SYNCHRONOUS = 14;
 
 	/**
 	 * The feature id for the '<em><b>Synchronous Event Timeout</b></em>' attribute.
@@ -2832,16 +2913,7 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MULE_ENVIRONMENT_PROPERTIES_TYPE__SYNCHRONOUS_EVENT_TIMEOUT = 11;
-
-	/**
-	 * The feature id for the '<em><b>Synchronous Receive</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int MULE_ENVIRONMENT_PROPERTIES_TYPE__SYNCHRONOUS_RECEIVE = 12;
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__SYNCHRONOUS_EVENT_TIMEOUT = 15;
 
 	/**
 	 * The feature id for the '<em><b>Transaction Timeout</b></em>' attribute.
@@ -2850,7 +2922,7 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MULE_ENVIRONMENT_PROPERTIES_TYPE__TRANSACTION_TIMEOUT = 13;
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__TRANSACTION_TIMEOUT = 16;
 
 	/**
 	 * The feature id for the '<em><b>Working Directory</b></em>' attribute.
@@ -2859,23 +2931,23 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int MULE_ENVIRONMENT_PROPERTIES_TYPE__WORKING_DIRECTORY = 14;
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE__WORKING_DIRECTORY = 17;
 
 	/**
-	 * The number of structural features of the the '<em>Mule Environment Properties Type</em>' class.
+	 * The number of structural features of the the '<em>Environment Properties Type</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int MULE_ENVIRONMENT_PROPERTIES_TYPE_FEATURE_COUNT = 15;
+	int MULE_ENVIRONMENT_PROPERTIES_TYPE_FEATURE_COUNT = 18;
 
 	/**
 	 * The meta object id for the '{@link org.mule.schema.impl.OutboundRouterTypeImpl <em>Outbound Router Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.OutboundRouterTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getOutboundRouterType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getOutboundRouterType()
 	 * @generated
 	 */
 	int OUTBOUND_ROUTER_TYPE = 37;
@@ -2930,7 +3002,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.PersistenceStrategyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getPersistenceStrategyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getPersistenceStrategyType()
 	 * @generated
 	 */
 	int PERSISTENCE_STRATEGY_TYPE = 38;
@@ -2976,7 +3048,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.PoolingProfileTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getPoolingProfileType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getPoolingProfileType()
 	 * @generated
 	 */
 	int POOLING_PROFILE_TYPE = 39;
@@ -3058,7 +3130,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.PropertiesTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getPropertiesType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getPropertiesType()
 	 * @generated
 	 */
 	int PROPERTIES_TYPE = 40;
@@ -3167,7 +3239,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.PropertyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getPropertyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getPropertyType()
 	 * @generated
 	 */
 	int PROPERTY_TYPE = 41;
@@ -3213,7 +3285,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.QueueProfileTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getQueueProfileType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getQueueProfileType()
 	 * @generated
 	 */
 	int QUEUE_PROFILE_TYPE = 42;
@@ -3268,7 +3340,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ReplyToTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getReplyToType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getReplyToType()
 	 * @generated
 	 */
 	int REPLY_TO_TYPE = 43;
@@ -3305,7 +3377,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ResponseRouterTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getResponseRouterType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getResponseRouterType()
 	 * @generated
 	 */
 	int RESPONSE_ROUTER_TYPE = 44;
@@ -3356,29 +3428,20 @@ public interface SchemaPackage extends EPackage {
 	int RESPONSE_ROUTER_TYPE__TIMEOUT = 4;
 
 	/**
-	 * The feature id for the '<em><b>Transformers</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int RESPONSE_ROUTER_TYPE__TRANSFORMERS = 5;
-
-	/**
 	 * The number of structural features of the the '<em>Response Router Type</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int RESPONSE_ROUTER_TYPE_FEATURE_COUNT = 6;
+	int RESPONSE_ROUTER_TYPE_FEATURE_COUNT = 5;
 
 	/**
 	 * The meta object id for the '{@link org.mule.schema.impl.RightFilterTypeImpl <em>Right Filter Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.RightFilterTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getRightFilterType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getRightFilterType()
 	 * @generated
 	 */
 	int RIGHT_FILTER_TYPE = 45;
@@ -3496,7 +3559,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.RouterTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getRouterType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getRouterType()
 	 * @generated
 	 */
 	int ROUTER_TYPE = 46;
@@ -3605,7 +3668,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.SecurityFilterTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getSecurityFilterType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getSecurityFilterType()
 	 * @generated
 	 */
 	int SECURITY_FILTER_TYPE = 47;
@@ -3660,7 +3723,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.SecurityManagerTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getSecurityManagerType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getSecurityManagerType()
 	 * @generated
 	 */
 	int SECURITY_MANAGER_TYPE = 48;
@@ -3724,7 +3787,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.SecurityProviderTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getSecurityProviderType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getSecurityProviderType()
 	 * @generated
 	 */
 	int SECURITY_PROVIDER_TYPE = 49;
@@ -3788,7 +3851,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.SystemEntryTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getSystemEntryType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getSystemEntryType()
 	 * @generated
 	 */
 	int SYSTEM_ENTRY_TYPE = 50;
@@ -3834,7 +3897,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.SystemPropertyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getSystemPropertyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getSystemPropertyType()
 	 * @generated
 	 */
 	int SYSTEM_PROPERTY_TYPE = 51;
@@ -3889,7 +3952,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.TextPropertyTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getTextPropertyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getTextPropertyType()
 	 * @generated
 	 */
 	int TEXT_PROPERTY_TYPE = 52;
@@ -3926,7 +3989,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.ThreadingProfileTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getThreadingProfileType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getThreadingProfileType()
 	 * @generated
 	 */
 	int THREADING_PROFILE_TYPE = 53;
@@ -4004,20 +4067,29 @@ public interface SchemaPackage extends EPackage {
 	int THREADING_PROFILE_TYPE__THREAD_TTL = 7;
 
 	/**
+	 * The feature id for the '<em><b>Thread Wait Timeout</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int THREADING_PROFILE_TYPE__THREAD_WAIT_TIMEOUT = 8;
+
+	/**
 	 * The number of structural features of the the '<em>Threading Profile Type</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int THREADING_PROFILE_TYPE_FEATURE_COUNT = 8;
+	int THREADING_PROFILE_TYPE_FEATURE_COUNT = 9;
 
 	/**
 	 * The meta object id for the '{@link org.mule.schema.impl.TransactionManagerTypeImpl <em>Transaction Manager Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.TransactionManagerTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getTransactionManagerType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getTransactionManagerType()
 	 * @generated
 	 */
 	int TRANSACTION_MANAGER_TYPE = 54;
@@ -4072,7 +4144,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.TransactionTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getTransactionType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getTransactionType()
 	 * @generated
 	 */
 	int TRANSACTION_TYPE = 55;
@@ -4136,7 +4208,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.TransformersTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getTransformersType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getTransformersType()
 	 * @generated
 	 */
 	int TRANSFORMERS_TYPE = 56;
@@ -4173,7 +4245,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.impl.TransformerTypeImpl
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getTransformerType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getTransformerType()
 	 * @generated
 	 */
 	int TRANSFORMER_TYPE = 57;
@@ -4255,7 +4327,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.ActionType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getActionType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getActionType()
 	 * @generated
 	 */
 	int ACTION_TYPE = 58;
@@ -4265,7 +4337,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.CreateConnectorType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getCreateConnectorType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getCreateConnectorType()
 	 * @generated
 	 */
 	int CREATE_CONNECTOR_TYPE = 59;
@@ -4275,7 +4347,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.EnableCorrelationType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getEnableCorrelationType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getEnableCorrelationType()
 	 * @generated
 	 */
 	int ENABLE_CORRELATION_TYPE = 60;
@@ -4285,7 +4357,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.ExhaustedActionType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getExhaustedActionType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getExhaustedActionType()
 	 * @generated
 	 */
 	int EXHAUSTED_ACTION_TYPE = 61;
@@ -4295,7 +4367,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.IdType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getIdType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getIdType()
 	 * @generated
 	 */
 	int ID_TYPE = 62;
@@ -4305,7 +4377,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.InitialisationPolicyType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getInitialisationPolicyType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getInitialisationPolicyType()
 	 * @generated
 	 */
 	int INITIALISATION_POLICY_TYPE = 63;
@@ -4315,7 +4387,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.InitialStateType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getInitialStateType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getInitialStateType()
 	 * @generated
 	 */
 	int INITIAL_STATE_TYPE = 64;
@@ -4325,27 +4397,27 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.PoolExhaustedActionType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getPoolExhaustedActionType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getPoolExhaustedActionType()
 	 * @generated
 	 */
 	int POOL_EXHAUSTED_ACTION_TYPE = 65;
 
 	/**
-	 * The meta object id for the '{@link org.mule.schema.TypeType <em>Type Type</em>}' enum.
+	 * The meta object id for the '{@link org.mule.schema.TypeType1 <em>Type Type1</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see org.mule.schema.TypeType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getTypeType()
+	 * @see org.mule.schema.TypeType1
+	 * @see org.mule.schema.impl.MulePackageImpl#getTypeType1()
 	 * @generated
 	 */
-	int TYPE_TYPE = 66;
+	int TYPE_TYPE1 = 66;
 
 	/**
 	 * The meta object id for the '<em>Action Type Object</em>' data type.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.ActionType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getActionTypeObject()
+	 * @see org.mule.schema.impl.MulePackageImpl#getActionTypeObject()
 	 * @generated
 	 */
 	int ACTION_TYPE_OBJECT = 67;
@@ -4355,7 +4427,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.CreateConnectorType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getCreateConnectorTypeObject()
+	 * @see org.mule.schema.impl.MulePackageImpl#getCreateConnectorTypeObject()
 	 * @generated
 	 */
 	int CREATE_CONNECTOR_TYPE_OBJECT = 68;
@@ -4365,7 +4437,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.EnableCorrelationType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getEnableCorrelationTypeObject()
+	 * @see org.mule.schema.impl.MulePackageImpl#getEnableCorrelationTypeObject()
 	 * @generated
 	 */
 	int ENABLE_CORRELATION_TYPE_OBJECT = 69;
@@ -4375,7 +4447,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.ExhaustedActionType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getExhaustedActionTypeObject()
+	 * @see org.mule.schema.impl.MulePackageImpl#getExhaustedActionTypeObject()
 	 * @generated
 	 */
 	int EXHAUSTED_ACTION_TYPE_OBJECT = 70;
@@ -4385,7 +4457,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.IdType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getIdTypeObject()
+	 * @see org.mule.schema.impl.MulePackageImpl#getIdTypeObject()
 	 * @generated
 	 */
 	int ID_TYPE_OBJECT = 71;
@@ -4395,7 +4467,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.InitialisationPolicyType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getInitialisationPolicyTypeObject()
+	 * @see org.mule.schema.impl.MulePackageImpl#getInitialisationPolicyTypeObject()
 	 * @generated
 	 */
 	int INITIALISATION_POLICY_TYPE_OBJECT = 72;
@@ -4405,7 +4477,7 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.InitialStateType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getInitialStateTypeObject()
+	 * @see org.mule.schema.impl.MulePackageImpl#getInitialStateTypeObject()
 	 * @generated
 	 */
 	int INITIAL_STATE_TYPE_OBJECT = 73;
@@ -4415,30 +4487,40 @@ public interface SchemaPackage extends EPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.mule.schema.PoolExhaustedActionType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getPoolExhaustedActionTypeObject()
+	 * @see org.mule.schema.impl.MulePackageImpl#getPoolExhaustedActionTypeObject()
 	 * @generated
 	 */
 	int POOL_EXHAUSTED_ACTION_TYPE_OBJECT = 74;
 
 	/**
+	 * The meta object id for the '<em>Type Type</em>' data type.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see java.lang.String
+	 * @see org.mule.schema.impl.MulePackageImpl#getTypeType()
+	 * @generated
+	 */
+	int TYPE_TYPE = 75;
+
+	/**
 	 * The meta object id for the '<em>Type Type Object</em>' data type.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see org.mule.schema.TypeType
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getTypeTypeObject()
+	 * @see org.mule.schema.TypeType1
+	 * @see org.mule.schema.impl.MulePackageImpl#getTypeTypeObject()
 	 * @generated
 	 */
-	int TYPE_TYPE_OBJECT = 75;
+	int TYPE_TYPE_OBJECT = 76;
 
 	/**
 	 * The meta object id for the '<em>Version Type</em>' data type.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see java.lang.String
-	 * @see org.mule.schema.impl.SchemaPackageImpl#getVersionType()
+	 * @see org.mule.schema.impl.MulePackageImpl#getVersionType()
 	 * @generated
 	 */
-	int VERSION_TYPE = 76;
+	int VERSION_TYPE = 77;
 
 
 	/**
@@ -5101,11 +5183,11 @@ public interface SchemaPackage extends EPackage {
 	EAttribute getContainerPropertyType_Mixed();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.mule.schema.ContainerPropertyType#isContainer <em>Container</em>}'.
+	 * Returns the meta object for the attribute '{@link org.mule.schema.ContainerPropertyType#getContainer <em>Container</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Container</em>'.
-	 * @see org.mule.schema.ContainerPropertyType#isContainer()
+	 * @see org.mule.schema.ContainerPropertyType#getContainer()
 	 * @see #getContainerPropertyType()
 	 * @generated
 	 */
@@ -5132,6 +5214,17 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getContainerPropertyType_Reference();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.mule.schema.ContainerPropertyType#isRequired <em>Required</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Required</em>'.
+	 * @see org.mule.schema.ContainerPropertyType#isRequired()
+	 * @see #getContainerPropertyType()
+	 * @generated
+	 */
+	EAttribute getContainerPropertyType_Required();
 
 	/**
 	 * Returns the meta object for class '{@link org.mule.schema.DocumentRoot <em>Document Root</em>}'.
@@ -5457,6 +5550,17 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getEndpointType_RemoteSyncTimeout();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.mule.schema.EndpointType#getResponseTransformers <em>Response Transformers</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Response Transformers</em>'.
+	 * @see org.mule.schema.EndpointType#getResponseTransformers()
+	 * @see #getEndpointType()
+	 * @generated
+	 */
+	EAttribute getEndpointType_ResponseTransformers();
 
 	/**
 	 * Returns the meta object for the attribute '{@link org.mule.schema.EndpointType#isSynchronous <em>Synchronous</em>}'.
@@ -6109,6 +6213,17 @@ public interface SchemaPackage extends EPackage {
 	EAttribute getGlobalEndpointType_RemoteSyncTimeout();
 
 	/**
+	 * Returns the meta object for the attribute '{@link org.mule.schema.GlobalEndpointType#getResponseTransformers <em>Response Transformers</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Response Transformers</em>'.
+	 * @see org.mule.schema.GlobalEndpointType#getResponseTransformers()
+	 * @see #getGlobalEndpointType()
+	 * @generated
+	 */
+	EAttribute getGlobalEndpointType_ResponseTransformers();
+
+	/**
 	 * Returns the meta object for the attribute '{@link org.mule.schema.GlobalEndpointType#isSynchronous <em>Synchronous</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -6740,6 +6855,17 @@ public interface SchemaPackage extends EPackage {
 	EReference getModelType_MuleDescriptor();
 
 	/**
+	 * Returns the meta object for the attribute '{@link org.mule.schema.ModelType#getClassName <em>Class Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Class Name</em>'.
+	 * @see org.mule.schema.ModelType#getClassName()
+	 * @see #getModelType()
+	 * @generated
+	 */
+	EAttribute getModelType_ClassName();
+
+	/**
 	 * Returns the meta object for the attribute '{@link org.mule.schema.ModelType#getName <em>Name</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -6762,10 +6888,21 @@ public interface SchemaPackage extends EPackage {
 	EAttribute getModelType_Ref();
 
 	/**
-	 * Returns the meta object for class '{@link org.mule.schema.MuleConfigurationType <em>Mule Configuration Type</em>}'.
+	 * Returns the meta object for the attribute '{@link org.mule.schema.ModelType#getType <em>Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Mule Configuration Type</em>'.
+	 * @return the meta object for the attribute '<em>Type</em>'.
+	 * @see org.mule.schema.ModelType#getType()
+	 * @see #getModelType()
+	 * @generated
+	 */
+	EAttribute getModelType_Type();
+
+	/**
+	 * Returns the meta object for class '{@link org.mule.schema.MuleConfigurationType <em>Configuration Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Configuration Type</em>'.
 	 * @see org.mule.schema.MuleConfigurationType
 	 * @generated
 	 */
@@ -6959,10 +7096,10 @@ public interface SchemaPackage extends EPackage {
 	EAttribute getMuleConfigurationType_Version();
 
 	/**
-	 * Returns the meta object for class '{@link org.mule.schema.MuleDescriptorType <em>Mule Descriptor Type</em>}'.
+	 * Returns the meta object for class '{@link org.mule.schema.MuleDescriptorType <em>Descriptor Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Mule Descriptor Type</em>'.
+	 * @return the meta object for class '<em>Descriptor Type</em>'.
 	 * @see org.mule.schema.MuleDescriptorType
 	 * @generated
 	 */
@@ -7211,10 +7348,10 @@ public interface SchemaPackage extends EPackage {
 	EAttribute getMuleDescriptorType_Version();
 
 	/**
-	 * Returns the meta object for class '{@link org.mule.schema.MuleEnvironmentPropertiesType <em>Mule Environment Properties Type</em>}'.
+	 * Returns the meta object for class '{@link org.mule.schema.MuleEnvironmentPropertiesType <em>Environment Properties Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Mule Environment Properties Type</em>'.
+	 * @return the meta object for class '<em>Environment Properties Type</em>'.
 	 * @see org.mule.schema.MuleEnvironmentPropertiesType
 	 * @generated
 	 */
@@ -7298,6 +7435,39 @@ public interface SchemaPackage extends EPackage {
 	EAttribute getMuleEnvironmentPropertiesType_ClientMode();
 
 	/**
+	 * Returns the meta object for the attribute '{@link org.mule.schema.MuleEnvironmentPropertiesType#isEmbedded <em>Embedded</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Embedded</em>'.
+	 * @see org.mule.schema.MuleEnvironmentPropertiesType#isEmbedded()
+	 * @see #getMuleEnvironmentPropertiesType()
+	 * @generated
+	 */
+	EAttribute getMuleEnvironmentPropertiesType_Embedded();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.mule.schema.MuleEnvironmentPropertiesType#isEnableMessageEvents <em>Enable Message Events</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Enable Message Events</em>'.
+	 * @see org.mule.schema.MuleEnvironmentPropertiesType#isEnableMessageEvents()
+	 * @see #getMuleEnvironmentPropertiesType()
+	 * @generated
+	 */
+	EAttribute getMuleEnvironmentPropertiesType_EnableMessageEvents();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.mule.schema.MuleEnvironmentPropertiesType#getEncoding <em>Encoding</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Encoding</em>'.
+	 * @see org.mule.schema.MuleEnvironmentPropertiesType#getEncoding()
+	 * @see #getMuleEnvironmentPropertiesType()
+	 * @generated
+	 */
+	EAttribute getMuleEnvironmentPropertiesType_Encoding();
+
+	/**
 	 * Returns the meta object for the attribute '{@link org.mule.schema.MuleEnvironmentPropertiesType#getModel <em>Model</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -7318,6 +7488,17 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getMuleEnvironmentPropertiesType_RecoverableMode();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.mule.schema.MuleEnvironmentPropertiesType#isRemoteSync <em>Remote Sync</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Remote Sync</em>'.
+	 * @see org.mule.schema.MuleEnvironmentPropertiesType#isRemoteSync()
+	 * @see #getMuleEnvironmentPropertiesType()
+	 * @generated
+	 */
+	EAttribute getMuleEnvironmentPropertiesType_RemoteSync();
 
 	/**
 	 * Returns the meta object for the attribute '{@link org.mule.schema.MuleEnvironmentPropertiesType#getServerUrl <em>Server Url</em>}'.
@@ -7351,17 +7532,6 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getMuleEnvironmentPropertiesType_SynchronousEventTimeout();
-
-	/**
-	 * Returns the meta object for the attribute '{@link org.mule.schema.MuleEnvironmentPropertiesType#isSynchronousReceive <em>Synchronous Receive</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Synchronous Receive</em>'.
-	 * @see org.mule.schema.MuleEnvironmentPropertiesType#isSynchronousReceive()
-	 * @see #getMuleEnvironmentPropertiesType()
-	 * @generated
-	 */
-	EAttribute getMuleEnvironmentPropertiesType_SynchronousReceive();
 
 	/**
 	 * Returns the meta object for the attribute '{@link org.mule.schema.MuleEnvironmentPropertiesType#getTransactionTimeout <em>Transaction Timeout</em>}'.
@@ -7882,17 +8052,6 @@ public interface SchemaPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getResponseRouterType_Timeout();
-
-	/**
-	 * Returns the meta object for the attribute '{@link org.mule.schema.ResponseRouterType#getTransformers <em>Transformers</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Transformers</em>'.
-	 * @see org.mule.schema.ResponseRouterType#getTransformers()
-	 * @see #getResponseRouterType()
-	 * @generated
-	 */
-	EAttribute getResponseRouterType_Transformers();
 
 	/**
 	 * Returns the meta object for class '{@link org.mule.schema.RightFilterType <em>Right Filter Type</em>}'.
@@ -8557,6 +8716,17 @@ public interface SchemaPackage extends EPackage {
 	EAttribute getThreadingProfileType_ThreadTTL();
 
 	/**
+	 * Returns the meta object for the attribute '{@link org.mule.schema.ThreadingProfileType#getThreadWaitTimeout <em>Thread Wait Timeout</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Thread Wait Timeout</em>'.
+	 * @see org.mule.schema.ThreadingProfileType#getThreadWaitTimeout()
+	 * @see #getThreadingProfileType()
+	 * @generated
+	 */
+	EAttribute getThreadingProfileType_ThreadWaitTimeout();
+
+	/**
 	 * Returns the meta object for class '{@link org.mule.schema.TransactionManagerType <em>Transaction Manager Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -8875,14 +9045,14 @@ public interface SchemaPackage extends EPackage {
 	EEnum getPoolExhaustedActionType();
 
 	/**
-	 * Returns the meta object for enum '{@link org.mule.schema.TypeType <em>Type Type</em>}'.
+	 * Returns the meta object for enum '{@link org.mule.schema.TypeType1 <em>Type Type1</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for enum '<em>Type Type</em>'.
-	 * @see org.mule.schema.TypeType
+	 * @return the meta object for enum '<em>Type Type1</em>'.
+	 * @see org.mule.schema.TypeType1
 	 * @generated
 	 */
-	EEnum getTypeType();
+	EEnum getTypeType1();
 
 	/**
 	 * Returns the meta object for data type '{@link org.mule.schema.ActionType <em>Action Type Object</em>}'.
@@ -8981,13 +9151,25 @@ public interface SchemaPackage extends EPackage {
 	EDataType getPoolExhaustedActionTypeObject();
 
 	/**
-	 * Returns the meta object for data type '{@link org.mule.schema.TypeType <em>Type Type Object</em>}'.
+	 * Returns the meta object for data type '{@link java.lang.String <em>Type Type</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for data type '<em>Type Type</em>'.
+	 * @see java.lang.String
+	 * @model instanceClass="java.lang.String"
+	 *        extendedMetaData="name='type_._type' baseType='http://www.eclipse.org/emf/2003/XMLType#NMTOKEN' enumeration='seda direct pipeline jms jms-clustered jcyclone custom'" 
+	 * @generated
+	 */
+	EDataType getTypeType();
+
+	/**
+	 * Returns the meta object for data type '{@link org.mule.schema.TypeType1 <em>Type Type Object</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for data type '<em>Type Type Object</em>'.
-	 * @see org.mule.schema.TypeType
-	 * @model instanceClass="org.mule.schema.TypeType"
-	 *        extendedMetaData="name='type_._type:Object' baseType='type_._type'" 
+	 * @see org.mule.schema.TypeType1
+	 * @model instanceClass="org.mule.schema.TypeType1"
+	 *        extendedMetaData="name='type_._1_._type:Object' baseType='type_._1_._type'" 
 	 * @generated
 	 */
 	EDataType getTypeTypeObject();
@@ -9011,6 +9193,6 @@ public interface SchemaPackage extends EPackage {
 	 * @return the factory that creates the instances of the model.
 	 * @generated
 	 */
-	SchemaFactory getSchemaFactory();
+	MuleFactory getMuleFactory();
 
-} //SchemaPackage
+} //MulePackage

@@ -30,7 +30,7 @@ import org.mule.schema.ComponentPoolFactoryType;
 import org.mule.schema.EntryPointResolverType;
 import org.mule.schema.ExceptionStrategyType;
 import org.mule.schema.ModelType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -47,8 +47,10 @@ import org.mule.schema.SchemaPackage;
  *   <li>{@link org.mule.schema.impl.ModelTypeImpl#getComponentPoolFactory <em>Component Pool Factory</em>}</li>
  *   <li>{@link org.mule.schema.impl.ModelTypeImpl#getExceptionStrategy <em>Exception Strategy</em>}</li>
  *   <li>{@link org.mule.schema.impl.ModelTypeImpl#getMuleDescriptor <em>Mule Descriptor</em>}</li>
+ *   <li>{@link org.mule.schema.impl.ModelTypeImpl#getClassName <em>Class Name</em>}</li>
  *   <li>{@link org.mule.schema.impl.ModelTypeImpl#getName <em>Name</em>}</li>
  *   <li>{@link org.mule.schema.impl.ModelTypeImpl#getRef <em>Ref</em>}</li>
+ *   <li>{@link org.mule.schema.impl.ModelTypeImpl#getType <em>Type</em>}</li>
  * </ul>
  * </p>
  *
@@ -74,6 +76,26 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @ordered
 	 */
 	protected static final String DESCRIPTION_EDEFAULT = null;
+
+	/**
+	 * The default value of the '{@link #getClassName() <em>Class Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getClassName()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String CLASS_NAME_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getClassName() <em>Class Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getClassName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String className = CLASS_NAME_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -116,6 +138,35 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	protected String ref = REF_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getType() <em>Type</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getType()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String TYPE_EDEFAULT = "seda";
+
+	/**
+	 * The cached value of the '{@link #getType() <em>Type</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getType()
+	 * @generated
+	 * @ordered
+	 */
+	protected String type = TYPE_EDEFAULT;
+
+	/**
+	 * This is true if the Type attribute has been set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean typeESet = false;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -130,7 +181,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getModelType();
+		return MulePackage.eINSTANCE.getModelType();
 	}
 
 	/**
@@ -140,7 +191,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.MODEL_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.MODEL_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -151,7 +202,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public String getDescription() {
-		return (String)getMixed().get(SchemaPackage.eINSTANCE.getModelType_Description(), true);
+		return (String)getMixed().get(MulePackage.eINSTANCE.getModelType_Description(), true);
 	}
 
 	/**
@@ -160,7 +211,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public void setDescription(String newDescription) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getModelType_Description(), newDescription);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getModelType_Description(), newDescription);
 	}
 
 	/**
@@ -169,7 +220,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public EntryPointResolverType getEntryPointResolver() {
-		return (EntryPointResolverType)getMixed().get(SchemaPackage.eINSTANCE.getModelType_EntryPointResolver(), true);
+		return (EntryPointResolverType)getMixed().get(MulePackage.eINSTANCE.getModelType_EntryPointResolver(), true);
 	}
 
 	/**
@@ -178,7 +229,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public NotificationChain basicSetEntryPointResolver(EntryPointResolverType newEntryPointResolver, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getModelType_EntryPointResolver(), newEntryPointResolver, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getModelType_EntryPointResolver(), newEntryPointResolver, msgs);
 	}
 
 	/**
@@ -187,7 +238,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public void setEntryPointResolver(EntryPointResolverType newEntryPointResolver) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getModelType_EntryPointResolver(), newEntryPointResolver);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getModelType_EntryPointResolver(), newEntryPointResolver);
 	}
 
 	/**
@@ -196,7 +247,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public ComponentFactoryType getComponentFactory() {
-		return (ComponentFactoryType)getMixed().get(SchemaPackage.eINSTANCE.getModelType_ComponentFactory(), true);
+		return (ComponentFactoryType)getMixed().get(MulePackage.eINSTANCE.getModelType_ComponentFactory(), true);
 	}
 
 	/**
@@ -205,7 +256,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public NotificationChain basicSetComponentFactory(ComponentFactoryType newComponentFactory, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getModelType_ComponentFactory(), newComponentFactory, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getModelType_ComponentFactory(), newComponentFactory, msgs);
 	}
 
 	/**
@@ -214,7 +265,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public void setComponentFactory(ComponentFactoryType newComponentFactory) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getModelType_ComponentFactory(), newComponentFactory);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getModelType_ComponentFactory(), newComponentFactory);
 	}
 
 	/**
@@ -223,7 +274,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public ComponentLifecycleAdapterFactoryType getComponentLifecycleAdapterFactory() {
-		return (ComponentLifecycleAdapterFactoryType)getMixed().get(SchemaPackage.eINSTANCE.getModelType_ComponentLifecycleAdapterFactory(), true);
+		return (ComponentLifecycleAdapterFactoryType)getMixed().get(MulePackage.eINSTANCE.getModelType_ComponentLifecycleAdapterFactory(), true);
 	}
 
 	/**
@@ -232,7 +283,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public NotificationChain basicSetComponentLifecycleAdapterFactory(ComponentLifecycleAdapterFactoryType newComponentLifecycleAdapterFactory, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getModelType_ComponentLifecycleAdapterFactory(), newComponentLifecycleAdapterFactory, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getModelType_ComponentLifecycleAdapterFactory(), newComponentLifecycleAdapterFactory, msgs);
 	}
 
 	/**
@@ -241,7 +292,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public void setComponentLifecycleAdapterFactory(ComponentLifecycleAdapterFactoryType newComponentLifecycleAdapterFactory) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getModelType_ComponentLifecycleAdapterFactory(), newComponentLifecycleAdapterFactory);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getModelType_ComponentLifecycleAdapterFactory(), newComponentLifecycleAdapterFactory);
 	}
 
 	/**
@@ -250,7 +301,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public ComponentPoolFactoryType getComponentPoolFactory() {
-		return (ComponentPoolFactoryType)getMixed().get(SchemaPackage.eINSTANCE.getModelType_ComponentPoolFactory(), true);
+		return (ComponentPoolFactoryType)getMixed().get(MulePackage.eINSTANCE.getModelType_ComponentPoolFactory(), true);
 	}
 
 	/**
@@ -259,7 +310,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public NotificationChain basicSetComponentPoolFactory(ComponentPoolFactoryType newComponentPoolFactory, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getModelType_ComponentPoolFactory(), newComponentPoolFactory, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getModelType_ComponentPoolFactory(), newComponentPoolFactory, msgs);
 	}
 
 	/**
@@ -268,7 +319,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public void setComponentPoolFactory(ComponentPoolFactoryType newComponentPoolFactory) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getModelType_ComponentPoolFactory(), newComponentPoolFactory);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getModelType_ComponentPoolFactory(), newComponentPoolFactory);
 	}
 
 	/**
@@ -277,7 +328,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public ExceptionStrategyType getExceptionStrategy() {
-		return (ExceptionStrategyType)getMixed().get(SchemaPackage.eINSTANCE.getModelType_ExceptionStrategy(), true);
+		return (ExceptionStrategyType)getMixed().get(MulePackage.eINSTANCE.getModelType_ExceptionStrategy(), true);
 	}
 
 	/**
@@ -286,7 +337,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public NotificationChain basicSetExceptionStrategy(ExceptionStrategyType newExceptionStrategy, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getModelType_ExceptionStrategy(), newExceptionStrategy, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getModelType_ExceptionStrategy(), newExceptionStrategy, msgs);
 	}
 
 	/**
@@ -295,7 +346,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public void setExceptionStrategy(ExceptionStrategyType newExceptionStrategy) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getModelType_ExceptionStrategy(), newExceptionStrategy);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getModelType_ExceptionStrategy(), newExceptionStrategy);
 	}
 
 	/**
@@ -304,7 +355,28 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 * @generated
 	 */
 	public EList getMuleDescriptor() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getModelType_MuleDescriptor());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getModelType_MuleDescriptor());
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getClassName() {
+		return className;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setClassName(String newClassName) {
+		String oldClassName = className;
+		className = newClassName;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MODEL_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -325,7 +397,7 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MODEL_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MODEL_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -346,7 +418,53 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 		String oldRef = ref;
 		ref = newRef;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MODEL_TYPE__REF, oldRef, ref));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MODEL_TYPE__REF, oldRef, ref));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setType(String newType) {
+		String oldType = type;
+		type = newType;
+		boolean oldTypeESet = typeESet;
+		typeESet = true;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MODEL_TYPE__TYPE, oldType, type, !oldTypeESet));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void unsetType() {
+		String oldType = type;
+		boolean oldTypeESet = typeESet;
+		type = TYPE_EDEFAULT;
+		typeESet = false;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.MODEL_TYPE__TYPE, oldType, TYPE_EDEFAULT, oldTypeESet));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean isSetType() {
+		return typeESet;
 	}
 
 	/**
@@ -357,19 +475,19 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.MODEL_TYPE__MIXED:
+				case MulePackage.MODEL_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
+				case MulePackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
 					return basicSetEntryPointResolver(null, msgs);
-				case SchemaPackage.MODEL_TYPE__COMPONENT_FACTORY:
+				case MulePackage.MODEL_TYPE__COMPONENT_FACTORY:
 					return basicSetComponentFactory(null, msgs);
-				case SchemaPackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
+				case MulePackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
 					return basicSetComponentLifecycleAdapterFactory(null, msgs);
-				case SchemaPackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
+				case MulePackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
 					return basicSetComponentPoolFactory(null, msgs);
-				case SchemaPackage.MODEL_TYPE__EXCEPTION_STRATEGY:
+				case MulePackage.MODEL_TYPE__EXCEPTION_STRATEGY:
 					return basicSetExceptionStrategy(null, msgs);
-				case SchemaPackage.MODEL_TYPE__MULE_DESCRIPTOR:
+				case MulePackage.MODEL_TYPE__MULE_DESCRIPTOR:
 					return ((InternalEList)getMuleDescriptor()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -385,26 +503,30 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MODEL_TYPE__MIXED:
+			case MulePackage.MODEL_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.MODEL_TYPE__DESCRIPTION:
+			case MulePackage.MODEL_TYPE__DESCRIPTION:
 				return getDescription();
-			case SchemaPackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
+			case MulePackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
 				return getEntryPointResolver();
-			case SchemaPackage.MODEL_TYPE__COMPONENT_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_FACTORY:
 				return getComponentFactory();
-			case SchemaPackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
 				return getComponentLifecycleAdapterFactory();
-			case SchemaPackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
 				return getComponentPoolFactory();
-			case SchemaPackage.MODEL_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.MODEL_TYPE__EXCEPTION_STRATEGY:
 				return getExceptionStrategy();
-			case SchemaPackage.MODEL_TYPE__MULE_DESCRIPTOR:
+			case MulePackage.MODEL_TYPE__MULE_DESCRIPTOR:
 				return getMuleDescriptor();
-			case SchemaPackage.MODEL_TYPE__NAME:
+			case MulePackage.MODEL_TYPE__CLASS_NAME:
+				return getClassName();
+			case MulePackage.MODEL_TYPE__NAME:
 				return getName();
-			case SchemaPackage.MODEL_TYPE__REF:
+			case MulePackage.MODEL_TYPE__REF:
 				return getRef();
+			case MulePackage.MODEL_TYPE__TYPE:
+				return getType();
 		}
 		return eDynamicGet(eFeature, resolve);
 	}
@@ -416,37 +538,43 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MODEL_TYPE__MIXED:
+			case MulePackage.MODEL_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MODEL_TYPE__DESCRIPTION:
+			case MulePackage.MODEL_TYPE__DESCRIPTION:
 				setDescription((String)newValue);
 				return;
-			case SchemaPackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
+			case MulePackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
 				setEntryPointResolver((EntryPointResolverType)newValue);
 				return;
-			case SchemaPackage.MODEL_TYPE__COMPONENT_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_FACTORY:
 				setComponentFactory((ComponentFactoryType)newValue);
 				return;
-			case SchemaPackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
 				setComponentLifecycleAdapterFactory((ComponentLifecycleAdapterFactoryType)newValue);
 				return;
-			case SchemaPackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
 				setComponentPoolFactory((ComponentPoolFactoryType)newValue);
 				return;
-			case SchemaPackage.MODEL_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.MODEL_TYPE__EXCEPTION_STRATEGY:
 				setExceptionStrategy((ExceptionStrategyType)newValue);
 				return;
-			case SchemaPackage.MODEL_TYPE__MULE_DESCRIPTOR:
+			case MulePackage.MODEL_TYPE__MULE_DESCRIPTOR:
 				getMuleDescriptor().clear();
 				getMuleDescriptor().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MODEL_TYPE__NAME:
+			case MulePackage.MODEL_TYPE__CLASS_NAME:
+				setClassName((String)newValue);
+				return;
+			case MulePackage.MODEL_TYPE__NAME:
 				setName((String)newValue);
 				return;
-			case SchemaPackage.MODEL_TYPE__REF:
+			case MulePackage.MODEL_TYPE__REF:
 				setRef((String)newValue);
+				return;
+			case MulePackage.MODEL_TYPE__TYPE:
+				setType((String)newValue);
 				return;
 		}
 		eDynamicSet(eFeature, newValue);
@@ -459,35 +587,41 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MODEL_TYPE__MIXED:
+			case MulePackage.MODEL_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.MODEL_TYPE__DESCRIPTION:
+			case MulePackage.MODEL_TYPE__DESCRIPTION:
 				setDescription(DESCRIPTION_EDEFAULT);
 				return;
-			case SchemaPackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
+			case MulePackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
 				setEntryPointResolver((EntryPointResolverType)null);
 				return;
-			case SchemaPackage.MODEL_TYPE__COMPONENT_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_FACTORY:
 				setComponentFactory((ComponentFactoryType)null);
 				return;
-			case SchemaPackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
 				setComponentLifecycleAdapterFactory((ComponentLifecycleAdapterFactoryType)null);
 				return;
-			case SchemaPackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
 				setComponentPoolFactory((ComponentPoolFactoryType)null);
 				return;
-			case SchemaPackage.MODEL_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.MODEL_TYPE__EXCEPTION_STRATEGY:
 				setExceptionStrategy((ExceptionStrategyType)null);
 				return;
-			case SchemaPackage.MODEL_TYPE__MULE_DESCRIPTOR:
+			case MulePackage.MODEL_TYPE__MULE_DESCRIPTOR:
 				getMuleDescriptor().clear();
 				return;
-			case SchemaPackage.MODEL_TYPE__NAME:
+			case MulePackage.MODEL_TYPE__CLASS_NAME:
+				setClassName(CLASS_NAME_EDEFAULT);
+				return;
+			case MulePackage.MODEL_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case SchemaPackage.MODEL_TYPE__REF:
+			case MulePackage.MODEL_TYPE__REF:
 				setRef(REF_EDEFAULT);
+				return;
+			case MulePackage.MODEL_TYPE__TYPE:
+				unsetType();
 				return;
 		}
 		eDynamicUnset(eFeature);
@@ -500,26 +634,30 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MODEL_TYPE__MIXED:
+			case MulePackage.MODEL_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.MODEL_TYPE__DESCRIPTION:
+			case MulePackage.MODEL_TYPE__DESCRIPTION:
 				return DESCRIPTION_EDEFAULT == null ? getDescription() != null : !DESCRIPTION_EDEFAULT.equals(getDescription());
-			case SchemaPackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
+			case MulePackage.MODEL_TYPE__ENTRY_POINT_RESOLVER:
 				return getEntryPointResolver() != null;
-			case SchemaPackage.MODEL_TYPE__COMPONENT_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_FACTORY:
 				return getComponentFactory() != null;
-			case SchemaPackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_LIFECYCLE_ADAPTER_FACTORY:
 				return getComponentLifecycleAdapterFactory() != null;
-			case SchemaPackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
+			case MulePackage.MODEL_TYPE__COMPONENT_POOL_FACTORY:
 				return getComponentPoolFactory() != null;
-			case SchemaPackage.MODEL_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.MODEL_TYPE__EXCEPTION_STRATEGY:
 				return getExceptionStrategy() != null;
-			case SchemaPackage.MODEL_TYPE__MULE_DESCRIPTOR:
+			case MulePackage.MODEL_TYPE__MULE_DESCRIPTOR:
 				return !getMuleDescriptor().isEmpty();
-			case SchemaPackage.MODEL_TYPE__NAME:
+			case MulePackage.MODEL_TYPE__CLASS_NAME:
+				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
+			case MulePackage.MODEL_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case SchemaPackage.MODEL_TYPE__REF:
+			case MulePackage.MODEL_TYPE__REF:
 				return REF_EDEFAULT == null ? ref != null : !REF_EDEFAULT.equals(ref);
+			case MulePackage.MODEL_TYPE__TYPE:
+				return isSetType();
 		}
 		return eDynamicIsSet(eFeature);
 	}
@@ -535,10 +673,14 @@ public class ModelTypeImpl extends EObjectImpl implements ModelType {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (mixed: ");
 		result.append(mixed);
+		result.append(", className: ");
+		result.append(className);
 		result.append(", name: ");
 		result.append(name);
 		result.append(", ref: ");
 		result.append(ref);
+		result.append(", type: ");
+		if (typeESet) result.append(type); else result.append("<unset>");
 		result.append(')');
 		return result.toString();
 	}

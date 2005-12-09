@@ -22,8 +22,8 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertyType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -106,7 +106,7 @@ public class PropertyTypeImpl extends EObjectImpl implements PropertyType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getPropertyType();
+		return MulePackage.eINSTANCE.getPropertyType();
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class PropertyTypeImpl extends EObjectImpl implements PropertyType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.PROPERTY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.PROPERTY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -139,7 +139,7 @@ public class PropertyTypeImpl extends EObjectImpl implements PropertyType {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.PROPERTY_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.PROPERTY_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class PropertyTypeImpl extends EObjectImpl implements PropertyType {
 		String oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.PROPERTY_TYPE__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.PROPERTY_TYPE__VALUE, oldValue, value));
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class PropertyTypeImpl extends EObjectImpl implements PropertyType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.PROPERTY_TYPE__MIXED:
+				case MulePackage.PROPERTY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -187,11 +187,11 @@ public class PropertyTypeImpl extends EObjectImpl implements PropertyType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PROPERTY_TYPE__MIXED:
+			case MulePackage.PROPERTY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.PROPERTY_TYPE__NAME:
+			case MulePackage.PROPERTY_TYPE__NAME:
 				return getName();
-			case SchemaPackage.PROPERTY_TYPE__VALUE:
+			case MulePackage.PROPERTY_TYPE__VALUE:
 				return getValue();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -204,14 +204,14 @@ public class PropertyTypeImpl extends EObjectImpl implements PropertyType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PROPERTY_TYPE__MIXED:
+			case MulePackage.PROPERTY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTY_TYPE__NAME:
+			case MulePackage.PROPERTY_TYPE__NAME:
 				setName((String)newValue);
 				return;
-			case SchemaPackage.PROPERTY_TYPE__VALUE:
+			case MulePackage.PROPERTY_TYPE__VALUE:
 				setValue((String)newValue);
 				return;
 		}
@@ -225,13 +225,13 @@ public class PropertyTypeImpl extends EObjectImpl implements PropertyType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PROPERTY_TYPE__MIXED:
+			case MulePackage.PROPERTY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.PROPERTY_TYPE__NAME:
+			case MulePackage.PROPERTY_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case SchemaPackage.PROPERTY_TYPE__VALUE:
+			case MulePackage.PROPERTY_TYPE__VALUE:
 				setValue(VALUE_EDEFAULT);
 				return;
 		}
@@ -245,11 +245,11 @@ public class PropertyTypeImpl extends EObjectImpl implements PropertyType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PROPERTY_TYPE__MIXED:
+			case MulePackage.PROPERTY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.PROPERTY_TYPE__NAME:
+			case MulePackage.PROPERTY_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case SchemaPackage.PROPERTY_TYPE__VALUE:
+			case MulePackage.PROPERTY_TYPE__VALUE:
 				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 		}
 		return eDynamicIsSet(eFeature);

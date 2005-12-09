@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.InterceptorStackType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -88,7 +88,7 @@ public class InterceptorStackTypeImpl extends EObjectImpl implements Interceptor
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getInterceptorStackType();
+		return MulePackage.eINSTANCE.getInterceptorStackType();
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class InterceptorStackTypeImpl extends EObjectImpl implements Interceptor
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.INTERCEPTOR_STACK_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.INTERCEPTOR_STACK_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -109,7 +109,7 @@ public class InterceptorStackTypeImpl extends EObjectImpl implements Interceptor
 	 * @generated
 	 */
 	public EList getInterceptor() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getInterceptorStackType_Interceptor());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getInterceptorStackType_Interceptor());
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class InterceptorStackTypeImpl extends EObjectImpl implements Interceptor
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.INTERCEPTOR_STACK_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.INTERCEPTOR_STACK_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -141,9 +141,9 @@ public class InterceptorStackTypeImpl extends EObjectImpl implements Interceptor
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.INTERCEPTOR_STACK_TYPE__MIXED:
+				case MulePackage.INTERCEPTOR_STACK_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
+				case MulePackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
 					return ((InternalEList)getInterceptor()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -159,11 +159,11 @@ public class InterceptorStackTypeImpl extends EObjectImpl implements Interceptor
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__MIXED:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
 				return getInterceptor();
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__NAME:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__NAME:
 				return getName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -176,15 +176,15 @@ public class InterceptorStackTypeImpl extends EObjectImpl implements Interceptor
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__MIXED:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
 				getInterceptor().clear();
 				getInterceptor().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__NAME:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__NAME:
 				setName((String)newValue);
 				return;
 		}
@@ -198,13 +198,13 @@ public class InterceptorStackTypeImpl extends EObjectImpl implements Interceptor
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__MIXED:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
 				getInterceptor().clear();
 				return;
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__NAME:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
 		}
@@ -218,11 +218,11 @@ public class InterceptorStackTypeImpl extends EObjectImpl implements Interceptor
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__MIXED:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__INTERCEPTOR:
 				return !getInterceptor().isEmpty();
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE__NAME:
+			case MulePackage.INTERCEPTOR_STACK_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return eDynamicIsSet(eFeature);

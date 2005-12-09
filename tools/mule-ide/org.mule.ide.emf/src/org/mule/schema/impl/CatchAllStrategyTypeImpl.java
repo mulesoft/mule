@@ -25,8 +25,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
 import org.mule.schema.CatchAllStrategyType;
 import org.mule.schema.EndpointType;
 import org.mule.schema.GlobalEndpointType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -91,7 +91,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getCatchAllStrategyType();
+		return MulePackage.eINSTANCE.getCatchAllStrategyType();
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.CATCH_ALL_STRATEGY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.CATCH_ALL_STRATEGY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -112,7 +112,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	public EndpointType getEndpoint() {
-		return (EndpointType)getMixed().get(SchemaPackage.eINSTANCE.getCatchAllStrategyType_Endpoint(), true);
+		return (EndpointType)getMixed().get(MulePackage.eINSTANCE.getCatchAllStrategyType_Endpoint(), true);
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	public NotificationChain basicSetEndpoint(EndpointType newEndpoint, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getCatchAllStrategyType_Endpoint(), newEndpoint, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getCatchAllStrategyType_Endpoint(), newEndpoint, msgs);
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	public void setEndpoint(EndpointType newEndpoint) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getCatchAllStrategyType_Endpoint(), newEndpoint);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getCatchAllStrategyType_Endpoint(), newEndpoint);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	public GlobalEndpointType getGlobalEndpoint() {
-		return (GlobalEndpointType)getMixed().get(SchemaPackage.eINSTANCE.getCatchAllStrategyType_GlobalEndpoint(), true);
+		return (GlobalEndpointType)getMixed().get(MulePackage.eINSTANCE.getCatchAllStrategyType_GlobalEndpoint(), true);
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	public NotificationChain basicSetGlobalEndpoint(GlobalEndpointType newGlobalEndpoint, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getCatchAllStrategyType_GlobalEndpoint(), newGlobalEndpoint, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getCatchAllStrategyType_GlobalEndpoint(), newGlobalEndpoint, msgs);
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	public void setGlobalEndpoint(GlobalEndpointType newGlobalEndpoint) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getCatchAllStrategyType_GlobalEndpoint(), newGlobalEndpoint);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getCatchAllStrategyType_GlobalEndpoint(), newGlobalEndpoint);
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getCatchAllStrategyType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getCatchAllStrategyType_Properties(), true);
 	}
 
 	/**
@@ -175,7 +175,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getCatchAllStrategyType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getCatchAllStrategyType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -184,7 +184,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getCatchAllStrategyType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getCatchAllStrategyType_Properties(), newProperties);
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -216,13 +216,13 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
+				case MulePackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
+				case MulePackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
 					return basicSetEndpoint(null, msgs);
-				case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+				case MulePackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 					return basicSetGlobalEndpoint(null, msgs);
-				case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
+				case MulePackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -238,15 +238,15 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
 				return getEndpoint();
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 				return getGlobalEndpoint();
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME:
 				return getClassName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -259,20 +259,20 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
 				setEndpoint((EndpointType)newValue);
 				return;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 				setGlobalEndpoint((GlobalEndpointType)newValue);
 				return;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
 		}
@@ -286,19 +286,19 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
 				setEndpoint((EndpointType)null);
 				return;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 				setGlobalEndpoint((GlobalEndpointType)null);
 				return;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
 		}
@@ -312,15 +312,15 @@ public class CatchAllStrategyTypeImpl extends EObjectImpl implements CatchAllStr
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__ENDPOINT:
 				return getEndpoint() != null;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 				return getGlobalEndpoint() != null;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
 		}
 		return eDynamicIsSet(eFeature);

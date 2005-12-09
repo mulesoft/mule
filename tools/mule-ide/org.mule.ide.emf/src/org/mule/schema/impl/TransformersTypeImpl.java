@@ -22,7 +22,7 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 import org.mule.schema.TransformersType;
 
 /**
@@ -65,7 +65,7 @@ public class TransformersTypeImpl extends EObjectImpl implements TransformersTyp
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getTransformersType();
+		return MulePackage.eINSTANCE.getTransformersType();
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class TransformersTypeImpl extends EObjectImpl implements TransformersTyp
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.TRANSFORMERS_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.TRANSFORMERS_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -86,7 +86,7 @@ public class TransformersTypeImpl extends EObjectImpl implements TransformersTyp
 	 * @generated
 	 */
 	public EList getTransformer() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getTransformersType_Transformer());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getTransformersType_Transformer());
 	}
 
 	/**
@@ -97,9 +97,9 @@ public class TransformersTypeImpl extends EObjectImpl implements TransformersTyp
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.TRANSFORMERS_TYPE__MIXED:
+				case MulePackage.TRANSFORMERS_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.TRANSFORMERS_TYPE__TRANSFORMER:
+				case MulePackage.TRANSFORMERS_TYPE__TRANSFORMER:
 					return ((InternalEList)getTransformer()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -115,9 +115,9 @@ public class TransformersTypeImpl extends EObjectImpl implements TransformersTyp
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSFORMERS_TYPE__MIXED:
+			case MulePackage.TRANSFORMERS_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.TRANSFORMERS_TYPE__TRANSFORMER:
+			case MulePackage.TRANSFORMERS_TYPE__TRANSFORMER:
 				return getTransformer();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -130,11 +130,11 @@ public class TransformersTypeImpl extends EObjectImpl implements TransformersTyp
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSFORMERS_TYPE__MIXED:
+			case MulePackage.TRANSFORMERS_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.TRANSFORMERS_TYPE__TRANSFORMER:
+			case MulePackage.TRANSFORMERS_TYPE__TRANSFORMER:
 				getTransformer().clear();
 				getTransformer().addAll((Collection)newValue);
 				return;
@@ -149,10 +149,10 @@ public class TransformersTypeImpl extends EObjectImpl implements TransformersTyp
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSFORMERS_TYPE__MIXED:
+			case MulePackage.TRANSFORMERS_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.TRANSFORMERS_TYPE__TRANSFORMER:
+			case MulePackage.TRANSFORMERS_TYPE__TRANSFORMER:
 				getTransformer().clear();
 				return;
 		}
@@ -166,9 +166,9 @@ public class TransformersTypeImpl extends EObjectImpl implements TransformersTyp
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSFORMERS_TYPE__MIXED:
+			case MulePackage.TRANSFORMERS_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.TRANSFORMERS_TYPE__TRANSFORMER:
+			case MulePackage.TRANSFORMERS_TYPE__TRANSFORMER:
 				return !getTransformer().isEmpty();
 		}
 		return eDynamicIsSet(eFeature);

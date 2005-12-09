@@ -2,7 +2,7 @@
 <xsd2ecore:XSD2EcoreMappingRoot xmi:version="2.0"
     xmlns:xmi="http://www.omg.org/XMI" xmlns:xsd2ecore="http://www.eclipse.org/emf/2002/XSD2Ecore" inputs="../xml/mule.xsd#/"
     outputs="mule.ecore#/" topToBottom="true">
-  <nested inputs="bundleentry://342/cache/www.w3.org/2001/XMLSchema.xsd#//string;XSDSimpleTypeDefinition=7"
+  <nested inputs="bundleentry://369/cache/www.w3.org/2001/XMLSchema.xsd#//string;XSDSimpleTypeDefinition=7"
       outputs="http://www.eclipse.org/emf/2003/XMLType#//String"/>
   <nested inputs="../xml/mule.xsd#//propertyType;XSDComplexTypeDefinition=39" outputs="mule.ecore#//PropertyType">
     <nested inputs="../xml/mule.xsd#//propertyType;XSDComplexTypeDefinition=39/XSDAttributeUse"
@@ -26,7 +26,7 @@
     <nested inputs="../xml/mule.xsd#//system-propertyType;XSDComplexTypeDefinition=49/XSDAttributeUse"
         outputs="mule.ecore#//SystemPropertyType/name"/>
   </nested>
-  <nested inputs="bundleentry://342/cache/www.w3.org/2001/XMLSchema.xsd#//boolean;XSDSimpleTypeDefinition=8"
+  <nested inputs="bundleentry://369/cache/www.w3.org/2001/XMLSchema.xsd#//boolean;XSDSimpleTypeDefinition=8"
       outputs="http://www.eclipse.org/emf/2003/XMLType#//Boolean"/>
   <nested inputs="../xml/mule.xsd#//container-propertyType;XSDComplexTypeDefinition=11"
       outputs="mule.ecore#//ContainerPropertyType">
@@ -36,13 +36,13 @@
         outputs="mule.ecore#//ContainerPropertyType/name"/>
     <nested inputs="../xml/mule.xsd#//container-propertyType;XSDComplexTypeDefinition=11/XSDAttributeUse=1"
         outputs="mule.ecore#//ContainerPropertyType/reference"/>
+    <nested inputs="../xml/mule.xsd#//container-propertyType;XSDComplexTypeDefinition=11/XSDAttributeUse=3"
+        outputs="mule.ecore#//ContainerPropertyType/required"/>
   </nested>
   <nested inputs="../xml/mule.xsd#//entryType;XSDComplexTypeDefinition=16" outputs="mule.ecore#//EntryType">
     <nested inputs="../xml/mule.xsd#//entryType;XSDComplexTypeDefinition=16/XSDAttributeUse"
         outputs="mule.ecore#//EntryType/value"/>
   </nested>
-  <nested inputs="bundleentry://342/cache/www.w3.org/2001/XMLSchema.xsd#//NMTOKEN;XSDSimpleTypeDefinition=31"
-      outputs="http://www.eclipse.org/emf/2003/XMLType#//NMTOKEN"/>
   <nested inputs="../xml/mule.xsd#//factory-entryType;XSDComplexTypeDefinition=20"
       outputs="mule.ecore#//FactoryEntryType">
     <nested inputs="../xml/mule.xsd#//factory-entryType;XSDComplexTypeDefinition=20/XSDAttributeUse"
@@ -146,11 +146,11 @@
   </nested>
   <nested inputs="../xml/mule.xsd#//threading-profileType;XSDComplexTypeDefinition=51"
       outputs="mule.ecore#//ThreadingProfileType">
-    <nested inputs="../xml/mule.xsd#//threading-profileType;XSDComplexTypeDefinition=51/XSDAttributeUse=5"
+    <nested inputs="../xml/mule.xsd#//threading-profileType;XSDComplexTypeDefinition=51/XSDAttributeUse=6"
         outputs="mule.ecore#//ThreadingProfileType/doThreading"/>
     <nested inputs="../xml/mule.xsd#//threading-profileType;XSDComplexTypeDefinition=51/XSDAttributeUse"
         outputs="mule.ecore#//ThreadingProfileType/id"/>
-    <nested inputs="../xml/mule.xsd#//threading-profileType;XSDComplexTypeDefinition=51/XSDAttributeUse=6"
+    <nested inputs="../xml/mule.xsd#//threading-profileType;XSDComplexTypeDefinition=51/XSDAttributeUse=7"
         outputs="mule.ecore#//ThreadingProfileType/maxBufferSize"/>
     <nested inputs="../xml/mule.xsd#//threading-profileType;XSDComplexTypeDefinition=51/XSDAttributeUse=1"
         outputs="mule.ecore#//ThreadingProfileType/maxThreadsActive"/>
@@ -160,6 +160,8 @@
         outputs="mule.ecore#//ThreadingProfileType/poolExhaustedAction"/>
     <nested inputs="../xml/mule.xsd#//threading-profileType;XSDComplexTypeDefinition=51/XSDAttributeUse=3"
         outputs="mule.ecore#//ThreadingProfileType/threadTTL"/>
+    <nested inputs="../xml/mule.xsd#//threading-profileType;XSDComplexTypeDefinition=51/XSDAttributeUse=5"
+        outputs="mule.ecore#//ThreadingProfileType/threadWaitTimeout"/>
   </nested>
   <nested inputs="../xml/mule.xsd#//pooling-profileType;XSDComplexTypeDefinition=37/XSDAttributeUse=3/exhaustedAction;XSDAttributeDeclaration/XSDSimpleTypeDefinition"
       outputs="mule.ecore#//ExhaustedActionType">
@@ -254,21 +256,27 @@
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/persistenceStrategy"/>
     <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDParticle/XSDModelGroup/XSDParticle=4"
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/connectionStrategy"/>
-    <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=8"
+    <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=10"
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/clientMode"/>
+    <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=7"
+        outputs="mule.ecore#//MuleEnvironmentPropertiesType/embedded"/>
+    <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=11"
+        outputs="mule.ecore#//MuleEnvironmentPropertiesType/enableMessageEvents"/>
+    <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=4"
+        outputs="mule.ecore#//MuleEnvironmentPropertiesType/encoding"/>
     <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=1"
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/model"/>
-    <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=7"
+    <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=9"
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/recoverableMode"/>
     <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=6"
+        outputs="mule.ecore#//MuleEnvironmentPropertiesType/remoteSync"/>
+    <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=8"
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/serverUrl"/>
     <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse"
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/synchronous"/>
     <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=3"
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/synchronousEventTimeout"/>
     <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=5"
-        outputs="mule.ecore#//MuleEnvironmentPropertiesType/synchronousReceive"/>
-    <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=4"
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/transactionTimeout"/>
     <nested inputs="../xml/mule.xsd#//mule-environment-propertiesType;XSDComplexTypeDefinition=34/XSDAttributeUse=2"
         outputs="mule.ecore#//MuleEnvironmentPropertiesType/workingDirectory"/>
@@ -282,8 +290,6 @@
     <nested inputs="../xml/mule.xsd#//container-contextType;XSDComplexTypeDefinition=9/XSDAttributeUse=1"
         outputs="mule.ecore#//ContainerContextType/name"/>
   </nested>
-  <nested inputs="bundleentry://342/cache/www.w3.org/2001/XMLSchema.xsd#//ID;XSDSimpleTypeDefinition=35"
-      outputs="http://www.eclipse.org/emf/2003/XMLType#//ID"/>
   <nested inputs="../xml/mule.xsd#//security-providerType;XSDComplexTypeDefinition=47"
       outputs="mule.ecore#//SecurityProviderType">
     <nested inputs="../xml/mule.xsd#//security-providerType;XSDComplexTypeDefinition=47/XSDParticle/XSDModelGroup/XSDParticle"
@@ -450,8 +456,6 @@
     <nested inputs="../xml/mule.xsd#//transactionType;XSDComplexTypeDefinition=52/XSDAttributeUse=2"
         outputs="mule.ecore#//TransactionType/timeout"/>
   </nested>
-  <nested inputs="bundleentry://342/cache/www.w3.org/2001/XMLSchema.xsd#//IDREFS;XSDSimpleTypeDefinition=29"
-      outputs="http://www.eclipse.org/emf/2003/XMLType#//IDREFS"/>
   <nested inputs="../xml/mule.xsd#//security-filterType;XSDComplexTypeDefinition=45"
       outputs="mule.ecore#//SecurityFilterType">
     <nested inputs="../xml/mule.xsd#//security-filterType;XSDComplexTypeDefinition=45/XSDParticle/XSDModelGroup/XSDParticle"
@@ -461,25 +465,25 @@
     <nested inputs="../xml/mule.xsd#//security-filterType;XSDComplexTypeDefinition=45/XSDAttributeUse"
         outputs="mule.ecore#//SecurityFilterType/useProviders"/>
   </nested>
-  <nested inputs="bundleentry://342/cache/www.w3.org/2001/XMLSchema.xsd#//IDREF;XSDSimpleTypeDefinition=36"
-      outputs="http://www.eclipse.org/emf/2003/XMLType#//IDREF"/>
-  <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=9/createConnector;XSDAttributeDeclaration/XSDSimpleTypeDefinition"
+  <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=10/createConnector;XSDAttributeDeclaration/XSDSimpleTypeDefinition"
       outputs="mule.ecore#//CreateConnectorType">
-    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=9/createConnector;XSDAttributeDeclaration/XSDSimpleTypeDefinition/XSDEnumerationFacet"
+    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=10/createConnector;XSDAttributeDeclaration/XSDSimpleTypeDefinition/XSDEnumerationFacet"
         outputs="mule.ecore#//CreateConnectorType/GET_OR_CREATE"/>
-    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=9/createConnector;XSDAttributeDeclaration/XSDSimpleTypeDefinition/XSDEnumerationFacet=1"
+    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=10/createConnector;XSDAttributeDeclaration/XSDSimpleTypeDefinition/XSDEnumerationFacet=1"
         outputs="mule.ecore#//CreateConnectorType/ALWAYS_CREATE"/>
-    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=9/createConnector;XSDAttributeDeclaration/XSDSimpleTypeDefinition/XSDEnumerationFacet=2"
+    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=10/createConnector;XSDAttributeDeclaration/XSDSimpleTypeDefinition/XSDEnumerationFacet=2"
         outputs="mule.ecore#//CreateConnectorType/NEVER_CREATE"/>
   </nested>
+  <nested inputs="bundleentry://369/cache/www.w3.org/2001/XMLSchema.xsd#//IDREFS;XSDSimpleTypeDefinition=29"
+      outputs="http://www.eclipse.org/emf/2003/XMLType#//IDREFS"/>
   <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=4/type;XSDAttributeDeclaration/XSDSimpleTypeDefinition"
-      outputs="mule.ecore#//TypeType">
+      outputs="mule.ecore#//TypeType1">
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=4/type;XSDAttributeDeclaration/XSDSimpleTypeDefinition/XSDEnumerationFacet"
-        outputs="mule.ecore#//TypeType/sender"/>
+        outputs="mule.ecore#//TypeType1/sender"/>
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=4/type;XSDAttributeDeclaration/XSDSimpleTypeDefinition/XSDEnumerationFacet=1"
-        outputs="mule.ecore#//TypeType/receiver"/>
+        outputs="mule.ecore#//TypeType1/receiver"/>
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=4/type;XSDAttributeDeclaration/XSDSimpleTypeDefinition/XSDEnumerationFacet=2"
-        outputs="mule.ecore#//TypeType/senderAndReceiver"/>
+        outputs="mule.ecore#//TypeType1/senderAndReceiver"/>
   </nested>
   <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13" outputs="mule.ecore#//EndpointType">
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDParticle/XSDModelGroup/XSDParticle"
@@ -494,17 +498,19 @@
         outputs="mule.ecore#//EndpointType/address"/>
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=3"
         outputs="mule.ecore#//EndpointType/connector"/>
-    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=9"
+    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=10"
         outputs="mule.ecore#//EndpointType/createConnector"/>
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse"
         outputs="mule.ecore#//EndpointType/name"/>
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=1"
         outputs="mule.ecore#//EndpointType/ref"/>
-    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=7"
-        outputs="mule.ecore#//EndpointType/remoteSync"/>
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=8"
+        outputs="mule.ecore#//EndpointType/remoteSync"/>
+    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=9"
         outputs="mule.ecore#//EndpointType/remoteSyncTimeout"/>
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=6"
+        outputs="mule.ecore#//EndpointType/responseTransformers"/>
+    <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=7"
         outputs="mule.ecore#//EndpointType/synchronous"/>
     <nested inputs="../xml/mule.xsd#//endpointType;XSDComplexTypeDefinition=13/XSDAttributeUse=5"
         outputs="mule.ecore#//EndpointType/transformers"/>
@@ -525,11 +531,13 @@
         outputs="mule.ecore#//GlobalEndpointType/address"/>
     <nested inputs="../xml/mule.xsd#//global-endpointType;XSDComplexTypeDefinition=24/XSDAttributeUse"
         outputs="mule.ecore#//GlobalEndpointType/name"/>
-    <nested inputs="../xml/mule.xsd#//global-endpointType;XSDComplexTypeDefinition=24/XSDAttributeUse=4"
-        outputs="mule.ecore#//GlobalEndpointType/remoteSync"/>
     <nested inputs="../xml/mule.xsd#//global-endpointType;XSDComplexTypeDefinition=24/XSDAttributeUse=5"
+        outputs="mule.ecore#//GlobalEndpointType/remoteSync"/>
+    <nested inputs="../xml/mule.xsd#//global-endpointType;XSDComplexTypeDefinition=24/XSDAttributeUse=6"
         outputs="mule.ecore#//GlobalEndpointType/remoteSyncTimeout"/>
     <nested inputs="../xml/mule.xsd#//global-endpointType;XSDComplexTypeDefinition=24/XSDAttributeUse=3"
+        outputs="mule.ecore#//GlobalEndpointType/responseTransformers"/>
+    <nested inputs="../xml/mule.xsd#//global-endpointType;XSDComplexTypeDefinition=24/XSDAttributeUse=4"
         outputs="mule.ecore#//GlobalEndpointType/synchronous"/>
     <nested inputs="../xml/mule.xsd#//global-endpointType;XSDComplexTypeDefinition=24/XSDAttributeUse=2"
         outputs="mule.ecore#//GlobalEndpointType/transformers"/>
@@ -708,10 +716,8 @@
         outputs="mule.ecore#//ResponseRouterType/globalEndpoint"/>
     <nested inputs="../xml/mule.xsd#//response-routerType;XSDComplexTypeDefinition=42/XSDParticle/XSDModelGroup/XSDParticle=2"
         outputs="mule.ecore#//ResponseRouterType/router"/>
-    <nested inputs="../xml/mule.xsd#//response-routerType;XSDComplexTypeDefinition=42/XSDAttributeUse=1"
-        outputs="mule.ecore#//ResponseRouterType/timeout"/>
     <nested inputs="../xml/mule.xsd#//response-routerType;XSDComplexTypeDefinition=42/XSDAttributeUse"
-        outputs="mule.ecore#//ResponseRouterType/transformers"/>
+        outputs="mule.ecore#//ResponseRouterType/timeout"/>
   </nested>
   <nested inputs="../xml/mule.xsd#//mule-descriptorType;XSDComplexTypeDefinition=33/XSDAttributeUse=11/initialState;XSDAttributeDeclaration/XSDSimpleTypeDefinition"
       outputs="mule.ecore#//InitialStateType">
@@ -765,6 +771,10 @@
     <nested inputs="../xml/mule.xsd#//mule-descriptorType;XSDComplexTypeDefinition=33/XSDAttributeUse=8"
         outputs="mule.ecore#//MuleDescriptorType/version"/>
   </nested>
+  <nested inputs="bundleentry://369/cache/www.w3.org/2001/XMLSchema.xsd#//NMTOKEN;XSDSimpleTypeDefinition=31"
+      outputs="http://www.eclipse.org/emf/2003/XMLType#//NMTOKEN"/>
+  <nested inputs="../xml/mule.xsd#//modelType;XSDComplexTypeDefinition=32/XSDAttributeUse=2/type;XSDAttributeDeclaration/XSDSimpleTypeDefinition"
+      outputs="mule.ecore#//TypeType"/>
   <nested inputs="../xml/mule.xsd#//modelType;XSDComplexTypeDefinition=32" outputs="mule.ecore#//ModelType">
     <nested inputs="../xml/mule.xsd#//modelType;XSDComplexTypeDefinition=32/XSDParticle/XSDModelGroup/XSDParticle"
         outputs="mule.ecore#//ModelType/description"/>
@@ -780,46 +790,50 @@
         outputs="mule.ecore#//ModelType/exceptionStrategy"/>
     <nested inputs="../xml/mule.xsd#//modelType;XSDComplexTypeDefinition=32/XSDParticle/XSDModelGroup/XSDParticle=6"
         outputs="mule.ecore#//ModelType/muleDescriptor"/>
+    <nested inputs="../xml/mule.xsd#//modelType;XSDComplexTypeDefinition=32/XSDAttributeUse=3"
+        outputs="mule.ecore#//ModelType/className"/>
     <nested inputs="../xml/mule.xsd#//modelType;XSDComplexTypeDefinition=32/XSDAttributeUse"
         outputs="mule.ecore#//ModelType/name"/>
     <nested inputs="../xml/mule.xsd#//modelType;XSDComplexTypeDefinition=32/XSDAttributeUse=1"
         outputs="mule.ecore#//ModelType/ref"/>
+    <nested inputs="../xml/mule.xsd#//modelType;XSDComplexTypeDefinition=32/XSDAttributeUse=2"
+        outputs="mule.ecore#//ModelType/type"/>
   </nested>
-  <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDAttributeUse=1/version;XSDAttributeDeclaration/XSDSimpleTypeDefinition"
+  <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDAttributeUse=1/version;XSDAttributeDeclaration/XSDSimpleTypeDefinition"
       outputs="mule.ecore#//VersionType"/>
-  <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56"
+  <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition"
       outputs="mule.ecore#//MuleConfigurationType">
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle"
         outputs="mule.ecore#//MuleConfigurationType/description"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=1"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=1"
         outputs="mule.ecore#//MuleConfigurationType/environmentProperties"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=2"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=2"
         outputs="mule.ecore#//MuleConfigurationType/muleEnvironmentProperties"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=3"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=3"
         outputs="mule.ecore#//MuleConfigurationType/containerContext"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=4"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=4"
         outputs="mule.ecore#//MuleConfigurationType/securityManager"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=5"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=5"
         outputs="mule.ecore#//MuleConfigurationType/transactionManager"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=6"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=6"
         outputs="mule.ecore#//MuleConfigurationType/agents"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=7"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=7"
         outputs="mule.ecore#//MuleConfigurationType/connector"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=8"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=8"
         outputs="mule.ecore#//MuleConfigurationType/endpointIdentifiers"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=9"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=9"
         outputs="mule.ecore#//MuleConfigurationType/transformers"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=10"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=10"
         outputs="mule.ecore#//MuleConfigurationType/globalEndpoints"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=11"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=11"
         outputs="mule.ecore#//MuleConfigurationType/interceptorStack"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=12"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=12"
         outputs="mule.ecore#//MuleConfigurationType/model"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDParticle/XSDModelGroup/XSDParticle=13"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDParticle/XSDModelGroup/XSDParticle=13"
         outputs="mule.ecore#//MuleConfigurationType/muleDescriptor"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDAttributeUse"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDAttributeUse"
         outputs="mule.ecore#//MuleConfigurationType/id"/>
-    <nested inputs="../xml/mule.xsd#//mule-configurationType;XSDComplexTypeDefinition=56/XSDAttributeUse=1"
+    <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration/XSDComplexTypeDefinition/XSDAttributeUse=1"
         outputs="mule.ecore#//MuleConfigurationType/version"/>
   </nested>
   <nested inputs="../xml/mule.xsd#//mule-configuration;XSDElementDeclaration" outputs="mule.ecore#//DocumentRoot/muleConfiguration"/>

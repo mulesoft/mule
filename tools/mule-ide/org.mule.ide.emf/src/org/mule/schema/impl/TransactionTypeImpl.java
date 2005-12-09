@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.ActionType;
 import org.mule.schema.ConstraintType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 import org.mule.schema.TransactionType;
 
 /**
@@ -139,7 +139,7 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getTransactionType();
+		return MulePackage.eINSTANCE.getTransactionType();
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.TRANSACTION_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.TRANSACTION_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -160,7 +160,7 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	 * @generated
 	 */
 	public ConstraintType getConstraint() {
-		return (ConstraintType)getMixed().get(SchemaPackage.eINSTANCE.getTransactionType_Constraint(), true);
+		return (ConstraintType)getMixed().get(MulePackage.eINSTANCE.getTransactionType_Constraint(), true);
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	 * @generated
 	 */
 	public NotificationChain basicSetConstraint(ConstraintType newConstraint, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getTransactionType_Constraint(), newConstraint, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getTransactionType_Constraint(), newConstraint, msgs);
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	 * @generated
 	 */
 	public void setConstraint(ConstraintType newConstraint) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getTransactionType_Constraint(), newConstraint);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getTransactionType_Constraint(), newConstraint);
 	}
 
 	/**
@@ -201,7 +201,7 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 		boolean oldActionESet = actionESet;
 		actionESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSACTION_TYPE__ACTION, oldAction, action, !oldActionESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSACTION_TYPE__ACTION, oldAction, action, !oldActionESet));
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 		action = ACTION_EDEFAULT;
 		actionESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.TRANSACTION_TYPE__ACTION, oldAction, ACTION_EDEFAULT, oldActionESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.TRANSACTION_TYPE__ACTION, oldAction, ACTION_EDEFAULT, oldActionESet));
 	}
 
 	/**
@@ -245,7 +245,7 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 		String oldFactory = factory;
 		factory = newFactory;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSACTION_TYPE__FACTORY, oldFactory, factory));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSACTION_TYPE__FACTORY, oldFactory, factory));
 	}
 
 	/**
@@ -266,7 +266,7 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 		String oldTimeout = timeout;
 		timeout = newTimeout;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSACTION_TYPE__TIMEOUT, oldTimeout, timeout));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSACTION_TYPE__TIMEOUT, oldTimeout, timeout));
 	}
 
 	/**
@@ -277,9 +277,9 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.TRANSACTION_TYPE__MIXED:
+				case MulePackage.TRANSACTION_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.TRANSACTION_TYPE__CONSTRAINT:
+				case MulePackage.TRANSACTION_TYPE__CONSTRAINT:
 					return basicSetConstraint(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -295,15 +295,15 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSACTION_TYPE__MIXED:
+			case MulePackage.TRANSACTION_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.TRANSACTION_TYPE__CONSTRAINT:
+			case MulePackage.TRANSACTION_TYPE__CONSTRAINT:
 				return getConstraint();
-			case SchemaPackage.TRANSACTION_TYPE__ACTION:
+			case MulePackage.TRANSACTION_TYPE__ACTION:
 				return getAction();
-			case SchemaPackage.TRANSACTION_TYPE__FACTORY:
+			case MulePackage.TRANSACTION_TYPE__FACTORY:
 				return getFactory();
-			case SchemaPackage.TRANSACTION_TYPE__TIMEOUT:
+			case MulePackage.TRANSACTION_TYPE__TIMEOUT:
 				return getTimeout();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -316,20 +316,20 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSACTION_TYPE__MIXED:
+			case MulePackage.TRANSACTION_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.TRANSACTION_TYPE__CONSTRAINT:
+			case MulePackage.TRANSACTION_TYPE__CONSTRAINT:
 				setConstraint((ConstraintType)newValue);
 				return;
-			case SchemaPackage.TRANSACTION_TYPE__ACTION:
+			case MulePackage.TRANSACTION_TYPE__ACTION:
 				setAction((ActionType)newValue);
 				return;
-			case SchemaPackage.TRANSACTION_TYPE__FACTORY:
+			case MulePackage.TRANSACTION_TYPE__FACTORY:
 				setFactory((String)newValue);
 				return;
-			case SchemaPackage.TRANSACTION_TYPE__TIMEOUT:
+			case MulePackage.TRANSACTION_TYPE__TIMEOUT:
 				setTimeout((String)newValue);
 				return;
 		}
@@ -343,19 +343,19 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSACTION_TYPE__MIXED:
+			case MulePackage.TRANSACTION_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.TRANSACTION_TYPE__CONSTRAINT:
+			case MulePackage.TRANSACTION_TYPE__CONSTRAINT:
 				setConstraint((ConstraintType)null);
 				return;
-			case SchemaPackage.TRANSACTION_TYPE__ACTION:
+			case MulePackage.TRANSACTION_TYPE__ACTION:
 				unsetAction();
 				return;
-			case SchemaPackage.TRANSACTION_TYPE__FACTORY:
+			case MulePackage.TRANSACTION_TYPE__FACTORY:
 				setFactory(FACTORY_EDEFAULT);
 				return;
-			case SchemaPackage.TRANSACTION_TYPE__TIMEOUT:
+			case MulePackage.TRANSACTION_TYPE__TIMEOUT:
 				setTimeout(TIMEOUT_EDEFAULT);
 				return;
 		}
@@ -369,15 +369,15 @@ public class TransactionTypeImpl extends EObjectImpl implements TransactionType 
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSACTION_TYPE__MIXED:
+			case MulePackage.TRANSACTION_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.TRANSACTION_TYPE__CONSTRAINT:
+			case MulePackage.TRANSACTION_TYPE__CONSTRAINT:
 				return getConstraint() != null;
-			case SchemaPackage.TRANSACTION_TYPE__ACTION:
+			case MulePackage.TRANSACTION_TYPE__ACTION:
 				return isSetAction();
-			case SchemaPackage.TRANSACTION_TYPE__FACTORY:
+			case MulePackage.TRANSACTION_TYPE__FACTORY:
 				return FACTORY_EDEFAULT == null ? factory != null : !FACTORY_EDEFAULT.equals(factory);
-			case SchemaPackage.TRANSACTION_TYPE__TIMEOUT:
+			case MulePackage.TRANSACTION_TYPE__TIMEOUT:
 				return TIMEOUT_EDEFAULT == null ? timeout != null : !TIMEOUT_EDEFAULT.equals(timeout);
 		}
 		return eDynamicIsSet(eFeature);

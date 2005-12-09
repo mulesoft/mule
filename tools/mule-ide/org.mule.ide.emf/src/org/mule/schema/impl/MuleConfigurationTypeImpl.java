@@ -31,14 +31,14 @@ import org.mule.schema.GlobalEndpointsType;
 import org.mule.schema.ModelType;
 import org.mule.schema.MuleConfigurationType;
 import org.mule.schema.MuleEnvironmentPropertiesType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 import org.mule.schema.SecurityManagerType;
 import org.mule.schema.TransactionManagerType;
 import org.mule.schema.TransformersType;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Mule Configuration Type</b></em>'.
+ * An implementation of the model object '<em><b>Configuration Type</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
@@ -141,7 +141,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getMuleConfigurationType();
+		return MulePackage.eINSTANCE.getMuleConfigurationType();
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.MULE_CONFIGURATION_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.MULE_CONFIGURATION_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -162,7 +162,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public String getDescription() {
-		return (String)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_Description(), true);
+		return (String)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_Description(), true);
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setDescription(String newDescription) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_Description(), newDescription);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_Description(), newDescription);
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public EnvironmentPropertiesType getEnvironmentProperties() {
-		return (EnvironmentPropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_EnvironmentProperties(), true);
+		return (EnvironmentPropertiesType)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_EnvironmentProperties(), true);
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public NotificationChain basicSetEnvironmentProperties(EnvironmentPropertiesType newEnvironmentProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleConfigurationType_EnvironmentProperties(), newEnvironmentProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleConfigurationType_EnvironmentProperties(), newEnvironmentProperties, msgs);
 	}
 
 	/**
@@ -198,7 +198,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setEnvironmentProperties(EnvironmentPropertiesType newEnvironmentProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_EnvironmentProperties(), newEnvironmentProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_EnvironmentProperties(), newEnvironmentProperties);
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public MuleEnvironmentPropertiesType getMuleEnvironmentProperties() {
-		return (MuleEnvironmentPropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_MuleEnvironmentProperties(), true);
+		return (MuleEnvironmentPropertiesType)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_MuleEnvironmentProperties(), true);
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public NotificationChain basicSetMuleEnvironmentProperties(MuleEnvironmentPropertiesType newMuleEnvironmentProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleConfigurationType_MuleEnvironmentProperties(), newMuleEnvironmentProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleConfigurationType_MuleEnvironmentProperties(), newMuleEnvironmentProperties, msgs);
 	}
 
 	/**
@@ -225,7 +225,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setMuleEnvironmentProperties(MuleEnvironmentPropertiesType newMuleEnvironmentProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_MuleEnvironmentProperties(), newMuleEnvironmentProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_MuleEnvironmentProperties(), newMuleEnvironmentProperties);
 	}
 
 	/**
@@ -234,7 +234,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public EList getContainerContext() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getMuleConfigurationType_ContainerContext());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getMuleConfigurationType_ContainerContext());
 	}
 
 	/**
@@ -243,7 +243,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public SecurityManagerType getSecurityManager() {
-		return (SecurityManagerType)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_SecurityManager(), true);
+		return (SecurityManagerType)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_SecurityManager(), true);
 	}
 
 	/**
@@ -252,7 +252,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public NotificationChain basicSetSecurityManager(SecurityManagerType newSecurityManager, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleConfigurationType_SecurityManager(), newSecurityManager, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleConfigurationType_SecurityManager(), newSecurityManager, msgs);
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setSecurityManager(SecurityManagerType newSecurityManager) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_SecurityManager(), newSecurityManager);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_SecurityManager(), newSecurityManager);
 	}
 
 	/**
@@ -270,7 +270,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public TransactionManagerType getTransactionManager() {
-		return (TransactionManagerType)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_TransactionManager(), true);
+		return (TransactionManagerType)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_TransactionManager(), true);
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public NotificationChain basicSetTransactionManager(TransactionManagerType newTransactionManager, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleConfigurationType_TransactionManager(), newTransactionManager, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleConfigurationType_TransactionManager(), newTransactionManager, msgs);
 	}
 
 	/**
@@ -288,7 +288,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setTransactionManager(TransactionManagerType newTransactionManager) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_TransactionManager(), newTransactionManager);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_TransactionManager(), newTransactionManager);
 	}
 
 	/**
@@ -297,7 +297,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public AgentsType getAgents() {
-		return (AgentsType)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_Agents(), true);
+		return (AgentsType)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_Agents(), true);
 	}
 
 	/**
@@ -306,7 +306,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public NotificationChain basicSetAgents(AgentsType newAgents, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleConfigurationType_Agents(), newAgents, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleConfigurationType_Agents(), newAgents, msgs);
 	}
 
 	/**
@@ -315,7 +315,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setAgents(AgentsType newAgents) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_Agents(), newAgents);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_Agents(), newAgents);
 	}
 
 	/**
@@ -324,7 +324,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public EList getConnector() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getMuleConfigurationType_Connector());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getMuleConfigurationType_Connector());
 	}
 
 	/**
@@ -333,7 +333,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public EndpointIdentifiersType getEndpointIdentifiers() {
-		return (EndpointIdentifiersType)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_EndpointIdentifiers(), true);
+		return (EndpointIdentifiersType)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_EndpointIdentifiers(), true);
 	}
 
 	/**
@@ -342,7 +342,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public NotificationChain basicSetEndpointIdentifiers(EndpointIdentifiersType newEndpointIdentifiers, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleConfigurationType_EndpointIdentifiers(), newEndpointIdentifiers, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleConfigurationType_EndpointIdentifiers(), newEndpointIdentifiers, msgs);
 	}
 
 	/**
@@ -351,7 +351,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setEndpointIdentifiers(EndpointIdentifiersType newEndpointIdentifiers) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_EndpointIdentifiers(), newEndpointIdentifiers);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_EndpointIdentifiers(), newEndpointIdentifiers);
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public TransformersType getTransformers() {
-		return (TransformersType)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_Transformers(), true);
+		return (TransformersType)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_Transformers(), true);
 	}
 
 	/**
@@ -369,7 +369,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public NotificationChain basicSetTransformers(TransformersType newTransformers, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleConfigurationType_Transformers(), newTransformers, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleConfigurationType_Transformers(), newTransformers, msgs);
 	}
 
 	/**
@@ -378,7 +378,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setTransformers(TransformersType newTransformers) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_Transformers(), newTransformers);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_Transformers(), newTransformers);
 	}
 
 	/**
@@ -387,7 +387,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public GlobalEndpointsType getGlobalEndpoints() {
-		return (GlobalEndpointsType)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_GlobalEndpoints(), true);
+		return (GlobalEndpointsType)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_GlobalEndpoints(), true);
 	}
 
 	/**
@@ -396,7 +396,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public NotificationChain basicSetGlobalEndpoints(GlobalEndpointsType newGlobalEndpoints, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleConfigurationType_GlobalEndpoints(), newGlobalEndpoints, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleConfigurationType_GlobalEndpoints(), newGlobalEndpoints, msgs);
 	}
 
 	/**
@@ -405,7 +405,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setGlobalEndpoints(GlobalEndpointsType newGlobalEndpoints) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_GlobalEndpoints(), newGlobalEndpoints);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_GlobalEndpoints(), newGlobalEndpoints);
 	}
 
 	/**
@@ -414,7 +414,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public EList getInterceptorStack() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getMuleConfigurationType_InterceptorStack());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getMuleConfigurationType_InterceptorStack());
 	}
 
 	/**
@@ -423,7 +423,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public ModelType getModel() {
-		return (ModelType)getMixed().get(SchemaPackage.eINSTANCE.getMuleConfigurationType_Model(), true);
+		return (ModelType)getMixed().get(MulePackage.eINSTANCE.getMuleConfigurationType_Model(), true);
 	}
 
 	/**
@@ -432,7 +432,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public NotificationChain basicSetModel(ModelType newModel, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleConfigurationType_Model(), newModel, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleConfigurationType_Model(), newModel, msgs);
 	}
 
 	/**
@@ -441,7 +441,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public void setModel(ModelType newModel) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleConfigurationType_Model(), newModel);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleConfigurationType_Model(), newModel);
 	}
 
 	/**
@@ -450,7 +450,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 * @generated
 	 */
 	public EList getMuleDescriptor() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getMuleConfigurationType_MuleDescriptor());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getMuleConfigurationType_MuleDescriptor());
 	}
 
 	/**
@@ -471,7 +471,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 		String oldId = id;
 		id = newId;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_CONFIGURATION_TYPE__ID, oldId, id));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_CONFIGURATION_TYPE__ID, oldId, id));
 	}
 
 	/**
@@ -492,7 +492,7 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 		String oldVersion = version;
 		version = newVersion;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_CONFIGURATION_TYPE__VERSION, oldVersion, version));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_CONFIGURATION_TYPE__VERSION, oldVersion, version));
 	}
 
 	/**
@@ -503,33 +503,33 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__MIXED:
+				case MulePackage.MULE_CONFIGURATION_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
+				case MulePackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
 					return basicSetEnvironmentProperties(null, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
+				case MulePackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
 					return basicSetMuleEnvironmentProperties(null, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
+				case MulePackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
 					return ((InternalEList)getContainerContext()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
+				case MulePackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
 					return basicSetSecurityManager(null, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
+				case MulePackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
 					return basicSetTransactionManager(null, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__AGENTS:
+				case MulePackage.MULE_CONFIGURATION_TYPE__AGENTS:
 					return basicSetAgents(null, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
+				case MulePackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
 					return ((InternalEList)getConnector()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
+				case MulePackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
 					return basicSetEndpointIdentifiers(null, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
+				case MulePackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
 					return basicSetTransformers(null, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
+				case MulePackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
 					return basicSetGlobalEndpoints(null, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
+				case MulePackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
 					return ((InternalEList)getInterceptorStack()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__MODEL:
+				case MulePackage.MULE_CONFIGURATION_TYPE__MODEL:
 					return basicSetModel(null, msgs);
-				case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
+				case MulePackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
 					return ((InternalEList)getMuleDescriptor()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -545,39 +545,39 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MIXED:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__DESCRIPTION:
+			case MulePackage.MULE_CONFIGURATION_TYPE__DESCRIPTION:
 				return getDescription();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
 				return getEnvironmentProperties();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
 				return getMuleEnvironmentProperties();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
+			case MulePackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
 				return getContainerContext();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
+			case MulePackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
 				return getSecurityManager();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
+			case MulePackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
 				return getTransactionManager();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__AGENTS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__AGENTS:
 				return getAgents();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
+			case MulePackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
 				return getConnector();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
 				return getEndpointIdentifiers();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
 				return getTransformers();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
 				return getGlobalEndpoints();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
+			case MulePackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
 				return getInterceptorStack();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MODEL:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MODEL:
 				return getModel();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
 				return getMuleDescriptor();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ID:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ID:
 				return getId();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__VERSION:
+			case MulePackage.MULE_CONFIGURATION_TYPE__VERSION:
 				return getVersion();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -590,60 +590,60 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MIXED:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__DESCRIPTION:
+			case MulePackage.MULE_CONFIGURATION_TYPE__DESCRIPTION:
 				setDescription((String)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
 				setEnvironmentProperties((EnvironmentPropertiesType)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
 				setMuleEnvironmentProperties((MuleEnvironmentPropertiesType)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
+			case MulePackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
 				getContainerContext().clear();
 				getContainerContext().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
+			case MulePackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
 				setSecurityManager((SecurityManagerType)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
+			case MulePackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
 				setTransactionManager((TransactionManagerType)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__AGENTS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__AGENTS:
 				setAgents((AgentsType)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
+			case MulePackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
 				getConnector().clear();
 				getConnector().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
 				setEndpointIdentifiers((EndpointIdentifiersType)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
 				setTransformers((TransformersType)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
 				setGlobalEndpoints((GlobalEndpointsType)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
+			case MulePackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
 				getInterceptorStack().clear();
 				getInterceptorStack().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MODEL:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MODEL:
 				setModel((ModelType)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
 				getMuleDescriptor().clear();
 				getMuleDescriptor().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ID:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ID:
 				setId((String)newValue);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__VERSION:
+			case MulePackage.MULE_CONFIGURATION_TYPE__VERSION:
 				setVersion((String)newValue);
 				return;
 		}
@@ -657,55 +657,55 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MIXED:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__DESCRIPTION:
+			case MulePackage.MULE_CONFIGURATION_TYPE__DESCRIPTION:
 				setDescription(DESCRIPTION_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
 				setEnvironmentProperties((EnvironmentPropertiesType)null);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
 				setMuleEnvironmentProperties((MuleEnvironmentPropertiesType)null);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
+			case MulePackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
 				getContainerContext().clear();
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
+			case MulePackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
 				setSecurityManager((SecurityManagerType)null);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
+			case MulePackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
 				setTransactionManager((TransactionManagerType)null);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__AGENTS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__AGENTS:
 				setAgents((AgentsType)null);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
+			case MulePackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
 				getConnector().clear();
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
 				setEndpointIdentifiers((EndpointIdentifiersType)null);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
 				setTransformers((TransformersType)null);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
 				setGlobalEndpoints((GlobalEndpointsType)null);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
+			case MulePackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
 				getInterceptorStack().clear();
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MODEL:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MODEL:
 				setModel((ModelType)null);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
 				getMuleDescriptor().clear();
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ID:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ID:
 				setId(ID_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__VERSION:
+			case MulePackage.MULE_CONFIGURATION_TYPE__VERSION:
 				setVersion(VERSION_EDEFAULT);
 				return;
 		}
@@ -719,39 +719,39 @@ public class MuleConfigurationTypeImpl extends EObjectImpl implements MuleConfig
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MIXED:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__DESCRIPTION:
+			case MulePackage.MULE_CONFIGURATION_TYPE__DESCRIPTION:
 				return DESCRIPTION_EDEFAULT == null ? getDescription() != null : !DESCRIPTION_EDEFAULT.equals(getDescription());
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ENVIRONMENT_PROPERTIES:
 				return getEnvironmentProperties() != null;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MULE_ENVIRONMENT_PROPERTIES:
 				return getMuleEnvironmentProperties() != null;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
+			case MulePackage.MULE_CONFIGURATION_TYPE__CONTAINER_CONTEXT:
 				return !getContainerContext().isEmpty();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
+			case MulePackage.MULE_CONFIGURATION_TYPE__SECURITY_MANAGER:
 				return getSecurityManager() != null;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
+			case MulePackage.MULE_CONFIGURATION_TYPE__TRANSACTION_MANAGER:
 				return getTransactionManager() != null;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__AGENTS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__AGENTS:
 				return getAgents() != null;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
+			case MulePackage.MULE_CONFIGURATION_TYPE__CONNECTOR:
 				return !getConnector().isEmpty();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ENDPOINT_IDENTIFIERS:
 				return getEndpointIdentifiers() != null;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__TRANSFORMERS:
 				return getTransformers() != null;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
+			case MulePackage.MULE_CONFIGURATION_TYPE__GLOBAL_ENDPOINTS:
 				return getGlobalEndpoints() != null;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
+			case MulePackage.MULE_CONFIGURATION_TYPE__INTERCEPTOR_STACK:
 				return !getInterceptorStack().isEmpty();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MODEL:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MODEL:
 				return getModel() != null;
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
+			case MulePackage.MULE_CONFIGURATION_TYPE__MULE_DESCRIPTOR:
 				return !getMuleDescriptor().isEmpty();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__ID:
+			case MulePackage.MULE_CONFIGURATION_TYPE__ID:
 				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
-			case SchemaPackage.MULE_CONFIGURATION_TYPE__VERSION:
+			case MulePackage.MULE_CONFIGURATION_TYPE__VERSION:
 				return VERSION_EDEFAULT == null ? version != null : !VERSION_EDEFAULT.equals(version);
 		}
 		return eDynamicIsSet(eFeature);

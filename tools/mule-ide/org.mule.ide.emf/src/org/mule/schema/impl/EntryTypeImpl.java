@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.EntryType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -85,7 +85,7 @@ public class EntryTypeImpl extends EObjectImpl implements EntryType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getEntryType();
+		return MulePackage.eINSTANCE.getEntryType();
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class EntryTypeImpl extends EObjectImpl implements EntryType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.ENTRY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.ENTRY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -118,7 +118,7 @@ public class EntryTypeImpl extends EObjectImpl implements EntryType {
 		String oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENTRY_TYPE__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENTRY_TYPE__VALUE, oldValue, value));
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class EntryTypeImpl extends EObjectImpl implements EntryType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.ENTRY_TYPE__MIXED:
+				case MulePackage.ENTRY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -145,9 +145,9 @@ public class EntryTypeImpl extends EObjectImpl implements EntryType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENTRY_TYPE__MIXED:
+			case MulePackage.ENTRY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.ENTRY_TYPE__VALUE:
+			case MulePackage.ENTRY_TYPE__VALUE:
 				return getValue();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -160,11 +160,11 @@ public class EntryTypeImpl extends EObjectImpl implements EntryType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENTRY_TYPE__MIXED:
+			case MulePackage.ENTRY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.ENTRY_TYPE__VALUE:
+			case MulePackage.ENTRY_TYPE__VALUE:
 				setValue((String)newValue);
 				return;
 		}
@@ -178,10 +178,10 @@ public class EntryTypeImpl extends EObjectImpl implements EntryType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENTRY_TYPE__MIXED:
+			case MulePackage.ENTRY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.ENTRY_TYPE__VALUE:
+			case MulePackage.ENTRY_TYPE__VALUE:
 				setValue(VALUE_EDEFAULT);
 				return;
 		}
@@ -195,9 +195,9 @@ public class EntryTypeImpl extends EObjectImpl implements EntryType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENTRY_TYPE__MIXED:
+			case MulePackage.ENTRY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.ENTRY_TYPE__VALUE:
+			case MulePackage.ENTRY_TYPE__VALUE:
 				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
 		}
 		return eDynamicIsSet(eFeature);

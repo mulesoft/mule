@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getConnectionStrategyType()
+ * @see org.mule.schema.MulePackage#getConnectionStrategyType()
  * @model extendedMetaData="name='connection-strategyType' kind='mixed'"
  * @generated
  */
@@ -39,7 +39,7 @@ public interface ConnectionStrategyType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getConnectionStrategyType_Mixed()
+	 * @see org.mule.schema.MulePackage#getConnectionStrategyType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -56,7 +56,7 @@ public interface ConnectionStrategyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getConnectionStrategyType_Properties()
+	 * @see org.mule.schema.MulePackage#getConnectionStrategyType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -83,9 +83,9 @@ public interface ConnectionStrategyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Class Name</em>' attribute.
 	 * @see #setClassName(String)
-	 * @see org.mule.schema.SchemaPackage#getConnectionStrategyType_ClassName()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='className'"
+	 * @see org.mule.schema.MulePackage#getConnectionStrategyType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getClassName();

@@ -22,8 +22,8 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.mule.schema.MulePackage;
 import org.mule.schema.ReplyToType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -85,7 +85,7 @@ public class ReplyToTypeImpl extends EObjectImpl implements ReplyToType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getReplyToType();
+		return MulePackage.eINSTANCE.getReplyToType();
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class ReplyToTypeImpl extends EObjectImpl implements ReplyToType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.REPLY_TO_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.REPLY_TO_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -118,7 +118,7 @@ public class ReplyToTypeImpl extends EObjectImpl implements ReplyToType {
 		String oldAddress = address;
 		address = newAddress;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.REPLY_TO_TYPE__ADDRESS, oldAddress, address));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.REPLY_TO_TYPE__ADDRESS, oldAddress, address));
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class ReplyToTypeImpl extends EObjectImpl implements ReplyToType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.REPLY_TO_TYPE__MIXED:
+				case MulePackage.REPLY_TO_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -145,9 +145,9 @@ public class ReplyToTypeImpl extends EObjectImpl implements ReplyToType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.REPLY_TO_TYPE__MIXED:
+			case MulePackage.REPLY_TO_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.REPLY_TO_TYPE__ADDRESS:
+			case MulePackage.REPLY_TO_TYPE__ADDRESS:
 				return getAddress();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -160,11 +160,11 @@ public class ReplyToTypeImpl extends EObjectImpl implements ReplyToType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.REPLY_TO_TYPE__MIXED:
+			case MulePackage.REPLY_TO_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.REPLY_TO_TYPE__ADDRESS:
+			case MulePackage.REPLY_TO_TYPE__ADDRESS:
 				setAddress((String)newValue);
 				return;
 		}
@@ -178,10 +178,10 @@ public class ReplyToTypeImpl extends EObjectImpl implements ReplyToType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.REPLY_TO_TYPE__MIXED:
+			case MulePackage.REPLY_TO_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.REPLY_TO_TYPE__ADDRESS:
+			case MulePackage.REPLY_TO_TYPE__ADDRESS:
 				setAddress(ADDRESS_EDEFAULT);
 				return;
 		}
@@ -195,9 +195,9 @@ public class ReplyToTypeImpl extends EObjectImpl implements ReplyToType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.REPLY_TO_TYPE__MIXED:
+			case MulePackage.REPLY_TO_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.REPLY_TO_TYPE__ADDRESS:
+			case MulePackage.REPLY_TO_TYPE__ADDRESS:
 				return ADDRESS_EDEFAULT == null ? address != null : !ADDRESS_EDEFAULT.equals(address);
 		}
 		return eDynamicIsSet(eFeature);

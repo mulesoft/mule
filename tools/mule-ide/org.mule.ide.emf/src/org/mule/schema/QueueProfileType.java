@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getQueueProfileType()
+ * @see org.mule.schema.MulePackage#getQueueProfileType()
  * @model extendedMetaData="name='queue-profileType' kind='mixed'"
  * @generated
  */
@@ -40,7 +40,7 @@ public interface QueueProfileType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getQueueProfileType_Mixed()
+	 * @see org.mule.schema.MulePackage#getQueueProfileType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -57,7 +57,7 @@ public interface QueueProfileType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getQueueProfileType_Properties()
+	 * @see org.mule.schema.MulePackage#getQueueProfileType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -84,9 +84,9 @@ public interface QueueProfileType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Max Outstanding Messages</em>' attribute.
 	 * @see #setMaxOutstandingMessages(String)
-	 * @see org.mule.schema.SchemaPackage#getQueueProfileType_MaxOutstandingMessages()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='maxOutstandingMessages'"
+	 * @see org.mule.schema.MulePackage#getQueueProfileType_MaxOutstandingMessages()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='maxOutstandingMessages' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getMaxOutstandingMessages();
@@ -114,9 +114,9 @@ public interface QueueProfileType extends EObject {
 	 * @see #isSetPersistent()
 	 * @see #unsetPersistent()
 	 * @see #setPersistent(boolean)
-	 * @see org.mule.schema.SchemaPackage#getQueueProfileType_Persistent()
+	 * @see org.mule.schema.MulePackage#getQueueProfileType_Persistent()
 	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='persistent'"
+	 *        extendedMetaData="kind='attribute' name='persistent' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isPersistent();

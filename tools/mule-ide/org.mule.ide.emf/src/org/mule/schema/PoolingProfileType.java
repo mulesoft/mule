@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getPoolingProfileType()
+ * @see org.mule.schema.MulePackage#getPoolingProfileType()
  * @model extendedMetaData="name='pooling-profileType' kind='mixed'"
  * @generated
  */
@@ -43,7 +43,7 @@ public interface PoolingProfileType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getPoolingProfileType_Mixed()
+	 * @see org.mule.schema.MulePackage#getPoolingProfileType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -65,9 +65,9 @@ public interface PoolingProfileType extends EObject {
 	 * @see #isSetExhaustedAction()
 	 * @see #unsetExhaustedAction()
 	 * @see #setExhaustedAction(ExhaustedActionType)
-	 * @see org.mule.schema.SchemaPackage#getPoolingProfileType_ExhaustedAction()
+	 * @see org.mule.schema.MulePackage#getPoolingProfileType_ExhaustedAction()
 	 * @model default="GROW" unique="false" unsettable="true"
-	 *        extendedMetaData="kind='attribute' name='exhaustedAction'"
+	 *        extendedMetaData="kind='attribute' name='exhaustedAction' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	ExhaustedActionType getExhaustedAction();
@@ -121,9 +121,9 @@ public interface PoolingProfileType extends EObject {
 	 * @see #isSetFactory()
 	 * @see #unsetFactory()
 	 * @see #setFactory(String)
-	 * @see org.mule.schema.SchemaPackage#getPoolingProfileType_Factory()
-	 * @model default="org.mule.config.pool.CommonsPoolFactory" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='factory'"
+	 * @see org.mule.schema.MulePackage#getPoolingProfileType_Factory()
+	 * @model default="org.mule.config.pool.CommonsPoolFactory" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='factory' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getFactory();
@@ -178,9 +178,9 @@ public interface PoolingProfileType extends EObject {
 	 * @see #isSetInitialisationPolicy()
 	 * @see #unsetInitialisationPolicy()
 	 * @see #setInitialisationPolicy(InitialisationPolicyType)
-	 * @see org.mule.schema.SchemaPackage#getPoolingProfileType_InitialisationPolicy()
+	 * @see org.mule.schema.MulePackage#getPoolingProfileType_InitialisationPolicy()
 	 * @model default="INITIALISE_FIRST" unique="false" unsettable="true"
-	 *        extendedMetaData="kind='attribute' name='initialisationPolicy'"
+	 *        extendedMetaData="kind='attribute' name='initialisationPolicy' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	InitialisationPolicyType getInitialisationPolicy();
@@ -231,9 +231,9 @@ public interface PoolingProfileType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Max Active</em>' attribute.
 	 * @see #setMaxActive(String)
-	 * @see org.mule.schema.SchemaPackage#getPoolingProfileType_MaxActive()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='maxActive'"
+	 * @see org.mule.schema.MulePackage#getPoolingProfileType_MaxActive()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='maxActive' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getMaxActive();
@@ -258,9 +258,9 @@ public interface PoolingProfileType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Max Idle</em>' attribute.
 	 * @see #setMaxIdle(String)
-	 * @see org.mule.schema.SchemaPackage#getPoolingProfileType_MaxIdle()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='maxIdle'"
+	 * @see org.mule.schema.MulePackage#getPoolingProfileType_MaxIdle()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='maxIdle' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getMaxIdle();
@@ -285,9 +285,9 @@ public interface PoolingProfileType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Max Wait</em>' attribute.
 	 * @see #setMaxWait(String)
-	 * @see org.mule.schema.SchemaPackage#getPoolingProfileType_MaxWait()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='maxWait'"
+	 * @see org.mule.schema.MulePackage#getPoolingProfileType_MaxWait()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='maxWait' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getMaxWait();

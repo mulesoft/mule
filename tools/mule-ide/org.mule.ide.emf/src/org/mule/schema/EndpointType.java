@@ -32,13 +32,14 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  *   <li>{@link org.mule.schema.EndpointType#getRef <em>Ref</em>}</li>
  *   <li>{@link org.mule.schema.EndpointType#isRemoteSync <em>Remote Sync</em>}</li>
  *   <li>{@link org.mule.schema.EndpointType#getRemoteSyncTimeout <em>Remote Sync Timeout</em>}</li>
+ *   <li>{@link org.mule.schema.EndpointType#getResponseTransformers <em>Response Transformers</em>}</li>
  *   <li>{@link org.mule.schema.EndpointType#isSynchronous <em>Synchronous</em>}</li>
  *   <li>{@link org.mule.schema.EndpointType#getTransformers <em>Transformers</em>}</li>
  *   <li>{@link org.mule.schema.EndpointType#getType <em>Type</em>}</li>
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getEndpointType()
+ * @see org.mule.schema.MulePackage#getEndpointType()
  * @model extendedMetaData="name='endpointType' kind='mixed'"
  * @generated
  */
@@ -53,7 +54,7 @@ public interface EndpointType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Mixed()
+	 * @see org.mule.schema.MulePackage#getEndpointType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -70,7 +71,7 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Transaction</em>' containment reference.
 	 * @see #setTransaction(TransactionType)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Transaction()
+	 * @see org.mule.schema.MulePackage#getEndpointType_Transaction()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='transaction' namespace='##targetNamespace'"
 	 * @generated
@@ -97,7 +98,7 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Filter</em>' containment reference.
 	 * @see #setFilter(FilterType)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Filter()
+	 * @see org.mule.schema.MulePackage#getEndpointType_Filter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='filter' namespace='##targetNamespace'"
 	 * @generated
@@ -124,7 +125,7 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Security Filter</em>' containment reference.
 	 * @see #setSecurityFilter(SecurityFilterType)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_SecurityFilter()
+	 * @see org.mule.schema.MulePackage#getEndpointType_SecurityFilter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='security-filter' namespace='##targetNamespace'"
 	 * @generated
@@ -151,7 +152,7 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Properties()
+	 * @see org.mule.schema.MulePackage#getEndpointType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -178,9 +179,9 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Address</em>' attribute.
 	 * @see #setAddress(String)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Address()
+	 * @see org.mule.schema.MulePackage#getEndpointType_Address()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='address'"
+	 *        extendedMetaData="kind='attribute' name='address' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getAddress();
@@ -205,9 +206,9 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Connector</em>' attribute.
 	 * @see #setConnector(String)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Connector()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.IDREF"
-	 *        extendedMetaData="kind='attribute' name='connector'"
+	 * @see org.mule.schema.MulePackage#getEndpointType_Connector()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='connector' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getConnector();
@@ -237,9 +238,9 @@ public interface EndpointType extends EObject {
 	 * @see #isSetCreateConnector()
 	 * @see #unsetCreateConnector()
 	 * @see #setCreateConnector(CreateConnectorType)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_CreateConnector()
+	 * @see org.mule.schema.MulePackage#getEndpointType_CreateConnector()
 	 * @model default="GET_OR_CREATE" unique="false" unsettable="true"
-	 *        extendedMetaData="kind='attribute' name='createConnector'"
+	 *        extendedMetaData="kind='attribute' name='createConnector' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	CreateConnectorType getCreateConnector();
@@ -290,9 +291,9 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Name()
-	 * @model unique="false" id="true" dataType="org.eclipse.emf.ecore.xml.type.ID"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 * @see org.mule.schema.MulePackage#getEndpointType_Name()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();
@@ -317,9 +318,9 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Ref</em>' attribute.
 	 * @see #setRef(String)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Ref()
+	 * @see org.mule.schema.MulePackage#getEndpointType_Ref()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='ref'"
+	 *        extendedMetaData="kind='attribute' name='ref' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getRef();
@@ -346,9 +347,9 @@ public interface EndpointType extends EObject {
 	 * @see #isSetRemoteSync()
 	 * @see #unsetRemoteSync()
 	 * @see #setRemoteSync(boolean)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_RemoteSync()
+	 * @see org.mule.schema.MulePackage#getEndpointType_RemoteSync()
 	 * @model unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='remoteSync'"
+	 *        extendedMetaData="kind='attribute' name='remoteSync' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isRemoteSync();
@@ -398,9 +399,9 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Remote Sync Timeout</em>' attribute.
 	 * @see #setRemoteSyncTimeout(String)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_RemoteSyncTimeout()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='remoteSyncTimeout'"
+	 * @see org.mule.schema.MulePackage#getEndpointType_RemoteSyncTimeout()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='remoteSyncTimeout' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getRemoteSyncTimeout();
@@ -416,6 +417,33 @@ public interface EndpointType extends EObject {
 	void setRemoteSyncTimeout(String value);
 
 	/**
+	 * Returns the value of the '<em><b>Response Transformers</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Response Transformers</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Response Transformers</em>' attribute.
+	 * @see #setResponseTransformers(List)
+	 * @see org.mule.schema.MulePackage#getEndpointType_ResponseTransformers()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.IDREFS" many="false"
+	 *        extendedMetaData="kind='attribute' name='responseTransformers' namespace='##targetNamespace'"
+	 * @generated
+	 */
+	List getResponseTransformers();
+
+	/**
+	 * Sets the value of the '{@link org.mule.schema.EndpointType#getResponseTransformers <em>Response Transformers</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Response Transformers</em>' attribute.
+	 * @see #getResponseTransformers()
+	 * @generated
+	 */
+	void setResponseTransformers(List value);
+
+	/**
 	 * Returns the value of the '<em><b>Synchronous</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
@@ -427,9 +455,9 @@ public interface EndpointType extends EObject {
 	 * @see #isSetSynchronous()
 	 * @see #unsetSynchronous()
 	 * @see #setSynchronous(boolean)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Synchronous()
+	 * @see org.mule.schema.MulePackage#getEndpointType_Synchronous()
 	 * @model unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='synchronous'"
+	 *        extendedMetaData="kind='attribute' name='synchronous' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isSynchronous();
@@ -478,13 +506,13 @@ public interface EndpointType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Transformers</em>' attribute.
-	 * @see #setTransformers(List)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Transformers()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.IDREFS" many="false"
-	 *        extendedMetaData="kind='attribute' name='transformers'"
+	 * @see #setTransformers(String)
+	 * @see org.mule.schema.MulePackage#getEndpointType_Transformers()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='transformers' namespace='##targetNamespace'"
 	 * @generated
 	 */
-	List getTransformers();
+	String getTransformers();
 
 	/**
 	 * Sets the value of the '{@link org.mule.schema.EndpointType#getTransformers <em>Transformers</em>}' attribute.
@@ -494,12 +522,12 @@ public interface EndpointType extends EObject {
 	 * @see #getTransformers()
 	 * @generated
 	 */
-	void setTransformers(List value);
+	void setTransformers(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Type</b></em>' attribute.
 	 * The default value is <code>"senderAndReceiver"</code>.
-	 * The literals are from the enumeration {@link org.mule.schema.TypeType}.
+	 * The literals are from the enumeration {@link org.mule.schema.TypeType1}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Type</em>' attribute isn't clear,
@@ -507,29 +535,29 @@ public interface EndpointType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Type</em>' attribute.
-	 * @see org.mule.schema.TypeType
+	 * @see org.mule.schema.TypeType1
 	 * @see #isSetType()
 	 * @see #unsetType()
-	 * @see #setType(TypeType)
-	 * @see org.mule.schema.SchemaPackage#getEndpointType_Type()
+	 * @see #setType(TypeType1)
+	 * @see org.mule.schema.MulePackage#getEndpointType_Type()
 	 * @model default="senderAndReceiver" unique="false" unsettable="true"
-	 *        extendedMetaData="kind='attribute' name='type'"
+	 *        extendedMetaData="kind='attribute' name='type' namespace='##targetNamespace'"
 	 * @generated
 	 */
-	TypeType getType();
+	TypeType1 getType();
 
 	/**
 	 * Sets the value of the '{@link org.mule.schema.EndpointType#getType <em>Type</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Type</em>' attribute.
-	 * @see org.mule.schema.TypeType
+	 * @see org.mule.schema.TypeType1
 	 * @see #isSetType()
 	 * @see #unsetType()
 	 * @see #getType()
 	 * @generated
 	 */
-	void setType(TypeType value);
+	void setType(TypeType1 value);
 
 	/**
 	 * Unsets the value of the '{@link org.mule.schema.EndpointType#getType <em>Type</em>}' attribute.
@@ -537,7 +565,7 @@ public interface EndpointType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @see #isSetType()
 	 * @see #getType()
-	 * @see #setType(TypeType)
+	 * @see #setType(TypeType1)
 	 * @generated
 	 */
 	void unsetType();
@@ -549,7 +577,7 @@ public interface EndpointType extends EObject {
 	 * @return whether the value of the '<em>Type</em>' attribute is set.
 	 * @see #unsetType()
 	 * @see #getType()
-	 * @see #setType(TypeType)
+	 * @see #setType(TypeType1)
 	 * @generated
 	 */
 	boolean isSetType();

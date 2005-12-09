@@ -22,8 +22,8 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -73,7 +73,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getPropertiesType();
+		return MulePackage.eINSTANCE.getPropertiesType();
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.PROPERTIES_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.PROPERTIES_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -94,7 +94,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	public FeatureMap getGroup() {
-		return (FeatureMap)((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getPropertiesType_Group());
+		return (FeatureMap)((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getPropertiesType_Group());
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	public EList getProperty() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getPropertiesType_Property());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getPropertiesType_Property());
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	public EList getFactoryProperty() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getPropertiesType_FactoryProperty());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getPropertiesType_FactoryProperty());
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	public EList getContainerProperty() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getPropertiesType_ContainerProperty());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getPropertiesType_ContainerProperty());
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	public EList getSystemProperty() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getPropertiesType_SystemProperty());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getPropertiesType_SystemProperty());
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	public EList getMap() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getPropertiesType_Map());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getPropertiesType_Map());
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	public EList getList() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getPropertiesType_List());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getPropertiesType_List());
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	public EList getFileProperties() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getPropertiesType_FileProperties());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getPropertiesType_FileProperties());
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 * @generated
 	 */
 	public EList getTextProperty() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getPropertiesType_TextProperty());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getPropertiesType_TextProperty());
 	}
 
 	/**
@@ -177,25 +177,25 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.PROPERTIES_TYPE__MIXED:
+				case MulePackage.PROPERTIES_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PROPERTIES_TYPE__GROUP:
+				case MulePackage.PROPERTIES_TYPE__GROUP:
 					return ((InternalEList)getGroup()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PROPERTIES_TYPE__PROPERTY:
+				case MulePackage.PROPERTIES_TYPE__PROPERTY:
 					return ((InternalEList)getProperty()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
+				case MulePackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
 					return ((InternalEList)getFactoryProperty()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
+				case MulePackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
 					return ((InternalEList)getContainerProperty()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
+				case MulePackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
 					return ((InternalEList)getSystemProperty()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PROPERTIES_TYPE__MAP:
+				case MulePackage.PROPERTIES_TYPE__MAP:
 					return ((InternalEList)getMap()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PROPERTIES_TYPE__LIST:
+				case MulePackage.PROPERTIES_TYPE__LIST:
 					return ((InternalEList)getList()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PROPERTIES_TYPE__FILE_PROPERTIES:
+				case MulePackage.PROPERTIES_TYPE__FILE_PROPERTIES:
 					return ((InternalEList)getFileProperties()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PROPERTIES_TYPE__TEXT_PROPERTY:
+				case MulePackage.PROPERTIES_TYPE__TEXT_PROPERTY:
 					return ((InternalEList)getTextProperty()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -211,25 +211,25 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PROPERTIES_TYPE__MIXED:
+			case MulePackage.PROPERTIES_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.PROPERTIES_TYPE__GROUP:
+			case MulePackage.PROPERTIES_TYPE__GROUP:
 				return getGroup();
-			case SchemaPackage.PROPERTIES_TYPE__PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__PROPERTY:
 				return getProperty();
-			case SchemaPackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
 				return getFactoryProperty();
-			case SchemaPackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
 				return getContainerProperty();
-			case SchemaPackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
 				return getSystemProperty();
-			case SchemaPackage.PROPERTIES_TYPE__MAP:
+			case MulePackage.PROPERTIES_TYPE__MAP:
 				return getMap();
-			case SchemaPackage.PROPERTIES_TYPE__LIST:
+			case MulePackage.PROPERTIES_TYPE__LIST:
 				return getList();
-			case SchemaPackage.PROPERTIES_TYPE__FILE_PROPERTIES:
+			case MulePackage.PROPERTIES_TYPE__FILE_PROPERTIES:
 				return getFileProperties();
-			case SchemaPackage.PROPERTIES_TYPE__TEXT_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__TEXT_PROPERTY:
 				return getTextProperty();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -242,43 +242,43 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PROPERTIES_TYPE__MIXED:
+			case MulePackage.PROPERTIES_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__GROUP:
+			case MulePackage.PROPERTIES_TYPE__GROUP:
 				getGroup().clear();
 				getGroup().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__PROPERTY:
 				getProperty().clear();
 				getProperty().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
 				getFactoryProperty().clear();
 				getFactoryProperty().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
 				getContainerProperty().clear();
 				getContainerProperty().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
 				getSystemProperty().clear();
 				getSystemProperty().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__MAP:
+			case MulePackage.PROPERTIES_TYPE__MAP:
 				getMap().clear();
 				getMap().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__LIST:
+			case MulePackage.PROPERTIES_TYPE__LIST:
 				getList().clear();
 				getList().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__FILE_PROPERTIES:
+			case MulePackage.PROPERTIES_TYPE__FILE_PROPERTIES:
 				getFileProperties().clear();
 				getFileProperties().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__TEXT_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__TEXT_PROPERTY:
 				getTextProperty().clear();
 				getTextProperty().addAll((Collection)newValue);
 				return;
@@ -293,34 +293,34 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PROPERTIES_TYPE__MIXED:
+			case MulePackage.PROPERTIES_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__GROUP:
+			case MulePackage.PROPERTIES_TYPE__GROUP:
 				getGroup().clear();
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__PROPERTY:
 				getProperty().clear();
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
 				getFactoryProperty().clear();
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
 				getContainerProperty().clear();
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
 				getSystemProperty().clear();
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__MAP:
+			case MulePackage.PROPERTIES_TYPE__MAP:
 				getMap().clear();
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__LIST:
+			case MulePackage.PROPERTIES_TYPE__LIST:
 				getList().clear();
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__FILE_PROPERTIES:
+			case MulePackage.PROPERTIES_TYPE__FILE_PROPERTIES:
 				getFileProperties().clear();
 				return;
-			case SchemaPackage.PROPERTIES_TYPE__TEXT_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__TEXT_PROPERTY:
 				getTextProperty().clear();
 				return;
 		}
@@ -334,25 +334,25 @@ public class PropertiesTypeImpl extends EObjectImpl implements PropertiesType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PROPERTIES_TYPE__MIXED:
+			case MulePackage.PROPERTIES_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.PROPERTIES_TYPE__GROUP:
+			case MulePackage.PROPERTIES_TYPE__GROUP:
 				return !getGroup().isEmpty();
-			case SchemaPackage.PROPERTIES_TYPE__PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__PROPERTY:
 				return !getProperty().isEmpty();
-			case SchemaPackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__FACTORY_PROPERTY:
 				return !getFactoryProperty().isEmpty();
-			case SchemaPackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__CONTAINER_PROPERTY:
 				return !getContainerProperty().isEmpty();
-			case SchemaPackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__SYSTEM_PROPERTY:
 				return !getSystemProperty().isEmpty();
-			case SchemaPackage.PROPERTIES_TYPE__MAP:
+			case MulePackage.PROPERTIES_TYPE__MAP:
 				return !getMap().isEmpty();
-			case SchemaPackage.PROPERTIES_TYPE__LIST:
+			case MulePackage.PROPERTIES_TYPE__LIST:
 				return !getList().isEmpty();
-			case SchemaPackage.PROPERTIES_TYPE__FILE_PROPERTIES:
+			case MulePackage.PROPERTIES_TYPE__FILE_PROPERTIES:
 				return !getFileProperties().isEmpty();
-			case SchemaPackage.PROPERTIES_TYPE__TEXT_PROPERTY:
+			case MulePackage.PROPERTIES_TYPE__TEXT_PROPERTY:
 				return !getTextProperty().isEmpty();
 		}
 		return eDynamicIsSet(eFeature);

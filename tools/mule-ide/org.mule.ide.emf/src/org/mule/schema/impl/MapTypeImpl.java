@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.MapType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -95,7 +95,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getMapType();
+		return MulePackage.eINSTANCE.getMapType();
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.MAP_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.MAP_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -116,7 +116,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 * @generated
 	 */
 	public FeatureMap getGroup() {
-		return (FeatureMap)((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getMapType_Group());
+		return (FeatureMap)((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getMapType_Group());
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 * @generated
 	 */
 	public EList getProperty() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getMapType_Property());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getMapType_Property());
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 * @generated
 	 */
 	public EList getFactoryProperty() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getMapType_FactoryProperty());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getMapType_FactoryProperty());
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 * @generated
 	 */
 	public EList getContainerProperty() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getMapType_ContainerProperty());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getMapType_ContainerProperty());
 	}
 
 	/**
@@ -152,7 +152,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 * @generated
 	 */
 	public EList getSystemProperty() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getMapType_SystemProperty());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getMapType_SystemProperty());
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 * @generated
 	 */
 	public EList getMap() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getMapType_Map());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getMapType_Map());
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 * @generated
 	 */
 	public EList getList() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getMapType_List());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getMapType_List());
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 * @generated
 	 */
 	public EList getFileProperties() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getMapType_FileProperties());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getMapType_FileProperties());
 	}
 
 	/**
@@ -200,7 +200,7 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MAP_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MAP_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -211,23 +211,23 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.MAP_TYPE__MIXED:
+				case MulePackage.MAP_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MAP_TYPE__GROUP:
+				case MulePackage.MAP_TYPE__GROUP:
 					return ((InternalEList)getGroup()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MAP_TYPE__PROPERTY:
+				case MulePackage.MAP_TYPE__PROPERTY:
 					return ((InternalEList)getProperty()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MAP_TYPE__FACTORY_PROPERTY:
+				case MulePackage.MAP_TYPE__FACTORY_PROPERTY:
 					return ((InternalEList)getFactoryProperty()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MAP_TYPE__CONTAINER_PROPERTY:
+				case MulePackage.MAP_TYPE__CONTAINER_PROPERTY:
 					return ((InternalEList)getContainerProperty()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MAP_TYPE__SYSTEM_PROPERTY:
+				case MulePackage.MAP_TYPE__SYSTEM_PROPERTY:
 					return ((InternalEList)getSystemProperty()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MAP_TYPE__MAP:
+				case MulePackage.MAP_TYPE__MAP:
 					return ((InternalEList)getMap()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MAP_TYPE__LIST:
+				case MulePackage.MAP_TYPE__LIST:
 					return ((InternalEList)getList()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MAP_TYPE__FILE_PROPERTIES:
+				case MulePackage.MAP_TYPE__FILE_PROPERTIES:
 					return ((InternalEList)getFileProperties()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -243,25 +243,25 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MAP_TYPE__MIXED:
+			case MulePackage.MAP_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.MAP_TYPE__GROUP:
+			case MulePackage.MAP_TYPE__GROUP:
 				return getGroup();
-			case SchemaPackage.MAP_TYPE__PROPERTY:
+			case MulePackage.MAP_TYPE__PROPERTY:
 				return getProperty();
-			case SchemaPackage.MAP_TYPE__FACTORY_PROPERTY:
+			case MulePackage.MAP_TYPE__FACTORY_PROPERTY:
 				return getFactoryProperty();
-			case SchemaPackage.MAP_TYPE__CONTAINER_PROPERTY:
+			case MulePackage.MAP_TYPE__CONTAINER_PROPERTY:
 				return getContainerProperty();
-			case SchemaPackage.MAP_TYPE__SYSTEM_PROPERTY:
+			case MulePackage.MAP_TYPE__SYSTEM_PROPERTY:
 				return getSystemProperty();
-			case SchemaPackage.MAP_TYPE__MAP:
+			case MulePackage.MAP_TYPE__MAP:
 				return getMap();
-			case SchemaPackage.MAP_TYPE__LIST:
+			case MulePackage.MAP_TYPE__LIST:
 				return getList();
-			case SchemaPackage.MAP_TYPE__FILE_PROPERTIES:
+			case MulePackage.MAP_TYPE__FILE_PROPERTIES:
 				return getFileProperties();
-			case SchemaPackage.MAP_TYPE__NAME:
+			case MulePackage.MAP_TYPE__NAME:
 				return getName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -274,43 +274,43 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MAP_TYPE__MIXED:
+			case MulePackage.MAP_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MAP_TYPE__GROUP:
+			case MulePackage.MAP_TYPE__GROUP:
 				getGroup().clear();
 				getGroup().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MAP_TYPE__PROPERTY:
+			case MulePackage.MAP_TYPE__PROPERTY:
 				getProperty().clear();
 				getProperty().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MAP_TYPE__FACTORY_PROPERTY:
+			case MulePackage.MAP_TYPE__FACTORY_PROPERTY:
 				getFactoryProperty().clear();
 				getFactoryProperty().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MAP_TYPE__CONTAINER_PROPERTY:
+			case MulePackage.MAP_TYPE__CONTAINER_PROPERTY:
 				getContainerProperty().clear();
 				getContainerProperty().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MAP_TYPE__SYSTEM_PROPERTY:
+			case MulePackage.MAP_TYPE__SYSTEM_PROPERTY:
 				getSystemProperty().clear();
 				getSystemProperty().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MAP_TYPE__MAP:
+			case MulePackage.MAP_TYPE__MAP:
 				getMap().clear();
 				getMap().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MAP_TYPE__LIST:
+			case MulePackage.MAP_TYPE__LIST:
 				getList().clear();
 				getList().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MAP_TYPE__FILE_PROPERTIES:
+			case MulePackage.MAP_TYPE__FILE_PROPERTIES:
 				getFileProperties().clear();
 				getFileProperties().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MAP_TYPE__NAME:
+			case MulePackage.MAP_TYPE__NAME:
 				setName((String)newValue);
 				return;
 		}
@@ -324,34 +324,34 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MAP_TYPE__MIXED:
+			case MulePackage.MAP_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.MAP_TYPE__GROUP:
+			case MulePackage.MAP_TYPE__GROUP:
 				getGroup().clear();
 				return;
-			case SchemaPackage.MAP_TYPE__PROPERTY:
+			case MulePackage.MAP_TYPE__PROPERTY:
 				getProperty().clear();
 				return;
-			case SchemaPackage.MAP_TYPE__FACTORY_PROPERTY:
+			case MulePackage.MAP_TYPE__FACTORY_PROPERTY:
 				getFactoryProperty().clear();
 				return;
-			case SchemaPackage.MAP_TYPE__CONTAINER_PROPERTY:
+			case MulePackage.MAP_TYPE__CONTAINER_PROPERTY:
 				getContainerProperty().clear();
 				return;
-			case SchemaPackage.MAP_TYPE__SYSTEM_PROPERTY:
+			case MulePackage.MAP_TYPE__SYSTEM_PROPERTY:
 				getSystemProperty().clear();
 				return;
-			case SchemaPackage.MAP_TYPE__MAP:
+			case MulePackage.MAP_TYPE__MAP:
 				getMap().clear();
 				return;
-			case SchemaPackage.MAP_TYPE__LIST:
+			case MulePackage.MAP_TYPE__LIST:
 				getList().clear();
 				return;
-			case SchemaPackage.MAP_TYPE__FILE_PROPERTIES:
+			case MulePackage.MAP_TYPE__FILE_PROPERTIES:
 				getFileProperties().clear();
 				return;
-			case SchemaPackage.MAP_TYPE__NAME:
+			case MulePackage.MAP_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
 		}
@@ -365,25 +365,25 @@ public class MapTypeImpl extends EObjectImpl implements MapType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MAP_TYPE__MIXED:
+			case MulePackage.MAP_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.MAP_TYPE__GROUP:
+			case MulePackage.MAP_TYPE__GROUP:
 				return !getGroup().isEmpty();
-			case SchemaPackage.MAP_TYPE__PROPERTY:
+			case MulePackage.MAP_TYPE__PROPERTY:
 				return !getProperty().isEmpty();
-			case SchemaPackage.MAP_TYPE__FACTORY_PROPERTY:
+			case MulePackage.MAP_TYPE__FACTORY_PROPERTY:
 				return !getFactoryProperty().isEmpty();
-			case SchemaPackage.MAP_TYPE__CONTAINER_PROPERTY:
+			case MulePackage.MAP_TYPE__CONTAINER_PROPERTY:
 				return !getContainerProperty().isEmpty();
-			case SchemaPackage.MAP_TYPE__SYSTEM_PROPERTY:
+			case MulePackage.MAP_TYPE__SYSTEM_PROPERTY:
 				return !getSystemProperty().isEmpty();
-			case SchemaPackage.MAP_TYPE__MAP:
+			case MulePackage.MAP_TYPE__MAP:
 				return !getMap().isEmpty();
-			case SchemaPackage.MAP_TYPE__LIST:
+			case MulePackage.MAP_TYPE__LIST:
 				return !getList().isEmpty();
-			case SchemaPackage.MAP_TYPE__FILE_PROPERTIES:
+			case MulePackage.MAP_TYPE__FILE_PROPERTIES:
 				return !getFileProperties().isEmpty();
-			case SchemaPackage.MAP_TYPE__NAME:
+			case MulePackage.MAP_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return eDynamicIsSet(eFeature);

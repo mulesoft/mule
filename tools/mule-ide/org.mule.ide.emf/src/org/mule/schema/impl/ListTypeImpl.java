@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.ListType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -92,7 +92,7 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getListType();
+		return MulePackage.eINSTANCE.getListType();
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.LIST_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.LIST_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -113,7 +113,7 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 * @generated
 	 */
 	public FeatureMap getGroup() {
-		return (FeatureMap)((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getListType_Group());
+		return (FeatureMap)((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getListType_Group());
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 * @generated
 	 */
 	public EList getEntry() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getListType_Entry());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getListType_Entry());
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 * @generated
 	 */
 	public EList getFactoryEntry() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getListType_FactoryEntry());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getListType_FactoryEntry());
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 * @generated
 	 */
 	public EList getSystemEntry() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getListType_SystemEntry());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getListType_SystemEntry());
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 * @generated
 	 */
 	public EList getContainerEntry() {
-		return ((FeatureMap)getGroup()).list(SchemaPackage.eINSTANCE.getListType_ContainerEntry());
+		return ((FeatureMap)getGroup()).list(MulePackage.eINSTANCE.getListType_ContainerEntry());
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.LIST_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.LIST_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -181,17 +181,17 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.LIST_TYPE__MIXED:
+				case MulePackage.LIST_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.LIST_TYPE__GROUP:
+				case MulePackage.LIST_TYPE__GROUP:
 					return ((InternalEList)getGroup()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.LIST_TYPE__ENTRY:
+				case MulePackage.LIST_TYPE__ENTRY:
 					return ((InternalEList)getEntry()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.LIST_TYPE__FACTORY_ENTRY:
+				case MulePackage.LIST_TYPE__FACTORY_ENTRY:
 					return ((InternalEList)getFactoryEntry()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.LIST_TYPE__SYSTEM_ENTRY:
+				case MulePackage.LIST_TYPE__SYSTEM_ENTRY:
 					return ((InternalEList)getSystemEntry()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.LIST_TYPE__CONTAINER_ENTRY:
+				case MulePackage.LIST_TYPE__CONTAINER_ENTRY:
 					return ((InternalEList)getContainerEntry()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -207,19 +207,19 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.LIST_TYPE__MIXED:
+			case MulePackage.LIST_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.LIST_TYPE__GROUP:
+			case MulePackage.LIST_TYPE__GROUP:
 				return getGroup();
-			case SchemaPackage.LIST_TYPE__ENTRY:
+			case MulePackage.LIST_TYPE__ENTRY:
 				return getEntry();
-			case SchemaPackage.LIST_TYPE__FACTORY_ENTRY:
+			case MulePackage.LIST_TYPE__FACTORY_ENTRY:
 				return getFactoryEntry();
-			case SchemaPackage.LIST_TYPE__SYSTEM_ENTRY:
+			case MulePackage.LIST_TYPE__SYSTEM_ENTRY:
 				return getSystemEntry();
-			case SchemaPackage.LIST_TYPE__CONTAINER_ENTRY:
+			case MulePackage.LIST_TYPE__CONTAINER_ENTRY:
 				return getContainerEntry();
-			case SchemaPackage.LIST_TYPE__NAME:
+			case MulePackage.LIST_TYPE__NAME:
 				return getName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -232,31 +232,31 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.LIST_TYPE__MIXED:
+			case MulePackage.LIST_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.LIST_TYPE__GROUP:
+			case MulePackage.LIST_TYPE__GROUP:
 				getGroup().clear();
 				getGroup().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.LIST_TYPE__ENTRY:
+			case MulePackage.LIST_TYPE__ENTRY:
 				getEntry().clear();
 				getEntry().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.LIST_TYPE__FACTORY_ENTRY:
+			case MulePackage.LIST_TYPE__FACTORY_ENTRY:
 				getFactoryEntry().clear();
 				getFactoryEntry().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.LIST_TYPE__SYSTEM_ENTRY:
+			case MulePackage.LIST_TYPE__SYSTEM_ENTRY:
 				getSystemEntry().clear();
 				getSystemEntry().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.LIST_TYPE__CONTAINER_ENTRY:
+			case MulePackage.LIST_TYPE__CONTAINER_ENTRY:
 				getContainerEntry().clear();
 				getContainerEntry().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.LIST_TYPE__NAME:
+			case MulePackage.LIST_TYPE__NAME:
 				setName((String)newValue);
 				return;
 		}
@@ -270,25 +270,25 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.LIST_TYPE__MIXED:
+			case MulePackage.LIST_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.LIST_TYPE__GROUP:
+			case MulePackage.LIST_TYPE__GROUP:
 				getGroup().clear();
 				return;
-			case SchemaPackage.LIST_TYPE__ENTRY:
+			case MulePackage.LIST_TYPE__ENTRY:
 				getEntry().clear();
 				return;
-			case SchemaPackage.LIST_TYPE__FACTORY_ENTRY:
+			case MulePackage.LIST_TYPE__FACTORY_ENTRY:
 				getFactoryEntry().clear();
 				return;
-			case SchemaPackage.LIST_TYPE__SYSTEM_ENTRY:
+			case MulePackage.LIST_TYPE__SYSTEM_ENTRY:
 				getSystemEntry().clear();
 				return;
-			case SchemaPackage.LIST_TYPE__CONTAINER_ENTRY:
+			case MulePackage.LIST_TYPE__CONTAINER_ENTRY:
 				getContainerEntry().clear();
 				return;
-			case SchemaPackage.LIST_TYPE__NAME:
+			case MulePackage.LIST_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
 		}
@@ -302,19 +302,19 @@ public class ListTypeImpl extends EObjectImpl implements ListType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.LIST_TYPE__MIXED:
+			case MulePackage.LIST_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.LIST_TYPE__GROUP:
+			case MulePackage.LIST_TYPE__GROUP:
 				return !getGroup().isEmpty();
-			case SchemaPackage.LIST_TYPE__ENTRY:
+			case MulePackage.LIST_TYPE__ENTRY:
 				return !getEntry().isEmpty();
-			case SchemaPackage.LIST_TYPE__FACTORY_ENTRY:
+			case MulePackage.LIST_TYPE__FACTORY_ENTRY:
 				return !getFactoryEntry().isEmpty();
-			case SchemaPackage.LIST_TYPE__SYSTEM_ENTRY:
+			case MulePackage.LIST_TYPE__SYSTEM_ENTRY:
 				return !getSystemEntry().isEmpty();
-			case SchemaPackage.LIST_TYPE__CONTAINER_ENTRY:
+			case MulePackage.LIST_TYPE__CONTAINER_ENTRY:
 				return !getContainerEntry().isEmpty();
-			case SchemaPackage.LIST_TYPE__NAME:
+			case MulePackage.LIST_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return eDynamicIsSet(eFeature);

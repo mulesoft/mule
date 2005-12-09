@@ -4,7 +4,7 @@
     xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.mule.ide.emf/src"
     modelPluginID="org.mule.ide.emf" forceOverwrite="true" modelName="Mule" importerID="org.eclipse.xsd.ecore.importer">
   <foreignModel>../xml/mule.xsd</foreignModel>
-  <genPackages prefix="Schema" basePackage="org.mule" resource="XML" disposableProviderFactory="true"
+  <genPackages prefix="Mule" basePackage="org.mule" resource="XML" disposableProviderFactory="true"
       ecorePackage="mule.ecore#/">
     <genEnums ecoreEnum="mule.ecore#//ActionType">
       <genEnumLiterals ecoreEnumLiteral="mule.ecore#//ActionType/NONE"/>
@@ -50,10 +50,10 @@
       <genEnumLiterals ecoreEnumLiteral="mule.ecore#//PoolExhaustedActionType/ABORT"/>
       <genEnumLiterals ecoreEnumLiteral="mule.ecore#//PoolExhaustedActionType/RUN"/>
     </genEnums>
-    <genEnums ecoreEnum="mule.ecore#//TypeType">
-      <genEnumLiterals ecoreEnumLiteral="mule.ecore#//TypeType/sender"/>
-      <genEnumLiterals ecoreEnumLiteral="mule.ecore#//TypeType/receiver"/>
-      <genEnumLiterals ecoreEnumLiteral="mule.ecore#//TypeType/senderAndReceiver"/>
+    <genEnums ecoreEnum="mule.ecore#//TypeType1">
+      <genEnumLiterals ecoreEnumLiteral="mule.ecore#//TypeType1/sender"/>
+      <genEnumLiterals ecoreEnumLiteral="mule.ecore#//TypeType1/receiver"/>
+      <genEnumLiterals ecoreEnumLiteral="mule.ecore#//TypeType1/senderAndReceiver"/>
     </genEnums>
     <genDataTypes ecoreDataType="mule.ecore#//ActionTypeObject"/>
     <genDataTypes ecoreDataType="mule.ecore#//CreateConnectorTypeObject"/>
@@ -63,6 +63,7 @@
     <genDataTypes ecoreDataType="mule.ecore#//InitialisationPolicyTypeObject"/>
     <genDataTypes ecoreDataType="mule.ecore#//InitialStateTypeObject"/>
     <genDataTypes ecoreDataType="mule.ecore#//PoolExhaustedActionTypeObject"/>
+    <genDataTypes ecoreDataType="mule.ecore#//TypeType"/>
     <genDataTypes ecoreDataType="mule.ecore#//TypeTypeObject"/>
     <genDataTypes ecoreDataType="mule.ecore#//VersionType"/>
     <genClasses ecoreClass="mule.ecore#//AgentsType">
@@ -140,6 +141,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ContainerPropertyType/container"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ContainerPropertyType/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ContainerPropertyType/reference"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ContainerPropertyType/required"/>
     </genClasses>
     <genClasses ecoreClass="mule.ecore#//DocumentRoot">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute mule.ecore#//DocumentRoot/mixed"/>
@@ -175,6 +177,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//EndpointType/ref"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//EndpointType/remoteSync"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//EndpointType/remoteSyncTimeout"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//EndpointType/responseTransformers"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//EndpointType/synchronous"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//EndpointType/transformers"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//EndpointType/type"/>
@@ -245,6 +248,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//GlobalEndpointType/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//GlobalEndpointType/remoteSync"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//GlobalEndpointType/remoteSyncTimeout"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//GlobalEndpointType/responseTransformers"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//GlobalEndpointType/synchronous"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//GlobalEndpointType/transformers"/>
     </genClasses>
@@ -310,25 +314,27 @@
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//ModelType/componentPoolFactory"/>
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//ModelType/exceptionStrategy"/>
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//ModelType/muleDescriptor"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ModelType/className"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ModelType/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ModelType/ref"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ModelType/type"/>
     </genClasses>
     <genClasses ecoreClass="mule.ecore#//MuleConfigurationType">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute mule.ecore#//MuleConfigurationType/mixed"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleConfigurationType/description"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/environmentProperties"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/muleEnvironmentProperties"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/containerContext"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/securityManager"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/transactionManager"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/agents"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/connector"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/endpointIdentifiers"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/transformers"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/globalEndpoints"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/interceptorStack"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/model"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/muleDescriptor"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/environmentProperties"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/muleEnvironmentProperties"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/containerContext"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/securityManager"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/transactionManager"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/agents"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/connector"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/endpointIdentifiers"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/transformers"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/globalEndpoints"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/interceptorStack"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/model"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleConfigurationType/muleDescriptor"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleConfigurationType/id"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleConfigurationType/version"/>
     </genClasses>
@@ -364,12 +370,15 @@
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleEnvironmentPropertiesType/persistenceStrategy"/>
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//MuleEnvironmentPropertiesType/connectionStrategy"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/clientMode"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/embedded"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/enableMessageEvents"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/encoding"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/model"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/recoverableMode"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/remoteSync"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/serverUrl"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/synchronous"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/synchronousEventTimeout"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/synchronousReceive"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/transactionTimeout"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//MuleEnvironmentPropertiesType/workingDirectory"/>
     </genClasses>
@@ -426,7 +435,6 @@
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//ResponseRouterType/globalEndpoint"/>
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference mule.ecore#//ResponseRouterType/router"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ResponseRouterType/timeout"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ResponseRouterType/transformers"/>
     </genClasses>
     <genClasses ecoreClass="mule.ecore#//RightFilterType">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute mule.ecore#//RightFilterType/mixed"/>
@@ -497,6 +505,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ThreadingProfileType/maxThreadsIdle"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ThreadingProfileType/poolExhaustedAction"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ThreadingProfileType/threadTTL"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mule.ecore#//ThreadingProfileType/threadWaitTimeout"/>
     </genClasses>
     <genClasses ecoreClass="mule.ecore#//TransactionManagerType">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute mule.ecore#//TransactionManagerType/mixed"/>

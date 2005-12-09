@@ -29,7 +29,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getConnectorType()
+ * @see org.mule.schema.MulePackage#getConnectorType()
  * @model extendedMetaData="name='connectorType' kind='mixed'"
  * @generated
  */
@@ -44,7 +44,7 @@ public interface ConnectorType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getConnectorType_Mixed()
+	 * @see org.mule.schema.MulePackage#getConnectorType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -61,7 +61,7 @@ public interface ConnectorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getConnectorType_Properties()
+	 * @see org.mule.schema.MulePackage#getConnectorType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -88,7 +88,7 @@ public interface ConnectorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Threading Profile</em>' containment reference.
 	 * @see #setThreadingProfile(ThreadingProfileType)
-	 * @see org.mule.schema.SchemaPackage#getConnectorType_ThreadingProfile()
+	 * @see org.mule.schema.MulePackage#getConnectorType_ThreadingProfile()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='threading-profile' namespace='##targetNamespace'"
 	 * @generated
@@ -115,7 +115,7 @@ public interface ConnectorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Exception Strategy</em>' containment reference.
 	 * @see #setExceptionStrategy(ExceptionStrategyType)
-	 * @see org.mule.schema.SchemaPackage#getConnectorType_ExceptionStrategy()
+	 * @see org.mule.schema.MulePackage#getConnectorType_ExceptionStrategy()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='exception-strategy' namespace='##targetNamespace'"
 	 * @generated
@@ -142,7 +142,7 @@ public interface ConnectorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Connection Strategy</em>' containment reference.
 	 * @see #setConnectionStrategy(ConnectionStrategyType)
-	 * @see org.mule.schema.SchemaPackage#getConnectorType_ConnectionStrategy()
+	 * @see org.mule.schema.MulePackage#getConnectorType_ConnectionStrategy()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='connection-strategy' namespace='##targetNamespace'"
 	 * @generated
@@ -169,9 +169,9 @@ public interface ConnectorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Class Name</em>' attribute.
 	 * @see #setClassName(String)
-	 * @see org.mule.schema.SchemaPackage#getConnectorType_ClassName()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='className'"
+	 * @see org.mule.schema.MulePackage#getConnectorType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getClassName();
@@ -196,9 +196,9 @@ public interface ConnectorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getConnectorType_Name()
-	 * @model unique="false" id="true" dataType="org.eclipse.emf.ecore.xml.type.ID" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 * @see org.mule.schema.MulePackage#getConnectorType_Name()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();
@@ -223,9 +223,9 @@ public interface ConnectorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Ref</em>' attribute.
 	 * @see #setRef(String)
-	 * @see org.mule.schema.SchemaPackage#getConnectorType_Ref()
+	 * @see org.mule.schema.MulePackage#getConnectorType_Ref()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='ref'"
+	 *        extendedMetaData="kind='attribute' name='ref' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getRef();

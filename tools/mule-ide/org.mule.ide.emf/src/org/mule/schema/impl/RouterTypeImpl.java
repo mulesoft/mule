@@ -26,10 +26,10 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.EnableCorrelationType;
 import org.mule.schema.FilterType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
 import org.mule.schema.ReplyToType;
 import org.mule.schema.RouterType;
-import org.mule.schema.SchemaPackage;
 import org.mule.schema.TransactionType;
 
 /**
@@ -149,7 +149,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getRouterType();
+		return MulePackage.eINSTANCE.getRouterType();
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.ROUTER_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.ROUTER_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -170,7 +170,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public EList getEndpoint() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getRouterType_Endpoint());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getRouterType_Endpoint());
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public EList getGlobalEndpoint() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getRouterType_GlobalEndpoint());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getRouterType_GlobalEndpoint());
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public ReplyToType getReplyTo() {
-		return (ReplyToType)getMixed().get(SchemaPackage.eINSTANCE.getRouterType_ReplyTo(), true);
+		return (ReplyToType)getMixed().get(MulePackage.eINSTANCE.getRouterType_ReplyTo(), true);
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public NotificationChain basicSetReplyTo(ReplyToType newReplyTo, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getRouterType_ReplyTo(), newReplyTo, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getRouterType_ReplyTo(), newReplyTo, msgs);
 	}
 
 	/**
@@ -206,7 +206,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public void setReplyTo(ReplyToType newReplyTo) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getRouterType_ReplyTo(), newReplyTo);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getRouterType_ReplyTo(), newReplyTo);
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public TransactionType getTransaction() {
-		return (TransactionType)getMixed().get(SchemaPackage.eINSTANCE.getRouterType_Transaction(), true);
+		return (TransactionType)getMixed().get(MulePackage.eINSTANCE.getRouterType_Transaction(), true);
 	}
 
 	/**
@@ -224,7 +224,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public NotificationChain basicSetTransaction(TransactionType newTransaction, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getRouterType_Transaction(), newTransaction, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getRouterType_Transaction(), newTransaction, msgs);
 	}
 
 	/**
@@ -233,7 +233,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public void setTransaction(TransactionType newTransaction) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getRouterType_Transaction(), newTransaction);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getRouterType_Transaction(), newTransaction);
 	}
 
 	/**
@@ -242,7 +242,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public FilterType getFilter() {
-		return (FilterType)getMixed().get(SchemaPackage.eINSTANCE.getRouterType_Filter(), true);
+		return (FilterType)getMixed().get(MulePackage.eINSTANCE.getRouterType_Filter(), true);
 	}
 
 	/**
@@ -251,7 +251,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public NotificationChain basicSetFilter(FilterType newFilter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getRouterType_Filter(), newFilter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getRouterType_Filter(), newFilter, msgs);
 	}
 
 	/**
@@ -260,7 +260,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public void setFilter(FilterType newFilter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getRouterType_Filter(), newFilter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getRouterType_Filter(), newFilter);
 	}
 
 	/**
@@ -269,7 +269,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getRouterType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getRouterType_Properties(), true);
 	}
 
 	/**
@@ -278,7 +278,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getRouterType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getRouterType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -287,7 +287,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getRouterType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getRouterType_Properties(), newProperties);
 	}
 
 	/**
@@ -308,7 +308,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ROUTER_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ROUTER_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -331,7 +331,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 		boolean oldEnableCorrelationESet = enableCorrelationESet;
 		enableCorrelationESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ROUTER_TYPE__ENABLE_CORRELATION, oldEnableCorrelation, enableCorrelation, !oldEnableCorrelationESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ROUTER_TYPE__ENABLE_CORRELATION, oldEnableCorrelation, enableCorrelation, !oldEnableCorrelationESet));
 	}
 
 	/**
@@ -345,7 +345,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 		enableCorrelation = ENABLE_CORRELATION_EDEFAULT;
 		enableCorrelationESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.ROUTER_TYPE__ENABLE_CORRELATION, oldEnableCorrelation, ENABLE_CORRELATION_EDEFAULT, oldEnableCorrelationESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.ROUTER_TYPE__ENABLE_CORRELATION, oldEnableCorrelation, ENABLE_CORRELATION_EDEFAULT, oldEnableCorrelationESet));
 	}
 
 	/**
@@ -375,7 +375,7 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 		String oldPropertyExtractor = propertyExtractor;
 		propertyExtractor = newPropertyExtractor;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ROUTER_TYPE__PROPERTY_EXTRACTOR, oldPropertyExtractor, propertyExtractor));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ROUTER_TYPE__PROPERTY_EXTRACTOR, oldPropertyExtractor, propertyExtractor));
 	}
 
 	/**
@@ -386,19 +386,19 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.ROUTER_TYPE__MIXED:
+				case MulePackage.ROUTER_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.ROUTER_TYPE__ENDPOINT:
+				case MulePackage.ROUTER_TYPE__ENDPOINT:
 					return ((InternalEList)getEndpoint()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
+				case MulePackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
 					return ((InternalEList)getGlobalEndpoint()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.ROUTER_TYPE__REPLY_TO:
+				case MulePackage.ROUTER_TYPE__REPLY_TO:
 					return basicSetReplyTo(null, msgs);
-				case SchemaPackage.ROUTER_TYPE__TRANSACTION:
+				case MulePackage.ROUTER_TYPE__TRANSACTION:
 					return basicSetTransaction(null, msgs);
-				case SchemaPackage.ROUTER_TYPE__FILTER:
+				case MulePackage.ROUTER_TYPE__FILTER:
 					return basicSetFilter(null, msgs);
-				case SchemaPackage.ROUTER_TYPE__PROPERTIES:
+				case MulePackage.ROUTER_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -414,25 +414,25 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ROUTER_TYPE__MIXED:
+			case MulePackage.ROUTER_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.ROUTER_TYPE__ENDPOINT:
+			case MulePackage.ROUTER_TYPE__ENDPOINT:
 				return getEndpoint();
-			case SchemaPackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
 				return getGlobalEndpoint();
-			case SchemaPackage.ROUTER_TYPE__REPLY_TO:
+			case MulePackage.ROUTER_TYPE__REPLY_TO:
 				return getReplyTo();
-			case SchemaPackage.ROUTER_TYPE__TRANSACTION:
+			case MulePackage.ROUTER_TYPE__TRANSACTION:
 				return getTransaction();
-			case SchemaPackage.ROUTER_TYPE__FILTER:
+			case MulePackage.ROUTER_TYPE__FILTER:
 				return getFilter();
-			case SchemaPackage.ROUTER_TYPE__PROPERTIES:
+			case MulePackage.ROUTER_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.ROUTER_TYPE__CLASS_NAME:
+			case MulePackage.ROUTER_TYPE__CLASS_NAME:
 				return getClassName();
-			case SchemaPackage.ROUTER_TYPE__ENABLE_CORRELATION:
+			case MulePackage.ROUTER_TYPE__ENABLE_CORRELATION:
 				return getEnableCorrelation();
-			case SchemaPackage.ROUTER_TYPE__PROPERTY_EXTRACTOR:
+			case MulePackage.ROUTER_TYPE__PROPERTY_EXTRACTOR:
 				return getPropertyExtractor();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -445,37 +445,37 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ROUTER_TYPE__MIXED:
+			case MulePackage.ROUTER_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.ROUTER_TYPE__ENDPOINT:
+			case MulePackage.ROUTER_TYPE__ENDPOINT:
 				getEndpoint().clear();
 				getEndpoint().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
 				getGlobalEndpoint().clear();
 				getGlobalEndpoint().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.ROUTER_TYPE__REPLY_TO:
+			case MulePackage.ROUTER_TYPE__REPLY_TO:
 				setReplyTo((ReplyToType)newValue);
 				return;
-			case SchemaPackage.ROUTER_TYPE__TRANSACTION:
+			case MulePackage.ROUTER_TYPE__TRANSACTION:
 				setTransaction((TransactionType)newValue);
 				return;
-			case SchemaPackage.ROUTER_TYPE__FILTER:
+			case MulePackage.ROUTER_TYPE__FILTER:
 				setFilter((FilterType)newValue);
 				return;
-			case SchemaPackage.ROUTER_TYPE__PROPERTIES:
+			case MulePackage.ROUTER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.ROUTER_TYPE__CLASS_NAME:
+			case MulePackage.ROUTER_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
-			case SchemaPackage.ROUTER_TYPE__ENABLE_CORRELATION:
+			case MulePackage.ROUTER_TYPE__ENABLE_CORRELATION:
 				setEnableCorrelation((EnableCorrelationType)newValue);
 				return;
-			case SchemaPackage.ROUTER_TYPE__PROPERTY_EXTRACTOR:
+			case MulePackage.ROUTER_TYPE__PROPERTY_EXTRACTOR:
 				setPropertyExtractor((String)newValue);
 				return;
 		}
@@ -489,34 +489,34 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ROUTER_TYPE__MIXED:
+			case MulePackage.ROUTER_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.ROUTER_TYPE__ENDPOINT:
+			case MulePackage.ROUTER_TYPE__ENDPOINT:
 				getEndpoint().clear();
 				return;
-			case SchemaPackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
 				getGlobalEndpoint().clear();
 				return;
-			case SchemaPackage.ROUTER_TYPE__REPLY_TO:
+			case MulePackage.ROUTER_TYPE__REPLY_TO:
 				setReplyTo((ReplyToType)null);
 				return;
-			case SchemaPackage.ROUTER_TYPE__TRANSACTION:
+			case MulePackage.ROUTER_TYPE__TRANSACTION:
 				setTransaction((TransactionType)null);
 				return;
-			case SchemaPackage.ROUTER_TYPE__FILTER:
+			case MulePackage.ROUTER_TYPE__FILTER:
 				setFilter((FilterType)null);
 				return;
-			case SchemaPackage.ROUTER_TYPE__PROPERTIES:
+			case MulePackage.ROUTER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.ROUTER_TYPE__CLASS_NAME:
+			case MulePackage.ROUTER_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
-			case SchemaPackage.ROUTER_TYPE__ENABLE_CORRELATION:
+			case MulePackage.ROUTER_TYPE__ENABLE_CORRELATION:
 				unsetEnableCorrelation();
 				return;
-			case SchemaPackage.ROUTER_TYPE__PROPERTY_EXTRACTOR:
+			case MulePackage.ROUTER_TYPE__PROPERTY_EXTRACTOR:
 				setPropertyExtractor(PROPERTY_EXTRACTOR_EDEFAULT);
 				return;
 		}
@@ -530,25 +530,25 @@ public class RouterTypeImpl extends EObjectImpl implements RouterType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ROUTER_TYPE__MIXED:
+			case MulePackage.ROUTER_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.ROUTER_TYPE__ENDPOINT:
+			case MulePackage.ROUTER_TYPE__ENDPOINT:
 				return !getEndpoint().isEmpty();
-			case SchemaPackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.ROUTER_TYPE__GLOBAL_ENDPOINT:
 				return !getGlobalEndpoint().isEmpty();
-			case SchemaPackage.ROUTER_TYPE__REPLY_TO:
+			case MulePackage.ROUTER_TYPE__REPLY_TO:
 				return getReplyTo() != null;
-			case SchemaPackage.ROUTER_TYPE__TRANSACTION:
+			case MulePackage.ROUTER_TYPE__TRANSACTION:
 				return getTransaction() != null;
-			case SchemaPackage.ROUTER_TYPE__FILTER:
+			case MulePackage.ROUTER_TYPE__FILTER:
 				return getFilter() != null;
-			case SchemaPackage.ROUTER_TYPE__PROPERTIES:
+			case MulePackage.ROUTER_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.ROUTER_TYPE__CLASS_NAME:
+			case MulePackage.ROUTER_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
-			case SchemaPackage.ROUTER_TYPE__ENABLE_CORRELATION:
+			case MulePackage.ROUTER_TYPE__ENABLE_CORRELATION:
 				return isSetEnableCorrelation();
-			case SchemaPackage.ROUTER_TYPE__PROPERTY_EXTRACTOR:
+			case MulePackage.ROUTER_TYPE__PROPERTY_EXTRACTOR:
 				return PROPERTY_EXTRACTOR_EDEFAULT == null ? propertyExtractor != null : !PROPERTY_EXTRACTOR_EDEFAULT.equals(propertyExtractor);
 		}
 		return eDynamicIsSet(eFeature);

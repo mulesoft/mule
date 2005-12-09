@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getSystemEntryType()
+ * @see org.mule.schema.MulePackage#getSystemEntryType()
  * @model extendedMetaData="name='system-entryType' kind='mixed'"
  * @generated
  */
@@ -39,7 +39,7 @@ public interface SystemEntryType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getSystemEntryType_Mixed()
+	 * @see org.mule.schema.MulePackage#getSystemEntryType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -56,9 +56,9 @@ public interface SystemEntryType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Default Value</em>' attribute.
 	 * @see #setDefaultValue(String)
-	 * @see org.mule.schema.SchemaPackage#getSystemEntryType_DefaultValue()
+	 * @see org.mule.schema.MulePackage#getSystemEntryType_DefaultValue()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='defaultValue'"
+	 *        extendedMetaData="kind='attribute' name='defaultValue' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getDefaultValue();
@@ -83,9 +83,9 @@ public interface SystemEntryType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Key</em>' attribute.
 	 * @see #setKey(String)
-	 * @see org.mule.schema.SchemaPackage#getSystemEntryType_Key()
+	 * @see org.mule.schema.MulePackage#getSystemEntryType_Key()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='key'"
+	 *        extendedMetaData="kind='attribute' name='key' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getKey();

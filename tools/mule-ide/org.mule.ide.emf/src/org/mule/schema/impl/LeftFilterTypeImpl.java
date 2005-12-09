@@ -24,9 +24,9 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.FilterType;
 import org.mule.schema.LeftFilterType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
 import org.mule.schema.RightFilterType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -197,7 +197,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getLeftFilterType();
+		return MulePackage.eINSTANCE.getLeftFilterType();
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.LEFT_FILTER_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.LEFT_FILTER_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -218,7 +218,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getLeftFilterType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getLeftFilterType_Properties(), true);
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getLeftFilterType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getLeftFilterType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -236,7 +236,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getLeftFilterType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getLeftFilterType_Properties(), newProperties);
 	}
 
 	/**
@@ -245,7 +245,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public FilterType getFilter() {
-		return (FilterType)getMixed().get(SchemaPackage.eINSTANCE.getLeftFilterType_Filter(), true);
+		return (FilterType)getMixed().get(MulePackage.eINSTANCE.getLeftFilterType_Filter(), true);
 	}
 
 	/**
@@ -254,7 +254,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public NotificationChain basicSetFilter(FilterType newFilter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getLeftFilterType_Filter(), newFilter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getLeftFilterType_Filter(), newFilter, msgs);
 	}
 
 	/**
@@ -263,7 +263,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public void setFilter(FilterType newFilter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getLeftFilterType_Filter(), newFilter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getLeftFilterType_Filter(), newFilter);
 	}
 
 	/**
@@ -272,7 +272,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public LeftFilterType getLeftFilter() {
-		return (LeftFilterType)getMixed().get(SchemaPackage.eINSTANCE.getLeftFilterType_LeftFilter(), true);
+		return (LeftFilterType)getMixed().get(MulePackage.eINSTANCE.getLeftFilterType_LeftFilter(), true);
 	}
 
 	/**
@@ -281,7 +281,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public NotificationChain basicSetLeftFilter(LeftFilterType newLeftFilter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getLeftFilterType_LeftFilter(), newLeftFilter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getLeftFilterType_LeftFilter(), newLeftFilter, msgs);
 	}
 
 	/**
@@ -290,7 +290,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public void setLeftFilter(LeftFilterType newLeftFilter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getLeftFilterType_LeftFilter(), newLeftFilter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getLeftFilterType_LeftFilter(), newLeftFilter);
 	}
 
 	/**
@@ -299,7 +299,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public RightFilterType getRightFilter() {
-		return (RightFilterType)getMixed().get(SchemaPackage.eINSTANCE.getLeftFilterType_RightFilter(), true);
+		return (RightFilterType)getMixed().get(MulePackage.eINSTANCE.getLeftFilterType_RightFilter(), true);
 	}
 
 	/**
@@ -308,7 +308,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public NotificationChain basicSetRightFilter(RightFilterType newRightFilter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getLeftFilterType_RightFilter(), newRightFilter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getLeftFilterType_RightFilter(), newRightFilter, msgs);
 	}
 
 	/**
@@ -317,7 +317,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 * @generated
 	 */
 	public void setRightFilter(RightFilterType newRightFilter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getLeftFilterType_RightFilter(), newRightFilter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getLeftFilterType_RightFilter(), newRightFilter);
 	}
 
 	/**
@@ -338,7 +338,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.LEFT_FILTER_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.LEFT_FILTER_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -359,7 +359,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 		String oldConfigFile = configFile;
 		configFile = newConfigFile;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.LEFT_FILTER_TYPE__CONFIG_FILE, oldConfigFile, configFile));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.LEFT_FILTER_TYPE__CONFIG_FILE, oldConfigFile, configFile));
 	}
 
 	/**
@@ -380,7 +380,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 		String oldExpectedType = expectedType;
 		expectedType = newExpectedType;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.LEFT_FILTER_TYPE__EXPECTED_TYPE, oldExpectedType, expectedType));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.LEFT_FILTER_TYPE__EXPECTED_TYPE, oldExpectedType, expectedType));
 	}
 
 	/**
@@ -401,7 +401,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 		String oldExpression = expression;
 		expression = newExpression;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.LEFT_FILTER_TYPE__EXPRESSION, oldExpression, expression));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.LEFT_FILTER_TYPE__EXPRESSION, oldExpression, expression));
 	}
 
 	/**
@@ -422,7 +422,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 		String oldPath = path;
 		path = newPath;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.LEFT_FILTER_TYPE__PATH, oldPath, path));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.LEFT_FILTER_TYPE__PATH, oldPath, path));
 	}
 
 	/**
@@ -443,7 +443,7 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 		String oldPattern = pattern;
 		pattern = newPattern;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.LEFT_FILTER_TYPE__PATTERN, oldPattern, pattern));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.LEFT_FILTER_TYPE__PATTERN, oldPattern, pattern));
 	}
 
 	/**
@@ -454,15 +454,15 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.LEFT_FILTER_TYPE__MIXED:
+				case MulePackage.LEFT_FILTER_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.LEFT_FILTER_TYPE__PROPERTIES:
+				case MulePackage.LEFT_FILTER_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
-				case SchemaPackage.LEFT_FILTER_TYPE__FILTER:
+				case MulePackage.LEFT_FILTER_TYPE__FILTER:
 					return basicSetFilter(null, msgs);
-				case SchemaPackage.LEFT_FILTER_TYPE__LEFT_FILTER:
+				case MulePackage.LEFT_FILTER_TYPE__LEFT_FILTER:
 					return basicSetLeftFilter(null, msgs);
-				case SchemaPackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
+				case MulePackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
 					return basicSetRightFilter(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -478,27 +478,27 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.LEFT_FILTER_TYPE__MIXED:
+			case MulePackage.LEFT_FILTER_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.LEFT_FILTER_TYPE__PROPERTIES:
+			case MulePackage.LEFT_FILTER_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.LEFT_FILTER_TYPE__FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__FILTER:
 				return getFilter();
-			case SchemaPackage.LEFT_FILTER_TYPE__LEFT_FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__LEFT_FILTER:
 				return getLeftFilter();
-			case SchemaPackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
 				return getRightFilter();
-			case SchemaPackage.LEFT_FILTER_TYPE__CLASS_NAME:
+			case MulePackage.LEFT_FILTER_TYPE__CLASS_NAME:
 				return getClassName();
-			case SchemaPackage.LEFT_FILTER_TYPE__CONFIG_FILE:
+			case MulePackage.LEFT_FILTER_TYPE__CONFIG_FILE:
 				return getConfigFile();
-			case SchemaPackage.LEFT_FILTER_TYPE__EXPECTED_TYPE:
+			case MulePackage.LEFT_FILTER_TYPE__EXPECTED_TYPE:
 				return getExpectedType();
-			case SchemaPackage.LEFT_FILTER_TYPE__EXPRESSION:
+			case MulePackage.LEFT_FILTER_TYPE__EXPRESSION:
 				return getExpression();
-			case SchemaPackage.LEFT_FILTER_TYPE__PATH:
+			case MulePackage.LEFT_FILTER_TYPE__PATH:
 				return getPath();
-			case SchemaPackage.LEFT_FILTER_TYPE__PATTERN:
+			case MulePackage.LEFT_FILTER_TYPE__PATTERN:
 				return getPattern();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -511,38 +511,38 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.LEFT_FILTER_TYPE__MIXED:
+			case MulePackage.LEFT_FILTER_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__PROPERTIES:
+			case MulePackage.LEFT_FILTER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__FILTER:
 				setFilter((FilterType)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__LEFT_FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__LEFT_FILTER:
 				setLeftFilter((LeftFilterType)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
 				setRightFilter((RightFilterType)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__CLASS_NAME:
+			case MulePackage.LEFT_FILTER_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__CONFIG_FILE:
+			case MulePackage.LEFT_FILTER_TYPE__CONFIG_FILE:
 				setConfigFile((String)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__EXPECTED_TYPE:
+			case MulePackage.LEFT_FILTER_TYPE__EXPECTED_TYPE:
 				setExpectedType((String)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__EXPRESSION:
+			case MulePackage.LEFT_FILTER_TYPE__EXPRESSION:
 				setExpression((String)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__PATH:
+			case MulePackage.LEFT_FILTER_TYPE__PATH:
 				setPath((String)newValue);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__PATTERN:
+			case MulePackage.LEFT_FILTER_TYPE__PATTERN:
 				setPattern((String)newValue);
 				return;
 		}
@@ -556,37 +556,37 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.LEFT_FILTER_TYPE__MIXED:
+			case MulePackage.LEFT_FILTER_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__PROPERTIES:
+			case MulePackage.LEFT_FILTER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__FILTER:
 				setFilter((FilterType)null);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__LEFT_FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__LEFT_FILTER:
 				setLeftFilter((LeftFilterType)null);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
 				setRightFilter((RightFilterType)null);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__CLASS_NAME:
+			case MulePackage.LEFT_FILTER_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__CONFIG_FILE:
+			case MulePackage.LEFT_FILTER_TYPE__CONFIG_FILE:
 				setConfigFile(CONFIG_FILE_EDEFAULT);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__EXPECTED_TYPE:
+			case MulePackage.LEFT_FILTER_TYPE__EXPECTED_TYPE:
 				setExpectedType(EXPECTED_TYPE_EDEFAULT);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__EXPRESSION:
+			case MulePackage.LEFT_FILTER_TYPE__EXPRESSION:
 				setExpression(EXPRESSION_EDEFAULT);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__PATH:
+			case MulePackage.LEFT_FILTER_TYPE__PATH:
 				setPath(PATH_EDEFAULT);
 				return;
-			case SchemaPackage.LEFT_FILTER_TYPE__PATTERN:
+			case MulePackage.LEFT_FILTER_TYPE__PATTERN:
 				setPattern(PATTERN_EDEFAULT);
 				return;
 		}
@@ -600,27 +600,27 @@ public class LeftFilterTypeImpl extends EObjectImpl implements LeftFilterType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.LEFT_FILTER_TYPE__MIXED:
+			case MulePackage.LEFT_FILTER_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.LEFT_FILTER_TYPE__PROPERTIES:
+			case MulePackage.LEFT_FILTER_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.LEFT_FILTER_TYPE__FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__FILTER:
 				return getFilter() != null;
-			case SchemaPackage.LEFT_FILTER_TYPE__LEFT_FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__LEFT_FILTER:
 				return getLeftFilter() != null;
-			case SchemaPackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
+			case MulePackage.LEFT_FILTER_TYPE__RIGHT_FILTER:
 				return getRightFilter() != null;
-			case SchemaPackage.LEFT_FILTER_TYPE__CLASS_NAME:
+			case MulePackage.LEFT_FILTER_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
-			case SchemaPackage.LEFT_FILTER_TYPE__CONFIG_FILE:
+			case MulePackage.LEFT_FILTER_TYPE__CONFIG_FILE:
 				return CONFIG_FILE_EDEFAULT == null ? configFile != null : !CONFIG_FILE_EDEFAULT.equals(configFile);
-			case SchemaPackage.LEFT_FILTER_TYPE__EXPECTED_TYPE:
+			case MulePackage.LEFT_FILTER_TYPE__EXPECTED_TYPE:
 				return EXPECTED_TYPE_EDEFAULT == null ? expectedType != null : !EXPECTED_TYPE_EDEFAULT.equals(expectedType);
-			case SchemaPackage.LEFT_FILTER_TYPE__EXPRESSION:
+			case MulePackage.LEFT_FILTER_TYPE__EXPRESSION:
 				return EXPRESSION_EDEFAULT == null ? expression != null : !EXPRESSION_EDEFAULT.equals(expression);
-			case SchemaPackage.LEFT_FILTER_TYPE__PATH:
+			case MulePackage.LEFT_FILTER_TYPE__PATH:
 				return PATH_EDEFAULT == null ? path != null : !PATH_EDEFAULT.equals(path);
-			case SchemaPackage.LEFT_FILTER_TYPE__PATTERN:
+			case MulePackage.LEFT_FILTER_TYPE__PATTERN:
 				return PATTERN_EDEFAULT == null ? pattern != null : !PATTERN_EDEFAULT.equals(pattern);
 		}
 		return eDynamicIsSet(eFeature);

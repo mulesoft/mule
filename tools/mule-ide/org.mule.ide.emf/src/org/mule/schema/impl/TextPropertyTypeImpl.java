@@ -14,7 +14,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 import org.mule.schema.TextPropertyType;
 
 /**
@@ -87,7 +87,7 @@ public class TextPropertyTypeImpl extends EObjectImpl implements TextPropertyTyp
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getTextPropertyType();
+		return MulePackage.eINSTANCE.getTextPropertyType();
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class TextPropertyTypeImpl extends EObjectImpl implements TextPropertyTyp
 		String oldValue = value;
 		value = newValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TEXT_PROPERTY_TYPE__VALUE, oldValue, value));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TEXT_PROPERTY_TYPE__VALUE, oldValue, value));
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class TextPropertyTypeImpl extends EObjectImpl implements TextPropertyTyp
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TEXT_PROPERTY_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TEXT_PROPERTY_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -139,9 +139,9 @@ public class TextPropertyTypeImpl extends EObjectImpl implements TextPropertyTyp
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TEXT_PROPERTY_TYPE__VALUE:
+			case MulePackage.TEXT_PROPERTY_TYPE__VALUE:
 				return getValue();
-			case SchemaPackage.TEXT_PROPERTY_TYPE__NAME:
+			case MulePackage.TEXT_PROPERTY_TYPE__NAME:
 				return getName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -154,10 +154,10 @@ public class TextPropertyTypeImpl extends EObjectImpl implements TextPropertyTyp
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TEXT_PROPERTY_TYPE__VALUE:
+			case MulePackage.TEXT_PROPERTY_TYPE__VALUE:
 				setValue((String)newValue);
 				return;
-			case SchemaPackage.TEXT_PROPERTY_TYPE__NAME:
+			case MulePackage.TEXT_PROPERTY_TYPE__NAME:
 				setName((String)newValue);
 				return;
 		}
@@ -171,10 +171,10 @@ public class TextPropertyTypeImpl extends EObjectImpl implements TextPropertyTyp
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TEXT_PROPERTY_TYPE__VALUE:
+			case MulePackage.TEXT_PROPERTY_TYPE__VALUE:
 				setValue(VALUE_EDEFAULT);
 				return;
-			case SchemaPackage.TEXT_PROPERTY_TYPE__NAME:
+			case MulePackage.TEXT_PROPERTY_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
 		}
@@ -188,9 +188,9 @@ public class TextPropertyTypeImpl extends EObjectImpl implements TextPropertyTyp
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TEXT_PROPERTY_TYPE__VALUE:
+			case MulePackage.TEXT_PROPERTY_TYPE__VALUE:
 				return VALUE_EDEFAULT == null ? value != null : !VALUE_EDEFAULT.equals(value);
-			case SchemaPackage.TEXT_PROPERTY_TYPE__NAME:
+			case MulePackage.TEXT_PROPERTY_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return eDynamicIsSet(eFeature);

@@ -22,8 +22,8 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 import org.mule.schema.TransactionManagerType;
 
 /**
@@ -108,7 +108,7 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getTransactionManagerType();
+		return MulePackage.eINSTANCE.getTransactionManagerType();
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.TRANSACTION_MANAGER_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.TRANSACTION_MANAGER_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -129,7 +129,7 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getTransactionManagerType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getTransactionManagerType_Properties(), true);
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getTransactionManagerType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getTransactionManagerType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getTransactionManagerType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getTransactionManagerType_Properties(), newProperties);
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 		String oldFactory = factory;
 		factory = newFactory;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSACTION_MANAGER_TYPE__FACTORY, oldFactory, factory));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSACTION_MANAGER_TYPE__FACTORY, oldFactory, factory));
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 		String oldRef = ref;
 		ref = newRef;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSACTION_MANAGER_TYPE__REF, oldRef, ref));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSACTION_MANAGER_TYPE__REF, oldRef, ref));
 	}
 
 	/**
@@ -200,9 +200,9 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.TRANSACTION_MANAGER_TYPE__MIXED:
+				case MulePackage.TRANSACTION_MANAGER_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
+				case MulePackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -218,13 +218,13 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__MIXED:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__FACTORY:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__FACTORY:
 				return getFactory();
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__REF:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__REF:
 				return getRef();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -237,17 +237,17 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__MIXED:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__FACTORY:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__FACTORY:
 				setFactory((String)newValue);
 				return;
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__REF:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__REF:
 				setRef((String)newValue);
 				return;
 		}
@@ -261,16 +261,16 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__MIXED:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__FACTORY:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__FACTORY:
 				setFactory(FACTORY_EDEFAULT);
 				return;
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__REF:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__REF:
 				setRef(REF_EDEFAULT);
 				return;
 		}
@@ -284,13 +284,13 @@ public class TransactionManagerTypeImpl extends EObjectImpl implements Transacti
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__MIXED:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__FACTORY:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__FACTORY:
 				return FACTORY_EDEFAULT == null ? factory != null : !FACTORY_EDEFAULT.equals(factory);
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE__REF:
+			case MulePackage.TRANSACTION_MANAGER_TYPE__REF:
 				return REF_EDEFAULT == null ? ref != null : !REF_EDEFAULT.equals(ref);
 		}
 		return eDynamicIsSet(eFeature);

@@ -7,7 +7,6 @@
 package org.mule.schema.impl;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -23,8 +22,8 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 import org.mule.schema.SecurityFilterType;
 
 /**
@@ -82,7 +81,7 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 * @generated
 	 * @ordered
 	 */
-	protected static final List USE_PROVIDERS_EDEFAULT = null;
+	protected static final String USE_PROVIDERS_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getUseProviders() <em>Use Providers</em>}' attribute.
@@ -92,7 +91,7 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 * @generated
 	 * @ordered
 	 */
-	protected List useProviders = USE_PROVIDERS_EDEFAULT;
+	protected String useProviders = USE_PROVIDERS_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -109,7 +108,7 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getSecurityFilterType();
+		return MulePackage.eINSTANCE.getSecurityFilterType();
 	}
 
 	/**
@@ -119,7 +118,7 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.SECURITY_FILTER_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.SECURITY_FILTER_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -130,7 +129,7 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getSecurityFilterType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getSecurityFilterType_Properties(), true);
 	}
 
 	/**
@@ -139,7 +138,7 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getSecurityFilterType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getSecurityFilterType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -148,7 +147,7 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getSecurityFilterType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getSecurityFilterType_Properties(), newProperties);
 	}
 
 	/**
@@ -169,7 +168,7 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.SECURITY_FILTER_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.SECURITY_FILTER_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -177,7 +176,7 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List getUseProviders() {
+	public String getUseProviders() {
 		return useProviders;
 	}
 
@@ -186,11 +185,11 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setUseProviders(List newUseProviders) {
-		List oldUseProviders = useProviders;
+	public void setUseProviders(String newUseProviders) {
+		String oldUseProviders = useProviders;
 		useProviders = newUseProviders;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.SECURITY_FILTER_TYPE__USE_PROVIDERS, oldUseProviders, useProviders));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.SECURITY_FILTER_TYPE__USE_PROVIDERS, oldUseProviders, useProviders));
 	}
 
 	/**
@@ -201,9 +200,9 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.SECURITY_FILTER_TYPE__MIXED:
+				case MulePackage.SECURITY_FILTER_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.SECURITY_FILTER_TYPE__PROPERTIES:
+				case MulePackage.SECURITY_FILTER_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -219,13 +218,13 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SECURITY_FILTER_TYPE__MIXED:
+			case MulePackage.SECURITY_FILTER_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.SECURITY_FILTER_TYPE__PROPERTIES:
+			case MulePackage.SECURITY_FILTER_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.SECURITY_FILTER_TYPE__CLASS_NAME:
+			case MulePackage.SECURITY_FILTER_TYPE__CLASS_NAME:
 				return getClassName();
-			case SchemaPackage.SECURITY_FILTER_TYPE__USE_PROVIDERS:
+			case MulePackage.SECURITY_FILTER_TYPE__USE_PROVIDERS:
 				return getUseProviders();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -238,18 +237,18 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SECURITY_FILTER_TYPE__MIXED:
+			case MulePackage.SECURITY_FILTER_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.SECURITY_FILTER_TYPE__PROPERTIES:
+			case MulePackage.SECURITY_FILTER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.SECURITY_FILTER_TYPE__CLASS_NAME:
+			case MulePackage.SECURITY_FILTER_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
-			case SchemaPackage.SECURITY_FILTER_TYPE__USE_PROVIDERS:
-				setUseProviders((List)newValue);
+			case MulePackage.SECURITY_FILTER_TYPE__USE_PROVIDERS:
+				setUseProviders((String)newValue);
 				return;
 		}
 		eDynamicSet(eFeature, newValue);
@@ -262,16 +261,16 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SECURITY_FILTER_TYPE__MIXED:
+			case MulePackage.SECURITY_FILTER_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.SECURITY_FILTER_TYPE__PROPERTIES:
+			case MulePackage.SECURITY_FILTER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.SECURITY_FILTER_TYPE__CLASS_NAME:
+			case MulePackage.SECURITY_FILTER_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
-			case SchemaPackage.SECURITY_FILTER_TYPE__USE_PROVIDERS:
+			case MulePackage.SECURITY_FILTER_TYPE__USE_PROVIDERS:
 				setUseProviders(USE_PROVIDERS_EDEFAULT);
 				return;
 		}
@@ -285,13 +284,13 @@ public class SecurityFilterTypeImpl extends EObjectImpl implements SecurityFilte
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SECURITY_FILTER_TYPE__MIXED:
+			case MulePackage.SECURITY_FILTER_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.SECURITY_FILTER_TYPE__PROPERTIES:
+			case MulePackage.SECURITY_FILTER_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.SECURITY_FILTER_TYPE__CLASS_NAME:
+			case MulePackage.SECURITY_FILTER_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
-			case SchemaPackage.SECURITY_FILTER_TYPE__USE_PROVIDERS:
+			case MulePackage.SECURITY_FILTER_TYPE__USE_PROVIDERS:
 				return USE_PROVIDERS_EDEFAULT == null ? useProviders != null : !USE_PROVIDERS_EDEFAULT.equals(useProviders);
 		}
 		return eDynamicIsSet(eFeature);

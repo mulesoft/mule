@@ -32,7 +32,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getFilterType()
+ * @see org.mule.schema.MulePackage#getFilterType()
  * @model extendedMetaData="name='filterType' kind='mixed'"
  * @generated
  */
@@ -47,7 +47,7 @@ public interface FilterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getFilterType_Mixed()
+	 * @see org.mule.schema.MulePackage#getFilterType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -64,7 +64,7 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_Properties()
+	 * @see org.mule.schema.MulePackage#getFilterType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -91,7 +91,7 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Filter</em>' containment reference.
 	 * @see #setFilter(FilterType)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_Filter()
+	 * @see org.mule.schema.MulePackage#getFilterType_Filter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='filter' namespace='##targetNamespace'"
 	 * @generated
@@ -118,7 +118,7 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Left Filter</em>' containment reference.
 	 * @see #setLeftFilter(LeftFilterType)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_LeftFilter()
+	 * @see org.mule.schema.MulePackage#getFilterType_LeftFilter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='left-filter' namespace='##targetNamespace'"
 	 * @generated
@@ -145,7 +145,7 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Right Filter</em>' containment reference.
 	 * @see #setRightFilter(RightFilterType)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_RightFilter()
+	 * @see org.mule.schema.MulePackage#getFilterType_RightFilter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='right-filter' namespace='##targetNamespace'"
 	 * @generated
@@ -172,9 +172,9 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Class Name</em>' attribute.
 	 * @see #setClassName(String)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_ClassName()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='className'"
+	 * @see org.mule.schema.MulePackage#getFilterType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getClassName();
@@ -199,9 +199,9 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Config File</em>' attribute.
 	 * @see #setConfigFile(String)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_ConfigFile()
+	 * @see org.mule.schema.MulePackage#getFilterType_ConfigFile()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='configFile'"
+	 *        extendedMetaData="kind='attribute' name='configFile' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getConfigFile();
@@ -226,9 +226,9 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Expected Type</em>' attribute.
 	 * @see #setExpectedType(String)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_ExpectedType()
+	 * @see org.mule.schema.MulePackage#getFilterType_ExpectedType()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='expectedType'"
+	 *        extendedMetaData="kind='attribute' name='expectedType' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getExpectedType();
@@ -253,9 +253,9 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Expression</em>' attribute.
 	 * @see #setExpression(String)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_Expression()
+	 * @see org.mule.schema.MulePackage#getFilterType_Expression()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='expression'"
+	 *        extendedMetaData="kind='attribute' name='expression' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getExpression();
@@ -280,9 +280,9 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Path</em>' attribute.
 	 * @see #setPath(String)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_Path()
+	 * @see org.mule.schema.MulePackage#getFilterType_Path()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='path'"
+	 *        extendedMetaData="kind='attribute' name='path' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getPath();
@@ -307,9 +307,9 @@ public interface FilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Pattern</em>' attribute.
 	 * @see #setPattern(String)
-	 * @see org.mule.schema.SchemaPackage#getFilterType_Pattern()
+	 * @see org.mule.schema.MulePackage#getFilterType_Pattern()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='pattern'"
+	 *        extendedMetaData="kind='attribute' name='pattern' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getPattern();

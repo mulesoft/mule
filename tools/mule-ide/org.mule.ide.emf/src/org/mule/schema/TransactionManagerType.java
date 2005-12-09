@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getTransactionManagerType()
+ * @see org.mule.schema.MulePackage#getTransactionManagerType()
  * @model extendedMetaData="name='transaction-managerType' kind='mixed'"
  * @generated
  */
@@ -40,7 +40,7 @@ public interface TransactionManagerType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getTransactionManagerType_Mixed()
+	 * @see org.mule.schema.MulePackage#getTransactionManagerType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -57,7 +57,7 @@ public interface TransactionManagerType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getTransactionManagerType_Properties()
+	 * @see org.mule.schema.MulePackage#getTransactionManagerType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -84,9 +84,9 @@ public interface TransactionManagerType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Factory</em>' attribute.
 	 * @see #setFactory(String)
-	 * @see org.mule.schema.SchemaPackage#getTransactionManagerType_Factory()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='factory'"
+	 * @see org.mule.schema.MulePackage#getTransactionManagerType_Factory()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='factory' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getFactory();
@@ -111,9 +111,9 @@ public interface TransactionManagerType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Ref</em>' attribute.
 	 * @see #setRef(String)
-	 * @see org.mule.schema.SchemaPackage#getTransactionManagerType_Ref()
+	 * @see org.mule.schema.MulePackage#getTransactionManagerType_Ref()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='ref'"
+	 *        extendedMetaData="kind='attribute' name='ref' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getRef();

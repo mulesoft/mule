@@ -14,7 +14,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Mule Configuration Type</b></em>'.
+ * A representation of the model object '<em><b>Configuration Type</b></em>'.
  * <!-- end-user-doc -->
  *
  * <p>
@@ -40,7 +40,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getMuleConfigurationType()
+ * @see org.mule.schema.MulePackage#getMuleConfigurationType()
  * @model extendedMetaData="name='mule-configurationType' kind='mixed'"
  * @generated
  */
@@ -55,7 +55,7 @@ public interface MuleConfigurationType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_Mixed()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -72,7 +72,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Description</em>' attribute.
 	 * @see #setDescription(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_Description()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_Description()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='description' namespace='##targetNamespace'"
 	 * @generated
@@ -99,7 +99,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Environment Properties</em>' containment reference.
 	 * @see #setEnvironmentProperties(EnvironmentPropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_EnvironmentProperties()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_EnvironmentProperties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='environment-properties' namespace='##targetNamespace'"
 	 * @generated
@@ -126,7 +126,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mule Environment Properties</em>' containment reference.
 	 * @see #setMuleEnvironmentProperties(MuleEnvironmentPropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_MuleEnvironmentProperties()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_MuleEnvironmentProperties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='mule-environment-properties' namespace='##targetNamespace'"
 	 * @generated
@@ -153,7 +153,7 @@ public interface MuleConfigurationType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Container Context</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_ContainerContext()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_ContainerContext()
 	 * @model type="org.mule.schema.ContainerContextType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='container-context' namespace='##targetNamespace'"
 	 * @generated
@@ -170,7 +170,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Security Manager</em>' containment reference.
 	 * @see #setSecurityManager(SecurityManagerType)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_SecurityManager()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_SecurityManager()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='security-manager' namespace='##targetNamespace'"
 	 * @generated
@@ -197,7 +197,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Transaction Manager</em>' containment reference.
 	 * @see #setTransactionManager(TransactionManagerType)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_TransactionManager()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_TransactionManager()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='transaction-manager' namespace='##targetNamespace'"
 	 * @generated
@@ -224,7 +224,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Agents</em>' containment reference.
 	 * @see #setAgents(AgentsType)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_Agents()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_Agents()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='agents' namespace='##targetNamespace'"
 	 * @generated
@@ -251,7 +251,7 @@ public interface MuleConfigurationType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Connector</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_Connector()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_Connector()
 	 * @model type="org.mule.schema.ConnectorType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='connector' namespace='##targetNamespace'"
 	 * @generated
@@ -268,7 +268,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Endpoint Identifiers</em>' containment reference.
 	 * @see #setEndpointIdentifiers(EndpointIdentifiersType)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_EndpointIdentifiers()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_EndpointIdentifiers()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='endpoint-identifiers' namespace='##targetNamespace'"
 	 * @generated
@@ -295,7 +295,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Transformers</em>' containment reference.
 	 * @see #setTransformers(TransformersType)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_Transformers()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_Transformers()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='transformers' namespace='##targetNamespace'"
 	 * @generated
@@ -322,7 +322,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Global Endpoints</em>' containment reference.
 	 * @see #setGlobalEndpoints(GlobalEndpointsType)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_GlobalEndpoints()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_GlobalEndpoints()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='global-endpoints' namespace='##targetNamespace'"
 	 * @generated
@@ -349,7 +349,7 @@ public interface MuleConfigurationType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Interceptor Stack</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_InterceptorStack()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_InterceptorStack()
 	 * @model type="org.mule.schema.InterceptorStackType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='interceptor-stack' namespace='##targetNamespace'"
 	 * @generated
@@ -366,7 +366,7 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Model</em>' containment reference.
 	 * @see #setModel(ModelType)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_Model()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_Model()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='model' namespace='##targetNamespace'"
 	 * @generated
@@ -393,7 +393,7 @@ public interface MuleConfigurationType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mule Descriptor</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_MuleDescriptor()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_MuleDescriptor()
 	 * @model type="org.mule.schema.MuleDescriptorType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='mule-descriptor' namespace='##targetNamespace'"
 	 * @generated
@@ -410,9 +410,9 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Id</em>' attribute.
 	 * @see #setId(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_Id()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='id'"
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_Id()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='id' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getId();
@@ -437,9 +437,9 @@ public interface MuleConfigurationType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Version</em>' attribute.
 	 * @see #setVersion(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleConfigurationType_Version()
+	 * @see org.mule.schema.MulePackage#getMuleConfigurationType_Version()
 	 * @model unique="false" dataType="org.mule.schema.VersionType" required="true"
-	 *        extendedMetaData="kind='attribute' name='version'"
+	 *        extendedMetaData="kind='attribute' name='version' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getVersion();

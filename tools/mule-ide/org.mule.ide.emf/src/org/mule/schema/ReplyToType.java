@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getReplyToType()
+ * @see org.mule.schema.MulePackage#getReplyToType()
  * @model extendedMetaData="name='reply-toType' kind='mixed'"
  * @generated
  */
@@ -38,7 +38,7 @@ public interface ReplyToType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getReplyToType_Mixed()
+	 * @see org.mule.schema.MulePackage#getReplyToType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -55,9 +55,9 @@ public interface ReplyToType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Address</em>' attribute.
 	 * @see #setAddress(String)
-	 * @see org.mule.schema.SchemaPackage#getReplyToType_Address()
+	 * @see org.mule.schema.MulePackage#getReplyToType_Address()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='address'"
+	 *        extendedMetaData="kind='attribute' name='address' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getAddress();

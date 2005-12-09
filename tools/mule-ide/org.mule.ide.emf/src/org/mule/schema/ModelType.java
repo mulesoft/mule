@@ -28,12 +28,14 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  *   <li>{@link org.mule.schema.ModelType#getComponentPoolFactory <em>Component Pool Factory</em>}</li>
  *   <li>{@link org.mule.schema.ModelType#getExceptionStrategy <em>Exception Strategy</em>}</li>
  *   <li>{@link org.mule.schema.ModelType#getMuleDescriptor <em>Mule Descriptor</em>}</li>
+ *   <li>{@link org.mule.schema.ModelType#getClassName <em>Class Name</em>}</li>
  *   <li>{@link org.mule.schema.ModelType#getName <em>Name</em>}</li>
  *   <li>{@link org.mule.schema.ModelType#getRef <em>Ref</em>}</li>
+ *   <li>{@link org.mule.schema.ModelType#getType <em>Type</em>}</li>
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getModelType()
+ * @see org.mule.schema.MulePackage#getModelType()
  * @model extendedMetaData="name='modelType' kind='mixed'"
  * @generated
  */
@@ -48,7 +50,7 @@ public interface ModelType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getModelType_Mixed()
+	 * @see org.mule.schema.MulePackage#getModelType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -65,7 +67,7 @@ public interface ModelType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Description</em>' attribute.
 	 * @see #setDescription(String)
-	 * @see org.mule.schema.SchemaPackage#getModelType_Description()
+	 * @see org.mule.schema.MulePackage#getModelType_Description()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='description' namespace='##targetNamespace'"
 	 * @generated
@@ -92,7 +94,7 @@ public interface ModelType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Entry Point Resolver</em>' containment reference.
 	 * @see #setEntryPointResolver(EntryPointResolverType)
-	 * @see org.mule.schema.SchemaPackage#getModelType_EntryPointResolver()
+	 * @see org.mule.schema.MulePackage#getModelType_EntryPointResolver()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='entry-point-resolver' namespace='##targetNamespace'"
 	 * @generated
@@ -119,7 +121,7 @@ public interface ModelType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Component Factory</em>' containment reference.
 	 * @see #setComponentFactory(ComponentFactoryType)
-	 * @see org.mule.schema.SchemaPackage#getModelType_ComponentFactory()
+	 * @see org.mule.schema.MulePackage#getModelType_ComponentFactory()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='component-factory' namespace='##targetNamespace'"
 	 * @generated
@@ -146,7 +148,7 @@ public interface ModelType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Component Lifecycle Adapter Factory</em>' containment reference.
 	 * @see #setComponentLifecycleAdapterFactory(ComponentLifecycleAdapterFactoryType)
-	 * @see org.mule.schema.SchemaPackage#getModelType_ComponentLifecycleAdapterFactory()
+	 * @see org.mule.schema.MulePackage#getModelType_ComponentLifecycleAdapterFactory()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='component-lifecycle-adapter-factory' namespace='##targetNamespace'"
 	 * @generated
@@ -173,7 +175,7 @@ public interface ModelType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Component Pool Factory</em>' containment reference.
 	 * @see #setComponentPoolFactory(ComponentPoolFactoryType)
-	 * @see org.mule.schema.SchemaPackage#getModelType_ComponentPoolFactory()
+	 * @see org.mule.schema.MulePackage#getModelType_ComponentPoolFactory()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='component-pool-factory' namespace='##targetNamespace'"
 	 * @generated
@@ -200,7 +202,7 @@ public interface ModelType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Exception Strategy</em>' containment reference.
 	 * @see #setExceptionStrategy(ExceptionStrategyType)
-	 * @see org.mule.schema.SchemaPackage#getModelType_ExceptionStrategy()
+	 * @see org.mule.schema.MulePackage#getModelType_ExceptionStrategy()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='exception-strategy' namespace='##targetNamespace'"
 	 * @generated
@@ -227,12 +229,39 @@ public interface ModelType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mule Descriptor</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getModelType_MuleDescriptor()
+	 * @see org.mule.schema.MulePackage#getModelType_MuleDescriptor()
 	 * @model type="org.mule.schema.MuleDescriptorType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='mule-descriptor' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	EList getMuleDescriptor();
+
+	/**
+	 * Returns the value of the '<em><b>Class Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Class Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Class Name</em>' attribute.
+	 * @see #setClassName(String)
+	 * @see org.mule.schema.MulePackage#getModelType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
+	 * @generated
+	 */
+	String getClassName();
+
+	/**
+	 * Sets the value of the '{@link org.mule.schema.ModelType#getClassName <em>Class Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Class Name</em>' attribute.
+	 * @see #getClassName()
+	 * @generated
+	 */
+	void setClassName(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Name</b></em>' attribute.
@@ -244,9 +273,9 @@ public interface ModelType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getModelType_Name()
+	 * @see org.mule.schema.MulePackage#getModelType_Name()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();
@@ -271,9 +300,9 @@ public interface ModelType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Ref</em>' attribute.
 	 * @see #setRef(String)
-	 * @see org.mule.schema.SchemaPackage#getModelType_Ref()
+	 * @see org.mule.schema.MulePackage#getModelType_Ref()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='ref'"
+	 *        extendedMetaData="kind='attribute' name='ref' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getRef();
@@ -287,5 +316,60 @@ public interface ModelType extends EObject {
 	 * @generated
 	 */
 	void setRef(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Type</b></em>' attribute.
+	 * The default value is <code>"seda"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Type</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Type</em>' attribute.
+	 * @see #isSetType()
+	 * @see #unsetType()
+	 * @see #setType(String)
+	 * @see org.mule.schema.MulePackage#getModelType_Type()
+	 * @model default="seda" unique="false" unsettable="true" dataType="org.mule.schema.TypeType"
+	 *        extendedMetaData="kind='attribute' name='type' namespace='##targetNamespace'"
+	 * @generated
+	 */
+	String getType();
+
+	/**
+	 * Sets the value of the '{@link org.mule.schema.ModelType#getType <em>Type</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Type</em>' attribute.
+	 * @see #isSetType()
+	 * @see #unsetType()
+	 * @see #getType()
+	 * @generated
+	 */
+	void setType(String value);
+
+	/**
+	 * Unsets the value of the '{@link org.mule.schema.ModelType#getType <em>Type</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isSetType()
+	 * @see #getType()
+	 * @see #setType(String)
+	 * @generated
+	 */
+	void unsetType();
+
+	/**
+	 * Returns whether the value of the '{@link org.mule.schema.ModelType#getType <em>Type</em>}' attribute is set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return whether the value of the '<em>Type</em>' attribute is set.
+	 * @see #unsetType()
+	 * @see #getType()
+	 * @see #setType(String)
+	 * @generated
+	 */
+	boolean isSetType();
 
 } // ModelType

@@ -22,9 +22,9 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
 import org.mule.schema.QueueProfileType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -117,7 +117,7 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getQueueProfileType();
+		return MulePackage.eINSTANCE.getQueueProfileType();
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.QUEUE_PROFILE_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.QUEUE_PROFILE_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -138,7 +138,7 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getQueueProfileType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getQueueProfileType_Properties(), true);
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getQueueProfileType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getQueueProfileType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -156,7 +156,7 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getQueueProfileType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getQueueProfileType_Properties(), newProperties);
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 		String oldMaxOutstandingMessages = maxOutstandingMessages;
 		maxOutstandingMessages = newMaxOutstandingMessages;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES, oldMaxOutstandingMessages, maxOutstandingMessages));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES, oldMaxOutstandingMessages, maxOutstandingMessages));
 	}
 
 	/**
@@ -200,7 +200,7 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 		boolean oldPersistentESet = persistentESet;
 		persistentESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.QUEUE_PROFILE_TYPE__PERSISTENT, oldPersistent, persistent, !oldPersistentESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.QUEUE_PROFILE_TYPE__PERSISTENT, oldPersistent, persistent, !oldPersistentESet));
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 		persistent = PERSISTENT_EDEFAULT;
 		persistentESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.QUEUE_PROFILE_TYPE__PERSISTENT, oldPersistent, PERSISTENT_EDEFAULT, oldPersistentESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.QUEUE_PROFILE_TYPE__PERSISTENT, oldPersistent, PERSISTENT_EDEFAULT, oldPersistentESet));
 	}
 
 	/**
@@ -234,9 +234,9 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.QUEUE_PROFILE_TYPE__MIXED:
+				case MulePackage.QUEUE_PROFILE_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.QUEUE_PROFILE_TYPE__PROPERTIES:
+				case MulePackage.QUEUE_PROFILE_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -252,13 +252,13 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.QUEUE_PROFILE_TYPE__MIXED:
+			case MulePackage.QUEUE_PROFILE_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.QUEUE_PROFILE_TYPE__PROPERTIES:
+			case MulePackage.QUEUE_PROFILE_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES:
+			case MulePackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES:
 				return getMaxOutstandingMessages();
-			case SchemaPackage.QUEUE_PROFILE_TYPE__PERSISTENT:
+			case MulePackage.QUEUE_PROFILE_TYPE__PERSISTENT:
 				return isPersistent() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -271,17 +271,17 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.QUEUE_PROFILE_TYPE__MIXED:
+			case MulePackage.QUEUE_PROFILE_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.QUEUE_PROFILE_TYPE__PROPERTIES:
+			case MulePackage.QUEUE_PROFILE_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES:
+			case MulePackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES:
 				setMaxOutstandingMessages((String)newValue);
 				return;
-			case SchemaPackage.QUEUE_PROFILE_TYPE__PERSISTENT:
+			case MulePackage.QUEUE_PROFILE_TYPE__PERSISTENT:
 				setPersistent(((Boolean)newValue).booleanValue());
 				return;
 		}
@@ -295,16 +295,16 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.QUEUE_PROFILE_TYPE__MIXED:
+			case MulePackage.QUEUE_PROFILE_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.QUEUE_PROFILE_TYPE__PROPERTIES:
+			case MulePackage.QUEUE_PROFILE_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES:
+			case MulePackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES:
 				setMaxOutstandingMessages(MAX_OUTSTANDING_MESSAGES_EDEFAULT);
 				return;
-			case SchemaPackage.QUEUE_PROFILE_TYPE__PERSISTENT:
+			case MulePackage.QUEUE_PROFILE_TYPE__PERSISTENT:
 				unsetPersistent();
 				return;
 		}
@@ -318,13 +318,13 @@ public class QueueProfileTypeImpl extends EObjectImpl implements QueueProfileTyp
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.QUEUE_PROFILE_TYPE__MIXED:
+			case MulePackage.QUEUE_PROFILE_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.QUEUE_PROFILE_TYPE__PROPERTIES:
+			case MulePackage.QUEUE_PROFILE_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES:
+			case MulePackage.QUEUE_PROFILE_TYPE__MAX_OUTSTANDING_MESSAGES:
 				return MAX_OUTSTANDING_MESSAGES_EDEFAULT == null ? maxOutstandingMessages != null : !MAX_OUTSTANDING_MESSAGES_EDEFAULT.equals(maxOutstandingMessages);
-			case SchemaPackage.QUEUE_PROFILE_TYPE__PERSISTENT:
+			case MulePackage.QUEUE_PROFILE_TYPE__PERSISTENT:
 				return isSetPersistent();
 		}
 		return eDynamicIsSet(eFeature);

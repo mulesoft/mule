@@ -6,8 +6,6 @@
  */
 package org.mule.schema;
 
-import java.util.List;
-
 import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EObject;
@@ -16,7 +14,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Mule Descriptor Type</b></em>'.
+ * A representation of the model object '<em><b>Descriptor Type</b></em>'.
  * <!-- end-user-doc -->
  *
  * <p>
@@ -47,7 +45,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getMuleDescriptorType()
+ * @see org.mule.schema.MulePackage#getMuleDescriptorType()
  * @model extendedMetaData="name='mule-descriptorType' kind='mixed'"
  * @generated
  */
@@ -62,7 +60,7 @@ public interface MuleDescriptorType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_Mixed()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -79,7 +77,7 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Inbound Router</em>' containment reference.
 	 * @see #setInboundRouter(InboundRouterType)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_InboundRouter()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_InboundRouter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='inbound-router' namespace='##targetNamespace'"
 	 * @generated
@@ -106,7 +104,7 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Outbound Router</em>' containment reference.
 	 * @see #setOutboundRouter(OutboundRouterType)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_OutboundRouter()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_OutboundRouter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='outbound-router' namespace='##targetNamespace'"
 	 * @generated
@@ -133,7 +131,7 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Response Router</em>' containment reference.
 	 * @see #setResponseRouter(ResponseRouterType)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_ResponseRouter()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_ResponseRouter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='response-router' namespace='##targetNamespace'"
 	 * @generated
@@ -160,7 +158,7 @@ public interface MuleDescriptorType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Interceptor</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_Interceptor()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_Interceptor()
 	 * @model type="org.mule.schema.InterceptorType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='interceptor' namespace='##targetNamespace'"
 	 * @generated
@@ -177,7 +175,7 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Threading Profile</em>' containment reference.
 	 * @see #setThreadingProfile(ThreadingProfileType)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_ThreadingProfile()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_ThreadingProfile()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='threading-profile' namespace='##targetNamespace'"
 	 * @generated
@@ -204,7 +202,7 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Pooling Profile</em>' containment reference.
 	 * @see #setPoolingProfile(PoolingProfileType)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_PoolingProfile()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_PoolingProfile()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='pooling-profile' namespace='##targetNamespace'"
 	 * @generated
@@ -231,7 +229,7 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Queue Profile</em>' containment reference.
 	 * @see #setQueueProfile(QueueProfileType)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_QueueProfile()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_QueueProfile()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='queue-profile' namespace='##targetNamespace'"
 	 * @generated
@@ -258,7 +256,7 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Exception Strategy</em>' containment reference.
 	 * @see #setExceptionStrategy(ExceptionStrategyType)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_ExceptionStrategy()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_ExceptionStrategy()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='exception-strategy' namespace='##targetNamespace'"
 	 * @generated
@@ -285,7 +283,7 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_Properties()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -315,9 +313,9 @@ public interface MuleDescriptorType extends EObject {
 	 * @see #isSetContainerManaged()
 	 * @see #unsetContainerManaged()
 	 * @see #setContainerManaged(boolean)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_ContainerManaged()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_ContainerManaged()
 	 * @model default="true" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='containerManaged'"
+	 *        extendedMetaData="kind='attribute' name='containerManaged' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isContainerManaged();
@@ -367,9 +365,9 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Implementation</em>' attribute.
 	 * @see #setImplementation(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_Implementation()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='implementation'"
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_Implementation()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='implementation' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getImplementation();
@@ -394,9 +392,9 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Inbound Endpoint</em>' attribute.
 	 * @see #setInboundEndpoint(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_InboundEndpoint()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_InboundEndpoint()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='inboundEndpoint'"
+	 *        extendedMetaData="kind='attribute' name='inboundEndpoint' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getInboundEndpoint();
@@ -420,13 +418,13 @@ public interface MuleDescriptorType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Inbound Transformer</em>' attribute.
-	 * @see #setInboundTransformer(List)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_InboundTransformer()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.IDREFS" many="false"
-	 *        extendedMetaData="kind='attribute' name='inboundTransformer'"
+	 * @see #setInboundTransformer(String)
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_InboundTransformer()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='inboundTransformer' namespace='##targetNamespace'"
 	 * @generated
 	 */
-	List getInboundTransformer();
+	String getInboundTransformer();
 
 	/**
 	 * Sets the value of the '{@link org.mule.schema.MuleDescriptorType#getInboundTransformer <em>Inbound Transformer</em>}' attribute.
@@ -436,7 +434,7 @@ public interface MuleDescriptorType extends EObject {
 	 * @see #getInboundTransformer()
 	 * @generated
 	 */
-	void setInboundTransformer(List value);
+	void setInboundTransformer(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Initial State</b></em>' attribute.
@@ -453,9 +451,9 @@ public interface MuleDescriptorType extends EObject {
 	 * @see #isSetInitialState()
 	 * @see #unsetInitialState()
 	 * @see #setInitialState(InitialStateType)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_InitialState()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_InitialState()
 	 * @model default="started" unique="false" unsettable="true"
-	 *        extendedMetaData="kind='attribute' name='initialState'"
+	 *        extendedMetaData="kind='attribute' name='initialState' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	InitialStateType getInitialState();
@@ -506,9 +504,9 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_Name()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_Name()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();
@@ -533,9 +531,9 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Outbound Endpoint</em>' attribute.
 	 * @see #setOutboundEndpoint(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_OutboundEndpoint()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_OutboundEndpoint()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='outboundEndpoint'"
+	 *        extendedMetaData="kind='attribute' name='outboundEndpoint' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getOutboundEndpoint();
@@ -559,13 +557,13 @@ public interface MuleDescriptorType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Outbound Transformer</em>' attribute.
-	 * @see #setOutboundTransformer(List)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_OutboundTransformer()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.IDREFS" many="false"
-	 *        extendedMetaData="kind='attribute' name='outboundTransformer'"
+	 * @see #setOutboundTransformer(String)
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_OutboundTransformer()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='outboundTransformer' namespace='##targetNamespace'"
 	 * @generated
 	 */
-	List getOutboundTransformer();
+	String getOutboundTransformer();
 
 	/**
 	 * Sets the value of the '{@link org.mule.schema.MuleDescriptorType#getOutboundTransformer <em>Outbound Transformer</em>}' attribute.
@@ -575,7 +573,7 @@ public interface MuleDescriptorType extends EObject {
 	 * @see #getOutboundTransformer()
 	 * @generated
 	 */
-	void setOutboundTransformer(List value);
+	void setOutboundTransformer(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Ref</b></em>' attribute.
@@ -587,9 +585,9 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Ref</em>' attribute.
 	 * @see #setRef(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_Ref()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_Ref()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='ref'"
+	 *        extendedMetaData="kind='attribute' name='ref' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getRef();
@@ -613,13 +611,13 @@ public interface MuleDescriptorType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Response Transformer</em>' attribute.
-	 * @see #setResponseTransformer(List)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_ResponseTransformer()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.IDREFS" many="false"
-	 *        extendedMetaData="kind='attribute' name='responseTransformer'"
+	 * @see #setResponseTransformer(String)
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_ResponseTransformer()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='responseTransformer' namespace='##targetNamespace'"
 	 * @generated
 	 */
-	List getResponseTransformer();
+	String getResponseTransformer();
 
 	/**
 	 * Sets the value of the '{@link org.mule.schema.MuleDescriptorType#getResponseTransformer <em>Response Transformer</em>}' attribute.
@@ -629,7 +627,7 @@ public interface MuleDescriptorType extends EObject {
 	 * @see #getResponseTransformer()
 	 * @generated
 	 */
-	void setResponseTransformer(List value);
+	void setResponseTransformer(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Singleton</b></em>' attribute.
@@ -644,9 +642,9 @@ public interface MuleDescriptorType extends EObject {
 	 * @see #isSetSingleton()
 	 * @see #unsetSingleton()
 	 * @see #setSingleton(boolean)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_Singleton()
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_Singleton()
 	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='singleton'"
+	 *        extendedMetaData="kind='attribute' name='singleton' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isSingleton();
@@ -696,9 +694,9 @@ public interface MuleDescriptorType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Version</em>' attribute.
 	 * @see #setVersion(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleDescriptorType_Version()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='version'"
+	 * @see org.mule.schema.MulePackage#getMuleDescriptorType_Version()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='version' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getVersion();

@@ -26,7 +26,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.CatchAllStrategyType;
 import org.mule.schema.InboundRouterType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -101,7 +101,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getInboundRouterType();
+		return MulePackage.eINSTANCE.getInboundRouterType();
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.INBOUND_ROUTER_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.INBOUND_ROUTER_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -122,7 +122,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 * @generated
 	 */
 	public CatchAllStrategyType getCatchAllStrategy() {
-		return (CatchAllStrategyType)getMixed().get(SchemaPackage.eINSTANCE.getInboundRouterType_CatchAllStrategy(), true);
+		return (CatchAllStrategyType)getMixed().get(MulePackage.eINSTANCE.getInboundRouterType_CatchAllStrategy(), true);
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 * @generated
 	 */
 	public NotificationChain basicSetCatchAllStrategy(CatchAllStrategyType newCatchAllStrategy, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getInboundRouterType_CatchAllStrategy(), newCatchAllStrategy, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getInboundRouterType_CatchAllStrategy(), newCatchAllStrategy, msgs);
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 * @generated
 	 */
 	public void setCatchAllStrategy(CatchAllStrategyType newCatchAllStrategy) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getInboundRouterType_CatchAllStrategy(), newCatchAllStrategy);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getInboundRouterType_CatchAllStrategy(), newCatchAllStrategy);
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 * @generated
 	 */
 	public EList getEndpoint() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getInboundRouterType_Endpoint());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getInboundRouterType_Endpoint());
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 * @generated
 	 */
 	public EList getGlobalEndpoint() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getInboundRouterType_GlobalEndpoint());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getInboundRouterType_GlobalEndpoint());
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 * @generated
 	 */
 	public EList getRouter() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getInboundRouterType_Router());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getInboundRouterType_Router());
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 		boolean oldMatchAllESet = matchAllESet;
 		matchAllESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.INBOUND_ROUTER_TYPE__MATCH_ALL, oldMatchAll, matchAll, !oldMatchAllESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.INBOUND_ROUTER_TYPE__MATCH_ALL, oldMatchAll, matchAll, !oldMatchAllESet));
 	}
 
 	/**
@@ -204,7 +204,7 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 		matchAll = MATCH_ALL_EDEFAULT;
 		matchAllESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.INBOUND_ROUTER_TYPE__MATCH_ALL, oldMatchAll, MATCH_ALL_EDEFAULT, oldMatchAllESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.INBOUND_ROUTER_TYPE__MATCH_ALL, oldMatchAll, MATCH_ALL_EDEFAULT, oldMatchAllESet));
 	}
 
 	/**
@@ -224,15 +224,15 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.INBOUND_ROUTER_TYPE__MIXED:
+				case MulePackage.INBOUND_ROUTER_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
+				case MulePackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
 					return basicSetCatchAllStrategy(null, msgs);
-				case SchemaPackage.INBOUND_ROUTER_TYPE__ENDPOINT:
+				case MulePackage.INBOUND_ROUTER_TYPE__ENDPOINT:
 					return ((InternalEList)getEndpoint()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
+				case MulePackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
 					return ((InternalEList)getGlobalEndpoint()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.INBOUND_ROUTER_TYPE__ROUTER:
+				case MulePackage.INBOUND_ROUTER_TYPE__ROUTER:
 					return ((InternalEList)getRouter()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -248,17 +248,17 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.INBOUND_ROUTER_TYPE__MIXED:
+			case MulePackage.INBOUND_ROUTER_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
+			case MulePackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
 				return getCatchAllStrategy();
-			case SchemaPackage.INBOUND_ROUTER_TYPE__ENDPOINT:
+			case MulePackage.INBOUND_ROUTER_TYPE__ENDPOINT:
 				return getEndpoint();
-			case SchemaPackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
 				return getGlobalEndpoint();
-			case SchemaPackage.INBOUND_ROUTER_TYPE__ROUTER:
+			case MulePackage.INBOUND_ROUTER_TYPE__ROUTER:
 				return getRouter();
-			case SchemaPackage.INBOUND_ROUTER_TYPE__MATCH_ALL:
+			case MulePackage.INBOUND_ROUTER_TYPE__MATCH_ALL:
 				return isMatchAll() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -271,26 +271,26 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.INBOUND_ROUTER_TYPE__MIXED:
+			case MulePackage.INBOUND_ROUTER_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
+			case MulePackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
 				setCatchAllStrategy((CatchAllStrategyType)newValue);
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__ENDPOINT:
+			case MulePackage.INBOUND_ROUTER_TYPE__ENDPOINT:
 				getEndpoint().clear();
 				getEndpoint().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
 				getGlobalEndpoint().clear();
 				getGlobalEndpoint().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__ROUTER:
+			case MulePackage.INBOUND_ROUTER_TYPE__ROUTER:
 				getRouter().clear();
 				getRouter().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__MATCH_ALL:
+			case MulePackage.INBOUND_ROUTER_TYPE__MATCH_ALL:
 				setMatchAll(((Boolean)newValue).booleanValue());
 				return;
 		}
@@ -304,22 +304,22 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.INBOUND_ROUTER_TYPE__MIXED:
+			case MulePackage.INBOUND_ROUTER_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
+			case MulePackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
 				setCatchAllStrategy((CatchAllStrategyType)null);
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__ENDPOINT:
+			case MulePackage.INBOUND_ROUTER_TYPE__ENDPOINT:
 				getEndpoint().clear();
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
 				getGlobalEndpoint().clear();
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__ROUTER:
+			case MulePackage.INBOUND_ROUTER_TYPE__ROUTER:
 				getRouter().clear();
 				return;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__MATCH_ALL:
+			case MulePackage.INBOUND_ROUTER_TYPE__MATCH_ALL:
 				unsetMatchAll();
 				return;
 		}
@@ -333,17 +333,17 @@ public class InboundRouterTypeImpl extends EObjectImpl implements InboundRouterT
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.INBOUND_ROUTER_TYPE__MIXED:
+			case MulePackage.INBOUND_ROUTER_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
+			case MulePackage.INBOUND_ROUTER_TYPE__CATCH_ALL_STRATEGY:
 				return getCatchAllStrategy() != null;
-			case SchemaPackage.INBOUND_ROUTER_TYPE__ENDPOINT:
+			case MulePackage.INBOUND_ROUTER_TYPE__ENDPOINT:
 				return !getEndpoint().isEmpty();
-			case SchemaPackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.INBOUND_ROUTER_TYPE__GLOBAL_ENDPOINT:
 				return !getGlobalEndpoint().isEmpty();
-			case SchemaPackage.INBOUND_ROUTER_TYPE__ROUTER:
+			case MulePackage.INBOUND_ROUTER_TYPE__ROUTER:
 				return !getRouter().isEmpty();
-			case SchemaPackage.INBOUND_ROUTER_TYPE__MATCH_ALL:
+			case MulePackage.INBOUND_ROUTER_TYPE__MATCH_ALL:
 				return isSetMatchAll();
 		}
 		return eDynamicIsSet(eFeature);

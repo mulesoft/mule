@@ -27,7 +27,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getDocumentRoot()
+ * @see org.mule.schema.MulePackage#getDocumentRoot()
  * @model extendedMetaData="name='' kind='mixed'"
  * @generated
  */
@@ -42,7 +42,7 @@ public interface DocumentRoot extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getDocumentRoot_Mixed()
+	 * @see org.mule.schema.MulePackage#getDocumentRoot_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -60,7 +60,7 @@ public interface DocumentRoot extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>XMLNS Prefix Map</em>' map.
-	 * @see org.mule.schema.SchemaPackage#getDocumentRoot_XMLNSPrefixMap()
+	 * @see org.mule.schema.MulePackage#getDocumentRoot_XMLNSPrefixMap()
 	 * @model mapType="org.eclipse.emf.ecore.EStringToStringMapEntry" keyType="java.lang.String" valueType="java.lang.String" transient="true"
 	 *        extendedMetaData="kind='attribute' name='xmlns:prefix'"
 	 * @generated
@@ -78,7 +78,7 @@ public interface DocumentRoot extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>XSI Schema Location</em>' map.
-	 * @see org.mule.schema.SchemaPackage#getDocumentRoot_XSISchemaLocation()
+	 * @see org.mule.schema.MulePackage#getDocumentRoot_XSISchemaLocation()
 	 * @model mapType="org.eclipse.emf.ecore.EStringToStringMapEntry" keyType="java.lang.String" valueType="java.lang.String" transient="true"
 	 *        extendedMetaData="kind='attribute' name='xsi:schemaLocation'"
 	 * @generated
@@ -95,7 +95,7 @@ public interface DocumentRoot extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mule Configuration</em>' containment reference.
 	 * @see #setMuleConfiguration(MuleConfigurationType)
-	 * @see org.mule.schema.SchemaPackage#getDocumentRoot_MuleConfiguration()
+	 * @see org.mule.schema.MulePackage#getDocumentRoot_MuleConfiguration()
 	 * @model containment="true" resolveProxies="false" upper="-2" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='mule-configuration' namespace='##targetNamespace'"
 	 * @generated

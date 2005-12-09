@@ -30,7 +30,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getListType()
+ * @see org.mule.schema.MulePackage#getListType()
  * @model extendedMetaData="name='listType' kind='mixed'"
  * @generated
  */
@@ -45,7 +45,7 @@ public interface ListType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getListType_Mixed()
+	 * @see org.mule.schema.MulePackage#getListType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -62,7 +62,7 @@ public interface ListType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Group</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getListType_Group()
+	 * @see org.mule.schema.MulePackage#getListType_Group()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='group' name='group:1'"
 	 * @generated
@@ -79,9 +79,9 @@ public interface ListType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Entry</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getListType_Entry()
+	 * @see org.mule.schema.MulePackage#getListType_Entry()
 	 * @model type="org.mule.schema.EntryType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='entry' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='entry' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getEntry();
@@ -96,9 +96,9 @@ public interface ListType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Factory Entry</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getListType_FactoryEntry()
+	 * @see org.mule.schema.MulePackage#getListType_FactoryEntry()
 	 * @model type="org.mule.schema.FactoryEntryType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='factory-entry' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='factory-entry' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getFactoryEntry();
@@ -113,9 +113,9 @@ public interface ListType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>System Entry</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getListType_SystemEntry()
+	 * @see org.mule.schema.MulePackage#getListType_SystemEntry()
 	 * @model type="org.mule.schema.SystemEntryType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='system-entry' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='system-entry' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getSystemEntry();
@@ -130,9 +130,9 @@ public interface ListType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Container Entry</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getListType_ContainerEntry()
+	 * @see org.mule.schema.MulePackage#getListType_ContainerEntry()
 	 * @model type="org.mule.schema.ContainerEntryType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='container-entry' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='container-entry' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getContainerEntry();
@@ -147,9 +147,9 @@ public interface ListType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getListType_Name()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 * @see org.mule.schema.MulePackage#getListType_Name()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();

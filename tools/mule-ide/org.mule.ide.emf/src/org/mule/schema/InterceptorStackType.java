@@ -26,7 +26,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getInterceptorStackType()
+ * @see org.mule.schema.MulePackage#getInterceptorStackType()
  * @model extendedMetaData="name='interceptor-stackType' kind='mixed'"
  * @generated
  */
@@ -41,7 +41,7 @@ public interface InterceptorStackType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getInterceptorStackType_Mixed()
+	 * @see org.mule.schema.MulePackage#getInterceptorStackType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -58,7 +58,7 @@ public interface InterceptorStackType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Interceptor</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getInterceptorStackType_Interceptor()
+	 * @see org.mule.schema.MulePackage#getInterceptorStackType_Interceptor()
 	 * @model type="org.mule.schema.InterceptorType" containment="true" resolveProxies="false" required="true" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='interceptor' namespace='##targetNamespace'"
 	 * @generated
@@ -75,9 +75,9 @@ public interface InterceptorStackType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getInterceptorStackType_Name()
-	 * @model unique="false" id="true" dataType="org.eclipse.emf.ecore.xml.type.ID" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 * @see org.mule.schema.MulePackage#getInterceptorStackType_Name()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();

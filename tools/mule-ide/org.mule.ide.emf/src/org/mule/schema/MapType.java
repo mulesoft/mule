@@ -33,7 +33,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getMapType()
+ * @see org.mule.schema.MulePackage#getMapType()
  * @model extendedMetaData="name='mapType' kind='mixed'"
  * @generated
  */
@@ -48,7 +48,7 @@ public interface MapType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getMapType_Mixed()
+	 * @see org.mule.schema.MulePackage#getMapType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -65,7 +65,7 @@ public interface MapType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Group</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getMapType_Group()
+	 * @see org.mule.schema.MulePackage#getMapType_Group()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='group' name='group:1'"
 	 * @generated
@@ -82,9 +82,9 @@ public interface MapType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Property</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMapType_Property()
+	 * @see org.mule.schema.MulePackage#getMapType_Property()
 	 * @model type="org.mule.schema.PropertyType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='property' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='property' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getProperty();
@@ -99,9 +99,9 @@ public interface MapType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Factory Property</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMapType_FactoryProperty()
+	 * @see org.mule.schema.MulePackage#getMapType_FactoryProperty()
 	 * @model type="org.mule.schema.FactoryPropertyType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='factory-property' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='factory-property' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getFactoryProperty();
@@ -116,9 +116,9 @@ public interface MapType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Container Property</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMapType_ContainerProperty()
+	 * @see org.mule.schema.MulePackage#getMapType_ContainerProperty()
 	 * @model type="org.mule.schema.ContainerPropertyType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='container-property' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='container-property' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getContainerProperty();
@@ -133,9 +133,9 @@ public interface MapType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>System Property</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMapType_SystemProperty()
+	 * @see org.mule.schema.MulePackage#getMapType_SystemProperty()
 	 * @model type="org.mule.schema.SystemPropertyType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='system-property' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='system-property' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getSystemProperty();
@@ -150,9 +150,9 @@ public interface MapType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Map</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMapType_Map()
+	 * @see org.mule.schema.MulePackage#getMapType_Map()
 	 * @model type="org.mule.schema.MapType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='map' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='map' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getMap();
@@ -167,9 +167,9 @@ public interface MapType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>List</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMapType_List()
+	 * @see org.mule.schema.MulePackage#getMapType_List()
 	 * @model type="org.mule.schema.ListType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='list' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='list' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getList();
@@ -184,9 +184,9 @@ public interface MapType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>File Properties</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMapType_FileProperties()
+	 * @see org.mule.schema.MulePackage#getMapType_FileProperties()
 	 * @model type="org.mule.schema.FilePropertiesType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='file-properties' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='file-properties' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getFileProperties();
@@ -201,9 +201,9 @@ public interface MapType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getMapType_Name()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 * @see org.mule.schema.MulePackage#getMapType_Name()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();

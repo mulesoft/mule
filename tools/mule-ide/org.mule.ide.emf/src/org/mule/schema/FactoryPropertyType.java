@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getFactoryPropertyType()
+ * @see org.mule.schema.MulePackage#getFactoryPropertyType()
  * @model extendedMetaData="name='factory-propertyType' kind='mixed'"
  * @generated
  */
@@ -39,7 +39,7 @@ public interface FactoryPropertyType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getFactoryPropertyType_Mixed()
+	 * @see org.mule.schema.MulePackage#getFactoryPropertyType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -56,9 +56,9 @@ public interface FactoryPropertyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Factory</em>' attribute.
 	 * @see #setFactory(String)
-	 * @see org.mule.schema.SchemaPackage#getFactoryPropertyType_Factory()
+	 * @see org.mule.schema.MulePackage#getFactoryPropertyType_Factory()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='factory'"
+	 *        extendedMetaData="kind='attribute' name='factory' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getFactory();
@@ -83,9 +83,9 @@ public interface FactoryPropertyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getFactoryPropertyType_Name()
+	 * @see org.mule.schema.MulePackage#getFactoryPropertyType_Name()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();

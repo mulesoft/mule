@@ -22,8 +22,8 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 import org.mule.schema.TransformerType;
 
 /**
@@ -189,7 +189,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getTransformerType();
+		return MulePackage.eINSTANCE.getTransformerType();
 	}
 
 	/**
@@ -199,7 +199,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.TRANSFORMER_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.TRANSFORMER_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -210,7 +210,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getTransformerType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getTransformerType_Properties(), true);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getTransformerType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getTransformerType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getTransformerType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getTransformerType_Properties(), newProperties);
 	}
 
 	/**
@@ -249,7 +249,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSFORMER_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSFORMER_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -272,7 +272,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 		boolean oldIgnoreBadInputESet = ignoreBadInputESet;
 		ignoreBadInputESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT, oldIgnoreBadInput, ignoreBadInput, !oldIgnoreBadInputESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT, oldIgnoreBadInput, ignoreBadInput, !oldIgnoreBadInputESet));
 	}
 
 	/**
@@ -286,7 +286,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 		ignoreBadInput = IGNORE_BAD_INPUT_EDEFAULT;
 		ignoreBadInputESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT, oldIgnoreBadInput, IGNORE_BAD_INPUT_EDEFAULT, oldIgnoreBadInputESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT, oldIgnoreBadInput, IGNORE_BAD_INPUT_EDEFAULT, oldIgnoreBadInputESet));
 	}
 
 	/**
@@ -316,7 +316,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSFORMER_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSFORMER_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -337,7 +337,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 		String oldRef = ref;
 		ref = newRef;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSFORMER_TYPE__REF, oldRef, ref));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSFORMER_TYPE__REF, oldRef, ref));
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 		boolean oldReturnClassESet = returnClassESet;
 		returnClassESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.TRANSFORMER_TYPE__RETURN_CLASS, oldReturnClass, returnClass, !oldReturnClassESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.TRANSFORMER_TYPE__RETURN_CLASS, oldReturnClass, returnClass, !oldReturnClassESet));
 	}
 
 	/**
@@ -374,7 +374,7 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 		returnClass = RETURN_CLASS_EDEFAULT;
 		returnClassESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.TRANSFORMER_TYPE__RETURN_CLASS, oldReturnClass, RETURN_CLASS_EDEFAULT, oldReturnClassESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.TRANSFORMER_TYPE__RETURN_CLASS, oldReturnClass, RETURN_CLASS_EDEFAULT, oldReturnClassESet));
 	}
 
 	/**
@@ -394,9 +394,9 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.TRANSFORMER_TYPE__MIXED:
+				case MulePackage.TRANSFORMER_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.TRANSFORMER_TYPE__PROPERTIES:
+				case MulePackage.TRANSFORMER_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -412,19 +412,19 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSFORMER_TYPE__MIXED:
+			case MulePackage.TRANSFORMER_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.TRANSFORMER_TYPE__PROPERTIES:
+			case MulePackage.TRANSFORMER_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.TRANSFORMER_TYPE__CLASS_NAME:
+			case MulePackage.TRANSFORMER_TYPE__CLASS_NAME:
 				return getClassName();
-			case SchemaPackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT:
+			case MulePackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT:
 				return isIgnoreBadInput() ? Boolean.TRUE : Boolean.FALSE;
-			case SchemaPackage.TRANSFORMER_TYPE__NAME:
+			case MulePackage.TRANSFORMER_TYPE__NAME:
 				return getName();
-			case SchemaPackage.TRANSFORMER_TYPE__REF:
+			case MulePackage.TRANSFORMER_TYPE__REF:
 				return getRef();
-			case SchemaPackage.TRANSFORMER_TYPE__RETURN_CLASS:
+			case MulePackage.TRANSFORMER_TYPE__RETURN_CLASS:
 				return getReturnClass();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -437,26 +437,26 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSFORMER_TYPE__MIXED:
+			case MulePackage.TRANSFORMER_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__PROPERTIES:
+			case MulePackage.TRANSFORMER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__CLASS_NAME:
+			case MulePackage.TRANSFORMER_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT:
+			case MulePackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT:
 				setIgnoreBadInput(((Boolean)newValue).booleanValue());
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__NAME:
+			case MulePackage.TRANSFORMER_TYPE__NAME:
 				setName((String)newValue);
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__REF:
+			case MulePackage.TRANSFORMER_TYPE__REF:
 				setRef((String)newValue);
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__RETURN_CLASS:
+			case MulePackage.TRANSFORMER_TYPE__RETURN_CLASS:
 				setReturnClass((String)newValue);
 				return;
 		}
@@ -470,25 +470,25 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSFORMER_TYPE__MIXED:
+			case MulePackage.TRANSFORMER_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__PROPERTIES:
+			case MulePackage.TRANSFORMER_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__CLASS_NAME:
+			case MulePackage.TRANSFORMER_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT:
+			case MulePackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT:
 				unsetIgnoreBadInput();
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__NAME:
+			case MulePackage.TRANSFORMER_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__REF:
+			case MulePackage.TRANSFORMER_TYPE__REF:
 				setRef(REF_EDEFAULT);
 				return;
-			case SchemaPackage.TRANSFORMER_TYPE__RETURN_CLASS:
+			case MulePackage.TRANSFORMER_TYPE__RETURN_CLASS:
 				unsetReturnClass();
 				return;
 		}
@@ -502,19 +502,19 @@ public class TransformerTypeImpl extends EObjectImpl implements TransformerType 
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.TRANSFORMER_TYPE__MIXED:
+			case MulePackage.TRANSFORMER_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.TRANSFORMER_TYPE__PROPERTIES:
+			case MulePackage.TRANSFORMER_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.TRANSFORMER_TYPE__CLASS_NAME:
+			case MulePackage.TRANSFORMER_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
-			case SchemaPackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT:
+			case MulePackage.TRANSFORMER_TYPE__IGNORE_BAD_INPUT:
 				return isSetIgnoreBadInput();
-			case SchemaPackage.TRANSFORMER_TYPE__NAME:
+			case MulePackage.TRANSFORMER_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case SchemaPackage.TRANSFORMER_TYPE__REF:
+			case MulePackage.TRANSFORMER_TYPE__REF:
 				return REF_EDEFAULT == null ? ref != null : !REF_EDEFAULT.equals(ref);
-			case SchemaPackage.TRANSFORMER_TYPE__RETURN_CLASS:
+			case MulePackage.TRANSFORMER_TYPE__RETURN_CLASS:
 				return isSetReturnClass();
 		}
 		return eDynamicIsSet(eFeature);

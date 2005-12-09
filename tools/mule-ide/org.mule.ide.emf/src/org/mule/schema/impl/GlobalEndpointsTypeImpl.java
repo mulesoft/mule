@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.GlobalEndpointsType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -65,7 +65,7 @@ public class GlobalEndpointsTypeImpl extends EObjectImpl implements GlobalEndpoi
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getGlobalEndpointsType();
+		return MulePackage.eINSTANCE.getGlobalEndpointsType();
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class GlobalEndpointsTypeImpl extends EObjectImpl implements GlobalEndpoi
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.GLOBAL_ENDPOINTS_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.GLOBAL_ENDPOINTS_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -86,7 +86,7 @@ public class GlobalEndpointsTypeImpl extends EObjectImpl implements GlobalEndpoi
 	 * @generated
 	 */
 	public EList getEndpoint() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getGlobalEndpointsType_Endpoint());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getGlobalEndpointsType_Endpoint());
 	}
 
 	/**
@@ -97,9 +97,9 @@ public class GlobalEndpointsTypeImpl extends EObjectImpl implements GlobalEndpoi
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
+				case MulePackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
+				case MulePackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
 					return ((InternalEList)getEndpoint()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -115,9 +115,9 @@ public class GlobalEndpointsTypeImpl extends EObjectImpl implements GlobalEndpoi
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
 				return getEndpoint();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -130,11 +130,11 @@ public class GlobalEndpointsTypeImpl extends EObjectImpl implements GlobalEndpoi
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
 				getEndpoint().clear();
 				getEndpoint().addAll((Collection)newValue);
 				return;
@@ -149,10 +149,10 @@ public class GlobalEndpointsTypeImpl extends EObjectImpl implements GlobalEndpoi
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
 				getEndpoint().clear();
 				return;
 		}
@@ -166,9 +166,9 @@ public class GlobalEndpointsTypeImpl extends EObjectImpl implements GlobalEndpoi
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE__ENDPOINT:
 				return !getEndpoint().isEmpty();
 		}
 		return eDynamicIsSet(eFeature);

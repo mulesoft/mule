@@ -22,7 +22,7 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 import org.mule.schema.SystemEntryType;
 
 /**
@@ -106,7 +106,7 @@ public class SystemEntryTypeImpl extends EObjectImpl implements SystemEntryType 
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getSystemEntryType();
+		return MulePackage.eINSTANCE.getSystemEntryType();
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class SystemEntryTypeImpl extends EObjectImpl implements SystemEntryType 
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.SYSTEM_ENTRY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.SYSTEM_ENTRY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -139,7 +139,7 @@ public class SystemEntryTypeImpl extends EObjectImpl implements SystemEntryType 
 		String oldDefaultValue = defaultValue;
 		defaultValue = newDefaultValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE, oldDefaultValue, defaultValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE, oldDefaultValue, defaultValue));
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class SystemEntryTypeImpl extends EObjectImpl implements SystemEntryType 
 		String oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.SYSTEM_ENTRY_TYPE__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.SYSTEM_ENTRY_TYPE__KEY, oldKey, key));
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class SystemEntryTypeImpl extends EObjectImpl implements SystemEntryType 
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.SYSTEM_ENTRY_TYPE__MIXED:
+				case MulePackage.SYSTEM_ENTRY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -187,11 +187,11 @@ public class SystemEntryTypeImpl extends EObjectImpl implements SystemEntryType 
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__MIXED:
+			case MulePackage.SYSTEM_ENTRY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE:
+			case MulePackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE:
 				return getDefaultValue();
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__KEY:
+			case MulePackage.SYSTEM_ENTRY_TYPE__KEY:
 				return getKey();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -204,14 +204,14 @@ public class SystemEntryTypeImpl extends EObjectImpl implements SystemEntryType 
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__MIXED:
+			case MulePackage.SYSTEM_ENTRY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE:
+			case MulePackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE:
 				setDefaultValue((String)newValue);
 				return;
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__KEY:
+			case MulePackage.SYSTEM_ENTRY_TYPE__KEY:
 				setKey((String)newValue);
 				return;
 		}
@@ -225,13 +225,13 @@ public class SystemEntryTypeImpl extends EObjectImpl implements SystemEntryType 
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__MIXED:
+			case MulePackage.SYSTEM_ENTRY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE:
+			case MulePackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE:
 				setDefaultValue(DEFAULT_VALUE_EDEFAULT);
 				return;
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__KEY:
+			case MulePackage.SYSTEM_ENTRY_TYPE__KEY:
 				setKey(KEY_EDEFAULT);
 				return;
 		}
@@ -245,11 +245,11 @@ public class SystemEntryTypeImpl extends EObjectImpl implements SystemEntryType 
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__MIXED:
+			case MulePackage.SYSTEM_ENTRY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE:
+			case MulePackage.SYSTEM_ENTRY_TYPE__DEFAULT_VALUE:
 				return DEFAULT_VALUE_EDEFAULT == null ? defaultValue != null : !DEFAULT_VALUE_EDEFAULT.equals(defaultValue);
-			case SchemaPackage.SYSTEM_ENTRY_TYPE__KEY:
+			case MulePackage.SYSTEM_ENTRY_TYPE__KEY:
 				return KEY_EDEFAULT == null ? key != null : !KEY_EDEFAULT.equals(key);
 		}
 		return eDynamicIsSet(eFeature);

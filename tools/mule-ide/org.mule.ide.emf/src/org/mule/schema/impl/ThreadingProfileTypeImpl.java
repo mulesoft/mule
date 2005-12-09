@@ -23,8 +23,8 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.IdType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PoolExhaustedActionType;
-import org.mule.schema.SchemaPackage;
 import org.mule.schema.ThreadingProfileType;
 
 /**
@@ -42,6 +42,7 @@ import org.mule.schema.ThreadingProfileType;
  *   <li>{@link org.mule.schema.impl.ThreadingProfileTypeImpl#getMaxThreadsIdle <em>Max Threads Idle</em>}</li>
  *   <li>{@link org.mule.schema.impl.ThreadingProfileTypeImpl#getPoolExhaustedAction <em>Pool Exhausted Action</em>}</li>
  *   <li>{@link org.mule.schema.impl.ThreadingProfileTypeImpl#getThreadTTL <em>Thread TTL</em>}</li>
+ *   <li>{@link org.mule.schema.impl.ThreadingProfileTypeImpl#getThreadWaitTimeout <em>Thread Wait Timeout</em>}</li>
  * </ul>
  * </p>
  *
@@ -226,6 +227,26 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 	protected String threadTTL = THREAD_TTL_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getThreadWaitTimeout() <em>Thread Wait Timeout</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getThreadWaitTimeout()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String THREAD_WAIT_TIMEOUT_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getThreadWaitTimeout() <em>Thread Wait Timeout</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getThreadWaitTimeout()
+	 * @generated
+	 * @ordered
+	 */
+	protected String threadWaitTimeout = THREAD_WAIT_TIMEOUT_EDEFAULT;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -240,7 +261,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getThreadingProfileType();
+		return MulePackage.eINSTANCE.getThreadingProfileType();
 	}
 
 	/**
@@ -250,7 +271,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.THREADING_PROFILE_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.THREADING_PROFILE_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -275,7 +296,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		boolean oldDoThreadingESet = doThreadingESet;
 		doThreadingESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.THREADING_PROFILE_TYPE__DO_THREADING, oldDoThreading, doThreading, !oldDoThreadingESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.THREADING_PROFILE_TYPE__DO_THREADING, oldDoThreading, doThreading, !oldDoThreadingESet));
 	}
 
 	/**
@@ -289,7 +310,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		doThreading = DO_THREADING_EDEFAULT;
 		doThreadingESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.THREADING_PROFILE_TYPE__DO_THREADING, oldDoThreading, DO_THREADING_EDEFAULT, oldDoThreadingESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.THREADING_PROFILE_TYPE__DO_THREADING, oldDoThreading, DO_THREADING_EDEFAULT, oldDoThreadingESet));
 	}
 
 	/**
@@ -321,7 +342,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		boolean oldIdESet = idESet;
 		idESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.THREADING_PROFILE_TYPE__ID, oldId, id, !oldIdESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.THREADING_PROFILE_TYPE__ID, oldId, id, !oldIdESet));
 	}
 
 	/**
@@ -335,7 +356,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		id = ID_EDEFAULT;
 		idESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.THREADING_PROFILE_TYPE__ID, oldId, ID_EDEFAULT, oldIdESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.THREADING_PROFILE_TYPE__ID, oldId, ID_EDEFAULT, oldIdESet));
 	}
 
 	/**
@@ -365,7 +386,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		String oldMaxBufferSize = maxBufferSize;
 		maxBufferSize = newMaxBufferSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE, oldMaxBufferSize, maxBufferSize));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE, oldMaxBufferSize, maxBufferSize));
 	}
 
 	/**
@@ -386,7 +407,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		String oldMaxThreadsActive = maxThreadsActive;
 		maxThreadsActive = newMaxThreadsActive;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE, oldMaxThreadsActive, maxThreadsActive));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE, oldMaxThreadsActive, maxThreadsActive));
 	}
 
 	/**
@@ -407,7 +428,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		String oldMaxThreadsIdle = maxThreadsIdle;
 		maxThreadsIdle = newMaxThreadsIdle;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE, oldMaxThreadsIdle, maxThreadsIdle));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE, oldMaxThreadsIdle, maxThreadsIdle));
 	}
 
 	/**
@@ -430,7 +451,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		boolean oldPoolExhaustedActionESet = poolExhaustedActionESet;
 		poolExhaustedActionESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION, oldPoolExhaustedAction, poolExhaustedAction, !oldPoolExhaustedActionESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION, oldPoolExhaustedAction, poolExhaustedAction, !oldPoolExhaustedActionESet));
 	}
 
 	/**
@@ -444,7 +465,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		poolExhaustedAction = POOL_EXHAUSTED_ACTION_EDEFAULT;
 		poolExhaustedActionESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION, oldPoolExhaustedAction, POOL_EXHAUSTED_ACTION_EDEFAULT, oldPoolExhaustedActionESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION, oldPoolExhaustedAction, POOL_EXHAUSTED_ACTION_EDEFAULT, oldPoolExhaustedActionESet));
 	}
 
 	/**
@@ -474,7 +495,28 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		String oldThreadTTL = threadTTL;
 		threadTTL = newThreadTTL;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.THREADING_PROFILE_TYPE__THREAD_TTL, oldThreadTTL, threadTTL));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.THREADING_PROFILE_TYPE__THREAD_TTL, oldThreadTTL, threadTTL));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getThreadWaitTimeout() {
+		return threadWaitTimeout;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setThreadWaitTimeout(String newThreadWaitTimeout) {
+		String oldThreadWaitTimeout = threadWaitTimeout;
+		threadWaitTimeout = newThreadWaitTimeout;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.THREADING_PROFILE_TYPE__THREAD_WAIT_TIMEOUT, oldThreadWaitTimeout, threadWaitTimeout));
 	}
 
 	/**
@@ -485,7 +527,7 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.THREADING_PROFILE_TYPE__MIXED:
+				case MulePackage.THREADING_PROFILE_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -501,22 +543,24 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.THREADING_PROFILE_TYPE__MIXED:
+			case MulePackage.THREADING_PROFILE_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.THREADING_PROFILE_TYPE__DO_THREADING:
+			case MulePackage.THREADING_PROFILE_TYPE__DO_THREADING:
 				return isDoThreading() ? Boolean.TRUE : Boolean.FALSE;
-			case SchemaPackage.THREADING_PROFILE_TYPE__ID:
+			case MulePackage.THREADING_PROFILE_TYPE__ID:
 				return getId();
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE:
 				return getMaxBufferSize();
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE:
 				return getMaxThreadsActive();
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE:
 				return getMaxThreadsIdle();
-			case SchemaPackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION:
+			case MulePackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION:
 				return getPoolExhaustedAction();
-			case SchemaPackage.THREADING_PROFILE_TYPE__THREAD_TTL:
+			case MulePackage.THREADING_PROFILE_TYPE__THREAD_TTL:
 				return getThreadTTL();
+			case MulePackage.THREADING_PROFILE_TYPE__THREAD_WAIT_TIMEOUT:
+				return getThreadWaitTimeout();
 		}
 		return eDynamicGet(eFeature, resolve);
 	}
@@ -528,30 +572,33 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.THREADING_PROFILE_TYPE__MIXED:
+			case MulePackage.THREADING_PROFILE_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__DO_THREADING:
+			case MulePackage.THREADING_PROFILE_TYPE__DO_THREADING:
 				setDoThreading(((Boolean)newValue).booleanValue());
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__ID:
+			case MulePackage.THREADING_PROFILE_TYPE__ID:
 				setId((IdType)newValue);
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE:
 				setMaxBufferSize((String)newValue);
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE:
 				setMaxThreadsActive((String)newValue);
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE:
 				setMaxThreadsIdle((String)newValue);
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION:
+			case MulePackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION:
 				setPoolExhaustedAction((PoolExhaustedActionType)newValue);
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__THREAD_TTL:
+			case MulePackage.THREADING_PROFILE_TYPE__THREAD_TTL:
 				setThreadTTL((String)newValue);
+				return;
+			case MulePackage.THREADING_PROFILE_TYPE__THREAD_WAIT_TIMEOUT:
+				setThreadWaitTimeout((String)newValue);
 				return;
 		}
 		eDynamicSet(eFeature, newValue);
@@ -564,29 +611,32 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.THREADING_PROFILE_TYPE__MIXED:
+			case MulePackage.THREADING_PROFILE_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__DO_THREADING:
+			case MulePackage.THREADING_PROFILE_TYPE__DO_THREADING:
 				unsetDoThreading();
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__ID:
+			case MulePackage.THREADING_PROFILE_TYPE__ID:
 				unsetId();
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE:
 				setMaxBufferSize(MAX_BUFFER_SIZE_EDEFAULT);
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE:
 				setMaxThreadsActive(MAX_THREADS_ACTIVE_EDEFAULT);
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE:
 				setMaxThreadsIdle(MAX_THREADS_IDLE_EDEFAULT);
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION:
+			case MulePackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION:
 				unsetPoolExhaustedAction();
 				return;
-			case SchemaPackage.THREADING_PROFILE_TYPE__THREAD_TTL:
+			case MulePackage.THREADING_PROFILE_TYPE__THREAD_TTL:
 				setThreadTTL(THREAD_TTL_EDEFAULT);
+				return;
+			case MulePackage.THREADING_PROFILE_TYPE__THREAD_WAIT_TIMEOUT:
+				setThreadWaitTimeout(THREAD_WAIT_TIMEOUT_EDEFAULT);
 				return;
 		}
 		eDynamicUnset(eFeature);
@@ -599,22 +649,24 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.THREADING_PROFILE_TYPE__MIXED:
+			case MulePackage.THREADING_PROFILE_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.THREADING_PROFILE_TYPE__DO_THREADING:
+			case MulePackage.THREADING_PROFILE_TYPE__DO_THREADING:
 				return isSetDoThreading();
-			case SchemaPackage.THREADING_PROFILE_TYPE__ID:
+			case MulePackage.THREADING_PROFILE_TYPE__ID:
 				return isSetId();
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_BUFFER_SIZE:
 				return MAX_BUFFER_SIZE_EDEFAULT == null ? maxBufferSize != null : !MAX_BUFFER_SIZE_EDEFAULT.equals(maxBufferSize);
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_ACTIVE:
 				return MAX_THREADS_ACTIVE_EDEFAULT == null ? maxThreadsActive != null : !MAX_THREADS_ACTIVE_EDEFAULT.equals(maxThreadsActive);
-			case SchemaPackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE:
+			case MulePackage.THREADING_PROFILE_TYPE__MAX_THREADS_IDLE:
 				return MAX_THREADS_IDLE_EDEFAULT == null ? maxThreadsIdle != null : !MAX_THREADS_IDLE_EDEFAULT.equals(maxThreadsIdle);
-			case SchemaPackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION:
+			case MulePackage.THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION:
 				return isSetPoolExhaustedAction();
-			case SchemaPackage.THREADING_PROFILE_TYPE__THREAD_TTL:
+			case MulePackage.THREADING_PROFILE_TYPE__THREAD_TTL:
 				return THREAD_TTL_EDEFAULT == null ? threadTTL != null : !THREAD_TTL_EDEFAULT.equals(threadTTL);
+			case MulePackage.THREADING_PROFILE_TYPE__THREAD_WAIT_TIMEOUT:
+				return THREAD_WAIT_TIMEOUT_EDEFAULT == null ? threadWaitTimeout != null : !THREAD_WAIT_TIMEOUT_EDEFAULT.equals(threadWaitTimeout);
 		}
 		return eDynamicIsSet(eFeature);
 	}
@@ -644,6 +696,8 @@ public class ThreadingProfileTypeImpl extends EObjectImpl implements ThreadingPr
 		if (poolExhaustedActionESet) result.append(poolExhaustedAction); else result.append("<unset>");
 		result.append(", threadTTL: ");
 		result.append(threadTTL);
+		result.append(", threadWaitTimeout: ");
+		result.append(threadWaitTimeout);
 		result.append(')');
 		return result.toString();
 	}

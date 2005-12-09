@@ -26,10 +26,11 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  *   <li>{@link org.mule.schema.ThreadingProfileType#getMaxThreadsIdle <em>Max Threads Idle</em>}</li>
  *   <li>{@link org.mule.schema.ThreadingProfileType#getPoolExhaustedAction <em>Pool Exhausted Action</em>}</li>
  *   <li>{@link org.mule.schema.ThreadingProfileType#getThreadTTL <em>Thread TTL</em>}</li>
+ *   <li>{@link org.mule.schema.ThreadingProfileType#getThreadWaitTimeout <em>Thread Wait Timeout</em>}</li>
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getThreadingProfileType()
+ * @see org.mule.schema.MulePackage#getThreadingProfileType()
  * @model extendedMetaData="name='threading-profileType' kind='mixed'"
  * @generated
  */
@@ -44,7 +45,7 @@ public interface ThreadingProfileType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getThreadingProfileType_Mixed()
+	 * @see org.mule.schema.MulePackage#getThreadingProfileType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -64,9 +65,9 @@ public interface ThreadingProfileType extends EObject {
 	 * @see #isSetDoThreading()
 	 * @see #unsetDoThreading()
 	 * @see #setDoThreading(boolean)
-	 * @see org.mule.schema.SchemaPackage#getThreadingProfileType_DoThreading()
+	 * @see org.mule.schema.MulePackage#getThreadingProfileType_DoThreading()
 	 * @model default="true" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='doThreading'"
+	 *        extendedMetaData="kind='attribute' name='doThreading' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isDoThreading();
@@ -121,9 +122,9 @@ public interface ThreadingProfileType extends EObject {
 	 * @see #isSetId()
 	 * @see #unsetId()
 	 * @see #setId(IdType)
-	 * @see org.mule.schema.SchemaPackage#getThreadingProfileType_Id()
+	 * @see org.mule.schema.MulePackage#getThreadingProfileType_Id()
 	 * @model default="default" unique="false" unsettable="true"
-	 *        extendedMetaData="kind='attribute' name='id'"
+	 *        extendedMetaData="kind='attribute' name='id' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	IdType getId();
@@ -174,9 +175,9 @@ public interface ThreadingProfileType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Max Buffer Size</em>' attribute.
 	 * @see #setMaxBufferSize(String)
-	 * @see org.mule.schema.SchemaPackage#getThreadingProfileType_MaxBufferSize()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='maxBufferSize'"
+	 * @see org.mule.schema.MulePackage#getThreadingProfileType_MaxBufferSize()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='maxBufferSize' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getMaxBufferSize();
@@ -201,9 +202,9 @@ public interface ThreadingProfileType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Max Threads Active</em>' attribute.
 	 * @see #setMaxThreadsActive(String)
-	 * @see org.mule.schema.SchemaPackage#getThreadingProfileType_MaxThreadsActive()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='maxThreadsActive'"
+	 * @see org.mule.schema.MulePackage#getThreadingProfileType_MaxThreadsActive()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='maxThreadsActive' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getMaxThreadsActive();
@@ -228,9 +229,9 @@ public interface ThreadingProfileType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Max Threads Idle</em>' attribute.
 	 * @see #setMaxThreadsIdle(String)
-	 * @see org.mule.schema.SchemaPackage#getThreadingProfileType_MaxThreadsIdle()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='maxThreadsIdle'"
+	 * @see org.mule.schema.MulePackage#getThreadingProfileType_MaxThreadsIdle()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='maxThreadsIdle' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getMaxThreadsIdle();
@@ -260,9 +261,9 @@ public interface ThreadingProfileType extends EObject {
 	 * @see #isSetPoolExhaustedAction()
 	 * @see #unsetPoolExhaustedAction()
 	 * @see #setPoolExhaustedAction(PoolExhaustedActionType)
-	 * @see org.mule.schema.SchemaPackage#getThreadingProfileType_PoolExhaustedAction()
+	 * @see org.mule.schema.MulePackage#getThreadingProfileType_PoolExhaustedAction()
 	 * @model default="RUN" unique="false" unsettable="true"
-	 *        extendedMetaData="kind='attribute' name='poolExhaustedAction'"
+	 *        extendedMetaData="kind='attribute' name='poolExhaustedAction' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	PoolExhaustedActionType getPoolExhaustedAction();
@@ -313,9 +314,9 @@ public interface ThreadingProfileType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Thread TTL</em>' attribute.
 	 * @see #setThreadTTL(String)
-	 * @see org.mule.schema.SchemaPackage#getThreadingProfileType_ThreadTTL()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='threadTTL'"
+	 * @see org.mule.schema.MulePackage#getThreadingProfileType_ThreadTTL()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='threadTTL' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getThreadTTL();
@@ -329,5 +330,32 @@ public interface ThreadingProfileType extends EObject {
 	 * @generated
 	 */
 	void setThreadTTL(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Thread Wait Timeout</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Thread Wait Timeout</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Thread Wait Timeout</em>' attribute.
+	 * @see #setThreadWaitTimeout(String)
+	 * @see org.mule.schema.MulePackage#getThreadingProfileType_ThreadWaitTimeout()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='threadWaitTimeout' namespace='##targetNamespace'"
+	 * @generated
+	 */
+	String getThreadWaitTimeout();
+
+	/**
+	 * Sets the value of the '{@link org.mule.schema.ThreadingProfileType#getThreadWaitTimeout <em>Thread Wait Timeout</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Thread Wait Timeout</em>' attribute.
+	 * @see #getThreadWaitTimeout()
+	 * @generated
+	 */
+	void setThreadWaitTimeout(String value);
 
 } // ThreadingProfileType

@@ -23,8 +23,8 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.AgentType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -129,7 +129,7 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getAgentType();
+		return MulePackage.eINSTANCE.getAgentType();
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.AGENT_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.AGENT_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -150,7 +150,7 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getAgentType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getAgentType_Properties(), true);
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getAgentType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getAgentType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getAgentType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getAgentType_Properties(), newProperties);
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.AGENT_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.AGENT_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.AGENT_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.AGENT_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -231,7 +231,7 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 		String oldRef = ref;
 		ref = newRef;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.AGENT_TYPE__REF, oldRef, ref));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.AGENT_TYPE__REF, oldRef, ref));
 	}
 
 	/**
@@ -242,9 +242,9 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.AGENT_TYPE__MIXED:
+				case MulePackage.AGENT_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.AGENT_TYPE__PROPERTIES:
+				case MulePackage.AGENT_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -260,15 +260,15 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.AGENT_TYPE__MIXED:
+			case MulePackage.AGENT_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.AGENT_TYPE__PROPERTIES:
+			case MulePackage.AGENT_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.AGENT_TYPE__CLASS_NAME:
+			case MulePackage.AGENT_TYPE__CLASS_NAME:
 				return getClassName();
-			case SchemaPackage.AGENT_TYPE__NAME:
+			case MulePackage.AGENT_TYPE__NAME:
 				return getName();
-			case SchemaPackage.AGENT_TYPE__REF:
+			case MulePackage.AGENT_TYPE__REF:
 				return getRef();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -281,20 +281,20 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.AGENT_TYPE__MIXED:
+			case MulePackage.AGENT_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.AGENT_TYPE__PROPERTIES:
+			case MulePackage.AGENT_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.AGENT_TYPE__CLASS_NAME:
+			case MulePackage.AGENT_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
-			case SchemaPackage.AGENT_TYPE__NAME:
+			case MulePackage.AGENT_TYPE__NAME:
 				setName((String)newValue);
 				return;
-			case SchemaPackage.AGENT_TYPE__REF:
+			case MulePackage.AGENT_TYPE__REF:
 				setRef((String)newValue);
 				return;
 		}
@@ -308,19 +308,19 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.AGENT_TYPE__MIXED:
+			case MulePackage.AGENT_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.AGENT_TYPE__PROPERTIES:
+			case MulePackage.AGENT_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.AGENT_TYPE__CLASS_NAME:
+			case MulePackage.AGENT_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
-			case SchemaPackage.AGENT_TYPE__NAME:
+			case MulePackage.AGENT_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case SchemaPackage.AGENT_TYPE__REF:
+			case MulePackage.AGENT_TYPE__REF:
 				setRef(REF_EDEFAULT);
 				return;
 		}
@@ -334,15 +334,15 @@ public class AgentTypeImpl extends EObjectImpl implements AgentType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.AGENT_TYPE__MIXED:
+			case MulePackage.AGENT_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.AGENT_TYPE__PROPERTIES:
+			case MulePackage.AGENT_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.AGENT_TYPE__CLASS_NAME:
+			case MulePackage.AGENT_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
-			case SchemaPackage.AGENT_TYPE__NAME:
+			case MulePackage.AGENT_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case SchemaPackage.AGENT_TYPE__REF:
+			case MulePackage.AGENT_TYPE__REF:
 				return REF_EDEFAULT == null ? ref != null : !REF_EDEFAULT.equals(ref);
 		}
 		return eDynamicIsSet(eFeature);

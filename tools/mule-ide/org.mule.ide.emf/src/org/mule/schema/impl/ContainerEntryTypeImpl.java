@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.ContainerEntryType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -115,7 +115,7 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getContainerEntryType();
+		return MulePackage.eINSTANCE.getContainerEntryType();
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.CONTAINER_ENTRY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.CONTAINER_ENTRY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -148,7 +148,7 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 		String oldReference = reference;
 		reference = newReference;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.CONTAINER_ENTRY_TYPE__REFERENCE, oldReference, reference));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.CONTAINER_ENTRY_TYPE__REFERENCE, oldReference, reference));
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 		boolean oldRequiredESet = requiredESet;
 		requiredESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.CONTAINER_ENTRY_TYPE__REQUIRED, oldRequired, required, !oldRequiredESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.CONTAINER_ENTRY_TYPE__REQUIRED, oldRequired, required, !oldRequiredESet));
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 		required = REQUIRED_EDEFAULT;
 		requiredESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.CONTAINER_ENTRY_TYPE__REQUIRED, oldRequired, REQUIRED_EDEFAULT, oldRequiredESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.CONTAINER_ENTRY_TYPE__REQUIRED, oldRequired, REQUIRED_EDEFAULT, oldRequiredESet));
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.CONTAINER_ENTRY_TYPE__MIXED:
+				case MulePackage.CONTAINER_ENTRY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -221,11 +221,11 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__MIXED:
+			case MulePackage.CONTAINER_ENTRY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__REFERENCE:
+			case MulePackage.CONTAINER_ENTRY_TYPE__REFERENCE:
 				return getReference();
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__REQUIRED:
+			case MulePackage.CONTAINER_ENTRY_TYPE__REQUIRED:
 				return isRequired() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -238,14 +238,14 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__MIXED:
+			case MulePackage.CONTAINER_ENTRY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__REFERENCE:
+			case MulePackage.CONTAINER_ENTRY_TYPE__REFERENCE:
 				setReference((String)newValue);
 				return;
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__REQUIRED:
+			case MulePackage.CONTAINER_ENTRY_TYPE__REQUIRED:
 				setRequired(((Boolean)newValue).booleanValue());
 				return;
 		}
@@ -259,13 +259,13 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__MIXED:
+			case MulePackage.CONTAINER_ENTRY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__REFERENCE:
+			case MulePackage.CONTAINER_ENTRY_TYPE__REFERENCE:
 				setReference(REFERENCE_EDEFAULT);
 				return;
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__REQUIRED:
+			case MulePackage.CONTAINER_ENTRY_TYPE__REQUIRED:
 				unsetRequired();
 				return;
 		}
@@ -279,11 +279,11 @@ public class ContainerEntryTypeImpl extends EObjectImpl implements ContainerEntr
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__MIXED:
+			case MulePackage.CONTAINER_ENTRY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__REFERENCE:
+			case MulePackage.CONTAINER_ENTRY_TYPE__REFERENCE:
 				return REFERENCE_EDEFAULT == null ? reference != null : !REFERENCE_EDEFAULT.equals(reference);
-			case SchemaPackage.CONTAINER_ENTRY_TYPE__REQUIRED:
+			case MulePackage.CONTAINER_ENTRY_TYPE__REQUIRED:
 				return isSetRequired();
 		}
 		return eDynamicIsSet(eFeature);

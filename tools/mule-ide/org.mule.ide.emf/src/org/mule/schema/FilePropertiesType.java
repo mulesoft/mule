@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getFilePropertiesType()
+ * @see org.mule.schema.MulePackage#getFilePropertiesType()
  * @model extendedMetaData="name='file-propertiesType' kind='mixed'"
  * @generated
  */
@@ -39,7 +39,7 @@ public interface FilePropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getFilePropertiesType_Mixed()
+	 * @see org.mule.schema.MulePackage#getFilePropertiesType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -56,9 +56,9 @@ public interface FilePropertiesType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Location</em>' attribute.
 	 * @see #setLocation(String)
-	 * @see org.mule.schema.SchemaPackage#getFilePropertiesType_Location()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='location'"
+	 * @see org.mule.schema.MulePackage#getFilePropertiesType_Location()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='location' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getLocation();
@@ -86,9 +86,9 @@ public interface FilePropertiesType extends EObject {
 	 * @see #isSetOverride()
 	 * @see #unsetOverride()
 	 * @see #setOverride(boolean)
-	 * @see org.mule.schema.SchemaPackage#getFilePropertiesType_Override()
+	 * @see org.mule.schema.MulePackage#getFilePropertiesType_Override()
 	 * @model default="true" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='override'"
+	 *        extendedMetaData="kind='attribute' name='override' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isOverride();

@@ -23,8 +23,8 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.ComponentPoolFactoryType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -87,7 +87,7 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getComponentPoolFactoryType();
+		return MulePackage.eINSTANCE.getComponentPoolFactoryType();
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.COMPONENT_POOL_FACTORY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -108,7 +108,7 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getComponentPoolFactoryType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getComponentPoolFactoryType_Properties(), true);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getComponentPoolFactoryType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getComponentPoolFactoryType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getComponentPoolFactoryType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getComponentPoolFactoryType_Properties(), newProperties);
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -158,9 +158,9 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
+				case MulePackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
+				case MulePackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -176,11 +176,11 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME:
 				return getClassName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -193,14 +193,14 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
 		}
@@ -214,13 +214,13 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
 		}
@@ -234,11 +234,11 @@ public class ComponentPoolFactoryTypeImpl extends EObjectImpl implements Compone
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
 		}
 		return eDynamicIsSet(eFeature);

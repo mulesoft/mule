@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.FactoryEntryType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -85,7 +85,7 @@ public class FactoryEntryTypeImpl extends EObjectImpl implements FactoryEntryTyp
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getFactoryEntryType();
+		return MulePackage.eINSTANCE.getFactoryEntryType();
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class FactoryEntryTypeImpl extends EObjectImpl implements FactoryEntryTyp
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.FACTORY_ENTRY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.FACTORY_ENTRY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -118,7 +118,7 @@ public class FactoryEntryTypeImpl extends EObjectImpl implements FactoryEntryTyp
 		String oldFactory = factory;
 		factory = newFactory;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.FACTORY_ENTRY_TYPE__FACTORY, oldFactory, factory));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.FACTORY_ENTRY_TYPE__FACTORY, oldFactory, factory));
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class FactoryEntryTypeImpl extends EObjectImpl implements FactoryEntryTyp
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.FACTORY_ENTRY_TYPE__MIXED:
+				case MulePackage.FACTORY_ENTRY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -145,9 +145,9 @@ public class FactoryEntryTypeImpl extends EObjectImpl implements FactoryEntryTyp
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FACTORY_ENTRY_TYPE__MIXED:
+			case MulePackage.FACTORY_ENTRY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.FACTORY_ENTRY_TYPE__FACTORY:
+			case MulePackage.FACTORY_ENTRY_TYPE__FACTORY:
 				return getFactory();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -160,11 +160,11 @@ public class FactoryEntryTypeImpl extends EObjectImpl implements FactoryEntryTyp
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FACTORY_ENTRY_TYPE__MIXED:
+			case MulePackage.FACTORY_ENTRY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.FACTORY_ENTRY_TYPE__FACTORY:
+			case MulePackage.FACTORY_ENTRY_TYPE__FACTORY:
 				setFactory((String)newValue);
 				return;
 		}
@@ -178,10 +178,10 @@ public class FactoryEntryTypeImpl extends EObjectImpl implements FactoryEntryTyp
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FACTORY_ENTRY_TYPE__MIXED:
+			case MulePackage.FACTORY_ENTRY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.FACTORY_ENTRY_TYPE__FACTORY:
+			case MulePackage.FACTORY_ENTRY_TYPE__FACTORY:
 				setFactory(FACTORY_EDEFAULT);
 				return;
 		}
@@ -195,9 +195,9 @@ public class FactoryEntryTypeImpl extends EObjectImpl implements FactoryEntryTyp
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.FACTORY_ENTRY_TYPE__MIXED:
+			case MulePackage.FACTORY_ENTRY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.FACTORY_ENTRY_TYPE__FACTORY:
+			case MulePackage.FACTORY_ENTRY_TYPE__FACTORY:
 				return FACTORY_EDEFAULT == null ? factory != null : !FACTORY_EDEFAULT.equals(factory);
 		}
 		return eDynamicIsSet(eFeature);

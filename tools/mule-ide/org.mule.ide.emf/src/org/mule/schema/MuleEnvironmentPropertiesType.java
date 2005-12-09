@@ -14,7 +14,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Mule Environment Properties Type</b></em>'.
+ * A representation of the model object '<em><b>Environment Properties Type</b></em>'.
  * <!-- end-user-doc -->
  *
  * <p>
@@ -27,18 +27,21 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#getPersistenceStrategy <em>Persistence Strategy</em>}</li>
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#getConnectionStrategy <em>Connection Strategy</em>}</li>
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#isClientMode <em>Client Mode</em>}</li>
+ *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#isEmbedded <em>Embedded</em>}</li>
+ *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#isEnableMessageEvents <em>Enable Message Events</em>}</li>
+ *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#getEncoding <em>Encoding</em>}</li>
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#getModel <em>Model</em>}</li>
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#isRecoverableMode <em>Recoverable Mode</em>}</li>
+ *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#isRemoteSync <em>Remote Sync</em>}</li>
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#getServerUrl <em>Server Url</em>}</li>
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#isSynchronous <em>Synchronous</em>}</li>
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#getSynchronousEventTimeout <em>Synchronous Event Timeout</em>}</li>
- *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#isSynchronousReceive <em>Synchronous Receive</em>}</li>
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#getTransactionTimeout <em>Transaction Timeout</em>}</li>
  *   <li>{@link org.mule.schema.MuleEnvironmentPropertiesType#getWorkingDirectory <em>Working Directory</em>}</li>
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType()
+ * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType()
  * @model extendedMetaData="name='mule-environment-propertiesType' kind='mixed'"
  * @generated
  */
@@ -53,7 +56,7 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_Mixed()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -70,7 +73,7 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Threading Profile</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_ThreadingProfile()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_ThreadingProfile()
 	 * @model type="org.mule.schema.ThreadingProfileType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='threading-profile' namespace='##targetNamespace'"
 	 * @generated
@@ -87,7 +90,7 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Pooling Profile</em>' containment reference.
 	 * @see #setPoolingProfile(PoolingProfileType)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_PoolingProfile()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_PoolingProfile()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='pooling-profile' namespace='##targetNamespace'"
 	 * @generated
@@ -114,7 +117,7 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Queue Profile</em>' containment reference.
 	 * @see #setQueueProfile(QueueProfileType)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_QueueProfile()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_QueueProfile()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='queue-profile' namespace='##targetNamespace'"
 	 * @generated
@@ -141,7 +144,7 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Persistence Strategy</em>' containment reference.
 	 * @see #setPersistenceStrategy(PersistenceStrategyType)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_PersistenceStrategy()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_PersistenceStrategy()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='persistence-strategy' namespace='##targetNamespace'"
 	 * @generated
@@ -168,7 +171,7 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Connection Strategy</em>' containment reference.
 	 * @see #setConnectionStrategy(ConnectionStrategyType)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_ConnectionStrategy()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_ConnectionStrategy()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='connection-strategy' namespace='##targetNamespace'"
 	 * @generated
@@ -198,9 +201,9 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * @see #isSetClientMode()
 	 * @see #unsetClientMode()
 	 * @see #setClientMode(boolean)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_ClientMode()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_ClientMode()
 	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='clientMode'"
+	 *        extendedMetaData="kind='attribute' name='clientMode' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isClientMode();
@@ -241,6 +244,143 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	boolean isSetClientMode();
 
 	/**
+	 * Returns the value of the '<em><b>Embedded</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Embedded</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Embedded</em>' attribute.
+	 * @see #isSetEmbedded()
+	 * @see #unsetEmbedded()
+	 * @see #setEmbedded(boolean)
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_Embedded()
+	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 *        extendedMetaData="kind='attribute' name='embedded' namespace='##targetNamespace'"
+	 * @generated
+	 */
+	boolean isEmbedded();
+
+	/**
+	 * Sets the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isEmbedded <em>Embedded</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Embedded</em>' attribute.
+	 * @see #isSetEmbedded()
+	 * @see #unsetEmbedded()
+	 * @see #isEmbedded()
+	 * @generated
+	 */
+	void setEmbedded(boolean value);
+
+	/**
+	 * Unsets the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isEmbedded <em>Embedded</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isSetEmbedded()
+	 * @see #isEmbedded()
+	 * @see #setEmbedded(boolean)
+	 * @generated
+	 */
+	void unsetEmbedded();
+
+	/**
+	 * Returns whether the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isEmbedded <em>Embedded</em>}' attribute is set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return whether the value of the '<em>Embedded</em>' attribute is set.
+	 * @see #unsetEmbedded()
+	 * @see #isEmbedded()
+	 * @see #setEmbedded(boolean)
+	 * @generated
+	 */
+	boolean isSetEmbedded();
+
+	/**
+	 * Returns the value of the '<em><b>Enable Message Events</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Enable Message Events</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Enable Message Events</em>' attribute.
+	 * @see #isSetEnableMessageEvents()
+	 * @see #unsetEnableMessageEvents()
+	 * @see #setEnableMessageEvents(boolean)
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_EnableMessageEvents()
+	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 *        extendedMetaData="kind='attribute' name='enableMessageEvents' namespace='##targetNamespace'"
+	 * @generated
+	 */
+	boolean isEnableMessageEvents();
+
+	/**
+	 * Sets the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isEnableMessageEvents <em>Enable Message Events</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Enable Message Events</em>' attribute.
+	 * @see #isSetEnableMessageEvents()
+	 * @see #unsetEnableMessageEvents()
+	 * @see #isEnableMessageEvents()
+	 * @generated
+	 */
+	void setEnableMessageEvents(boolean value);
+
+	/**
+	 * Unsets the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isEnableMessageEvents <em>Enable Message Events</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isSetEnableMessageEvents()
+	 * @see #isEnableMessageEvents()
+	 * @see #setEnableMessageEvents(boolean)
+	 * @generated
+	 */
+	void unsetEnableMessageEvents();
+
+	/**
+	 * Returns whether the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isEnableMessageEvents <em>Enable Message Events</em>}' attribute is set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return whether the value of the '<em>Enable Message Events</em>' attribute is set.
+	 * @see #unsetEnableMessageEvents()
+	 * @see #isEnableMessageEvents()
+	 * @see #setEnableMessageEvents(boolean)
+	 * @generated
+	 */
+	boolean isSetEnableMessageEvents();
+
+	/**
+	 * Returns the value of the '<em><b>Encoding</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Encoding</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Encoding</em>' attribute.
+	 * @see #setEncoding(String)
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_Encoding()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='encoding' namespace='##targetNamespace'"
+	 * @generated
+	 */
+	String getEncoding();
+
+	/**
+	 * Sets the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#getEncoding <em>Encoding</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Encoding</em>' attribute.
+	 * @see #getEncoding()
+	 * @generated
+	 */
+	void setEncoding(String value);
+
+	/**
 	 * Returns the value of the '<em><b>Model</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
@@ -250,9 +390,9 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Model</em>' attribute.
 	 * @see #setModel(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_Model()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_Model()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='model'"
+	 *        extendedMetaData="kind='attribute' name='model' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getModel();
@@ -280,9 +420,9 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * @see #isSetRecoverableMode()
 	 * @see #unsetRecoverableMode()
 	 * @see #setRecoverableMode(boolean)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_RecoverableMode()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_RecoverableMode()
 	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='recoverableMode'"
+	 *        extendedMetaData="kind='attribute' name='recoverableMode' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isRecoverableMode();
@@ -323,6 +463,61 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	boolean isSetRecoverableMode();
 
 	/**
+	 * Returns the value of the '<em><b>Remote Sync</b></em>' attribute.
+	 * The default value is <code>"false"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Remote Sync</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Remote Sync</em>' attribute.
+	 * @see #isSetRemoteSync()
+	 * @see #unsetRemoteSync()
+	 * @see #setRemoteSync(boolean)
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_RemoteSync()
+	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 *        extendedMetaData="kind='attribute' name='remoteSync' namespace='##targetNamespace'"
+	 * @generated
+	 */
+	boolean isRemoteSync();
+
+	/**
+	 * Sets the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isRemoteSync <em>Remote Sync</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Remote Sync</em>' attribute.
+	 * @see #isSetRemoteSync()
+	 * @see #unsetRemoteSync()
+	 * @see #isRemoteSync()
+	 * @generated
+	 */
+	void setRemoteSync(boolean value);
+
+	/**
+	 * Unsets the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isRemoteSync <em>Remote Sync</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isSetRemoteSync()
+	 * @see #isRemoteSync()
+	 * @see #setRemoteSync(boolean)
+	 * @generated
+	 */
+	void unsetRemoteSync();
+
+	/**
+	 * Returns whether the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isRemoteSync <em>Remote Sync</em>}' attribute is set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return whether the value of the '<em>Remote Sync</em>' attribute is set.
+	 * @see #unsetRemoteSync()
+	 * @see #isRemoteSync()
+	 * @see #setRemoteSync(boolean)
+	 * @generated
+	 */
+	boolean isSetRemoteSync();
+
+	/**
 	 * Returns the value of the '<em><b>Server Url</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
@@ -332,9 +527,9 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Server Url</em>' attribute.
 	 * @see #setServerUrl(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_ServerUrl()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_ServerUrl()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='serverUrl'"
+	 *        extendedMetaData="kind='attribute' name='serverUrl' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getServerUrl();
@@ -362,9 +557,9 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * @see #isSetSynchronous()
 	 * @see #unsetSynchronous()
 	 * @see #setSynchronous(boolean)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_Synchronous()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_Synchronous()
 	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='synchronous'"
+	 *        extendedMetaData="kind='attribute' name='synchronous' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isSynchronous();
@@ -414,9 +609,9 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Synchronous Event Timeout</em>' attribute.
 	 * @see #setSynchronousEventTimeout(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_SynchronousEventTimeout()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='synchronousEventTimeout'"
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_SynchronousEventTimeout()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='synchronousEventTimeout' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getSynchronousEventTimeout();
@@ -432,61 +627,6 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	void setSynchronousEventTimeout(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Synchronous Receive</b></em>' attribute.
-	 * The default value is <code>"false"</code>.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Synchronous Receive</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Synchronous Receive</em>' attribute.
-	 * @see #isSetSynchronousReceive()
-	 * @see #unsetSynchronousReceive()
-	 * @see #setSynchronousReceive(boolean)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_SynchronousReceive()
-	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='synchronousReceive'"
-	 * @generated
-	 */
-	boolean isSynchronousReceive();
-
-	/**
-	 * Sets the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isSynchronousReceive <em>Synchronous Receive</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Synchronous Receive</em>' attribute.
-	 * @see #isSetSynchronousReceive()
-	 * @see #unsetSynchronousReceive()
-	 * @see #isSynchronousReceive()
-	 * @generated
-	 */
-	void setSynchronousReceive(boolean value);
-
-	/**
-	 * Unsets the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isSynchronousReceive <em>Synchronous Receive</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isSetSynchronousReceive()
-	 * @see #isSynchronousReceive()
-	 * @see #setSynchronousReceive(boolean)
-	 * @generated
-	 */
-	void unsetSynchronousReceive();
-
-	/**
-	 * Returns whether the value of the '{@link org.mule.schema.MuleEnvironmentPropertiesType#isSynchronousReceive <em>Synchronous Receive</em>}' attribute is set.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return whether the value of the '<em>Synchronous Receive</em>' attribute is set.
-	 * @see #unsetSynchronousReceive()
-	 * @see #isSynchronousReceive()
-	 * @see #setSynchronousReceive(boolean)
-	 * @generated
-	 */
-	boolean isSetSynchronousReceive();
-
-	/**
 	 * Returns the value of the '<em><b>Transaction Timeout</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
@@ -496,9 +636,9 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Transaction Timeout</em>' attribute.
 	 * @see #setTransactionTimeout(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_TransactionTimeout()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='transactionTimeout'"
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_TransactionTimeout()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='transactionTimeout' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getTransactionTimeout();
@@ -526,9 +666,9 @@ public interface MuleEnvironmentPropertiesType extends EObject {
 	 * @see #isSetWorkingDirectory()
 	 * @see #unsetWorkingDirectory()
 	 * @see #setWorkingDirectory(String)
-	 * @see org.mule.schema.SchemaPackage#getMuleEnvironmentPropertiesType_WorkingDirectory()
+	 * @see org.mule.schema.MulePackage#getMuleEnvironmentPropertiesType_WorkingDirectory()
 	 * @model default="./.mule" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='workingDirectory'"
+	 *        extendedMetaData="kind='attribute' name='workingDirectory' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getWorkingDirectory();

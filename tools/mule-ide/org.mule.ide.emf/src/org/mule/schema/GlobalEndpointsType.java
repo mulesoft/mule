@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getGlobalEndpointsType()
+ * @see org.mule.schema.MulePackage#getGlobalEndpointsType()
  * @model extendedMetaData="name='global-endpointsType' kind='mixed'"
  * @generated
  */
@@ -40,7 +40,7 @@ public interface GlobalEndpointsType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getGlobalEndpointsType_Mixed()
+	 * @see org.mule.schema.MulePackage#getGlobalEndpointsType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -57,7 +57,7 @@ public interface GlobalEndpointsType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Endpoint</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getGlobalEndpointsType_Endpoint()
+	 * @see org.mule.schema.MulePackage#getGlobalEndpointsType_Endpoint()
 	 * @model type="org.mule.schema.EndpointType" containment="true" resolveProxies="false" required="true" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='endpoint' namespace='##targetNamespace'"
 	 * @generated

@@ -29,7 +29,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getInboundRouterType()
+ * @see org.mule.schema.MulePackage#getInboundRouterType()
  * @model extendedMetaData="name='inbound-routerType' kind='mixed'"
  * @generated
  */
@@ -44,7 +44,7 @@ public interface InboundRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getInboundRouterType_Mixed()
+	 * @see org.mule.schema.MulePackage#getInboundRouterType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -61,7 +61,7 @@ public interface InboundRouterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Catch All Strategy</em>' containment reference.
 	 * @see #setCatchAllStrategy(CatchAllStrategyType)
-	 * @see org.mule.schema.SchemaPackage#getInboundRouterType_CatchAllStrategy()
+	 * @see org.mule.schema.MulePackage#getInboundRouterType_CatchAllStrategy()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='catch-all-strategy' namespace='##targetNamespace'"
 	 * @generated
@@ -88,7 +88,7 @@ public interface InboundRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Endpoint</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getInboundRouterType_Endpoint()
+	 * @see org.mule.schema.MulePackage#getInboundRouterType_Endpoint()
 	 * @model type="org.mule.schema.EndpointType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -105,7 +105,7 @@ public interface InboundRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Global Endpoint</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getInboundRouterType_GlobalEndpoint()
+	 * @see org.mule.schema.MulePackage#getInboundRouterType_GlobalEndpoint()
 	 * @model type="org.mule.schema.GlobalEndpointType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='global-endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -122,7 +122,7 @@ public interface InboundRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Router</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getInboundRouterType_Router()
+	 * @see org.mule.schema.MulePackage#getInboundRouterType_Router()
 	 * @model type="org.mule.schema.RouterType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='router' namespace='##targetNamespace'"
 	 * @generated
@@ -142,9 +142,9 @@ public interface InboundRouterType extends EObject {
 	 * @see #isSetMatchAll()
 	 * @see #unsetMatchAll()
 	 * @see #setMatchAll(boolean)
-	 * @see org.mule.schema.SchemaPackage#getInboundRouterType_MatchAll()
+	 * @see org.mule.schema.MulePackage#getInboundRouterType_MatchAll()
 	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='matchAll'"
+	 *        extendedMetaData="kind='attribute' name='matchAll' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isMatchAll();

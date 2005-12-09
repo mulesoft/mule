@@ -27,7 +27,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.DocumentRoot;
 import org.mule.schema.MuleConfigurationType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -91,7 +91,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getDocumentRoot();
+		return MulePackage.eINSTANCE.getDocumentRoot();
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.DOCUMENT_ROOT__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.DOCUMENT_ROOT__MIXED);
 		}
 		return mixed;
 	}
@@ -113,7 +113,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 */
 	public EMap getXMLNSPrefixMap() {
 		if (xMLNSPrefixMap == null) {
-			xMLNSPrefixMap = new EcoreEMap(EcorePackage.eINSTANCE.getEStringToStringMapEntry(), EStringToStringMapEntryImpl.class, this, SchemaPackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP);
+			xMLNSPrefixMap = new EcoreEMap(EcorePackage.eINSTANCE.getEStringToStringMapEntry(), EStringToStringMapEntryImpl.class, this, MulePackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP);
 		}
 		return xMLNSPrefixMap;
 	}
@@ -125,7 +125,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 */
 	public EMap getXSISchemaLocation() {
 		if (xSISchemaLocation == null) {
-			xSISchemaLocation = new EcoreEMap(EcorePackage.eINSTANCE.getEStringToStringMapEntry(), EStringToStringMapEntryImpl.class, this, SchemaPackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION);
+			xSISchemaLocation = new EcoreEMap(EcorePackage.eINSTANCE.getEStringToStringMapEntry(), EStringToStringMapEntryImpl.class, this, MulePackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION);
 		}
 		return xSISchemaLocation;
 	}
@@ -136,7 +136,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 * @generated
 	 */
 	public MuleConfigurationType getMuleConfiguration() {
-		return (MuleConfigurationType)getMixed().get(SchemaPackage.eINSTANCE.getDocumentRoot_MuleConfiguration(), true);
+		return (MuleConfigurationType)getMixed().get(MulePackage.eINSTANCE.getDocumentRoot_MuleConfiguration(), true);
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 * @generated
 	 */
 	public NotificationChain basicSetMuleConfiguration(MuleConfigurationType newMuleConfiguration, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getDocumentRoot_MuleConfiguration(), newMuleConfiguration, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getDocumentRoot_MuleConfiguration(), newMuleConfiguration, msgs);
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 * @generated
 	 */
 	public void setMuleConfiguration(MuleConfigurationType newMuleConfiguration) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getDocumentRoot_MuleConfiguration(), newMuleConfiguration);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getDocumentRoot_MuleConfiguration(), newMuleConfiguration);
 	}
 
 	/**
@@ -165,13 +165,13 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.DOCUMENT_ROOT__MIXED:
+				case MulePackage.DOCUMENT_ROOT__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
+				case MulePackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
 					return ((InternalEList)getXMLNSPrefixMap()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
+				case MulePackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
 					return ((InternalEList)getXSISchemaLocation()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
+				case MulePackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
 					return basicSetMuleConfiguration(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -187,13 +187,13 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.DOCUMENT_ROOT__MIXED:
+			case MulePackage.DOCUMENT_ROOT__MIXED:
 				return getMixed();
-			case SchemaPackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
+			case MulePackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
 				return getXMLNSPrefixMap();
-			case SchemaPackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
+			case MulePackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
 				return getXSISchemaLocation();
-			case SchemaPackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
+			case MulePackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
 				return getMuleConfiguration();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -206,19 +206,19 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.DOCUMENT_ROOT__MIXED:
+			case MulePackage.DOCUMENT_ROOT__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
+			case MulePackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
 				getXMLNSPrefixMap().clear();
 				getXMLNSPrefixMap().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
+			case MulePackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
 				getXSISchemaLocation().clear();
 				getXSISchemaLocation().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
+			case MulePackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
 				setMuleConfiguration((MuleConfigurationType)newValue);
 				return;
 		}
@@ -232,16 +232,16 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.DOCUMENT_ROOT__MIXED:
+			case MulePackage.DOCUMENT_ROOT__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
+			case MulePackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
 				getXMLNSPrefixMap().clear();
 				return;
-			case SchemaPackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
+			case MulePackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
 				getXSISchemaLocation().clear();
 				return;
-			case SchemaPackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
+			case MulePackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
 				setMuleConfiguration((MuleConfigurationType)null);
 				return;
 		}
@@ -255,13 +255,13 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.DOCUMENT_ROOT__MIXED:
+			case MulePackage.DOCUMENT_ROOT__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
+			case MulePackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
 				return xMLNSPrefixMap != null && !xMLNSPrefixMap.isEmpty();
-			case SchemaPackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
+			case MulePackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
 				return xSISchemaLocation != null && !xSISchemaLocation.isEmpty();
-			case SchemaPackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
+			case MulePackage.DOCUMENT_ROOT__MULE_CONFIGURATION:
 				return getMuleConfiguration() != null;
 		}
 		return eDynamicIsSet(eFeature);

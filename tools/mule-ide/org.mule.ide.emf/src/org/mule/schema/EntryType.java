@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getEntryType()
+ * @see org.mule.schema.MulePackage#getEntryType()
  * @model extendedMetaData="name='entryType' kind='mixed'"
  * @generated
  */
@@ -38,7 +38,7 @@ public interface EntryType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getEntryType_Mixed()
+	 * @see org.mule.schema.MulePackage#getEntryType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -55,9 +55,9 @@ public interface EntryType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Value</em>' attribute.
 	 * @see #setValue(String)
-	 * @see org.mule.schema.SchemaPackage#getEntryType_Value()
+	 * @see org.mule.schema.MulePackage#getEntryType_Value()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='value'"
+	 *        extendedMetaData="kind='attribute' name='value' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getValue();

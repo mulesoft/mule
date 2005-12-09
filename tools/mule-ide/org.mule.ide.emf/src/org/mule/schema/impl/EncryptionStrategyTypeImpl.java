@@ -23,8 +23,8 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.EncryptionStrategyType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -108,7 +108,7 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getEncryptionStrategyType();
+		return MulePackage.eINSTANCE.getEncryptionStrategyType();
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.ENCRYPTION_STRATEGY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.ENCRYPTION_STRATEGY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -129,7 +129,7 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getEncryptionStrategyType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getEncryptionStrategyType_Properties(), true);
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getEncryptionStrategyType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getEncryptionStrategyType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getEncryptionStrategyType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getEncryptionStrategyType_Properties(), newProperties);
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.ENCRYPTION_STRATEGY_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.ENCRYPTION_STRATEGY_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -200,9 +200,9 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
+				case MulePackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
+				case MulePackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -218,13 +218,13 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME:
 				return getClassName();
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__NAME:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__NAME:
 				return getName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -237,17 +237,17 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__NAME:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__NAME:
 				setName((String)newValue);
 				return;
 		}
@@ -261,16 +261,16 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__NAME:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
 		}
@@ -284,13 +284,13 @@ public class EncryptionStrategyTypeImpl extends EObjectImpl implements Encryptio
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE__NAME:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return eDynamicIsSet(eFeature);

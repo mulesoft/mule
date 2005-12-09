@@ -24,8 +24,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.ExhaustedActionType;
 import org.mule.schema.InitialisationPolicyType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PoolingProfileType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -219,7 +219,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getPoolingProfileType();
+		return MulePackage.eINSTANCE.getPoolingProfileType();
 	}
 
 	/**
@@ -229,7 +229,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.POOLING_PROFILE_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.POOLING_PROFILE_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -254,7 +254,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 		boolean oldExhaustedActionESet = exhaustedActionESet;
 		exhaustedActionESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION, oldExhaustedAction, exhaustedAction, !oldExhaustedActionESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION, oldExhaustedAction, exhaustedAction, !oldExhaustedActionESet));
 	}
 
 	/**
@@ -268,7 +268,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 		exhaustedAction = EXHAUSTED_ACTION_EDEFAULT;
 		exhaustedActionESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION, oldExhaustedAction, EXHAUSTED_ACTION_EDEFAULT, oldExhaustedActionESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION, oldExhaustedAction, EXHAUSTED_ACTION_EDEFAULT, oldExhaustedActionESet));
 	}
 
 	/**
@@ -300,7 +300,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 		boolean oldFactoryESet = factoryESet;
 		factoryESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.POOLING_PROFILE_TYPE__FACTORY, oldFactory, factory, !oldFactoryESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.POOLING_PROFILE_TYPE__FACTORY, oldFactory, factory, !oldFactoryESet));
 	}
 
 	/**
@@ -314,7 +314,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 		factory = FACTORY_EDEFAULT;
 		factoryESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.POOLING_PROFILE_TYPE__FACTORY, oldFactory, FACTORY_EDEFAULT, oldFactoryESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.POOLING_PROFILE_TYPE__FACTORY, oldFactory, FACTORY_EDEFAULT, oldFactoryESet));
 	}
 
 	/**
@@ -346,7 +346,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 		boolean oldInitialisationPolicyESet = initialisationPolicyESet;
 		initialisationPolicyESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY, oldInitialisationPolicy, initialisationPolicy, !oldInitialisationPolicyESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY, oldInitialisationPolicy, initialisationPolicy, !oldInitialisationPolicyESet));
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 		initialisationPolicy = INITIALISATION_POLICY_EDEFAULT;
 		initialisationPolicyESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY, oldInitialisationPolicy, INITIALISATION_POLICY_EDEFAULT, oldInitialisationPolicyESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY, oldInitialisationPolicy, INITIALISATION_POLICY_EDEFAULT, oldInitialisationPolicyESet));
 	}
 
 	/**
@@ -390,7 +390,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 		String oldMaxActive = maxActive;
 		maxActive = newMaxActive;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.POOLING_PROFILE_TYPE__MAX_ACTIVE, oldMaxActive, maxActive));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.POOLING_PROFILE_TYPE__MAX_ACTIVE, oldMaxActive, maxActive));
 	}
 
 	/**
@@ -411,7 +411,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 		String oldMaxIdle = maxIdle;
 		maxIdle = newMaxIdle;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.POOLING_PROFILE_TYPE__MAX_IDLE, oldMaxIdle, maxIdle));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.POOLING_PROFILE_TYPE__MAX_IDLE, oldMaxIdle, maxIdle));
 	}
 
 	/**
@@ -432,7 +432,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 		String oldMaxWait = maxWait;
 		maxWait = newMaxWait;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.POOLING_PROFILE_TYPE__MAX_WAIT, oldMaxWait, maxWait));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.POOLING_PROFILE_TYPE__MAX_WAIT, oldMaxWait, maxWait));
 	}
 
 	/**
@@ -443,7 +443,7 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.POOLING_PROFILE_TYPE__MIXED:
+				case MulePackage.POOLING_PROFILE_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -459,19 +459,19 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.POOLING_PROFILE_TYPE__MIXED:
+			case MulePackage.POOLING_PROFILE_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION:
+			case MulePackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION:
 				return getExhaustedAction();
-			case SchemaPackage.POOLING_PROFILE_TYPE__FACTORY:
+			case MulePackage.POOLING_PROFILE_TYPE__FACTORY:
 				return getFactory();
-			case SchemaPackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY:
+			case MulePackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY:
 				return getInitialisationPolicy();
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_ACTIVE:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_ACTIVE:
 				return getMaxActive();
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_IDLE:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_IDLE:
 				return getMaxIdle();
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_WAIT:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_WAIT:
 				return getMaxWait();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -484,26 +484,26 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.POOLING_PROFILE_TYPE__MIXED:
+			case MulePackage.POOLING_PROFILE_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION:
+			case MulePackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION:
 				setExhaustedAction((ExhaustedActionType)newValue);
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__FACTORY:
+			case MulePackage.POOLING_PROFILE_TYPE__FACTORY:
 				setFactory((String)newValue);
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY:
+			case MulePackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY:
 				setInitialisationPolicy((InitialisationPolicyType)newValue);
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_ACTIVE:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_ACTIVE:
 				setMaxActive((String)newValue);
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_IDLE:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_IDLE:
 				setMaxIdle((String)newValue);
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_WAIT:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_WAIT:
 				setMaxWait((String)newValue);
 				return;
 		}
@@ -517,25 +517,25 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.POOLING_PROFILE_TYPE__MIXED:
+			case MulePackage.POOLING_PROFILE_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION:
+			case MulePackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION:
 				unsetExhaustedAction();
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__FACTORY:
+			case MulePackage.POOLING_PROFILE_TYPE__FACTORY:
 				unsetFactory();
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY:
+			case MulePackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY:
 				unsetInitialisationPolicy();
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_ACTIVE:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_ACTIVE:
 				setMaxActive(MAX_ACTIVE_EDEFAULT);
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_IDLE:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_IDLE:
 				setMaxIdle(MAX_IDLE_EDEFAULT);
 				return;
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_WAIT:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_WAIT:
 				setMaxWait(MAX_WAIT_EDEFAULT);
 				return;
 		}
@@ -549,19 +549,19 @@ public class PoolingProfileTypeImpl extends EObjectImpl implements PoolingProfil
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.POOLING_PROFILE_TYPE__MIXED:
+			case MulePackage.POOLING_PROFILE_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION:
+			case MulePackage.POOLING_PROFILE_TYPE__EXHAUSTED_ACTION:
 				return isSetExhaustedAction();
-			case SchemaPackage.POOLING_PROFILE_TYPE__FACTORY:
+			case MulePackage.POOLING_PROFILE_TYPE__FACTORY:
 				return isSetFactory();
-			case SchemaPackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY:
+			case MulePackage.POOLING_PROFILE_TYPE__INITIALISATION_POLICY:
 				return isSetInitialisationPolicy();
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_ACTIVE:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_ACTIVE:
 				return MAX_ACTIVE_EDEFAULT == null ? maxActive != null : !MAX_ACTIVE_EDEFAULT.equals(maxActive);
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_IDLE:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_IDLE:
 				return MAX_IDLE_EDEFAULT == null ? maxIdle != null : !MAX_IDLE_EDEFAULT.equals(maxIdle);
-			case SchemaPackage.POOLING_PROFILE_TYPE__MAX_WAIT:
+			case MulePackage.POOLING_PROFILE_TYPE__MAX_WAIT:
 				return MAX_WAIT_EDEFAULT == null ? maxWait != null : !MAX_WAIT_EDEFAULT.equals(maxWait);
 		}
 		return eDynamicIsSet(eFeature);

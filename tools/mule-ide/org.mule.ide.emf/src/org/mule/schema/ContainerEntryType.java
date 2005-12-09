@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getContainerEntryType()
+ * @see org.mule.schema.MulePackage#getContainerEntryType()
  * @model extendedMetaData="name='container-entryType' kind='mixed'"
  * @generated
  */
@@ -39,7 +39,7 @@ public interface ContainerEntryType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getContainerEntryType_Mixed()
+	 * @see org.mule.schema.MulePackage#getContainerEntryType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -56,9 +56,9 @@ public interface ContainerEntryType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Reference</em>' attribute.
 	 * @see #setReference(String)
-	 * @see org.mule.schema.SchemaPackage#getContainerEntryType_Reference()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='reference'"
+	 * @see org.mule.schema.MulePackage#getContainerEntryType_Reference()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='reference' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getReference();
@@ -86,9 +86,9 @@ public interface ContainerEntryType extends EObject {
 	 * @see #isSetRequired()
 	 * @see #unsetRequired()
 	 * @see #setRequired(boolean)
-	 * @see org.mule.schema.SchemaPackage#getContainerEntryType_Required()
+	 * @see org.mule.schema.MulePackage#getContainerEntryType_Required()
 	 * @model default="true" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='required'"
+	 *        extendedMetaData="kind='attribute' name='required' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isRequired();

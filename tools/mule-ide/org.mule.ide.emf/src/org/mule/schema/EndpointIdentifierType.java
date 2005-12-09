@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getEndpointIdentifierType()
+ * @see org.mule.schema.MulePackage#getEndpointIdentifierType()
  * @model extendedMetaData="name='endpoint-identifierType' kind='mixed'"
  * @generated
  */
@@ -39,7 +39,7 @@ public interface EndpointIdentifierType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getEndpointIdentifierType_Mixed()
+	 * @see org.mule.schema.MulePackage#getEndpointIdentifierType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -56,9 +56,9 @@ public interface EndpointIdentifierType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getEndpointIdentifierType_Name()
+	 * @see org.mule.schema.MulePackage#getEndpointIdentifierType_Name()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();
@@ -83,9 +83,9 @@ public interface EndpointIdentifierType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Value</em>' attribute.
 	 * @see #setValue(String)
-	 * @see org.mule.schema.SchemaPackage#getEndpointIdentifierType_Value()
+	 * @see org.mule.schema.MulePackage#getEndpointIdentifierType_Value()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='value'"
+	 *        extendedMetaData="kind='attribute' name='value' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getValue();

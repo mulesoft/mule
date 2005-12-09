@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.ComponentLifecycleAdapterFactoryType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -85,7 +85,7 @@ public class ComponentLifecycleAdapterFactoryTypeImpl extends EObjectImpl implem
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getComponentLifecycleAdapterFactoryType();
+		return MulePackage.eINSTANCE.getComponentLifecycleAdapterFactoryType();
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class ComponentLifecycleAdapterFactoryTypeImpl extends EObjectImpl implem
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -118,7 +118,7 @@ public class ComponentLifecycleAdapterFactoryTypeImpl extends EObjectImpl implem
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class ComponentLifecycleAdapterFactoryTypeImpl extends EObjectImpl implem
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
+				case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -145,9 +145,9 @@ public class ComponentLifecycleAdapterFactoryTypeImpl extends EObjectImpl implem
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME:
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME:
 				return getClassName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -160,11 +160,11 @@ public class ComponentLifecycleAdapterFactoryTypeImpl extends EObjectImpl implem
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME:
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
 		}
@@ -178,10 +178,10 @@ public class ComponentLifecycleAdapterFactoryTypeImpl extends EObjectImpl implem
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME:
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
 		}
@@ -195,9 +195,9 @@ public class ComponentLifecycleAdapterFactoryTypeImpl extends EObjectImpl implem
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME:
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
 		}
 		return eDynamicIsSet(eFeature);

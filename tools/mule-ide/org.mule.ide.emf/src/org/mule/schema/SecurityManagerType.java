@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getSecurityManagerType()
+ * @see org.mule.schema.MulePackage#getSecurityManagerType()
  * @model extendedMetaData="name='security-managerType' kind='mixed'"
  * @generated
  */
@@ -43,7 +43,7 @@ public interface SecurityManagerType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getSecurityManagerType_Mixed()
+	 * @see org.mule.schema.MulePackage#getSecurityManagerType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -60,7 +60,7 @@ public interface SecurityManagerType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Security Provider</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getSecurityManagerType_SecurityProvider()
+	 * @see org.mule.schema.MulePackage#getSecurityManagerType_SecurityProvider()
 	 * @model type="org.mule.schema.SecurityProviderType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='security-provider' namespace='##targetNamespace'"
 	 * @generated
@@ -77,7 +77,7 @@ public interface SecurityManagerType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Encryption Strategy</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getSecurityManagerType_EncryptionStrategy()
+	 * @see org.mule.schema.MulePackage#getSecurityManagerType_EncryptionStrategy()
 	 * @model type="org.mule.schema.EncryptionStrategyType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='encryption-strategy' namespace='##targetNamespace'"
 	 * @generated
@@ -94,9 +94,9 @@ public interface SecurityManagerType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Class Name</em>' attribute.
 	 * @see #setClassName(String)
-	 * @see org.mule.schema.SchemaPackage#getSecurityManagerType_ClassName()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='className'"
+	 * @see org.mule.schema.MulePackage#getSecurityManagerType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getClassName();
@@ -121,9 +121,9 @@ public interface SecurityManagerType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Ref</em>' attribute.
 	 * @see #setRef(String)
-	 * @see org.mule.schema.SchemaPackage#getSecurityManagerType_Ref()
+	 * @see org.mule.schema.MulePackage#getSecurityManagerType_Ref()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='ref'"
+	 *        extendedMetaData="kind='attribute' name='ref' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getRef();

@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 import org.mule.schema.SecurityManagerType;
 
 /**
@@ -110,7 +110,7 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getSecurityManagerType();
+		return MulePackage.eINSTANCE.getSecurityManagerType();
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.SECURITY_MANAGER_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.SECURITY_MANAGER_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -131,7 +131,7 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 	 * @generated
 	 */
 	public EList getSecurityProvider() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getSecurityManagerType_SecurityProvider());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getSecurityManagerType_SecurityProvider());
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 	 * @generated
 	 */
 	public EList getEncryptionStrategy() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getSecurityManagerType_EncryptionStrategy());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getSecurityManagerType_EncryptionStrategy());
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.SECURITY_MANAGER_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.SECURITY_MANAGER_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 		String oldRef = ref;
 		ref = newRef;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.SECURITY_MANAGER_TYPE__REF, oldRef, ref));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.SECURITY_MANAGER_TYPE__REF, oldRef, ref));
 	}
 
 	/**
@@ -193,11 +193,11 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.SECURITY_MANAGER_TYPE__MIXED:
+				case MulePackage.SECURITY_MANAGER_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
+				case MulePackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
 					return ((InternalEList)getSecurityProvider()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
+				case MulePackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
 					return ((InternalEList)getEncryptionStrategy()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -213,15 +213,15 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SECURITY_MANAGER_TYPE__MIXED:
+			case MulePackage.SECURITY_MANAGER_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
+			case MulePackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
 				return getSecurityProvider();
-			case SchemaPackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
+			case MulePackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
 				return getEncryptionStrategy();
-			case SchemaPackage.SECURITY_MANAGER_TYPE__CLASS_NAME:
+			case MulePackage.SECURITY_MANAGER_TYPE__CLASS_NAME:
 				return getClassName();
-			case SchemaPackage.SECURITY_MANAGER_TYPE__REF:
+			case MulePackage.SECURITY_MANAGER_TYPE__REF:
 				return getRef();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -234,22 +234,22 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SECURITY_MANAGER_TYPE__MIXED:
+			case MulePackage.SECURITY_MANAGER_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
+			case MulePackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
 				getSecurityProvider().clear();
 				getSecurityProvider().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
+			case MulePackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
 				getEncryptionStrategy().clear();
 				getEncryptionStrategy().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.SECURITY_MANAGER_TYPE__CLASS_NAME:
+			case MulePackage.SECURITY_MANAGER_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
-			case SchemaPackage.SECURITY_MANAGER_TYPE__REF:
+			case MulePackage.SECURITY_MANAGER_TYPE__REF:
 				setRef((String)newValue);
 				return;
 		}
@@ -263,19 +263,19 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SECURITY_MANAGER_TYPE__MIXED:
+			case MulePackage.SECURITY_MANAGER_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
+			case MulePackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
 				getSecurityProvider().clear();
 				return;
-			case SchemaPackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
+			case MulePackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
 				getEncryptionStrategy().clear();
 				return;
-			case SchemaPackage.SECURITY_MANAGER_TYPE__CLASS_NAME:
+			case MulePackage.SECURITY_MANAGER_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
-			case SchemaPackage.SECURITY_MANAGER_TYPE__REF:
+			case MulePackage.SECURITY_MANAGER_TYPE__REF:
 				setRef(REF_EDEFAULT);
 				return;
 		}
@@ -289,15 +289,15 @@ public class SecurityManagerTypeImpl extends EObjectImpl implements SecurityMana
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SECURITY_MANAGER_TYPE__MIXED:
+			case MulePackage.SECURITY_MANAGER_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
+			case MulePackage.SECURITY_MANAGER_TYPE__SECURITY_PROVIDER:
 				return !getSecurityProvider().isEmpty();
-			case SchemaPackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
+			case MulePackage.SECURITY_MANAGER_TYPE__ENCRYPTION_STRATEGY:
 				return !getEncryptionStrategy().isEmpty();
-			case SchemaPackage.SECURITY_MANAGER_TYPE__CLASS_NAME:
+			case MulePackage.SECURITY_MANAGER_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
-			case SchemaPackage.SECURITY_MANAGER_TYPE__REF:
+			case MulePackage.SECURITY_MANAGER_TYPE__REF:
 				return REF_EDEFAULT == null ? ref != null : !REF_EDEFAULT.equals(ref);
 		}
 		return eDynamicIsSet(eFeature);

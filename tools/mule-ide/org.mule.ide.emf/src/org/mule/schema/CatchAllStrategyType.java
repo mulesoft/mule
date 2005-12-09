@@ -26,7 +26,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getCatchAllStrategyType()
+ * @see org.mule.schema.MulePackage#getCatchAllStrategyType()
  * @model extendedMetaData="name='catch-all-strategyType' kind='mixed'"
  * @generated
  */
@@ -41,7 +41,7 @@ public interface CatchAllStrategyType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getCatchAllStrategyType_Mixed()
+	 * @see org.mule.schema.MulePackage#getCatchAllStrategyType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -58,7 +58,7 @@ public interface CatchAllStrategyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Endpoint</em>' containment reference.
 	 * @see #setEndpoint(EndpointType)
-	 * @see org.mule.schema.SchemaPackage#getCatchAllStrategyType_Endpoint()
+	 * @see org.mule.schema.MulePackage#getCatchAllStrategyType_Endpoint()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -85,7 +85,7 @@ public interface CatchAllStrategyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Global Endpoint</em>' containment reference.
 	 * @see #setGlobalEndpoint(GlobalEndpointType)
-	 * @see org.mule.schema.SchemaPackage#getCatchAllStrategyType_GlobalEndpoint()
+	 * @see org.mule.schema.MulePackage#getCatchAllStrategyType_GlobalEndpoint()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='global-endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -112,7 +112,7 @@ public interface CatchAllStrategyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getCatchAllStrategyType_Properties()
+	 * @see org.mule.schema.MulePackage#getCatchAllStrategyType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -139,9 +139,9 @@ public interface CatchAllStrategyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Class Name</em>' attribute.
 	 * @see #setClassName(String)
-	 * @see org.mule.schema.SchemaPackage#getCatchAllStrategyType_ClassName()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='className'"
+	 * @see org.mule.schema.MulePackage#getCatchAllStrategyType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getClassName();

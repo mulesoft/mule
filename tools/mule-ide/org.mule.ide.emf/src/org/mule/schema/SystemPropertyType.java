@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getSystemPropertyType()
+ * @see org.mule.schema.MulePackage#getSystemPropertyType()
  * @model extendedMetaData="name='system-propertyType' kind='mixed'"
  * @generated
  */
@@ -40,7 +40,7 @@ public interface SystemPropertyType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getSystemPropertyType_Mixed()
+	 * @see org.mule.schema.MulePackage#getSystemPropertyType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -57,9 +57,9 @@ public interface SystemPropertyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Default Value</em>' attribute.
 	 * @see #setDefaultValue(String)
-	 * @see org.mule.schema.SchemaPackage#getSystemPropertyType_DefaultValue()
+	 * @see org.mule.schema.MulePackage#getSystemPropertyType_DefaultValue()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='defaultValue'"
+	 *        extendedMetaData="kind='attribute' name='defaultValue' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getDefaultValue();
@@ -84,9 +84,9 @@ public interface SystemPropertyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Key</em>' attribute.
 	 * @see #setKey(String)
-	 * @see org.mule.schema.SchemaPackage#getSystemPropertyType_Key()
+	 * @see org.mule.schema.MulePackage#getSystemPropertyType_Key()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='key'"
+	 *        extendedMetaData="kind='attribute' name='key' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getKey();
@@ -111,9 +111,9 @@ public interface SystemPropertyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Name</em>' attribute.
 	 * @see #setName(String)
-	 * @see org.mule.schema.SchemaPackage#getSystemPropertyType_Name()
+	 * @see org.mule.schema.MulePackage#getSystemPropertyType_Name()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
-	 *        extendedMetaData="kind='attribute' name='name'"
+	 *        extendedMetaData="kind='attribute' name='name' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getName();

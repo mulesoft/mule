@@ -7,7 +7,6 @@
 package org.mule.schema.impl;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -29,17 +28,17 @@ import org.mule.schema.ExceptionStrategyType;
 import org.mule.schema.InboundRouterType;
 import org.mule.schema.InitialStateType;
 import org.mule.schema.MuleDescriptorType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.OutboundRouterType;
 import org.mule.schema.PoolingProfileType;
 import org.mule.schema.PropertiesType;
 import org.mule.schema.QueueProfileType;
 import org.mule.schema.ResponseRouterType;
-import org.mule.schema.SchemaPackage;
 import org.mule.schema.ThreadingProfileType;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Mule Descriptor Type</b></em>'.
+ * An implementation of the model object '<em><b>Descriptor Type</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
@@ -159,7 +158,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 * @ordered
 	 */
-	protected static final List INBOUND_TRANSFORMER_EDEFAULT = null;
+	protected static final String INBOUND_TRANSFORMER_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getInboundTransformer() <em>Inbound Transformer</em>}' attribute.
@@ -169,7 +168,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 * @ordered
 	 */
-	protected List inboundTransformer = INBOUND_TRANSFORMER_EDEFAULT;
+	protected String inboundTransformer = INBOUND_TRANSFORMER_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getInitialState() <em>Initial State</em>}' attribute.
@@ -248,7 +247,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 * @ordered
 	 */
-	protected static final List OUTBOUND_TRANSFORMER_EDEFAULT = null;
+	protected static final String OUTBOUND_TRANSFORMER_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getOutboundTransformer() <em>Outbound Transformer</em>}' attribute.
@@ -258,7 +257,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 * @ordered
 	 */
-	protected List outboundTransformer = OUTBOUND_TRANSFORMER_EDEFAULT;
+	protected String outboundTransformer = OUTBOUND_TRANSFORMER_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getRef() <em>Ref</em>}' attribute.
@@ -288,7 +287,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 * @ordered
 	 */
-	protected static final List RESPONSE_TRANSFORMER_EDEFAULT = null;
+	protected static final String RESPONSE_TRANSFORMER_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getResponseTransformer() <em>Response Transformer</em>}' attribute.
@@ -298,7 +297,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 * @ordered
 	 */
-	protected List responseTransformer = RESPONSE_TRANSFORMER_EDEFAULT;
+	protected String responseTransformer = RESPONSE_TRANSFORMER_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #isSingleton() <em>Singleton</em>}' attribute.
@@ -364,7 +363,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getMuleDescriptorType();
+		return MulePackage.eINSTANCE.getMuleDescriptorType();
 	}
 
 	/**
@@ -374,7 +373,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.MULE_DESCRIPTOR_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.MULE_DESCRIPTOR_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -385,7 +384,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public InboundRouterType getInboundRouter() {
-		return (InboundRouterType)getMixed().get(SchemaPackage.eINSTANCE.getMuleDescriptorType_InboundRouter(), true);
+		return (InboundRouterType)getMixed().get(MulePackage.eINSTANCE.getMuleDescriptorType_InboundRouter(), true);
 	}
 
 	/**
@@ -394,7 +393,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public NotificationChain basicSetInboundRouter(InboundRouterType newInboundRouter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleDescriptorType_InboundRouter(), newInboundRouter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleDescriptorType_InboundRouter(), newInboundRouter, msgs);
 	}
 
 	/**
@@ -403,7 +402,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public void setInboundRouter(InboundRouterType newInboundRouter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleDescriptorType_InboundRouter(), newInboundRouter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleDescriptorType_InboundRouter(), newInboundRouter);
 	}
 
 	/**
@@ -412,7 +411,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public OutboundRouterType getOutboundRouter() {
-		return (OutboundRouterType)getMixed().get(SchemaPackage.eINSTANCE.getMuleDescriptorType_OutboundRouter(), true);
+		return (OutboundRouterType)getMixed().get(MulePackage.eINSTANCE.getMuleDescriptorType_OutboundRouter(), true);
 	}
 
 	/**
@@ -421,7 +420,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public NotificationChain basicSetOutboundRouter(OutboundRouterType newOutboundRouter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleDescriptorType_OutboundRouter(), newOutboundRouter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleDescriptorType_OutboundRouter(), newOutboundRouter, msgs);
 	}
 
 	/**
@@ -430,7 +429,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public void setOutboundRouter(OutboundRouterType newOutboundRouter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleDescriptorType_OutboundRouter(), newOutboundRouter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleDescriptorType_OutboundRouter(), newOutboundRouter);
 	}
 
 	/**
@@ -439,7 +438,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public ResponseRouterType getResponseRouter() {
-		return (ResponseRouterType)getMixed().get(SchemaPackage.eINSTANCE.getMuleDescriptorType_ResponseRouter(), true);
+		return (ResponseRouterType)getMixed().get(MulePackage.eINSTANCE.getMuleDescriptorType_ResponseRouter(), true);
 	}
 
 	/**
@@ -448,7 +447,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public NotificationChain basicSetResponseRouter(ResponseRouterType newResponseRouter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleDescriptorType_ResponseRouter(), newResponseRouter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleDescriptorType_ResponseRouter(), newResponseRouter, msgs);
 	}
 
 	/**
@@ -457,7 +456,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public void setResponseRouter(ResponseRouterType newResponseRouter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleDescriptorType_ResponseRouter(), newResponseRouter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleDescriptorType_ResponseRouter(), newResponseRouter);
 	}
 
 	/**
@@ -466,7 +465,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public EList getInterceptor() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getMuleDescriptorType_Interceptor());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getMuleDescriptorType_Interceptor());
 	}
 
 	/**
@@ -475,7 +474,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public ThreadingProfileType getThreadingProfile() {
-		return (ThreadingProfileType)getMixed().get(SchemaPackage.eINSTANCE.getMuleDescriptorType_ThreadingProfile(), true);
+		return (ThreadingProfileType)getMixed().get(MulePackage.eINSTANCE.getMuleDescriptorType_ThreadingProfile(), true);
 	}
 
 	/**
@@ -484,7 +483,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public NotificationChain basicSetThreadingProfile(ThreadingProfileType newThreadingProfile, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleDescriptorType_ThreadingProfile(), newThreadingProfile, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleDescriptorType_ThreadingProfile(), newThreadingProfile, msgs);
 	}
 
 	/**
@@ -493,7 +492,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public void setThreadingProfile(ThreadingProfileType newThreadingProfile) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleDescriptorType_ThreadingProfile(), newThreadingProfile);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleDescriptorType_ThreadingProfile(), newThreadingProfile);
 	}
 
 	/**
@@ -502,7 +501,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public PoolingProfileType getPoolingProfile() {
-		return (PoolingProfileType)getMixed().get(SchemaPackage.eINSTANCE.getMuleDescriptorType_PoolingProfile(), true);
+		return (PoolingProfileType)getMixed().get(MulePackage.eINSTANCE.getMuleDescriptorType_PoolingProfile(), true);
 	}
 
 	/**
@@ -511,7 +510,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public NotificationChain basicSetPoolingProfile(PoolingProfileType newPoolingProfile, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleDescriptorType_PoolingProfile(), newPoolingProfile, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleDescriptorType_PoolingProfile(), newPoolingProfile, msgs);
 	}
 
 	/**
@@ -520,7 +519,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public void setPoolingProfile(PoolingProfileType newPoolingProfile) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleDescriptorType_PoolingProfile(), newPoolingProfile);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleDescriptorType_PoolingProfile(), newPoolingProfile);
 	}
 
 	/**
@@ -529,7 +528,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public QueueProfileType getQueueProfile() {
-		return (QueueProfileType)getMixed().get(SchemaPackage.eINSTANCE.getMuleDescriptorType_QueueProfile(), true);
+		return (QueueProfileType)getMixed().get(MulePackage.eINSTANCE.getMuleDescriptorType_QueueProfile(), true);
 	}
 
 	/**
@@ -538,7 +537,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public NotificationChain basicSetQueueProfile(QueueProfileType newQueueProfile, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleDescriptorType_QueueProfile(), newQueueProfile, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleDescriptorType_QueueProfile(), newQueueProfile, msgs);
 	}
 
 	/**
@@ -547,7 +546,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public void setQueueProfile(QueueProfileType newQueueProfile) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleDescriptorType_QueueProfile(), newQueueProfile);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleDescriptorType_QueueProfile(), newQueueProfile);
 	}
 
 	/**
@@ -556,7 +555,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public ExceptionStrategyType getExceptionStrategy() {
-		return (ExceptionStrategyType)getMixed().get(SchemaPackage.eINSTANCE.getMuleDescriptorType_ExceptionStrategy(), true);
+		return (ExceptionStrategyType)getMixed().get(MulePackage.eINSTANCE.getMuleDescriptorType_ExceptionStrategy(), true);
 	}
 
 	/**
@@ -565,7 +564,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public NotificationChain basicSetExceptionStrategy(ExceptionStrategyType newExceptionStrategy, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleDescriptorType_ExceptionStrategy(), newExceptionStrategy, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleDescriptorType_ExceptionStrategy(), newExceptionStrategy, msgs);
 	}
 
 	/**
@@ -574,7 +573,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public void setExceptionStrategy(ExceptionStrategyType newExceptionStrategy) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleDescriptorType_ExceptionStrategy(), newExceptionStrategy);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleDescriptorType_ExceptionStrategy(), newExceptionStrategy);
 	}
 
 	/**
@@ -583,7 +582,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getMuleDescriptorType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getMuleDescriptorType_Properties(), true);
 	}
 
 	/**
@@ -592,7 +591,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getMuleDescriptorType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getMuleDescriptorType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -601,7 +600,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getMuleDescriptorType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getMuleDescriptorType_Properties(), newProperties);
 	}
 
 	/**
@@ -624,7 +623,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		boolean oldContainerManagedESet = containerManagedESet;
 		containerManagedESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED, oldContainerManaged, containerManaged, !oldContainerManagedESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED, oldContainerManaged, containerManaged, !oldContainerManagedESet));
 	}
 
 	/**
@@ -638,7 +637,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		containerManaged = CONTAINER_MANAGED_EDEFAULT;
 		containerManagedESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED, oldContainerManaged, CONTAINER_MANAGED_EDEFAULT, oldContainerManagedESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED, oldContainerManaged, CONTAINER_MANAGED_EDEFAULT, oldContainerManagedESet));
 	}
 
 	/**
@@ -668,7 +667,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		String oldImplementation = implementation;
 		implementation = newImplementation;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION, oldImplementation, implementation));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION, oldImplementation, implementation));
 	}
 
 	/**
@@ -689,7 +688,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		String oldInboundEndpoint = inboundEndpoint;
 		inboundEndpoint = newInboundEndpoint;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT, oldInboundEndpoint, inboundEndpoint));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT, oldInboundEndpoint, inboundEndpoint));
 	}
 
 	/**
@@ -697,7 +696,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List getInboundTransformer() {
+	public String getInboundTransformer() {
 		return inboundTransformer;
 	}
 
@@ -706,11 +705,11 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setInboundTransformer(List newInboundTransformer) {
-		List oldInboundTransformer = inboundTransformer;
+	public void setInboundTransformer(String newInboundTransformer) {
+		String oldInboundTransformer = inboundTransformer;
 		inboundTransformer = newInboundTransformer;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER, oldInboundTransformer, inboundTransformer));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER, oldInboundTransformer, inboundTransformer));
 	}
 
 	/**
@@ -733,7 +732,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		boolean oldInitialStateESet = initialStateESet;
 		initialStateESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE, oldInitialState, initialState, !oldInitialStateESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE, oldInitialState, initialState, !oldInitialStateESet));
 	}
 
 	/**
@@ -747,7 +746,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		initialState = INITIAL_STATE_EDEFAULT;
 		initialStateESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE, oldInitialState, INITIAL_STATE_EDEFAULT, oldInitialStateESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE, oldInitialState, INITIAL_STATE_EDEFAULT, oldInitialStateESet));
 	}
 
 	/**
@@ -777,7 +776,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -798,7 +797,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		String oldOutboundEndpoint = outboundEndpoint;
 		outboundEndpoint = newOutboundEndpoint;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT, oldOutboundEndpoint, outboundEndpoint));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT, oldOutboundEndpoint, outboundEndpoint));
 	}
 
 	/**
@@ -806,7 +805,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List getOutboundTransformer() {
+	public String getOutboundTransformer() {
 		return outboundTransformer;
 	}
 
@@ -815,11 +814,11 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setOutboundTransformer(List newOutboundTransformer) {
-		List oldOutboundTransformer = outboundTransformer;
+	public void setOutboundTransformer(String newOutboundTransformer) {
+		String oldOutboundTransformer = outboundTransformer;
 		outboundTransformer = newOutboundTransformer;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER, oldOutboundTransformer, outboundTransformer));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER, oldOutboundTransformer, outboundTransformer));
 	}
 
 	/**
@@ -840,7 +839,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		String oldRef = ref;
 		ref = newRef;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__REF, oldRef, ref));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__REF, oldRef, ref));
 	}
 
 	/**
@@ -848,7 +847,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List getResponseTransformer() {
+	public String getResponseTransformer() {
 		return responseTransformer;
 	}
 
@@ -857,11 +856,11 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setResponseTransformer(List newResponseTransformer) {
-		List oldResponseTransformer = responseTransformer;
+	public void setResponseTransformer(String newResponseTransformer) {
+		String oldResponseTransformer = responseTransformer;
 		responseTransformer = newResponseTransformer;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER, oldResponseTransformer, responseTransformer));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER, oldResponseTransformer, responseTransformer));
 	}
 
 	/**
@@ -884,7 +883,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		boolean oldSingletonESet = singletonESet;
 		singletonESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__SINGLETON, oldSingleton, singleton, !oldSingletonESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__SINGLETON, oldSingleton, singleton, !oldSingletonESet));
 	}
 
 	/**
@@ -898,7 +897,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		singleton = SINGLETON_EDEFAULT;
 		singletonESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.MULE_DESCRIPTOR_TYPE__SINGLETON, oldSingleton, SINGLETON_EDEFAULT, oldSingletonESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.MULE_DESCRIPTOR_TYPE__SINGLETON, oldSingleton, SINGLETON_EDEFAULT, oldSingletonESet));
 	}
 
 	/**
@@ -928,7 +927,7 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 		String oldVersion = version;
 		version = newVersion;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.MULE_DESCRIPTOR_TYPE__VERSION, oldVersion, version));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.MULE_DESCRIPTOR_TYPE__VERSION, oldVersion, version));
 	}
 
 	/**
@@ -939,25 +938,25 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__MIXED:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
 					return basicSetInboundRouter(null, msgs);
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
 					return basicSetOutboundRouter(null, msgs);
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
 					return basicSetResponseRouter(null, msgs);
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
 					return ((InternalEList)getInterceptor()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
 					return basicSetThreadingProfile(null, msgs);
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
 					return basicSetPoolingProfile(null, msgs);
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
 					return basicSetQueueProfile(null, msgs);
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
 					return basicSetExceptionStrategy(null, msgs);
-				case SchemaPackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
+				case MulePackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -973,49 +972,49 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__MIXED:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
 				return getInboundRouter();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
 				return getOutboundRouter();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
 				return getResponseRouter();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
 				return getInterceptor();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
 				return getThreadingProfile();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
 				return getPoolingProfile();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
 				return getQueueProfile();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
 				return getExceptionStrategy();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED:
 				return isContainerManaged() ? Boolean.TRUE : Boolean.FALSE;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION:
 				return getImplementation();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT:
 				return getInboundEndpoint();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER:
 				return getInboundTransformer();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE:
 				return getInitialState();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__NAME:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__NAME:
 				return getName();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT:
 				return getOutboundEndpoint();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER:
 				return getOutboundTransformer();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__REF:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__REF:
 				return getRef();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER:
 				return getResponseTransformer();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__SINGLETON:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__SINGLETON:
 				return isSingleton() ? Boolean.TRUE : Boolean.FALSE;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__VERSION:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__VERSION:
 				return getVersion();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -1028,72 +1027,72 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__MIXED:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
 				setInboundRouter((InboundRouterType)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
 				setOutboundRouter((OutboundRouterType)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
 				setResponseRouter((ResponseRouterType)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
 				getInterceptor().clear();
 				getInterceptor().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
 				setThreadingProfile((ThreadingProfileType)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
 				setPoolingProfile((PoolingProfileType)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
 				setQueueProfile((QueueProfileType)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
 				setExceptionStrategy((ExceptionStrategyType)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED:
 				setContainerManaged(((Boolean)newValue).booleanValue());
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION:
 				setImplementation((String)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT:
 				setInboundEndpoint((String)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER:
-				setInboundTransformer((List)newValue);
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER:
+				setInboundTransformer((String)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE:
 				setInitialState((InitialStateType)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__NAME:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__NAME:
 				setName((String)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT:
 				setOutboundEndpoint((String)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER:
-				setOutboundTransformer((List)newValue);
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER:
+				setOutboundTransformer((String)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__REF:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__REF:
 				setRef((String)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER:
-				setResponseTransformer((List)newValue);
+			case MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER:
+				setResponseTransformer((String)newValue);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__SINGLETON:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__SINGLETON:
 				setSingleton(((Boolean)newValue).booleanValue());
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__VERSION:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__VERSION:
 				setVersion((String)newValue);
 				return;
 		}
@@ -1107,70 +1106,70 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__MIXED:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
 				setInboundRouter((InboundRouterType)null);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
 				setOutboundRouter((OutboundRouterType)null);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
 				setResponseRouter((ResponseRouterType)null);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
 				getInterceptor().clear();
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
 				setThreadingProfile((ThreadingProfileType)null);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
 				setPoolingProfile((PoolingProfileType)null);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
 				setQueueProfile((QueueProfileType)null);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
 				setExceptionStrategy((ExceptionStrategyType)null);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED:
 				unsetContainerManaged();
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION:
 				setImplementation(IMPLEMENTATION_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT:
 				setInboundEndpoint(INBOUND_ENDPOINT_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER:
 				setInboundTransformer(INBOUND_TRANSFORMER_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE:
 				unsetInitialState();
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__NAME:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT:
 				setOutboundEndpoint(OUTBOUND_ENDPOINT_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER:
 				setOutboundTransformer(OUTBOUND_TRANSFORMER_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__REF:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__REF:
 				setRef(REF_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER:
 				setResponseTransformer(RESPONSE_TRANSFORMER_EDEFAULT);
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__SINGLETON:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__SINGLETON:
 				unsetSingleton();
 				return;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__VERSION:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__VERSION:
 				setVersion(VERSION_EDEFAULT);
 				return;
 		}
@@ -1184,49 +1183,49 @@ public class MuleDescriptorTypeImpl extends EObjectImpl implements MuleDescripto
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__MIXED:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ROUTER:
 				return getInboundRouter() != null;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ROUTER:
 				return getOutboundRouter() != null;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_ROUTER:
 				return getResponseRouter() != null;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INTERCEPTOR:
 				return !getInterceptor().isEmpty();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__THREADING_PROFILE:
 				return getThreadingProfile() != null;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__POOLING_PROFILE:
 				return getPoolingProfile() != null;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__QUEUE_PROFILE:
 				return getQueueProfile() != null;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__EXCEPTION_STRATEGY:
 				return getExceptionStrategy() != null;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__CONTAINER_MANAGED:
 				return isSetContainerManaged();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__IMPLEMENTATION:
 				return IMPLEMENTATION_EDEFAULT == null ? implementation != null : !IMPLEMENTATION_EDEFAULT.equals(implementation);
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_ENDPOINT:
 				return INBOUND_ENDPOINT_EDEFAULT == null ? inboundEndpoint != null : !INBOUND_ENDPOINT_EDEFAULT.equals(inboundEndpoint);
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INBOUND_TRANSFORMER:
 				return INBOUND_TRANSFORMER_EDEFAULT == null ? inboundTransformer != null : !INBOUND_TRANSFORMER_EDEFAULT.equals(inboundTransformer);
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__INITIAL_STATE:
 				return isSetInitialState();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__NAME:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_ENDPOINT:
 				return OUTBOUND_ENDPOINT_EDEFAULT == null ? outboundEndpoint != null : !OUTBOUND_ENDPOINT_EDEFAULT.equals(outboundEndpoint);
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__OUTBOUND_TRANSFORMER:
 				return OUTBOUND_TRANSFORMER_EDEFAULT == null ? outboundTransformer != null : !OUTBOUND_TRANSFORMER_EDEFAULT.equals(outboundTransformer);
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__REF:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__REF:
 				return REF_EDEFAULT == null ? ref != null : !REF_EDEFAULT.equals(ref);
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__RESPONSE_TRANSFORMER:
 				return RESPONSE_TRANSFORMER_EDEFAULT == null ? responseTransformer != null : !RESPONSE_TRANSFORMER_EDEFAULT.equals(responseTransformer);
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__SINGLETON:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__SINGLETON:
 				return isSetSingleton();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE__VERSION:
+			case MulePackage.MULE_DESCRIPTOR_TYPE__VERSION:
 				return VERSION_EDEFAULT == null ? version != null : !VERSION_EDEFAULT.equals(version);
 		}
 		return eDynamicIsSet(eFeature);

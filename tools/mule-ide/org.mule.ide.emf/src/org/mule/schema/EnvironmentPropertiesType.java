@@ -31,7 +31,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getEnvironmentPropertiesType()
+ * @see org.mule.schema.MulePackage#getEnvironmentPropertiesType()
  * @model extendedMetaData="name='environment-propertiesType' kind='mixed'"
  * @generated
  */
@@ -46,7 +46,7 @@ public interface EnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getEnvironmentPropertiesType_Mixed()
+	 * @see org.mule.schema.MulePackage#getEnvironmentPropertiesType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -63,7 +63,7 @@ public interface EnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Group</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getEnvironmentPropertiesType_Group()
+	 * @see org.mule.schema.MulePackage#getEnvironmentPropertiesType_Group()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='group' name='group:1'"
 	 * @generated
@@ -80,9 +80,9 @@ public interface EnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Property</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getEnvironmentPropertiesType_Property()
+	 * @see org.mule.schema.MulePackage#getEnvironmentPropertiesType_Property()
 	 * @model type="org.mule.schema.PropertyType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='property' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='property' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getProperty();
@@ -97,9 +97,9 @@ public interface EnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Factory Property</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getEnvironmentPropertiesType_FactoryProperty()
+	 * @see org.mule.schema.MulePackage#getEnvironmentPropertiesType_FactoryProperty()
 	 * @model type="org.mule.schema.FactoryPropertyType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='factory-property' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='factory-property' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getFactoryProperty();
@@ -114,9 +114,9 @@ public interface EnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>System Property</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getEnvironmentPropertiesType_SystemProperty()
+	 * @see org.mule.schema.MulePackage#getEnvironmentPropertiesType_SystemProperty()
 	 * @model type="org.mule.schema.SystemPropertyType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='system-property' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='system-property' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getSystemProperty();
@@ -131,9 +131,9 @@ public interface EnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Map</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getEnvironmentPropertiesType_Map()
+	 * @see org.mule.schema.MulePackage#getEnvironmentPropertiesType_Map()
 	 * @model type="org.mule.schema.MapType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='map' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='map' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getMap();
@@ -148,9 +148,9 @@ public interface EnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>List</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getEnvironmentPropertiesType_List()
+	 * @see org.mule.schema.MulePackage#getEnvironmentPropertiesType_List()
 	 * @model type="org.mule.schema.ListType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='list' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='list' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getList();
@@ -165,9 +165,9 @@ public interface EnvironmentPropertiesType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>File Properties</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getEnvironmentPropertiesType_FileProperties()
+	 * @see org.mule.schema.MulePackage#getEnvironmentPropertiesType_FileProperties()
 	 * @model type="org.mule.schema.FilePropertiesType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='file-properties' namespace='##targetNamespace' group='#group:1'"
+	 *        extendedMetaData="kind='element' name='file-properties' namespace='##targetNamespace' group='group:1'"
 	 * @generated
 	 */
 	EList getFileProperties();

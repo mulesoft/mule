@@ -6,8 +6,6 @@
  */
 package org.mule.schema;
 
-import java.util.List;
-
 import org.eclipse.emf.common.util.EList;
 
 import org.eclipse.emf.ecore.EObject;
@@ -27,11 +25,10 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  *   <li>{@link org.mule.schema.ResponseRouterType#getGlobalEndpoint <em>Global Endpoint</em>}</li>
  *   <li>{@link org.mule.schema.ResponseRouterType#getRouter <em>Router</em>}</li>
  *   <li>{@link org.mule.schema.ResponseRouterType#getTimeout <em>Timeout</em>}</li>
- *   <li>{@link org.mule.schema.ResponseRouterType#getTransformers <em>Transformers</em>}</li>
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getResponseRouterType()
+ * @see org.mule.schema.MulePackage#getResponseRouterType()
  * @model extendedMetaData="name='response-routerType' kind='mixed'"
  * @generated
  */
@@ -46,7 +43,7 @@ public interface ResponseRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getResponseRouterType_Mixed()
+	 * @see org.mule.schema.MulePackage#getResponseRouterType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -63,7 +60,7 @@ public interface ResponseRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Endpoint</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getResponseRouterType_Endpoint()
+	 * @see org.mule.schema.MulePackage#getResponseRouterType_Endpoint()
 	 * @model type="org.mule.schema.EndpointType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -80,7 +77,7 @@ public interface ResponseRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Global Endpoint</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getResponseRouterType_GlobalEndpoint()
+	 * @see org.mule.schema.MulePackage#getResponseRouterType_GlobalEndpoint()
 	 * @model type="org.mule.schema.GlobalEndpointType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='global-endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -97,7 +94,7 @@ public interface ResponseRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Router</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getResponseRouterType_Router()
+	 * @see org.mule.schema.MulePackage#getResponseRouterType_Router()
 	 * @model type="org.mule.schema.RouterType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='router' namespace='##targetNamespace'"
 	 * @generated
@@ -114,9 +111,9 @@ public interface ResponseRouterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Timeout</em>' attribute.
 	 * @see #setTimeout(String)
-	 * @see org.mule.schema.SchemaPackage#getResponseRouterType_Timeout()
+	 * @see org.mule.schema.MulePackage#getResponseRouterType_Timeout()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='timeout'"
+	 *        extendedMetaData="kind='attribute' name='timeout' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getTimeout();
@@ -130,32 +127,5 @@ public interface ResponseRouterType extends EObject {
 	 * @generated
 	 */
 	void setTimeout(String value);
-
-	/**
-	 * Returns the value of the '<em><b>Transformers</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Transformers</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Transformers</em>' attribute.
-	 * @see #setTransformers(List)
-	 * @see org.mule.schema.SchemaPackage#getResponseRouterType_Transformers()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.IDREFS" many="false"
-	 *        extendedMetaData="kind='attribute' name='transformers'"
-	 * @generated
-	 */
-	List getTransformers();
-
-	/**
-	 * Sets the value of the '{@link org.mule.schema.ResponseRouterType#getTransformers <em>Transformers</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Transformers</em>' attribute.
-	 * @see #getTransformers()
-	 * @generated
-	 */
-	void setTransformers(List value);
 
 } // ResponseRouterType

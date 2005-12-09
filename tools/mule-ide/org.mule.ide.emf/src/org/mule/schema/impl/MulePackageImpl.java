@@ -64,6 +64,8 @@ import org.mule.schema.ModelType;
 import org.mule.schema.MuleConfigurationType;
 import org.mule.schema.MuleDescriptorType;
 import org.mule.schema.MuleEnvironmentPropertiesType;
+import org.mule.schema.MuleFactory;
+import org.mule.schema.MulePackage;
 import org.mule.schema.OutboundRouterType;
 import org.mule.schema.PersistenceStrategyType;
 import org.mule.schema.PoolExhaustedActionType;
@@ -75,8 +77,6 @@ import org.mule.schema.ReplyToType;
 import org.mule.schema.ResponseRouterType;
 import org.mule.schema.RightFilterType;
 import org.mule.schema.RouterType;
-import org.mule.schema.SchemaFactory;
-import org.mule.schema.SchemaPackage;
 import org.mule.schema.SecurityFilterType;
 import org.mule.schema.SecurityManagerType;
 import org.mule.schema.SecurityProviderType;
@@ -88,9 +88,9 @@ import org.mule.schema.TransactionManagerType;
 import org.mule.schema.TransactionType;
 import org.mule.schema.TransformerType;
 import org.mule.schema.TransformersType;
-import org.mule.schema.TypeType;
+import org.mule.schema.TypeType1;
 
-import org.mule.schema.util.SchemaValidator;
+import org.mule.schema.util.MuleValidator;
 
 /**
  * <!-- begin-user-doc -->
@@ -98,7 +98,7 @@ import org.mule.schema.util.SchemaValidator;
  * <!-- end-user-doc -->
  * @generated
  */
-public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
+public class MulePackageImpl extends EPackageImpl implements MulePackage {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -566,7 +566,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EEnum typeTypeEEnum = null;
+	private EEnum typeType1EEnum = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -629,6 +629,13 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private EDataType typeTypeEDataType = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	private EDataType typeTypeObjectEDataType = null;
 
 	/**
@@ -649,12 +656,12 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @see org.eclipse.emf.ecore.EPackage.Registry
-	 * @see org.mule.schema.SchemaPackage#eNS_URI
+	 * @see org.mule.schema.MulePackage#eNS_URI
 	 * @see #init()
 	 * @generated
 	 */
-	private SchemaPackageImpl() {
-		super(eNS_URI, SchemaFactory.eINSTANCE);
+	private MulePackageImpl() {
+		super(eNS_URI, MuleFactory.eINSTANCE);
 	}
 
 	/**
@@ -686,11 +693,11 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * @see #initializePackageContents()
 	 * @generated
 	 */
-	public static SchemaPackage init() {
-		if (isInited) return (SchemaPackage)EPackage.Registry.INSTANCE.getEPackage(SchemaPackage.eNS_URI);
+	public static MulePackage init() {
+		if (isInited) return (MulePackage)EPackage.Registry.INSTANCE.getEPackage(MulePackage.eNS_URI);
 
 		// Obtain or create and register package
-		SchemaPackageImpl theSchemaPackage = (SchemaPackageImpl)(EPackage.Registry.INSTANCE.getEPackage(eNS_URI) instanceof SchemaPackageImpl ? EPackage.Registry.INSTANCE.getEPackage(eNS_URI) : new SchemaPackageImpl());
+		MulePackageImpl theMulePackage = (MulePackageImpl)(EPackage.Registry.INSTANCE.getEPackage(eNS_URI) instanceof MulePackageImpl ? EPackage.Registry.INSTANCE.getEPackage(eNS_URI) : new MulePackageImpl());
 
 		isInited = true;
 
@@ -698,24 +705,24 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		XMLTypePackageImpl.init();
 
 		// Create package meta-data objects
-		theSchemaPackage.createPackageContents();
+		theMulePackage.createPackageContents();
 
 		// Initialize created meta-data
-		theSchemaPackage.initializePackageContents();
+		theMulePackage.initializePackageContents();
 
 		// Register package validator
 		EValidator.Registry.INSTANCE.put
-			(theSchemaPackage, 
+			(theMulePackage, 
 			 new EValidator.Descriptor() {
 				 public EValidator getEValidator() {
-					 return SchemaValidator.INSTANCE;
+					 return MuleValidator.INSTANCE;
 				 }
 			 });
 
 		// Mark meta-data to indicate it can't be changed
-		theSchemaPackage.freeze();
+		theMulePackage.freeze();
 
-		return theSchemaPackage;
+		return theMulePackage;
 	}
 
 	/**
@@ -1299,6 +1306,15 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getContainerPropertyType_Required() {
+		return (EAttribute)containerPropertyTypeEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getDocumentRoot() {
 		return documentRootEClass;
 	}
@@ -1569,7 +1585,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getEndpointType_Synchronous() {
+	public EAttribute getEndpointType_ResponseTransformers() {
 		return (EAttribute)endpointTypeEClass.getEStructuralFeatures().get(12);
 	}
 
@@ -1578,7 +1594,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getEndpointType_Transformers() {
+	public EAttribute getEndpointType_Synchronous() {
 		return (EAttribute)endpointTypeEClass.getEStructuralFeatures().get(13);
 	}
 
@@ -1587,8 +1603,17 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getEndpointType_Type() {
+	public EAttribute getEndpointType_Transformers() {
 		return (EAttribute)endpointTypeEClass.getEStructuralFeatures().get(14);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getEndpointType_Type() {
+		return (EAttribute)endpointTypeEClass.getEStructuralFeatures().get(15);
 	}
 
 	/**
@@ -2109,7 +2134,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getGlobalEndpointType_Synchronous() {
+	public EAttribute getGlobalEndpointType_ResponseTransformers() {
 		return (EAttribute)globalEndpointTypeEClass.getEStructuralFeatures().get(9);
 	}
 
@@ -2118,8 +2143,17 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getGlobalEndpointType_Transformers() {
+	public EAttribute getGlobalEndpointType_Synchronous() {
 		return (EAttribute)globalEndpointTypeEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getGlobalEndpointType_Transformers() {
+		return (EAttribute)globalEndpointTypeEClass.getEStructuralFeatures().get(11);
 	}
 
 	/**
@@ -2631,7 +2665,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getModelType_Name() {
+	public EAttribute getModelType_ClassName() {
 		return (EAttribute)modelTypeEClass.getEStructuralFeatures().get(8);
 	}
 
@@ -2640,8 +2674,26 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getModelType_Ref() {
+	public EAttribute getModelType_Name() {
 		return (EAttribute)modelTypeEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getModelType_Ref() {
+		return (EAttribute)modelTypeEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getModelType_Type() {
+		return (EAttribute)modelTypeEClass.getEStructuralFeatures().get(11);
 	}
 
 	/**
@@ -3090,7 +3142,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMuleEnvironmentPropertiesType_Model() {
+	public EAttribute getMuleEnvironmentPropertiesType_Embedded() {
 		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(7);
 	}
 
@@ -3099,7 +3151,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMuleEnvironmentPropertiesType_RecoverableMode() {
+	public EAttribute getMuleEnvironmentPropertiesType_EnableMessageEvents() {
 		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(8);
 	}
 
@@ -3108,7 +3160,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMuleEnvironmentPropertiesType_ServerUrl() {
+	public EAttribute getMuleEnvironmentPropertiesType_Encoding() {
 		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(9);
 	}
 
@@ -3117,7 +3169,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMuleEnvironmentPropertiesType_Synchronous() {
+	public EAttribute getMuleEnvironmentPropertiesType_Model() {
 		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(10);
 	}
 
@@ -3126,7 +3178,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMuleEnvironmentPropertiesType_SynchronousEventTimeout() {
+	public EAttribute getMuleEnvironmentPropertiesType_RecoverableMode() {
 		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(11);
 	}
 
@@ -3135,7 +3187,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMuleEnvironmentPropertiesType_SynchronousReceive() {
+	public EAttribute getMuleEnvironmentPropertiesType_RemoteSync() {
 		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(12);
 	}
 
@@ -3144,7 +3196,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMuleEnvironmentPropertiesType_TransactionTimeout() {
+	public EAttribute getMuleEnvironmentPropertiesType_ServerUrl() {
 		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(13);
 	}
 
@@ -3153,8 +3205,35 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMuleEnvironmentPropertiesType_WorkingDirectory() {
+	public EAttribute getMuleEnvironmentPropertiesType_Synchronous() {
 		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(14);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMuleEnvironmentPropertiesType_SynchronousEventTimeout() {
+		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(15);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMuleEnvironmentPropertiesType_TransactionTimeout() {
+		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(16);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getMuleEnvironmentPropertiesType_WorkingDirectory() {
+		return (EAttribute)muleEnvironmentPropertiesTypeEClass.getEStructuralFeatures().get(17);
 	}
 
 	/**
@@ -3569,15 +3648,6 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 */
 	public EAttribute getResponseRouterType_Timeout() {
 		return (EAttribute)responseRouterTypeEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getResponseRouterType_Transformers() {
-		return (EAttribute)responseRouterTypeEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -4134,6 +4204,15 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getThreadingProfileType_ThreadWaitTimeout() {
+		return (EAttribute)threadingProfileTypeEClass.getEStructuralFeatures().get(8);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getTransactionManagerType() {
 		return transactionManagerTypeEClass;
 	}
@@ -4404,8 +4483,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EEnum getTypeType() {
-		return typeTypeEEnum;
+	public EEnum getTypeType1() {
+		return typeType1EEnum;
 	}
 
 	/**
@@ -4485,6 +4564,15 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EDataType getTypeType() {
+		return typeTypeEDataType;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EDataType getTypeTypeObject() {
 		return typeTypeObjectEDataType;
 	}
@@ -4503,8 +4591,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public SchemaFactory getSchemaFactory() {
-		return (SchemaFactory)getEFactoryInstance();
+	public MuleFactory getMuleFactory() {
+		return (MuleFactory)getEFactoryInstance();
 	}
 
 	/**
@@ -4601,6 +4689,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		createEAttribute(containerPropertyTypeEClass, CONTAINER_PROPERTY_TYPE__CONTAINER);
 		createEAttribute(containerPropertyTypeEClass, CONTAINER_PROPERTY_TYPE__NAME);
 		createEAttribute(containerPropertyTypeEClass, CONTAINER_PROPERTY_TYPE__REFERENCE);
+		createEAttribute(containerPropertyTypeEClass, CONTAINER_PROPERTY_TYPE__REQUIRED);
 
 		documentRootEClass = createEClass(DOCUMENT_ROOT);
 		createEAttribute(documentRootEClass, DOCUMENT_ROOT__MIXED);
@@ -4636,6 +4725,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		createEAttribute(endpointTypeEClass, ENDPOINT_TYPE__REF);
 		createEAttribute(endpointTypeEClass, ENDPOINT_TYPE__REMOTE_SYNC);
 		createEAttribute(endpointTypeEClass, ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT);
+		createEAttribute(endpointTypeEClass, ENDPOINT_TYPE__RESPONSE_TRANSFORMERS);
 		createEAttribute(endpointTypeEClass, ENDPOINT_TYPE__SYNCHRONOUS);
 		createEAttribute(endpointTypeEClass, ENDPOINT_TYPE__TRANSFORMERS);
 		createEAttribute(endpointTypeEClass, ENDPOINT_TYPE__TYPE);
@@ -4706,6 +4796,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		createEAttribute(globalEndpointTypeEClass, GLOBAL_ENDPOINT_TYPE__NAME);
 		createEAttribute(globalEndpointTypeEClass, GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC);
 		createEAttribute(globalEndpointTypeEClass, GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT);
+		createEAttribute(globalEndpointTypeEClass, GLOBAL_ENDPOINT_TYPE__RESPONSE_TRANSFORMERS);
 		createEAttribute(globalEndpointTypeEClass, GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS);
 		createEAttribute(globalEndpointTypeEClass, GLOBAL_ENDPOINT_TYPE__TRANSFORMERS);
 
@@ -4771,8 +4862,10 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		createEReference(modelTypeEClass, MODEL_TYPE__COMPONENT_POOL_FACTORY);
 		createEReference(modelTypeEClass, MODEL_TYPE__EXCEPTION_STRATEGY);
 		createEReference(modelTypeEClass, MODEL_TYPE__MULE_DESCRIPTOR);
+		createEAttribute(modelTypeEClass, MODEL_TYPE__CLASS_NAME);
 		createEAttribute(modelTypeEClass, MODEL_TYPE__NAME);
 		createEAttribute(modelTypeEClass, MODEL_TYPE__REF);
+		createEAttribute(modelTypeEClass, MODEL_TYPE__TYPE);
 
 		muleConfigurationTypeEClass = createEClass(MULE_CONFIGURATION_TYPE);
 		createEAttribute(muleConfigurationTypeEClass, MULE_CONFIGURATION_TYPE__MIXED);
@@ -4825,12 +4918,15 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		createEReference(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__PERSISTENCE_STRATEGY);
 		createEReference(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__CONNECTION_STRATEGY);
 		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__CLIENT_MODE);
+		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__EMBEDDED);
+		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__ENABLE_MESSAGE_EVENTS);
+		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__ENCODING);
 		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__MODEL);
 		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__RECOVERABLE_MODE);
+		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__REMOTE_SYNC);
 		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__SERVER_URL);
 		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__SYNCHRONOUS);
 		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__SYNCHRONOUS_EVENT_TIMEOUT);
-		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__SYNCHRONOUS_RECEIVE);
 		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__TRANSACTION_TIMEOUT);
 		createEAttribute(muleEnvironmentPropertiesTypeEClass, MULE_ENVIRONMENT_PROPERTIES_TYPE__WORKING_DIRECTORY);
 
@@ -4887,7 +4983,6 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		createEReference(responseRouterTypeEClass, RESPONSE_ROUTER_TYPE__GLOBAL_ENDPOINT);
 		createEReference(responseRouterTypeEClass, RESPONSE_ROUTER_TYPE__ROUTER);
 		createEAttribute(responseRouterTypeEClass, RESPONSE_ROUTER_TYPE__TIMEOUT);
-		createEAttribute(responseRouterTypeEClass, RESPONSE_ROUTER_TYPE__TRANSFORMERS);
 
 		rightFilterTypeEClass = createEClass(RIGHT_FILTER_TYPE);
 		createEAttribute(rightFilterTypeEClass, RIGHT_FILTER_TYPE__MIXED);
@@ -4958,6 +5053,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		createEAttribute(threadingProfileTypeEClass, THREADING_PROFILE_TYPE__MAX_THREADS_IDLE);
 		createEAttribute(threadingProfileTypeEClass, THREADING_PROFILE_TYPE__POOL_EXHAUSTED_ACTION);
 		createEAttribute(threadingProfileTypeEClass, THREADING_PROFILE_TYPE__THREAD_TTL);
+		createEAttribute(threadingProfileTypeEClass, THREADING_PROFILE_TYPE__THREAD_WAIT_TIMEOUT);
 
 		transactionManagerTypeEClass = createEClass(TRANSACTION_MANAGER_TYPE);
 		createEAttribute(transactionManagerTypeEClass, TRANSACTION_MANAGER_TYPE__MIXED);
@@ -4994,7 +5090,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initialisationPolicyTypeEEnum = createEEnum(INITIALISATION_POLICY_TYPE);
 		initialStateTypeEEnum = createEEnum(INITIAL_STATE_TYPE);
 		poolExhaustedActionTypeEEnum = createEEnum(POOL_EXHAUSTED_ACTION_TYPE);
-		typeTypeEEnum = createEEnum(TYPE_TYPE);
+		typeType1EEnum = createEEnum(TYPE_TYPE1);
 
 		// Create data types
 		actionTypeObjectEDataType = createEDataType(ACTION_TYPE_OBJECT);
@@ -5005,6 +5101,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initialisationPolicyTypeObjectEDataType = createEDataType(INITIALISATION_POLICY_TYPE_OBJECT);
 		initialStateTypeObjectEDataType = createEDataType(INITIAL_STATE_TYPE_OBJECT);
 		poolExhaustedActionTypeObjectEDataType = createEDataType(POOL_EXHAUSTED_ACTION_TYPE_OBJECT);
+		typeTypeEDataType = createEDataType(TYPE_TYPE);
 		typeTypeObjectEDataType = createEDataType(TYPE_TYPE_OBJECT);
 		versionTypeEDataType = createEDataType(VERSION_TYPE);
 	}
@@ -5045,7 +5142,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEClass(agentTypeEClass, AgentType.class, "AgentType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getAgentType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, AgentType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getAgentType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, AgentType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getAgentType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 0, 1, AgentType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getAgentType_ClassName(), theXMLTypePackage.getString(), "className", null, 0, 1, AgentType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAgentType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, AgentType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getAgentType_Ref(), theXMLTypePackage.getString(), "ref", null, 0, 1, AgentType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -5054,25 +5151,25 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getCatchAllStrategyType_Endpoint(), this.getEndpointType(), null, "endpoint", null, 0, 1, CatchAllStrategyType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getCatchAllStrategyType_GlobalEndpoint(), this.getGlobalEndpointType(), null, "globalEndpoint", null, 0, 1, CatchAllStrategyType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getCatchAllStrategyType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, CatchAllStrategyType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getCatchAllStrategyType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, CatchAllStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getCatchAllStrategyType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, CatchAllStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(componentFactoryTypeEClass, ComponentFactoryType.class, "ComponentFactoryType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getComponentFactoryType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ComponentFactoryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getComponentFactoryType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, ComponentFactoryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getComponentFactoryType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, ComponentFactoryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(componentLifecycleAdapterFactoryTypeEClass, ComponentLifecycleAdapterFactoryType.class, "ComponentLifecycleAdapterFactoryType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getComponentLifecycleAdapterFactoryType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ComponentLifecycleAdapterFactoryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getComponentLifecycleAdapterFactoryType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, ComponentLifecycleAdapterFactoryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getComponentLifecycleAdapterFactoryType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, ComponentLifecycleAdapterFactoryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(componentPoolFactoryTypeEClass, ComponentPoolFactoryType.class, "ComponentPoolFactoryType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getComponentPoolFactoryType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ComponentPoolFactoryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getComponentPoolFactoryType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, ComponentPoolFactoryType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getComponentPoolFactoryType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, ComponentPoolFactoryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getComponentPoolFactoryType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, ComponentPoolFactoryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(connectionStrategyTypeEClass, ConnectionStrategyType.class, "ConnectionStrategyType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getConnectionStrategyType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ConnectionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getConnectionStrategyType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, ConnectionStrategyType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getConnectionStrategyType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, ConnectionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getConnectionStrategyType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, ConnectionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(connectorTypeEClass, ConnectorType.class, "ConnectorType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getConnectorType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ConnectorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5080,8 +5177,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getConnectorType_ThreadingProfile(), this.getThreadingProfileType(), null, "threadingProfile", null, 0, 1, ConnectorType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getConnectorType_ExceptionStrategy(), this.getExceptionStrategyType(), null, "exceptionStrategy", null, 0, 1, ConnectorType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getConnectorType_ConnectionStrategy(), this.getConnectionStrategyType(), null, "connectionStrategy", null, 0, 1, ConnectorType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getConnectorType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 0, 1, ConnectorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getConnectorType_Name(), theXMLTypePackage.getID(), "name", null, 1, 1, ConnectorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getConnectorType_ClassName(), theXMLTypePackage.getString(), "className", null, 0, 1, ConnectorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getConnectorType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, ConnectorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getConnectorType_Ref(), theXMLTypePackage.getString(), "ref", null, 0, 1, ConnectorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(constraintTypeEClass, ConstraintType.class, "ConstraintType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -5089,8 +5186,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getConstraintType_LeftFilter(), this.getLeftFilterType(), null, "leftFilter", null, 0, 1, ConstraintType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getConstraintType_RightFilter(), this.getRightFilterType(), null, "rightFilter", null, 0, 1, ConstraintType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getConstraintType_Filter(), this.getFilterType(), null, "filter", null, 0, 1, ConstraintType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getConstraintType_BatchSize(), theXMLTypePackage.getNMTOKEN(), "batchSize", null, 0, 1, ConstraintType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getConstraintType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, ConstraintType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getConstraintType_BatchSize(), theXMLTypePackage.getString(), "batchSize", null, 0, 1, ConstraintType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getConstraintType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, ConstraintType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getConstraintType_ExpectedType(), theXMLTypePackage.getString(), "expectedType", null, 0, 1, ConstraintType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getConstraintType_Expression(), theXMLTypePackage.getString(), "expression", null, 0, 1, ConstraintType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getConstraintType_Frequency(), theXMLTypePackage.getString(), "frequency", null, 0, 1, ConstraintType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5100,19 +5197,20 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEClass(containerContextTypeEClass, ContainerContextType.class, "ContainerContextType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getContainerContextType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ContainerContextType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getContainerContextType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, ContainerContextType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getContainerContextType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, ContainerContextType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getContainerContextType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, ContainerContextType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getContainerContextType_Name(), theXMLTypePackage.getString(), "name", null, 0, 1, ContainerContextType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(containerEntryTypeEClass, ContainerEntryType.class, "ContainerEntryType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getContainerEntryType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ContainerEntryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getContainerEntryType_Reference(), theXMLTypePackage.getNMTOKEN(), "reference", null, 1, 1, ContainerEntryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getContainerEntryType_Reference(), theXMLTypePackage.getString(), "reference", null, 1, 1, ContainerEntryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getContainerEntryType_Required(), theXMLTypePackage.getBoolean(), "required", "true", 0, 1, ContainerEntryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(containerPropertyTypeEClass, ContainerPropertyType.class, "ContainerPropertyType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getContainerPropertyType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ContainerPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getContainerPropertyType_Container(), theXMLTypePackage.getBoolean(), "container", "true", 0, 1, ContainerPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getContainerPropertyType_Container(), theXMLTypePackage.getString(), "container", null, 0, 1, ContainerPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getContainerPropertyType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, ContainerPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getContainerPropertyType_Reference(), theXMLTypePackage.getString(), "reference", null, 1, 1, ContainerPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getContainerPropertyType_Required(), theXMLTypePackage.getBoolean(), "required", "true", 0, 1, ContainerPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(documentRootEClass, DocumentRoot.class, "DocumentRoot", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getDocumentRoot_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, null, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5123,8 +5221,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEClass(encryptionStrategyTypeEClass, EncryptionStrategyType.class, "EncryptionStrategyType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getEncryptionStrategyType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, EncryptionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getEncryptionStrategyType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, EncryptionStrategyType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEncryptionStrategyType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, EncryptionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEncryptionStrategyType_Name(), theXMLTypePackage.getID(), "name", null, 1, 1, EncryptionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEncryptionStrategyType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, EncryptionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEncryptionStrategyType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, EncryptionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(endpointIdentifiersTypeEClass, EndpointIdentifiersType.class, "EndpointIdentifiersType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getEndpointIdentifiersType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, EndpointIdentifiersType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5142,19 +5240,20 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getEndpointType_SecurityFilter(), this.getSecurityFilterType(), null, "securityFilter", null, 0, 1, EndpointType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getEndpointType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, EndpointType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEndpointType_Address(), theXMLTypePackage.getString(), "address", null, 1, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEndpointType_Connector(), theXMLTypePackage.getIDREF(), "connector", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEndpointType_Connector(), theXMLTypePackage.getString(), "connector", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEndpointType_CreateConnector(), this.getCreateConnectorType(), "createConnector", "GET_OR_CREATE", 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEndpointType_Name(), theXMLTypePackage.getID(), "name", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEndpointType_Name(), theXMLTypePackage.getString(), "name", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEndpointType_Ref(), theXMLTypePackage.getString(), "ref", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEndpointType_RemoteSync(), theXMLTypePackage.getBoolean(), "remoteSync", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEndpointType_RemoteSyncTimeout(), theXMLTypePackage.getNMTOKEN(), "remoteSyncTimeout", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEndpointType_RemoteSyncTimeout(), theXMLTypePackage.getString(), "remoteSyncTimeout", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEndpointType_ResponseTransformers(), theXMLTypePackage.getIDREFS(), "responseTransformers", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getEndpointType_Synchronous(), theXMLTypePackage.getBoolean(), "synchronous", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEndpointType_Transformers(), theXMLTypePackage.getIDREFS(), "transformers", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEndpointType_Type(), this.getTypeType(), "type", "senderAndReceiver", 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEndpointType_Transformers(), theXMLTypePackage.getString(), "transformers", null, 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEndpointType_Type(), this.getTypeType1(), "type", "senderAndReceiver", 0, 1, EndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(entryPointResolverTypeEClass, EntryPointResolverType.class, "EntryPointResolverType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getEntryPointResolverType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, EntryPointResolverType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getEntryPointResolverType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, EntryPointResolverType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getEntryPointResolverType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, EntryPointResolverType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(entryTypeEClass, EntryType.class, "EntryType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getEntryType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, EntryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5175,11 +5274,11 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getExceptionStrategyType_Endpoint(), this.getEndpointType(), null, "endpoint", null, 0, -1, ExceptionStrategyType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getExceptionStrategyType_GlobalEndpoint(), this.getGlobalEndpointType(), null, "globalEndpoint", null, 0, -1, ExceptionStrategyType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getExceptionStrategyType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, ExceptionStrategyType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getExceptionStrategyType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, ExceptionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getExceptionStrategyType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, ExceptionStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(factoryEntryTypeEClass, FactoryEntryType.class, "FactoryEntryType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getFactoryEntryType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, FactoryEntryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getFactoryEntryType_Factory(), theXMLTypePackage.getNMTOKEN(), "factory", null, 1, 1, FactoryEntryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFactoryEntryType_Factory(), theXMLTypePackage.getString(), "factory", null, 1, 1, FactoryEntryType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(factoryPropertyTypeEClass, FactoryPropertyType.class, "FactoryPropertyType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getFactoryPropertyType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, FactoryPropertyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5188,7 +5287,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 
 		initEClass(filePropertiesTypeEClass, FilePropertiesType.class, "FilePropertiesType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getFilePropertiesType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, FilePropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getFilePropertiesType_Location(), theXMLTypePackage.getNMTOKEN(), "location", null, 1, 1, FilePropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFilePropertiesType_Location(), theXMLTypePackage.getString(), "location", null, 1, 1, FilePropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFilePropertiesType_Override(), theXMLTypePackage.getBoolean(), "override", "true", 0, 1, FilePropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(filterTypeEClass, FilterType.class, "FilterType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -5197,7 +5296,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getFilterType_Filter(), this.getFilterType(), null, "filter", null, 0, 1, FilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getFilterType_LeftFilter(), this.getLeftFilterType(), null, "leftFilter", null, 0, 1, FilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getFilterType_RightFilter(), this.getRightFilterType(), null, "rightFilter", null, 0, 1, FilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getFilterType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, FilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getFilterType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, FilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFilterType_ConfigFile(), theXMLTypePackage.getString(), "configFile", null, 0, 1, FilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFilterType_ExpectedType(), theXMLTypePackage.getString(), "expectedType", null, 0, 1, FilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getFilterType_Expression(), theXMLTypePackage.getString(), "expression", null, 0, 1, FilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5215,11 +5314,12 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getGlobalEndpointType_SecurityFilter(), this.getSecurityFilterType(), null, "securityFilter", null, 0, 1, GlobalEndpointType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getGlobalEndpointType_Properties(), this.getPropertiesType(), null, "properties", null, 0, -1, GlobalEndpointType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getGlobalEndpointType_Address(), theXMLTypePackage.getString(), "address", null, 0, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getGlobalEndpointType_Name(), theXMLTypePackage.getIDREF(), "name", null, 1, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGlobalEndpointType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getGlobalEndpointType_RemoteSync(), theXMLTypePackage.getBoolean(), "remoteSync", null, 0, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getGlobalEndpointType_RemoteSyncTimeout(), theXMLTypePackage.getNMTOKEN(), "remoteSyncTimeout", null, 0, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGlobalEndpointType_RemoteSyncTimeout(), theXMLTypePackage.getString(), "remoteSyncTimeout", null, 0, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGlobalEndpointType_ResponseTransformers(), theXMLTypePackage.getString(), "responseTransformers", null, 0, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getGlobalEndpointType_Synchronous(), theXMLTypePackage.getBoolean(), "synchronous", null, 0, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getGlobalEndpointType_Transformers(), theXMLTypePackage.getIDREFS(), "transformers", null, 0, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGlobalEndpointType_Transformers(), theXMLTypePackage.getString(), "transformers", null, 0, 1, GlobalEndpointType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(inboundRouterTypeEClass, InboundRouterType.class, "InboundRouterType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getInboundRouterType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, InboundRouterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5232,13 +5332,13 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEClass(interceptorStackTypeEClass, InterceptorStackType.class, "InterceptorStackType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getInterceptorStackType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, InterceptorStackType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInterceptorStackType_Interceptor(), this.getInterceptorType(), null, "interceptor", null, 1, -1, InterceptorStackType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getInterceptorStackType_Name(), theXMLTypePackage.getID(), "name", null, 1, 1, InterceptorStackType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getInterceptorStackType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, InterceptorStackType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(interceptorTypeEClass, InterceptorType.class, "InterceptorType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getInterceptorType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, InterceptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getInterceptorType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, InterceptorType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getInterceptorType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 0, 1, InterceptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getInterceptorType_Name(), theXMLTypePackage.getNMTOKEN(), "name", null, 0, 1, InterceptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getInterceptorType_ClassName(), theXMLTypePackage.getString(), "className", null, 0, 1, InterceptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getInterceptorType_Name(), theXMLTypePackage.getString(), "name", null, 0, 1, InterceptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(leftFilterTypeEClass, LeftFilterType.class, "LeftFilterType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getLeftFilterType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, LeftFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5246,7 +5346,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getLeftFilterType_Filter(), this.getFilterType(), null, "filter", null, 0, 1, LeftFilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getLeftFilterType_LeftFilter(), this.getLeftFilterType(), null, "leftFilter", null, 0, 1, LeftFilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getLeftFilterType_RightFilter(), this.getRightFilterType(), null, "rightFilter", null, 0, 1, LeftFilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getLeftFilterType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, LeftFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getLeftFilterType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, LeftFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getLeftFilterType_ConfigFile(), theXMLTypePackage.getString(), "configFile", null, 0, 1, LeftFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getLeftFilterType_ExpectedType(), theXMLTypePackage.getString(), "expectedType", null, 0, 1, LeftFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getLeftFilterType_Expression(), theXMLTypePackage.getString(), "expression", null, 0, 1, LeftFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5260,7 +5360,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getListType_FactoryEntry(), this.getFactoryEntryType(), null, "factoryEntry", null, 0, -1, ListType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getListType_SystemEntry(), this.getSystemEntryType(), null, "systemEntry", null, 0, -1, ListType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getListType_ContainerEntry(), this.getContainerEntryType(), null, "containerEntry", null, 0, -1, ListType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getListType_Name(), theXMLTypePackage.getNMTOKEN(), "name", null, 1, 1, ListType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getListType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, ListType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(mapTypeEClass, MapType.class, "MapType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getMapType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, MapType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5272,7 +5372,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getMapType_Map(), this.getMapType(), null, "map", null, 0, -1, MapType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getMapType_List(), this.getListType(), null, "list", null, 0, -1, MapType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getMapType_FileProperties(), this.getFilePropertiesType(), null, "fileProperties", null, 0, -1, MapType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMapType_Name(), theXMLTypePackage.getNMTOKEN(), "name", null, 1, 1, MapType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMapType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, MapType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(modelTypeEClass, ModelType.class, "ModelType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getModelType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ModelType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5283,8 +5383,10 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getModelType_ComponentPoolFactory(), this.getComponentPoolFactoryType(), null, "componentPoolFactory", null, 0, 1, ModelType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getModelType_ExceptionStrategy(), this.getExceptionStrategyType(), null, "exceptionStrategy", null, 0, 1, ModelType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getModelType_MuleDescriptor(), this.getMuleDescriptorType(), null, "muleDescriptor", null, 0, -1, ModelType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getModelType_ClassName(), theXMLTypePackage.getString(), "className", null, 0, 1, ModelType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getModelType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, ModelType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getModelType_Ref(), theXMLTypePackage.getString(), "ref", null, 0, 1, ModelType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getModelType_Type(), this.getTypeType(), "type", "seda", 0, 1, ModelType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(muleConfigurationTypeEClass, MuleConfigurationType.class, "MuleConfigurationType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getMuleConfigurationType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, MuleConfigurationType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5302,7 +5404,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getMuleConfigurationType_InterceptorStack(), this.getInterceptorStackType(), null, "interceptorStack", null, 0, -1, MuleConfigurationType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getMuleConfigurationType_Model(), this.getModelType(), null, "model", null, 0, 1, MuleConfigurationType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getMuleConfigurationType_MuleDescriptor(), this.getMuleDescriptorType(), null, "muleDescriptor", null, 0, -1, MuleConfigurationType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMuleConfigurationType_Id(), theXMLTypePackage.getNMTOKEN(), "id", null, 0, 1, MuleConfigurationType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleConfigurationType_Id(), theXMLTypePackage.getString(), "id", null, 0, 1, MuleConfigurationType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleConfigurationType_Version(), this.getVersionType(), "version", null, 1, 1, MuleConfigurationType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(muleDescriptorTypeEClass, MuleDescriptorType.class, "MuleDescriptorType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -5317,17 +5419,17 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getMuleDescriptorType_ExceptionStrategy(), this.getExceptionStrategyType(), null, "exceptionStrategy", null, 0, 1, MuleDescriptorType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getMuleDescriptorType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, MuleDescriptorType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleDescriptorType_ContainerManaged(), theXMLTypePackage.getBoolean(), "containerManaged", "true", 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMuleDescriptorType_Implementation(), theXMLTypePackage.getNMTOKEN(), "implementation", null, 1, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleDescriptorType_Implementation(), theXMLTypePackage.getString(), "implementation", null, 1, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleDescriptorType_InboundEndpoint(), theXMLTypePackage.getString(), "inboundEndpoint", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMuleDescriptorType_InboundTransformer(), theXMLTypePackage.getIDREFS(), "inboundTransformer", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleDescriptorType_InboundTransformer(), theXMLTypePackage.getString(), "inboundTransformer", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleDescriptorType_InitialState(), this.getInitialStateType(), "initialState", "started", 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleDescriptorType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleDescriptorType_OutboundEndpoint(), theXMLTypePackage.getString(), "outboundEndpoint", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMuleDescriptorType_OutboundTransformer(), theXMLTypePackage.getIDREFS(), "outboundTransformer", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleDescriptorType_OutboundTransformer(), theXMLTypePackage.getString(), "outboundTransformer", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleDescriptorType_Ref(), theXMLTypePackage.getString(), "ref", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMuleDescriptorType_ResponseTransformer(), theXMLTypePackage.getIDREFS(), "responseTransformer", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleDescriptorType_ResponseTransformer(), theXMLTypePackage.getString(), "responseTransformer", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleDescriptorType_Singleton(), theXMLTypePackage.getBoolean(), "singleton", "false", 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMuleDescriptorType_Version(), theXMLTypePackage.getNMTOKEN(), "version", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleDescriptorType_Version(), theXMLTypePackage.getString(), "version", null, 0, 1, MuleDescriptorType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(muleEnvironmentPropertiesTypeEClass, MuleEnvironmentPropertiesType.class, "MuleEnvironmentPropertiesType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getMuleEnvironmentPropertiesType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5337,13 +5439,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getMuleEnvironmentPropertiesType_PersistenceStrategy(), this.getPersistenceStrategyType(), null, "persistenceStrategy", null, 0, 1, MuleEnvironmentPropertiesType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getMuleEnvironmentPropertiesType_ConnectionStrategy(), this.getConnectionStrategyType(), null, "connectionStrategy", null, 0, 1, MuleEnvironmentPropertiesType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleEnvironmentPropertiesType_ClientMode(), theXMLTypePackage.getBoolean(), "clientMode", "false", 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleEnvironmentPropertiesType_Embedded(), theXMLTypePackage.getBoolean(), "embedded", "false", 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleEnvironmentPropertiesType_EnableMessageEvents(), theXMLTypePackage.getBoolean(), "enableMessageEvents", "false", 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleEnvironmentPropertiesType_Encoding(), theXMLTypePackage.getString(), "encoding", null, 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleEnvironmentPropertiesType_Model(), theXMLTypePackage.getString(), "model", null, 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleEnvironmentPropertiesType_RecoverableMode(), theXMLTypePackage.getBoolean(), "recoverableMode", "false", 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleEnvironmentPropertiesType_RemoteSync(), theXMLTypePackage.getBoolean(), "remoteSync", "false", 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleEnvironmentPropertiesType_ServerUrl(), theXMLTypePackage.getString(), "serverUrl", null, 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleEnvironmentPropertiesType_Synchronous(), theXMLTypePackage.getBoolean(), "synchronous", "false", 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMuleEnvironmentPropertiesType_SynchronousEventTimeout(), theXMLTypePackage.getNMTOKEN(), "synchronousEventTimeout", null, 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMuleEnvironmentPropertiesType_SynchronousReceive(), theXMLTypePackage.getBoolean(), "synchronousReceive", "false", 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMuleEnvironmentPropertiesType_TransactionTimeout(), theXMLTypePackage.getNMTOKEN(), "transactionTimeout", null, 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleEnvironmentPropertiesType_SynchronousEventTimeout(), theXMLTypePackage.getString(), "synchronousEventTimeout", null, 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMuleEnvironmentPropertiesType_TransactionTimeout(), theXMLTypePackage.getString(), "transactionTimeout", null, 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMuleEnvironmentPropertiesType_WorkingDirectory(), theXMLTypePackage.getString(), "workingDirectory", "./.mule", 0, 1, MuleEnvironmentPropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(outboundRouterTypeEClass, OutboundRouterType.class, "OutboundRouterType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -5355,16 +5460,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEClass(persistenceStrategyTypeEClass, PersistenceStrategyType.class, "PersistenceStrategyType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPersistenceStrategyType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, PersistenceStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getPersistenceStrategyType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, PersistenceStrategyType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPersistenceStrategyType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, PersistenceStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPersistenceStrategyType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, PersistenceStrategyType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(poolingProfileTypeEClass, PoolingProfileType.class, "PoolingProfileType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPoolingProfileType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPoolingProfileType_ExhaustedAction(), this.getExhaustedActionType(), "exhaustedAction", "GROW", 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPoolingProfileType_Factory(), theXMLTypePackage.getNMTOKEN(), "factory", "org.mule.config.pool.CommonsPoolFactory", 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPoolingProfileType_Factory(), theXMLTypePackage.getString(), "factory", "org.mule.config.pool.CommonsPoolFactory", 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getPoolingProfileType_InitialisationPolicy(), this.getInitialisationPolicyType(), "initialisationPolicy", "INITIALISE_FIRST", 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPoolingProfileType_MaxActive(), theXMLTypePackage.getNMTOKEN(), "maxActive", null, 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPoolingProfileType_MaxIdle(), theXMLTypePackage.getNMTOKEN(), "maxIdle", null, 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPoolingProfileType_MaxWait(), theXMLTypePackage.getNMTOKEN(), "maxWait", null, 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPoolingProfileType_MaxActive(), theXMLTypePackage.getString(), "maxActive", null, 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPoolingProfileType_MaxIdle(), theXMLTypePackage.getString(), "maxIdle", null, 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPoolingProfileType_MaxWait(), theXMLTypePackage.getString(), "maxWait", null, 0, 1, PoolingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(propertiesTypeEClass, PropertiesType.class, "PropertiesType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPropertiesType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, PropertiesType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5386,7 +5491,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEClass(queueProfileTypeEClass, QueueProfileType.class, "QueueProfileType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getQueueProfileType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, QueueProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getQueueProfileType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, QueueProfileType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getQueueProfileType_MaxOutstandingMessages(), theXMLTypePackage.getNMTOKEN(), "maxOutstandingMessages", null, 0, 1, QueueProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getQueueProfileType_MaxOutstandingMessages(), theXMLTypePackage.getString(), "maxOutstandingMessages", null, 0, 1, QueueProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getQueueProfileType_Persistent(), theXMLTypePackage.getBoolean(), "persistent", "false", 0, 1, QueueProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(replyToTypeEClass, ReplyToType.class, "ReplyToType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -5399,7 +5504,6 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getResponseRouterType_GlobalEndpoint(), this.getGlobalEndpointType(), null, "globalEndpoint", null, 0, -1, ResponseRouterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getResponseRouterType_Router(), this.getRouterType(), null, "router", null, 0, -1, ResponseRouterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getResponseRouterType_Timeout(), theXMLTypePackage.getString(), "timeout", null, 0, 1, ResponseRouterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getResponseRouterType_Transformers(), theXMLTypePackage.getIDREFS(), "transformers", null, 0, 1, ResponseRouterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(rightFilterTypeEClass, RightFilterType.class, "RightFilterType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getRightFilterType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, RightFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5407,7 +5511,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getRightFilterType_Filter(), this.getFilterType(), null, "filter", null, 0, 1, RightFilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getRightFilterType_LeftFilter(), this.getLeftFilterType(), null, "leftFilter", null, 0, 1, RightFilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getRightFilterType_RightFilter(), this.getRightFilterType(), null, "rightFilter", null, 0, 1, RightFilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getRightFilterType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, RightFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRightFilterType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, RightFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getRightFilterType_ConfigFile(), theXMLTypePackage.getString(), "configFile", null, 0, 1, RightFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getRightFilterType_ExpectedType(), theXMLTypePackage.getString(), "expectedType", null, 0, 1, RightFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getRightFilterType_Expression(), theXMLTypePackage.getString(), "expression", null, 0, 1, RightFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5422,28 +5526,28 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEReference(getRouterType_Transaction(), this.getTransactionType(), null, "transaction", null, 0, 1, RouterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getRouterType_Filter(), this.getFilterType(), null, "filter", null, 0, 1, RouterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getRouterType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, RouterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getRouterType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, RouterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRouterType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, RouterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getRouterType_EnableCorrelation(), this.getEnableCorrelationType(), "enableCorrelation", "IF_NOT_SET", 0, 1, RouterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getRouterType_PropertyExtractor(), theXMLTypePackage.getNMTOKEN(), "propertyExtractor", null, 0, 1, RouterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRouterType_PropertyExtractor(), theXMLTypePackage.getString(), "propertyExtractor", null, 0, 1, RouterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(securityFilterTypeEClass, SecurityFilterType.class, "SecurityFilterType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSecurityFilterType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, SecurityFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getSecurityFilterType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, SecurityFilterType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSecurityFilterType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 1, 1, SecurityFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSecurityFilterType_UseProviders(), theXMLTypePackage.getIDREFS(), "useProviders", null, 0, 1, SecurityFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSecurityFilterType_ClassName(), theXMLTypePackage.getString(), "className", null, 1, 1, SecurityFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSecurityFilterType_UseProviders(), theXMLTypePackage.getString(), "useProviders", null, 0, 1, SecurityFilterType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(securityManagerTypeEClass, SecurityManagerType.class, "SecurityManagerType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSecurityManagerType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, SecurityManagerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getSecurityManagerType_SecurityProvider(), this.getSecurityProviderType(), null, "securityProvider", null, 0, -1, SecurityManagerType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getSecurityManagerType_EncryptionStrategy(), this.getEncryptionStrategyType(), null, "encryptionStrategy", null, 0, -1, SecurityManagerType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSecurityManagerType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 0, 1, SecurityManagerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSecurityManagerType_ClassName(), theXMLTypePackage.getString(), "className", null, 0, 1, SecurityManagerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSecurityManagerType_Ref(), theXMLTypePackage.getString(), "ref", null, 0, 1, SecurityManagerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(securityProviderTypeEClass, SecurityProviderType.class, "SecurityProviderType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSecurityProviderType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, SecurityProviderType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getSecurityProviderType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, SecurityProviderType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSecurityProviderType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 0, 1, SecurityProviderType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSecurityProviderType_Name(), theXMLTypePackage.getID(), "name", null, 1, 1, SecurityProviderType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSecurityProviderType_ClassName(), theXMLTypePackage.getString(), "className", null, 0, 1, SecurityProviderType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSecurityProviderType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, SecurityProviderType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSecurityProviderType_Ref(), theXMLTypePackage.getString(), "ref", null, 0, 1, SecurityProviderType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(systemEntryTypeEClass, SystemEntryType.class, "SystemEntryType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -5465,24 +5569,25 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEAttribute(getThreadingProfileType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getThreadingProfileType_DoThreading(), theXMLTypePackage.getBoolean(), "doThreading", "true", 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getThreadingProfileType_Id(), this.getIdType(), "id", "default", 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getThreadingProfileType_MaxBufferSize(), theXMLTypePackage.getNMTOKEN(), "maxBufferSize", null, 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getThreadingProfileType_MaxThreadsActive(), theXMLTypePackage.getNMTOKEN(), "maxThreadsActive", null, 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getThreadingProfileType_MaxThreadsIdle(), theXMLTypePackage.getNMTOKEN(), "maxThreadsIdle", null, 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getThreadingProfileType_MaxBufferSize(), theXMLTypePackage.getString(), "maxBufferSize", null, 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getThreadingProfileType_MaxThreadsActive(), theXMLTypePackage.getString(), "maxThreadsActive", null, 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getThreadingProfileType_MaxThreadsIdle(), theXMLTypePackage.getString(), "maxThreadsIdle", null, 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getThreadingProfileType_PoolExhaustedAction(), this.getPoolExhaustedActionType(), "poolExhaustedAction", "RUN", 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getThreadingProfileType_ThreadTTL(), theXMLTypePackage.getNMTOKEN(), "threadTTL", null, 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getThreadingProfileType_ThreadTTL(), theXMLTypePackage.getString(), "threadTTL", null, 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getThreadingProfileType_ThreadWaitTimeout(), theXMLTypePackage.getString(), "threadWaitTimeout", null, 0, 1, ThreadingProfileType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(transactionManagerTypeEClass, TransactionManagerType.class, "TransactionManagerType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTransactionManagerType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, TransactionManagerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTransactionManagerType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, TransactionManagerType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTransactionManagerType_Factory(), theXMLTypePackage.getNMTOKEN(), "factory", null, 0, 1, TransactionManagerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTransactionManagerType_Factory(), theXMLTypePackage.getString(), "factory", null, 0, 1, TransactionManagerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTransactionManagerType_Ref(), theXMLTypePackage.getString(), "ref", null, 0, 1, TransactionManagerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(transactionTypeEClass, TransactionType.class, "TransactionType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTransactionType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, TransactionType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTransactionType_Constraint(), this.getConstraintType(), null, "constraint", null, 0, 1, TransactionType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTransactionType_Action(), this.getActionType(), "action", "NONE", 0, 1, TransactionType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTransactionType_Factory(), theXMLTypePackage.getNMTOKEN(), "factory", null, 0, 1, TransactionType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTransactionType_Timeout(), theXMLTypePackage.getNMTOKEN(), "timeout", null, 0, 1, TransactionType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTransactionType_Factory(), theXMLTypePackage.getString(), "factory", null, 0, 1, TransactionType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTransactionType_Timeout(), theXMLTypePackage.getString(), "timeout", null, 0, 1, TransactionType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(transformersTypeEClass, TransformersType.class, "TransformersType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTransformersType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, TransformersType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -5491,9 +5596,9 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEClass(transformerTypeEClass, TransformerType.class, "TransformerType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTransformerType_Mixed(), ecorePackage.getEFeatureMapEntry(), "mixed", null, 0, -1, TransformerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getTransformerType_Properties(), this.getPropertiesType(), null, "properties", null, 0, 1, TransformerType.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTransformerType_ClassName(), theXMLTypePackage.getNMTOKEN(), "className", null, 0, 1, TransformerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTransformerType_ClassName(), theXMLTypePackage.getString(), "className", null, 0, 1, TransformerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTransformerType_IgnoreBadInput(), theXMLTypePackage.getBoolean(), "ignoreBadInput", null, 0, 1, TransformerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTransformerType_Name(), theXMLTypePackage.getID(), "name", null, 1, 1, TransformerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTransformerType_Name(), theXMLTypePackage.getString(), "name", null, 1, 1, TransformerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTransformerType_Ref(), theXMLTypePackage.getString(), "ref", null, 0, 1, TransformerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTransformerType_ReturnClass(), theXMLTypePackage.getString(), "returnClass", "java.lang.Object", 0, 1, TransformerType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
@@ -5542,10 +5647,10 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		addEEnumLiteral(poolExhaustedActionTypeEEnum, PoolExhaustedActionType.ABORT_LITERAL);
 		addEEnumLiteral(poolExhaustedActionTypeEEnum, PoolExhaustedActionType.RUN_LITERAL);
 
-		initEEnum(typeTypeEEnum, TypeType.class, "TypeType");
-		addEEnumLiteral(typeTypeEEnum, TypeType.SENDER_LITERAL);
-		addEEnumLiteral(typeTypeEEnum, TypeType.RECEIVER_LITERAL);
-		addEEnumLiteral(typeTypeEEnum, TypeType.SENDER_AND_RECEIVER_LITERAL);
+		initEEnum(typeType1EEnum, TypeType1.class, "TypeType1");
+		addEEnumLiteral(typeType1EEnum, TypeType1.SENDER_LITERAL);
+		addEEnumLiteral(typeType1EEnum, TypeType1.RECEIVER_LITERAL);
+		addEEnumLiteral(typeType1EEnum, TypeType1.SENDER_AND_RECEIVER_LITERAL);
 
 		// Initialize data types
 		initEDataType(actionTypeObjectEDataType, ActionType.class, "ActionTypeObject", IS_SERIALIZABLE, IS_GENERATED_INSTANCE_CLASS);
@@ -5556,7 +5661,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		initEDataType(initialisationPolicyTypeObjectEDataType, InitialisationPolicyType.class, "InitialisationPolicyTypeObject", IS_SERIALIZABLE, IS_GENERATED_INSTANCE_CLASS);
 		initEDataType(initialStateTypeObjectEDataType, InitialStateType.class, "InitialStateTypeObject", IS_SERIALIZABLE, IS_GENERATED_INSTANCE_CLASS);
 		initEDataType(poolExhaustedActionTypeObjectEDataType, PoolExhaustedActionType.class, "PoolExhaustedActionTypeObject", IS_SERIALIZABLE, IS_GENERATED_INSTANCE_CLASS);
-		initEDataType(typeTypeObjectEDataType, TypeType.class, "TypeTypeObject", IS_SERIALIZABLE, IS_GENERATED_INSTANCE_CLASS);
+		initEDataType(typeTypeEDataType, String.class, "TypeType", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
+		initEDataType(typeTypeObjectEDataType, TypeType1.class, "TypeTypeObject", IS_SERIALIZABLE, IS_GENERATED_INSTANCE_CLASS);
 		initEDataType(versionTypeEDataType, String.class, "VersionType", IS_SERIALIZABLE, !IS_GENERATED_INSTANCE_CLASS);
 
 		// Create resource
@@ -5575,6 +5681,12 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 	 */
 	protected void createExtendedMetaDataAnnotations() {
 		String source = "http:///org/eclipse/emf/ecore/util/ExtendedMetaData";		
+		addAnnotation
+		  (this, 
+		   source, 
+		   new String[] {
+			 "qualified", "false"
+		   });		
 		addAnnotation
 		  (actionTypeEEnum, 
 		   source, 
@@ -5637,21 +5749,24 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getAgentType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getAgentType_Ref(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ref"
+			 "name", "ref",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (catchAllStrategyTypeEClass, 
@@ -5696,7 +5811,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (componentFactoryTypeEClass, 
@@ -5717,7 +5833,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (componentLifecycleAdapterFactoryTypeEClass, 
@@ -5738,7 +5855,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (componentPoolFactoryTypeEClass, 
@@ -5767,7 +5885,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (connectionStrategyTypeEClass, 
@@ -5796,7 +5915,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (connectorTypeEClass, 
@@ -5849,21 +5969,24 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getConnectorType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getConnectorType_Ref(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ref"
+			 "name", "ref",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (constraintTypeEClass, 
@@ -5908,49 +6031,56 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "batchSize"
+			 "name", "batchSize",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getConstraintType_ClassName(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getConstraintType_ExpectedType(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "expectedType"
+			 "name", "expectedType",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getConstraintType_Expression(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "expression"
+			 "name", "expression",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getConstraintType_Frequency(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "frequency"
+			 "name", "frequency",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getConstraintType_Path(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "path"
+			 "name", "path",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getConstraintType_Pattern(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "pattern"
+			 "name", "pattern",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (containerContextTypeEClass, 
@@ -5979,14 +6109,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getContainerContextType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (containerEntryTypeEClass, 
@@ -6007,14 +6139,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "reference"
+			 "name", "reference",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getContainerEntryType_Required(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "required"
+			 "name", "required",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (containerPropertyTypeEClass, 
@@ -6035,21 +6169,32 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "container"
+			 "name", "container",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getContainerPropertyType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getContainerPropertyType_Reference(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "reference"
+			 "name", "reference",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
+		  (getContainerPropertyType_Required(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "required",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (createConnectorTypeEEnum, 
@@ -6140,14 +6285,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEncryptionStrategyType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (endpointIdentifiersTypeEClass, 
@@ -6190,14 +6337,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointIdentifierType_Value(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "value"
+			 "name", "value",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (endpointTypeEClass, 
@@ -6250,70 +6399,88 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "address"
+			 "name", "address",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointType_Connector(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "connector"
+			 "name", "connector",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointType_CreateConnector(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "createConnector"
+			 "name", "createConnector",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointType_Ref(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ref"
+			 "name", "ref",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointType_RemoteSync(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "remoteSync"
+			 "name", "remoteSync",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointType_RemoteSyncTimeout(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "remoteSyncTimeout"
+			 "name", "remoteSyncTimeout",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
+		  (getEndpointType_ResponseTransformers(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "responseTransformers",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointType_Synchronous(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "synchronous"
+			 "name", "synchronous",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointType_Transformers(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "transformers"
+			 "name", "transformers",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getEndpointType_Type(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "type"
+			 "name", "type",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (entryPointResolverTypeEClass, 
@@ -6334,7 +6501,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (entryTypeEClass, 
@@ -6355,7 +6523,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "value"
+			 "name", "value",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (environmentPropertiesTypeEClass, 
@@ -6385,7 +6554,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getEnvironmentPropertiesType_FactoryProperty(), 
@@ -6394,7 +6563,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "factory-property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getEnvironmentPropertiesType_SystemProperty(), 
@@ -6403,7 +6572,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "system-property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getEnvironmentPropertiesType_Map(), 
@@ -6412,7 +6581,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "map",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getEnvironmentPropertiesType_List(), 
@@ -6421,7 +6590,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "list",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getEnvironmentPropertiesType_FileProperties(), 
@@ -6430,7 +6599,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "file-properties",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (exceptionStrategyTypeEClass, 
@@ -6475,7 +6644,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (exhaustedActionTypeEEnum, 
@@ -6509,7 +6679,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "factory"
+			 "name", "factory",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (factoryPropertyTypeEClass, 
@@ -6530,14 +6701,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "factory"
+			 "name", "factory",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getFactoryPropertyType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (filePropertiesTypeEClass, 
@@ -6558,14 +6731,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "location"
+			 "name", "location",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getFilePropertiesType_Override(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "override"
+			 "name", "override",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (filterTypeEClass, 
@@ -6618,42 +6793,48 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getFilterType_ConfigFile(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "configFile"
+			 "name", "configFile",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getFilterType_ExpectedType(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "expectedType"
+			 "name", "expectedType",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getFilterType_Expression(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "expression"
+			 "name", "expression",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getFilterType_Path(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "path"
+			 "name", "path",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getFilterType_Pattern(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "pattern"
+			 "name", "pattern",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (globalEndpointsTypeEClass, 
@@ -6728,42 +6909,56 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "address"
+			 "name", "address",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getGlobalEndpointType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getGlobalEndpointType_RemoteSync(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "remoteSync"
+			 "name", "remoteSync",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getGlobalEndpointType_RemoteSyncTimeout(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "remoteSyncTimeout"
+			 "name", "remoteSyncTimeout",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
+		  (getGlobalEndpointType_ResponseTransformers(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "responseTransformers",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getGlobalEndpointType_Synchronous(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "synchronous"
+			 "name", "synchronous",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getGlobalEndpointType_Transformers(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "transformers"
+			 "name", "transformers",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (idTypeEEnum, 
@@ -6829,7 +7024,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "matchAll"
+			 "name", "matchAll",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (initialisationPolicyTypeEEnum, 
@@ -6884,7 +7080,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (interceptorTypeEClass, 
@@ -6913,14 +7110,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getInterceptorType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (leftFilterTypeEClass, 
@@ -6973,42 +7172,48 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getLeftFilterType_ConfigFile(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "configFile"
+			 "name", "configFile",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getLeftFilterType_ExpectedType(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "expectedType"
+			 "name", "expectedType",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getLeftFilterType_Expression(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "expression"
+			 "name", "expression",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getLeftFilterType_Path(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "path"
+			 "name", "path",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getLeftFilterType_Pattern(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "pattern"
+			 "name", "pattern",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (listTypeEClass, 
@@ -7038,7 +7243,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "entry",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getListType_FactoryEntry(), 
@@ -7047,7 +7252,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "factory-entry",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getListType_SystemEntry(), 
@@ -7056,7 +7261,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "system-entry",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getListType_ContainerEntry(), 
@@ -7065,14 +7270,15 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "container-entry",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getListType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (mapTypeEClass, 
@@ -7102,7 +7308,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getMapType_FactoryProperty(), 
@@ -7111,7 +7317,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "factory-property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getMapType_ContainerProperty(), 
@@ -7120,7 +7326,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "container-property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getMapType_SystemProperty(), 
@@ -7129,7 +7335,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "system-property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getMapType_Map(), 
@@ -7138,7 +7344,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "map",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getMapType_List(), 
@@ -7147,7 +7353,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "list",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getMapType_FileProperties(), 
@@ -7156,14 +7362,15 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "file-properties",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getMapType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (modelTypeEClass, 
@@ -7236,18 +7443,36 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
+		  (getModelType_ClassName(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "className",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
 		  (getModelType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getModelType_Ref(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ref"
+			 "name", "ref",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
+		  (getModelType_Type(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "type",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (muleConfigurationTypeEClass, 
@@ -7380,14 +7605,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "id"
+			 "name", "id",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleConfigurationType_Version(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "version"
+			 "name", "version",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (muleDescriptorTypeEClass, 
@@ -7480,84 +7707,96 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "containerManaged"
+			 "name", "containerManaged",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_Implementation(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "implementation"
+			 "name", "implementation",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_InboundEndpoint(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "inboundEndpoint"
+			 "name", "inboundEndpoint",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_InboundTransformer(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "inboundTransformer"
+			 "name", "inboundTransformer",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_InitialState(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "initialState"
+			 "name", "initialState",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_OutboundEndpoint(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "outboundEndpoint"
+			 "name", "outboundEndpoint",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_OutboundTransformer(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "outboundTransformer"
+			 "name", "outboundTransformer",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_Ref(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ref"
+			 "name", "ref",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_ResponseTransformer(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "responseTransformer"
+			 "name", "responseTransformer",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_Singleton(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "singleton"
+			 "name", "singleton",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleDescriptorType_Version(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "version"
+			 "name", "version",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (muleEnvironmentPropertiesTypeEClass, 
@@ -7618,63 +7857,96 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "clientMode"
+			 "name", "clientMode",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
+		  (getMuleEnvironmentPropertiesType_Embedded(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "embedded",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
+		  (getMuleEnvironmentPropertiesType_EnableMessageEvents(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "enableMessageEvents",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
+		  (getMuleEnvironmentPropertiesType_Encoding(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "encoding",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleEnvironmentPropertiesType_Model(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "model"
+			 "name", "model",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleEnvironmentPropertiesType_RecoverableMode(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "recoverableMode"
+			 "name", "recoverableMode",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
+		  (getMuleEnvironmentPropertiesType_RemoteSync(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "remoteSync",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleEnvironmentPropertiesType_ServerUrl(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "serverUrl"
+			 "name", "serverUrl",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleEnvironmentPropertiesType_Synchronous(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "synchronous"
+			 "name", "synchronous",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleEnvironmentPropertiesType_SynchronousEventTimeout(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "synchronousEventTimeout"
-		   });		
-		addAnnotation
-		  (getMuleEnvironmentPropertiesType_SynchronousReceive(), 
-		   source, 
-		   new String[] {
-			 "kind", "attribute",
-			 "name", "synchronousReceive"
+			 "name", "synchronousEventTimeout",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleEnvironmentPropertiesType_TransactionTimeout(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "transactionTimeout"
+			 "name", "transactionTimeout",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getMuleEnvironmentPropertiesType_WorkingDirectory(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "workingDirectory"
+			 "name", "workingDirectory",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (outboundRouterTypeEClass, 
@@ -7711,7 +7983,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "matchAll"
+			 "name", "matchAll",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (persistenceStrategyTypeEClass, 
@@ -7740,7 +8013,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (poolExhaustedActionTypeEEnum, 
@@ -7774,42 +8048,48 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "exhaustedAction"
+			 "name", "exhaustedAction",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getPoolingProfileType_Factory(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "factory"
+			 "name", "factory",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getPoolingProfileType_InitialisationPolicy(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "initialisationPolicy"
+			 "name", "initialisationPolicy",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getPoolingProfileType_MaxActive(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "maxActive"
+			 "name", "maxActive",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getPoolingProfileType_MaxIdle(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "maxIdle"
+			 "name", "maxIdle",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getPoolingProfileType_MaxWait(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "maxWait"
+			 "name", "maxWait",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (propertiesTypeEClass, 
@@ -7839,7 +8119,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getPropertiesType_FactoryProperty(), 
@@ -7848,7 +8128,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "factory-property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getPropertiesType_ContainerProperty(), 
@@ -7857,7 +8137,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "container-property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getPropertiesType_SystemProperty(), 
@@ -7866,7 +8146,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "system-property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getPropertiesType_Map(), 
@@ -7875,7 +8155,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "map",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getPropertiesType_List(), 
@@ -7884,7 +8164,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "list",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getPropertiesType_FileProperties(), 
@@ -7893,7 +8173,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "file-properties",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (getPropertiesType_TextProperty(), 
@@ -7902,7 +8182,7 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 			 "kind", "element",
 			 "name", "text-property",
 			 "namespace", "##targetNamespace",
-			 "group", "#group:1"
+			 "group", "group:1"
 		   });		
 		addAnnotation
 		  (propertyTypeEClass, 
@@ -7923,14 +8203,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getPropertyType_Value(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "value"
+			 "name", "value",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (queueProfileTypeEClass, 
@@ -7959,14 +8241,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "maxOutstandingMessages"
+			 "name", "maxOutstandingMessages",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getQueueProfileType_Persistent(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "persistent"
+			 "name", "persistent",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (replyToTypeEClass, 
@@ -7987,7 +8271,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "address"
+			 "name", "address",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (responseRouterTypeEClass, 
@@ -8032,14 +8317,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "timeout"
-		   });		
-		addAnnotation
-		  (getResponseRouterType_Transformers(), 
-		   source, 
-		   new String[] {
-			 "kind", "attribute",
-			 "name", "transformers"
+			 "name", "timeout",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (rightFilterTypeEClass, 
@@ -8092,42 +8371,48 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getRightFilterType_ConfigFile(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "configFile"
+			 "name", "configFile",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getRightFilterType_ExpectedType(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "expectedType"
+			 "name", "expectedType",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getRightFilterType_Expression(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "expression"
+			 "name", "expression",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getRightFilterType_Path(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "path"
+			 "name", "path",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getRightFilterType_Pattern(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "pattern"
+			 "name", "pattern",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (routerTypeEClass, 
@@ -8196,21 +8481,24 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getRouterType_EnableCorrelation(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "enableCorrelation"
+			 "name", "enableCorrelation",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getRouterType_PropertyExtractor(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "propertyExtractor"
+			 "name", "propertyExtractor",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (securityFilterTypeEClass, 
@@ -8239,14 +8527,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getSecurityFilterType_UseProviders(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "useProviders"
+			 "name", "useProviders",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (securityManagerTypeEClass, 
@@ -8283,14 +8573,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getSecurityManagerType_Ref(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ref"
+			 "name", "ref",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (securityProviderTypeEClass, 
@@ -8319,21 +8611,24 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getSecurityProviderType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getSecurityProviderType_Ref(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ref"
+			 "name", "ref",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (systemEntryTypeEClass, 
@@ -8354,14 +8649,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "defaultValue"
+			 "name", "defaultValue",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getSystemEntryType_Key(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "key"
+			 "name", "key",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (systemPropertyTypeEClass, 
@@ -8382,21 +8679,24 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "defaultValue"
+			 "name", "defaultValue",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getSystemPropertyType_Key(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "key"
+			 "name", "key",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getSystemPropertyType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (textPropertyTypeEClass, 
@@ -8417,7 +8717,8 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (threadingProfileTypeEClass, 
@@ -8438,49 +8739,64 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "doThreading"
+			 "name", "doThreading",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getThreadingProfileType_Id(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "id"
+			 "name", "id",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getThreadingProfileType_MaxBufferSize(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "maxBufferSize"
+			 "name", "maxBufferSize",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getThreadingProfileType_MaxThreadsActive(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "maxThreadsActive"
+			 "name", "maxThreadsActive",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getThreadingProfileType_MaxThreadsIdle(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "maxThreadsIdle"
+			 "name", "maxThreadsIdle",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getThreadingProfileType_PoolExhaustedAction(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "poolExhaustedAction"
+			 "name", "poolExhaustedAction",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getThreadingProfileType_ThreadTTL(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "threadTTL"
+			 "name", "threadTTL",
+			 "namespace", "##targetNamespace"
+		   });		
+		addAnnotation
+		  (getThreadingProfileType_ThreadWaitTimeout(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "threadWaitTimeout",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (transactionManagerTypeEClass, 
@@ -8509,14 +8825,16 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "factory"
+			 "name", "factory",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getTransactionManagerType_Ref(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ref"
+			 "name", "ref",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (transactionTypeEClass, 
@@ -8545,21 +8863,24 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "action"
+			 "name", "action",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getTransactionType_Factory(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "factory"
+			 "name", "factory",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getTransactionType_Timeout(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "timeout"
+			 "name", "timeout",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (transformersTypeEClass, 
@@ -8610,48 +8931,61 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "className"
+			 "name", "className",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getTransformerType_IgnoreBadInput(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ignoreBadInput"
+			 "name", "ignoreBadInput",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getTransformerType_Name(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "name"
+			 "name", "name",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getTransformerType_Ref(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "ref"
+			 "name", "ref",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
 		  (getTransformerType_ReturnClass(), 
 		   source, 
 		   new String[] {
 			 "kind", "attribute",
-			 "name", "returnClass"
+			 "name", "returnClass",
+			 "namespace", "##targetNamespace"
 		   });		
 		addAnnotation
-		  (typeTypeEEnum, 
+		  (typeTypeEDataType, 
 		   source, 
 		   new String[] {
-			 "name", "type_._type"
+			 "name", "type_._type",
+			 "baseType", "http://www.eclipse.org/emf/2003/XMLType#NMTOKEN",
+			 "enumeration", "seda direct pipeline jms jms-clustered jcyclone custom"
+		   });		
+		addAnnotation
+		  (typeType1EEnum, 
+		   source, 
+		   new String[] {
+			 "name", "type_._1_._type"
 		   });		
 		addAnnotation
 		  (typeTypeObjectEDataType, 
 		   source, 
 		   new String[] {
-			 "name", "type_._type:Object",
-			 "baseType", "type_._type"
+			 "name", "type_._1_._type:Object",
+			 "baseType", "type_._1_._type"
 		   });		
 		addAnnotation
 		  (versionTypeEDataType, 
@@ -8663,4 +8997,4 @@ public class SchemaPackageImpl extends EPackageImpl implements SchemaPackage {
 		   });
 	}
 
-} //SchemaPackageImpl
+} //MulePackageImpl

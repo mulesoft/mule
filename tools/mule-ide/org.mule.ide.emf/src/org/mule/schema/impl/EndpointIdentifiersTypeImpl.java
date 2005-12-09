@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.EndpointIdentifiersType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -65,7 +65,7 @@ public class EndpointIdentifiersTypeImpl extends EObjectImpl implements Endpoint
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getEndpointIdentifiersType();
+		return MulePackage.eINSTANCE.getEndpointIdentifiersType();
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class EndpointIdentifiersTypeImpl extends EObjectImpl implements Endpoint
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -86,7 +86,7 @@ public class EndpointIdentifiersTypeImpl extends EObjectImpl implements Endpoint
 	 * @generated
 	 */
 	public EList getEndpointIdentifier() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getEndpointIdentifiersType_EndpointIdentifier());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getEndpointIdentifiersType_EndpointIdentifier());
 	}
 
 	/**
@@ -97,9 +97,9 @@ public class EndpointIdentifiersTypeImpl extends EObjectImpl implements Endpoint
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
+				case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
+				case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
 					return ((InternalEList)getEndpointIdentifier()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -115,9 +115,9 @@ public class EndpointIdentifiersTypeImpl extends EObjectImpl implements Endpoint
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
 				return getEndpointIdentifier();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -130,11 +130,11 @@ public class EndpointIdentifiersTypeImpl extends EObjectImpl implements Endpoint
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
 				getEndpointIdentifier().clear();
 				getEndpointIdentifier().addAll((Collection)newValue);
 				return;
@@ -149,10 +149,10 @@ public class EndpointIdentifiersTypeImpl extends EObjectImpl implements Endpoint
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
 				getEndpointIdentifier().clear();
 				return;
 		}
@@ -166,9 +166,9 @@ public class EndpointIdentifiersTypeImpl extends EObjectImpl implements Endpoint
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE__ENDPOINT_IDENTIFIER:
 				return !getEndpointIdentifier().isEmpty();
 		}
 		return eDynamicIsSet(eFeature);

@@ -13,17 +13,17 @@ import org.eclipse.emf.ecore.EFactory;
  * The <b>Factory</b> for the model.
  * It provides a create method for each non-abstract class of the model.
  * <!-- end-user-doc -->
- * @see org.mule.schema.SchemaPackage
+ * @see org.mule.schema.MulePackage
  * @generated
  */
-public interface SchemaFactory extends EFactory {
+public interface MuleFactory extends EFactory {
 	/**
 	 * The singleton instance of the factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	SchemaFactory eINSTANCE = new org.mule.schema.impl.SchemaFactoryImpl();
+	MuleFactory eINSTANCE = new org.mule.schema.impl.MuleFactoryImpl();
 
 	/**
 	 * Returns a new object of class '<em>Agents Type</em>'.
@@ -332,28 +332,28 @@ public interface SchemaFactory extends EFactory {
 	ModelType createModelType();
 
 	/**
-	 * Returns a new object of class '<em>Mule Configuration Type</em>'.
+	 * Returns a new object of class '<em>Configuration Type</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Mule Configuration Type</em>'.
+	 * @return a new object of class '<em>Configuration Type</em>'.
 	 * @generated
 	 */
 	MuleConfigurationType createMuleConfigurationType();
 
 	/**
-	 * Returns a new object of class '<em>Mule Descriptor Type</em>'.
+	 * Returns a new object of class '<em>Descriptor Type</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Mule Descriptor Type</em>'.
+	 * @return a new object of class '<em>Descriptor Type</em>'.
 	 * @generated
 	 */
 	MuleDescriptorType createMuleDescriptorType();
 
 	/**
-	 * Returns a new object of class '<em>Mule Environment Properties Type</em>'.
+	 * Returns a new object of class '<em>Environment Properties Type</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Mule Environment Properties Type</em>'.
+	 * @return a new object of class '<em>Environment Properties Type</em>'.
 	 * @generated
 	 */
 	MuleEnvironmentPropertiesType createMuleEnvironmentPropertiesType();
@@ -554,6 +554,6 @@ public interface SchemaFactory extends EFactory {
 	 * @return the package supported by this factory.
 	 * @generated
 	 */
-	SchemaPackage getSchemaPackage();
+	MulePackage getMulePackage();
 
-} //SchemaFactory
+} //MuleFactory

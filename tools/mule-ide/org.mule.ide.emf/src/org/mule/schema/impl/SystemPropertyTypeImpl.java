@@ -22,7 +22,7 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 import org.mule.schema.SystemPropertyType;
 
 /**
@@ -127,7 +127,7 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getSystemPropertyType();
+		return MulePackage.eINSTANCE.getSystemPropertyType();
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.SYSTEM_PROPERTY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.SYSTEM_PROPERTY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -160,7 +160,7 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 		String oldDefaultValue = defaultValue;
 		defaultValue = newDefaultValue;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE, oldDefaultValue, defaultValue));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE, oldDefaultValue, defaultValue));
 	}
 
 	/**
@@ -181,7 +181,7 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 		String oldKey = key;
 		key = newKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.SYSTEM_PROPERTY_TYPE__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.SYSTEM_PROPERTY_TYPE__KEY, oldKey, key));
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.SYSTEM_PROPERTY_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.SYSTEM_PROPERTY_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -213,7 +213,7 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.SYSTEM_PROPERTY_TYPE__MIXED:
+				case MulePackage.SYSTEM_PROPERTY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -229,13 +229,13 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__MIXED:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE:
 				return getDefaultValue();
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__KEY:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__KEY:
 				return getKey();
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__NAME:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__NAME:
 				return getName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -248,17 +248,17 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__MIXED:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE:
 				setDefaultValue((String)newValue);
 				return;
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__KEY:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__KEY:
 				setKey((String)newValue);
 				return;
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__NAME:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__NAME:
 				setName((String)newValue);
 				return;
 		}
@@ -272,16 +272,16 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__MIXED:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE:
 				setDefaultValue(DEFAULT_VALUE_EDEFAULT);
 				return;
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__KEY:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__KEY:
 				setKey(KEY_EDEFAULT);
 				return;
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__NAME:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
 		}
@@ -295,13 +295,13 @@ public class SystemPropertyTypeImpl extends EObjectImpl implements SystemPropert
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__MIXED:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__DEFAULT_VALUE:
 				return DEFAULT_VALUE_EDEFAULT == null ? defaultValue != null : !DEFAULT_VALUE_EDEFAULT.equals(defaultValue);
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__KEY:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__KEY:
 				return KEY_EDEFAULT == null ? key != null : !KEY_EDEFAULT.equals(key);
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE__NAME:
+			case MulePackage.SYSTEM_PROPERTY_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return eDynamicIsSet(eFeature);

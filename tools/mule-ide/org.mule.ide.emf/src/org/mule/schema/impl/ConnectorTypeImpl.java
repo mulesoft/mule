@@ -25,8 +25,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
 import org.mule.schema.ConnectionStrategyType;
 import org.mule.schema.ConnectorType;
 import org.mule.schema.ExceptionStrategyType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 import org.mule.schema.ThreadingProfileType;
 
 /**
@@ -135,7 +135,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getConnectorType();
+		return MulePackage.eINSTANCE.getConnectorType();
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.CONNECTOR_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.CONNECTOR_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -156,7 +156,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getConnectorType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getConnectorType_Properties(), true);
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getConnectorType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getConnectorType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getConnectorType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getConnectorType_Properties(), newProperties);
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public ThreadingProfileType getThreadingProfile() {
-		return (ThreadingProfileType)getMixed().get(SchemaPackage.eINSTANCE.getConnectorType_ThreadingProfile(), true);
+		return (ThreadingProfileType)getMixed().get(MulePackage.eINSTANCE.getConnectorType_ThreadingProfile(), true);
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public NotificationChain basicSetThreadingProfile(ThreadingProfileType newThreadingProfile, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getConnectorType_ThreadingProfile(), newThreadingProfile, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getConnectorType_ThreadingProfile(), newThreadingProfile, msgs);
 	}
 
 	/**
@@ -201,7 +201,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public void setThreadingProfile(ThreadingProfileType newThreadingProfile) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getConnectorType_ThreadingProfile(), newThreadingProfile);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getConnectorType_ThreadingProfile(), newThreadingProfile);
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public ExceptionStrategyType getExceptionStrategy() {
-		return (ExceptionStrategyType)getMixed().get(SchemaPackage.eINSTANCE.getConnectorType_ExceptionStrategy(), true);
+		return (ExceptionStrategyType)getMixed().get(MulePackage.eINSTANCE.getConnectorType_ExceptionStrategy(), true);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public NotificationChain basicSetExceptionStrategy(ExceptionStrategyType newExceptionStrategy, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getConnectorType_ExceptionStrategy(), newExceptionStrategy, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getConnectorType_ExceptionStrategy(), newExceptionStrategy, msgs);
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public void setExceptionStrategy(ExceptionStrategyType newExceptionStrategy) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getConnectorType_ExceptionStrategy(), newExceptionStrategy);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getConnectorType_ExceptionStrategy(), newExceptionStrategy);
 	}
 
 	/**
@@ -237,7 +237,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public ConnectionStrategyType getConnectionStrategy() {
-		return (ConnectionStrategyType)getMixed().get(SchemaPackage.eINSTANCE.getConnectorType_ConnectionStrategy(), true);
+		return (ConnectionStrategyType)getMixed().get(MulePackage.eINSTANCE.getConnectorType_ConnectionStrategy(), true);
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public NotificationChain basicSetConnectionStrategy(ConnectionStrategyType newConnectionStrategy, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getConnectorType_ConnectionStrategy(), newConnectionStrategy, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getConnectorType_ConnectionStrategy(), newConnectionStrategy, msgs);
 	}
 
 	/**
@@ -255,7 +255,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 * @generated
 	 */
 	public void setConnectionStrategy(ConnectionStrategyType newConnectionStrategy) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getConnectorType_ConnectionStrategy(), newConnectionStrategy);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getConnectorType_ConnectionStrategy(), newConnectionStrategy);
 	}
 
 	/**
@@ -276,7 +276,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.CONNECTOR_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.CONNECTOR_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -297,7 +297,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.CONNECTOR_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.CONNECTOR_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -318,7 +318,7 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 		String oldRef = ref;
 		ref = newRef;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.CONNECTOR_TYPE__REF, oldRef, ref));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.CONNECTOR_TYPE__REF, oldRef, ref));
 	}
 
 	/**
@@ -329,15 +329,15 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.CONNECTOR_TYPE__MIXED:
+				case MulePackage.CONNECTOR_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.CONNECTOR_TYPE__PROPERTIES:
+				case MulePackage.CONNECTOR_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
-				case SchemaPackage.CONNECTOR_TYPE__THREADING_PROFILE:
+				case MulePackage.CONNECTOR_TYPE__THREADING_PROFILE:
 					return basicSetThreadingProfile(null, msgs);
-				case SchemaPackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
+				case MulePackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
 					return basicSetExceptionStrategy(null, msgs);
-				case SchemaPackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
+				case MulePackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
 					return basicSetConnectionStrategy(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -353,21 +353,21 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CONNECTOR_TYPE__MIXED:
+			case MulePackage.CONNECTOR_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.CONNECTOR_TYPE__PROPERTIES:
+			case MulePackage.CONNECTOR_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.CONNECTOR_TYPE__THREADING_PROFILE:
+			case MulePackage.CONNECTOR_TYPE__THREADING_PROFILE:
 				return getThreadingProfile();
-			case SchemaPackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
 				return getExceptionStrategy();
-			case SchemaPackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
+			case MulePackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
 				return getConnectionStrategy();
-			case SchemaPackage.CONNECTOR_TYPE__CLASS_NAME:
+			case MulePackage.CONNECTOR_TYPE__CLASS_NAME:
 				return getClassName();
-			case SchemaPackage.CONNECTOR_TYPE__NAME:
+			case MulePackage.CONNECTOR_TYPE__NAME:
 				return getName();
-			case SchemaPackage.CONNECTOR_TYPE__REF:
+			case MulePackage.CONNECTOR_TYPE__REF:
 				return getRef();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -380,29 +380,29 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CONNECTOR_TYPE__MIXED:
+			case MulePackage.CONNECTOR_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__PROPERTIES:
+			case MulePackage.CONNECTOR_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__THREADING_PROFILE:
+			case MulePackage.CONNECTOR_TYPE__THREADING_PROFILE:
 				setThreadingProfile((ThreadingProfileType)newValue);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
 				setExceptionStrategy((ExceptionStrategyType)newValue);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
+			case MulePackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
 				setConnectionStrategy((ConnectionStrategyType)newValue);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__CLASS_NAME:
+			case MulePackage.CONNECTOR_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__NAME:
+			case MulePackage.CONNECTOR_TYPE__NAME:
 				setName((String)newValue);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__REF:
+			case MulePackage.CONNECTOR_TYPE__REF:
 				setRef((String)newValue);
 				return;
 		}
@@ -416,28 +416,28 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CONNECTOR_TYPE__MIXED:
+			case MulePackage.CONNECTOR_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__PROPERTIES:
+			case MulePackage.CONNECTOR_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__THREADING_PROFILE:
+			case MulePackage.CONNECTOR_TYPE__THREADING_PROFILE:
 				setThreadingProfile((ThreadingProfileType)null);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
 				setExceptionStrategy((ExceptionStrategyType)null);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
+			case MulePackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
 				setConnectionStrategy((ConnectionStrategyType)null);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__CLASS_NAME:
+			case MulePackage.CONNECTOR_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__NAME:
+			case MulePackage.CONNECTOR_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case SchemaPackage.CONNECTOR_TYPE__REF:
+			case MulePackage.CONNECTOR_TYPE__REF:
 				setRef(REF_EDEFAULT);
 				return;
 		}
@@ -451,21 +451,21 @@ public class ConnectorTypeImpl extends EObjectImpl implements ConnectorType {
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.CONNECTOR_TYPE__MIXED:
+			case MulePackage.CONNECTOR_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.CONNECTOR_TYPE__PROPERTIES:
+			case MulePackage.CONNECTOR_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.CONNECTOR_TYPE__THREADING_PROFILE:
+			case MulePackage.CONNECTOR_TYPE__THREADING_PROFILE:
 				return getThreadingProfile() != null;
-			case SchemaPackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
+			case MulePackage.CONNECTOR_TYPE__EXCEPTION_STRATEGY:
 				return getExceptionStrategy() != null;
-			case SchemaPackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
+			case MulePackage.CONNECTOR_TYPE__CONNECTION_STRATEGY:
 				return getConnectionStrategy() != null;
-			case SchemaPackage.CONNECTOR_TYPE__CLASS_NAME:
+			case MulePackage.CONNECTOR_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
-			case SchemaPackage.CONNECTOR_TYPE__NAME:
+			case MulePackage.CONNECTOR_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case SchemaPackage.CONNECTOR_TYPE__REF:
+			case MulePackage.CONNECTOR_TYPE__REF:
 				return REF_EDEFAULT == null ? ref != null : !REF_EDEFAULT.equals(ref);
 		}
 		return eDynamicIsSet(eFeature);

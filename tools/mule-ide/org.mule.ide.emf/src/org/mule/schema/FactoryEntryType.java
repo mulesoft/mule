@@ -23,7 +23,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getFactoryEntryType()
+ * @see org.mule.schema.MulePackage#getFactoryEntryType()
  * @model extendedMetaData="name='factory-entryType' kind='mixed'"
  * @generated
  */
@@ -38,7 +38,7 @@ public interface FactoryEntryType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getFactoryEntryType_Mixed()
+	 * @see org.mule.schema.MulePackage#getFactoryEntryType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -55,9 +55,9 @@ public interface FactoryEntryType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Factory</em>' attribute.
 	 * @see #setFactory(String)
-	 * @see org.mule.schema.SchemaPackage#getFactoryEntryType_Factory()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='factory'"
+	 * @see org.mule.schema.MulePackage#getFactoryEntryType_Factory()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='factory' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getFactory();

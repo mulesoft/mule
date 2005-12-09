@@ -32,7 +32,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getConstraintType()
+ * @see org.mule.schema.MulePackage#getConstraintType()
  * @model extendedMetaData="name='constraintType' kind='mixed'"
  * @generated
  */
@@ -47,7 +47,7 @@ public interface ConstraintType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_Mixed()
+	 * @see org.mule.schema.MulePackage#getConstraintType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -64,7 +64,7 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Left Filter</em>' containment reference.
 	 * @see #setLeftFilter(LeftFilterType)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_LeftFilter()
+	 * @see org.mule.schema.MulePackage#getConstraintType_LeftFilter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='left-filter' namespace='##targetNamespace'"
 	 * @generated
@@ -91,7 +91,7 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Right Filter</em>' containment reference.
 	 * @see #setRightFilter(RightFilterType)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_RightFilter()
+	 * @see org.mule.schema.MulePackage#getConstraintType_RightFilter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='right-filter' namespace='##targetNamespace'"
 	 * @generated
@@ -118,7 +118,7 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Filter</em>' containment reference.
 	 * @see #setFilter(FilterType)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_Filter()
+	 * @see org.mule.schema.MulePackage#getConstraintType_Filter()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='filter' namespace='##targetNamespace'"
 	 * @generated
@@ -145,9 +145,9 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Batch Size</em>' attribute.
 	 * @see #setBatchSize(String)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_BatchSize()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='batchSize'"
+	 * @see org.mule.schema.MulePackage#getConstraintType_BatchSize()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='batchSize' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getBatchSize();
@@ -172,9 +172,9 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Class Name</em>' attribute.
 	 * @see #setClassName(String)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_ClassName()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='className'"
+	 * @see org.mule.schema.MulePackage#getConstraintType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getClassName();
@@ -199,9 +199,9 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Expected Type</em>' attribute.
 	 * @see #setExpectedType(String)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_ExpectedType()
+	 * @see org.mule.schema.MulePackage#getConstraintType_ExpectedType()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='expectedType'"
+	 *        extendedMetaData="kind='attribute' name='expectedType' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getExpectedType();
@@ -226,9 +226,9 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Expression</em>' attribute.
 	 * @see #setExpression(String)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_Expression()
+	 * @see org.mule.schema.MulePackage#getConstraintType_Expression()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='expression'"
+	 *        extendedMetaData="kind='attribute' name='expression' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getExpression();
@@ -253,9 +253,9 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Frequency</em>' attribute.
 	 * @see #setFrequency(String)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_Frequency()
+	 * @see org.mule.schema.MulePackage#getConstraintType_Frequency()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='frequency'"
+	 *        extendedMetaData="kind='attribute' name='frequency' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getFrequency();
@@ -280,9 +280,9 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Path</em>' attribute.
 	 * @see #setPath(String)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_Path()
+	 * @see org.mule.schema.MulePackage#getConstraintType_Path()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='path'"
+	 *        extendedMetaData="kind='attribute' name='path' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getPath();
@@ -307,9 +307,9 @@ public interface ConstraintType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Pattern</em>' attribute.
 	 * @see #setPattern(String)
-	 * @see org.mule.schema.SchemaPackage#getConstraintType_Pattern()
+	 * @see org.mule.schema.MulePackage#getConstraintType_Pattern()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='pattern'"
+	 *        extendedMetaData="kind='attribute' name='pattern' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getPattern();

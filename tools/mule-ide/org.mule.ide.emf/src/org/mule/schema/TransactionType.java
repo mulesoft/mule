@@ -26,7 +26,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getTransactionType()
+ * @see org.mule.schema.MulePackage#getTransactionType()
  * @model extendedMetaData="name='transactionType' kind='mixed'"
  * @generated
  */
@@ -41,7 +41,7 @@ public interface TransactionType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getTransactionType_Mixed()
+	 * @see org.mule.schema.MulePackage#getTransactionType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -58,7 +58,7 @@ public interface TransactionType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Constraint</em>' containment reference.
 	 * @see #setConstraint(ConstraintType)
-	 * @see org.mule.schema.SchemaPackage#getTransactionType_Constraint()
+	 * @see org.mule.schema.MulePackage#getTransactionType_Constraint()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='constraint' namespace='##targetNamespace'"
 	 * @generated
@@ -90,9 +90,9 @@ public interface TransactionType extends EObject {
 	 * @see #isSetAction()
 	 * @see #unsetAction()
 	 * @see #setAction(ActionType)
-	 * @see org.mule.schema.SchemaPackage#getTransactionType_Action()
+	 * @see org.mule.schema.MulePackage#getTransactionType_Action()
 	 * @model default="NONE" unique="false" unsettable="true"
-	 *        extendedMetaData="kind='attribute' name='action'"
+	 *        extendedMetaData="kind='attribute' name='action' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	ActionType getAction();
@@ -143,9 +143,9 @@ public interface TransactionType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Factory</em>' attribute.
 	 * @see #setFactory(String)
-	 * @see org.mule.schema.SchemaPackage#getTransactionType_Factory()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='factory'"
+	 * @see org.mule.schema.MulePackage#getTransactionType_Factory()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='factory' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getFactory();
@@ -170,9 +170,9 @@ public interface TransactionType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Timeout</em>' attribute.
 	 * @see #setTimeout(String)
-	 * @see org.mule.schema.SchemaPackage#getTransactionType_Timeout()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN"
-	 *        extendedMetaData="kind='attribute' name='timeout'"
+	 * @see org.mule.schema.MulePackage#getTransactionType_Timeout()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='timeout' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getTimeout();

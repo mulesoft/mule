@@ -23,17 +23,17 @@ import org.mule.schema.*;
  * <!-- begin-user-doc -->
  * The <b>Validator</b> for the model.
  * <!-- end-user-doc -->
- * @see org.mule.schema.SchemaPackage
+ * @see org.mule.schema.MulePackage
  * @generated
  */
-public class SchemaValidator extends EObjectValidator {
+public class MuleValidator extends EObjectValidator {
 	/**
 	 * The cached model package
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final SchemaValidator INSTANCE = new SchemaValidator();
+	public static final MuleValidator INSTANCE = new MuleValidator();
 
 	/**
 	 * A constant for the {@link org.eclipse.emf.common.util.Diagnostic#getSource() source} of diagnostic {@link org.eclipse.emf.common.util.Diagnostic#getCode() codes} from this package.
@@ -75,7 +75,7 @@ public class SchemaValidator extends EObjectValidator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public SchemaValidator() {
+	public MuleValidator() {
 		super();
 		xmlTypeValidator = XMLTypeValidator.INSTANCE;
 	}
@@ -87,7 +87,7 @@ public class SchemaValidator extends EObjectValidator {
 	 * @generated
 	 */
 	protected EPackage getEPackage() {
-	  return SchemaPackage.eINSTANCE;
+	  return MulePackage.eINSTANCE;
 	}
 
 	/**
@@ -98,159 +98,161 @@ public class SchemaValidator extends EObjectValidator {
 	 */
 	protected boolean validate(int classifierID, Object value, DiagnosticChain diagnostics, Map context) {
 		switch (classifierID) {
-			case SchemaPackage.AGENTS_TYPE:
+			case MulePackage.AGENTS_TYPE:
 				return validateAgentsType((AgentsType)value, diagnostics, context);
-			case SchemaPackage.AGENT_TYPE:
+			case MulePackage.AGENT_TYPE:
 				return validateAgentType((AgentType)value, diagnostics, context);
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE:
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE:
 				return validateCatchAllStrategyType((CatchAllStrategyType)value, diagnostics, context);
-			case SchemaPackage.COMPONENT_FACTORY_TYPE:
+			case MulePackage.COMPONENT_FACTORY_TYPE:
 				return validateComponentFactoryType((ComponentFactoryType)value, diagnostics, context);
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE:
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE:
 				return validateComponentLifecycleAdapterFactoryType((ComponentLifecycleAdapterFactoryType)value, diagnostics, context);
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE:
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE:
 				return validateComponentPoolFactoryType((ComponentPoolFactoryType)value, diagnostics, context);
-			case SchemaPackage.CONNECTION_STRATEGY_TYPE:
+			case MulePackage.CONNECTION_STRATEGY_TYPE:
 				return validateConnectionStrategyType((ConnectionStrategyType)value, diagnostics, context);
-			case SchemaPackage.CONNECTOR_TYPE:
+			case MulePackage.CONNECTOR_TYPE:
 				return validateConnectorType((ConnectorType)value, diagnostics, context);
-			case SchemaPackage.CONSTRAINT_TYPE:
+			case MulePackage.CONSTRAINT_TYPE:
 				return validateConstraintType((ConstraintType)value, diagnostics, context);
-			case SchemaPackage.CONTAINER_CONTEXT_TYPE:
+			case MulePackage.CONTAINER_CONTEXT_TYPE:
 				return validateContainerContextType((ContainerContextType)value, diagnostics, context);
-			case SchemaPackage.CONTAINER_ENTRY_TYPE:
+			case MulePackage.CONTAINER_ENTRY_TYPE:
 				return validateContainerEntryType((ContainerEntryType)value, diagnostics, context);
-			case SchemaPackage.CONTAINER_PROPERTY_TYPE:
+			case MulePackage.CONTAINER_PROPERTY_TYPE:
 				return validateContainerPropertyType((ContainerPropertyType)value, diagnostics, context);
-			case SchemaPackage.DOCUMENT_ROOT:
+			case MulePackage.DOCUMENT_ROOT:
 				return validateDocumentRoot((DocumentRoot)value, diagnostics, context);
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE:
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE:
 				return validateEncryptionStrategyType((EncryptionStrategyType)value, diagnostics, context);
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE:
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE:
 				return validateEndpointIdentifiersType((EndpointIdentifiersType)value, diagnostics, context);
-			case SchemaPackage.ENDPOINT_IDENTIFIER_TYPE:
+			case MulePackage.ENDPOINT_IDENTIFIER_TYPE:
 				return validateEndpointIdentifierType((EndpointIdentifierType)value, diagnostics, context);
-			case SchemaPackage.ENDPOINT_TYPE:
+			case MulePackage.ENDPOINT_TYPE:
 				return validateEndpointType((EndpointType)value, diagnostics, context);
-			case SchemaPackage.ENTRY_POINT_RESOLVER_TYPE:
+			case MulePackage.ENTRY_POINT_RESOLVER_TYPE:
 				return validateEntryPointResolverType((EntryPointResolverType)value, diagnostics, context);
-			case SchemaPackage.ENTRY_TYPE:
+			case MulePackage.ENTRY_TYPE:
 				return validateEntryType((EntryType)value, diagnostics, context);
-			case SchemaPackage.ENVIRONMENT_PROPERTIES_TYPE:
+			case MulePackage.ENVIRONMENT_PROPERTIES_TYPE:
 				return validateEnvironmentPropertiesType((EnvironmentPropertiesType)value, diagnostics, context);
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE:
 				return validateExceptionStrategyType((ExceptionStrategyType)value, diagnostics, context);
-			case SchemaPackage.FACTORY_ENTRY_TYPE:
+			case MulePackage.FACTORY_ENTRY_TYPE:
 				return validateFactoryEntryType((FactoryEntryType)value, diagnostics, context);
-			case SchemaPackage.FACTORY_PROPERTY_TYPE:
+			case MulePackage.FACTORY_PROPERTY_TYPE:
 				return validateFactoryPropertyType((FactoryPropertyType)value, diagnostics, context);
-			case SchemaPackage.FILE_PROPERTIES_TYPE:
+			case MulePackage.FILE_PROPERTIES_TYPE:
 				return validateFilePropertiesType((FilePropertiesType)value, diagnostics, context);
-			case SchemaPackage.FILTER_TYPE:
+			case MulePackage.FILTER_TYPE:
 				return validateFilterType((FilterType)value, diagnostics, context);
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE:
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE:
 				return validateGlobalEndpointsType((GlobalEndpointsType)value, diagnostics, context);
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE:
 				return validateGlobalEndpointType((GlobalEndpointType)value, diagnostics, context);
-			case SchemaPackage.INBOUND_ROUTER_TYPE:
+			case MulePackage.INBOUND_ROUTER_TYPE:
 				return validateInboundRouterType((InboundRouterType)value, diagnostics, context);
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE:
+			case MulePackage.INTERCEPTOR_STACK_TYPE:
 				return validateInterceptorStackType((InterceptorStackType)value, diagnostics, context);
-			case SchemaPackage.INTERCEPTOR_TYPE:
+			case MulePackage.INTERCEPTOR_TYPE:
 				return validateInterceptorType((InterceptorType)value, diagnostics, context);
-			case SchemaPackage.LEFT_FILTER_TYPE:
+			case MulePackage.LEFT_FILTER_TYPE:
 				return validateLeftFilterType((LeftFilterType)value, diagnostics, context);
-			case SchemaPackage.LIST_TYPE:
+			case MulePackage.LIST_TYPE:
 				return validateListType((ListType)value, diagnostics, context);
-			case SchemaPackage.MAP_TYPE:
+			case MulePackage.MAP_TYPE:
 				return validateMapType((MapType)value, diagnostics, context);
-			case SchemaPackage.MODEL_TYPE:
+			case MulePackage.MODEL_TYPE:
 				return validateModelType((ModelType)value, diagnostics, context);
-			case SchemaPackage.MULE_CONFIGURATION_TYPE:
+			case MulePackage.MULE_CONFIGURATION_TYPE:
 				return validateMuleConfigurationType((MuleConfigurationType)value, diagnostics, context);
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE:
+			case MulePackage.MULE_DESCRIPTOR_TYPE:
 				return validateMuleDescriptorType((MuleDescriptorType)value, diagnostics, context);
-			case SchemaPackage.MULE_ENVIRONMENT_PROPERTIES_TYPE:
+			case MulePackage.MULE_ENVIRONMENT_PROPERTIES_TYPE:
 				return validateMuleEnvironmentPropertiesType((MuleEnvironmentPropertiesType)value, diagnostics, context);
-			case SchemaPackage.OUTBOUND_ROUTER_TYPE:
+			case MulePackage.OUTBOUND_ROUTER_TYPE:
 				return validateOutboundRouterType((OutboundRouterType)value, diagnostics, context);
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE:
 				return validatePersistenceStrategyType((PersistenceStrategyType)value, diagnostics, context);
-			case SchemaPackage.POOLING_PROFILE_TYPE:
+			case MulePackage.POOLING_PROFILE_TYPE:
 				return validatePoolingProfileType((PoolingProfileType)value, diagnostics, context);
-			case SchemaPackage.PROPERTIES_TYPE:
+			case MulePackage.PROPERTIES_TYPE:
 				return validatePropertiesType((PropertiesType)value, diagnostics, context);
-			case SchemaPackage.PROPERTY_TYPE:
+			case MulePackage.PROPERTY_TYPE:
 				return validatePropertyType((PropertyType)value, diagnostics, context);
-			case SchemaPackage.QUEUE_PROFILE_TYPE:
+			case MulePackage.QUEUE_PROFILE_TYPE:
 				return validateQueueProfileType((QueueProfileType)value, diagnostics, context);
-			case SchemaPackage.REPLY_TO_TYPE:
+			case MulePackage.REPLY_TO_TYPE:
 				return validateReplyToType((ReplyToType)value, diagnostics, context);
-			case SchemaPackage.RESPONSE_ROUTER_TYPE:
+			case MulePackage.RESPONSE_ROUTER_TYPE:
 				return validateResponseRouterType((ResponseRouterType)value, diagnostics, context);
-			case SchemaPackage.RIGHT_FILTER_TYPE:
+			case MulePackage.RIGHT_FILTER_TYPE:
 				return validateRightFilterType((RightFilterType)value, diagnostics, context);
-			case SchemaPackage.ROUTER_TYPE:
+			case MulePackage.ROUTER_TYPE:
 				return validateRouterType((RouterType)value, diagnostics, context);
-			case SchemaPackage.SECURITY_FILTER_TYPE:
+			case MulePackage.SECURITY_FILTER_TYPE:
 				return validateSecurityFilterType((SecurityFilterType)value, diagnostics, context);
-			case SchemaPackage.SECURITY_MANAGER_TYPE:
+			case MulePackage.SECURITY_MANAGER_TYPE:
 				return validateSecurityManagerType((SecurityManagerType)value, diagnostics, context);
-			case SchemaPackage.SECURITY_PROVIDER_TYPE:
+			case MulePackage.SECURITY_PROVIDER_TYPE:
 				return validateSecurityProviderType((SecurityProviderType)value, diagnostics, context);
-			case SchemaPackage.SYSTEM_ENTRY_TYPE:
+			case MulePackage.SYSTEM_ENTRY_TYPE:
 				return validateSystemEntryType((SystemEntryType)value, diagnostics, context);
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE:
+			case MulePackage.SYSTEM_PROPERTY_TYPE:
 				return validateSystemPropertyType((SystemPropertyType)value, diagnostics, context);
-			case SchemaPackage.TEXT_PROPERTY_TYPE:
+			case MulePackage.TEXT_PROPERTY_TYPE:
 				return validateTextPropertyType((TextPropertyType)value, diagnostics, context);
-			case SchemaPackage.THREADING_PROFILE_TYPE:
+			case MulePackage.THREADING_PROFILE_TYPE:
 				return validateThreadingProfileType((ThreadingProfileType)value, diagnostics, context);
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE:
+			case MulePackage.TRANSACTION_MANAGER_TYPE:
 				return validateTransactionManagerType((TransactionManagerType)value, diagnostics, context);
-			case SchemaPackage.TRANSACTION_TYPE:
+			case MulePackage.TRANSACTION_TYPE:
 				return validateTransactionType((TransactionType)value, diagnostics, context);
-			case SchemaPackage.TRANSFORMERS_TYPE:
+			case MulePackage.TRANSFORMERS_TYPE:
 				return validateTransformersType((TransformersType)value, diagnostics, context);
-			case SchemaPackage.TRANSFORMER_TYPE:
+			case MulePackage.TRANSFORMER_TYPE:
 				return validateTransformerType((TransformerType)value, diagnostics, context);
-			case SchemaPackage.ACTION_TYPE:
+			case MulePackage.ACTION_TYPE:
 				return validateActionType((Object)value, diagnostics, context);
-			case SchemaPackage.CREATE_CONNECTOR_TYPE:
+			case MulePackage.CREATE_CONNECTOR_TYPE:
 				return validateCreateConnectorType((Object)value, diagnostics, context);
-			case SchemaPackage.ENABLE_CORRELATION_TYPE:
+			case MulePackage.ENABLE_CORRELATION_TYPE:
 				return validateEnableCorrelationType((Object)value, diagnostics, context);
-			case SchemaPackage.EXHAUSTED_ACTION_TYPE:
+			case MulePackage.EXHAUSTED_ACTION_TYPE:
 				return validateExhaustedActionType((Object)value, diagnostics, context);
-			case SchemaPackage.ID_TYPE:
+			case MulePackage.ID_TYPE:
 				return validateIdType((Object)value, diagnostics, context);
-			case SchemaPackage.INITIALISATION_POLICY_TYPE:
+			case MulePackage.INITIALISATION_POLICY_TYPE:
 				return validateInitialisationPolicyType((Object)value, diagnostics, context);
-			case SchemaPackage.INITIAL_STATE_TYPE:
+			case MulePackage.INITIAL_STATE_TYPE:
 				return validateInitialStateType((Object)value, diagnostics, context);
-			case SchemaPackage.POOL_EXHAUSTED_ACTION_TYPE:
+			case MulePackage.POOL_EXHAUSTED_ACTION_TYPE:
 				return validatePoolExhaustedActionType((Object)value, diagnostics, context);
-			case SchemaPackage.TYPE_TYPE:
-				return validateTypeType((Object)value, diagnostics, context);
-			case SchemaPackage.ACTION_TYPE_OBJECT:
+			case MulePackage.TYPE_TYPE1:
+				return validateTypeType1((Object)value, diagnostics, context);
+			case MulePackage.ACTION_TYPE_OBJECT:
 				return validateActionTypeObject((ActionType)value, diagnostics, context);
-			case SchemaPackage.CREATE_CONNECTOR_TYPE_OBJECT:
+			case MulePackage.CREATE_CONNECTOR_TYPE_OBJECT:
 				return validateCreateConnectorTypeObject((CreateConnectorType)value, diagnostics, context);
-			case SchemaPackage.ENABLE_CORRELATION_TYPE_OBJECT:
+			case MulePackage.ENABLE_CORRELATION_TYPE_OBJECT:
 				return validateEnableCorrelationTypeObject((EnableCorrelationType)value, diagnostics, context);
-			case SchemaPackage.EXHAUSTED_ACTION_TYPE_OBJECT:
+			case MulePackage.EXHAUSTED_ACTION_TYPE_OBJECT:
 				return validateExhaustedActionTypeObject((ExhaustedActionType)value, diagnostics, context);
-			case SchemaPackage.ID_TYPE_OBJECT:
+			case MulePackage.ID_TYPE_OBJECT:
 				return validateIdTypeObject((IdType)value, diagnostics, context);
-			case SchemaPackage.INITIALISATION_POLICY_TYPE_OBJECT:
+			case MulePackage.INITIALISATION_POLICY_TYPE_OBJECT:
 				return validateInitialisationPolicyTypeObject((InitialisationPolicyType)value, diagnostics, context);
-			case SchemaPackage.INITIAL_STATE_TYPE_OBJECT:
+			case MulePackage.INITIAL_STATE_TYPE_OBJECT:
 				return validateInitialStateTypeObject((InitialStateType)value, diagnostics, context);
-			case SchemaPackage.POOL_EXHAUSTED_ACTION_TYPE_OBJECT:
+			case MulePackage.POOL_EXHAUSTED_ACTION_TYPE_OBJECT:
 				return validatePoolExhaustedActionTypeObject((PoolExhaustedActionType)value, diagnostics, context);
-			case SchemaPackage.TYPE_TYPE_OBJECT:
-				return validateTypeTypeObject((TypeType)value, diagnostics, context);
-			case SchemaPackage.VERSION_TYPE:
+			case MulePackage.TYPE_TYPE:
+				return validateTypeType((String)value, diagnostics, context);
+			case MulePackage.TYPE_TYPE_OBJECT:
+				return validateTypeTypeObject((TypeType1)value, diagnostics, context);
+			case MulePackage.VERSION_TYPE:
 				return validateVersionType((String)value, diagnostics, context);
 			default: 
 				return true;
@@ -856,7 +858,7 @@ public class SchemaValidator extends EObjectValidator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateTypeType(Object typeType, DiagnosticChain diagnostics, Map context) {
+	public boolean validateTypeType1(Object typeType1, DiagnosticChain diagnostics, Map context) {
 		return true;
 	}
 
@@ -937,7 +939,48 @@ public class SchemaValidator extends EObjectValidator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateTypeTypeObject(TypeType typeTypeObject, DiagnosticChain diagnostics, Map context) {
+	public boolean validateTypeType(String typeType, DiagnosticChain diagnostics, Map context) {
+		boolean result = validateTypeType_Enumeration(typeType, diagnostics, context);
+		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @see #validateTypeType_Enumeration
+	 */
+	public static final Collection TYPE_TYPE__ENUMERATION__VALUES =
+		wrapEnumerationValues
+			(new Object[] {
+				 "seda",
+				 "direct",
+				 "pipeline",
+				 "jms",
+				 "jms-clustered",
+				 "jcyclone",
+				 "custom"
+			 });
+
+	/**
+	 * Validates the Enumeration constraint of '<em>Type Type</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateTypeType_Enumeration(String typeType, DiagnosticChain diagnostics, Map context) {
+		boolean result = TYPE_TYPE__ENUMERATION__VALUES.contains(typeType);
+		if (!result && diagnostics != null) 
+			reportEnumerationViolation(MulePackage.eINSTANCE.getTypeType(), typeType, TYPE_TYPE__ENUMERATION__VALUES, diagnostics, context);
+		return result; 
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateTypeTypeObject(TypeType1 typeTypeObject, DiagnosticChain diagnostics, Map context) {
 		return true;
 	}
 
@@ -972,8 +1015,8 @@ public class SchemaValidator extends EObjectValidator {
 	public boolean validateVersionType_Enumeration(String versionType, DiagnosticChain diagnostics, Map context) {
 		boolean result = VERSION_TYPE__ENUMERATION__VALUES.contains(versionType);
 		if (!result && diagnostics != null) 
-			reportEnumerationViolation(SchemaPackage.eINSTANCE.getVersionType(), versionType, VERSION_TYPE__ENUMERATION__VALUES, diagnostics, context);
+			reportEnumerationViolation(MulePackage.eINSTANCE.getVersionType(), versionType, VERSION_TYPE__ENUMERATION__VALUES, diagnostics, context);
 		return result; 
 	}
 
-} //SchemaValidator
+} //MuleValidator

@@ -6,8 +6,6 @@
  */
 package org.mule.schema;
 
-import java.util.List;
-
 import org.eclipse.emf.ecore.EObject;
 
 import org.eclipse.emf.ecore.util.FeatureMap;
@@ -27,7 +25,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getSecurityFilterType()
+ * @see org.mule.schema.MulePackage#getSecurityFilterType()
  * @model extendedMetaData="name='security-filterType' kind='mixed'"
  * @generated
  */
@@ -42,7 +40,7 @@ public interface SecurityFilterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getSecurityFilterType_Mixed()
+	 * @see org.mule.schema.MulePackage#getSecurityFilterType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -59,7 +57,7 @@ public interface SecurityFilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getSecurityFilterType_Properties()
+	 * @see org.mule.schema.MulePackage#getSecurityFilterType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -86,9 +84,9 @@ public interface SecurityFilterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Class Name</em>' attribute.
 	 * @see #setClassName(String)
-	 * @see org.mule.schema.SchemaPackage#getSecurityFilterType_ClassName()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='className'"
+	 * @see org.mule.schema.MulePackage#getSecurityFilterType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getClassName();
@@ -112,13 +110,13 @@ public interface SecurityFilterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Use Providers</em>' attribute.
-	 * @see #setUseProviders(List)
-	 * @see org.mule.schema.SchemaPackage#getSecurityFilterType_UseProviders()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.IDREFS" many="false"
-	 *        extendedMetaData="kind='attribute' name='useProviders'"
+	 * @see #setUseProviders(String)
+	 * @see org.mule.schema.MulePackage#getSecurityFilterType_UseProviders()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='attribute' name='useProviders' namespace='##targetNamespace'"
 	 * @generated
 	 */
-	List getUseProviders();
+	String getUseProviders();
 
 	/**
 	 * Sets the value of the '{@link org.mule.schema.SecurityFilterType#getUseProviders <em>Use Providers</em>}' attribute.
@@ -128,6 +126,6 @@ public interface SecurityFilterType extends EObject {
 	 * @see #getUseProviders()
 	 * @generated
 	 */
-	void setUseProviders(List value);
+	void setUseProviders(String value);
 
 } // SecurityFilterType

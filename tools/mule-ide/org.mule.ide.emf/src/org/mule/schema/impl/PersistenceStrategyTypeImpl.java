@@ -22,9 +22,9 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.mule.schema.MulePackage;
 import org.mule.schema.PersistenceStrategyType;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -87,7 +87,7 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getPersistenceStrategyType();
+		return MulePackage.eINSTANCE.getPersistenceStrategyType();
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.PERSISTENCE_STRATEGY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.PERSISTENCE_STRATEGY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -108,7 +108,7 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getPersistenceStrategyType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getPersistenceStrategyType_Properties(), true);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getPersistenceStrategyType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getPersistenceStrategyType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getPersistenceStrategyType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getPersistenceStrategyType_Properties(), newProperties);
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -158,9 +158,9 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
+				case MulePackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
+				case MulePackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -176,11 +176,11 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME:
 				return getClassName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -193,14 +193,14 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
 		}
@@ -214,13 +214,13 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
 		}
@@ -234,11 +234,11 @@ public class PersistenceStrategyTypeImpl extends EObjectImpl implements Persiste
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
 		}
 		return eDynamicIsSet(eFeature);

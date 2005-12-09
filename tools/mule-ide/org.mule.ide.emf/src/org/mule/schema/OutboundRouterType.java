@@ -27,7 +27,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getOutboundRouterType()
+ * @see org.mule.schema.MulePackage#getOutboundRouterType()
  * @model extendedMetaData="name='outbound-routerType' kind='mixed'"
  * @generated
  */
@@ -42,7 +42,7 @@ public interface OutboundRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getOutboundRouterType_Mixed()
+	 * @see org.mule.schema.MulePackage#getOutboundRouterType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -59,7 +59,7 @@ public interface OutboundRouterType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Catch All Strategy</em>' containment reference.
 	 * @see #setCatchAllStrategy(CatchAllStrategyType)
-	 * @see org.mule.schema.SchemaPackage#getOutboundRouterType_CatchAllStrategy()
+	 * @see org.mule.schema.MulePackage#getOutboundRouterType_CatchAllStrategy()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='catch-all-strategy' namespace='##targetNamespace'"
 	 * @generated
@@ -86,7 +86,7 @@ public interface OutboundRouterType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Router</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getOutboundRouterType_Router()
+	 * @see org.mule.schema.MulePackage#getOutboundRouterType_Router()
 	 * @model type="org.mule.schema.RouterType" containment="true" resolveProxies="false" required="true" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='router' namespace='##targetNamespace'"
 	 * @generated
@@ -106,9 +106,9 @@ public interface OutboundRouterType extends EObject {
 	 * @see #isSetMatchAll()
 	 * @see #unsetMatchAll()
 	 * @see #setMatchAll(boolean)
-	 * @see org.mule.schema.SchemaPackage#getOutboundRouterType_MatchAll()
+	 * @see org.mule.schema.MulePackage#getOutboundRouterType_MatchAll()
 	 * @model default="false" unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='matchAll'"
+	 *        extendedMetaData="kind='attribute' name='matchAll' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	boolean isMatchAll();

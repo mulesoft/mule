@@ -14,14 +14,14 @@ import org.eclipse.emf.common.util.AbstractEnumerator;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the literals of the enumeration '<em><b>Type Type</b></em>',
+ * A representation of the literals of the enumeration '<em><b>Type Type1</b></em>',
  * and utility methods for working with them.
  * <!-- end-user-doc -->
- * @see org.mule.schema.SchemaPackage#getTypeType()
+ * @see org.mule.schema.MulePackage#getTypeType1()
  * @model
  * @generated
  */
-public final class TypeType extends AbstractEnumerator {
+public final class TypeType1 extends AbstractEnumerator {
 	/**
 	 * The '<em><b>Sender</b></em>' literal value.
 	 * <!-- begin-user-doc -->
@@ -75,7 +75,7 @@ public final class TypeType extends AbstractEnumerator {
 	 * @generated
 	 * @ordered
 	 */
-	public static final TypeType SENDER_LITERAL = new TypeType(SENDER, "sender");
+	public static final TypeType1 SENDER_LITERAL = new TypeType1(SENDER, "sender");
 
 	/**
 	 * The '<em><b>Receiver</b></em>' literal object.
@@ -85,7 +85,7 @@ public final class TypeType extends AbstractEnumerator {
 	 * @generated
 	 * @ordered
 	 */
-	public static final TypeType RECEIVER_LITERAL = new TypeType(RECEIVER, "receiver");
+	public static final TypeType1 RECEIVER_LITERAL = new TypeType1(RECEIVER, "receiver");
 
 	/**
 	 * The '<em><b>Sender And Receiver</b></em>' literal object.
@@ -95,23 +95,23 @@ public final class TypeType extends AbstractEnumerator {
 	 * @generated
 	 * @ordered
 	 */
-	public static final TypeType SENDER_AND_RECEIVER_LITERAL = new TypeType(SENDER_AND_RECEIVER, "senderAndReceiver");
+	public static final TypeType1 SENDER_AND_RECEIVER_LITERAL = new TypeType1(SENDER_AND_RECEIVER, "senderAndReceiver");
 
 	/**
-	 * An array of all the '<em><b>Type Type</b></em>' enumerators.
+	 * An array of all the '<em><b>Type Type1</b></em>' enumerators.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final TypeType[] VALUES_ARRAY =
-		new TypeType[] {
+	private static final TypeType1[] VALUES_ARRAY =
+		new TypeType1[] {
 			SENDER_LITERAL,
 			RECEIVER_LITERAL,
 			SENDER_AND_RECEIVER_LITERAL,
 		};
 
 	/**
-	 * A public read-only list of all the '<em><b>Type Type</b></em>' enumerators.
+	 * A public read-only list of all the '<em><b>Type Type1</b></em>' enumerators.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -119,14 +119,14 @@ public final class TypeType extends AbstractEnumerator {
 	public static final List VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
-	 * Returns the '<em><b>Type Type</b></em>' literal with the specified name.
+	 * Returns the '<em><b>Type Type1</b></em>' literal with the specified name.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static TypeType get(String name) {
+	public static TypeType1 get(String name) {
 		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
-			TypeType result = VALUES_ARRAY[i];
+			TypeType1 result = VALUES_ARRAY[i];
 			if (result.toString().equals(name)) {
 				return result;
 			}
@@ -135,12 +135,12 @@ public final class TypeType extends AbstractEnumerator {
 	}
 
 	/**
-	 * Returns the '<em><b>Type Type</b></em>' literal with the specified value.
+	 * Returns the '<em><b>Type Type1</b></em>' literal with the specified value.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static TypeType get(int value) {
+	public static TypeType1 get(int value) {
 		switch (value) {
 			case SENDER: return SENDER_LITERAL;
 			case RECEIVER: return RECEIVER_LITERAL;
@@ -155,8 +155,8 @@ public final class TypeType extends AbstractEnumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private TypeType(int value, String name) {
+	private TypeType1(int value, String name) {
 		super(value, name);
 	}
 
-} //TypeType
+} //TypeType1

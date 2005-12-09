@@ -23,14 +23,14 @@ import org.mule.schema.*;
  * <!-- end-user-doc -->
  * @generated
  */
-public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
+public class MuleFactoryImpl extends EFactoryImpl implements MuleFactory {
 	/**
 	 * Creates an instance of the factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public SchemaFactoryImpl() {
+	public MuleFactoryImpl() {
 		super();
 	}
 
@@ -41,64 +41,64 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 */
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case SchemaPackage.AGENTS_TYPE: return createAgentsType();
-			case SchemaPackage.AGENT_TYPE: return createAgentType();
-			case SchemaPackage.CATCH_ALL_STRATEGY_TYPE: return createCatchAllStrategyType();
-			case SchemaPackage.COMPONENT_FACTORY_TYPE: return createComponentFactoryType();
-			case SchemaPackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE: return createComponentLifecycleAdapterFactoryType();
-			case SchemaPackage.COMPONENT_POOL_FACTORY_TYPE: return createComponentPoolFactoryType();
-			case SchemaPackage.CONNECTION_STRATEGY_TYPE: return createConnectionStrategyType();
-			case SchemaPackage.CONNECTOR_TYPE: return createConnectorType();
-			case SchemaPackage.CONSTRAINT_TYPE: return createConstraintType();
-			case SchemaPackage.CONTAINER_CONTEXT_TYPE: return createContainerContextType();
-			case SchemaPackage.CONTAINER_ENTRY_TYPE: return createContainerEntryType();
-			case SchemaPackage.CONTAINER_PROPERTY_TYPE: return createContainerPropertyType();
-			case SchemaPackage.DOCUMENT_ROOT: return createDocumentRoot();
-			case SchemaPackage.ENCRYPTION_STRATEGY_TYPE: return createEncryptionStrategyType();
-			case SchemaPackage.ENDPOINT_IDENTIFIERS_TYPE: return createEndpointIdentifiersType();
-			case SchemaPackage.ENDPOINT_IDENTIFIER_TYPE: return createEndpointIdentifierType();
-			case SchemaPackage.ENDPOINT_TYPE: return createEndpointType();
-			case SchemaPackage.ENTRY_POINT_RESOLVER_TYPE: return createEntryPointResolverType();
-			case SchemaPackage.ENTRY_TYPE: return createEntryType();
-			case SchemaPackage.ENVIRONMENT_PROPERTIES_TYPE: return createEnvironmentPropertiesType();
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE: return createExceptionStrategyType();
-			case SchemaPackage.FACTORY_ENTRY_TYPE: return createFactoryEntryType();
-			case SchemaPackage.FACTORY_PROPERTY_TYPE: return createFactoryPropertyType();
-			case SchemaPackage.FILE_PROPERTIES_TYPE: return createFilePropertiesType();
-			case SchemaPackage.FILTER_TYPE: return createFilterType();
-			case SchemaPackage.GLOBAL_ENDPOINTS_TYPE: return createGlobalEndpointsType();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE: return createGlobalEndpointType();
-			case SchemaPackage.INBOUND_ROUTER_TYPE: return createInboundRouterType();
-			case SchemaPackage.INTERCEPTOR_STACK_TYPE: return createInterceptorStackType();
-			case SchemaPackage.INTERCEPTOR_TYPE: return createInterceptorType();
-			case SchemaPackage.LEFT_FILTER_TYPE: return createLeftFilterType();
-			case SchemaPackage.LIST_TYPE: return createListType();
-			case SchemaPackage.MAP_TYPE: return createMapType();
-			case SchemaPackage.MODEL_TYPE: return createModelType();
-			case SchemaPackage.MULE_CONFIGURATION_TYPE: return createMuleConfigurationType();
-			case SchemaPackage.MULE_DESCRIPTOR_TYPE: return createMuleDescriptorType();
-			case SchemaPackage.MULE_ENVIRONMENT_PROPERTIES_TYPE: return createMuleEnvironmentPropertiesType();
-			case SchemaPackage.OUTBOUND_ROUTER_TYPE: return createOutboundRouterType();
-			case SchemaPackage.PERSISTENCE_STRATEGY_TYPE: return createPersistenceStrategyType();
-			case SchemaPackage.POOLING_PROFILE_TYPE: return createPoolingProfileType();
-			case SchemaPackage.PROPERTIES_TYPE: return createPropertiesType();
-			case SchemaPackage.PROPERTY_TYPE: return createPropertyType();
-			case SchemaPackage.QUEUE_PROFILE_TYPE: return createQueueProfileType();
-			case SchemaPackage.REPLY_TO_TYPE: return createReplyToType();
-			case SchemaPackage.RESPONSE_ROUTER_TYPE: return createResponseRouterType();
-			case SchemaPackage.RIGHT_FILTER_TYPE: return createRightFilterType();
-			case SchemaPackage.ROUTER_TYPE: return createRouterType();
-			case SchemaPackage.SECURITY_FILTER_TYPE: return createSecurityFilterType();
-			case SchemaPackage.SECURITY_MANAGER_TYPE: return createSecurityManagerType();
-			case SchemaPackage.SECURITY_PROVIDER_TYPE: return createSecurityProviderType();
-			case SchemaPackage.SYSTEM_ENTRY_TYPE: return createSystemEntryType();
-			case SchemaPackage.SYSTEM_PROPERTY_TYPE: return createSystemPropertyType();
-			case SchemaPackage.TEXT_PROPERTY_TYPE: return createTextPropertyType();
-			case SchemaPackage.THREADING_PROFILE_TYPE: return createThreadingProfileType();
-			case SchemaPackage.TRANSACTION_MANAGER_TYPE: return createTransactionManagerType();
-			case SchemaPackage.TRANSACTION_TYPE: return createTransactionType();
-			case SchemaPackage.TRANSFORMERS_TYPE: return createTransformersType();
-			case SchemaPackage.TRANSFORMER_TYPE: return createTransformerType();
+			case MulePackage.AGENTS_TYPE: return createAgentsType();
+			case MulePackage.AGENT_TYPE: return createAgentType();
+			case MulePackage.CATCH_ALL_STRATEGY_TYPE: return createCatchAllStrategyType();
+			case MulePackage.COMPONENT_FACTORY_TYPE: return createComponentFactoryType();
+			case MulePackage.COMPONENT_LIFECYCLE_ADAPTER_FACTORY_TYPE: return createComponentLifecycleAdapterFactoryType();
+			case MulePackage.COMPONENT_POOL_FACTORY_TYPE: return createComponentPoolFactoryType();
+			case MulePackage.CONNECTION_STRATEGY_TYPE: return createConnectionStrategyType();
+			case MulePackage.CONNECTOR_TYPE: return createConnectorType();
+			case MulePackage.CONSTRAINT_TYPE: return createConstraintType();
+			case MulePackage.CONTAINER_CONTEXT_TYPE: return createContainerContextType();
+			case MulePackage.CONTAINER_ENTRY_TYPE: return createContainerEntryType();
+			case MulePackage.CONTAINER_PROPERTY_TYPE: return createContainerPropertyType();
+			case MulePackage.DOCUMENT_ROOT: return createDocumentRoot();
+			case MulePackage.ENCRYPTION_STRATEGY_TYPE: return createEncryptionStrategyType();
+			case MulePackage.ENDPOINT_IDENTIFIERS_TYPE: return createEndpointIdentifiersType();
+			case MulePackage.ENDPOINT_IDENTIFIER_TYPE: return createEndpointIdentifierType();
+			case MulePackage.ENDPOINT_TYPE: return createEndpointType();
+			case MulePackage.ENTRY_POINT_RESOLVER_TYPE: return createEntryPointResolverType();
+			case MulePackage.ENTRY_TYPE: return createEntryType();
+			case MulePackage.ENVIRONMENT_PROPERTIES_TYPE: return createEnvironmentPropertiesType();
+			case MulePackage.EXCEPTION_STRATEGY_TYPE: return createExceptionStrategyType();
+			case MulePackage.FACTORY_ENTRY_TYPE: return createFactoryEntryType();
+			case MulePackage.FACTORY_PROPERTY_TYPE: return createFactoryPropertyType();
+			case MulePackage.FILE_PROPERTIES_TYPE: return createFilePropertiesType();
+			case MulePackage.FILTER_TYPE: return createFilterType();
+			case MulePackage.GLOBAL_ENDPOINTS_TYPE: return createGlobalEndpointsType();
+			case MulePackage.GLOBAL_ENDPOINT_TYPE: return createGlobalEndpointType();
+			case MulePackage.INBOUND_ROUTER_TYPE: return createInboundRouterType();
+			case MulePackage.INTERCEPTOR_STACK_TYPE: return createInterceptorStackType();
+			case MulePackage.INTERCEPTOR_TYPE: return createInterceptorType();
+			case MulePackage.LEFT_FILTER_TYPE: return createLeftFilterType();
+			case MulePackage.LIST_TYPE: return createListType();
+			case MulePackage.MAP_TYPE: return createMapType();
+			case MulePackage.MODEL_TYPE: return createModelType();
+			case MulePackage.MULE_CONFIGURATION_TYPE: return createMuleConfigurationType();
+			case MulePackage.MULE_DESCRIPTOR_TYPE: return createMuleDescriptorType();
+			case MulePackage.MULE_ENVIRONMENT_PROPERTIES_TYPE: return createMuleEnvironmentPropertiesType();
+			case MulePackage.OUTBOUND_ROUTER_TYPE: return createOutboundRouterType();
+			case MulePackage.PERSISTENCE_STRATEGY_TYPE: return createPersistenceStrategyType();
+			case MulePackage.POOLING_PROFILE_TYPE: return createPoolingProfileType();
+			case MulePackage.PROPERTIES_TYPE: return createPropertiesType();
+			case MulePackage.PROPERTY_TYPE: return createPropertyType();
+			case MulePackage.QUEUE_PROFILE_TYPE: return createQueueProfileType();
+			case MulePackage.REPLY_TO_TYPE: return createReplyToType();
+			case MulePackage.RESPONSE_ROUTER_TYPE: return createResponseRouterType();
+			case MulePackage.RIGHT_FILTER_TYPE: return createRightFilterType();
+			case MulePackage.ROUTER_TYPE: return createRouterType();
+			case MulePackage.SECURITY_FILTER_TYPE: return createSecurityFilterType();
+			case MulePackage.SECURITY_MANAGER_TYPE: return createSecurityManagerType();
+			case MulePackage.SECURITY_PROVIDER_TYPE: return createSecurityProviderType();
+			case MulePackage.SYSTEM_ENTRY_TYPE: return createSystemEntryType();
+			case MulePackage.SYSTEM_PROPERTY_TYPE: return createSystemPropertyType();
+			case MulePackage.TEXT_PROPERTY_TYPE: return createTextPropertyType();
+			case MulePackage.THREADING_PROFILE_TYPE: return createThreadingProfileType();
+			case MulePackage.TRANSACTION_MANAGER_TYPE: return createTransactionManagerType();
+			case MulePackage.TRANSACTION_TYPE: return createTransactionType();
+			case MulePackage.TRANSFORMERS_TYPE: return createTransformersType();
+			case MulePackage.TRANSFORMER_TYPE: return createTransformerType();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -111,70 +111,72 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 */
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
-			case SchemaPackage.ACTION_TYPE: {
+			case MulePackage.ACTION_TYPE: {
 				ActionType result = ActionType.get(initialValue);
 				if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 				return result;
 			}
-			case SchemaPackage.CREATE_CONNECTOR_TYPE: {
+			case MulePackage.CREATE_CONNECTOR_TYPE: {
 				CreateConnectorType result = CreateConnectorType.get(initialValue);
 				if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 				return result;
 			}
-			case SchemaPackage.ENABLE_CORRELATION_TYPE: {
+			case MulePackage.ENABLE_CORRELATION_TYPE: {
 				EnableCorrelationType result = EnableCorrelationType.get(initialValue);
 				if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 				return result;
 			}
-			case SchemaPackage.EXHAUSTED_ACTION_TYPE: {
+			case MulePackage.EXHAUSTED_ACTION_TYPE: {
 				ExhaustedActionType result = ExhaustedActionType.get(initialValue);
 				if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 				return result;
 			}
-			case SchemaPackage.ID_TYPE: {
+			case MulePackage.ID_TYPE: {
 				IdType result = IdType.get(initialValue);
 				if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 				return result;
 			}
-			case SchemaPackage.INITIALISATION_POLICY_TYPE: {
+			case MulePackage.INITIALISATION_POLICY_TYPE: {
 				InitialisationPolicyType result = InitialisationPolicyType.get(initialValue);
 				if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 				return result;
 			}
-			case SchemaPackage.INITIAL_STATE_TYPE: {
+			case MulePackage.INITIAL_STATE_TYPE: {
 				InitialStateType result = InitialStateType.get(initialValue);
 				if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 				return result;
 			}
-			case SchemaPackage.POOL_EXHAUSTED_ACTION_TYPE: {
+			case MulePackage.POOL_EXHAUSTED_ACTION_TYPE: {
 				PoolExhaustedActionType result = PoolExhaustedActionType.get(initialValue);
 				if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 				return result;
 			}
-			case SchemaPackage.TYPE_TYPE: {
-				TypeType result = TypeType.get(initialValue);
+			case MulePackage.TYPE_TYPE1: {
+				TypeType1 result = TypeType1.get(initialValue);
 				if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
 				return result;
 			}
-			case SchemaPackage.ACTION_TYPE_OBJECT:
+			case MulePackage.ACTION_TYPE_OBJECT:
 				return createActionTypeObjectFromString(eDataType, initialValue);
-			case SchemaPackage.CREATE_CONNECTOR_TYPE_OBJECT:
+			case MulePackage.CREATE_CONNECTOR_TYPE_OBJECT:
 				return createCreateConnectorTypeObjectFromString(eDataType, initialValue);
-			case SchemaPackage.ENABLE_CORRELATION_TYPE_OBJECT:
+			case MulePackage.ENABLE_CORRELATION_TYPE_OBJECT:
 				return createEnableCorrelationTypeObjectFromString(eDataType, initialValue);
-			case SchemaPackage.EXHAUSTED_ACTION_TYPE_OBJECT:
+			case MulePackage.EXHAUSTED_ACTION_TYPE_OBJECT:
 				return createExhaustedActionTypeObjectFromString(eDataType, initialValue);
-			case SchemaPackage.ID_TYPE_OBJECT:
+			case MulePackage.ID_TYPE_OBJECT:
 				return createIdTypeObjectFromString(eDataType, initialValue);
-			case SchemaPackage.INITIALISATION_POLICY_TYPE_OBJECT:
+			case MulePackage.INITIALISATION_POLICY_TYPE_OBJECT:
 				return createInitialisationPolicyTypeObjectFromString(eDataType, initialValue);
-			case SchemaPackage.INITIAL_STATE_TYPE_OBJECT:
+			case MulePackage.INITIAL_STATE_TYPE_OBJECT:
 				return createInitialStateTypeObjectFromString(eDataType, initialValue);
-			case SchemaPackage.POOL_EXHAUSTED_ACTION_TYPE_OBJECT:
+			case MulePackage.POOL_EXHAUSTED_ACTION_TYPE_OBJECT:
 				return createPoolExhaustedActionTypeObjectFromString(eDataType, initialValue);
-			case SchemaPackage.TYPE_TYPE_OBJECT:
+			case MulePackage.TYPE_TYPE:
+				return createTypeTypeFromString(eDataType, initialValue);
+			case MulePackage.TYPE_TYPE_OBJECT:
 				return createTypeTypeObjectFromString(eDataType, initialValue);
-			case SchemaPackage.VERSION_TYPE:
+			case MulePackage.VERSION_TYPE:
 				return createVersionTypeFromString(eDataType, initialValue);
 			default:
 				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
@@ -188,43 +190,45 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 */
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
-			case SchemaPackage.ACTION_TYPE:
+			case MulePackage.ACTION_TYPE:
 				return instanceValue == null ? null : instanceValue.toString();
-			case SchemaPackage.CREATE_CONNECTOR_TYPE:
+			case MulePackage.CREATE_CONNECTOR_TYPE:
 				return instanceValue == null ? null : instanceValue.toString();
-			case SchemaPackage.ENABLE_CORRELATION_TYPE:
+			case MulePackage.ENABLE_CORRELATION_TYPE:
 				return instanceValue == null ? null : instanceValue.toString();
-			case SchemaPackage.EXHAUSTED_ACTION_TYPE:
+			case MulePackage.EXHAUSTED_ACTION_TYPE:
 				return instanceValue == null ? null : instanceValue.toString();
-			case SchemaPackage.ID_TYPE:
+			case MulePackage.ID_TYPE:
 				return instanceValue == null ? null : instanceValue.toString();
-			case SchemaPackage.INITIALISATION_POLICY_TYPE:
+			case MulePackage.INITIALISATION_POLICY_TYPE:
 				return instanceValue == null ? null : instanceValue.toString();
-			case SchemaPackage.INITIAL_STATE_TYPE:
+			case MulePackage.INITIAL_STATE_TYPE:
 				return instanceValue == null ? null : instanceValue.toString();
-			case SchemaPackage.POOL_EXHAUSTED_ACTION_TYPE:
+			case MulePackage.POOL_EXHAUSTED_ACTION_TYPE:
 				return instanceValue == null ? null : instanceValue.toString();
-			case SchemaPackage.TYPE_TYPE:
+			case MulePackage.TYPE_TYPE1:
 				return instanceValue == null ? null : instanceValue.toString();
-			case SchemaPackage.ACTION_TYPE_OBJECT:
+			case MulePackage.ACTION_TYPE_OBJECT:
 				return convertActionTypeObjectToString(eDataType, instanceValue);
-			case SchemaPackage.CREATE_CONNECTOR_TYPE_OBJECT:
+			case MulePackage.CREATE_CONNECTOR_TYPE_OBJECT:
 				return convertCreateConnectorTypeObjectToString(eDataType, instanceValue);
-			case SchemaPackage.ENABLE_CORRELATION_TYPE_OBJECT:
+			case MulePackage.ENABLE_CORRELATION_TYPE_OBJECT:
 				return convertEnableCorrelationTypeObjectToString(eDataType, instanceValue);
-			case SchemaPackage.EXHAUSTED_ACTION_TYPE_OBJECT:
+			case MulePackage.EXHAUSTED_ACTION_TYPE_OBJECT:
 				return convertExhaustedActionTypeObjectToString(eDataType, instanceValue);
-			case SchemaPackage.ID_TYPE_OBJECT:
+			case MulePackage.ID_TYPE_OBJECT:
 				return convertIdTypeObjectToString(eDataType, instanceValue);
-			case SchemaPackage.INITIALISATION_POLICY_TYPE_OBJECT:
+			case MulePackage.INITIALISATION_POLICY_TYPE_OBJECT:
 				return convertInitialisationPolicyTypeObjectToString(eDataType, instanceValue);
-			case SchemaPackage.INITIAL_STATE_TYPE_OBJECT:
+			case MulePackage.INITIAL_STATE_TYPE_OBJECT:
 				return convertInitialStateTypeObjectToString(eDataType, instanceValue);
-			case SchemaPackage.POOL_EXHAUSTED_ACTION_TYPE_OBJECT:
+			case MulePackage.POOL_EXHAUSTED_ACTION_TYPE_OBJECT:
 				return convertPoolExhaustedActionTypeObjectToString(eDataType, instanceValue);
-			case SchemaPackage.TYPE_TYPE_OBJECT:
+			case MulePackage.TYPE_TYPE:
+				return convertTypeTypeToString(eDataType, instanceValue);
+			case MulePackage.TYPE_TYPE_OBJECT:
 				return convertTypeTypeObjectToString(eDataType, instanceValue);
-			case SchemaPackage.VERSION_TYPE:
+			case MulePackage.VERSION_TYPE:
 				return convertVersionTypeToString(eDataType, instanceValue);
 			default:
 				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
@@ -817,7 +821,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public ActionType createActionTypeObjectFromString(EDataType eDataType, String initialValue) {
-		return (ActionType)SchemaFactory.eINSTANCE.createFromString(SchemaPackage.eINSTANCE.getActionType(), initialValue);
+		return (ActionType)MuleFactory.eINSTANCE.createFromString(MulePackage.eINSTANCE.getActionType(), initialValue);
 	}
 
 	/**
@@ -826,7 +830,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public String convertActionTypeObjectToString(EDataType eDataType, Object instanceValue) {
-		return SchemaFactory.eINSTANCE.convertToString(SchemaPackage.eINSTANCE.getActionType(), instanceValue);
+		return MuleFactory.eINSTANCE.convertToString(MulePackage.eINSTANCE.getActionType(), instanceValue);
 	}
 
 	/**
@@ -835,7 +839,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public CreateConnectorType createCreateConnectorTypeObjectFromString(EDataType eDataType, String initialValue) {
-		return (CreateConnectorType)SchemaFactory.eINSTANCE.createFromString(SchemaPackage.eINSTANCE.getCreateConnectorType(), initialValue);
+		return (CreateConnectorType)MuleFactory.eINSTANCE.createFromString(MulePackage.eINSTANCE.getCreateConnectorType(), initialValue);
 	}
 
 	/**
@@ -844,7 +848,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public String convertCreateConnectorTypeObjectToString(EDataType eDataType, Object instanceValue) {
-		return SchemaFactory.eINSTANCE.convertToString(SchemaPackage.eINSTANCE.getCreateConnectorType(), instanceValue);
+		return MuleFactory.eINSTANCE.convertToString(MulePackage.eINSTANCE.getCreateConnectorType(), instanceValue);
 	}
 
 	/**
@@ -853,7 +857,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public EnableCorrelationType createEnableCorrelationTypeObjectFromString(EDataType eDataType, String initialValue) {
-		return (EnableCorrelationType)SchemaFactory.eINSTANCE.createFromString(SchemaPackage.eINSTANCE.getEnableCorrelationType(), initialValue);
+		return (EnableCorrelationType)MuleFactory.eINSTANCE.createFromString(MulePackage.eINSTANCE.getEnableCorrelationType(), initialValue);
 	}
 
 	/**
@@ -862,7 +866,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public String convertEnableCorrelationTypeObjectToString(EDataType eDataType, Object instanceValue) {
-		return SchemaFactory.eINSTANCE.convertToString(SchemaPackage.eINSTANCE.getEnableCorrelationType(), instanceValue);
+		return MuleFactory.eINSTANCE.convertToString(MulePackage.eINSTANCE.getEnableCorrelationType(), instanceValue);
 	}
 
 	/**
@@ -871,7 +875,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public ExhaustedActionType createExhaustedActionTypeObjectFromString(EDataType eDataType, String initialValue) {
-		return (ExhaustedActionType)SchemaFactory.eINSTANCE.createFromString(SchemaPackage.eINSTANCE.getExhaustedActionType(), initialValue);
+		return (ExhaustedActionType)MuleFactory.eINSTANCE.createFromString(MulePackage.eINSTANCE.getExhaustedActionType(), initialValue);
 	}
 
 	/**
@@ -880,7 +884,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public String convertExhaustedActionTypeObjectToString(EDataType eDataType, Object instanceValue) {
-		return SchemaFactory.eINSTANCE.convertToString(SchemaPackage.eINSTANCE.getExhaustedActionType(), instanceValue);
+		return MuleFactory.eINSTANCE.convertToString(MulePackage.eINSTANCE.getExhaustedActionType(), instanceValue);
 	}
 
 	/**
@@ -889,7 +893,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public IdType createIdTypeObjectFromString(EDataType eDataType, String initialValue) {
-		return (IdType)SchemaFactory.eINSTANCE.createFromString(SchemaPackage.eINSTANCE.getIdType(), initialValue);
+		return (IdType)MuleFactory.eINSTANCE.createFromString(MulePackage.eINSTANCE.getIdType(), initialValue);
 	}
 
 	/**
@@ -898,7 +902,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public String convertIdTypeObjectToString(EDataType eDataType, Object instanceValue) {
-		return SchemaFactory.eINSTANCE.convertToString(SchemaPackage.eINSTANCE.getIdType(), instanceValue);
+		return MuleFactory.eINSTANCE.convertToString(MulePackage.eINSTANCE.getIdType(), instanceValue);
 	}
 
 	/**
@@ -907,7 +911,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public InitialisationPolicyType createInitialisationPolicyTypeObjectFromString(EDataType eDataType, String initialValue) {
-		return (InitialisationPolicyType)SchemaFactory.eINSTANCE.createFromString(SchemaPackage.eINSTANCE.getInitialisationPolicyType(), initialValue);
+		return (InitialisationPolicyType)MuleFactory.eINSTANCE.createFromString(MulePackage.eINSTANCE.getInitialisationPolicyType(), initialValue);
 	}
 
 	/**
@@ -916,7 +920,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public String convertInitialisationPolicyTypeObjectToString(EDataType eDataType, Object instanceValue) {
-		return SchemaFactory.eINSTANCE.convertToString(SchemaPackage.eINSTANCE.getInitialisationPolicyType(), instanceValue);
+		return MuleFactory.eINSTANCE.convertToString(MulePackage.eINSTANCE.getInitialisationPolicyType(), instanceValue);
 	}
 
 	/**
@@ -925,7 +929,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public InitialStateType createInitialStateTypeObjectFromString(EDataType eDataType, String initialValue) {
-		return (InitialStateType)SchemaFactory.eINSTANCE.createFromString(SchemaPackage.eINSTANCE.getInitialStateType(), initialValue);
+		return (InitialStateType)MuleFactory.eINSTANCE.createFromString(MulePackage.eINSTANCE.getInitialStateType(), initialValue);
 	}
 
 	/**
@@ -934,7 +938,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public String convertInitialStateTypeObjectToString(EDataType eDataType, Object instanceValue) {
-		return SchemaFactory.eINSTANCE.convertToString(SchemaPackage.eINSTANCE.getInitialStateType(), instanceValue);
+		return MuleFactory.eINSTANCE.convertToString(MulePackage.eINSTANCE.getInitialStateType(), instanceValue);
 	}
 
 	/**
@@ -943,7 +947,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public PoolExhaustedActionType createPoolExhaustedActionTypeObjectFromString(EDataType eDataType, String initialValue) {
-		return (PoolExhaustedActionType)SchemaFactory.eINSTANCE.createFromString(SchemaPackage.eINSTANCE.getPoolExhaustedActionType(), initialValue);
+		return (PoolExhaustedActionType)MuleFactory.eINSTANCE.createFromString(MulePackage.eINSTANCE.getPoolExhaustedActionType(), initialValue);
 	}
 
 	/**
@@ -952,7 +956,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public String convertPoolExhaustedActionTypeObjectToString(EDataType eDataType, Object instanceValue) {
-		return SchemaFactory.eINSTANCE.convertToString(SchemaPackage.eINSTANCE.getPoolExhaustedActionType(), instanceValue);
+		return MuleFactory.eINSTANCE.convertToString(MulePackage.eINSTANCE.getPoolExhaustedActionType(), instanceValue);
 	}
 
 	/**
@@ -960,8 +964,26 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public TypeType createTypeTypeObjectFromString(EDataType eDataType, String initialValue) {
-		return (TypeType)SchemaFactory.eINSTANCE.createFromString(SchemaPackage.eINSTANCE.getTypeType(), initialValue);
+	public String createTypeTypeFromString(EDataType eDataType, String initialValue) {
+		return (String)XMLTypeFactory.eINSTANCE.createFromString(XMLTypePackage.eINSTANCE.getNMTOKEN(), initialValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertTypeTypeToString(EDataType eDataType, Object instanceValue) {
+		return XMLTypeFactory.eINSTANCE.convertToString(XMLTypePackage.eINSTANCE.getNMTOKEN(), instanceValue);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public TypeType1 createTypeTypeObjectFromString(EDataType eDataType, String initialValue) {
+		return (TypeType1)MuleFactory.eINSTANCE.createFromString(MulePackage.eINSTANCE.getTypeType1(), initialValue);
 	}
 
 	/**
@@ -970,7 +992,7 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @generated
 	 */
 	public String convertTypeTypeObjectToString(EDataType eDataType, Object instanceValue) {
-		return SchemaFactory.eINSTANCE.convertToString(SchemaPackage.eINSTANCE.getTypeType(), instanceValue);
+		return MuleFactory.eINSTANCE.convertToString(MulePackage.eINSTANCE.getTypeType1(), instanceValue);
 	}
 
 	/**
@@ -996,8 +1018,8 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public SchemaPackage getSchemaPackage() {
-		return (SchemaPackage)getEPackage();
+	public MulePackage getMulePackage() {
+		return (MulePackage)getEPackage();
 	}
 
 	/**
@@ -1006,8 +1028,8 @@ public class SchemaFactoryImpl extends EFactoryImpl implements SchemaFactory {
 	 * @deprecated
 	 * @generated
 	 */
-	public static SchemaPackage getPackage() {
-		return SchemaPackage.eINSTANCE;
+	public static MulePackage getPackage() {
+		return MulePackage.eINSTANCE;
 	}
 
-} //SchemaFactoryImpl
+} //MuleFactoryImpl

@@ -25,8 +25,8 @@ import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.ExceptionStrategyType;
+import org.mule.schema.MulePackage;
 import org.mule.schema.PropertiesType;
-import org.mule.schema.SchemaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -91,7 +91,7 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getExceptionStrategyType();
+		return MulePackage.eINSTANCE.getExceptionStrategyType();
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.EXCEPTION_STRATEGY_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.EXCEPTION_STRATEGY_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -112,7 +112,7 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 * @generated
 	 */
 	public EList getEndpoint() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getExceptionStrategyType_Endpoint());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getExceptionStrategyType_Endpoint());
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 * @generated
 	 */
 	public EList getGlobalEndpoint() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getExceptionStrategyType_GlobalEndpoint());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getExceptionStrategyType_GlobalEndpoint());
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 * @generated
 	 */
 	public PropertiesType getProperties() {
-		return (PropertiesType)getMixed().get(SchemaPackage.eINSTANCE.getExceptionStrategyType_Properties(), true);
+		return (PropertiesType)getMixed().get(MulePackage.eINSTANCE.getExceptionStrategyType_Properties(), true);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 * @generated
 	 */
 	public NotificationChain basicSetProperties(PropertiesType newProperties, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getExceptionStrategyType_Properties(), newProperties, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getExceptionStrategyType_Properties(), newProperties, msgs);
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 * @generated
 	 */
 	public void setProperties(PropertiesType newProperties) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getExceptionStrategyType_Properties(), newProperties);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getExceptionStrategyType_Properties(), newProperties);
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 		String oldClassName = className;
 		className = newClassName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME, oldClassName, className));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME, oldClassName, className));
 	}
 
 	/**
@@ -180,13 +180,13 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.EXCEPTION_STRATEGY_TYPE__MIXED:
+				case MulePackage.EXCEPTION_STRATEGY_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
+				case MulePackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
 					return ((InternalEList)getEndpoint()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+				case MulePackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 					return ((InternalEList)getGlobalEndpoint()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
+				case MulePackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
 					return basicSetProperties(null, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -202,15 +202,15 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__MIXED:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
 				return getEndpoint();
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 				return getGlobalEndpoint();
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME:
 				return getClassName();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -223,22 +223,22 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__MIXED:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
 				getEndpoint().clear();
 				getEndpoint().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 				getGlobalEndpoint().clear();
 				getGlobalEndpoint().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)newValue);
 				return;
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME:
 				setClassName((String)newValue);
 				return;
 		}
@@ -252,19 +252,19 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__MIXED:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
 				getEndpoint().clear();
 				return;
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 				getGlobalEndpoint().clear();
 				return;
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
 				setProperties((PropertiesType)null);
 				return;
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME:
 				setClassName(CLASS_NAME_EDEFAULT);
 				return;
 		}
@@ -278,15 +278,15 @@ public class ExceptionStrategyTypeImpl extends EObjectImpl implements ExceptionS
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__MIXED:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__ENDPOINT:
 				return !getEndpoint().isEmpty();
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__GLOBAL_ENDPOINT:
 				return !getGlobalEndpoint().isEmpty();
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__PROPERTIES:
 				return getProperties() != null;
-			case SchemaPackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME:
+			case MulePackage.EXCEPTION_STRATEGY_TYPE__CLASS_NAME:
 				return CLASS_NAME_EDEFAULT == null ? className != null : !CLASS_NAME_EDEFAULT.equals(className);
 		}
 		return eDynamicIsSet(eFeature);

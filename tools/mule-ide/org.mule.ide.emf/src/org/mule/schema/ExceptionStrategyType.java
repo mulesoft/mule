@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * </ul>
  * </p>
  *
- * @see org.mule.schema.SchemaPackage#getExceptionStrategyType()
+ * @see org.mule.schema.MulePackage#getExceptionStrategyType()
  * @model extendedMetaData="name='exception-strategyType' kind='mixed'"
  * @generated
  */
@@ -43,7 +43,7 @@ public interface ExceptionStrategyType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mixed</em>' attribute list.
-	 * @see org.mule.schema.SchemaPackage#getExceptionStrategyType_Mixed()
+	 * @see org.mule.schema.MulePackage#getExceptionStrategyType_Mixed()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
 	 *        extendedMetaData="kind='elementWildcard' name=':mixed'"
 	 * @generated
@@ -60,7 +60,7 @@ public interface ExceptionStrategyType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Endpoint</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getExceptionStrategyType_Endpoint()
+	 * @see org.mule.schema.MulePackage#getExceptionStrategyType_Endpoint()
 	 * @model type="org.mule.schema.EndpointType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -77,7 +77,7 @@ public interface ExceptionStrategyType extends EObject {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Global Endpoint</em>' containment reference list.
-	 * @see org.mule.schema.SchemaPackage#getExceptionStrategyType_GlobalEndpoint()
+	 * @see org.mule.schema.MulePackage#getExceptionStrategyType_GlobalEndpoint()
 	 * @model type="org.mule.schema.GlobalEndpointType" containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='global-endpoint' namespace='##targetNamespace'"
 	 * @generated
@@ -94,7 +94,7 @@ public interface ExceptionStrategyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Properties</em>' containment reference.
 	 * @see #setProperties(PropertiesType)
-	 * @see org.mule.schema.SchemaPackage#getExceptionStrategyType_Properties()
+	 * @see org.mule.schema.MulePackage#getExceptionStrategyType_Properties()
 	 * @model containment="true" resolveProxies="false" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='properties' namespace='##targetNamespace'"
 	 * @generated
@@ -121,9 +121,9 @@ public interface ExceptionStrategyType extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Class Name</em>' attribute.
 	 * @see #setClassName(String)
-	 * @see org.mule.schema.SchemaPackage#getExceptionStrategyType_ClassName()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.NMTOKEN" required="true"
-	 *        extendedMetaData="kind='attribute' name='className'"
+	 * @see org.mule.schema.MulePackage#getExceptionStrategyType_ClassName()
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" required="true"
+	 *        extendedMetaData="kind='attribute' name='className' namespace='##targetNamespace'"
 	 * @generated
 	 */
 	String getClassName();

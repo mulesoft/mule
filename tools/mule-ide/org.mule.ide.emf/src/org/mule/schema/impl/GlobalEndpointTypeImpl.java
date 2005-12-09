@@ -7,7 +7,6 @@
 package org.mule.schema.impl;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -27,7 +26,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.mule.schema.FilterType;
 import org.mule.schema.GlobalEndpointType;
-import org.mule.schema.SchemaPackage;
+import org.mule.schema.MulePackage;
 import org.mule.schema.SecurityFilterType;
 import org.mule.schema.TransactionType;
 
@@ -47,6 +46,7 @@ import org.mule.schema.TransactionType;
  *   <li>{@link org.mule.schema.impl.GlobalEndpointTypeImpl#getName <em>Name</em>}</li>
  *   <li>{@link org.mule.schema.impl.GlobalEndpointTypeImpl#isRemoteSync <em>Remote Sync</em>}</li>
  *   <li>{@link org.mule.schema.impl.GlobalEndpointTypeImpl#getRemoteSyncTimeout <em>Remote Sync Timeout</em>}</li>
+ *   <li>{@link org.mule.schema.impl.GlobalEndpointTypeImpl#getResponseTransformers <em>Response Transformers</em>}</li>
  *   <li>{@link org.mule.schema.impl.GlobalEndpointTypeImpl#isSynchronous <em>Synchronous</em>}</li>
  *   <li>{@link org.mule.schema.impl.GlobalEndpointTypeImpl#getTransformers <em>Transformers</em>}</li>
  * </ul>
@@ -155,6 +155,26 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	protected String remoteSyncTimeout = REMOTE_SYNC_TIMEOUT_EDEFAULT;
 
 	/**
+	 * The default value of the '{@link #getResponseTransformers() <em>Response Transformers</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getResponseTransformers()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String RESPONSE_TRANSFORMERS_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getResponseTransformers() <em>Response Transformers</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getResponseTransformers()
+	 * @generated
+	 * @ordered
+	 */
+	protected String responseTransformers = RESPONSE_TRANSFORMERS_EDEFAULT;
+
+	/**
 	 * The default value of the '{@link #isSynchronous() <em>Synchronous</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -191,7 +211,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 * @ordered
 	 */
-	protected static final List TRANSFORMERS_EDEFAULT = null;
+	protected static final String TRANSFORMERS_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getTransformers() <em>Transformers</em>}' attribute.
@@ -201,7 +221,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 * @ordered
 	 */
-	protected List transformers = TRANSFORMERS_EDEFAULT;
+	protected String transformers = TRANSFORMERS_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -218,7 +238,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	protected EClass eStaticClass() {
-		return SchemaPackage.eINSTANCE.getGlobalEndpointType();
+		return MulePackage.eINSTANCE.getGlobalEndpointType();
 	}
 
 	/**
@@ -228,7 +248,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 */
 	public FeatureMap getMixed() {
 		if (mixed == null) {
-			mixed = new BasicFeatureMap(this, SchemaPackage.GLOBAL_ENDPOINT_TYPE__MIXED);
+			mixed = new BasicFeatureMap(this, MulePackage.GLOBAL_ENDPOINT_TYPE__MIXED);
 		}
 		return mixed;
 	}
@@ -239,7 +259,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public TransactionType getTransaction() {
-		return (TransactionType)getMixed().get(SchemaPackage.eINSTANCE.getGlobalEndpointType_Transaction(), true);
+		return (TransactionType)getMixed().get(MulePackage.eINSTANCE.getGlobalEndpointType_Transaction(), true);
 	}
 
 	/**
@@ -248,7 +268,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public NotificationChain basicSetTransaction(TransactionType newTransaction, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getGlobalEndpointType_Transaction(), newTransaction, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getGlobalEndpointType_Transaction(), newTransaction, msgs);
 	}
 
 	/**
@@ -257,7 +277,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public void setTransaction(TransactionType newTransaction) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getGlobalEndpointType_Transaction(), newTransaction);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getGlobalEndpointType_Transaction(), newTransaction);
 	}
 
 	/**
@@ -266,7 +286,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public FilterType getFilter() {
-		return (FilterType)getMixed().get(SchemaPackage.eINSTANCE.getGlobalEndpointType_Filter(), true);
+		return (FilterType)getMixed().get(MulePackage.eINSTANCE.getGlobalEndpointType_Filter(), true);
 	}
 
 	/**
@@ -275,7 +295,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public NotificationChain basicSetFilter(FilterType newFilter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getGlobalEndpointType_Filter(), newFilter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getGlobalEndpointType_Filter(), newFilter, msgs);
 	}
 
 	/**
@@ -284,7 +304,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public void setFilter(FilterType newFilter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getGlobalEndpointType_Filter(), newFilter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getGlobalEndpointType_Filter(), newFilter);
 	}
 
 	/**
@@ -293,7 +313,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public SecurityFilterType getSecurityFilter() {
-		return (SecurityFilterType)getMixed().get(SchemaPackage.eINSTANCE.getGlobalEndpointType_SecurityFilter(), true);
+		return (SecurityFilterType)getMixed().get(MulePackage.eINSTANCE.getGlobalEndpointType_SecurityFilter(), true);
 	}
 
 	/**
@@ -302,7 +322,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public NotificationChain basicSetSecurityFilter(SecurityFilterType newSecurityFilter, NotificationChain msgs) {
-		return ((FeatureMap.Internal)getMixed()).basicAdd(SchemaPackage.eINSTANCE.getGlobalEndpointType_SecurityFilter(), newSecurityFilter, msgs);
+		return ((FeatureMap.Internal)getMixed()).basicAdd(MulePackage.eINSTANCE.getGlobalEndpointType_SecurityFilter(), newSecurityFilter, msgs);
 	}
 
 	/**
@@ -311,7 +331,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public void setSecurityFilter(SecurityFilterType newSecurityFilter) {
-		((FeatureMap.Internal)getMixed()).set(SchemaPackage.eINSTANCE.getGlobalEndpointType_SecurityFilter(), newSecurityFilter);
+		((FeatureMap.Internal)getMixed()).set(MulePackage.eINSTANCE.getGlobalEndpointType_SecurityFilter(), newSecurityFilter);
 	}
 
 	/**
@@ -320,7 +340,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * @generated
 	 */
 	public EList getProperties() {
-		return ((FeatureMap)getMixed()).list(SchemaPackage.eINSTANCE.getGlobalEndpointType_Properties());
+		return ((FeatureMap)getMixed()).list(MulePackage.eINSTANCE.getGlobalEndpointType_Properties());
 	}
 
 	/**
@@ -341,7 +361,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 		String oldAddress = address;
 		address = newAddress;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.GLOBAL_ENDPOINT_TYPE__ADDRESS, oldAddress, address));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.GLOBAL_ENDPOINT_TYPE__ADDRESS, oldAddress, address));
 	}
 
 	/**
@@ -362,7 +382,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 		String oldName = name;
 		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.GLOBAL_ENDPOINT_TYPE__NAME, oldName, name));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.GLOBAL_ENDPOINT_TYPE__NAME, oldName, name));
 	}
 
 	/**
@@ -385,7 +405,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 		boolean oldRemoteSyncESet = remoteSyncESet;
 		remoteSyncESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC, oldRemoteSync, remoteSync, !oldRemoteSyncESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC, oldRemoteSync, remoteSync, !oldRemoteSyncESet));
 	}
 
 	/**
@@ -399,7 +419,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 		remoteSync = REMOTE_SYNC_EDEFAULT;
 		remoteSyncESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC, oldRemoteSync, REMOTE_SYNC_EDEFAULT, oldRemoteSyncESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC, oldRemoteSync, REMOTE_SYNC_EDEFAULT, oldRemoteSyncESet));
 	}
 
 	/**
@@ -429,7 +449,28 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 		String oldRemoteSyncTimeout = remoteSyncTimeout;
 		remoteSyncTimeout = newRemoteSyncTimeout;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT, oldRemoteSyncTimeout, remoteSyncTimeout));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT, oldRemoteSyncTimeout, remoteSyncTimeout));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getResponseTransformers() {
+		return responseTransformers;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setResponseTransformers(String newResponseTransformers) {
+		String oldResponseTransformers = responseTransformers;
+		responseTransformers = newResponseTransformers;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.GLOBAL_ENDPOINT_TYPE__RESPONSE_TRANSFORMERS, oldResponseTransformers, responseTransformers));
 	}
 
 	/**
@@ -452,7 +493,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 		boolean oldSynchronousESet = synchronousESet;
 		synchronousESet = true;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS, oldSynchronous, synchronous, !oldSynchronousESet));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS, oldSynchronous, synchronous, !oldSynchronousESet));
 	}
 
 	/**
@@ -466,7 +507,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 		synchronous = SYNCHRONOUS_EDEFAULT;
 		synchronousESet = false;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SchemaPackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS, oldSynchronous, SYNCHRONOUS_EDEFAULT, oldSynchronousESet));
+			eNotify(new ENotificationImpl(this, Notification.UNSET, MulePackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS, oldSynchronous, SYNCHRONOUS_EDEFAULT, oldSynchronousESet));
 	}
 
 	/**
@@ -483,7 +524,7 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List getTransformers() {
+	public String getTransformers() {
 		return transformers;
 	}
 
@@ -492,11 +533,11 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setTransformers(List newTransformers) {
-		List oldTransformers = transformers;
+	public void setTransformers(String newTransformers) {
+		String oldTransformers = transformers;
 		transformers = newTransformers;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS, oldTransformers, transformers));
+			eNotify(new ENotificationImpl(this, Notification.SET, MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS, oldTransformers, transformers));
 	}
 
 	/**
@@ -507,15 +548,15 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, Class baseClass, NotificationChain msgs) {
 		if (featureID >= 0) {
 			switch (eDerivedStructuralFeatureID(featureID, baseClass)) {
-				case SchemaPackage.GLOBAL_ENDPOINT_TYPE__MIXED:
+				case MulePackage.GLOBAL_ENDPOINT_TYPE__MIXED:
 					return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
-				case SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
+				case MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
 					return basicSetTransaction(null, msgs);
-				case SchemaPackage.GLOBAL_ENDPOINT_TYPE__FILTER:
+				case MulePackage.GLOBAL_ENDPOINT_TYPE__FILTER:
 					return basicSetFilter(null, msgs);
-				case SchemaPackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
+				case MulePackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
 					return basicSetSecurityFilter(null, msgs);
-				case SchemaPackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
+				case MulePackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
 					return ((InternalEList)getProperties()).basicRemove(otherEnd, msgs);
 				default:
 					return eDynamicInverseRemove(otherEnd, featureID, baseClass, msgs);
@@ -531,27 +572,29 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 */
 	public Object eGet(EStructuralFeature eFeature, boolean resolve) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__MIXED:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__MIXED:
 				return getMixed();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
 				return getTransaction();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__FILTER:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__FILTER:
 				return getFilter();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
 				return getSecurityFilter();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
 				return getProperties();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__ADDRESS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__ADDRESS:
 				return getAddress();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__NAME:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__NAME:
 				return getName();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC:
 				return isRemoteSync() ? Boolean.TRUE : Boolean.FALSE;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
 				return getRemoteSyncTimeout();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__RESPONSE_TRANSFORMERS:
+				return getResponseTransformers();
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS:
 				return isSynchronous() ? Boolean.TRUE : Boolean.FALSE;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS:
 				return getTransformers();
 		}
 		return eDynamicGet(eFeature, resolve);
@@ -564,40 +607,43 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 */
 	public void eSet(EStructuralFeature eFeature, Object newValue) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__MIXED:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__MIXED:
 				getMixed().clear();
 				getMixed().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
 				setTransaction((TransactionType)newValue);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__FILTER:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__FILTER:
 				setFilter((FilterType)newValue);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
 				setSecurityFilter((SecurityFilterType)newValue);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
 				getProperties().clear();
 				getProperties().addAll((Collection)newValue);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__ADDRESS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__ADDRESS:
 				setAddress((String)newValue);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__NAME:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__NAME:
 				setName((String)newValue);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC:
 				setRemoteSync(((Boolean)newValue).booleanValue());
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
 				setRemoteSyncTimeout((String)newValue);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__RESPONSE_TRANSFORMERS:
+				setResponseTransformers((String)newValue);
+				return;
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS:
 				setSynchronous(((Boolean)newValue).booleanValue());
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS:
-				setTransformers((List)newValue);
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS:
+				setTransformers((String)newValue);
 				return;
 		}
 		eDynamicSet(eFeature, newValue);
@@ -610,37 +656,40 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 */
 	public void eUnset(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__MIXED:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__MIXED:
 				getMixed().clear();
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
 				setTransaction((TransactionType)null);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__FILTER:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__FILTER:
 				setFilter((FilterType)null);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
 				setSecurityFilter((SecurityFilterType)null);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
 				getProperties().clear();
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__ADDRESS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__ADDRESS:
 				setAddress(ADDRESS_EDEFAULT);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__NAME:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__NAME:
 				setName(NAME_EDEFAULT);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC:
 				unsetRemoteSync();
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
 				setRemoteSyncTimeout(REMOTE_SYNC_TIMEOUT_EDEFAULT);
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__RESPONSE_TRANSFORMERS:
+				setResponseTransformers(RESPONSE_TRANSFORMERS_EDEFAULT);
+				return;
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS:
 				unsetSynchronous();
 				return;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS:
 				setTransformers(TRANSFORMERS_EDEFAULT);
 				return;
 		}
@@ -654,27 +703,29 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 	 */
 	public boolean eIsSet(EStructuralFeature eFeature) {
 		switch (eDerivedStructuralFeatureID(eFeature)) {
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__MIXED:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__MIXED:
 				return mixed != null && !mixed.isEmpty();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSACTION:
 				return getTransaction() != null;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__FILTER:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__FILTER:
 				return getFilter() != null;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__SECURITY_FILTER:
 				return getSecurityFilter() != null;
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__PROPERTIES:
 				return !getProperties().isEmpty();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__ADDRESS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__ADDRESS:
 				return ADDRESS_EDEFAULT == null ? address != null : !ADDRESS_EDEFAULT.equals(address);
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__NAME:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC:
 				return isSetRemoteSync();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__REMOTE_SYNC_TIMEOUT:
 				return REMOTE_SYNC_TIMEOUT_EDEFAULT == null ? remoteSyncTimeout != null : !REMOTE_SYNC_TIMEOUT_EDEFAULT.equals(remoteSyncTimeout);
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__RESPONSE_TRANSFORMERS:
+				return RESPONSE_TRANSFORMERS_EDEFAULT == null ? responseTransformers != null : !RESPONSE_TRANSFORMERS_EDEFAULT.equals(responseTransformers);
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__SYNCHRONOUS:
 				return isSetSynchronous();
-			case SchemaPackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS:
+			case MulePackage.GLOBAL_ENDPOINT_TYPE__TRANSFORMERS:
 				return TRANSFORMERS_EDEFAULT == null ? transformers != null : !TRANSFORMERS_EDEFAULT.equals(transformers);
 		}
 		return eDynamicIsSet(eFeature);
@@ -699,6 +750,8 @@ public class GlobalEndpointTypeImpl extends EObjectImpl implements GlobalEndpoin
 		if (remoteSyncESet) result.append(remoteSync); else result.append("<unset>");
 		result.append(", remoteSyncTimeout: ");
 		result.append(remoteSyncTimeout);
+		result.append(", responseTransformers: ");
+		result.append(responseTransformers);
 		result.append(", synchronous: ");
 		if (synchronousESet) result.append(synchronous); else result.append("<unset>");
 		result.append(", transformers: ");
