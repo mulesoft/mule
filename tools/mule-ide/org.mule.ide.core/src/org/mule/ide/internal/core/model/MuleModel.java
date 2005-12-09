@@ -5,6 +5,7 @@
  */
 package org.mule.ide.internal.core.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,9 +19,11 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -85,12 +88,32 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	 * @see org.mule.ide.core.model.IMuleModel#commitWorkingCopy(org.mule.ide.core.model.IMuleModel)
 	 */
 	public void commitWorkingCopy(IMuleModel workingCopy) throws MuleModelException {
+		// Persist the working copy to the model.
 		MuleIdeConfigType config = MuleIDEFactory.eINSTANCE.createMuleIdeConfigType();
 		((MuleModel) workingCopy).saveTo(config);
-		IStatus result = loadFrom(config);
+		MultiStatus result = loadFrom(config);
+
+		// Save the model to disk.
+		IStatus saveResult = save();
+		if (!saveResult.isOK()) {
+			result.add(saveResult);
+		}
+
+		// Update the markers and throw an exception if an error occurred.
 		updateTopLevelMarkers(result);
 		if (!result.isOK()) {
 			throw new MuleModelException(result);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleModel#clearMuleConfigurations()
+	 */
+	public void clearMuleConfigurations() {
+		synchronized (this.muleConfigurations) {
+			this.muleConfigSets.clear();
 		}
 	}
 
@@ -118,6 +141,17 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 				return id;
 			}
 			index++;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleModel#clearMuleConfigSets()
+	 */
+	public void clearMuleConfigSets() {
+		synchronized (this.muleConfigSets) {
+			this.muleConfigSets.clear();
 		}
 	}
 
@@ -250,7 +284,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 		if (id == null) {
 			throw new IllegalArgumentException("Null id passed in removeMuleConfigSet.");
 		}
-		synchronized (this.muleConfigurations) {
+		synchronized (this.muleConfigSets) {
 			return (IMuleConfigSet) this.muleConfigSets.remove(id);
 		}
 	}
@@ -308,15 +342,38 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	}
 
 	/**
+	 * Commit the in-memory model to disk.
+	 * 
+	 * @return the result status
+	 */
+	protected IStatus save() {
+		IFile file = getProject().getFile(IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
+		try {
+			ByteArrayInputStream stream = new ByteArrayInputStream(getAsXML().getBytes());
+			if (file.exists()) {
+				file.setContents(stream, true, true, new NullProgressMonitor());
+			} else {
+				file.create(stream, true, new NullProgressMonitor());
+			}
+		} catch (IOException e) {
+			return MuleCorePlugin.getDefault().createErrorStatus(e.getMessage(), e);
+		} catch (CoreException e) {
+			return e.getStatus();
+		}
+		return Status.OK_STATUS;
+	}
+
+	/**
 	 * Load the Eclipse model from the underlying EMF representation.
 	 * 
 	 * @param emfModel the EMF model
 	 * @return a status indicator
 	 */
-	public IStatus loadFrom(MuleIdeConfigType emfModel) {
+	protected MultiStatus loadFrom(MuleIdeConfigType emfModel) {
 		MultiStatus multi = MuleCorePlugin.getDefault().createMultiStatus(ERROR_LOADING_CONFIGS);
 
 		// Convert the config files.
+		clearMuleConfigurations();
 		EList configFiles = emfModel.getConfigFile();
 		Iterator it = configFiles.iterator();
 		while (it.hasNext()) {
@@ -338,7 +395,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	 * 
 	 * @param emfModel the EMF model
 	 */
-	public IStatus saveTo(MuleIdeConfigType emfModel) {
+	protected IStatus saveTo(MuleIdeConfigType emfModel) {
 		List configFiles = new ArrayList(getMuleConfigurations());
 		Collections.sort(configFiles);
 		Iterator it = configFiles.iterator();
@@ -355,7 +412,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	 * @return the XML
 	 * @throws IOException
 	 */
-	public String getAsXML() throws IOException {
+	protected String getAsXML() throws IOException {
 		Resource resource = (new MuleIDEResourceFactoryImpl()).createResource(null);
 		DocumentRoot root = MuleIDEFactory.eINSTANCE.createDocumentRoot();
 		MuleIdeConfigType config = MuleIDEFactory.eINSTANCE.createMuleIdeConfigType();

@@ -11,12 +11,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.model.IMuleConfiguration;
 import org.mule.ide.core.model.IMuleModel;
-import org.mule.schema.util.SchemaResourceFactoryImpl;
+import org.mule.schema.util.MuleResourceFactoryImpl;
 
 /**
  * Default Mule configuration implementation.
@@ -77,13 +76,9 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 					ERROR_CONFIG_NOT_FOUND + relativePath, null));
 		} else {
 			try {
-				// Only load the EMF resource once, after that just call load()
-				if (getResource() == null) {
-					URI uri = URI.createFileURI(parent.getProject().getLocation().toString()
-							+ IPath.SEPARATOR + relativePath);
-					setResource((new SchemaResourceFactoryImpl()).createResource(uri));
-				}
-				getResource().load(Collections.EMPTY_MAP);
+				Resource.Factory factory = new MuleResourceFactoryImpl();
+				setResource(factory.createResource(null));
+				getResource().load(configFile.getContents(), Collections.EMPTY_MAP);
 			} catch (Exception e) {
 				setStatus(MuleCorePlugin.getDefault().createErrorStatus(
 						ERROR_LOADING_CONFIG + relativePath, e));

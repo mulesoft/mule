@@ -41,6 +41,11 @@ public interface IMuleModel extends IMuleModelElement {
 	public void commitWorkingCopy(IMuleModel workingCopy) throws MuleModelException;
 
 	/**
+	 * Empties the list of Mule configuration files.
+	 */
+	public void clearMuleConfigurations();
+
+	/**
 	 * Creates a new Mule configuration.
 	 * 
 	 * @param description description of configuration
@@ -48,6 +53,11 @@ public interface IMuleModel extends IMuleModelElement {
 	 * @return the created configuration
 	 */
 	public IMuleConfiguration createNewMuleConfiguration(String description, String relativePath);
+
+	/**
+	 * Empties the list of Mule configuration sets.
+	 */
+	public void clearMuleConfigSets();
 
 	/**
 	 * Creates a new Mule config set.
