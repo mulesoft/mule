@@ -190,7 +190,7 @@ public class MuleConfigurationDialog extends Dialog implements ModifyListener {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
-		if (!textDescription.isDisposed()) {
+		if ((textDescription != null) && (!textDescription.isDisposed())) {
 			textDescription.setText(description);
 		}
 	}
@@ -211,7 +211,7 @@ public class MuleConfigurationDialog extends Dialog implements ModifyListener {
 	 */
 	public void setPath(String path) {
 		this.path = path;
-		if (!textPath.isDisposed()) {
+		if ((textPath != null) && (!textPath.isDisposed())) {
 			textPath.setText(path);
 		}
 	}

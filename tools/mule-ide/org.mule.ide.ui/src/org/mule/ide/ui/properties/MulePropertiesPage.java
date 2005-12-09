@@ -130,7 +130,7 @@ public class MulePropertiesPage extends PropertyPage {
 		try {
 			getMuleModel().commitWorkingCopy(getWorkingCopy());
 		} catch (MuleModelException e) {
-			// Errors will have been added as markers.
+			MuleCorePlugin.getDefault().logException("Error commiting model.", e);
 		}
 		return true;
 	}

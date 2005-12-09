@@ -1,5 +1,6 @@
 package org.mule.ide.ui.properties;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
@@ -136,8 +137,8 @@ public class MuleConfigurationsPanel implements IMulePropertyPanel {
 		MuleConfigurationDialog dialog = new MuleConfigurationDialog(muleModel.getProject(),
 				getConfigsTable().getTable().getShell());
 		if (dialog.open() == Window.OK) {
-			IMuleConfiguration config = muleModel.createNewMuleConfiguration(dialog
-					.getDescription(), dialog.getPath());
+			IMuleConfiguration config = muleModel.createNewMuleConfiguration(
+					dialog.getDescription(), dialog.getPath());
 			muleModel.addMuleConfiguration(config);
 			getConfigsTable().refresh();
 		}
@@ -147,12 +148,35 @@ public class MuleConfigurationsPanel implements IMulePropertyPanel {
 	 * Edit button was clicked.
 	 */
 	protected void editClicked() {
+		// Get the current selection.
+		IStructuredSelection selection = (IStructuredSelection) getConfigsTable().getSelection();
+		IMuleConfiguration config = (IMuleConfiguration) selection.getFirstElement();
+		if (config == null) {
+			return;
+		}
+
+		// Load the selection in the dialog.
+		MuleConfigurationDialog dialog = new MuleConfigurationDialog(muleModel.getProject(),
+				getConfigsTable().getTable().getShell());
+		dialog.setDescription(config.getDescription());
+		dialog.setPath(config.getRelativePath());
+		if (dialog.open() == Window.OK) {
+			muleModel.removeMuleConfiguration(config.getId());
+			muleModel.addMuleConfiguration(config);
+			getConfigsTable().refresh();
+		}
 	}
 
 	/**
 	 * Delete button was clicked.
 	 */
 	protected void deleteClicked() {
+		IStructuredSelection selection = (IStructuredSelection) getConfigsTable().getSelection();
+		IMuleConfiguration config = (IMuleConfiguration) selection.getFirstElement();
+		if (config != null) {
+			muleModel.removeMuleConfiguration(config.getId());
+			getConfigsTable().refresh();
+		}
 	}
 
 	/**
