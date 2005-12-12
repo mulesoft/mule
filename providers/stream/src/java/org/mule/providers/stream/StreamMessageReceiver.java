@@ -56,7 +56,7 @@ public class StreamMessageReceiver extends PollingMessageReceiver
                 ((SystemStreamConnector)connector).setPromptMessage(promptMessage);
             }
             if(messageDelayTime!=null) {
-                ((SystemStreamConnector)connector).setMessageDelayTime(Long.valueOf(messageDelayTime).longValue());
+                ((SystemStreamConnector)connector).setMessageDelayTime(new Long(messageDelayTime).longValue());
             }
         }
     }
