@@ -13,7 +13,11 @@
  */
 package org.mule.providers.soap.axis;
 
-import java.util.Iterator;
+import org.apache.axis.MessageContext;
+import org.apache.axis.message.MessageElement;
+import org.apache.axis.utils.XMLUtils;
+import org.mule.config.MuleProperties;
+import org.mule.umo.UMOEvent;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPElement;
@@ -21,12 +25,7 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
-
-import org.apache.axis.MessageContext;
-import org.apache.axis.message.MessageElement;
-import org.apache.axis.utils.XMLUtils;
-import org.mule.config.MuleProperties;
-import org.mule.umo.UMOEvent;
+import java.util.Iterator;
 
 /**
  * <code>MuleSoapHeaders</code> is a helper class for extracting and writing
@@ -64,9 +63,8 @@ public class MuleSoapHeaders
      * Extracts Mule header properties from a Soap message
      * 
      * @param soapHeader
-     * @throws SOAPException
      */
-    public MuleSoapHeaders(SOAPHeader soapHeader) throws SOAPException
+    public MuleSoapHeaders(SOAPHeader soapHeader)
     {
         Iterator iter = soapHeader.examineHeaderElements(MULE_10_ACTOR);
         SOAPHeaderElement header;
@@ -87,9 +85,6 @@ public class MuleSoapHeaders
                     correlationSequence = getStringValue(element);
                 } else if (MuleProperties.MULE_REPLY_TO_PROPERTY.equals(element.getElementName().getLocalName())) {
                     replyTo = getStringValue(element);
-                } else {
-                    throw new SOAPException("Unrecognised Mule Soap header: "
-                            + element.getElementName().getQualifiedName());
                 }
             }
         }
