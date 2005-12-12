@@ -110,7 +110,7 @@ public class MuleConfigNature implements IProjectNature {
 
 			// If the model loaded, refresh the config files asynchronously.
 			if (status.isOK()) {
-				Job job = new RefreshMuleConfigurationsJob(muleModel);
+				Job job = new RefreshMuleConfigurationsJob(muleModel, true);
 				job.setPriority(Job.SHORT);
 				job.schedule();
 			}

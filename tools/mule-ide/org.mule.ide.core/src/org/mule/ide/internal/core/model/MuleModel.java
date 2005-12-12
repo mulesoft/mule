@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.mule.ide.ConfigFileType;
+import org.mule.ide.ConfigSetType;
 import org.mule.ide.DocumentRoot;
 import org.mule.ide.MuleIDEFactory;
 import org.mule.ide.MuleIdeConfigType;
@@ -380,6 +381,16 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 			ConfigFileType configFile = (ConfigFileType) it.next();
 			IMuleConfiguration modelConfig = MuleModelFactory.convert(this, configFile);
 			addMuleConfiguration(modelConfig);
+		}
+
+		// Convert the config sets.
+		clearMuleConfigSets();
+		EList configSets = emfModel.getConfigSet();
+		it = configSets.iterator();
+		while (it.hasNext()) {
+			ConfigSetType configSet = (ConfigSetType) it.next();
+			IMuleConfigSet modelConfigSet = MuleModelFactory.convert(this, configSet);
+			addMuleConfigSet(modelConfigSet);
 		}
 		return multi;
 	}

@@ -19,7 +19,7 @@ import org.mule.ide.core.model.IMuleModel;
 public class MuleConfigSet extends MuleModelElement implements IMuleConfigSet {
 
 	/** The parent model */
-	private MuleModel parent;
+	private IMuleModel parent;
 
 	/** Id */
 	private String id;
@@ -37,7 +37,7 @@ public class MuleConfigSet extends MuleModelElement implements IMuleConfigSet {
 	 * @param id the unique id
 	 * @param description the description
 	 */
-	public MuleConfigSet(MuleModel parent, String id, String description) {
+	public MuleConfigSet(IMuleModel parent, String id, String description) {
 		this.parent = parent;
 		this.id = id;
 		this.description = description;

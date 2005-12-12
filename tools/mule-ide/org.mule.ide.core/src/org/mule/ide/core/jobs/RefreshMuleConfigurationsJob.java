@@ -22,9 +22,21 @@ public class RefreshMuleConfigurationsJob extends Job {
 	/** The model to refresh */
 	private IMuleModel model;
 
-	public RefreshMuleConfigurationsJob(IMuleModel model) {
+	/** Indicates whether all configs should be reloaded */
+	private boolean reloadAll;
+
+	/**
+	 * Background job for refreshing the Mule EMF models from the config files. If the reloadAll
+	 * parameter is not specified, only the config files that have not already been loaded will be
+	 * processed. If reloadAll is true, all config files will be reloaded.
+	 * 
+	 * @param model the Mule model
+	 * @param reloadAll flag indicating whether to force reload on all configs
+	 */
+	public RefreshMuleConfigurationsJob(IMuleModel model, boolean reloadAll) {
 		super("Refreshing Mule configuration files");
 		this.model = model;
+		this.reloadAll = reloadAll;
 	}
 
 	/*
@@ -42,7 +54,14 @@ public class RefreshMuleConfigurationsJob extends Job {
 			// Getting the config forces a refresh if not initialized.
 			IMuleConfiguration config = (IMuleConfiguration) it.next();
 			try {
-				config.getConfigDocument();
+				if (this.reloadAll) {
+					IStatus refreshResult = config.refresh();
+					if (!refreshResult.isOK()) {
+						status.add(refreshResult);
+					}
+				} else {
+					config.getConfigDocument();
+				}
 			} catch (MuleModelException e) {
 				status.add(e.getStatus());
 			}
