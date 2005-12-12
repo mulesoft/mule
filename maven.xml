@@ -501,6 +501,9 @@
                 <fileset file="${mule.release.dist.dir}/*.dtd"/>
             </copy>
 
+            <copy file="${pom.siteDirectory}/../dist/dtds/mule-configuration.dtd" tofile="${pom.siteDirectory}/../dist/dtds/mule-${pom.currentVersion}-configuration.dtd"/>
+            <copy file="${pom.siteDirectory}/../dist/dtds/mule-spring-configuration.dtd" tofile="${pom.siteDirectory}/../dist/dtds/mule-${pom.currentVersion}-spring-configuration.dtd"/>
+
             <echo> Copying distributions from ${mule.release.dist.dir}</echo>
             <copy todir="${pom.siteDirectory}/../dist/distributions">
                 <fileset file="${maven.build.dir}/distributions/${maven.final.name}-dist.*"/>
@@ -564,7 +567,7 @@
                     dest="${pom.siteDirectory}" compression="gzip"/>
             </u:available>
 
-            <copy todir="${pom.siteDirectory}/../dist/dtds">
+            <copy todir="${pom.siteDirectory}/../dist/nightly">
                 <fileset file="${mule.release.dist.dir}/*.dtd"/>
             </copy>
 
