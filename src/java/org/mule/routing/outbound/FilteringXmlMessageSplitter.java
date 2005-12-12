@@ -159,7 +159,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                 logger.warn("Unsupported message type, ignoring");
             }
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Failed to initialise the payload.", ex);
+            throw new IllegalArgumentException("Failed to initialise the payload: " + ex.getMessage());
         }
 
         Map theProperties = message.getProperties();
