@@ -56,7 +56,7 @@ public class ScriptComponent extends Scriptable implements Callable {
     }
 
     protected void populateNamespace(Namespace namespace, UMOEventContext context) {
-        namespace.put("context", context);
+        namespace.put("eventContext", context);
         namespace.put("message", context.getMessage());
         namespace.put("descriptor", context.getComponentDescriptor());
         namespace.put("componentNamespace", this.namespace);
