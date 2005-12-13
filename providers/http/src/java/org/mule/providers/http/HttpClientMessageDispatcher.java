@@ -36,6 +36,8 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.UMOTransformer;
+import org.mule.util.Utility;
+
 import sun.misc.BASE64Encoder;
 
 import java.net.BindException;
@@ -241,13 +243,14 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             logger.debug("Http response is: " + status);
             ExceptionPayload ep = null;
             if(httpMethod.getStatusCode() >= 400 ) {
-                logger.error(httpMethod.getResponseBodyAsString());
+                logger.error(Utility.getInputStreamAsString(httpMethod.getResponseBodyAsStream()));
                 ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
                         new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText())));
             }
             UMOMessage m = null;
             // text or binary content?
-            if(httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE).getValue().startsWith("text/")) {
+            Header header = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
+            if ((header != null) && header.getValue().startsWith("text/")) {
                 m = new MuleMessage(httpMethod.getResponseBodyAsString(), h);
             } else {
                 m = new MuleMessage(httpMethod.getResponseBody(), h);
