@@ -96,7 +96,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
         try {
             router.route(message, (UMOSession) session.proxy(), false);
-            fail("Sohlud not allow malformed endpointUri");
+            fail("Should not allow malformed endpointUri");
         } catch (RoutingException e) {
             // ignore
         }
