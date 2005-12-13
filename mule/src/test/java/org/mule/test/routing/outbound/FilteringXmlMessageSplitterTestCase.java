@@ -94,7 +94,8 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
             splitter.route(message, (UMOSession) session.proxy(), false);
             fail("No exception thrown.");
         } catch (IllegalArgumentException iaex) {
-            assertEquals("Failed to initialise the payload.", iaex.getMessage());
+            assertTrue("Wrong exception message.",
+                       iaex.getMessage().startsWith("Failed to initialise the payload: "));
         }
 
     }
