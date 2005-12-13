@@ -23,6 +23,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
@@ -474,5 +475,38 @@ public class Utility
         } catch (IOException ioe) {
             // ignore
         }
+    }
+
+    /** Reads the input stream into a string. */
+	public static String getInputStreamAsString(InputStream input) throws IOException {
+        return (readToString(new InputStreamReader(input)));
+    }
+
+	/** Reads the stream into a string. */
+	public static String readToString(Reader reader) throws IOException {
+        String text = "";
+
+        // Read the stream into an array of strings.
+        ArrayList lines = readToArray(reader);
+
+        // Concatenate the array of strings into a single string.
+        int numLines = lines.size();
+        for (int i = 0; i < numLines; ++i) {
+            if (text.equals("") == false) text += "\n";
+            text += lines.get(i);
+        }
+        return (text);
+    }
+
+    /** Reads the stream into an array of strings. */
+	public static ArrayList readToArray(Reader reader) throws IOException {
+	    ArrayList lines = new ArrayList();
+        String line;
+        BufferedReader buffer = new BufferedReader(reader);
+
+        while ((line = buffer.readLine()) != null) {
+            lines.add(line);
+        }
+        return (lines);
     }
 }
