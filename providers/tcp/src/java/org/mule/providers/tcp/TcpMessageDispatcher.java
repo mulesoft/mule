@@ -81,14 +81,35 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     public void doDispatch(UMOEvent event) throws Exception
     {
-        Socket socket = null;
         try {
             Object payload = event.getTransformedMessage();
-            socket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
-            write(socket, payload);
-        } finally {
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
+
+            if (!connector.isKeepSendSocketOpen()) {
+                connectedSocket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
+            } else {
+                reconnect(event, connector.getMaxRetryCount());
+            }
+
+            try {
+                write(connectedSocket, payload);
+                // If we're doing sync receive try and read return info from socket
+            }
+            catch (IOException e) {
+                if (connector.isKeepSendSocketOpen()) {
+                    logger.warn("Write raised exception: '" + e.getMessage() + "' attempting to reconnect.");
+
+                    doDispose();
+
+                    if (reconnect(event, connector.getMaxRetryCount()))
+                        write(connectedSocket, payload);
+                } else {
+                    throw e;
+                }
+            }
+        }
+        finally {
+            if (!connector.isKeepSendSocketOpen()) {
+                doDispose();
             }
         }
     }
@@ -116,56 +137,27 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     public UMOMessage doSend(UMOEvent event) throws Exception
     {
-        try {
-            Object payload = event.getTransformedMessage();
+        doDispatch(event);
 
-            if (!connector.isKeepSendSocketOpen()) {
-                connectedSocket = initSocket(event.getEndpoint().getEndpointURI().getAddress());
-            } else {
-                reconnect(event, connector.getMaxRetryCount());
-            }
-
+        if (useRemoteSync(event)) {
             try {
-                write(connectedSocket, payload);
-                // If we're doing sync receive try and read return info from socket
-            }
-            catch (IOException e) {
-                if (connector.isKeepSendSocketOpen()) {
-                    logger.warn("Write raised exception: '" + e.getMessage() + "' attempting to reconnect.");
-
-                    doDispose();
-
-                    if (reconnect(event, connector.getMaxRetryCount()))
-                        write(connectedSocket, payload);
-                } else {
-                    throw e;
-                }
-            }
-
-            if (useRemoteSync(event)) {
-                try {
-                    byte[] result = receive(connectedSocket, event.getEndpoint().getRemoteSyncTimeout());
-                    if (result == null) {
-                        return null;
-                    }
-                    return new MuleMessage(connector.getMessageAdapter(result));
-                }
-                catch (SocketTimeoutException e) {
-                    // we don't necessarily expect to receive a response here
-                    logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
-                            + event.getEndpoint().getEndpointURI());
+                byte[] result = receive(connectedSocket, event.getEndpoint().getRemoteSyncTimeout());
+                if (result == null) {
                     return null;
                 }
-            } else {
-                return event.getMessage();
+                return new MuleMessage(connector.getMessageAdapter(result));
             }
-        }
-        finally {
-            if (!connector.isKeepSendSocketOpen()) {
-                doDispose();
+            catch (SocketTimeoutException e) {
+                // we don't necessarily expect to receive a response here
+                logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
+                        + event.getEndpoint().getEndpointURI());
+                return null;
             }
+        } else {
+            return event.getMessage();
         }
     }
+
 
     protected byte[] receive(Socket socket, int timeout) throws IOException
     {
@@ -189,7 +181,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                 UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));
                 return message;
             } catch (SocketTimeoutException e) {
-                // we dont necesarily expect to receive a resonse here
+                // we don't necesarily expect to receive a resonse here
                 logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
                         + endpointUri);
                 return null;
