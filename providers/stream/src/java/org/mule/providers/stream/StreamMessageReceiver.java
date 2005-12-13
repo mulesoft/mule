@@ -1,8 +1,7 @@
 /*
- * $Header:
- * /cvsroot/mule/mule/src/java/org/mule/providers/vm/VMMessageReceiver.java,v
- * 1.8 2003/11/10 21:05:47 rossmason Exp $ $Revision$ $Date: 2003/11/10
- * 21:05:47 $
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  * 
  * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
@@ -21,6 +20,7 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.Utility;
 
 import java.io.InputStream;
 
@@ -33,41 +33,40 @@ import java.io.InputStream;
  */
 public class StreamMessageReceiver extends PollingMessageReceiver
 {
-    public static final int DEFAULT_BUFFER_SIZE = 1024 * 8;
+    public static final int DEFAULT_BUFFER_SIZE = 4096;
 
     private int bufferSize = DEFAULT_BUFFER_SIZE;
     private InputStream inputStream;
-    private StreamConnector connector;
 
     public StreamMessageReceiver(UMOConnector connector,
                                  UMOComponent component,
                                  UMOEndpoint endpoint,
                                  InputStream stream,
-                                 Long checkFrequency) throws InitialisationException
-    {
-
+                                 Long checkFrequency) throws InitialisationException {
         super(connector, component, endpoint, checkFrequency);
-        this.connector = (StreamConnector)connector;
         inputStream = stream;
-        if(connector instanceof SystemStreamConnector) {
+
+        // apply connector-specific properties
+        if (connector instanceof SystemStreamConnector) {
+            SystemStreamConnector ssc = (SystemStreamConnector)connector;
+
             String promptMessage = (String)endpoint.getProperties().get("promptMessage");
-            String messageDelayTime = (String)endpoint.getProperties().get("messageDelayTime");
-            if(promptMessage!=null) {
-                ((SystemStreamConnector)connector).setPromptMessage(promptMessage);
+            if (promptMessage != null) {
+                ssc.setPromptMessage(promptMessage);
             }
-            if(messageDelayTime!=null) {
-                ((SystemStreamConnector)connector).setMessageDelayTime(new Long(messageDelayTime).longValue());
+
+            String messageDelayTime = (String)endpoint.getProperties().get("messageDelayTime");
+            if (messageDelayTime != null) {
+                ssc.setMessageDelayTime(Long.parseLong(messageDelayTime));
             }
         }
     }
 
-    public void doConnect() throws Exception
-    {
+    public void doConnect() throws Exception {
         // noop
     }
 
-    public void doDisconnect() throws Exception
-    {
+    public void doDisconnect() throws Exception {
         // noop
     }
 
@@ -76,45 +75,58 @@ public class StreamMessageReceiver extends PollingMessageReceiver
      * 
      * @see org.mule.util.timer.TimeEventListener#timeExpired(org.mule.util.timer.TimeEvent)
      */
-    public void poll()
-    {
+    public void poll() {
         try {
-            StringBuffer message = new StringBuffer();
-            byte[] buf = new byte[getBufferSize()];
-            int len = inputStream.read(buf);
-            if (len == -1)
-                return;
-            message.append(new String(buf, 0, len));
-            //remove the trailing /n
-            String read = message.toString();
-            if(read.endsWith("\n")) read = read.substring(0, message.length()-1);
+            byte[] inputBuffer = new byte[bufferSize];
+            int len = inputStream.read(inputBuffer);
 
-            UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(read));
+            if (len == -1) {
+                // System.in is unlikely to be closed but..
+                return;
+            }
+
+            StringBuffer fullBuffer = new StringBuffer(bufferSize);
+            while (len > 0) {
+                fullBuffer.append(new String(inputBuffer, 0, len));
+                len = 0; // mark as read
+                if (inputStream.available() > 0) {
+                    len = inputStream.read(inputBuffer);
+                }
+            }
+
+            //remove any trailing CR/LF
+            String finalMessageString;
+            int noCRLFLength = fullBuffer.length() - Utility.CRLF.length();
+            if (fullBuffer.indexOf(Utility.CRLF, noCRLFLength) != -1) {
+                finalMessageString = fullBuffer.substring(0, noCRLFLength);
+            }
+            else {
+                finalMessageString = fullBuffer.toString();
+            }
+
+            UMOMessage umoMessage = new MuleMessage(connector.getMessageAdapter(finalMessageString));
             routeMessage(umoMessage, endpoint.isSynchronous());
 
-            ((StreamConnector) endpoint.getConnector()).reinitialise();
-        } catch (Exception e) {
+            ((StreamConnector)endpoint.getConnector()).reinitialise();
+        }
+        catch (Exception e) {
             handleException(e);
         }
     }
 
-    public InputStream getInputStream()
-    {
+    public InputStream getInputStream() {
         return inputStream;
     }
 
-    public void setInputStream(InputStream inputStream)
-    {
+    public void setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
-    public int getBufferSize()
-    {
+    public int getBufferSize() {
         return bufferSize;
     }
 
-    public void setBufferSize(int bufferSize)
-    {
+    public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;
     }
 }
