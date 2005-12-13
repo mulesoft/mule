@@ -33,7 +33,7 @@ import org.mule.util.StringMessageHelper;
 
 /**
  * <code>MuleServer</code> is a simple application that represents a local
- * Mule Server deamon. It is initalised with a mule-configuration.xml file.
+ * Mule Server deamon. It is initalised with a mule-config.xml file.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -90,7 +90,8 @@ public class MuleServer implements Runnable
                 server.setConfigurationResources(config);
             }
         } else {
-            URL configUrl = ClassHelper.getResource("mule-config.xml", MuleServer.class);
+            logger.warn("A configuration file was not set, using default: " + DEFAULT_CONFIGURATION);
+            URL configUrl = ClassHelper.getResource(DEFAULT_CONFIGURATION, MuleServer.class);
             if (configUrl != null) {
                 config = configUrl.toExternalForm();
                 server.setConfigurationResources(config);
