@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.exception.MuleModelException;
@@ -67,6 +68,13 @@ public class RefreshMuleConfigurationsJob extends Job {
 			}
 			monitor.worked(1);
 		}
-		return status;
+
+		// Log any errors to the Eclipse log.
+		if (!status.isOK()) {
+			MuleCorePlugin.getDefault().getLog().log(status);
+		}
+
+		// Do not pop up error dialog.
+		return Status.OK_STATUS;
 	}
 }

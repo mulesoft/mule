@@ -49,7 +49,7 @@ public class MuleModelFactory {
 		Iterator it = refs.iterator();
 		while (it.hasNext()) {
 			ConfigFileRefType ref = (ConfigFileRefType) it.next();
-			IMuleConfigSet resolved = parent.getMuleConfigSet(ref.getId());
+			IMuleConfiguration resolved = parent.getMuleConfiguration(ref.getId());
 			if (resolved != null) {
 				modelConfigSet.getMuleConfigurations().add(resolved);
 			}
@@ -69,5 +69,25 @@ public class MuleModelFactory {
 		config.setDescription(modelConfig.getDescription());
 		config.setPath(modelConfig.getRelativePath());
 		return config;
+	}
+
+	/**
+	 * Convert the Eclipse config set element to an EMF element.
+	 * 
+	 * @param modelConfigSet the Eclipse config set element
+	 * @return the EMF config set element
+	 */
+	public static ConfigSetType convert(IMuleConfigSet modelConfigSet) {
+		ConfigSetType configSet = MuleIDEFactory.eINSTANCE.createConfigSetType();
+		configSet.setId(modelConfigSet.getId());
+		configSet.setDescription(modelConfigSet.getDescription());
+		Iterator it = modelConfigSet.getMuleConfigurations().iterator();
+		while (it.hasNext()) {
+			IMuleConfiguration referenced = (IMuleConfiguration) it.next();
+			ConfigFileRefType refType = MuleIDEFactory.eINSTANCE.createConfigFileRefType();
+			refType.setId(referenced.getId());
+			configSet.getConfigFileRef().add(refType);
+		}
+		return configSet;
 	}
 }

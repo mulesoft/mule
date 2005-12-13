@@ -29,13 +29,6 @@ public interface IMuleConfiguration extends IMuleModelElement, Comparable {
 	public String getDescription();
 
 	/**
-	 * Get the label that is shown in various views.
-	 * 
-	 * @return the label
-	 */
-	public String getLabel();
-
-	/**
 	 * Gets the project-relative path to the config file.
 	 * 
 	 * @return the path

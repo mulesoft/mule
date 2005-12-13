@@ -8,12 +8,10 @@ package org.mule.ide.internal.core.model;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -72,6 +70,15 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.mule.ide.core.model.IMuleModelElement#getLabel()
+	 */
+	public String getLabel() {
+		return getProject().getName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mule.ide.core.model.IMuleModel#createWorkingCopy()
 	 */
 	public IMuleModel createWorkingCopy() throws MuleModelException {
@@ -114,7 +121,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	 */
 	public void clearMuleConfigurations() {
 		synchronized (this.muleConfigurations) {
-			this.muleConfigSets.clear();
+			this.muleConfigurations.clear();
 		}
 	}
 
@@ -401,12 +408,15 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	 * @param emfModel the EMF model
 	 */
 	protected IStatus saveTo(MuleIdeConfigType emfModel) {
-		List configFiles = new ArrayList(getMuleConfigurations());
-		Collections.sort(configFiles);
-		Iterator it = configFiles.iterator();
+		Iterator it = getMuleConfigurations().iterator();
 		while (it.hasNext()) {
 			IMuleConfiguration configFile = (IMuleConfiguration) it.next();
 			emfModel.getConfigFile().add(MuleModelFactory.convert(configFile));
+		}
+		it = getMuleConfigSets().iterator();
+		while (it.hasNext()) {
+			IMuleConfigSet configSet = (IMuleConfigSet) it.next();
+			emfModel.getConfigSet().add(MuleModelFactory.convert(configSet));
 		}
 		return Status.OK_STATUS;
 	}

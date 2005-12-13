@@ -12,8 +12,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ViewerLabel;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
-import org.mule.ide.core.model.IMuleConfiguration;
-import org.mule.ide.core.model.IMuleModel;
+import org.mule.ide.core.model.IMuleModelElement;
 
 /**
  * Handles labels and images associated with elements in the Mule model.
@@ -35,10 +34,8 @@ public class MuleModelLabelProvider extends LabelProvider implements IViewerLabe
 	 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
 	 */
 	public String getText(Object element) {
-		if (element instanceof IMuleModel) {
-			return ((IMuleModel) element).getProject().getName();
-		} else if (element instanceof IMuleConfiguration) {
-			return ((IMuleConfiguration) element).getLabel();
+		if (element instanceof IMuleModelElement) {
+			return ((IMuleModelElement) element).getLabel();
 		}
 		return super.getText(element);
 	}

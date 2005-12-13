@@ -32,4 +32,11 @@ public interface IMuleModelElement {
 	 * @return the status
 	 */
 	public IStatus getStatus();
+
+	/**
+	 * Get the label shown in views for the element.
+	 * 
+	 * @return the label
+	 */
+	public String getLabel();
 }

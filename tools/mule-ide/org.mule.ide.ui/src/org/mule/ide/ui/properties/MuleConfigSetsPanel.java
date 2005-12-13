@@ -22,6 +22,9 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	/** Holds the config sets list */
 	private TableViewer configSetsTable;
 
+	/** Holds the list of configs in a config set */
+	private TableViewer configsTable;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -59,9 +62,21 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 		getConfigSetsTable().setSorter(new MuleModelViewerSorter());
 		getConfigSetsTable().getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		Composite buttons = MuleUIUtils.createButtonPanel(composite);
-		MuleUIUtils.createSideButton("Add", buttons);
-		MuleUIUtils.createSideButton("Delete", buttons);
+		Composite csButtons = MuleUIUtils.createButtonPanel(composite);
+		MuleUIUtils.createSideButton("Add", csButtons);
+		MuleUIUtils.createSideButton("Edit", csButtons);
+		MuleUIUtils.createSideButton("Delete", csButtons);
+
+		setConfigsTable(new TableViewer(composite));
+		getConfigsTable().setLabelProvider(
+				MuleModelLabelProvider.getDecoratingMuleModelLabelProvider());
+		getConfigsTable().setContentProvider(new MuleModelContentProvider(false, true));
+		getConfigsTable().setSorter(new MuleModelViewerSorter());
+		getConfigsTable().getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		Composite cButtons = MuleUIUtils.createButtonPanel(composite);
+		MuleUIUtils.createSideButton("Add", cButtons);
+		MuleUIUtils.createSideButton("Delete", cButtons);
 
 		return composite;
 	}
@@ -108,5 +123,23 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	 */
 	protected TableViewer getConfigSetsTable() {
 		return configSetsTable;
+	}
+
+	/**
+	 * Sets the 'configsTable' field.
+	 * 
+	 * @param configsTable The 'configsTable' value.
+	 */
+	protected void setConfigsTable(TableViewer configsTable) {
+		this.configsTable = configsTable;
+	}
+
+	/**
+	 * Returns the 'configsTable' field.
+	 * 
+	 * @return the 'configsTable' field value.
+	 */
+	protected TableViewer getConfigsTable() {
+		return configsTable;
 	}
 }

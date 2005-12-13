@@ -114,6 +114,15 @@ public class MuleConfigNature implements IProjectNature {
 				job.setPriority(Job.SHORT);
 				job.schedule();
 			}
+			// Unable to load main config file. Add an error for the file.
+			else {
+				IFile file = getProject().getFile(IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
+				if (file.exists()) {
+					MuleCorePlugin.getDefault().clearMarkers(file);
+					MuleCorePlugin.getDefault().createMarker(file, IMarker.SEVERITY_ERROR,
+							status.getMessage());
+				}
+			}
 		}
 		return muleModel;
 	}

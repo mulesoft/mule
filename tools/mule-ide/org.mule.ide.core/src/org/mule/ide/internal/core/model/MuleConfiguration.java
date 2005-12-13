@@ -114,7 +114,7 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.mule.ide.core.model.IMuleConfiguration#getLabel()
+	 * @see org.mule.ide.core.model.IMuleModelElement#getLabel()
 	 */
 	public String getLabel() {
 		return getRelativePath() + " [" + getDescription() + "]";

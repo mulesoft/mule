@@ -8,15 +8,16 @@ package org.mule.ide.ui.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.mule.ide.core.model.IMuleConfigSet;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.core.model.IMuleModelElement;
 
 /**
  * Provides content hierarchy for the Mule model.
  */
-public class MuleModelContentProvider implements ITreeContentProvider {
+public class MuleModelContentProvider implements IStructuredContentProvider {
 
 	/** Constant for no children */
 	private static final Object[] NO_CHILDREN = new Object[0];
@@ -35,11 +36,11 @@ public class MuleModelContentProvider implements ITreeContentProvider {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 	 */
-	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof IMuleModel) {
-			IMuleModel model = (IMuleModel) parentElement;
+	public Object[] getElements(Object inputElement) {
+		if (inputElement instanceof IMuleModel) {
+			IMuleModel model = (IMuleModel) inputElement;
 			List children = new ArrayList();
 			if (isShowingConfigurations()) {
 				children.addAll(model.getMuleConfigurations());
@@ -48,38 +49,10 @@ public class MuleModelContentProvider implements ITreeContentProvider {
 				children.addAll(model.getMuleConfigSets());
 			}
 			return children.toArray();
+		} else if (inputElement instanceof IMuleConfigSet) {
+			return ((IMuleConfigSet) inputElement).getMuleConfigurations().toArray();
 		}
 		return NO_CHILDREN;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
-	 */
-	public Object getParent(Object element) {
-		if ((element instanceof IMuleModelElement) && (!(element instanceof IMuleModel))) {
-			return ((IMuleModelElement) element).getMuleModel();
-		}
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
-	 */
-	public boolean hasChildren(Object element) {
-		return getChildren(element).length > 0;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-	 */
-	public Object[] getElements(Object inputElement) {
-		return getChildren(inputElement);
 	}
 
 	/*

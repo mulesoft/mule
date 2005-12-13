@@ -55,6 +55,15 @@ public class MuleConfigSet extends MuleModelElement implements IMuleConfigSet {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.mule.ide.core.model.IMuleModelElement#getLabel()
+	 */
+	public String getLabel() {
+		return getDescription();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mule.ide.core.model.IMuleConfigSet#getDescription()
 	 */
 	public String getDescription() {
