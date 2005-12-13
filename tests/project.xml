@@ -12,6 +12,7 @@
     <description>
         Integration tests ensure that Mule sub projects work well together. 
         Use cases are scenarios presented on the Mailing lists.
+	Vendor tests are tests that require a third-party product (database, application server, etc.) in order to run.
     </description>
     <url>http://wiki.muleumo.org/display/MULEPROJ/Integration+Tests</url>
     <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>

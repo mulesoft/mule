@@ -17,7 +17,7 @@ package org.mule.routing.filters;
 import org.mule.umo.UMOMessage;
 
 /**
- * tA fitler that accepts messages that have an exception payload. An Exception
+ * A filter that accepts messages that have an exception payload. An Exception
  * type can also be set on this filter to allow it to accept Exception messages
  * of a particular Exception class only.
  *
