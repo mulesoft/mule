@@ -15,7 +15,6 @@ package org.mule.components.simple;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageHelper;
@@ -29,7 +28,7 @@ import org.mule.util.StringMessageHelper;
  */
 public class LogComponent implements Callable, LogService
 {
-    private static transient Log logger = LogFactory.getLog(FunctionalTestComponent.class);
+    private static transient Log logger = LogFactory.getLog(LogComponent.class);
 
     public Object onCall(UMOEventContext context) throws Exception
     {
