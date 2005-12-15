@@ -1,11 +1,20 @@
 package org.mule.ide.ui.properties;
 
+import java.util.Iterator;
+
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.mule.ide.core.model.IMuleConfigSet;
+import org.mule.ide.core.model.IMuleConfiguration;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.ui.IMuleImages;
 import org.mule.ide.ui.MulePlugin;
@@ -24,6 +33,18 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 
 	/** Holds the list of configs in a config set */
 	private TableViewer configsTable;
+
+	/** Button for adding a config file */
+	private Button buttonConfigAdd;
+
+	/** Button for moving a config file up */
+	private Button buttonConfigUp;
+
+	/** Button for moving a config file down */
+	private Button buttonConfigDown;
+
+	/** Button for deleting a config file */
+	private Button buttonConfigDelete;
 
 	/*
 	 * (non-Javadoc)
@@ -55,30 +76,148 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 		composite.setLayout(mainLayout);
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		setConfigSetsTable(new TableViewer(composite));
+		createConfigSetsArea(composite);
+		createConfigFilesArea(composite);
+
+		return composite;
+	}
+
+	/**
+	 * Create the area that contains the config sets table and associated buttons.
+	 * 
+	 * @param composite the parent composite
+	 */
+	protected void createConfigSetsArea(Composite composite) {
+		setConfigSetsTable(new TableViewer(composite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.BORDER));
 		getConfigSetsTable().setLabelProvider(
 				MuleModelLabelProvider.getDecoratingMuleModelLabelProvider());
 		getConfigSetsTable().setContentProvider(new MuleModelContentProvider(false, true));
 		getConfigSetsTable().setSorter(new MuleModelViewerSorter());
 		getConfigSetsTable().getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 
+		// Listen for selection changes in the config set table.
+		getConfigSetsTable().addPostSelectionChangedListener(new ISelectionChangedListener() {
+
+			public void selectionChanged(SelectionChangedEvent event) {
+				configSetSelected(getSelectedConfigSet());
+			}
+		});
+
+		// Create the config set buttons.
 		Composite csButtons = MuleUIUtils.createButtonPanel(composite);
 		MuleUIUtils.createSideButton("Add", csButtons);
 		MuleUIUtils.createSideButton("Edit", csButtons);
 		MuleUIUtils.createSideButton("Delete", csButtons);
+	}
 
-		setConfigsTable(new TableViewer(composite));
+	/**
+	 * Return the config set selected in the config sets table.
+	 * 
+	 * @return the config set or null if none is selected
+	 */
+	protected IMuleConfigSet getSelectedConfigSet() {
+		IStructuredSelection selection = (IStructuredSelection) getConfigSetsTable().getSelection();
+		if (!selection.isEmpty()) {
+			return (IMuleConfigSet) selection.getFirstElement();
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Create the area that contains the config files and associated buttons.
+	 * 
+	 * @param composite the parent composite
+	 */
+	protected void createConfigFilesArea(Composite composite) {
+		setConfigsTable(new TableViewer(composite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.BORDER));
 		getConfigsTable().setLabelProvider(
 				MuleModelLabelProvider.getDecoratingMuleModelLabelProvider());
 		getConfigsTable().setContentProvider(new MuleModelContentProvider(false, true));
-		getConfigsTable().setSorter(new MuleModelViewerSorter());
 		getConfigsTable().getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		Composite cButtons = MuleUIUtils.createButtonPanel(composite);
-		MuleUIUtils.createSideButton("Add", cButtons);
-		MuleUIUtils.createSideButton("Delete", cButtons);
+		// Listen for selection changes in the config set table.
+		getConfigsTable().addPostSelectionChangedListener(new ISelectionChangedListener() {
 
-		return composite;
+			public void selectionChanged(SelectionChangedEvent event) {
+				configFileSelected(getSelectedConfigFile());
+			}
+		});
+
+		// Create the buttons for modifying the config files.
+		Composite cButtons = MuleUIUtils.createButtonPanel(composite);
+		buttonConfigAdd = MuleUIUtils.createSideButton("Add", cButtons);
+		buttonConfigUp = MuleUIUtils.createSideButton("Up", cButtons);
+		buttonConfigDown = MuleUIUtils.createSideButton("Down", cButtons);
+		buttonConfigDelete = MuleUIUtils.createSideButton("Delete", cButtons);
+	}
+
+	/**
+	 * Return the config set selected in the config sets table.
+	 * 
+	 * @return the config set or null if none is selected
+	 */
+	protected IMuleConfiguration getSelectedConfigFile() {
+		IStructuredSelection selection = (IStructuredSelection) getConfigsTable().getSelection();
+		if (!selection.isEmpty()) {
+			return (IMuleConfiguration) selection.getFirstElement();
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Called when the config set selection changes.
+	 * 
+	 * @param configSet the config set or null if none selected
+	 */
+	protected void configSetSelected(IMuleConfigSet configSet) {
+		// Show the contents of the config set in the configs table.
+		getConfigsTable().setInput(configSet);
+
+		// If available, set the selection to the first config in the set.
+		if (configSet != null) {
+			Iterator it = configSet.getMuleConfigurations().iterator();
+			if (it.hasNext()) {
+				IMuleConfiguration config = (IMuleConfiguration) it.next();
+				getConfigsTable().setSelection(new StructuredSelection(config));
+			}
+		}
+	}
+
+	/**
+	 * Called when a config file is selected.
+	 * 
+	 * @param configFile the file that was selected
+	 */
+	protected void configFileSelected(IMuleConfiguration configFile) {
+		updateConfigFileButtonEnablement(configFile);
+	}
+
+	/**
+	 * Update the enablement of the buttons based on the selection.
+	 * 
+	 * @param configFile the selected config file
+	 */
+	protected void updateConfigFileButtonEnablement(IMuleConfiguration configFile) {
+		IMuleConfigSet configSet = getSelectedConfigSet();
+		if (configSet != null) {
+			if (configSet.isFirstConfiguration(configFile)) {
+				buttonConfigUp.setEnabled(false);
+			} else {
+				buttonConfigUp.setEnabled(true);
+			}
+			if (configSet.isLastConfiguration(configFile)) {
+				buttonConfigDown.setEnabled(false);
+			} else {
+				buttonConfigDown.setEnabled(true);
+			}
+		} else {
+			buttonConfigUp.setEnabled(false);
+			buttonConfigDown.setEnabled(false);
+		}
 	}
 
 	/*
@@ -87,7 +226,17 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	 * @see org.mule.ide.ui.properties.IMulePropertyPanel#initialize(org.mule.ide.core.model.IMuleModel)
 	 */
 	public void initialize(IMuleModel model) {
+		// Set the model as the input for the config sets table.
 		getConfigSetsTable().setInput(model);
+
+		// If available, set the selection to the first config set.
+		if (model != null) {
+			Iterator it = model.getMuleConfigSets().iterator();
+			if (it.hasNext()) {
+				IMuleConfigSet configSet = (IMuleConfigSet) it.next();
+				getConfigSetsTable().setSelection(new StructuredSelection(configSet));
+			}
+		}
 	}
 
 	/*

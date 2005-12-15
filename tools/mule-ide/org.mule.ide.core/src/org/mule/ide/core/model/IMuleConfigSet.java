@@ -32,4 +32,20 @@ public interface IMuleConfigSet extends IMuleModelElement {
 	 * @return the ordered list of configurations
 	 */
 	public List getMuleConfigurations();
+
+	/**
+	 * Indicates if the given configuration is the first for this config set.
+	 * 
+	 * @param config the configuration
+	 * @return true if first, false if not
+	 */
+	public boolean isFirstConfiguration(IMuleConfiguration config);
+
+	/**
+	 * Indicates if the given configuration is the last for this config set.
+	 * 
+	 * @param config the configuration
+	 * @return true if last, false if not
+	 */
+	public boolean isLastConfiguration(IMuleConfiguration config);
 }

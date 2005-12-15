@@ -11,6 +11,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.mule.ide.core.model.IMuleConfigSet;
+import org.mule.ide.core.model.IMuleConfiguration;
 import org.mule.ide.core.model.IMuleModel;
 
 /**
@@ -77,6 +78,43 @@ public class MuleConfigSet extends MuleModelElement implements IMuleConfigSet {
 	 */
 	public List getMuleConfigurations() {
 		return this.muleConfigurations;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfigSet#isFirstConfiguration(org.mule.ide.core.model.IMuleConfiguration)
+	 */
+	public boolean isFirstConfiguration(IMuleConfiguration config) {
+		if (config != null) {
+			int numConfigs = getMuleConfigurations().size();
+			if (numConfigs > 0) {
+				IMuleConfiguration first = (IMuleConfiguration) getMuleConfigurations().get(0);
+				if (config.getId().equals(first.getId())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfigSet#isLastConfiguration(org.mule.ide.core.model.IMuleConfiguration)
+	 */
+	public boolean isLastConfiguration(IMuleConfiguration config) {
+		if (config != null) {
+			int numConfigs = getMuleConfigurations().size();
+			if (numConfigs > 0) {
+				IMuleConfiguration last = (IMuleConfiguration) getMuleConfigurations().get(
+						numConfigs - 1);
+				if (config.getId().equals(last.getId())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/*
