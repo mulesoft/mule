@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<!-- Version -->
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.codehaus.mule</groupId>
+	<artifactId>mule</artifactId>
+	<packaging>pom</packaging>
+	<version>2.0-SNAPSHOT</version>
+
+	<!-- Organization -->
+	<organization>
+		<name>SymphonySoft Limited</name>
+		<url>http://www.symphonysoft.com</url>
+	</organization>
+
+	<!-- Project -->
+	<name>Mule</name>
+	<description>Mule is a simple yet robust and highly scalable ESB services framework. It is designed as a light-weight, event-driven component technology that handles communication with disparate systems transparently providing a simple component interface.</description>
+	<url>http://mule.codehaus.org</url>
+	<inceptionYear>2003</inceptionYear>
+    <mailingLists>
+        <mailingList>
+          <name>Mule User List</name>
+          <subscribe>user-subscribe@mule.codehaus.org</subscribe>
+          <unsubscribe>user-unsubscribe@mule.codehaus.org</unsubscribe>
+          <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
+        <mailingList>
+          <name>Mule Developer List</name>
+          <subscribe>dev-subscribe@mule.codehaus.org</subscribe>
+          <unsubscribe>dev-unsubscribe@mule.codehaus.org</unsubscribe>
+          <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
+        <mailingList>
+          <name>Mule SCM List</name>
+          <subscribe>scm-subscribe@mule.codehaus.org</subscribe>
+          <unsubscribe>scm-unsubscribe@mule.codehaus.org</unsubscribe>
+          <archive>http://mule.codehaus.org/Mailing+List+Archives</archive>
+        </mailingList>
+    </mailingLists>
+	<developers>
+		<!-- Refer to http://mule.codehaus.org/Team -->
+	</developers>
+	<contributors>
+		<!-- Refer to http://mule.codehaus.org/Team -->
+	</contributors>
+
+	<!-- Build -->
+	  <scm>
+		<connection>scm:cvs:ssh:rossmason@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</connection>
+		<developerConnection>scm:cvs:ext:${maven.username}@cvs.mule.codehaus.org:/home/projects/mule/scm:mule</developerConnection>
+		<url>http://cvs.mule.codehaus.org/</url>
+	  </scm>
+	  <distributionManagement>
+		<downloadUrl>http://mule.codehaus.org/Download</downloadUrl>
+	    <repository>
+	      <id>default</id>
+	      <name>Default Repository</name>
+	      <url>dist.codehaus.org//dist</url>
+	    </repository>
+	    <site>
+	      <id>default</id>
+	      <name>Default Site</name>
+	      <url>scp://mule.codehaus.org//home/projects/mule/public_html</url>
+	    </site>
+	  </distributionManagement>
+	<repositories>
+	    <repository>
+	      <id>local</id>
+	      <name>Local repository</name>
+	      <url>file:///export/home/carlson/mule/lib</url>
+	      <layout>legacy</layout>
+	    </repository>
+		<repository>
+			<id>codehaus</id>
+			<name>codehaus</name>
+			<url>dist.codehaus.org</url>
+			<layout>legacy</layout>
+		</repository>
+  		<repository>
+			<id>ibiblio</id>
+			<name>ibiblio</name>
+			<url>www.ibiblio.org/maven2</url>
+		</repository>
+	</repositories>
+	<build>
+		<!-- Directory layout -->
+		<sourceDirectory>src/java</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src/conf</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>${testSourceDirectory}/conf</directory>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.4</source>
+					<target>1.4</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- Subprojects -->
+	<modules>
+		<module>mule</module>
+		<module>providers</module>
+		<module>mule-extras</module>
+		<!--
+		<module>samples</module>
+		<module>tools</module>
+		<module>tests</module>
+		-->
+		<module>distributions</module>
+	</modules>
+
+	<dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+			<scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
+            <version>0.09</version>
+			<scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.0</version>
+			<scope>test</scope>
+        </dependency>
+	</dependencies>
+</project>
+

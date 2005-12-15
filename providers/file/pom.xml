@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.codehaus.mule</groupId>
+		<artifactId>mule-providers</artifactId>
+		<relativePath>../pom.xml</relativePath>
+		<version>2.0-SNAPSHOT</version>
+	</parent>
+    <artifactId>mule-file-provider</artifactId>
+	<packaging>jar</packaging>
+    <name>File Provider</name>
+    <description>A Mule provider for File Connectivity. This connector allows files to be read and written to
+        directories on the local file system. The connector can be configured to filter the file it reads and the way
+        files are written, such as whether binary output is used or the file is appended to.</description>
+</project>

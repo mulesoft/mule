@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.codehaus.mule</groupId>
+		<artifactId>mule-extras</artifactId>
+		<relativePath>../pom.xml</relativePath>
+		<version>2.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>mule-extras-pgp</artifactId>
+	<packaging>jar</packaging>
+	<name>PGP Security</name>
+	<description>A Mule implementation of PGP security using cryptix libraries.</description>
+	<dependencies>
+		<dependency>
+			<groupId>cryptix-jce</groupId>
+			<artifactId>cryptix-jce-api</artifactId>
+			<version>20050328</version>
+		</dependency>
+		<dependency>
+			<groupId>cryptix-jce</groupId>
+			<artifactId>cryptix-jce-provider</artifactId>
+			<version>20050328</version>
+		</dependency>
+		<dependency>
+			<groupId>cryptix-openpgp</groupId>
+			<artifactId>cryptix-message-api</artifactId>
+			<version>20050405</version>
+		</dependency>
+		<dependency>
+			<groupId>cryptix-openpgp</groupId>
+			<artifactId>cryptix-openpgp-provider</artifactId>
+			<version>20050405</version>
+		</dependency>
+		<dependency>
+			<groupId>cryptix-openpgp</groupId>
+			<artifactId>cryptix-pki-api</artifactId>
+			<version>20050405</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.mule</groupId>
+			<artifactId>mule-file-provider</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.mule</groupId>
+			<artifactId>mule-extras-client</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.mule</groupId>
+			<artifactId>mule-extras-spring</artifactId>
+			<version>${version}</version>
+		</dependency>
+	</dependencies>
+</project>

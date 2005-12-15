@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.codehaus.mule</groupId>
+		<artifactId>mule-extras</artifactId>
+		<relativePath>../pom.xml</relativePath>
+		<version>2.0-SNAPSHOT</version>
+	</parent>
+    <artifactId>mule-extras-spring</artifactId>
+	<packaging>jar</packaging>
+    <name>Spring Extensions</name>
+    <description>Provides extensions to use the Spring framework with Mule such as utilising the the spring container to build components managed by Mule.</description>   
+    <dependencies>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-jdbc-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jms</artifactId>
+            <version>1.1-rc4</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>

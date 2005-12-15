@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.codehaus.mule</groupId>
+		<artifactId>mule-providers</artifactId>
+		<relativePath>../pom.xml</relativePath>
+		<version>2.0-SNAPSHOT</version>
+	</parent>
+    <artifactId>mule-jbi-provider</artifactId>
+	<packaging>jar</packaging>
+    <name>Jbi Provider</name>
+    <description>Allows JBI components to interact with Mule.  Note this is different from Mule-JBI, which is a JBI (JSR-208) implementation based on the Mule framework.</description>
+    <dependencies>
+         <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-jbi-spec</artifactId>
+            <version>SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jaxrpc</groupId>
+            <artifactId>jaxrpc-qname-patch</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>jaxrpc</groupId>
+            <artifactId>jaxrpc</artifactId>
+            <version>1.1</version>
+        </dependency>
+    </dependencies>
+</project>
