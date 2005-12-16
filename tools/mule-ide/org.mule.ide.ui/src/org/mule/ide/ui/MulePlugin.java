@@ -120,6 +120,7 @@ public class MulePlugin extends AbstractUIPlugin {
 	protected void initializeImageRegistry(ImageRegistry reg) {
 		super.initializeImageRegistry(reg);
 		reg.put(IMuleImages.KEY_MULE_LOGO, getImageDescriptor(IMuleImages.PATH_MULE_LOGO));
+		reg.put(IMuleImages.KEY_MULE_CONFIG, getImageDescriptor(IMuleImages.PATH_MULE_CONFIG));
 	}
 
 	/**

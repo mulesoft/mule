@@ -56,7 +56,7 @@ public class MuleConfigurationsPanel implements IMulePropertyPanel {
 	 * @see org.mule.ide.ui.properties.IMulePropertyPanel#getImage()
 	 */
 	public Image getImage() {
-		return MulePlugin.getDefault().getImage(IMuleImages.KEY_MULE_LOGO);
+		return MulePlugin.getDefault().getImage(IMuleImages.KEY_MULE_CONFIG);
 	}
 
 	/*
@@ -137,8 +137,8 @@ public class MuleConfigurationsPanel implements IMulePropertyPanel {
 		MuleConfigurationDialog dialog = new MuleConfigurationDialog(muleModel.getProject(),
 				getConfigsTable().getTable().getShell());
 		if (dialog.open() == Window.OK) {
-			IMuleConfiguration config = muleModel.createNewMuleConfiguration(
-					dialog.getDescription(), dialog.getPath());
+			IMuleConfiguration config = muleModel.createNewMuleConfiguration(dialog
+					.getDescription(), dialog.getPath());
 			muleModel.addMuleConfiguration(config);
 			getConfigsTable().refresh();
 		}
