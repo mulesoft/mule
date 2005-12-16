@@ -136,7 +136,14 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
                 chat = new Chat(xmppConnection, recipient);
             }
         }
-        Message message = (Message)event.getTransformedMessage();
+        Object msgObj = event.getMessage().getPayload();
+        Message message;
+        // avoid duplicate transformation
+        if (!(msgObj instanceof Message)) {
+            message = (Message)event.getTransformedMessage();
+        } else {
+            message = (Message) msgObj;
+        }
 
         if (logger.isTraceEnabled()) {
             logger.trace("Transformed packet: " + message.toXML());
