@@ -57,7 +57,7 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
         env.put(Context.INITIAL_CONTEXT_FACTORY, MuleInitialContextFactory.class.getName());
         context.setEnvironment(env);
         context.initialise();
-        InitialContext ic = context.getContext();
+        Context ic = context.getContext();
         ic.bind(FruitBowl.class.getName(), new FruitBowl(new Apple(), new Banana()));
         ic.bind(Apple.class.getName(), new Apple());
     }
@@ -80,14 +80,14 @@ public class JndiContainerContextTestCase extends AbstractContainerContextTestCa
      */
     public void testDefaultInitialContext() throws Exception
     {
-        InitialContext icEnv = context.getContext();
+        Context icEnv = context.getContext();
         assertNotNull(icEnv);
 
         // reset initial context
         context.setEnvironment(null);
         context.setContext(null);
         context.initialise();
-        InitialContext icDefault = context.getContext();
+        Context icDefault = context.getContext();
         assertNotNull(icDefault);
         assertNotSame(icEnv, icDefault);
 

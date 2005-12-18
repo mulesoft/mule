@@ -13,19 +13,18 @@
  */
 package org.mule.impl.container;
 
-import java.io.Reader;
-import java.util.Hashtable;
-import java.util.Map;
-
-import javax.naming.InitialContext;
-import javax.naming.Name;
-import javax.naming.NamingException;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.ContainerException;
 import org.mule.umo.manager.ObjectNotFoundException;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.Name;
+import javax.naming.NamingException;
+import java.io.Reader;
+import java.util.Map;
 
 /**
  * <code>JndiContainerContext</code> is a container implementaiton that
@@ -33,11 +32,12 @@ import org.mule.umo.manager.ObjectNotFoundException;
  * configuration will be passed to the initial context.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  * @version $Revision$
  */
 public class JndiContainerContext extends AbstractContainerContext
 {
-    protected InitialContext context;
+    protected Context context;
     private Map environment;
 
     public JndiContainerContext()
@@ -60,7 +60,7 @@ public class JndiContainerContext extends AbstractContainerContext
         this.environment = environment;
     }
 
-    public InitialContext getContext() {
+    public Context getContext() {
         return context;
     }
 
@@ -95,11 +95,7 @@ public class JndiContainerContext extends AbstractContainerContext
     {
         try {
             if (context == null) {
-                if (environment != null && environment.size() > 0) {
-                    context = new InitialContext(new Hashtable(environment));
-                } else {
-                    context = new InitialContext();
-                }
+                context = JndiContextHelper.initialise(getEnvironment());
             }
         } catch (NamingException e) {
             throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Jndi context"), e, this);
