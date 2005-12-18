@@ -12,13 +12,15 @@
  * the LICENSE.txt file.
  *
  */
-package org.mule.transaction;
+package org.mule.transaction.lookup;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.JndiContextHelper;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -38,6 +40,8 @@ import java.util.Map;
  */
 public class GenericTransactionManagerLookupFactory implements UMOTransactionManagerFactory
 {
+    protected final Log logger = LogFactory.getLog(getClass());
+
     protected Context context;
 
     private Map environment;
