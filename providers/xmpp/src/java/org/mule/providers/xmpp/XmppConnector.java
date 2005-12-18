@@ -77,7 +77,7 @@ public class XmppConnector extends AbstractServiceEnabledConnector
             logger.info("pw is        : " + password);
             logger.info("server       : " + hostname);
             logger.info("resource     : " + resource);
-            if(resource != null) {
+            if(resource == null) {
                 xmppConnection.login(username, password);
             } else {
                 xmppConnection.login(username, password, resource);
