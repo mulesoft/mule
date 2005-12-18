@@ -23,7 +23,6 @@ import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public class EjbContainerContextTestCase extends AbstractContainerContextTestCas
         context.setEnvironment(env);
         //context.setSecurityPolicy("open-security.policy");
         context.initialise();
-        InitialContext ic = context.getContext();
+        Context ic = context.getContext();
         ic.bind(EJB_NAME, new DummyEjbHomeProxy());
         ic.bind(Apple.class.getName(), new Apple());
     }
