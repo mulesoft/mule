@@ -15,7 +15,23 @@ package org.mule.util;
 
 import org.mule.MuleManager;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -26,7 +42,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.StringTokenizer;
+import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -367,38 +385,38 @@ public class Utility
      * Unzip the specified archive to the given directory
      */
     public static void unzip(File archive, File directory) throws IOException {
-    	ZipFile zip = null;
-    	if (directory.exists()) {
-    		if (!directory.isDirectory()) {
-    			throw new IOException("Directory is not a directory: " + directory);
-    		}
-    	} else {
-    		if (!directory.mkdirs()) {
-    			throw new IOException("Could not create directory: " + directory);
-    		}
-    	}
-    	try {
-    		zip = new ZipFile(archive);
-    		for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-    			ZipEntry entry = (ZipEntry) entries.nextElement();
-    			File f = new File(directory, entry.getName());
-				if (entry.isDirectory()) {
-					if (!f.mkdirs()) {
-						throw new IOException("Could not create directory: " + f);
-					}
-				} else {
-					InputStream is = zip.getInputStream(entry);
-					OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-					copy(is, os);
-					is.close();
-					os.close();
-				}
-			}
-    	} finally {
-    		if (zip != null) {
-    			zip.close();
-    		}
-    	}
+        ZipFile zip = null;
+        if (directory.exists()) {
+            if (!directory.isDirectory()) {
+                throw new IOException("Directory is not a directory: " + directory);
+            }
+        } else {
+            if (!directory.mkdirs()) {
+                throw new IOException("Could not create directory: " + directory);
+            }
+        }
+        try {
+            zip = new ZipFile(archive);
+            for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
+                File f = new File(directory, entry.getName());
+                if (entry.isDirectory()) {
+                    if (!f.mkdirs()) {
+                        throw new IOException("Could not create directory: " + f);
+                    }
+                } else {
+                    InputStream is = zip.getInputStream(entry);
+                    OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+                    copy(is, os);
+                    is.close();
+                    os.close();
+                }
+            }
+        } finally {
+            if (zip != null) {
+                zip.close();
+            }
+        }
     }
 
 
@@ -428,17 +446,17 @@ public class Utility
     }
 
     public static void copy(URL url, File output) throws IOException {
-		InputStream is = null;
-		FileOutputStream os = null;
-		try {
-			// Copy url content stream to file
-			is = url.openStream();
-			os = new FileOutputStream(output);
-			copy(is, os);
-		} finally {
-			closeQuietly(is);
-			closeQuietly(os);
-		}
+        InputStream is = null;
+        FileOutputStream os = null;
+        try {
+            // Copy url content stream to file
+            is = url.openStream();
+            os = new FileOutputStream(output);
+            copy(is, os);
+        } finally {
+            closeQuietly(is);
+            closeQuietly(os);
+        }
     }
 
     /**
@@ -478,29 +496,33 @@ public class Utility
     }
 
     /** Reads the input stream into a string. */
-	public static String getInputStreamAsString(InputStream input) throws IOException {
+    public static String getInputStreamAsString(InputStream input) throws IOException {
         return (readToString(new InputStreamReader(input)));
     }
 
-	/** Reads the stream into a string. */
-	public static String readToString(Reader reader) throws IOException {
+    /** Reads the stream into a string. */
+    public static String readToString(Reader reader) throws IOException {
         String text = "";
 
         // Read the stream into an array of strings.
-        ArrayList lines = readToArray(reader);
+        List lines = readToStringList(reader);
 
         // Concatenate the array of strings into a single string.
-        int numLines = lines.size();
-        for (int i = 0; i < numLines; ++i) {
-            if (text.equals("") == false) text += "\n";
-            text += lines.get(i);
+        StringBuffer sb = new StringBuffer(lines.size() * 5);
+        for (Iterator it = lines.iterator(); it.hasNext();) {
+            String line = (String) it.next();
+            if (sb.length() > 0) {
+                sb.append("\n");
+            }
+            sb.append(line);
         }
-        return (text);
+
+        return sb.toString();
     }
 
-    /** Reads the stream into an array of strings. */
-	public static ArrayList readToArray(Reader reader) throws IOException {
-	    ArrayList lines = new ArrayList();
+    /** Reads the stream into a list of strings. */
+    public static List readToStringList(Reader reader) throws IOException {
+        List lines = new ArrayList();
         String line;
         BufferedReader buffer = new BufferedReader(reader);
 
