@@ -14,6 +14,10 @@
  */
 package org.mule.transaction.lookup;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.umo.manager.UMOTransactionManagerFactory;
+
 import javax.transaction.TransactionManager;
 import java.lang.reflect.Method;
 
@@ -26,13 +30,15 @@ import java.lang.reflect.Method;
  * @see com.ibm.ejs.jts.jta.TransactionManagerFactory#getTransactionManager
 
  */
-public class WebsphereTransactionManagerLookupFactory extends GenericTransactionManagerLookupFactory
+public class WebsphereTransactionManagerLookupFactory implements UMOTransactionManagerFactory
 {
     private static final String FACTORY_CLASS_5_1 = "com.ibm.ws.Transaction.TransactionManagerFactory";
 
     private static final String FACTORY_CLASS_5_0 = "com.ibm.ejs.jts.jta.TransactionManagerFactory";
 
     private static final String FACTORY_CLASS_4 = "com.ibm.ejs.jts.jta.JTSXA";
+
+    private final Log logger = LogFactory.getLog(getClass());
 
     /**
      * This constructor retrieves the WebSphere TransactionManager factory class,
