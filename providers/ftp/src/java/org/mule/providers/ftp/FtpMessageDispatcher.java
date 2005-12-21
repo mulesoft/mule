@@ -25,6 +25,7 @@ import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -57,7 +58,8 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
     public void doDispatch(UMOEvent event) throws Exception
     {
         FTPClient client = null;
-        UMOEndpointURI uri = event.getEndpoint().getEndpointURI();
+        final UMOEndpoint endpoint = event.getEndpoint();
+        UMOEndpointURI uri = endpoint.getEndpointURI();
         try {
             String filename = (String) event.getProperty(FtpConnector.PROPERTY_FILENAME);
 
@@ -81,6 +83,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
             }
 
             client = connector.getFtp(uri);
+            connector.enterActiveOrPassiveMode(client, endpoint.getProperties());
             if (!client.changeWorkingDirectory(uri.getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
@@ -105,6 +108,8 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
         try {
 
             client = connector.getFtp(endpointUri);
+            // not sure this getParams() will always work, there's a todo in the code
+            connector.enterActiveOrPassiveMode(client, endpointUri.getParams());
             if (!client.changeWorkingDirectory(endpointUri.getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }

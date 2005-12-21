@@ -48,6 +48,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final String PROPERTY_FILENAME = "filename";
     public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern";
+    public static final String PROPERTY_PASSIVE_MODE = "passive";
 
     /**
      * Time in milliseconds to poll. On each poll the poll() method is called
@@ -57,6 +58,8 @@ public class FtpConnector extends AbstractServiceEnabledConnector
     private String outputPattern = null;
 
     private FilenameParser filenameParser = new SimpleFilenameParser();
+
+    private boolean passive = false;
 
     private Map pools = new HashMap();
 
@@ -252,6 +255,54 @@ public class FtpConnector extends AbstractServiceEnabledConnector
     public void setFilenameParser(FilenameParser filenameParser)
     {
         this.filenameParser = filenameParser;
+    }
+
+    /**
+     * Getter for FTP passive mode.
+     * @return true if using FTP passive mode
+     */
+    public boolean isPassive()
+    {
+        return passive;
+    }
+
+    /**
+     * Setter for FTP passive mode.
+     * @param passive passive mode flag
+     */
+    public void setPassive(final boolean passive)
+    {
+        this.passive = passive;
+    }
+
+    /**
+     * Passive mode is OFF by default. The value is taken from the connector settings.
+     * In case there are any overriding properties set on the endpoint, those will be used.
+     */
+    public void enterActiveOrPassiveMode(FTPClient client, Map endpointProperties)
+    {
+        // well, no endpoint URI here, as we have to use the most common denominator in API :(
+        final String passiveString = (String) endpointProperties.get(FtpConnector.PROPERTY_PASSIVE_MODE);
+        if (passiveString == null) {
+            // try the connector properties then
+            if (isPassive()) {
+                logger.debug("Entering FTP passive mode");
+                client.enterLocalPassiveMode();
+            } else {
+                logger.debug("Entering FTP active mode");
+                client.enterLocalActiveMode();
+            }
+        } else {
+            // override with endpoint's definition
+            final boolean passiveMode = Boolean.valueOf(passiveString).booleanValue();
+            if (passiveMode) {
+                logger.debug("Entering FTP passive mode (endpoint override)");
+                client.enterLocalPassiveMode();
+            } else {
+                logger.debug("Entering FTP active mode (endpoint override)");
+                client.enterLocalActiveMode();
+            }
+        }
     }
 
 }
