@@ -8,6 +8,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -150,8 +152,23 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 		Composite cButtons = MuleUIUtils.createButtonPanel(composite);
 		buttonConfigAdd = MuleUIUtils.createSideButton("Add", cButtons);
 		buttonConfigUp = MuleUIUtils.createSideButton("Up", cButtons);
+		buttonConfigUp.addMouseListener(new MouseAdapter() {
+			public void mouseUp(MouseEvent e) {
+				upClicked();
+			}
+		});
 		buttonConfigDown = MuleUIUtils.createSideButton("Down", cButtons);
+		buttonConfigDown.addMouseListener(new MouseAdapter() {
+			public void mouseUp(MouseEvent e) {
+				downClicked();
+			}
+		});
 		buttonConfigDelete = MuleUIUtils.createSideButton("Delete", cButtons);
+		buttonConfigDelete.addMouseListener(new MouseAdapter() {
+			public void mouseUp(MouseEvent e) {
+				deleteClicked();
+			}
+		});
 	}
 
 	/**
@@ -203,7 +220,7 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	 */
 	protected void updateConfigFileButtonEnablement(IMuleConfiguration configFile) {
 		IMuleConfigSet configSet = getSelectedConfigSet();
-		if (configSet != null) {
+		if ((configSet != null) && (configFile != null)) {
 			if (configSet.isFirstConfiguration(configFile)) {
 				buttonConfigUp.setEnabled(false);
 			} else {
@@ -214,9 +231,50 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 			} else {
 				buttonConfigDown.setEnabled(true);
 			}
+			buttonConfigDelete.setEnabled(true);
 		} else {
 			buttonConfigUp.setEnabled(false);
 			buttonConfigDown.setEnabled(false);
+			buttonConfigDelete.setEnabled(false);
+		}
+	}
+
+	/**
+	 * Called when the button for moving a config up in priority is clicked.
+	 */
+	protected void upClicked() {
+		IMuleConfigSet configSet = getSelectedConfigSet();
+		IMuleConfiguration config = getSelectedConfigFile();
+		if ((configSet != null) && (config != null)) {
+			configSet.increasePriority(config);
+			getConfigsTable().refresh();
+			getConfigsTable().setSelection(new StructuredSelection(config));
+		}
+	}
+
+	/**
+	 * Called when the button for moving a config down in priority is clicked.
+	 */
+	protected void downClicked() {
+		IMuleConfigSet configSet = getSelectedConfigSet();
+		IMuleConfiguration config = getSelectedConfigFile();
+		if ((configSet != null) && (config != null)) {
+			configSet.decreasePriority(config);
+			getConfigsTable().refresh();
+			getConfigsTable().setSelection(new StructuredSelection(config));
+		}
+	}
+
+	/**
+	 * Called when the delete button is clicked.
+	 */
+	protected void deleteClicked() {
+		IMuleConfigSet configSet = getSelectedConfigSet();
+		IMuleConfiguration config = getSelectedConfigFile();
+		if ((configSet != null) && (config != null)) {
+			configSet.removeConfiguration(config);
+			getConfigsTable().refresh();
+			updateConfigFileButtonEnablement(null);
 		}
 	}
 

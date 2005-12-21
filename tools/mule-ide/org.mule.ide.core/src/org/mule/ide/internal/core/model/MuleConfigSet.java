@@ -120,6 +120,44 @@ public class MuleConfigSet extends MuleModelElement implements IMuleConfigSet {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.mule.ide.core.model.IMuleConfigSet#increasePriority(org.mule.ide.core.model.IMuleConfiguration)
+	 */
+	public void increasePriority(IMuleConfiguration config) {
+		int location = getMuleConfigurations().indexOf(config);
+		if (location > 0) {
+			getMuleConfigurations().remove(location);
+			getMuleConfigurations().add(location - 1, config);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfigSet#decreasePriority(org.mule.ide.core.model.IMuleConfiguration)
+	 */
+	public void decreasePriority(IMuleConfiguration config) {
+		int location = getMuleConfigurations().indexOf(config);
+		if ((location > -1) && (location < (getMuleConfigurations().size() - 1))) {
+			getMuleConfigurations().remove(location);
+			getMuleConfigurations().add(location + 1, config);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfigSet#removeConfiguration(org.mule.ide.core.model.IMuleConfiguration)
+	 */
+	public void removeConfiguration(IMuleConfiguration config) {
+		int location = getMuleConfigurations().indexOf(config);
+		if ((location > -1) && (location < getMuleConfigurations().size())) {
+			getMuleConfigurations().remove(location);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mule.ide.core.model.IMuleModelElement#getMuleModel()
 	 */
 	public IMuleModel getMuleModel() {

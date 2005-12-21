@@ -34,6 +34,13 @@ public interface IMuleConfigSet extends IMuleModelElement {
 	public List getMuleConfigurations();
 
 	/**
+	 * Remove the given configuration from the set.
+	 * 
+	 * @param config the config to remove
+	 */
+	public void removeConfiguration(IMuleConfiguration config);
+
+	/**
 	 * Indicates if the given configuration is the first for this config set.
 	 * 
 	 * @param config the configuration
@@ -48,4 +55,18 @@ public interface IMuleConfigSet extends IMuleModelElement {
 	 * @return true if last, false if not
 	 */
 	public boolean isLastConfiguration(IMuleConfiguration config);
+
+	/**
+	 * Increase the priority of a configuration within the set.
+	 * 
+	 * @param config the configuration
+	 */
+	public void increasePriority(IMuleConfiguration config);
+
+	/**
+	 * Decrease the priority of a configuration within the set.
+	 * 
+	 * @param config the configuration
+	 */
+	public void decreasePriority(IMuleConfiguration config);
 }
