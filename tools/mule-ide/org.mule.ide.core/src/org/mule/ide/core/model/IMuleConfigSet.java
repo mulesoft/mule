@@ -27,6 +27,13 @@ public interface IMuleConfigSet extends IMuleModelElement {
 	public String getDescription();
 
 	/**
+	 * Set the description.
+	 * 
+	 * @param description the description
+	 */
+	public void setDescription(String description);
+
+	/**
 	 * Get the ordered list of Mule configurations used in this config set.
 	 * 
 	 * @return the ordered list of configurations

@@ -74,6 +74,15 @@ public class MuleConfigSet extends MuleModelElement implements IMuleConfigSet {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.mule.ide.core.model.IMuleConfigSet#setDescription(java.lang.String)
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mule.ide.core.model.IMuleConfigSet#getMuleConfigurations()
 	 */
 	public List getMuleConfigurations() {

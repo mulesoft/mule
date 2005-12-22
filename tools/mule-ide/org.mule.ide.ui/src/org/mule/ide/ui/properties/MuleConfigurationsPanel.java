@@ -1,5 +1,7 @@
 package org.mule.ide.ui.properties;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.Window;
@@ -79,6 +81,14 @@ public class MuleConfigurationsPanel implements IMulePropertyPanel {
 		getConfigsTable().setSorter(new MuleModelViewerSorter());
 		getConfigsTable().getTable().setLayoutData(new GridData(GridData.FILL_BOTH));
 
+		// Double clicking a config acts like clicking the edit button.
+		getConfigsTable().addDoubleClickListener(new IDoubleClickListener() {
+
+			public void doubleClick(DoubleClickEvent event) {
+				editClicked();
+			}
+		});
+
 		// Create buttons and add button handlers.
 		Composite buttons = MuleUIUtils.createButtonPanel(composite);
 		addButton = MuleUIUtils.createSideButton("Add", buttons);
@@ -137,8 +147,8 @@ public class MuleConfigurationsPanel implements IMulePropertyPanel {
 		MuleConfigurationDialog dialog = new MuleConfigurationDialog(muleModel.getProject(),
 				getConfigsTable().getTable().getShell());
 		if (dialog.open() == Window.OK) {
-			IMuleConfiguration config = muleModel.createNewMuleConfiguration(dialog
-					.getDescription(), dialog.getPath());
+			IMuleConfiguration config = muleModel.createNewMuleConfiguration(
+					dialog.getDescription(), dialog.getPath());
 			muleModel.addMuleConfiguration(config);
 			getConfigsTable().refresh();
 		}

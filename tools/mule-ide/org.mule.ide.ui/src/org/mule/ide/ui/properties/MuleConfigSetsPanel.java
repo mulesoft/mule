@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -25,6 +27,7 @@ import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.ui.IMuleImages;
 import org.mule.ide.ui.MulePlugin;
 import org.mule.ide.ui.MuleUIUtils;
+import org.mule.ide.ui.dialogs.MuleConfigSetDialog;
 import org.mule.ide.ui.model.MuleModelContentProvider;
 import org.mule.ide.ui.model.MuleModelLabelProvider;
 import org.mule.ide.ui.model.MuleModelViewerSorter;
@@ -34,11 +37,23 @@ import org.mule.ide.ui.model.MuleModelViewerSorter;
  */
 public class MuleConfigSetsPanel implements IMulePropertyPanel {
 
+	/** The Mule model for the project */
+	private IMuleModel muleModel;
+
 	/** Holds the config sets list */
 	private TableViewer configSetsTable;
 
 	/** Holds the list of configs in a config set */
 	private TableViewer configsTable;
+
+	/** Button for adding a config set */
+	private Button buttonSetAdd;
+
+	/** Button for editing a config set */
+	private Button buttonSetEdit;
+
+	/** Button for deleting a config set */
+	private Button buttonSetDelete;
 
 	/** Button for adding a config file */
 	private Button buttonConfigAdd;
@@ -110,11 +125,34 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 			}
 		});
 
+		// Double clicking a set acts like clicking the edit button.
+		getConfigSetsTable().addDoubleClickListener(new IDoubleClickListener() {
+
+			public void doubleClick(DoubleClickEvent event) {
+				editSetClicked();
+			}
+		});
+
 		// Create the config set buttons.
 		Composite csButtons = MuleUIUtils.createButtonPanel(composite);
-		MuleUIUtils.createSideButton("Add", csButtons);
-		MuleUIUtils.createSideButton("Edit", csButtons);
-		MuleUIUtils.createSideButton("Delete", csButtons);
+		buttonSetAdd = MuleUIUtils.createSideButton("Add", csButtons);
+		buttonSetAdd.addMouseListener(new MouseAdapter() {
+			public void mouseUp(MouseEvent e) {
+				addSetClicked();
+			}
+		});
+		buttonSetEdit = MuleUIUtils.createSideButton("Edit", csButtons);
+		buttonSetEdit.addMouseListener(new MouseAdapter() {
+			public void mouseUp(MouseEvent e) {
+				editSetClicked();
+			}
+		});
+		buttonSetDelete = MuleUIUtils.createSideButton("Delete", csButtons);
+		buttonSetDelete.addMouseListener(new MouseAdapter() {
+			public void mouseUp(MouseEvent e) {
+				deleteSetClicked();
+			}
+		});
 	}
 
 	/**
@@ -249,6 +287,44 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	}
 
 	/**
+	 * Button for adding a config set was clicked.
+	 */
+	protected void addSetClicked() {
+		MuleConfigSetDialog dialog = new MuleConfigSetDialog(getMuleModel().getProject(),
+				getConfigSetsTable().getTable().getShell());
+		if (dialog.open() == Window.OK) {
+			IMuleConfigSet configSet = getMuleModel().createNewMuleConfigSet(
+					dialog.getDescription());
+			getMuleModel().addMuleConfigSet(configSet);
+			getConfigSetsTable().refresh();
+			getConfigSetsTable().setSelection(new StructuredSelection(configSet));
+		}
+	}
+
+	/**
+	 * Button for adding a config set was clicked.
+	 */
+	protected void editSetClicked() {
+		IMuleConfigSet configSet = getSelectedConfigSet();
+		MuleConfigSetDialog dialog = new MuleConfigSetDialog(getMuleModel().getProject(),
+				getConfigSetsTable().getTable().getShell());
+		dialog.setDescription(configSet.getDescription());
+		if (dialog.open() == Window.OK) {
+			configSet.setDescription(dialog.getDescription());
+			getConfigSetsTable().refresh();
+		}
+	}
+
+	/**
+	 * Button for adding a config set was clicked.
+	 */
+	protected void deleteSetClicked() {
+		IMuleConfigSet configSet = getSelectedConfigSet();
+		getMuleModel().removeMuleConfigSet(configSet.getId());
+		getConfigSetsTable().refresh();
+	}
+
+	/**
 	 * Called when the button for adding configs is clicked.
 	 */
 	protected void addClicked() {
@@ -321,6 +397,8 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	 * @see org.mule.ide.ui.properties.IMulePropertyPanel#initialize(org.mule.ide.core.model.IMuleModel)
 	 */
 	public void initialize(IMuleModel model) {
+		this.setMuleModel(model);
+
 		// Set the model as the input for the config sets table.
 		getConfigSetsTable().setInput(model);
 
@@ -385,5 +463,23 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	 */
 	protected TableViewer getConfigsTable() {
 		return configsTable;
+	}
+
+	/**
+	 * Sets the 'muleModel' field.
+	 * 
+	 * @param muleModel The 'muleModel' value.
+	 */
+	protected void setMuleModel(IMuleModel muleModel) {
+		this.muleModel = muleModel;
+	}
+
+	/**
+	 * Returns the 'muleModel' field.
+	 * 
+	 * @return the 'muleModel' field value.
+	 */
+	protected IMuleModel getMuleModel() {
+		return muleModel;
 	}
 }
