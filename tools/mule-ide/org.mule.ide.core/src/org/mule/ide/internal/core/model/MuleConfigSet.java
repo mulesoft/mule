@@ -146,6 +146,17 @@ public class MuleConfigSet extends MuleModelElement implements IMuleConfigSet {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see org.mule.ide.core.model.IMuleConfigSet#addConfiguration(org.mule.ide.core.model.IMuleConfiguration)
+	 */
+	public void addConfiguration(IMuleConfiguration config) {
+		if (!getMuleConfigurations().contains(config)) {
+			getMuleConfigurations().add(config);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.mule.ide.core.model.IMuleConfigSet#removeConfiguration(org.mule.ide.core.model.IMuleConfiguration)
 	 */
 	public void removeConfiguration(IMuleConfiguration config) {

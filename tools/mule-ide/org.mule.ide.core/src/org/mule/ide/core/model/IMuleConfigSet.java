@@ -34,6 +34,13 @@ public interface IMuleConfigSet extends IMuleModelElement {
 	public List getMuleConfigurations();
 
 	/**
+	 * Add the given configuration to the set.
+	 * 
+	 * @param config the config to add
+	 */
+	public void addConfiguration(IMuleConfiguration config);
+
+	/**
 	 * Remove the given configuration from the set.
 	 * 
 	 * @param config the config to remove

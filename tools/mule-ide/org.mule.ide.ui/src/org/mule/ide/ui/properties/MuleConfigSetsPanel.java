@@ -1,12 +1,15 @@
 package org.mule.ide.ui.properties;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -15,6 +18,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.mule.ide.core.model.IMuleConfigSet;
 import org.mule.ide.core.model.IMuleConfiguration;
 import org.mule.ide.core.model.IMuleModel;
@@ -151,6 +155,11 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 		// Create the buttons for modifying the config files.
 		Composite cButtons = MuleUIUtils.createButtonPanel(composite);
 		buttonConfigAdd = MuleUIUtils.createSideButton("Add", cButtons);
+		buttonConfigAdd.addMouseListener(new MouseAdapter() {
+			public void mouseUp(MouseEvent e) {
+				addClicked();
+			}
+		});
 		buttonConfigUp = MuleUIUtils.createSideButton("Up", cButtons);
 		buttonConfigUp.addMouseListener(new MouseAdapter() {
 			public void mouseUp(MouseEvent e) {
@@ -236,6 +245,34 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 			buttonConfigUp.setEnabled(false);
 			buttonConfigDown.setEnabled(false);
 			buttonConfigDelete.setEnabled(false);
+		}
+	}
+
+	/**
+	 * Called when the button for adding configs is clicked.
+	 */
+	protected void addClicked() {
+		IMuleConfigSet configSet = getSelectedConfigSet();
+		List dupsRemoved = new ArrayList(configSet.getMuleModel().getMuleConfigurations());
+		Iterator it = configSet.getMuleConfigurations().iterator();
+		while (it.hasNext()) {
+			IMuleConfiguration config = (IMuleConfiguration) it.next();
+			dupsRemoved.remove(config);
+		}
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
+				buttonConfigAdd.getShell(),
+				MuleModelLabelProvider.getDecoratingMuleModelLabelProvider());
+		dialog.setTitle("Add Mule Config Files");
+		dialog.setMessage("Select the Mule configuration files to add");
+		dialog.setMultipleSelection(true);
+		dialog.setElements(dupsRemoved.toArray());
+		if (dialog.open() == Window.OK) {
+			Object[] results = dialog.getResult();
+			for (int i = 0; i < results.length; i++) {
+				IMuleConfiguration config = (IMuleConfiguration) results[i];
+				configSet.addConfiguration(config);
+			}
+			getConfigsTable().refresh();
 		}
 	}
 
