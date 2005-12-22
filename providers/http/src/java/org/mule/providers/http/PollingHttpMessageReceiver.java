@@ -14,6 +14,16 @@
  */
 package org.mule.providers.http;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleMessage;
@@ -25,12 +35,6 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.util.PropertiesHelper;
-
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Will poll an http URL and use the response as the input for a service
@@ -93,7 +97,18 @@ public class PollingHttpMessageReceiver extends PollingMessageReceiver
         }
         buffer = baos.toByteArray();
         baos.close();
-        UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[] { buffer, connection.getHeaderFields() });
+
+        // Truncate repetitive headers
+        Map respHeaders = new HashMap();
+		Iterator it = connection.getHeaderFields().entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry msgHeader = (Map.Entry) it.next();
+			if (msgHeader.getValue() != null) {
+				respHeaders.put(msgHeader.getKey(), ((List) msgHeader.getValue()).get(0));
+			}
+		}
+
+        UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[] { buffer, respHeaders });
 
         connection.disconnect();
         UMOMessage message = new MuleMessage(adapter);
