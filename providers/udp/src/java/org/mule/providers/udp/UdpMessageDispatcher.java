@@ -52,18 +52,13 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         this.connector = connector;
     }
 
-    protected DatagramSocket createSocket(int port, InetAddress inetAddress) throws IOException
-    {
-        return new DatagramSocket(port, inetAddress);
-    }
-
     protected void initialise(String endpoint) throws IOException, URISyntaxException
     {
         if (!initialised.get()) {
             URI uri = new URI(endpoint);
             port = uri.getPort();
             inetAddress = InetAddress.getByName(uri.getHost());
-            socket = createSocket(port, inetAddress);
+            socket = new DatagramSocket();
             socket.setReceiveBufferSize(connector.getBufferSize());
             socket.setSendBufferSize(connector.getBufferSize());
             socket.setSoTimeout(connector.getTimeout());
