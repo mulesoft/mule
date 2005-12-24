@@ -16,7 +16,6 @@ package org.mule.test.providers.email;
 import org.mule.providers.email.MailUtils;
 import org.mule.tck.NamedTestCase;
 
-import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
 /**
@@ -28,7 +27,6 @@ public class MailUtilsTestCase extends NamedTestCase
     private static final String EMAIL_2 = "zhora@buryakov.com";
     private InternetAddress inetAddress1;
     private InternetAddress inetAddress2;
-    private Address address1;
     private static final String MULTIPLE_EMAILS_WITH_WHITESPACE = EMAIL_1 + ", " + EMAIL_2;
     private static final String MULTIPLE_EMAILS_WITHOUT_WHITESPACE = EMAIL_1 + "," + EMAIL_2;
 
