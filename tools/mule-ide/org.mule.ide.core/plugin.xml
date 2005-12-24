@@ -76,6 +76,12 @@
               value="http://www.symphonysoft.com/dtds/mule/mule-spring-configuration.dtd"/>
        </describer>
       </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.core.classpathContainerInitializer">
+      <classpathContainerInitializer
+            class="org.mule.ide.internal.core.classpath.MuleClasspathContainerInitializer"
+            id="org.mule.ide.core.MuleLibraries"/>
    </extension> 
 
 </plugin>

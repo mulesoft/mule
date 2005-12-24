@@ -11,7 +11,10 @@ Export-Package: org.mule.ide.ui,
  org.mule.ide.ui.preferences,
  org.mule.ide.ui.properties
 Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.ide,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.jdt.ui,
+ org.eclipse.jdt.core,
  org.mule.ide.core
 Eclipse-AutoStart: true

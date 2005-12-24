@@ -12,20 +12,29 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
-
 package org.mule.ide.core;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.JavaCore;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.core.nature.MuleConfigNature;
 import org.mule.ide.core.preferences.PreferenceConstants;
@@ -41,12 +50,12 @@ public class MuleCorePlugin extends Plugin {
 	/** Eclipse plugin id */
 	public static final String PLUGIN_ID = "org.mule.ide.core";
 
+	/** Unique for the Mule classpath container */
+	public static final String ID_MULE_CLASSPATH_CONTAINER = PLUGIN_ID + ".MuleLibraries";
+
 	/** Problem marker id */
 	public static final String MARKER_TYPE = "org.mule.ide.core.xmlProblem";
 
-	/**
-	 * 
-	 */
 	public MuleCorePlugin() {
 		super();
 		defaultPlugin = this;
@@ -107,8 +116,8 @@ public class MuleCorePlugin extends Plugin {
 
 		// Outcome A - add the nature
 		String[] newNatures = new String[natures.length + 1];
-		System.arraycopy(natures, 0, newNatures, 0, natures.length);
-		newNatures[natures.length] = MuleConfigNature.NATURE_ID;
+		System.arraycopy(natures, 0, newNatures, 1, natures.length);
+		newNatures[0] = MuleConfigNature.NATURE_ID;
 		description.setNatureIds(newNatures);
 		project.setDescription(description, null);
 	}
@@ -139,6 +148,37 @@ public class MuleCorePlugin extends Plugin {
 			return nature.getMuleModel();
 		}
 		return null;
+	}
+
+	/**
+	 * Create a container entry for the Mule classpath manager.
+	 * 
+	 * @return the classpath entry
+	 */
+	public static IClasspathEntry createMuleClasspathContainerEntry() {
+		return JavaCore.newContainerEntry(new Path(MuleCorePlugin.ID_MULE_CLASSPATH_CONTAINER));
+	}
+
+	/**
+	 * Create classpath entries for all jars in the "lib" folder of the plugin.
+	 * 
+	 * @return the array of entries
+	 */
+	public IClasspathEntry[] getMuleLibraries() {
+		Enumeration urls = getBundle().findEntries("lib", "*.jar", false);
+		List classpath = new ArrayList();
+		while (urls.hasMoreElements()) {
+			URL url = (URL) urls.nextElement();
+			try {
+				url = Platform.resolve(url);
+				IPath filePath = new Path(new File(url.getFile()).getAbsolutePath());
+				IClasspathEntry entry = JavaCore.newLibraryEntry(filePath, null, null);
+				classpath.add(entry);
+			} catch (IOException e) {
+				logException("Unable to add library to classpath.", e);
+			}
+		}
+		return (IClasspathEntry[]) classpath.toArray(new IClasspathEntry[classpath.size()]);
 	}
 
 	/**

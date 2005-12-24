@@ -42,5 +42,27 @@
             id="org.mule.ide.ui.keyword.mule"
             label="Mule"/>
    </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="META-INF/icons/mule_overlay.gif"
+            id="org.mule.ide.ui.ProjectNatureImage"
+            natureId="org.mule.ide.core.muleConfigNature"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.mule.ide.ui.MuleProjectWizard"
+            name="Mule"/>
+      <wizard
+            canFinishEarly="false"
+            category="org.mule.ide.ui.MuleProjectWizard"
+            class="org.mule.ide.ui.wizards.MuleProjectWizard"
+            hasPages="true"
+            icon="META-INF/icons/mule16.gif"
+            id="org.mule.ide.ui.MuleProjectWizard"
+            name="Mule Project"
+            project="true"/>
+   </extension>
 
 </plugin>

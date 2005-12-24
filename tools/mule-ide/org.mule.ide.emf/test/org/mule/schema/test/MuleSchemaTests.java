@@ -21,10 +21,10 @@ public class MuleSchemaTests extends TestCase {
 			Resource resource = factory.createResource(null);
 			InputStream stream = new FileInputStream("xml/mule-config.xml");
 			resource.load(stream, Collections.EMPTY_MAP);
-			this.assertTrue("Could not find resource via URI.", resource.isLoaded());
+			assertTrue("Could not find resource via URI.", resource.isLoaded());
 			resource.save(System.out, Collections.EMPTY_MAP);
 		} catch (IOException e) {
-			this.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 	}
 }

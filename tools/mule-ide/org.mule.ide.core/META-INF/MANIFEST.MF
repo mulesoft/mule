@@ -116,5 +116,6 @@ Export-Package: org.mule,
  org.mule.util.xa
 Require-Bundle: org.eclipse.core.resources,
  org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
  org.mule.ide.emf
 Eclipse-AutoStart: true
