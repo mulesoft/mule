@@ -64,29 +64,36 @@ public class MailUtils
         }
 
         Properties props = System.getProperties();
-        props.put("mail." + protocol +".host", url.getHost());
-        int port = url.getPort();
-        if(port==-1) {
-            port = connector.getPort();
-        }
-        props.put("mail." + protocol + ".port", String.valueOf(port));
-
-        if(secure) {
-            System.setProperty("mail." + protocol + ".socketFactory.port", String.valueOf(port));
-
-        }
         Session session;
-        if (url.getPassword() != null) {
-            props.put("mail." + protocol + ".auth", "true");
-            Authenticator auth = connector.getAuthenticator();
-            if(auth==null) {
-                auth = new DefaultAuthenticator(url.getUsername(), url.getPassword());
-                logger.debug("No Authenticator set on Connector: " + connector.getName() + ". Using default.");
+
+        // make sure we do not mess with authentication set via system properties
+        synchronized (props) {
+            props.put("mail." + protocol +".host", url.getHost());
+            int port = url.getPort();
+            if(port==-1) {
+                port = connector.getPort();
             }
-            session = Session.getInstance(props, auth);
-        } else {
-            session = Session.getDefaultInstance(props, null);
+            props.put("mail." + protocol + ".port", String.valueOf(port));
+
+            if(secure) {
+                System.setProperty("mail." + protocol + ".socketFactory.port", String.valueOf(port));
+
+            }
+            if (url.getPassword() != null) {
+                props.put("mail." + protocol + ".auth", "true");
+                Authenticator auth = connector.getAuthenticator();
+                if(auth==null) {
+                    auth = new DefaultAuthenticator(url.getUsername(), url.getPassword());
+                    logger.debug("No Authenticator set on Connector: " + connector.getName() + ". Using default.");
+                }
+                session = Session.getInstance(props, auth);
+            } else {
+                // reset authentication property so smtp is not affected (MULE-464)
+                props.put("mail." + protocol + ".auth", "false");
+                session = Session.getDefaultInstance(props, null);
+            }
         }
+
         return session;
     }
 
@@ -95,11 +102,13 @@ public class MailUtils
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < addresses.length; i++) {
             InternetAddress address = addresses[i];
-            buf.append(address.getAddress()).append(", ");
+            buf.append(address.getAddress());
+            // all except the last one
+            if (i < addresses.length - 1) {
+                buf.append(", ");
+            }
         }
-        String result = buf.toString();
-        if(result.endsWith(", ")) result.substring(0, result.length()-2);
-        return result;
+        return  buf.toString();
     }
 
     public static String internetAddressesToString(InternetAddress address) {
@@ -111,18 +120,20 @@ public class MailUtils
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < addresses.length; i++) {
             Address address = addresses[i];
-            buf.append(address.toString()).append(", ");
+            buf.append(address.toString());
+            // all except the last one
+            if (i < addresses.length - 1) {
+                buf.append(", ");
+            }
         }
-        String result = buf.toString();
-        if(result.endsWith(", ")) result.substring(0, result.length()-2);
-        return result;
+        return  buf.toString();
     }
 
     public static String mailAddressesToString(Address address) {
         return mailAddressesToString(new Address[]{address});
     }
 
-    public static InternetAddress[] StringToInternetAddresses(String address) throws AddressException
+    public static InternetAddress[] stringToInternetAddresses(String address) throws AddressException
     {
         InternetAddress[] inetaddresses = null;
         if (!(address == null || "".equals(address))) {

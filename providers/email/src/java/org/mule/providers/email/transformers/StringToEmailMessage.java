@@ -104,25 +104,25 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
         try {
             Message msg = new MimeMessage((Session) endpoint.getConnector().getDispatcher(endpointAddress).getDelegateSession());
 
-            msg.setRecipients(Message.RecipientType.TO, MailUtils.StringToInternetAddresses(to));
+            msg.setRecipients(Message.RecipientType.TO, MailUtils.stringToInternetAddresses(to));
 
             // sent date
             msg.setSentDate(Calendar.getInstance().getTime());
 
             if (from != null && !Utility.EMPTY_STRING.equals(from)) {
-                msg.setFrom(MailUtils.StringToInternetAddresses(from)[0]);
+                msg.setFrom(MailUtils.stringToInternetAddresses(from)[0]);
             }
 
             if (cc != null && !Utility.EMPTY_STRING.equals(cc)) {
-                msg.setRecipients(Message.RecipientType.CC, MailUtils.StringToInternetAddresses(cc));
+                msg.setRecipients(Message.RecipientType.CC, MailUtils.stringToInternetAddresses(cc));
             }
 
             if (bcc != null && !Utility.EMPTY_STRING.equals(bcc)) {
-                msg.setRecipients(Message.RecipientType.BCC, MailUtils.StringToInternetAddresses(bcc));
+                msg.setRecipients(Message.RecipientType.BCC, MailUtils.stringToInternetAddresses(bcc));
             }
 
             if (replyTo != null && !Utility.EMPTY_STRING.equals(replyTo)) {
-                msg.setReplyTo(MailUtils.StringToInternetAddresses(replyTo));
+                msg.setReplyTo(MailUtils.stringToInternetAddresses(replyTo));
             }
 
             msg.setSubject(subject);
