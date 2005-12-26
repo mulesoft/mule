@@ -12,7 +12,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.mule.ide.core.model.IMuleConfigSet;
 import org.mule.ide.core.model.IMuleModel;
-import org.mule.ide.core.model.IMuleModelElement;
 
 /**
  * Provides content hierarchy for the Mule model.

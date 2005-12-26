@@ -8,8 +8,11 @@ Bundle-Activator: org.mule.ide.ui.MulePlugin
 Bundle-Vendor: Mule UMO
 Bundle-Localization: plugin
 Export-Package: org.mule.ide.ui,
+ org.mule.ide.ui.dialogs,
+ org.mule.ide.ui.model,
  org.mule.ide.ui.preferences,
- org.mule.ide.ui.properties
+ org.mule.ide.ui.properties,
+ org.mule.ide.ui.wizards
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.runtime,

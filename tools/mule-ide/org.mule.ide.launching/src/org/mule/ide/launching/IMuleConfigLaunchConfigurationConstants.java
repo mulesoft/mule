@@ -17,7 +17,12 @@ package org.mule.ide.launching;
 
 public interface IMuleConfigLaunchConfigurationConstants {
 
-	String ATTR_CONFIG_FILE_NAME = "FlowName";
-	String ATTR_FLOWRUNNER_CLASS = "FlowRunnerMain";
-	String DEFAULT_FLOWRUNNER_CLASS = "org.mule.MuleServer";
+	/** Attribute that holds the selected Mule project */
+	String ATTR_MULE_EXEC_CLASS = "org.mule.MuleExecClass";
+
+	/** Attribute that holds the selected Mule config set id */
+	String ATTR_MULE_CONFIG_SET_ID = "org.mule.MuleConfigSetId";
+
+	/** Default class to execute for a Mule launch */
+	String DEFAULT_MULE_EXEC_CLASS = "org.mule.MuleServer";
 }

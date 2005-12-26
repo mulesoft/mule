@@ -7,6 +7,8 @@ package org.mule.ide.core.model;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+
 /**
  * An ordered list of related IMuleConfiguration objects.
  */
@@ -39,6 +41,13 @@ public interface IMuleConfigSet extends IMuleModelElement {
 	 * @return the ordered list of configurations
 	 */
 	public List getMuleConfigurations();
+
+	/**
+	 * Get the path handles for all config files in the set.
+	 * 
+	 * @return the array of paths
+	 */
+	public IPath[] getConfigFilePaths();
 
 	/**
 	 * Add the given configuration to the set.

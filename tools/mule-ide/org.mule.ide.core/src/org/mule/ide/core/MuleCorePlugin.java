@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -137,6 +138,16 @@ public class MuleCorePlugin extends Plugin {
 	}
 
 	/**
+	 * Indicates whether the given project has a Mule nature assigned.
+	 * 
+	 * @param project the project to check
+	 * @return true if has nature, false if not
+	 */
+	public boolean hasMuleNature(IProject project) {
+		return (getMuleNature(project) != null);
+	}
+
+	/**
 	 * Get the Mule model for the given project.
 	 * 
 	 * @param project the project
@@ -148,6 +159,22 @@ public class MuleCorePlugin extends Plugin {
 			return nature.getMuleModel();
 		}
 		return null;
+	}
+
+	/**
+	 * Get the list of project that have a Mule nature assigned.
+	 * 
+	 * @return the list of IProject objects
+	 */
+	public IProject[] getMuleProjects() {
+		List result = new ArrayList();
+		IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+		for (int i = 0; i < projects.length; i++) {
+			if (hasMuleNature(projects[i])) {
+				result.add(projects[i]);
+			}
+		}
+		return (IProject[]) result.toArray(new IProject[result.size()]);
 	}
 
 	/**

@@ -87,7 +87,7 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 	public IStatus refresh() {
 		setStatus(Status.OK_STATUS);
 		IFile configFile = parent.getProject().getFile(relativePath);
-		setFilePath(configFile.getFullPath());
+		setFilePath(configFile.getProjectRelativePath());
 		if (!configFile.exists()) {
 			this.configDocument = null;
 			setStatus(MuleCorePlugin.getDefault().createErrorStatus(

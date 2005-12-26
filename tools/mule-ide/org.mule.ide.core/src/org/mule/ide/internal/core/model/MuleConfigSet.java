@@ -6,8 +6,10 @@
 package org.mule.ide.internal.core.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.mule.ide.core.model.IMuleConfigSet;
@@ -87,6 +89,22 @@ public class MuleConfigSet extends MuleModelElement implements IMuleConfigSet {
 	 */
 	public List getMuleConfigurations() {
 		return this.muleConfigurations;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.mule.ide.core.model.IMuleConfigSet#getConfigFilePaths()
+	 */
+	public IPath[] getConfigFilePaths() {
+		List result = new ArrayList();
+		List configs = getMuleConfigurations();
+		Iterator it = configs.iterator();
+		while (it.hasNext()) {
+			IMuleConfiguration config = (IMuleConfiguration) it.next();
+			result.add(config.getFilePath());
+		}
+		return (IPath[]) result.toArray(new IPath[result.size()]);
 	}
 
 	/*

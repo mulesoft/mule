@@ -15,510 +15,442 @@
 
 package org.mule.ide.launching.ui;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.internal.ui.SWTUtil;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.window.Window;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.mule.ide.core.MuleCorePlugin;
-import org.mule.ide.core.builder.MuleConfigBuilder;
-import org.mule.ide.core.nature.MuleConfigNature;
+import org.mule.ide.core.model.IMuleConfigSet;
+import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.launching.IMuleConfigLaunchConfigurationConstants;
+import org.mule.ide.ui.IMuleImages;
+import org.mule.ide.ui.MulePlugin;
+import org.mule.ide.ui.model.MuleModelLabelProvider;
 
 /**
- * This tab appears in the LaunchConfigurationDialog for launch configurations that
- * require Java-specific launching information such as a main type and JRE.
+ * This tab appears in the LaunchConfigurationDialog for launch configurations that require
+ * Java-specific launching information such as a main type and JRE.
  */
 public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 
-	private static final String MULE_CONFIG_FILE_SUFFIX = ".xml";
+	/** Table viewer for selecting project */
+	private TableViewer projectsTable;
 
-	// Tab general info
-	private final Image fMuleIcon = createLauncherlImage("icons/mule16.gif"); //$NON-NLS-1$
+	/** Table viewer for selecting the config set within a project */
+	private TableViewer configSetsTable;
 
-	// Project UI widgets
-	private Label fProjLabel;
-	private Text fProjText;
-	private Button fProjButton;
-	
-	// File to run UI widgets
-	private Label fConfigLabel;
-	private Text fConfigText;
-	private Button fConfigChooseButton;
-	
-	private MuleConfigBuilder configBuilder = new MuleConfigBuilder();
-	
-	/**
-	 * @see ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
+	/** The current project */
+	private IProject currentProject;
+
+	/** The current config set */
+	private IMuleConfigSet currentConfigSet;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#createControl(org.eclipse.swt.widgets.Composite)
 	 */
-	public void createControl(Composite parent) {		
+	public void createControl(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
+		GridLayout topLayout = new GridLayout();
+		comp.setLayout(topLayout);
+		Dialog.applyDialogFont(comp);
 		setControl(comp);
 
-		GridLayout topLayout = new GridLayout();
-		topLayout.numColumns= 3;
-		comp.setLayout(topLayout);		
-		
-		Label label = new Label(comp, SWT.NONE);
-		GridData gd = new GridData();
-		gd.horizontalSpan = 3;
-		label.setLayoutData(gd);
-		
-		createSingleTestSection(comp);
-		
-		label = new Label(comp, SWT.NONE);
-		gd = new GridData();
-		gd.horizontalSpan = 3;
-		label.setLayoutData(gd);
-		
-		Dialog.applyDialogFont(comp);
-		
-		validatePage();
-	}
-
-	protected void createSingleTestSection(Composite comp) {
-		GridData gd = new GridData();
-		gd.horizontalSpan = 3;
-		
-		fProjLabel = new Label(comp, SWT.NONE);
-		fProjLabel.setText("Project"); 
-		gd= new GridData();
-		gd.horizontalAlignment |= GridData.HORIZONTAL_ALIGN_END;
-		fProjLabel.setLayoutData(gd);
-		gd.horizontalAlignment &= ~GridData.HORIZONTAL_ALIGN_END;
-		
-		fProjText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		fProjText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		fProjText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent evt) {
-				validatePage();
-				updateLaunchConfigurationDialog();				
-				fConfigChooseButton.setEnabled(fProjText.getText().length() > 0);
-			}
-		});
-			
-		fProjButton = new Button(comp, SWT.PUSH);
-		fProjButton.setText("..."); 
-		fProjButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent evt) {
-				handleProjectButtonSelected();
-			}
-		});
-		setButtonGridData(fProjButton);
-		
-		fConfigLabel = new Label(comp, SWT.NONE);
-		gd = new GridData();
-		gd.horizontalAlignment |= GridData.HORIZONTAL_ALIGN_END;
-		fConfigLabel.setLayoutData(gd);
-		gd.horizontalAlignment &= ~GridData.HORIZONTAL_ALIGN_END;
-		fConfigLabel.setText("Configuration File"); 
-			
-		fConfigText = new Text(comp, SWT.SINGLE | SWT.BORDER);
-		fConfigText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		fConfigText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent evt) {
-				validatePage();
-				updateLaunchConfigurationDialog();
-			}
-		});
-		
-		fConfigChooseButton = new Button(comp, SWT.PUSH);
-		fConfigChooseButton.setEnabled(fProjText.getText().length() > 0);		
-		fConfigChooseButton.setText("..."); 
-		fConfigChooseButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent evt) {
-				handleSearchButtonSelected();
-			}
-		});
-		setButtonGridData(fConfigChooseButton);
-		
-		new Label(comp, SWT.NONE);
-	}
-
-	protected static Image createLauncherlImage(String path) {
-		ImageDescriptor id= ImageDescriptor.createFromFile(MuleLauncherTab.class, path);
-		return id.createImage();
+		createMainMuleConfigArea(comp);
 	}
 
 	/**
-	 * @see ILaunchConfigurationTab#initializeFrom(ILaunchConfiguration)
+	 * Create the main area for choosing Mule launch parameters.
+	 * 
+	 * @param parent the parent composite
+	 */
+	protected void createMainMuleConfigArea(Composite parent) {
+		Composite composite = new Composite(parent, SWT.NONE);
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		composite.setLayout(layout);
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		GridData gd;
+
+		// Project label.
+		Label fProjLabel = new Label(composite, SWT.NONE);
+		fProjLabel.setText("Mule Project:");
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_BEGINNING);
+		gd.widthHint = 110;
+		fProjLabel.setLayoutData(gd);
+
+		// Create the viewer for the Mule project list.
+		setProjectsTable(new TableViewer(composite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.BORDER));
+		getProjectsTable().setLabelProvider(
+				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
+		getProjectsTable().setContentProvider(new ArrayContentProvider());
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.heightHint = 75;
+		getProjectsTable().getTable().setLayoutData(gd);
+		getProjectsTable().getTable().addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+				doSelect(e);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				doSelect(e);
+			}
+
+			protected void doSelect(SelectionEvent e) {
+				IProject newProject = getSelectedProject();
+				if (updateSelectedProject(newProject)) {
+					validatePage();
+				}
+			}
+		});
+
+		// Config set label.
+		Label fConfigLabel = new Label(composite, SWT.NONE);
+		gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_BEGINNING);
+		gd.widthHint = 110;
+		fConfigLabel.setLayoutData(gd);
+		fConfigLabel.setText("Configuration Set:");
+
+		// Config set table.
+		setConfigSetsTable(new TableViewer(composite, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.BORDER));
+		getConfigSetsTable().setLabelProvider(
+				MuleModelLabelProvider.getDecoratingMuleModelLabelProvider());
+		getConfigSetsTable().setContentProvider(new ArrayContentProvider());
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.heightHint = 75;
+		getConfigSetsTable().getTable().setLayoutData(gd);
+		getConfigSetsTable().getTable().addSelectionListener(new SelectionListener() {
+			public void widgetSelected(SelectionEvent e) {
+				doSelect(e);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				doSelect(e);
+			}
+
+			protected void doSelect(SelectionEvent e) {
+				IMuleConfigSet configSet = getSelectedConfigSet();
+				if (updateSelectedConfigSet(configSet)) {
+					validatePage();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Refresh the list of projects shown in the dropdown.
+	 */
+	protected void refreshProjectList() {
+		List result = new ArrayList();
+		IProject[] projects = MuleCorePlugin.getDefault().getMuleProjects();
+		for (int i = 0; i < projects.length; i++) {
+			result.add(projects[i]);
+		}
+		getProjectsTable().setInput(result);
+	}
+
+	/**
+	 * Get the selected project from the project list.
+	 * 
+	 * @return the selected project or null if none is selected
+	 */
+	protected IProject getSelectedProject() {
+		IStructuredSelection selection = (IStructuredSelection) getProjectsTable().getSelection();
+		if (selection.isEmpty()) {
+			return null;
+		}
+		return (IProject) selection.getFirstElement();
+	}
+
+	/**
+	 * Updates the selected project if it really changed. Also updates the list of config sets from
+	 * the new project.
+	 * 
+	 * @param newProject the new project
+	 * @return true if the project changed, false if not
+	 */
+	protected boolean updateSelectedProject(IProject newProject) {
+		if ((getCurrentProject() == null) || (!getCurrentProject().equals(newProject))) {
+			if (newProject == null) {
+				getConfigSetsTable().setInput(null);
+			} else {
+				IMuleModel model = MuleCorePlugin.getDefault().getMuleModel(newProject);
+				getConfigSetsTable().setInput(model.getMuleConfigSets());
+			}
+			setDirty(true);
+			setCurrentProject(newProject);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Get the selected config set from the config sets list.
+	 * 
+	 * @return the selected config set or null if none is selected.
+	 */
+	protected IMuleConfigSet getSelectedConfigSet() {
+		IStructuredSelection selection = (IStructuredSelection) getConfigSetsTable().getSelection();
+		if (selection.isEmpty()) {
+			return null;
+		}
+		return (IMuleConfigSet) selection.getFirstElement();
+	}
+
+	/**
+	 * Updates the current config set if it really changed.
+	 * 
+	 * @param newConfigSet the new config set
+	 * @return true if the config set changed, false if not
+	 */
+	protected boolean updateSelectedConfigSet(IMuleConfigSet newConfigSet) {
+		if ((getCurrentConfigSet() == null) || (!getCurrentConfigSet().equals(newConfigSet))) {
+			setDirty(true);
+			updateLaunchConfigurationDialog();
+			setCurrentConfigSet(newConfigSet);
+			return true;
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public void initializeFrom(ILaunchConfiguration config) {
 
-		// Update project
-		String projectName= ""; //$NON-NLS-1$
 		try {
-			projectName = config.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, ""); //$NON-NLS-1$
-		} catch (CoreException ce) {
-		}
-		fProjText.setText(projectName);
-		
-		// Update config name
-		String configName= ""; //$NON-NLS-1$
-		try {
-			configName = config.getAttribute(IMuleConfigLaunchConfigurationConstants.ATTR_CONFIG_FILE_NAME, ""); //$NON-NLS-1$
-		} catch (CoreException ce) {			
-		}
-		fConfigText.setText(configName);
-	}
+			refreshProjectList();
+			String projectName = config.getAttribute(
+					IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
+			if (projectName.length() > 0) {
+				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+				if (project != null) {
+					updateSelectedProject(project);
+					getProjectsTable().setSelection(new StructuredSelection(project));
+					String configSetId = config.getAttribute(
+							IMuleConfigLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID, "");
+					IMuleModel model = MuleCorePlugin.getDefault().getMuleModel(project);
 
-	/*
-	 * @see ILaunchConfigurationTab#performApply(ILaunchConfigurationWorkingCopy)
-	 */
-	public void performApply(ILaunchConfigurationWorkingCopy config) {
-		config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, fProjText.getText());
-		config.setAttribute(IMuleConfigLaunchConfigurationConstants.ATTR_CONFIG_FILE_NAME, fConfigText.getText());
-	}
-
-	/*
-	 * @see ILaunchConfigurationTab#dispose()
-	 */
-	public void dispose() {
-		super.dispose();
-		fMuleIcon.dispose();
-	}
-
-	/*
-	 * @see AbstractLaunchConfigurationTab#getImage()
-	 */
-	public Image getImage() {
-		return fMuleIcon;
-	}
-
-	void collect(IContainer inside, String suffix, List result) throws CoreException {
-		if (inside == null) return;
-		
-		IResource[] resources = inside.members();
-		for (int i=0; i<resources.length; ++i) {
-			if (resources[i] instanceof IContainer)
-				collect((IContainer)resources[i], suffix, result);
-			else if (resources[i] instanceof IFile) {
-				if (resources[i].getName().endsWith(suffix)) result.add(resources[i]);
-			}
-		}
-	}
-	
-	/**
-	 * Show a dialog that lists all main types
-	 */
-	protected IResource chooseConfigFile() {
-		Shell shell = getShell();
-		
-		IProject project = getProject();
-		if (project == null) {
-			MessageDialog.openError(shell, "Choose Mule Config File", "No project selected");
-			return null;
-		}
-		
-		ILabelProvider labelProvider= new WorkbenchLabelProvider() {
-			protected String decorateText(String input, Object element) {
-				if (element instanceof IFile) return input + " - " + ((IFile)element).getProjectRelativePath().toString();
-				return input;				
-			}
-		};
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), labelProvider);
-		
-		dialog.setTitle("Choose Mule Config File"); 
-		dialog.setMessage("Select the config file you wish to run or debug"); 
-		try {
-			List l = new ArrayList();
-			collect(project, MULE_CONFIG_FILE_SUFFIX, l);
-			if (l.size() < 1) {
-				MessageDialog.openError(shell, "Mule Config File", "No Mule config files in selected project");
-				return null;
-			}
-			
-			dialog.setElements(l.toArray());
-			if (dialog.open() == Window.OK) {
-				IFile file = (IFile) dialog.getFirstResult();
-				if (configBuilder.isCorrectXML(file)) {
-					fConfigText.setText(file.getProjectRelativePath().toString());
-				}
-			}			
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * Show a dialog that lists all main types
-	 */
-	protected void handleSearchButtonSelected() {
-		chooseConfigFile();
-	}
-
-	
-	/**
-	 * Show a dialog that lets the user select a project.  This in turn provides
-	 * context for the main type, allowing the user to key a main type name, or
-	 * constraining the search for main types to the specified project.
-	 */
-	protected void handleProjectButtonSelected() {
-		IProject project = chooseProject();
-		if (project == null) {
-			return;
-		}
-		
-		String projectName = project.getName();
-		fProjText.setText(projectName);		
-	}
-	
-	/*
-	 * Realize a Java Project selection dialog and return the first selected project,
-	 * or null if there was none.
-	 */
-	protected IProject chooseProject() {
-		IProject[] projects;
-		projects= getWorkspaceRoot().getProjects();
-		
-		ILabelProvider labelProvider = new WorkbenchLabelProvider();
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), labelProvider);
-		dialog.setTitle("Choose Project"); 
-		dialog.setMessage("Select the project containing the classes you wish to launch a Mule configuration for."); 
-		dialog.setElements(projects);
-		
-		IProject aProject = getProject();
-		if (aProject != null) {
-			dialog.setInitialSelections(new Object[] { aProject });
-		}
-		if (dialog.open() == Window.OK) {			
-			IProject project = (IProject) dialog.getFirstResult();
-			try {
-				if (! project.hasNature(MuleConfigNature.NATURE_ID)) {
-					if (MessageDialog.openQuestion(getShell(), "Choose project", 
-							"The selected project is not associated with Mule. Would you like to associate '" + project.getName() + "' with Mule?")) {
-						MuleCorePlugin.getDefault().setMuleNature(project, true);
+					// If a config set is chosen, select it.
+					if (configSetId.length() > 0) {
+						IMuleConfigSet configSet = model.getMuleConfigSet(configSetId);
+						if (configSet != null) {
+							updateSelectedConfigSet(configSet);
+							getConfigSetsTable().setSelection(new StructuredSelection(configSet));
+						}
+					}
+					// If no config set is chosen, select the first.
+					else {
+						Iterator it = model.getMuleConfigSets().iterator();
+						if (it.hasNext()) {
+							getConfigSetsTable().setSelection(new StructuredSelection(it.next()));
+						}
 					}
 				}
-			} catch (CoreException e) {
-				MessageDialog.openError(getShell(), "Set project nature", "Unable to set project nature: " + e.getLocalizedMessage());
 			}
-			return project;
+		} catch (CoreException e) {
+			MuleCorePlugin.getDefault().logException("Unable to initialize from launch config.", e);
 		}
-		return null;
 	}
-	
+
 	/*
-	 * Return the IProject corresponding to the project name in the project name
-	 * text field, or null if the text does not match a project name.
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#performApply(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
-	protected IProject getProject() {
-		String projectName = fProjText.getText().trim();
-		if (projectName.length() < 1) {
-			return null;
+	public void performApply(ILaunchConfigurationWorkingCopy config) {
+		// Save the project choice.
+		IProject project = getCurrentProject();
+		if (project == null) {
+			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
+		} else {
+			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project
+					.getName());
 		}
-		return getWorkspaceRoot().getProject(projectName);		
+
+		// Save the config set choice.
+		IMuleConfigSet configSet = getCurrentConfigSet();
+		if (configSet != null) {
+			config.setAttribute(IMuleConfigLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID,
+					configSet.getId());
+		} else {
+			config.setAttribute(IMuleConfigLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID,
+					(String) null);
+		}
 	}
-	
+
 	/*
-	 * Convenience method to get the workspace root.
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getImage()
 	 */
-	private IWorkspaceRoot getWorkspaceRoot() {
-		return ResourcesPlugin.getWorkspace().getRoot();
+	public Image getImage() {
+		return MulePlugin.getDefault().getImage(IMuleImages.KEY_MULE_LOGO);
 	}
-	
+
 	/*
-	 * @see ILaunchConfigurationTab#isValid(ILaunchConfiguration)
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public boolean isValid(ILaunchConfiguration config) {
 		return getErrorMessage() == null;
 	}
-	
+
+	/**
+	 * Validate that everything required for launching is present.
+	 */
 	private void validatePage() {
 		setErrorMessage(null);
 		setMessage(null);
-		
-		File muleRoot = MuleCorePlugin.getDefault().getMulePath();
-		if (muleRoot == null)  {
-			setErrorMessage("Mule is not set up (see Preferences...)");
-			return;
-		}
-		
-		String projectName = fProjText.getText().trim();
-		if (projectName.length() == 0) {
-			setErrorMessage("No project selected");
+
+		// Make sure there is at least one Mule project to choose from.
+		if (getProjectsTable().getTable().getItemCount() == 0) {
+			setErrorMessage("There are no Mule projects in the workspace.");
 			return;
 		}
 
-		IProject project = getWorkspaceRoot().getProject(projectName);
-		if (!project.exists()) {
-			setErrorMessage("Project does not exist"); 
+		// Make sure there is at least one Mule project to choose from.
+		if (getConfigSetsTable().getTable().getItemCount() == 0) {
+			setErrorMessage("The selected Mule project has no configuration sets defined.");
 			return;
-		}
-		
-		try {
-			if (!project.hasNature(MuleConfigNature.NATURE_ID)) {
- 				setErrorMessage("The selected project is not a Mule project"); 
-			}
-			
-			if (!project.hasNature(JavaCore.NATURE_ID)) {
- 				setMessage("The selected project is not a Java project"); 
-			}
-			
-			String configPath = fConfigText.getText().trim();
-			if (configPath.length() == 0) {
-				setErrorMessage("No Mule Configuration selected"); 
-				return;
-			}
-			IFile theFile = project.getFile(configPath);
-			if (! theFile.exists()) {
-				setErrorMessage("Mule Configuration does not exists"); 
-				return;
-			}
-		} catch (Exception e) {
 		}
 	}
 
 	/*
-	 * @see ILaunchConfigurationTab#setDefaults(ILaunchConfigurationWorkingCopy)
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#setDefaults(org.eclipse.debug.core.ILaunchConfigurationWorkingCopy)
 	 */
 	public void setDefaults(ILaunchConfigurationWorkingCopy config) {
-		IResource element = getContextFile();
-		if (element != null) {
-			initializeProject(element, config);
-		} else {
-			// We set empty attributes for project & main type so that when one config is
-			// compared to another, the existence of empty attributes doesn't cause an
-			// incorrect result (the performApply() method can result in empty values
-			// for these attributes being set on a config if there is nothing in the
-			// corresponding text boxes)
-			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, ""); //$NON-NLS-1$
-			config.setAttribute(IMuleConfigLaunchConfigurationConstants.ATTR_CONFIG_FILE_NAME, ""); //$NON-NLS-1$
-		}
-		initializeTestAttributes(getContextFlowFile(), config);
-	}
-	
-	/*
-	 * @see ILaunchConfigurationTab#getName()
-	 */
-	public String getName() {
-		return "Mule"; 
+		initializeProject(config);
 	}
 
-	protected void setButtonGridData(Button button) {
-		GridData gridData= new GridData();
-		button.setLayoutData(gridData);
-		SWTUtil.setButtonDimensionHint(button);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#getName()
+	 */
+	public String getName() {
+		return "Mule";
 	}
 
 	/**
-	 * Returns the current file resource from which to initialize
-	 * default settings, or <code>null</code> if none.
+	 * If a resource element is selected in the IDE, return the project associated with it.
 	 * 
-	 * @return File context.
+	 * @return the project or null if selection can not be determined
 	 */
-	protected IResource getContextFile() {
+	protected IProject getProjectForSelection() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window == null)
+		if (window == null) {
 			return null;
+		}
+
 		IWorkbenchPage page = window.getActivePage();
-				
-		if (page == null) return null;
+		if (page == null) {
+			return null;
+		}
+
+		// Get the selection fom the active page in the workbench.
 		ISelection selection = page.getSelection();
-		
-		IResource aFile = null;
 		if (selection instanceof IStructuredSelection) {
-			IStructuredSelection ss = (IStructuredSelection)selection;
+			IStructuredSelection ss = (IStructuredSelection) selection;
 			if (!ss.isEmpty()) {
 				Object obj = ss.getFirstElement();
 				if (obj instanceof IResource) {
-					aFile = (IResource)obj;
+					IResource aResource = (IResource) obj;
+					return aResource.getProject();
 				}
 			}
 		}
+
+		// Fall back to the input source of the active editor.
 		IEditorPart part = page.getActiveEditor();
 		if (part != null) {
 			IEditorInput input = part.getEditorInput();
-			aFile = (IResource)input.getAdapter(IResource.class);
+			IResource aResource = (IResource) input.getAdapter(IResource.class);
+			if (aResource != null) {
+				return aResource.getProject();
+			}
 		}
-		
-		return aFile;
+
+		return null;
 	}
 
 	/**
-	 * Returns the current file resource from which to initialize
-	 * default settings, or <code>null</code> if none.
-	 * 
-	 * @return File context.
+	 * Set the Java project attribute based on the current selection.
 	 */
-	protected IFile getContextFlowFile() {
-		IResource aRes = getContextFile();
-		if (aRes instanceof IFile) {
-			IFile aFile = (IFile)aRes;
-			if (configBuilder.isCorrectXML(aFile)) return aFile;
+	protected void initializeProject(ILaunchConfigurationWorkingCopy config) {
+		IProject project = getProjectForSelection();
+		if ((project != null) && (project.isAccessible())) {
+			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project
+					.getName());
 		}
-		return null;
 	}
-	
-	/**
-	 * Set the java project attribute based on the IJavaElement.
-	 */
-	protected void initializeProject(IResource element, ILaunchConfigurationWorkingCopy config) {
-		IProject project = element.getProject();
-		String name = null;
-		if (project != null && project.exists()) {
-			name = project.getName();
-		}
-		config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, name);
+
+	protected IMuleConfigSet getCurrentConfigSet() {
+		return currentConfigSet;
 	}
-	
-	private void initializeTestAttributes(IFile flowFile, ILaunchConfigurationWorkingCopy config) {
-		config.setAttribute(IMuleConfigLaunchConfigurationConstants.ATTR_CONFIG_FILE_NAME, flowFile != null ? flowFile.getProjectRelativePath().toString() : "");
-		initializeName(config, flowFile != null ? flowFile.getName() : null);
+
+	protected void setCurrentConfigSet(IMuleConfigSet currentConfigSet) {
+		this.currentConfigSet = currentConfigSet;
 	}
-	
-	private void initializeName(ILaunchConfigurationWorkingCopy config, String name) {
-		if (name == null) {
-			name= ""; //$NON-NLS-1$
-		}
-		if (name.length() > 0) {
-			int index = name.lastIndexOf('.');
-			if (index > 0) {
-				name = name.substring(0, index);
-			}
-			name= getLaunchConfigurationDialog().generateName(name);
-			config.rename(name);
-		}
+
+	protected IProject getCurrentProject() {
+		return currentProject;
+	}
+
+	protected void setCurrentProject(IProject currentProject) {
+		this.currentProject = currentProject;
+	}
+
+	protected void setProjectsTable(TableViewer projectsTable) {
+		this.projectsTable = projectsTable;
+	}
+
+	protected TableViewer getProjectsTable() {
+		return projectsTable;
+	}
+
+	protected void setConfigSetsTable(TableViewer configSetsTable) {
+		this.configSetsTable = configSetsTable;
+	}
+
+	protected TableViewer getConfigSetsTable() {
+		return configSetsTable;
 	}
 }

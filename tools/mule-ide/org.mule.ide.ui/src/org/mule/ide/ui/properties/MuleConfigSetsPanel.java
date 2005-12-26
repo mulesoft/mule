@@ -290,8 +290,8 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	 * Button for adding a config set was clicked.
 	 */
 	protected void addSetClicked() {
-		MuleConfigSetDialog dialog = new MuleConfigSetDialog(getMuleModel().getProject(),
-				getConfigSetsTable().getTable().getShell());
+		MuleConfigSetDialog dialog = new MuleConfigSetDialog(getConfigSetsTable().getTable()
+				.getShell());
 		if (dialog.open() == Window.OK) {
 			IMuleConfigSet configSet = getMuleModel().createNewMuleConfigSet(
 					dialog.getDescription());
@@ -306,8 +306,8 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 	 */
 	protected void editSetClicked() {
 		IMuleConfigSet configSet = getSelectedConfigSet();
-		MuleConfigSetDialog dialog = new MuleConfigSetDialog(getMuleModel().getProject(),
-				getConfigSetsTable().getTable().getShell());
+		MuleConfigSetDialog dialog = new MuleConfigSetDialog(getConfigSetsTable().getTable()
+				.getShell());
 		dialog.setDescription(configSet.getDescription());
 		if (dialog.open() == Window.OK) {
 			configSet.setDescription(dialog.getDescription());
@@ -335,9 +335,8 @@ public class MuleConfigSetsPanel implements IMulePropertyPanel {
 			IMuleConfiguration config = (IMuleConfiguration) it.next();
 			dupsRemoved.remove(config);
 		}
-		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
-				buttonConfigAdd.getShell(),
-				MuleModelLabelProvider.getDecoratingMuleModelLabelProvider());
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(buttonConfigAdd
+				.getShell(), MuleModelLabelProvider.getDecoratingMuleModelLabelProvider());
 		dialog.setTitle("Add Mule Config Files");
 		dialog.setMessage("Select the Mule configuration files to add");
 		dialog.setMultipleSelection(true);

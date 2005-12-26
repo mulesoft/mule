@@ -1,6 +1,5 @@
 package org.mule.ide.ui.dialogs;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -18,9 +17,6 @@ import org.eclipse.swt.widgets.Text;
  */
 public class MuleConfigSetDialog extends Dialog implements ModifyListener {
 
-	/** Parent project */
-	private IProject project;
-
 	/** Widget for description */
 	private Text textDescription;
 
@@ -32,9 +28,8 @@ public class MuleConfigSetDialog extends Dialog implements ModifyListener {
 	 * 
 	 * @param parent the parent shell
 	 */
-	public MuleConfigSetDialog(IProject project, Shell parent) {
+	public MuleConfigSetDialog(Shell parent) {
 		super(parent);
-		this.project = project;
 	}
 
 	/*

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -41,7 +42,8 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		projectPage = new MuleWizardProjectPage();
 		addPage(projectPage);
-		javaPage = new NewJavaProjectWizardPage(null, projectPage);
+		javaPage = new NewJavaProjectWizardPage(ResourcesPlugin.getWorkspace().getRoot(),
+				projectPage);
 		addPage(javaPage);
 	}
 
