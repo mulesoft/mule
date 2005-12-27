@@ -6,6 +6,7 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.mule.ide.core.MuleCorePlugin;
+import org.mule.ide.core.exception.MuleModelException;
 
 /**
  * Classpath container that includes libraries required by Mule.
@@ -35,8 +36,17 @@ public class MuleClasspathContainer implements IClasspathContainer {
 	 * 
 	 * @param project
 	 */
-	public void reloadEntries(IJavaProject project) {
-		entries = MuleCorePlugin.getDefault().getMuleLibraries();
+	public void reloadEntries(IJavaProject javaProject) {
+		try {
+			if (MuleCorePlugin.getDefault().isExternalLibMuleClasspath()) {
+				entries = MuleCorePlugin.getDefault().getExternalMuleLibraries(
+						javaProject.getProject());
+			} else {
+				entries = MuleCorePlugin.getDefault().getMulePluginLibraries();
+			}
+		} catch (MuleModelException e) {
+			entries = new IClasspathEntry[0];
+		}
 	}
 
 	/*
@@ -54,7 +64,11 @@ public class MuleClasspathContainer implements IClasspathContainer {
 	 * @see org.eclipse.jdt.core.IClasspathContainer#getDescription()
 	 */
 	public String getDescription() {
-		return CONTAINER_DESC;
+		if (MuleCorePlugin.getDefault().isExternalLibMuleClasspath()) {
+			return CONTAINER_DESC + " [External Classpath]";
+		} else {
+			return CONTAINER_DESC + " [Plugin Classpath]";
+		}
 	}
 
 	/*

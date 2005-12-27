@@ -21,10 +21,13 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -36,9 +39,10 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
+import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.core.nature.MuleConfigNature;
-import org.mule.ide.core.preferences.PreferenceConstants;
+import org.mule.ide.core.preferences.IPreferenceConstants;
 
 /**
  * @author Jesper
@@ -52,7 +56,10 @@ public class MuleCorePlugin extends Plugin {
 	public static final String PLUGIN_ID = "org.mule.ide.core";
 
 	/** Unique for the Mule classpath container */
-	public static final String ID_MULE_CLASSPATH_CONTAINER = PLUGIN_ID + ".MuleLibraries";
+	public static final String ID_MULE_CLASSPATH_CONTAINER = PLUGIN_ID + ".MULE_CONTAINER";
+
+	/** Eclipse variable that holds the Mule external root folder location */
+	public static final String ID_MULE_EXTERNAL_ROOT = "MULEROOT";
 
 	/** Problem marker id */
 	public static final String MARKER_TYPE = "org.mule.ide.core.xmlProblem";
@@ -70,14 +77,36 @@ public class MuleCorePlugin extends Plugin {
 	}
 
 	/**
+	 * Loads the external Mule root path from the preference value and sets a variable for it.
 	 * 
-	 * @return The path of base of Mule executables, or null
+	 * @throws MuleModelException if the Mule root can not be updated
 	 */
-	public File getMulePath() {
-		String path = getPluginPreferences().getString(PreferenceConstants.P_MULEPATH);
-		if (path.length() < 2)
-			return null;
-		return new File(path);
+	public void updateExternalMuleRootVariable() throws MuleModelException {
+		String rawPath = getPluginPreferences().getString(IPreferenceConstants.EXTERNAL_MULE_ROOT);
+		IPath rootPath = new Path(rawPath);
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IPathVariableManager varManager = workspace.getPathVariableManager();
+		if ((varManager.validateName(ID_MULE_EXTERNAL_ROOT).isOK())
+				&& (varManager.validateValue(rootPath).isOK())) {
+			try {
+				varManager.setValue(ID_MULE_EXTERNAL_ROOT, rootPath);
+			} catch (CoreException e) {
+				throw new MuleModelException(e.getStatus());
+			}
+		} else {
+			throw new MuleModelException(createErrorStatus("External Mule root is invalid.", null));
+		}
+	}
+
+	/**
+	 * Indicates whether the external Mule root location variable is set.
+	 * 
+	 * @return true if the variable is set, false if not.
+	 */
+	public boolean hasExternalMuleRootVariable() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IPathVariableManager varManager = workspace.getPathVariableManager();
+		return (varManager.getValue(ID_MULE_EXTERNAL_ROOT) != null);
 	}
 
 	/**
@@ -191,7 +220,7 @@ public class MuleCorePlugin extends Plugin {
 	 * 
 	 * @return the array of entries
 	 */
-	public IClasspathEntry[] getMuleLibraries() {
+	public IClasspathEntry[] getMulePluginLibraries() {
 		Enumeration urls = getBundle().findEntries("lib", "*.jar", false);
 		List classpath = new ArrayList();
 		while (urls.hasMoreElements()) {
@@ -206,6 +235,49 @@ public class MuleCorePlugin extends Plugin {
 			}
 		}
 		return (IClasspathEntry[]) classpath.toArray(new IClasspathEntry[classpath.size()]);
+	}
+
+	/**
+	 * Get the libraries located in an external Mule installation folder.
+	 * 
+	 * @param project the project that will contain the classpath entries
+	 * @return the classpath entries for libraries in the install folder
+	 * @throws MuleModelException if there is a problem accessing the external location
+	 */
+	public IClasspathEntry[] getExternalMuleLibraries(IProject project) throws MuleModelException {
+		// Make sure the external root folder is specified in preferences.
+		if (!hasExternalMuleRootVariable()) {
+			updateExternalMuleRootVariable();
+		}
+
+		// Load the Mule nature for the project.
+		MuleConfigNature nature = getMuleNature(project);
+		if (nature == null) {
+			throw new MuleModelException(createErrorStatus("Project does not have a Mule nature.",
+					null));
+		}
+
+		// Get the linked folder and create the classpath from its jars.
+		IFolder folder = nature.getExternalLibFolder();
+		if (!folder.exists()) {
+			throw new MuleModelException(MuleCorePlugin.getDefault().createErrorStatus(
+					"External Mule lib folder not found", null));
+		}
+		try {
+			List entries = new ArrayList();
+			IResource[] members = folder.members();
+			for (int i = 0; i < members.length; i++) {
+				if ((members[i].getType() == IResource.FILE)
+						&& ("jar".equals(members[i].getFileExtension()))) {
+					IClasspathEntry entry = JavaCore.newLibraryEntry(members[i].getRawLocation(),
+							null, null);
+					entries.add(entry);
+				}
+			}
+			return (IClasspathEntry[]) entries.toArray(new IClasspathEntry[entries.size()]);
+		} catch (CoreException e) {
+			throw new MuleModelException(e.getStatus());
+		}
 	}
 
 	/**
@@ -290,5 +362,25 @@ public class MuleCorePlugin extends Plugin {
 		} catch (CoreException e) {
 			logException(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * Indicates whether the default for Mule classpath is the core plugin libraries.
+	 * 
+	 * @return true if loaded from plugin, false if external
+	 */
+	public boolean isPluginLibMuleClasspath() {
+		String type = getPluginPreferences().getString(IPreferenceConstants.MULE_CLASSPATH_TYPE);
+		return IPreferenceConstants.MULE_CLASSPATH_TYPE_PLUGIN.equals(type);
+	}
+
+	/**
+	 * Indicates whether the default for Mule classpath is the external libraries.
+	 * 
+	 * @return true if loaded from external, false if from plugin
+	 */
+	public boolean isExternalLibMuleClasspath() {
+		String type = getPluginPreferences().getString(IPreferenceConstants.MULE_CLASSPATH_TYPE);
+		return IPreferenceConstants.MULE_CLASSPATH_TYPE_EXTERNAL.equals(type);
 	}
 }

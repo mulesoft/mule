@@ -81,7 +81,7 @@
          point="org.eclipse.jdt.core.classpathContainerInitializer">
       <classpathContainerInitializer
             class="org.mule.ide.internal.core.classpath.MuleClasspathContainerInitializer"
-            id="org.mule.ide.core.MuleLibraries"/>
+            id="org.mule.ide.core.MULE_CONTAINER"/>
    </extension> 
 
 </plugin>

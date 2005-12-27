@@ -17,17 +17,23 @@ package org.mule.ide.core.nature;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Collections;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.mule.ide.DocumentRoot;
@@ -36,6 +42,7 @@ import org.mule.ide.MuleIdeConfigType;
 import org.mule.ide.core.IMuleDefaults;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.builder.MuleConfigBuilder;
+import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.jobs.RefreshMuleConfigurationsJob;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.internal.core.model.MuleModel;
@@ -51,6 +58,9 @@ public class MuleConfigNature implements IProjectNature {
 
 	/** Error message for marker when config file can not be created */
 	private static final String ERROR_CREATING_CONFIG_FILE = "Could not create Mule IDE configuration file.";
+
+	/** Name for folder linked to the external Mule install */
+	public static final String EXTERNAL_LIBS_LINK_DIR = ".mulelibs";
 
 	/** ID of this project nature */
 	public static final String NATURE_ID = "org.mule.ide.core.muleConfigNature";
@@ -149,6 +159,50 @@ public class MuleConfigNature implements IProjectNature {
 				MuleCorePlugin.getDefault().logException(ERROR_CREATING_CONFIG_FILE, e);
 			}
 		}
+	}
+
+	/**
+	 * Checks for existence of the external Mule libraries link folder.
+	 * 
+	 * @return true if it exists, false if not
+	 */
+	public boolean hasExternalLibFolder() {
+		return getProject().getFolder(EXTERNAL_LIBS_LINK_DIR).exists();
+	}
+
+	/**
+	 * Removes the linked folder that maps to the external Mule install directory.
+	 * 
+	 * @throws MuleModelException
+	 */
+	public void removeExternalLibFolder() throws MuleModelException {
+		try {
+			getExternalLibFolder().delete(true, new NullProgressMonitor());
+		} catch (CoreException e) {
+			throw new MuleModelException(e.getStatus());
+		}
+	}
+
+	/**
+	 * Get the folder that links to the external Mule libraries.
+	 * 
+	 * @return the folder (handle only)
+	 */
+	public IFolder getExternalLibFolder() throws MuleModelException {
+		IFolder folder = getProject().getFolder(EXTERNAL_LIBS_LINK_DIR);
+		if (!folder.exists()) {
+			IPath location = new Path(MuleCorePlugin.ID_MULE_EXTERNAL_ROOT + File.separator + "lib");
+			IStatus status = ResourcesPlugin.getWorkspace().validateLinkLocation(folder, location);
+			if (!status.isOK()) {
+				throw new MuleModelException(status);
+			}
+			try {
+				folder.createLink(location, IResource.NONE, null);
+			} catch (CoreException e) {
+				throw new MuleModelException(e.getStatus());
+			}
+		}
+		return folder;
 	}
 
 	/*
