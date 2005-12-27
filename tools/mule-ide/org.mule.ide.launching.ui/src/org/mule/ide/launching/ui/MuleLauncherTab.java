@@ -258,7 +258,7 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 					IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, "");
 			if (projectName.length() > 0) {
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-				if (project != null) {
+				if ((project != null) && (project.isAccessible())) {
 					updateSelectedProject(project);
 					getProjectsTable().setSelection(new StructuredSelection(project));
 					String configSetId = config.getAttribute(
@@ -298,8 +298,8 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 		if (project == null) {
 			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
 		} else {
-			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project
-					.getName());
+			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
+					project.getName());
 		}
 
 		// Save the config set choice.
@@ -417,8 +417,8 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 	protected void initializeProject(ILaunchConfigurationWorkingCopy config) {
 		IProject project = getProjectForSelection();
 		if ((project != null) && (project.isAccessible())) {
-			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project
-					.getName());
+			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
+					project.getName());
 		}
 	}
 
