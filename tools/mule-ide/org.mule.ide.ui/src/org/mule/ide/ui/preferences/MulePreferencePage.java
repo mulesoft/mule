@@ -15,51 +15,80 @@
 
 package org.mule.ide.ui.preferences;
 
-import org.eclipse.jface.preference.*;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.jface.preference.DirectoryFieldEditor;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
-import org.mule.ide.core.preferences.PreferenceConstants;
+import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.mule.ide.core.MuleCorePlugin;
+import org.mule.ide.core.exception.MuleModelException;
+import org.mule.ide.core.preferences.IPreferenceConstants;
 import org.mule.ide.ui.MulePlugin;
 
 /**
- * This class represents a preference page that
- * is contributed to the Preferences dialog. By 
- * subclassing <samp>FieldEditorPreferencePage</samp>, we
- * can use the field support built into JFace that allows
- * us to create a page that is small and knows how to 
- * save, restore and apply itself.
- * <p>
- * This page is used to modify preferences only. They
- * are stored in the preference store that belongs to
- * the main plug-in class. That way, preferences can
- * be accessed directly via the preference store.
+ * Preference page for Mule setttings.
  */
+public class MulePreferencePage extends FieldEditorPreferencePage implements
+		IWorkbenchPreferencePage {
 
-public class MulePreferencePage
-	extends FieldEditorPreferencePage
-	implements IWorkbenchPreferencePage {
+	/** The radio button group for classpath type */
+	private RadioGroupFieldEditor classpathType;
+
+	/** Field editor for external Mule root directory */
+	private DirectoryFieldEditor externalMuleRoot;
+
+	/** The text widget in the directory field editor */
+	Text textExternalMuleRoot;
 
 	public MulePreferencePage() {
 		super(GRID);
 		setPreferenceStore(MulePlugin.getDefault().getPreferenceStore());
-		setDescription("Sets the preferences for Mule Universal Message Objects");
-	}
-	
-	/**
-	 * Creates the field editors. Field editors are abstractions of
-	 * the common GUI blocks needed to manipulate various types
-	 * of preferences. Each field editor knows how to save and
-	 * restore itself.
-	 */
-	public void createFieldEditors() {
-		addField(new DirectoryFieldEditor(PreferenceConstants.P_MULEPATH, 
-				"&Folder of Mule installation:", getFieldEditorParent()));
+		setDescription("Default settings for Mule UMO projects");
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Creates the field editors. Field editors are abstractions of the common GUI blocks needed to
+	 * manipulate various types of preferences. Each field editor knows how to save and restore
+	 * itself.
+	 */
+	public void createFieldEditors() {
+
+		classpathType = new RadioGroupFieldEditor(IPreferenceConstants.MULE_CLASSPATH_TYPE,
+				"Choose where Eclipse will look for Mule libraries:", 1, new String[][] {
+						{ "Mule plugin (jars included with Mini-Mule distribution)",
+								IPreferenceConstants.MULE_CLASSPATH_TYPE_PLUGIN },
+						{ "External location specified below",
+								IPreferenceConstants.MULE_CLASSPATH_TYPE_EXTERNAL } },
+				getFieldEditorParent(), true);
+		addField(classpathType);
+		externalMuleRoot = new DirectoryFieldEditor(IPreferenceConstants.EXTERNAL_MULE_ROOT,
+				"&Mule installation folder:", getFieldEditorParent());
+		addField(externalMuleRoot);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performOk()
+	 */
+	public boolean performOk() {
+		boolean ok = super.performOk();
+		if (ok) {
+			try {
+				MuleCorePlugin.getDefault().updateExternalMuleRootVariable();
+			} catch (MuleModelException e) {
+				MuleCorePlugin.getDefault().logException("Unable to set Mule root variable", e);
+			}
+		}
+		return ok;
+	}
 }
