@@ -46,6 +46,7 @@ import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.jobs.RefreshMuleConfigurationsJob;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.internal.core.model.MuleModel;
+import org.mule.ide.internal.core.model.MuleModelDeltaListener;
 import org.mule.ide.util.MuleIDEResourceFactoryImpl;
 
 public class MuleConfigNature implements IProjectNature {
@@ -133,6 +134,8 @@ public class MuleConfigNature implements IProjectNature {
 							status.getMessage());
 				}
 			}
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(
+					new MuleModelDeltaListener(muleModel));
 		}
 		return muleModel;
 	}
