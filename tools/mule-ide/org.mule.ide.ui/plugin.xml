@@ -34,6 +34,9 @@
             name="Mule UMO"
             objectClass="org.eclipse.core.resources.IProject">
          <keywordReference id="org.mule.ide.ui.keyword.mule"/>
+         <filter
+               name="projectNature"
+               value="org.mule.ide.core.muleConfigNature"/>
       </page>
    </extension>
    <extension
