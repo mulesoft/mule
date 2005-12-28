@@ -198,19 +198,19 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 	 * Updates the selected project if it really changed. Also updates the list of config sets from
 	 * the new project.
 	 * 
-	 * @param newProject the new project
+	 * @param selectedProject the selected project
 	 * @return true if the project changed, false if not
 	 */
-	protected boolean updateSelectedProject(IProject newProject) {
-		if ((getCurrentProject() == null) || (!getCurrentProject().equals(newProject))) {
-			if (newProject == null) {
+	protected boolean updateSelectedProject(IProject selectedProject) {
+		if (getCurrentProject() != selectedProject) {
+			if (selectedProject == null) {
 				getConfigSetsTable().setInput(null);
 			} else {
-				IMuleModel model = MuleCorePlugin.getDefault().getMuleModel(newProject);
+				IMuleModel model = MuleCorePlugin.getDefault().getMuleModel(selectedProject);
 				getConfigSetsTable().setInput(model.getMuleConfigSets());
 			}
 			setDirty(true);
-			setCurrentProject(newProject);
+			setCurrentProject(selectedProject);
 			return true;
 		}
 		return false;
@@ -232,14 +232,14 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 	/**
 	 * Updates the current config set if it really changed.
 	 * 
-	 * @param newConfigSet the new config set
+	 * @param selectedConfigSet the selected config set
 	 * @return true if the config set changed, false if not
 	 */
-	protected boolean updateSelectedConfigSet(IMuleConfigSet newConfigSet) {
-		if ((getCurrentConfigSet() == null) || (!getCurrentConfigSet().equals(newConfigSet))) {
+	protected boolean updateSelectedConfigSet(IMuleConfigSet selectedConfigSet) {
+		if ((getCurrentConfigSet() == null) || (getCurrentConfigSet() != selectedConfigSet)) {
 			setDirty(true);
 			updateLaunchConfigurationDialog();
-			setCurrentConfigSet(newConfigSet);
+			setCurrentConfigSet(selectedConfigSet);
 			return true;
 		}
 		return false;
