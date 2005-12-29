@@ -129,9 +129,7 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 
 			protected void doSelect(SelectionEvent e) {
 				IProject newProject = getSelectedProject();
-				if (updateSelectedProject(newProject)) {
-					validatePage();
-				}
+				updateSelectedProject(newProject);
 			}
 		});
 
@@ -162,9 +160,7 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 
 			protected void doSelect(SelectionEvent e) {
 				IMuleConfigSet configSet = getSelectedConfigSet();
-				if (updateSelectedConfigSet(configSet)) {
-					validatePage();
-				}
+				updateSelectedConfigSet(configSet);
 			}
 		});
 	}
@@ -201,8 +197,9 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 	 * @param selectedProject the selected project
 	 * @return true if the project changed, false if not
 	 */
-	protected boolean updateSelectedProject(IProject selectedProject) {
+	protected void updateSelectedProject(IProject selectedProject) {
 		if (getCurrentProject() != selectedProject) {
+			setCurrentProject(selectedProject);
 			if (selectedProject == null) {
 				getConfigSetsTable().setInput(null);
 			} else {
@@ -210,10 +207,8 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 				getConfigSetsTable().setInput(model.getMuleConfigSets());
 			}
 			setDirty(true);
-			setCurrentProject(selectedProject);
-			return true;
+			updateLaunchConfigurationDialog();
 		}
-		return false;
 	}
 
 	/**
@@ -233,16 +228,13 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 	 * Updates the current config set if it really changed.
 	 * 
 	 * @param selectedConfigSet the selected config set
-	 * @return true if the config set changed, false if not
 	 */
-	protected boolean updateSelectedConfigSet(IMuleConfigSet selectedConfigSet) {
+	protected void updateSelectedConfigSet(IMuleConfigSet selectedConfigSet) {
 		if ((getCurrentConfigSet() == null) || (getCurrentConfigSet() != selectedConfigSet)) {
+			setCurrentConfigSet(selectedConfigSet);
 			setDirty(true);
 			updateLaunchConfigurationDialog();
-			setCurrentConfigSet(selectedConfigSet);
-			return true;
 		}
-		return false;
 	}
 
 	/*
@@ -328,27 +320,33 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 	 * @see org.eclipse.debug.ui.ILaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public boolean isValid(ILaunchConfiguration config) {
-		return getErrorMessage() == null;
-	}
-
-	/**
-	 * Validate that everything required for launching is present.
-	 */
-	private void validatePage() {
 		setErrorMessage(null);
 		setMessage(null);
 
 		// Make sure there is at least one Mule project to choose from.
 		if (getProjectsTable().getTable().getItemCount() == 0) {
 			setErrorMessage("There are no Mule projects in the workspace.");
-			return;
+			return false;
 		}
 
 		// Make sure there is at least one Mule project to choose from.
 		if (getConfigSetsTable().getTable().getItemCount() == 0) {
 			setErrorMessage("The selected Mule project has no configuration sets defined.");
-			return;
+			return false;
 		}
+
+		// Make sure a project was selected.
+		if (getSelectedProject() == null) {
+			setErrorMessage("Select a Mule project that contains the configuration set to launch.");
+			return false;
+		}
+
+		// Make sure a config set was selected.
+		if (getSelectedConfigSet() == null) {
+			setErrorMessage("Select a configuration set to launch.");
+			return false;
+		}
+		return true;
 	}
 
 	/*
