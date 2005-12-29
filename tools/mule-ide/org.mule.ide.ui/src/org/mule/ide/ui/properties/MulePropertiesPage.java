@@ -19,6 +19,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.model.IMuleModel;
+import org.mule.ide.ui.MulePlugin;
 
 public class MulePropertiesPage extends PropertyPage {
 
@@ -128,9 +129,9 @@ public class MulePropertiesPage extends PropertyPage {
 			}
 		}
 		try {
-			getMuleModel().commitWorkingCopy(getWorkingCopy());
+			getWorkingCopy().save();
 		} catch (MuleModelException e) {
-			MuleCorePlugin.getDefault().logException("Error commiting model.", e);
+			MulePlugin.getDefault().showError("Unable to save Mule settings.", e.getStatus());
 		}
 		return true;
 	}
