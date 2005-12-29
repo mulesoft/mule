@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.mule.ide.DocumentRoot;
 import org.mule.ide.MuleIDEFactory;
@@ -43,7 +42,6 @@ import org.mule.ide.core.IMuleDefaults;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.builder.MuleConfigBuilder;
 import org.mule.ide.core.exception.MuleModelException;
-import org.mule.ide.core.jobs.RefreshMuleConfigurationsJob;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.internal.core.model.MuleModel;
 import org.mule.ide.internal.core.model.MuleModelDeltaListener;
@@ -119,14 +117,7 @@ public class MuleConfigNature implements IProjectNature {
 			muleModel = new MuleModel(getProject());
 			IStatus status = muleModel.refresh();
 
-			// If the model loaded, refresh the config files asynchronously.
-			if (status.isOK()) {
-				Job job = new RefreshMuleConfigurationsJob(muleModel, true);
-				job.setPriority(Job.SHORT);
-				job.schedule();
-			}
-			// Unable to load main config file. Add an error for the file.
-			else {
+			if (!status.isOK()) {
 				IFile file = getProject().getFile(IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
 				if (file.exists()) {
 					MuleCorePlugin.getDefault().clearMarkers(file);

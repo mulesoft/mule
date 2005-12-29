@@ -93,9 +93,9 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 			setStatus(MuleCorePlugin.getDefault().createErrorStatus(
 					ERROR_CONFIG_NOT_FOUND + relativePath, null));
 		} else {
+			Resource.Factory factory = new MuleResourceFactoryImpl();
+			Resource resource = factory.createResource(null);
 			try {
-				Resource.Factory factory = new MuleResourceFactoryImpl();
-				Resource resource = factory.createResource(null);
 				resource.load(configFile.getContents(), Collections.EMPTY_MAP);
 				EList contents = resource.getContents();
 				if (!contents.isEmpty()) {
@@ -104,8 +104,9 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 					this.configDocument = null;
 				}
 			} catch (Exception e) {
-				setStatus(MuleCorePlugin.getDefault().createErrorStatus(
-						ERROR_LOADING_CONFIG + relativePath, e));
+				MuleCorePlugin.getDefault().logException(e.getMessage(), e);
+			} finally {
+				MuleCorePlugin.getDefault().updateMarkersForEcoreResource(configFile, resource);
 			}
 		}
 		return getStatus();

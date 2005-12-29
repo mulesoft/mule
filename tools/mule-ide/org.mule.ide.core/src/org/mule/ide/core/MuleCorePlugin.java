@@ -37,9 +37,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 import org.mule.ide.core.exception.MuleModelException;
+import org.mule.ide.core.jobs.UpdateMarkersForEcoreResourceJob;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.core.nature.MuleConfigNature;
 import org.mule.ide.core.preferences.IPreferenceConstants;
@@ -342,10 +345,23 @@ public class MuleCorePlugin extends Plugin {
 	 * @param message the error message
 	 */
 	public void createMarker(IResource resource, int severity, String message) {
+		createMarker(resource, severity, message, null);
+	}
+
+	/**
+	 * Create a marker on the given resource
+	 * 
+	 * @param resource the resource
+	 * @param severity the severity constant
+	 * @param message the message
+	 * @param lineNumber the line number
+	 */
+	public void createMarker(IResource resource, int severity, String message, Integer lineNumber) {
 		try {
 			IMarker marker = resource.createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, severity);
+			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
 		} catch (CoreException e) {
 			logException(e.getMessage(), e);
 		}
@@ -358,10 +374,25 @@ public class MuleCorePlugin extends Plugin {
 	 */
 	public void clearMarkers(IResource resource) {
 		try {
-			resource.deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_ZERO);
+			resource.deleteMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
 			logException(e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * Gets the errors and warnings for the Ecore resource and adds them as markers for the given
+	 * Eclipse resource. Runs as a background job so that workspace locks do not prevent adding
+	 * markers.
+	 * 
+	 * @param eclipseResource the Eclipse resource
+	 * @param ecoreResource the Ecore resource wrapper
+	 */
+	public void updateMarkersForEcoreResource(IResource eclipseResource, Resource ecoreResource) {
+		UpdateMarkersForEcoreResourceJob job = new UpdateMarkersForEcoreResourceJob(
+				eclipseResource, ecoreResource);
+		job.setPriority(Job.SHORT);
+		job.schedule();
 	}
 
 	/**

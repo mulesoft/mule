@@ -33,12 +33,11 @@ public interface IMuleModel extends IMuleModelElement {
 	public IMuleModel createWorkingCopy() throws MuleModelException;
 
 	/**
-	 * Commit the changes in the working copy to the model.
+	 * Persist the model.
 	 * 
-	 * @param workingCopy the working copy that contains changes
-	 * @throws MuleModelException if the working copy could not be committed
+	 * @throws MuleModelException if the model could not be saved
 	 */
-	public void commitWorkingCopy(IMuleModel workingCopy) throws MuleModelException;
+	public void save() throws MuleModelException;
 
 	/**
 	 * Empties the list of Mule configuration files.

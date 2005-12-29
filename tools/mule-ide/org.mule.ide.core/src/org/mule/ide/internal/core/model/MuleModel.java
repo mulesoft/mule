@@ -15,14 +15,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.mule.ide.ConfigFileType;
@@ -33,6 +32,7 @@ import org.mule.ide.MuleIdeConfigType;
 import org.mule.ide.core.IMuleDefaults;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.exception.MuleModelException;
+import org.mule.ide.core.jobs.RefreshMuleConfigurationsJob;
 import org.mule.ide.core.model.IMuleConfigSet;
 import org.mule.ide.core.model.IMuleConfiguration;
 import org.mule.ide.core.model.IMuleModel;
@@ -88,30 +88,6 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 		saveTo(config);
 		model.loadFrom(config);
 		return model;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.ide.core.model.IMuleModel#commitWorkingCopy(org.mule.ide.core.model.IMuleModel)
-	 */
-	public void commitWorkingCopy(IMuleModel workingCopy) throws MuleModelException {
-		// Persist the working copy to the model.
-		MuleIdeConfigType config = MuleIDEFactory.eINSTANCE.createMuleIdeConfigType();
-		((MuleModel) workingCopy).saveTo(config);
-		MultiStatus result = loadFrom(config);
-
-		// Save the model to disk.
-		IStatus saveResult = save();
-		if (!saveResult.isOK()) {
-			result.add(saveResult);
-		}
-
-		// Update the markers and throw an exception if an error occurred.
-		updateTopLevelMarkers(result);
-		if (!result.isOK()) {
-			throw new MuleModelException(result);
-		}
 	}
 
 	/*
@@ -297,26 +273,6 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 		}
 	}
 
-	/**
-	 * Update the markers that are at the model level (associated with the project).
-	 * 
-	 * @param status the status
-	 */
-	protected void updateTopLevelMarkers(IStatus status) {
-		MuleCorePlugin.getDefault().clearMarkers(getProject());
-		if (status.isMultiStatus()) {
-			MultiStatus multi = (MultiStatus) status;
-			IStatus[] children = multi.getChildren();
-			for (int i = 0; i < children.length; i++) {
-				MuleCorePlugin.getDefault().createMarker(getProject(), IMarker.SEVERITY_ERROR,
-						children[i].getMessage());
-			}
-		} else {
-			MuleCorePlugin.getDefault().createMarker(getProject(), IMarker.SEVERITY_ERROR,
-					status.getMessage());
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -326,35 +282,38 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 		setStatus(Status.OK_STATUS);
 		IFile file = getProject().getFile(IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
 		if (file.exists()) {
+			Resource resource = (new MuleIDEResourceFactoryImpl()).createResource(null);
 			try {
-				Resource resource = (new MuleIDEResourceFactoryImpl()).createResource(null);
 				resource.load(file.getContents(), Collections.EMPTY_MAP);
 				if (!resource.getContents().isEmpty()) {
+					// Reload the Eclipse model from the EMF model.
 					DocumentRoot root = (DocumentRoot) resource.getContents().get(0);
 					MuleIdeConfigType config = root.getMuleIdeConfig();
-					if (config != null) {
-						setStatus(loadFrom(config));
-						updateTopLevelMarkers(getStatus());
-						return getStatus();
-					}
+					loadFrom(config);
+
+					// Create a background job for refreshing the config files.
+					Job job = new RefreshMuleConfigurationsJob(this, true);
+					job.setPriority(Job.SHORT);
+					job.schedule();
 				}
 			} catch (Exception e) {
-				MuleCorePlugin.getDefault().logException(ERROR_READING_CONFIG_FILE, e);
-				setStatus(MuleCorePlugin.getDefault().createErrorStatus(ERROR_READING_CONFIG_FILE,
-						e));
-				return getStatus();
+				MuleCorePlugin.getDefault().logException(e.getMessage(), e);
+			} finally {
+				MuleCorePlugin.getDefault().updateMarkersForEcoreResource(file, resource);
 			}
+		} else {
+			setStatus(MuleCorePlugin.getDefault().createErrorStatus(ERROR_READING_CONFIG_FILE, null));
 		}
-		setStatus(MuleCorePlugin.getDefault().createErrorStatus(ERROR_READING_CONFIG_FILE, null));
 		return getStatus();
 	}
 
-	/**
-	 * Commit the in-memory model to disk.
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return the result status
+	 * @see org.mule.ide.core.model.IMuleModel#save()
 	 */
-	protected IStatus save() {
+	public void save() throws MuleModelException {
+		IStatus status = Status.OK_STATUS;
 		IFile file = getProject().getFile(IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
 		try {
 			ByteArrayInputStream stream = new ByteArrayInputStream(getAsXML().getBytes());
@@ -364,11 +323,13 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 				file.create(stream, true, new NullProgressMonitor());
 			}
 		} catch (IOException e) {
-			return MuleCorePlugin.getDefault().createErrorStatus(e.getMessage(), e);
+			status = MuleCorePlugin.getDefault().createErrorStatus(e.getMessage(), e);
 		} catch (CoreException e) {
-			return e.getStatus();
+			status = e.getStatus();
 		}
-		return Status.OK_STATUS;
+		if (!status.isOK()) {
+			throw new MuleModelException(status);
+		}
 	}
 
 	/**
@@ -377,9 +338,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	 * @param emfModel the EMF model
 	 * @return a status indicator
 	 */
-	protected MultiStatus loadFrom(MuleIdeConfigType emfModel) {
-		MultiStatus multi = MuleCorePlugin.getDefault().createMultiStatus(ERROR_LOADING_CONFIGS);
-
+	protected void loadFrom(MuleIdeConfigType emfModel) {
 		// Convert the config files.
 		clearMuleConfigurations();
 		EList configFiles = emfModel.getConfigFile();
@@ -399,7 +358,6 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 			IMuleConfigSet modelConfigSet = MuleModelFactory.convert(this, configSet);
 			addMuleConfigSet(modelConfigSet);
 		}
-		return multi;
 	}
 
 	/**

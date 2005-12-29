@@ -55,7 +55,10 @@ public class MuleModelDeltaListener implements IResourceChangeListener, IResourc
 			switch (delta.getKind()) {
 			case IResourceDelta.CHANGED:
 				if (resource.getFullPath().equals(getConfigFilePath())) {
-					configFileChanged();
+					// Ignore marker changes.
+					if ((delta.getFlags() & IResourceDelta.MARKERS) == 0) {
+						configFileChanged();
+					}
 				}
 			}
 		}
