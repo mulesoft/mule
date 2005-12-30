@@ -3,7 +3,8 @@
       id="org.mule.ide"
       label="org.mule.ide"
       version="1.2.0"
-      provider-name="Mule UMO">
+      provider-name="Mule UMO"
+      plugin="org.mule.ide.core">
 
    <description url="http://mule.codehaus.org">
       Mule IDE
