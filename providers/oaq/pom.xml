@@ -23,19 +23,19 @@
             <groupId>oracle</groupId>
             <artifactId>ojdbc14</artifactId>
             <version>9i</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>oracle</groupId>
-            <artifactId>aqapi13</artifactId>
-            <version>9i</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>jmscommon</artifactId>
             <version>9i</version>
-            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>aqapi13</artifactId>
+            <version>9i</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- For XMLType support only -->
@@ -43,13 +43,13 @@
             <groupId>oracle</groupId>
             <artifactId>xdb</artifactId>
             <version>9i</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>oracle</groupId>
             <artifactId>xmlparserv2</artifactId>
             <version>9i</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

@@ -17,7 +17,7 @@
             <groupId>as400dq</groupId>
 			<artifactId>jt400</artifactId>
 			<version>1</version>
-			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
     </dependencies>
 </project>

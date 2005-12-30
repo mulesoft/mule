@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.codehaus.mule</groupId>
-		<artifactId>mule</artifactId>
+		<artifactId>mule-project</artifactId>
 		<relativePath>../pom.xml</relativePath>
 		<version>2.0-SNAPSHOT</version>
 	</parent>
@@ -28,6 +28,11 @@
 		</plugins>
 	</build>             
     <dependencies>
+		<!-- 
+		**************************************************************** 
+		Required Dependencies
+        ****************************************************************** 
+        -->
 		<dependency>
 			<groupId>backport-util-concurrent</groupId>
 			<artifactId>backport-util-concurrent</artifactId>
@@ -75,7 +80,6 @@
 			<groupId>commons-digester</groupId>
 			<artifactId>commons-digester</artifactId>
 			<version>1.5</version>
-			<optional/>
 		</dependency>
 		<!-- Optional: JXPath filtering of events -->
 		<dependency>
@@ -204,7 +208,20 @@
 			<artifactId>ognl</artifactId>
 			<version>2.6.7</version>
 		</dependency>
-        <!-- The following are needed at runtime for the org.mule.tck classes. -->
+		
+		<!-- 
+		**************************************************************** 
+		Optional Dependencies
+        ****************************************************************** 
+        TODO
+        -->
+
+		<!-- 
+		**************************************************************** 
+		Testing Dependencies
+        ****************************************************************** 
+        -->
+        <!-- These dependencies need scope="compile" for the org.mule.tck classes. -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

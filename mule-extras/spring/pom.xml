@@ -15,25 +15,22 @@
     <description>Provides extensions to use the Spring framework with Mule such as utilising the the spring container to build components managed by Mule.</description>   
     <dependencies>
         <dependency>
-            <groupId>org.codehaus.mule</groupId>
-            <artifactId>mule-extras-client</artifactId>
-            <version>${version}</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+            <version>1.2.6</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-            <version>1.2.5</version>
+            <artifactId>spring-hibernate</artifactId>
+            <version>1.2.6</version>
         </dependency>
+
+        <!-- For test cases only -->
         <dependency>
             <groupId>org.codehaus.mule</groupId>
-            <artifactId>mule-jdbc-provider</artifactId>
+            <artifactId>mule-extras-client</artifactId>
             <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-jms</artifactId>
-            <version>1.1-rc4</version>
-            <scope>provided</scope>
+	    	<scope>test</scope>
         </dependency>
     </dependencies>
 </project>

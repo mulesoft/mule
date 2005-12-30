@@ -5,7 +5,7 @@
 	<!-- Version -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.codehaus.mule</groupId>
-	<artifactId>mule</artifactId>
+	<artifactId>mule-project</artifactId>
 	<packaging>pom</packaging>
 	<version>2.0-SNAPSHOT</version>
 
@@ -95,7 +95,7 @@
 		</resources>
 		<testResources>
 			<testResource>
-				<directory>${testSourceDirectory}/conf</directory>
+				<directory>src/test/conf</directory>
 			</testResource>
 		</testResources>
 
@@ -119,12 +119,13 @@
 		<!--
 		<module>samples</module>
 		<module>tools</module>
-		<module>tests</module>
 		-->
 		<module>distributions</module>
+		<module>tests</module>
 	</modules>
 
 	<dependencies>
+		<!-- Testing Dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
