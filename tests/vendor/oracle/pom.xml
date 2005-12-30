@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.codehaus.mule.tests</groupId>
+		<artifactId>mule-tests-external-deps</artifactId>
+		<relativePath>../pom.xml</relativePath>
+		<version>2.0-SNAPSHOT</version>
+	</parent>
+    <artifactId>mule-tests-oracle</artifactId>
+	<packaging>jar</packaging>
+    <name>Oracle Integration Tests</name>
+    <description>Functional and integration tests for the Mule Oracle JMS provider.</description>
+
+	<dependencies>
+		<!-- The native AQ (i.e., non-JMS) API is only needed for administrative functions 
+		(creating/deleting queues, etc.) -->
+        <dependency>
+            <groupId>oracle</groupId>
+            <artifactId>aqapi13</artifactId>
+            <version>9i</version>
+            <scope>test</scope>
+        </dependency>
+	</dependencies>
+</project>
