@@ -69,7 +69,7 @@ goto end
 :end
 echo MULE_HOME=%MULE_HOME%
 
-if %MULE_HOME% == "" goto :noMuleHome
+if "%MULE_HOME%" == "" goto :noMuleHome
 goto checkJava
 
 :noMuleHome
