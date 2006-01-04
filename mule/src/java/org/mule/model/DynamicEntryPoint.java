@@ -96,7 +96,12 @@ public class DynamicEntryPoint implements UMOEntryPoint
                                                          true,
                                                          true,
                                                          false);
-        if (methods.size() == 1) {
+        if (methods.size() > 1) {
+            TooManySatisfiableMethodsException tmsmex = new TooManySatisfiableMethodsException(component.getClass());
+            throw new InvocationTargetException(
+                    tmsmex, "There must be only one method accepting " + context.getClass().getName() +
+                    " in component " + component.getClass().getName());
+        } else if (methods.size() == 1) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Dynamic Entrypoint using method: " + component.getClass().getName() + "."
                         + ((Method) methods.get(0)).getName() + "(" + context.getClass().getName() + ")");
@@ -109,6 +114,12 @@ public class DynamicEntryPoint implements UMOEntryPoint
                                                         true,
                                                         true,
                                                         true);
+            if (methods.size() > 1) {
+                TooManySatisfiableMethodsException tmsmex = new TooManySatisfiableMethodsException(component.getClass());
+                throw new InvocationTargetException(
+                        tmsmex, "There must be only one method accepting " + payload.getClass().getName() +
+                        " in component " + component.getClass().getName());
+            }
             if (methods.size() == 1) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Dynamic Entrypoint using method: " + component.getClass().getName() + "."
