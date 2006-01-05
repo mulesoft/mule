@@ -499,8 +499,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
             }
         }
 
-        if(transformer.isSourceTypeSupported(returnMessage.getPayload().getClass())) {
-            Object result = transformer.transform(returnMessage.getPayload());
+        Object returnPayload = returnMessage.getPayload();
+        if(transformer.isSourceTypeSupported(returnPayload.getClass())) {
+            Object result = transformer.transform(returnPayload);
             if(result instanceof UMOMessage) {
                 returnMessage = (UMOMessage)result;
             } else {
