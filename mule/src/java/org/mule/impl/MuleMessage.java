@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * <code>MuleMessage</code> is a wrapper that contains a payload payload and
+ * <code>MuleMessage</code> is a wrapper that contains a payload and
  * properties associated with the payload.
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -46,17 +46,17 @@ public class MuleMessage implements UMOMessage
 
     public MuleMessage(Object message)
     {
-        this(message, new HashMap());
+        this(message, null);
     }
 
-    public MuleMessage(Object message, Map props)
+    public MuleMessage(Object message, Map properties)
     {
         if (message instanceof UMOMessageAdapter) {
             adapter = (UMOMessageAdapter) message;
         } else {
             adapter = new DefaultMessageAdapter(message);
         }
-        addProperties(props);
+        addProperties(properties);
     }
 
     public MuleMessage(Object message, Map properties, UMOMessage previous) {
