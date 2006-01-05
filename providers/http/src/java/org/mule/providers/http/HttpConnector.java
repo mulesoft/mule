@@ -51,7 +51,6 @@ public class HttpConnector extends TcpConnector
     /**
      * Event property to pass back the status for the response
      */
-    public static final String DEFAULT_CONTENT_TYPE = "text/plain";
     public static final String HTTP_STATUS_PROPERTY = "http.status";
     public static final String HTTP_VERSION_PROPERTY = "http.version";
     public static final String HTTP_CUSTOM_HEADERS_MAP_PROPERTY = "http.custom.headers";
@@ -62,12 +61,9 @@ public class HttpConnector extends TcpConnector
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
     public static final String HTTP_POST_BODY_PARAM_PROPERTY = "http.post.body.param";
 
-    public static final int DEFAULT_PORT = 80;
-    public static String DEFAULT_HTTP_VERSION = HttpConstants.HTTP11;
-
     private String proxyHostname = null;
 
-    private int proxyPort = DEFAULT_PORT;
+    private int proxyPort = HttpConstants.DEFAULT_HTTP_PORT;
 
     private String proxyUsername = null;
 

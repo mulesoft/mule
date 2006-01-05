@@ -34,11 +34,14 @@ public class HttpConstants
     public static String HTTP10 = "HTTP/1.0";
     public static String HTTP1X = "HTTP/1.x";
     public static String HTTP11 = "HTTP/1.1";
+    public static String DEFAULT_HTTP_VERSION = HttpConstants.HTTP11;
+    
+    // Default HTTP port
+    public static final int DEFAULT_HTTP_PORT = 80;
 
+    // HTTP Methods
     public static final String METHOD_POST = "POST";
     public static final String METHOD_GET = "GET";
-
-    public static final String DEFAULT_CONTENT_TYPE = "text/xml";
 
     // Date header format
     public static final String DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss zzz";
@@ -47,6 +50,9 @@ public class HttpConstants
     public static String CRLF = "\r\n";
     // Mime/Content separator
     public static String HEADER_CONTENT_SEPARATOR = CRLF + CRLF;
+
+    // The default content type
+    public static final String DEFAULT_CONTENT_TYPE = "text/plain";
 
     // Headers
     public static final String HEADER_ACCEPT = "Accept";// [Request]

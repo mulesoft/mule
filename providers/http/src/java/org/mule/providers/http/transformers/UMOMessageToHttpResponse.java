@@ -71,7 +71,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         String version = context.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
         String date = format.format(new Date());
         byte[] response = null;
-        String contentType = context.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConnector.DEFAULT_CONTENT_TYPE);
+        String contentType = context.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE);
 
         if (src instanceof byte[]) {
             response = (byte[]) src;
