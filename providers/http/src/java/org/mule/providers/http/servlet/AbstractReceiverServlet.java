@@ -1,35 +1,22 @@
 /* 
-
  * $Header$
-
  * $Revision$
-
  * $Date$
-
  * ------------------------------------------------------------------------------------------------------
-
  * 
-
  * Copyright (c) SymphonySoft Limited. All rights reserved.
-
  * http://www.symphonysoft.com
-
  * 
-
  * The software in this package is published under the terms of the BSD
-
  * style license a copy of which has been included with this distribution in
-
  * the LICENSE.txt file. 
-
  *
-
  */
-
 package org.mule.providers.http.servlet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.providers.http.HttpConstants;
 import org.mule.umo.UMOMessage;
 
 import javax.servlet.ServletConfig;
@@ -64,7 +51,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     protected String payloadParameterName;
     protected long timeout = DEFAULT_GET_TIMEOUT;
     protected boolean feedback = true;
-    protected String defaultContentType = "text/plain";
+    protected String defaultContentType = HttpConstants.DEFAULT_CONTENT_TYPE;
 
     public final void init() throws ServletException
     {
