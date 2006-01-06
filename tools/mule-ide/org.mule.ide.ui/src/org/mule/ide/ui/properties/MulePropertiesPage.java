@@ -186,7 +186,11 @@ public class MulePropertiesPage extends PropertyPage {
 	 * @return the model
 	 */
 	protected IMuleModel getMuleModel() {
-		return MuleCorePlugin.getDefault().getMuleModel(getProject(getElement()));
+		try {
+			return MuleCorePlugin.getDefault().getMuleModel(getProject(getElement()));
+		} catch (MuleModelException e) {
+			return null;
+		}
 	}
 
 	/**

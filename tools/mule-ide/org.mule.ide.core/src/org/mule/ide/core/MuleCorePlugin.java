@@ -184,13 +184,20 @@ public class MuleCorePlugin extends Plugin {
 	 * 
 	 * @param project the project
 	 * @return the model, or null if nature not configured
+	 * @throws MuleModelException
 	 */
-	public IMuleModel getMuleModel(IProject project) {
+	public IMuleModel getMuleModel(IProject project) throws MuleModelException {
 		MuleConfigNature nature = getMuleNature(project);
 		if (nature != null) {
-			return nature.getMuleModel();
+			IMuleModel model = nature.getMuleModel();
+			if (model != null) {
+				return model;
+			}
+			throw new MuleModelException(createErrorStatus("Mule model is null for project: "
+					+ project.getName(), null));
 		}
-		return null;
+		throw new MuleModelException(createErrorStatus(
+				"Project does not have the Mule nature configured: " + project.getName(), null));
 	}
 
 	/**

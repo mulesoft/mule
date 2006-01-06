@@ -48,6 +48,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.mule.ide.core.MuleCorePlugin;
+import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.model.IMuleConfigSet;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.launching.IMuleConfigLaunchConfigurationConstants;
@@ -203,8 +204,12 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 			if (selectedProject == null) {
 				getConfigSetsTable().setInput(null);
 			} else {
-				IMuleModel model = MuleCorePlugin.getDefault().getMuleModel(selectedProject);
-				getConfigSetsTable().setInput(model.getMuleConfigSets());
+				try {
+					IMuleModel model = MuleCorePlugin.getDefault().getMuleModel(selectedProject);
+					getConfigSetsTable().setInput(model.getMuleConfigSets());
+				} catch (MuleModelException e) {
+					MuleCorePlugin.getDefault().getLog().log(e.getStatus());
+				}
 			}
 			setDirty(true);
 			updateLaunchConfigurationDialog();
@@ -290,8 +295,8 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 		if (project == null) {
 			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
 		} else {
-			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-					project.getName());
+			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project
+					.getName());
 		}
 
 		// Save the config set choice.
@@ -415,8 +420,8 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 	protected void initializeProject(ILaunchConfigurationWorkingCopy config) {
 		IProject project = getProjectForSelection();
 		if ((project != null) && (project.isAccessible())) {
-			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-					project.getName());
+			config.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project
+					.getName());
 		}
 	}
 

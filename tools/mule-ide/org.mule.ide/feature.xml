@@ -73,8 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
          id="org.mule.ide.core"
          download-size="0"
          install-size="0"
-         version="1.2.0"
-         unpack="false"/>
+         version="1.2.0"/>
 
    <plugin
          id="org.mule.ide.launching"
