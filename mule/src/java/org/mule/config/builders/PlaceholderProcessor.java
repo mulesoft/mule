@@ -108,6 +108,9 @@ public class PlaceholderProcessor
                     return null;
                 }
                 value = value.substring(0, x) +  realValue + value.substring(y+1);
+
+                // fix for a bug when realValue.length <= key.length
+                y = y - 3 + (realValue.length() - key.length());
             } else {
                 logger.info("Property for placeholder: '" + key + "' was not found.  Leaving place holder as is. This is not necessarily a problem as the placeholder may not be a Mule placeholder.");
             }
