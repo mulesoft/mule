@@ -55,9 +55,6 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	/** Error message for marker when config file can not be read */
 	private static final String ERROR_READING_CONFIG_FILE = "Could not read Mule IDE configuration file.";
 
-	/** Error message for marker when config file elements can not be loaded */
-	private static final String ERROR_LOADING_CONFIGS = "One or more configuration elements were not resolved.";
-
 	/**
 	 * Create a Mule IDE model for the given project.
 	 * 
@@ -302,7 +299,8 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 				MuleCorePlugin.getDefault().updateMarkersForEcoreResource(file, resource);
 			}
 		} else {
-			setStatus(MuleCorePlugin.getDefault().createErrorStatus(ERROR_READING_CONFIG_FILE, null));
+			setStatus(MuleCorePlugin.getDefault()
+					.createErrorStatus(ERROR_READING_CONFIG_FILE, null));
 		}
 		return getStatus();
 	}

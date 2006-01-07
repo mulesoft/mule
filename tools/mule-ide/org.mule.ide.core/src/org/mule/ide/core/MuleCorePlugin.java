@@ -403,6 +403,15 @@ public class MuleCorePlugin extends Plugin {
 	}
 
 	/**
+	 * Gets the preferences setting for the external Mule root folder.
+	 * 
+	 * @return the path or null if not set
+	 */
+	public String getExternalMuleRoot() {
+		return getPluginPreferences().getString(IPreferenceConstants.EXTERNAL_MULE_ROOT);
+	}
+
+	/**
 	 * Indicates whether the default for Mule classpath is the core plugin libraries.
 	 * 
 	 * @return true if loaded from plugin, false if external

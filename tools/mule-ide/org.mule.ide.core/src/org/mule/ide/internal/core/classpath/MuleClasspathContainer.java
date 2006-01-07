@@ -13,11 +13,11 @@ import org.mule.ide.core.exception.MuleModelException;
  */
 public class MuleClasspathContainer implements IClasspathContainer {
 
+	/** The path for the classpath container */
+	public static final IPath PATH = new Path(MuleCorePlugin.ID_MULE_CLASSPATH_CONTAINER);
+
 	/** The description shown for the container */
 	private static final String CONTAINER_DESC = "Mule Libraries";
-
-	/** The path for the classpath container */
-	private static final IPath PATH = new Path(MuleCorePlugin.ID_MULE_CLASSPATH_CONTAINER);
 
 	/** The array of classpath entries */
 	private IClasspathEntry[] entries;

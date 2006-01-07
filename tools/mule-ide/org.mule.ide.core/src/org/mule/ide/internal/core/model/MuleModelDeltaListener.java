@@ -10,7 +10,6 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.mule.ide.core.IMuleDefaults;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.model.IMuleModel;
@@ -57,7 +56,7 @@ public class MuleModelDeltaListener implements IResourceChangeListener, IResourc
 				if (resource.getFullPath().equals(getConfigFilePath())) {
 					// Ignore marker changes.
 					if ((delta.getFlags() & IResourceDelta.MARKERS) == 0) {
-						configFileChanged();
+						muleIdeConfigFileChanged();
 					}
 				}
 			}
@@ -67,10 +66,10 @@ public class MuleModelDeltaListener implements IResourceChangeListener, IResourc
 	}
 
 	/**
-	 * Called when the contents of the config file change.
+	 * Called when the contents of the Mule IDE config file changes (the .muleide file).
 	 */
-	protected void configFileChanged() {
-		IStatus status = getModel().refresh();
+	protected void muleIdeConfigFileChanged() {
+		getModel().refresh();
 	}
 
 	/**

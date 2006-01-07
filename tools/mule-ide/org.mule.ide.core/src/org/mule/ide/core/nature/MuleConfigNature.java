@@ -35,6 +35,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.jdt.core.ClasspathContainerInitializer;
+import org.eclipse.jdt.core.IClasspathContainer;
+import org.eclipse.jdt.core.JavaCore;
 import org.mule.ide.DocumentRoot;
 import org.mule.ide.MuleIDEFactory;
 import org.mule.ide.MuleIdeConfigType;
@@ -43,6 +46,7 @@ import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.builder.MuleConfigBuilder;
 import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.model.IMuleModel;
+import org.mule.ide.internal.core.classpath.MuleClasspathContainer;
 import org.mule.ide.internal.core.model.MuleModel;
 import org.mule.ide.internal.core.model.MuleModelDeltaListener;
 import org.mule.ide.util.MuleIDEResourceFactoryImpl;
@@ -197,6 +201,24 @@ public class MuleConfigNature implements IProjectNature {
 			}
 		}
 		return folder;
+	}
+
+	/**
+	 * Refresh the contents of the Mule classpath container.
+	 * 
+	 * @throws MuleModelException
+	 */
+	public void refreshMuleClasspathContainer() throws MuleModelException {
+		ClasspathContainerInitializer initializer = JavaCore
+				.getClasspathContainerInitializer(MuleCorePlugin.ID_MULE_CLASSPATH_CONTAINER);
+		if (initializer != null) {
+			try {
+				initializer.requestClasspathContainerUpdate(MuleClasspathContainer.PATH, JavaCore
+						.create(getProject()), (IClasspathContainer) null);
+			} catch (CoreException e) {
+				throw new MuleModelException(e.getStatus());
+			}
+		}
 	}
 
 	/*

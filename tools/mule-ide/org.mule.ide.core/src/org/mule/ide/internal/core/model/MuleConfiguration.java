@@ -46,9 +46,6 @@ public class MuleConfiguration extends MuleModelElement implements IMuleConfigur
 	/** Error indicating that a config file was not found */
 	private static final String ERROR_CONFIG_NOT_FOUND = "The Mule configuration file was not found: ";
 
-	/** Error indicating that a config file was not able to be loaded */
-	private static final String ERROR_LOADING_CONFIG = "Unable to load Mule configuration file: ";
-
 	/**
 	 * Create a new Mule configuration.
 	 * 
