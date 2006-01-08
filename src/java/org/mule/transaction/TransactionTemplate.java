@@ -82,7 +82,7 @@ public class TransactionTemplate
                 return result;
             } catch (Exception e) {
                 if (exceptionListener != null) {
-                    logger.info("Exception Caught in Transaction template.  Handing of to exception handler: "
+                    logger.info("Exception Caught in Transaction template.  Handing off to exception handler: "
                             + exceptionListener);
                     exceptionListener.exceptionThrown(e);
                 } else {
