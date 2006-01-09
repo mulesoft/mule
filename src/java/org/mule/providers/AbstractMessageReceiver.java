@@ -464,7 +464,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                 authorised=true;
             }
 
-            if(authorised) {
+            if (authorised) {
                 // the security filter may update the payload so we need to get the
                 // latest event again
                 muleEvent = RequestContext.getEvent();
@@ -477,6 +477,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                     resultMessage = component.getDescriptor().getInboundRouter().route(muleEvent);
                 }
             }
+            RequestContext.rewriteEvent(resultMessage);
             return applyResponseTransformer(resultMessage);
         }
     }
@@ -488,30 +489,43 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     protected UMOMessage applyResponseTransformer(UMOMessage returnMessage) throws TransformerException {
         UMOTransformer transformer = endpoint.getResponseTransformer();
-        if(transformer==null) transformer = component.getDescriptor().getResponseTransformer();
-        if(transformer==null) return returnMessage;
 
-        if((returnMessage==null)) {
-            if(transformer.isAcceptNull()) {
+        // no endpoint transformer, so check on component
+        if (transformer == null) {
+            transformer = component.getDescriptor().getResponseTransformer();
+        }
+
+        // still no transformer, so do nothing.
+        if (transformer == null) {
+            return returnMessage;
+        }
+
+        if (returnMessage == null) {
+            if (transformer.isAcceptNull()) {
                 returnMessage = new MuleMessage(new NullPayload(), RequestContext.getProperties());
-            } else {
+            }
+            else {
                 return null;
             }
         }
 
         Object returnPayload = returnMessage.getPayload();
-        if(transformer.isSourceTypeSupported(returnPayload.getClass())) {
+        if (transformer.isSourceTypeSupported(returnPayload.getClass())) {
             Object result = transformer.transform(returnPayload);
-            if(result instanceof UMOMessage) {
+            if (result instanceof UMOMessage) {
                 returnMessage = (UMOMessage)result;
-            } else {
+            }
+            else {
                 returnMessage = new MuleMessage(result, returnMessage.getProperties());
             }
-        } else {
-            if(logger.isDebugEnabled()) {
-                logger.debug("Response transformer: " + transformer + " doesn't support the result payload: " + returnMessage.getPayload().getClass());
+        }
+        else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Response transformer: " + transformer
+                        + " doesn't support the result payload: " + returnPayload.getClass());
             }
         }
         return returnMessage;
     }
+
 }
