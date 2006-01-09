@@ -26,7 +26,7 @@ import org.mule.umo.transformer.TransformerException;
  * 
  * Note that when part of a transform chain, the Message payload reflects the
  * pre-transform message state, unless there is no current event for this
- * thread, then the message will be a new MuleMessage with the src as it's
+ * thread, then the message will be a new MuleMessage with the src as its
  * payload. Transformers should always work on the src object not the message
  * payload.
  * 
