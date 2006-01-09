@@ -101,7 +101,7 @@ public class MuleEventContext implements UMOEventContext
     }
 
     /**
-     * Returns the message transformed into it's recognised or expected format.
+     * Returns the message transformed into its recognised or expected format.
      * The transformer used is the one configured on the endpoint through which
      * this event was received.
      *
