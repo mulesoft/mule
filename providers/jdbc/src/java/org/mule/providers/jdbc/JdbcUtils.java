@@ -33,9 +33,9 @@ import java.util.regex.Pattern;
 public abstract class JdbcUtils
 {
 
-	public static void close(Connection con) throws SQLException
+    public static void close(Connection con) throws SQLException
     {
-        if (con != null) {
+        if (con != null && !con.isClosed()) {
             con.close();
         }
     }
@@ -43,7 +43,7 @@ public abstract class JdbcUtils
     public static void commitAndClose(Connection con) throws SQLException
     {
         if (con != null) {
-            if (con.getAutoCommit() == false) {
+            if (!con.getAutoCommit()) {
                 con.commit();
             }
             con.close();
@@ -53,7 +53,7 @@ public abstract class JdbcUtils
     public static void rollbackAndClose(Connection con) throws SQLException
     {
         if (con != null) {
-            if (con.getAutoCommit() == false) {
+            if (!con.getAutoCommit()) {
                 con.rollback();
             }
             con.close();
@@ -63,7 +63,7 @@ public abstract class JdbcUtils
     /**
      * Parse the given statement filling the parameter list and return the ready
      * to use statement.
-     * 
+     *
      * @param stmt
      * @param params
      * @return
@@ -95,47 +95,47 @@ public abstract class JdbcUtils
             if ("NOW".equalsIgnoreCase(name)) {
                 value = new Timestamp(Calendar.getInstance().getTimeInMillis());
             } else if (root instanceof org.w3c.dom.Document) {
-		org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document) root;
-		org.dom4j.Document dom4jDoc = new DOMReader().read(x3cDoc);
-		try {
-		    Node node = dom4jDoc.selectSingleNode(name);
-		    if (node != null) {
-			value = node.getText();
-		    }
+                org.w3c.dom.Document x3cDoc = (org.w3c.dom.Document) root;
+                org.dom4j.Document dom4jDoc = new DOMReader().read(x3cDoc);
+                try {
+                    Node node = dom4jDoc.selectSingleNode(name);
+                    if (node != null) {
+                        value = node.getText();
+                    }
                 } catch (Exception ignored) {
-		    value = null;
-		}
+                    value = null;
+                }
             } else if (root instanceof org.dom4j.Document) {
-		org.dom4j.Document dom4jDoc = (org.dom4j.Document) root;
-		try {
-		    Node node = dom4jDoc.selectSingleNode(name);
-		    if (node != null) {
-			value = node.getText();
-		    }
+                org.dom4j.Document dom4jDoc = (org.dom4j.Document) root;
+                try {
+                    Node node = dom4jDoc.selectSingleNode(name);
+                    if (node != null) {
+                        value = node.getText();
+                    }
                 } catch (Exception ignored) {
-		    value = null;
-		} 
+                    value = null;
+                }
             } else if (root instanceof org.dom4j.Node) {
-		org.dom4j.Node dom4jNode = (org.dom4j.Node) root;
-		try {
-		    Node node = dom4jNode.selectSingleNode(name);
-		    if (node != null) {
-			value = node.getText();
-		    }
+                org.dom4j.Node dom4jNode = (org.dom4j.Node) root;
+                try {
+                    Node node = dom4jNode.selectSingleNode(name);
+                    if (node != null) {
+                        value = node.getText();
+                    }
                 } catch (Exception ignored) {
-		    value = null;
-		} 
+                    value = null;
+                }
             } else {
                 try {
                     value = BeanUtils.getProperty(root, name);
                 } catch (Exception ignored) {
-		    value = null;
+                    value = null;
                 }
             }
             if (value == null) {
                 value = uri.getParams().getProperty(name);
             }
-            if(name.equals("payload")) {
+            if (name.equals("payload")) {
                 value = root;
             }
 
