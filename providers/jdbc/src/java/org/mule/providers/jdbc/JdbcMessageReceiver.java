@@ -13,11 +13,6 @@
  */
 package org.mule.providers.jdbc;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapListHandler;
 import org.mule.impl.MuleMessage;
@@ -32,6 +27,11 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Guillaume Nodet
  * @version $Revision$
@@ -39,11 +39,11 @@ import org.mule.umo.provider.UMOMessageAdapter;
 public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 {
 
-    private JdbcConnector connector;
-    private String readStmt;
-    private String ackStmt;
-    private List readParams;
-    private List ackParams;
+    protected JdbcConnector connector;
+    protected String readStmt;
+    protected String ackStmt;
+    protected List readParams;
+    protected List ackParams;
 
     public JdbcMessageReceiver(UMOConnector connector,
                                UMOComponent component,
@@ -96,10 +96,16 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             UMOMessageAdapter msgAdapter = this.connector.getMessageAdapter(message);
             UMOMessage umoMessage = new MuleMessage(msgAdapter);
             routeMessage(umoMessage, tx, tx != null || endpoint.isSynchronous());
-        } finally {
-            if (tx == null) {
-                JdbcUtils.close(con);
+
+        } catch(Exception ex) {
+            if (tx != null) {
+                tx.setRollbackOnly();
             }
+
+            // rethrow
+            throw ex;
+        } finally {
+            JdbcUtils.close(con);
         }
     }
 
@@ -107,11 +113,12 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     {
         Connection con = null;
         try {
-        	try {
-        		con = this.connector.getConnection();
-        	} catch (SQLException e) {
-        		throw new ConnectException(e, this);
-        	}
+            try {
+                con = this.connector.getConnection();
+            } catch (SQLException e) {
+                throw new ConnectException(e, this);
+            }
+
             Object[] readParams = JdbcUtils.getParams(getEndpointURI(), this.readParams, null);
             Object results = new QueryRunner().query(con, this.readStmt, readParams, new MapListHandler());
             return (List) results;
