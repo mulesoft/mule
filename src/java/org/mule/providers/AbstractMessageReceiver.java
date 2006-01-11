@@ -477,7 +477,9 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                     resultMessage = component.getDescriptor().getInboundRouter().route(muleEvent);
                 }
             }
-            if(resultMessage!=null) RequestContext.rewriteEvent(resultMessage);
+            if (resultMessage != null) {
+                RequestContext.rewriteEvent(resultMessage);
+            }
             return applyResponseTransformer(resultMessage);
         }
     }
