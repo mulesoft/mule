@@ -13,15 +13,7 @@
  */
 package org.mule.providers.jdbc;
 
-import java.sql.Connection;
-import java.util.Hashtable;
-import java.util.Map;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractServiceEnabledConnector;
@@ -34,12 +26,25 @@ import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOMessageReceiver;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.Hashtable;
+import java.util.Map;
+
 /**
  * @author Guillaume Nodet
  * @version $Revision$
  */
 public class JdbcConnector extends AbstractServiceEnabledConnector
 {
+
+    /* Register the SQL Exception reader if this class gets loaded*/
+    static {
+        ExceptionHelper.registerExceptionReader(new SQLExceptionReader());
+    }
 
     private long pollingFrequency = 0;
     private DataSource dataSource;

@@ -132,9 +132,11 @@ public abstract class UMOException extends Exception
         String javadoc = ExceptionHelper.getJavaDocUrl(getClass());
         String doc = ExceptionHelper.getDocUrl(getClass());
         if (javadoc != null) {
+            //info.put(ClassHelper.getClassName(getClass()) + " JavaDoc", javadoc);
             info.put("JavaDoc", javadoc);
         }
         if (doc != null) {
+            //info.put(ClassHelper.getClassName(getClass()) + " Other Doc", doc);
             info.put("Other Doc", doc);
         }
     }
@@ -147,13 +149,15 @@ public abstract class UMOException extends Exception
         }
         StringBuffer buf = new StringBuffer(1024);
         buf.append(Utility.CRLF).append(StringMessageHelper.charString('*', 80)).append(Utility.CRLF);
-        buf.append("Message          : ").append(message).append(Utility.CRLF);
-        buf.append("Type             : ").append(getClass().getName()).append(Utility.CRLF);
-        buf.append("Code             : ").append(getExceptionCode() + getMessageCode()).append(Utility.CRLF);
+        buf.append("Message               : ").append(message).append(Utility.CRLF);
+        buf.append("Type                  : ").append(getClass().getName()).append(Utility.CRLF);
+        buf.append("Code                  : ").append(getExceptionCode() + getMessageCode()).append(Utility.CRLF);
         // buf.append("Msg Code : ").append(getMessageCode()).append(Utility.CRLF);
+
+        Map info = ExceptionHelper.getExceptionInfo(this);
         for (Iterator iterator = info.keySet().iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
-            int pad = 17 - s.length();
+            int pad = 22 - s.length();
             buf.append(s);
             if (pad > 0) {
                 buf.append(StringMessageHelper.charString(' ', pad));

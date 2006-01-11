@@ -17,6 +17,7 @@ package org.mule.providers.jms;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.notifications.ConnectionNotification;
@@ -62,6 +63,10 @@ import java.util.Map;
 
 public class JmsConnector extends AbstractServiceEnabledConnector implements ConnectionNotificationListener
 {
+    /* Register the Jms Exception reader if this class gets loaded*/
+    static {
+        ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
+    }
 
     private String connectionFactoryJndiName;
 
