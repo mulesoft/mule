@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Mule IDE UI Plugin
 Bundle-SymbolicName: org.mule.ide.ui; singleton:=true
-Bundle-Version: 1.2.0
+Bundle-Version: 1.2.1
 Bundle-ClassPath: mule-ui.jar
 Bundle-Activator: org.mule.ide.ui.MulePlugin
 Bundle-Vendor: Mule UMO

@@ -51,7 +51,7 @@ import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.model.IMuleConfigSet;
 import org.mule.ide.core.model.IMuleModel;
-import org.mule.ide.launching.IMuleConfigLaunchConfigurationConstants;
+import org.mule.ide.launching.IMuleLaunchConfigurationConstants;
 import org.mule.ide.ui.IMuleImages;
 import org.mule.ide.ui.MulePlugin;
 import org.mule.ide.ui.model.MuleModelLabelProvider;
@@ -259,7 +259,7 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 					updateSelectedProject(project);
 					getProjectsTable().setSelection(new StructuredSelection(project));
 					String configSetId = config.getAttribute(
-							IMuleConfigLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID, "");
+							IMuleLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID, "");
 					IMuleModel model = MuleCorePlugin.getDefault().getMuleModel(project);
 
 					// If a config set is chosen, select it.
@@ -302,10 +302,10 @@ public class MuleLauncherTab extends AbstractLaunchConfigurationTab {
 		// Save the config set choice.
 		IMuleConfigSet configSet = getCurrentConfigSet();
 		if (configSet != null) {
-			config.setAttribute(IMuleConfigLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID,
+			config.setAttribute(IMuleLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID,
 					configSet.getId());
 		} else {
-			config.setAttribute(IMuleConfigLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID,
+			config.setAttribute(IMuleLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID,
 					(String) null);
 		}
 	}

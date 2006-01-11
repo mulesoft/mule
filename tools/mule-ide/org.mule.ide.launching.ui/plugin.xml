@@ -17,7 +17,7 @@
      <extension
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
       <launchConfigurationTypeImage
-            configTypeID="org.mule.ide.launching.config"
+            configTypeID="org.mule.ide.launching.localMuleServer"
             icon="META-INF/icons/mule16.gif"
             id="org.mule.ide.launching.configTypeImage"/>
    </extension>
@@ -27,7 +27,7 @@
             class="org.mule.ide.launching.ui.ConfigFileTabGroup"
             helpContextId="org.mule.ide.launching.tab_group"
             id="org.mule.ide.launching.configTabGroup"
-            type="org.mule.ide.launching.config">
+            type="org.mule.ide.launching.localMuleServer">
          <launchMode
                perspective="org.eclipse.debug.ui.DebugPerspective"
                description="%MuleLaunchTabGroupDescription.debug"

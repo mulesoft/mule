@@ -23,7 +23,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.exception.MuleModelException;
-import org.mule.ide.core.nature.MuleConfigNature;
+import org.mule.ide.core.nature.MuleNature;
 import org.mule.ide.core.preferences.IPreferenceConstants;
 import org.mule.ide.ui.MulePlugin;
 
@@ -140,7 +140,7 @@ public class MulePreferencePage extends FieldEditorPreferencePage implements
 	protected void updateClasspathForMuleProjects() {
 		IProject[] projects = MuleCorePlugin.getDefault().getMuleProjects();
 		for (int i = 0; i < projects.length; i++) {
-			MuleConfigNature config = MuleCorePlugin.getDefault().getMuleNature(projects[i]);
+			MuleNature config = MuleCorePlugin.getDefault().getMuleNature(projects[i]);
 			try {
 				config.refreshMuleClasspathContainer();
 			} catch (MuleModelException e) {
