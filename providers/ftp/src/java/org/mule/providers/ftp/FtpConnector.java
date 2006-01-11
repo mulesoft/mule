@@ -3,13 +3,13 @@
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
- * 
+ *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
  * http://www.symphonysoft.com
- * 
+ *
  * The software in this package is published under the terms of the BSD
  * style license a copy of which has been included with this distribution in
- * the LICENSE.txt file. 
+ * the LICENSE.txt file.
  *
  */
 package org.mule.providers.ftp;
@@ -321,6 +321,13 @@ public class FtpConnector extends AbstractServiceEnabledConnector
 
     /**
      * Whether to test FTP connection on each take from pool.
+     * This takes care of a failed (or restarted) FTP server at the expense of
+     * an additional NOOP command packet being sent, but increases overall availability.
+     * <p/>
+     * Disable to gain slight performance gain or if you are absolutely sure of the
+     * FTP server availability.
+     * <p/>
+     * The default value is <code>true</code>
      */
     public void setValidateConnections(final boolean validateConnections)
     {
