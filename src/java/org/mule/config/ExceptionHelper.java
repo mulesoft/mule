@@ -25,7 +25,12 @@ import org.mule.util.Utility;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <code>ExceptionHelper</code> provides a number of helper functions that can
@@ -35,13 +40,12 @@ import java.util.*;
  * url for a given exception can be resolved using this class 3. Error code
  * mappings can be looked up by providing the the protocol to map to and the
  * Mule exception
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class ExceptionHelper
-{
+public class ExceptionHelper {
     /**
      * This is the property to set the error code to no the message it is the
      * property name the Transport provider uses set the set the error code on
@@ -71,20 +75,61 @@ public class ExceptionHelper
     private static boolean initialised = false;
 
     private static String J2SE_VERSION = "";
-    private static String J2EE_VERSION = "";
+
+    /** todo How do you get the j2ee version?? */
+    private static String J2EE_VERSION = "1.3ee";
+
+    /**
+     * A list of the exception readers to use for different types of exceptions
+     */
+    private static List exceptionReaders = new ArrayList();
+
+    /**
+     * The default ExceptionReader which will be used for most types of exceptions
+     */
+    private static ExceptionReader defaultExceptionReader = new DefaultExceptionReader();
 
     static {
         initialise();
     }
 
-    public static int getErrorCode(Class exception)
-    {
+    public static void initialise() {
+        try {
+            if (initialised) {
+                return;
+            }
+
+            registerExceptionReader(new UMOExceptionReader());
+            J2SE_VERSION = System.getProperty("java.specification.version");
+
+            InputStream is = SpiHelper.findServiceDescriptor("org/mule/config",
+                    "mule-exception-codes.properties",
+                    ExceptionHelper.class);
+            if (is == null) {
+                throw new NullPointerException("Failed to load resource: META_INF/services/org/mule/config/mule-exception-codes.properties");
+            }
+            errorCodes.load(is);
+            reverseErrorCodes = PropertiesHelper.reverseProperties(errorCodes);
+            is = SpiHelper.findServiceDescriptor("org/mule/config",
+                    "mule-exception-config.properties",
+                    ExceptionHelper.class);
+            if (is == null) {
+                throw new NullPointerException("Failed to load resource: META_INF/services/org/mule/config/mule-exception-config.properties");
+            }
+            errorDocs.load(is);
+
+            initialised = true;
+        } catch (IOException e) {
+            throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resources"), e);
+        }
+    }
+
+    public static int getErrorCode(Class exception) {
         String code = errorCodes.getProperty(exception.getName(), "-1");
         return Integer.parseInt(code);
     }
 
-    public static Class getErrorClass(int code)
-    {
+    public static Class getErrorClass(int code) {
         String key = String.valueOf(code);
         Object clazz = reverseErrorCodes.get(key);
         if (clazz == null) {
@@ -103,8 +148,7 @@ public class ExceptionHelper
         }
     }
 
-    public static String getErrorMapping(String protocol, int code)
-    {
+    public static String getErrorMapping(String protocol, int code) {
         Class c = getErrorClass(code);
         if (c != null) {
             return getErrorMapping(protocol, c);
@@ -114,8 +158,7 @@ public class ExceptionHelper
         }
     }
 
-    private static Properties getErrorMappings(String protocol)
-    {
+    private static Properties getErrorMappings(String protocol) {
         Object m = errorMappings.get(protocol);
         if (m != null) {
             if (m instanceof Properties) {
@@ -152,8 +195,7 @@ public class ExceptionHelper
         }
     }
 
-    public static String getErrorCodePropertyName(String protocol)
-    {
+    public static String getErrorCodePropertyName(String protocol) {
         protocol = protocol.toLowerCase();
         Properties mappings = getErrorMappings(protocol);
         if (mappings == null) {
@@ -162,8 +204,7 @@ public class ExceptionHelper
         return mappings.getProperty(ERROR_CODE_PROPERTY);
     }
 
-    public static String getErrorMapping(String protocol, Class exception)
-    {
+    public static String getErrorMapping(String protocol, Class exception) {
         protocol = protocol.toLowerCase();
         Properties mappings = getErrorMappings(protocol);
         if (mappings == null) {
@@ -187,61 +228,24 @@ public class ExceptionHelper
         return mappings.getProperty(code, code);
     }
 
-    public static void initialise()
-    {
-        try {
-            if (initialised) {
-                return;
-            }
-            J2SE_VERSION = System.getProperty("java.version");
-            int i = J2SE_VERSION.indexOf("_");
-            if (i > 0) {
-                J2SE_VERSION = J2SE_VERSION.substring(0, i);
-            }
 
-            InputStream is = SpiHelper.findServiceDescriptor("org/mule/config",
-                                                             "mule-exception-codes.properties",
-                                                             ExceptionHelper.class);
-            if (is == null) {
-                throw new NullPointerException("Failed to load resource: META_INF/services/org/mule/config/mule-exception-codes.properties");
-            }
-            errorCodes.load(is);
-            reverseErrorCodes = PropertiesHelper.reverseProperties(errorCodes);
-            is = SpiHelper.findServiceDescriptor("org/mule/config",
-                                                 "mule-exception-config.properties",
-                                                 ExceptionHelper.class);
-            if (is == null) {
-                throw new NullPointerException("Failed to load resource: META_INF/services/org/mule/config/mule-exception-config.properties");
-            }
-            errorDocs.load(is);
-
-            initialised = true;
-        } catch (IOException e) {
-            throw new MuleRuntimeException(Message.createStaticMessage("Failed to load Exception resources"), e);
-        }
-    }
-
-    public static String getJavaDocUrl(Class exception)
-    {
+    public static String getJavaDocUrl(Class exception) {
         return getDocUrl("javadoc.", exception.getName());
     }
 
-    public static String getDocUrl(Class exception)
-    {
+    public static String getDocUrl(Class exception) {
         return getDocUrl("doc.", exception.getName());
     }
 
-    private static String getDocUrl(String prefix, String packageName)
-    {
+    private static String getDocUrl(String prefix, String packageName) {
         String key = prefix;
-        if (packageName.startsWith("java.")) {
+        if (packageName.startsWith("java.") || packageName.startsWith("javax.")) {
             key += J2SE_VERSION;
-        } else if (packageName.startsWith("javax.")) {
-            key += J2EE_VERSION;
         }
         String url = getUrl(key, packageName);
-        if (url == null && packageName.startsWith("javax.")) {
-            url = getUrl(key, packageName.replaceFirst("javax", "java"));
+        if (url == null && (packageName.startsWith("java.") || packageName.startsWith("javax."))) {
+            key = prefix + J2EE_VERSION;
+            url = getUrl(key, packageName);
         }
         if (url != null) {
             if (!url.endsWith("/")) {
@@ -263,8 +267,7 @@ public class ExceptionHelper
         return url;
     }
 
-    private static String getUrl(String key, String packageName)
-    {
+    private static String getUrl(String key, String packageName) {
         String url = null;
         if (!key.endsWith(".")) {
             key += ".";
@@ -285,19 +288,17 @@ public class ExceptionHelper
         return url;
     }
 
-    public static Throwable getRootException(Throwable t)
-    {
+    public static Throwable getRootException(Throwable t) {
         Throwable cause = t;
         Throwable root = null;
         while (cause != null) {
             root = cause;
-            cause = cause.getCause();
+            cause = getExceptionReader(cause).getCause(cause);
         }
         return root;
     }
 
-    public static Throwable getRootParentException(Throwable t)
-    {
+    public static Throwable getRootParentException(Throwable t) {
         Throwable cause = t;
         Throwable parent = t;
         while (cause != null) {
@@ -305,34 +306,48 @@ public class ExceptionHelper
                 return parent;
             }
             parent = cause;
-            cause = cause.getCause();
+            cause = getExceptionReader(cause).getCause(cause);
         }
         return t;
     }
 
-    public static UMOException getRootMuleException(Throwable t)
-    {
+    public static UMOException getRootMuleException(Throwable t) {
         Throwable cause = t;
         UMOException umoException = null;
         while (cause != null) {
             if (cause instanceof UMOException) {
                 umoException = (UMOException) cause;
             }
-            cause = cause.getCause();
+            cause = getExceptionReader(cause).getCause(cause);
         }
         return umoException;
     }
 
-    public static String getExceptionStack(Throwable t)
-    {
-        StringBuffer buf = new StringBuffer();
-        // get exception stack
+    public static List getExceptionsAsList(Throwable t) {
         List exceptions = new ArrayList();
         Throwable cause = t;
         while (cause != null) {
             exceptions.add(0, cause);
-            cause = cause.getCause();
+            cause = getExceptionReader(cause).getCause(cause);
         }
+        return exceptions;
+    }
+
+    public static Map getExceptionInfo(Throwable t) {
+        Map info = new HashMap();
+        Throwable cause = t;
+        while (cause != null) {
+            info.putAll(getExceptionReader(cause).getInfo(cause));
+            cause = getExceptionReader(cause).getCause(cause);
+        }
+        return info;
+    }
+
+    public static String getExceptionStack(Throwable t) {
+        StringBuffer buf = new StringBuffer();
+        // get exception stack
+        List exceptions = getExceptionsAsList(t);
+
         int i = 1;
         for (Iterator iterator = exceptions.iterator(); iterator.hasNext(); i++) {
             if (i > exceptionThreshold && exceptionThreshold > 0) {
@@ -340,19 +355,45 @@ public class ExceptionHelper
                 break;
             }
             Throwable throwable = (Throwable) iterator.next();
-            buf.append(i).append(". ").append(throwable.getMessage()).append(" (");
+            ExceptionReader er = getExceptionReader(throwable);
+            buf.append(i).append(". ").append(er.getMessage(throwable)).append(" (");
             buf.append(throwable.getClass().getName()).append(")\n");
             if (verbose && throwable.getStackTrace().length > 0) {
                 StackTraceElement e = throwable.getStackTrace()[0];
                 buf.append("  ")
-                   .append(e.getClassName())
-                   .append(":")
-                   .append(e.getLineNumber())
-                   .append(" (")
-                   .append(getJavaDocUrl(throwable.getClass()))
-                   .append(")\n");
+                        .append(e.getClassName())
+                        .append(":")
+                        .append(e.getLineNumber())
+                        .append(" (")
+                        .append(getJavaDocUrl(throwable.getClass()))
+                        .append(")\n");
             }
         }
         return buf.toString();
+    }
+
+    /**
+     * Registers an exception reader with Mule
+     *
+     * @param reader the reader to register.
+     */
+    public static void registerExceptionReader(ExceptionReader reader) {
+        exceptionReaders.add(reader);
+    }
+
+    /**
+     * Gets an exception reader for the exception
+     *
+     * @param t the exception to get a reader for
+     * @return either a specific reader or an instance of DefaultExceptionReader.  This method never returns null;
+     */
+    public static ExceptionReader getExceptionReader(Throwable t) {
+        for (Iterator iterator = exceptionReaders.iterator(); iterator.hasNext();) {
+            ExceptionReader exceptionReader = (ExceptionReader) iterator.next();
+            if (exceptionReader.getExceptionType().isInstance(t)) {
+                return exceptionReader;
+            }
+        }
+        return defaultExceptionReader;
     }
 }
