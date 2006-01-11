@@ -17,10 +17,10 @@
      <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            delegate="org.mule.ide.launching.MuleConfigLaunchConfigurationDelegate"
-            id="org.mule.ide.launching.config"
+            delegate="org.mule.ide.launching.MuleLaunchConfigurationDelegate"
+            id="org.mule.ide.launching.localMuleServer"
             modes="run, debug"
-            name="Mule Configuration"
+            name="Local Mule Server"
             sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
             sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
          <fileExtension

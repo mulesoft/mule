@@ -26,7 +26,7 @@ import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.model.IMuleConfigSet;
 import org.mule.ide.core.model.IMuleModel;
 
-public class MuleConfigLaunchConfigurationDelegate extends JavaLaunchDelegate {
+public class MuleLaunchConfigurationDelegate extends JavaLaunchDelegate {
 
 	/*
 	 * (non-Javadoc)
@@ -37,7 +37,7 @@ public class MuleConfigLaunchConfigurationDelegate extends JavaLaunchDelegate {
 
 		// Load the attributes from the launch configuration.
 		String configSetId = configuration.getAttribute(
-				IMuleConfigLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID, (String) null);
+				IMuleLaunchConfigurationConstants.ATTR_MULE_CONFIG_SET_ID, (String) null);
 		String projectName = configuration.getAttribute(
 				IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, (String) null);
 		if ((configSetId == null) || (projectName == null)) {
@@ -66,7 +66,6 @@ public class MuleConfigLaunchConfigurationDelegate extends JavaLaunchDelegate {
 		// Build the argument string.
 		IPath[] paths = configSet.getConfigFilePaths();
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("-config ");
 		for (int i = 0; i < paths.length; i++) {
 			if (paths[i] != null) {
 				if (i > 0) {
@@ -75,6 +74,7 @@ public class MuleConfigLaunchConfigurationDelegate extends JavaLaunchDelegate {
 				buffer.append(paths[i].toString());
 			}
 		}
+		buffer.append(" 12345");
 		return buffer.toString();
 	}
 
@@ -84,8 +84,7 @@ public class MuleConfigLaunchConfigurationDelegate extends JavaLaunchDelegate {
 	 * @see org.eclipse.jdt.launching.AbstractJavaLaunchConfigurationDelegate#getMainTypeName(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
 	public String getMainTypeName(ILaunchConfiguration configuration) throws CoreException {
-		return configuration.getAttribute(
-				IMuleConfigLaunchConfigurationConstants.ATTR_MULE_EXEC_CLASS,
-				IMuleConfigLaunchConfigurationConstants.DEFAULT_MULE_EXEC_CLASS);
+		return configuration.getAttribute(IMuleLaunchConfigurationConstants.ATTR_MULE_EXEC_CLASS,
+				IMuleLaunchConfigurationConstants.DEFAULT_MULE_EXEC_CLASS);
 	}
 }

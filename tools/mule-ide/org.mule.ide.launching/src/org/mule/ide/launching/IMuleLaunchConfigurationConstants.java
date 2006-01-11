@@ -15,7 +15,10 @@
 
 package org.mule.ide.launching;
 
-public interface IMuleConfigLaunchConfigurationConstants {
+public interface IMuleLaunchConfigurationConstants {
+
+	/** Identifier for the Local Mule Server launch configuration type */
+	public static final String ID_MULE_SERVER = MuleLaunchPlugin.PLUGIN_ID + ".localMuleServer";
 
 	/** Attribute that holds the selected Mule project */
 	String ATTR_MULE_EXEC_CLASS = "org.mule.MuleExecClass";
@@ -24,5 +27,5 @@ public interface IMuleConfigLaunchConfigurationConstants {
 	String ATTR_MULE_CONFIG_SET_ID = "org.mule.MuleConfigSetId";
 
 	/** Default class to execute for a Mule launch */
-	String DEFAULT_MULE_EXEC_CLASS = "org.mule.MuleServer";
+	String DEFAULT_MULE_EXEC_CLASS = "org.mule.ide.core.server.MuleServerController";
 }
