@@ -54,7 +54,9 @@ public class RequestContext
     public static synchronized void setEvent(UMOEvent event)
     {
         events.set(event);
-        if(event!=null) props.set(event.getProperties());
+        if (event != null) {
+            props.set(event.getProperties());
+        }
     }
 
     public static void setProperty(String key, Object value)
@@ -74,19 +76,24 @@ public class RequestContext
 
     public static Object getProperty(String key)
     {
-        Map properties = (Map) props.get();
-        if (properties == null) {
-            return null;
+        Object property = null;
+        if (key != null) {
+            Map properties = (Map) props.get();
+            if (properties != null) {
+                property = properties.get(key);
+            }
         }
-        return properties.get(key);
+        return property;
     }
 
     public static void rewriteEvent(UMOMessage message)
     {
-        UMOEvent event = getEvent();
-        if (event != null) {
-            event = new MuleEvent(message, event);
-            setEvent(event);
+        if (message != null) {
+            UMOEvent event = getEvent();
+            if (event != null) {
+                event = new MuleEvent(message, event);
+                setEvent(event);
+            }
         }
     }
 
