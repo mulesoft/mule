@@ -6,3 +6,4 @@ bin
 .mule
 ActiveMQ
 mule-integration-tests.iml
+mule-tests-integration.iml
