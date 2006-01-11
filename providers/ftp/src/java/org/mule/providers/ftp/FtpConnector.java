@@ -61,6 +61,11 @@ public class FtpConnector extends AbstractServiceEnabledConnector
 
     private boolean passive = false;
 
+    /**
+     * Whether to test FTP connection on each take from pool.
+     */
+    private boolean validateConnections = true;
+
     private Map pools = new HashMap();
 
 
@@ -138,6 +143,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector
         ObjectPool pool = (ObjectPool) pools.get(key);
         if (pool == null) {
             pool = new GenericObjectPool(new FtpConnectionFactory(uri));
+            ((GenericObjectPool) pool).setTestOnBorrow(this.validateConnections);
             pools.put(key, pool);
         }
         return pool;
@@ -305,4 +311,19 @@ public class FtpConnector extends AbstractServiceEnabledConnector
         }
     }
 
+    /**
+     * Whether to test FTP connection on each take from pool.
+     */
+    public boolean isValidateConnections()
+    {
+        return validateConnections;
+    }
+
+    /**
+     * Whether to test FTP connection on each take from pool.
+     */
+    public void setValidateConnections(final boolean validateConnections)
+    {
+        this.validateConnections = validateConnections;
+    }
 }
