@@ -17,21 +17,6 @@
             <artifactId>mule-jbi-spec</artifactId>
             <version>${mule_jbi_spec_version}</version>
             <url>http://www.mulejbi.org</url>
-            <properties>
-            	<eclipse.dependency>true</eclipse.dependency>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>jaxrpc</groupId>
-            <artifactId>jaxrpc-qname-patch</artifactId>
-            <version>${jaxrpc_version}</version>
-            <properties>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>jaxrpc</groupId>
-            <artifactId>jaxrpc</artifactId>
-            <version>${jaxrpc_version}</version>
         </dependency>
     </dependencies>
 </project>
