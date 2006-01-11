@@ -14,7 +14,6 @@
  */
 package org.mule.ide.core;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.jobs.UpdateMarkersForEcoreResourceJob;
 import org.mule.ide.core.model.IMuleModel;
-import org.mule.ide.core.nature.MuleConfigNature;
+import org.mule.ide.core.nature.MuleNature;
 import org.mule.ide.core.preferences.IPreferenceConstants;
 
 /**
@@ -131,7 +130,7 @@ public class MuleCorePlugin extends Plugin {
 		String[] natures = description.getNatureIds();
 
 		for (int i = 0; i < natures.length; ++i) {
-			if (MuleConfigNature.NATURE_ID.equals(natures[i])) {
+			if (MuleNature.NATURE_ID.equals(natures[i])) {
 				if (setIt)
 					return; // outcome B - Already had the nature
 
@@ -150,7 +149,7 @@ public class MuleCorePlugin extends Plugin {
 		// Outcome A - add the nature
 		String[] newNatures = new String[natures.length + 1];
 		System.arraycopy(natures, 0, newNatures, 1, natures.length);
-		newNatures[0] = MuleConfigNature.NATURE_ID;
+		newNatures[0] = MuleNature.NATURE_ID;
 		description.setNatureIds(newNatures);
 		project.setDescription(description, null);
 	}
@@ -161,9 +160,9 @@ public class MuleCorePlugin extends Plugin {
 	 * @param project the project
 	 * @return the nature or null if nature not configured
 	 */
-	public MuleConfigNature getMuleNature(IProject project) {
+	public MuleNature getMuleNature(IProject project) {
 		try {
-			return (MuleConfigNature) project.getNature(MuleConfigNature.NATURE_ID);
+			return (MuleNature) project.getNature(MuleNature.NATURE_ID);
 		} catch (CoreException e) {
 			return null;
 		}
@@ -187,7 +186,7 @@ public class MuleCorePlugin extends Plugin {
 	 * @throws MuleModelException
 	 */
 	public IMuleModel getMuleModel(IProject project) throws MuleModelException {
-		MuleConfigNature nature = getMuleNature(project);
+		MuleNature nature = getMuleNature(project);
 		if (nature != null) {
 			IMuleModel model = nature.getMuleModel();
 			if (model != null) {
@@ -230,18 +229,51 @@ public class MuleCorePlugin extends Plugin {
 	 * 
 	 * @return the array of entries
 	 */
-	public IClasspathEntry[] getMulePluginLibraries() {
-		Enumeration urls = getBundle().findEntries("lib", "*.jar", false);
+	public IClasspathEntry[] getMulePluginLibraryEntries() {
+		Enumeration urls = getBundle().findEntries("/", "*.jar", false);
+		return convertUrlsToClasspathEntries(urls);
+	}
+
+	/**
+	 * Create a classpath entry for the mule core jar.
+	 * 
+	 * @return the entry, or null if not found
+	 */
+	public IClasspathEntry getMuleCoreLibraryEntry() {
+		Enumeration urls = getBundle().findEntries("/", "mule-core.jar", false);
+		IClasspathEntry[] entries = convertUrlsToClasspathEntries(urls);
+		if (entries.length > 0) {
+			return entries[0];
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Convert plugin URLs to classpath entries.
+	 * 
+	 * @param urls the URLs
+	 * @return the classpath entries
+	 */
+	protected IClasspathEntry[] convertUrlsToClasspathEntries(Enumeration urls) {
+		if (urls == null) {
+			return new IClasspathEntry[0];
+		}
 		List classpath = new ArrayList();
 		while (urls.hasMoreElements()) {
 			URL url = (URL) urls.nextElement();
 			try {
-				url = Platform.resolve(url);
-				IPath filePath = new Path(new File(url.getFile()).getAbsolutePath());
+				// url = Platform.resolve(url);
+				url = Platform.asLocalURL(url);
+				logInfo("URL after resolve: " + url.toString());
+				// IPath filePath = new Path(new File(url.getFile()).getAbsolutePath());
+				IPath filePath = new Path(url.getFile());
+				logInfo("URL after path conversion: " + filePath.toString());
 				IClasspathEntry entry = JavaCore.newLibraryEntry(filePath, null, null);
+				logInfo("URL as classpath entry: " + entry.toString());
 				classpath.add(entry);
 			} catch (IOException e) {
-				logException("Unable to add library to classpath.", e);
+				logException("Unable to access library.", e);
 			}
 		}
 		return (IClasspathEntry[]) classpath.toArray(new IClasspathEntry[classpath.size()]);
@@ -261,7 +293,7 @@ public class MuleCorePlugin extends Plugin {
 		}
 
 		// Load the Mule nature for the project.
-		MuleConfigNature nature = getMuleNature(project);
+		MuleNature nature = getMuleNature(project);
 		if (nature == null) {
 			throw new MuleModelException(createErrorStatus("Project does not have a Mule nature.",
 					null));
@@ -283,6 +315,12 @@ public class MuleCorePlugin extends Plugin {
 							null, null);
 					entries.add(entry);
 				}
+			}
+
+			// Add the core library to the classpath.
+			IClasspathEntry entry = getMuleCoreLibraryEntry();
+			if (entry != null) {
+				entries.add(entry);
 			}
 			return (IClasspathEntry[]) entries.toArray(new IClasspathEntry[entries.size()]);
 		} catch (CoreException e) {

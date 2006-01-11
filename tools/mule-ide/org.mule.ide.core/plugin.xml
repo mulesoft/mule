@@ -45,7 +45,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="org.mule.ide.core.nature.MuleConfigNature">
+               class="org.mule.ide.core.nature.MuleNature">
          </run>
       </runtime>
       <builder

@@ -51,7 +51,7 @@ import org.mule.ide.internal.core.model.MuleModel;
 import org.mule.ide.internal.core.model.MuleModelDeltaListener;
 import org.mule.ide.util.MuleIDEResourceFactoryImpl;
 
-public class MuleConfigNature implements IProjectNature {
+public class MuleNature implements IProjectNature {
 
 	/** The parent project */
 	private IProject project;

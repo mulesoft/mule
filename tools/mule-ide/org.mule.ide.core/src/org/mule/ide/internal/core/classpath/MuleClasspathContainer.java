@@ -42,7 +42,7 @@ public class MuleClasspathContainer implements IClasspathContainer {
 				entries = MuleCorePlugin.getDefault().getExternalMuleLibraries(
 						javaProject.getProject());
 			} else {
-				entries = MuleCorePlugin.getDefault().getMulePluginLibraries();
+				entries = MuleCorePlugin.getDefault().getMulePluginLibraryEntries();
 			}
 		} catch (MuleModelException e) {
 			entries = new IClasspathEntry[0];
