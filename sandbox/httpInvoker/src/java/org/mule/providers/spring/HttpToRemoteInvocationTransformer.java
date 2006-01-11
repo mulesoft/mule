@@ -35,8 +35,9 @@ public class HttpToRemoteInvocationTransformer extends AbstractTransformer
             if (logger.isDebugEnabled())
             {
                 logger.debug("request to execute " + ri.getMethodName());
-                for (Object a : ri.getArguments())
+                for (int i=0;i < ri.getArguments().length;i++)
                 {
+                    Object a = ri.getArguments()[i];
                     logger.debug("with argument (" + a.toString() + ")");
                 }
             }

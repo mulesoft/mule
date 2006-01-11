@@ -57,7 +57,7 @@ public class Client
     
     private void invokeSpringService()
     {
-        ComplexData cd = new ComplexData("Foo", 13);
+        ComplexData cd = new ComplexData("Foo", new Integer(13));
         HttpInvokerProxyFactoryBean invoker = new HttpInvokerProxyFactoryBean();
         invoker.setServiceInterface(WorkInterface.class);
         invoker.setServiceUrl(SPRING_ENDPOINT);

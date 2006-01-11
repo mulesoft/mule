@@ -1,18 +1,18 @@
 package org.mule.providers.spring;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
 import org.mule.impl.UMODescriptorAware;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.util.ClassHelper;
+import org.mule.util.Utility;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.remoting.support.RemoteInvocationResult;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 public class SpringHttpInvokerComponent implements UMODescriptorAware, Callable
 {
@@ -63,18 +63,17 @@ public class SpringHttpInvokerComponent implements UMODescriptorAware, Callable
     private void setPojo(Map properties) throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         // Instantiate a POJO named by serviceClass
-        String serviceClass = (String) properties.get("serviceClass");
-        properties.remove("serviceClass");
-        if(!StringUtils.isEmpty(serviceClass))
+        String serviceClass = (String) properties.remove("serviceClass");
+
+        if(serviceClass!=null && !serviceClass.equals(Utility.EMPTY_STRING))
         {
             Object service = ClassHelper.instanciateClass(serviceClass, null);
             delegate.setService(service);
         }
         // Alternative:
         // Locate a Spring bean named by serviceBean
-        String serviceBean = (String) properties.get("serviceBean");
-        properties.remove("serviceBean");
-        if(!StringUtils.isEmpty(serviceBean))
+        String serviceBean = (String) properties.remove("serviceBean");
+        if(serviceBean!=null && !serviceBean.equals(Utility.EMPTY_STRING))
         {
             // How do I find the Spring bean named by 'serviceBean'?
             Object service = null;
