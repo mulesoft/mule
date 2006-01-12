@@ -14,7 +14,6 @@
 package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -30,6 +29,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
 import org.mule.util.Utility;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -183,7 +183,11 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
 
     public void setEndpoints(List endpoints)
     {
-        this.endpoints = new CopyOnWriteArrayList(endpoints);
+        //this.endpoints = new CopyOnWriteArrayList(endpoints);
+        for (Iterator iterator = endpoints.iterator(); iterator.hasNext();) {
+            UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
+            addEndpoint(umoEndpoint);
+        }
     }
 
     public void addEndpoint(UMOEndpoint endpoint)

@@ -78,4 +78,6 @@ public class TemplateEndpointRouter extends FilteringOutboundRouter {
         }
         return result;
     }
+
+    
 }

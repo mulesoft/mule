@@ -157,4 +157,9 @@ public class TemplateParser
         return style;
     }
 
+    public boolean isContainsTemplate(String value) {
+        Matcher m = pattern.matcher(value);
+        return m.find();
+    }
+
 }

@@ -56,7 +56,7 @@ public class ChainingRouter extends FilteringOutboundRouter
             UMOMessage intermediaryResult = message;
 
             for (int i = 0; i < endpointsCount; i++) {
-                endpoint = (UMOEndpoint) endpoints.get(i);
+                endpoint = getEndpoint(i, intermediaryResult);
                 // if it's not the last endpoint in the chain,
                 // enforce the synchronous call, otherwise we lose response
                 boolean lastEndpointInChain = (i == endpointsCount - 1);

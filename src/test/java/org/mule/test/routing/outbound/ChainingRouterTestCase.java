@@ -16,6 +16,7 @@ package org.mule.test.routing.outbound;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.ChainingRouter;
@@ -26,7 +27,9 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -52,8 +55,8 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         assertNotNull(endpoint1);
 
-        UMOEndpoint endpoint2 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        assertNotNull(endpoint1);
+        UMOEndpoint endpoint2 = getTestEndpoint("Test2Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        assertNotNull(endpoint2);
 
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router.setFilter(filter);
@@ -74,6 +77,30 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
 
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(0)), message);
         session.expectAndReturn("sendEvent", C.eq(message, endpoints.get(1)), message);
+        final UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        assertNotNull("This is a sync call, we need a result returned.", result);
+        assertEquals(message, result);
+        session.verify();
+    }
+
+    public void testChainingOutboundRouterSynchronousWithTemplate() throws Exception
+    {
+        UMOEndpoint endpoint3 = getTestEndpoint("Test3Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        assertNotNull(endpoint3);
+        endpoint3.setEndpointURI(new MuleEndpointURI("test://foo?[barValue]"));
+        router.addEndpoint(endpoint3);
+
+        Map m = new HashMap();
+        m.put("barValue", "bar");
+        UMOMessage message = new MuleMessage("test event", m);
+        assertTrue(router.isMatch(message));
+
+        UMOEndpoint ep = router.getEndpoint(2, message);
+        assertEquals("test://foo?bar", ep.getEndpointURI().toString());
+
+        session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(0)), message);
+        session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(1)), message);
+        session.expectAndReturn("sendEvent", C.eq(message, router.getEndpoints().get(2)), message);
         final UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
         assertNotNull("This is a sync call, we need a result returned.", result);
         assertEquals(message, result);
