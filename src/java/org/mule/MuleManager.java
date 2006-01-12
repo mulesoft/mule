@@ -53,6 +53,8 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule
@@ -962,8 +964,17 @@ public class MuleManager implements UMOManager
         }
         message.add(" ");
         message.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(getStartDate()).toString()).getMessage());
+        String patch = System.getProperty("sun.os.patch.level", null);
         message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
-        message.add("OS: " + System.getProperty("os.name") + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
+        message.add("OS: " + System.getProperty("os.name") + (patch!=null ? " - " + patch : "") + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
+
+        try {
+            InetAddress host = InetAddress.getLocalHost();
+            message.add("Host: " + host.getCanonicalHostName() + " (" + host.getHostAddress() + ")");
+        } catch (UnknownHostException e) {}
+
+        message.add("ID: " + id);
+
         message.add(" ");
         if (agents.size() == 0) {
             message.add(new Message(Messages.AGENTS_RUNNING).getMessage() + " "
