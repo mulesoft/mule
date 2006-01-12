@@ -1069,11 +1069,17 @@ Is a fully qualified class name of the catch all strategy class
 <!ATTLIST router enableCorrelation           (ALWAYS | NEVER | IF_NOT_SET)           "IF_NOT_SET">
 
 <!--
+    transformer
+    This is the transformer chain to apply to the message before it is checked for a match.  This is useful
+    where you want to filter on a subset of the message and cannot query it using a filter.
+-->
+<!ATTLIST router transformer           IDREFS           #IMPLIED>
+
+<!--
     propertyExtractor
     Is a fully qualified classname of a class that implements org.mule.config.PropertyExtractor
     This object will be used to extract properties such as CorrelationId from the incoming message
 -->
-
 <!ATTLIST router propertyExtractor           NMTOKEN                                #IMPLIED>
 
 <!ELEMENT reply-to EMPTY>
