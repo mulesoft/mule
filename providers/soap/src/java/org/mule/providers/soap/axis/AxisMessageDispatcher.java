@@ -1,7 +1,5 @@
 /*
- * $Header:
-/home/projects/mule/scm/mule/providers/soap/src/java/org/mule/providers/soap/axis/AxisMessageDispatcher.java,v
-1.9 2005/06/09 21:15:40 gnt Exp $
+ * $Header$
  * $Revision$
  * $Date$
  * ------------------------------------------------------------------------------------------------------
@@ -14,6 +12,8 @@
  * the LICENSE.txt file.
  */
 package org.mule.providers.soap.axis;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.Handler;
@@ -54,10 +54,12 @@ import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.BeanUtils;
 import org.mule.util.TemplateParser;
+import org.mule.util.Utility;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPEnvelope;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -83,11 +85,12 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected SimpleProvider clientConfig;
 
     protected AxisConnector connector;
+
     public AxisMessageDispatcher(AxisConnector connector) {
         super(connector);
         this.connector = connector;
         AxisProperties.setProperty("axis.doAutoTypes", Boolean.toString(connector.isDoAutoTypes()));
-        services = new HashMap();
+        services = new ConcurrentHashMap();
         //Should be loading this from a WSDD but for some reason it is not working for me??
         createClientConfig();
     }
@@ -96,21 +99,19 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     {
     }
 
-    protected synchronized Service getService(UMOEvent event) throws Exception 
-    {
+    protected Service getService(UMOEvent event) throws Exception {
         String wsdlUrl = getWsdlUrl(event);
-        Service service = (Service) services.get(wsdlUrl);
-        if (service != null) {
-            services.put(wsdlUrl, service);
-        } else {
+        Service service = (Service)services.get(wsdlUrl);
+        if (service == null) {
             service = createService(event);
+            services.put(wsdlUrl, service);
         }
         return service;
     }
 
     protected void createClientConfig() {
-        //clientConfig = connector.getClientProvider();
-        clientConfig = new SimpleProvider(connector.getClientProvider());
+        // clientConfig = connector.getClientProvider();
+        clientConfig = new SimpleProvider();
         Handler muleHandler = new MuleSoapHeadersHandler();
         SimpleChain reqHandler = new SimpleChain();
         SimpleChain respHandler = new SimpleChain();
@@ -171,12 +172,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected String getWsdlUrl(UMOEvent event)
     {
-        Object wsdlUrlProp = event.getProperties().get(AxisConnector.WSDL_URL_PROPERTY);
-        String wsdlUrl = "";
-        if (wsdlUrlProp != null) {
-            wsdlUrl = wsdlUrlProp.toString();
-        }
-        return wsdlUrl;
+        return event.getStringProperty(AxisConnector.WSDL_URL_PROPERTY, Utility.EMPTY_STRING);
     }
 
     public void doDispatch(UMOEvent event) throws Exception
