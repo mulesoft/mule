@@ -13,3 +13,4 @@ workspace
 ActiveMQ
 xdocs
 mule-event.log
+mule.log
