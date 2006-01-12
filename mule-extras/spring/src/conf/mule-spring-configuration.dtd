@@ -1060,6 +1060,12 @@ Is a fully qualified class name of the catch all strategy class
 
 <!ATTLIST router className                   NMTOKEN           #REQUIRED>
 
+<!--
+    transformer
+    This is the transformer chain to apply to the message before it is checked for a match.  This is useful
+    where you want to filter on a subset of the message and cannot query it using a filter.
+-->
+<!ATTLIST router transformer           IDREFS           #IMPLIED>
 
 <!--
     enableCorrelation
