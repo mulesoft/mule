@@ -292,10 +292,14 @@ public class FtpConnector extends AbstractServiceEnabledConnector
         if (passiveString == null) {
             // try the connector properties then
             if (isPassive()) {
-                logger.debug("Entering FTP passive mode");
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Entering FTP passive mode");
+                }
                 client.enterLocalPassiveMode();
             } else {
-                logger.debug("Entering FTP active mode");
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Entering FTP active mode");
+                }
                 client.enterLocalActiveMode();
             }
         } else {
