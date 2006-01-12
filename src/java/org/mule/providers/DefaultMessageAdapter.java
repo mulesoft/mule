@@ -16,6 +16,8 @@ package org.mule.providers;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.UUID;
 
+import java.util.Map;
+
 /**
  * <code>DefaultMessageAdapter</code> can be used to wrap an arbitary object
  * where no special 'apapting' is needed. The adpapter allows for a set of
@@ -27,9 +29,18 @@ import org.mule.util.UUID;
 
 public class DefaultMessageAdapter extends AbstractMessageAdapter
 {
+    /** The message object wrapped by this adapter */
     private Object message;
+
+    /** A generated UUID for this message */
     private String id = null;
 
+    /**
+     * Creates a default message adapter with properties and attachments
+     * @param message the message to wrap. If this is null and NullPayload object will be used
+     *
+     * @see NullPayload
+     */
     public DefaultMessageAdapter(Object message)
     {
         id = new UUID().getUUID();
@@ -38,6 +49,22 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
         } else {
             this.message = message;
         }
+    }
+
+    /**
+     * Creates a default message adapter with properties and attachments
+     * @param message the message to wrap. If this is null and NullPayload object will be used
+     * @param properties a map properties to set on the adapter. Can be null.
+     * @param attachments a map attaches (DataHandler objects) to set on the adapter. Can be null.
+     *
+     * @see NullPayload
+     * @see javax.activation.DataHandler
+     */
+    public DefaultMessageAdapter(Object message, Map properties, Map attachments)
+    {
+        this(message);
+        if(properties!=null) this.properties.putAll(properties);
+        if(attachments!=null) this.attachments.putAll(attachments);
     }
 
     /**
