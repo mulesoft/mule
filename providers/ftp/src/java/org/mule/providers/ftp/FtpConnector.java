@@ -302,10 +302,14 @@ public class FtpConnector extends AbstractServiceEnabledConnector
             // override with endpoint's definition
             final boolean passiveMode = Boolean.valueOf(passiveString).booleanValue();
             if (passiveMode) {
-                logger.debug("Entering FTP passive mode (endpoint override)");
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Entering FTP passive mode (endpoint override)");
+                }
                 client.enterLocalPassiveMode();
             } else {
-                logger.debug("Entering FTP active mode (endpoint override)");
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Entering FTP active mode (endpoint override)");
+                }
                 client.enterLocalActiveMode();
             }
         }
