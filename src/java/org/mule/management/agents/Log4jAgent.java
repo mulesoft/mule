@@ -71,7 +71,7 @@ public class Log4jAgent implements UMOAgent
      */
     public String getDescription()
     {
-        return "Log4j agent";
+        return "Log4j JMX Agent";
     }
 
     /*
