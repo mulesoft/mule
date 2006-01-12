@@ -19,12 +19,14 @@ import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageDispatcher;
+import org.mule.providers.DefaultMessageAdapter;
 import org.mule.providers.file.filters.FilenameWildcardFilter;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 
 import java.io.File;
@@ -210,12 +212,13 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         return connector;
     }
 
-    private String generateFilename(UMOEvent event, String pattern)
-    {
+    private String generateFilename(UMOEvent event, String pattern) throws TransformerException {
         if (pattern == null) {
             pattern = connector.getOutputPattern();
         }
-        return connector.getFilenameParser().getFilename(event.getMessage(), pattern);
+        //Wrap the transformed message in an Adapter before passing it to the filename parser
+        DefaultMessageAdapter message = new DefaultMessageAdapter(event.getTransformedMessage(), event.getProperties(), null);
+        return connector.getFilenameParser().getFilename(message, pattern);
     }
 
     public void doDispose()

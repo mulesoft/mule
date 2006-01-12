@@ -24,5 +24,5 @@ import org.mule.umo.provider.UMOMessageAdapter;
  */
 public interface FilenameParser
 {
-    public String getFilename(UMOMessageAdapter adaptor, String pattern);
+    public String getFilename(UMOMessageAdapter adapter, String pattern);
 }

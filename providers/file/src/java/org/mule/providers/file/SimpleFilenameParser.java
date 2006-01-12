@@ -44,19 +44,19 @@ public class SimpleFilenameParser implements FilenameParser
 
     private long count = 1;
 
-    public String getFilename(UMOMessageAdapter adaptor, String pattern)
+    public String getFilename(UMOMessageAdapter adapter, String pattern)
     {
         String result = null;
         if (pattern != null && pattern.indexOf('{') > -1) {
-            result = getFilename(adaptor, pattern, '{', '}');
+            result = getFilename(adapter, pattern, '{', '}');
         } else {
-            result = getFilename(adaptor, pattern, '[', ']');
+            result = getFilename(adapter, pattern, '[', ']');
         }
 
         return result;
     }
 
-    protected String getFilename(UMOMessageAdapter adaptor, String pattern, char left, char right)
+    protected String getFilename(UMOMessageAdapter adapter, String pattern, char left, char right)
     {
         String filename = pattern;
         if (pattern == null) {
@@ -92,8 +92,8 @@ public class SimpleFilenameParser implements FilenameParser
                 filename = filename.replaceAll("\\$\\" + left + "COUNT\\" + right, String.valueOf(getCount()));
             }
             index = pattern.indexOf("$" + left + "ORIGINALNAME" + right);
-            if (index > -1 && adaptor != null) {
-                String name = (String) adaptor.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
+            if (index > -1 && adapter != null) {
+                String name = (String) adapter.getProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
                 if (name != null) {
                     filename = filename.replaceAll("\\$\\" + left + "ORIGINALNAME\\" + right, name);
                 }
