@@ -13,8 +13,6 @@
  */
 package org.mule.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.impl.message.ExceptionPayload;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.management.stats.ComponentStatistics;
@@ -35,11 +33,6 @@ import org.mule.umo.endpoint.UMOEndpoint;
  */
 public class DefaultComponentExceptionStrategy extends DefaultExceptionStrategy
 {
-    /**
-     * logger used by this class
-     */
-    protected static transient Log logger = LogFactory.getLog(DefaultComponentExceptionStrategy.class);
-
     /**
      * The component to which the Exception handler belongs
      */
