@@ -66,7 +66,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
 
     protected UMOEndpointURI getOutDest()
     {
-        return getInDest();
+        return null;
     }
 	
     protected UMOConnector createConnector() throws Exception
