@@ -15,39 +15,49 @@ package org.mule.test.routing.outbound;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
-import org.mule.components.simple.EchoComponent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.outbound.ExceptionBasedRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
+import org.mule.umo.routing.RoutingException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
+ * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
+ *
  * @version $Revision$
  */
 
 public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 {
+
+    /**
+     * Multiple endpoints, no failures.
+     * Event dispatched asynchronously, but forced into sync mode.
+     * Test case ends here.
+     */
     public void testSuccessfulExceptionRouter() throws Exception
     {
         Mock session = getMockSession();
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
-        UMOEndpoint endpoint1 = new MuleEndpoint("test://AlwaysFail", false);
-        UMOEndpoint endpoint2 = new MuleEndpoint("test://AlwaysFail", false);
+        UMOEndpoint endpoint1 = new MuleEndpoint("test://Dummy1", false);
+        UMOEndpoint endpoint2 = new MuleEndpoint("test://Dummy2", false);
 
-        UMOEndpoint endpoint3 = new MuleEndpoint("test://Dummy", false);
+        UMOEndpoint endpoint3 = new MuleEndpoint("test://Dummy3", false);
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
         RegExFilter filter = new RegExFilter("(.*) event");
@@ -64,24 +74,28 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
 
-        //Only one dispatch should be called as the others should fail
-        session.expect("dispatchEvent", C.eq(message, endpoint1));
-        router.route(message, (UMOSession) session.proxy(), false);
+        session.expect("sendEvent", C.eq(message, endpoint1));
+        UMOMessage result = router.route(message, (UMOSession) session.proxy(), false);
+        assertNull("Async call should've returned null.", result);
         session.verify();
 
         message = new MuleMessage("test event");
 
-        //Only one send should be called as the others should fail
+        // only one send should be called and succeed, the others should not be called
         session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
+        result = router.route(message, (UMOSession) session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
     }
 
-    public void testFailingRouterRouter() throws Exception
+    /**
+     * Both endpoints fail during dispatch.
+     * The first endpoint should be forced into sync mode.
+     */
+    public void testBothFailing() throws Exception
     {
-        UMOSession session = getTestSession(getTestComponent(getTestDescriptor("test", EchoComponent.class.getName())));
+        Mock mockSession = getMockSession();
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 
@@ -102,59 +116,95 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
 
-        try {
-            router.route(message, session, false);
-            fail("Should have thrown exception as both endpoints would have failed");
-        } catch (CouldNotRouteOutboundMessageException e) {
-            //expected
-        }
-        message = new MuleMessage("test event");
-
+        // exception to throw
+        UMOException rex = new RoutingException(message, endpoint1);
+        mockSession.expectAndThrow("sendEvent", C.args(C.eq(message), C.eq(endpoint1)), rex);
+        mockSession.expectAndThrow("dispatchEvent", C.args(C.eq(message), C.eq(endpoint2)), rex);
+        UMOSession session = (UMOSession) mockSession.proxy();
         UMOMessage result = null;
         try {
-            result = router.route(message, session, true);
+            result = router.route(message, session, false);
             fail("Should have thrown exception as both endpoints would have failed");
         } catch (CouldNotRouteOutboundMessageException e) {
             //expected
         }
-        assertNull(result);
+        assertNull("Async call should've returned null.", result);
+        mockSession.verify();
+
+
+        message = new MuleMessage("test event");
+
+
     }
 
-    public void testSuccessfulExceptionRouterWithNoException() throws Exception
+    /**
+     * The first endpoint fails, second succeeds.
+     * Events are being sent synchronously.
+     */
+    public void testFailFirstSuccessSecondSync() throws Exception
     {
-        Mock session = getMockSession();
-        OutboundMessageRouter messageRouter = new OutboundMessageRouter();
-        messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
+        Mock mockSession = getMockSession();
 
-        UMOEndpoint endpoint1 = new MuleEndpoint("test://Dummy1", false);
-        UMOEndpoint endpoint2 = new MuleEndpoint("test://Dummy2", false);
+        UMOEndpoint endpoint1 = getTestEndpoint("TestFailEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
+        UMOEndpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
 
         ExceptionBasedRouter router = new ExceptionBasedRouter();
-        RegExFilter filter = new RegExFilter("(.*) event");
-        router.setFilter(filter);
-        List endpoints = new ArrayList();
-        endpoints.add(endpoint1);
-        endpoints.add(endpoint2);
-        router.setEndpoints(endpoints);
-
-        assertEquals(filter, router.getFilter());
+        router.addEndpoint(endpoint1);
+        router.addEndpoint(endpoint2);
 
         UMOMessage message = new MuleMessage("test event");
+        UMOMessage expectedResultMessage = new MuleMessage("Return event");
 
         assertTrue(router.isMatch(message));
 
-        //Only one dispatch should be called as the others should fail
-        session.expect("dispatchEvent", C.eq(message, endpoint1));
-        router.route(message, (UMOSession) session.proxy(), false);
-        session.verify();
+        final UMOSession session = (UMOSession) mockSession.proxy();
+        // exception to throw
+        UMOException rex = new RoutingException(message, endpoint1);
+        // 1st failure
+        mockSession.expectAndThrow("sendEvent", C.args(C.eq(message), C.eq(endpoint1)), rex);
+        // next endpoint
+        mockSession.expectAndReturn("sendEvent", C.args(C.eq(message), C.eq(endpoint2)), expectedResultMessage);
+        UMOMessage actualResultMessage = router.route(message, session, true);
+        mockSession.verify();
 
-        message = new MuleMessage("test event");
-
-        //Only one send should be called as the others should fail
-        session.expectAndReturn("sendEvent", C.eq(message, endpoint1), message);
-        UMOMessage result = router.route(message, (UMOSession) session.proxy(), true);
-        assertNotNull(result);
-        assertEquals(message, result);
-        session.verify();
+        assertEquals("Got an invalid return message.", expectedResultMessage, actualResultMessage);
     }
+
+
+    /**
+     * The first endpoint fails, second succeeds.
+     * Events are being forced into a sync mode, until we reach the last one.
+     */
+    public void testFailFirstSuccessSecondAsync() throws Exception
+    {
+        Mock mockSession = getMockSession();
+
+        UMOEndpoint endpoint1 = getTestEndpoint("TestFailEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
+        UMOEndpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
+
+        ExceptionBasedRouter router = new ExceptionBasedRouter();
+        router.addEndpoint(endpoint1);
+        router.addEndpoint(endpoint2);
+
+        UMOMessage message = new MuleMessage("test event");
+        UMOMessage expectedResultMessage = new MuleMessage("Return event");
+
+        assertTrue(router.isMatch(message));
+
+        final UMOSession session = (UMOSession) mockSession.proxy();
+        // exception to throw
+        UMOException rex = new RoutingException(message, endpoint1);
+        // 1st failure
+        mockSession.expectAndThrow("sendEvent", C.args(C.eq(message), C.eq(endpoint1)), rex);
+        // next endpoint
+        mockSession.expectAndReturn("dispatchEvent", C.args(C.eq(message), C.eq(endpoint2)), expectedResultMessage);
+        UMOMessage actualResultMessage = router.route(message, session, false);
+        assertNull("Async call should not return any results.", actualResultMessage);
+        mockSession.verify();
+    }
+
 }
