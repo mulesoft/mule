@@ -27,7 +27,10 @@ import org.mule.umo.routing.RoutingException;
  * <code>ExceptionBasedRouter</code> Will send the current event to the first endpoint
  * that doesn't throw an exception. If all attempted endpoints fail then an exception is
  * thrown.
- * 
+ * <p/>
+ * The router will override the sync/async mode of the endpoint and force the sync mode
+ * for all endpoints except the last one. <code>remoteSync</code> is also enforced.
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
