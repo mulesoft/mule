@@ -24,6 +24,10 @@ import org.mule.util.queue.MemoryPersistenceStrategy;
  */
 public class VMSpaceFactory  extends DefaultSpaceFactory {
 
+    public VMSpaceFactory() {
+        super();
+    }
+    
     public VMSpaceFactory(boolean enableMonitorEvents) {
         super(enableMonitorEvents);
         setPersistenceStrategy(new MemoryPersistenceStrategy());

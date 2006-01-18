@@ -15,7 +15,12 @@ package org.mule.impl.space;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.mule.umo.space.UMOSpaceException;
-import org.mule.util.queue.*;
+import org.mule.util.queue.Queue;
+import org.mule.util.queue.QueueConfiguration;
+import org.mule.util.queue.QueueManager;
+import org.mule.util.queue.QueuePersistenceStrategy;
+import org.mule.util.queue.QueueSession;
+import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.xa.ResourceManagerException;
 import org.mule.util.xa.ResourceManagerSystemException;
 
@@ -79,7 +84,7 @@ public class DefaultSpace extends AbstractSpace {
         try {
             space.put(item);
         } catch (InterruptedException e) {
-            throw new SpaceActionInteruptedException("put", e);
+           // throw new SpaceActionInteruptedException("put", e);
         }
     }
 
@@ -87,7 +92,7 @@ public class DefaultSpace extends AbstractSpace {
         try {
             space.put(item);
         } catch (InterruptedException e) {
-            throw new SpaceActionInteruptedException("put-lease", e);
+            //throw new SpaceActionInteruptedException("put-lease", e);
         }
     }
 
@@ -95,7 +100,8 @@ public class DefaultSpace extends AbstractSpace {
         try {
             return space.take();
         } catch (InterruptedException e) {
-            throw new SpaceActionInteruptedException("take", e);
+            //throw new SpaceActionInteruptedException("take", e);
+            return null;
         }
     }
 
@@ -103,7 +109,8 @@ public class DefaultSpace extends AbstractSpace {
         try {
             return space.poll(timeout);
         } catch (InterruptedException e) {
-            throw new SpaceActionInteruptedException("take-" + timeout, e);
+            //throw new SpaceActionInteruptedException("take-" + timeout, e);
+            return null;
         }
     }
 
@@ -111,7 +118,8 @@ public class DefaultSpace extends AbstractSpace {
         try {
             return space.poll(1L);
         } catch (InterruptedException e) {
-            throw new SpaceActionInteruptedException("takeNoWait", e);
+            //throw new SpaceActionInteruptedException("takeNoWait", e);
+            return null;
         }
     }
 
@@ -142,8 +150,12 @@ public class DefaultSpace extends AbstractSpace {
         }
     }
 
-    public void commitTransaction() throws ResourceManagerException {
-        session.commit();
+    public void commitTransaction() throws UMOSpaceException {
+        try {
+            session.commit();            
+        } catch (ResourceManagerException e) {
+            throw new SpaceTransactionException(e);
+        }
     }
 
     public void rollbackTransaction() throws UMOSpaceException {

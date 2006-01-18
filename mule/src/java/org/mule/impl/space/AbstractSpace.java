@@ -17,6 +17,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceEvent;
 import org.mule.umo.space.UMOSpaceEventListener;
@@ -42,6 +43,7 @@ public abstract class AbstractSpace implements UMOSpace {
     protected List moniterListeners = new CopyOnWriteArrayList();
     protected String name;
     protected boolean enableMonitorEvents = true;
+    protected UMOTransactionFactory transactionFactory = null;
 
     protected AbstractSpace(String name) {
         this.name = name;
@@ -59,7 +61,7 @@ public abstract class AbstractSpace implements UMOSpace {
     }
 
     public void removeListener(UMOSpaceEventListener listener) {
-        moniterListeners.remove(listener);
+        listeners.remove(listener);
         fireMonitorEvent(SpaceMonitorNotification.SPACE_LISTENER_REMOVED, listener);
     }
 
@@ -85,6 +87,7 @@ public abstract class AbstractSpace implements UMOSpace {
     }
 
     public void put(Object value, long lease) throws UMOSpaceException {
+        if(logger.isTraceEnabled()) logger.trace("Writing value to space: " + name + ", with lease: " + lease + ", Value is: " + value );
         doPut(value, lease);
         fireListeners();
         fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_ADDED, value);
@@ -93,9 +96,12 @@ public abstract class AbstractSpace implements UMOSpace {
 
     public Object take() throws UMOSpaceException {
         Object item = doTake();
+
         if(item==null) {
+            if(logger.isTraceEnabled()) logger.trace("Taking from space: " + name + " returned null");
             fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_MISS, item);
         } else {
+            if(logger.isTraceEnabled()) logger.trace("Taking from space: " + name + " returned:" + item);
             fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_REMOVED, item);
         }
         return item;
@@ -104,9 +110,11 @@ public abstract class AbstractSpace implements UMOSpace {
     public Object take(long timeout) throws UMOSpaceException {
         Object item = doTake(timeout);
         if(item==null) {
+            if(logger.isTraceEnabled()) logger.trace("Taking from space (timeout "+ timeout + "): returned null");            
             fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_MISS, item);
         } else {
             fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_REMOVED, item);
+            if(logger.isTraceEnabled()) logger.trace("Taking from space (timeout "+ timeout + "): " + name + " returned:" + item);
         }
         return item;
     }
@@ -115,8 +123,10 @@ public abstract class AbstractSpace implements UMOSpace {
         Object item = doTakeNoWait();
         if(item==null) {
             fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_MISS, item);
+            if(logger.isTraceEnabled()) logger.trace("Taking from space (no wait): " + name + " returned: null");
         } else {
             fireMonitorEvent(SpaceMonitorNotification.SPACE_ITEM_REMOVED, item);
+            if(logger.isTraceEnabled()) logger.trace("Taking from space (no wait): " + name + " returned:" + item);
         }
         return item;
     }
@@ -149,6 +159,14 @@ public abstract class AbstractSpace implements UMOSpace {
     public void dispose() {
         doDispose();
         fireMonitorEvent(SpaceMonitorNotification.SPACE_DISPOSED, this);
+    }
+
+    public UMOTransactionFactory getTransactionFactory() {
+        return transactionFactory;
+    }
+
+    public void setTransactionFactory(UMOTransactionFactory transactionFactory) {
+        this.transactionFactory = transactionFactory;
     }
 
     public abstract void doPut(Object value) throws UMOSpaceException;

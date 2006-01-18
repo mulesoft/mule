@@ -13,8 +13,8 @@
  */
 package org.mule.umo.space;
 
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.lifecycle.Disposable;
-import org.mule.util.xa.ResourceManagerException;
 
 
 /**
@@ -44,9 +44,13 @@ public interface UMOSpace extends Disposable {
 
     public int size();
 
+    void setTransactionFactory(UMOTransactionFactory txFactory);
+
+    UMOTransactionFactory getTransactionFactory();
+
     void beginTransaction() throws UMOSpaceException;
 
-    void commitTransaction() throws ResourceManagerException;
+    void commitTransaction() throws UMOSpaceException;
 
     void rollbackTransaction() throws UMOSpaceException;
 
