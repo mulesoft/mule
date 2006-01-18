@@ -21,5 +21,5 @@ package org.mule.umo.space;
  */
 public interface UMOSpaceFactory {
 
-    public UMOSpace create(String name) throws UMOSpaceException;
+    public UMOSpace create(String spaceIdentifier) throws UMOSpaceException;
 }
