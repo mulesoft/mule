@@ -23,7 +23,6 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
@@ -42,6 +41,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     protected static UMOManager manager;
     protected boolean callbackCalled = false;
     protected int callbackCount = 0;
+    protected boolean transacted = false;
 
     private final Object lock = new Object();
 
@@ -73,10 +73,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
     {
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
-        initialiseComponent(descriptor,
-                            UMOTransactionConfig.ACTION_NONE,
-                            UMOTransactionConfig.ACTION_NONE,
-                            this.createEventCallback());
+        initialiseComponent(descriptor, this.createEventCallback());
 
 
         sendTestData(100);
@@ -88,27 +85,10 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         assertTrue(callbackCalled);
     }
 
-    public UMOComponent initialiseComponent(UMODescriptor descriptor,
-                                            byte txBeginAction,
-                                            byte txCommitAction,
-                                            EventCallback callback) throws Exception
+    public UMOComponent initialiseComponent(UMODescriptor descriptor, EventCallback callback) throws Exception
     {
-
-        UMOEndpoint endpoint = new MuleEndpoint("testIn",
-                                                getInDest(),
-                                                connector,
-                                                null,
-                                                UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
-                                                0,
-                                                null);
-
-        // UMOEndpoint outProvider = new MuleEndpoint("testOut", getOutDest(),
-        // connector, null,
-        // UMOEndpoint.PROVIDER_TYPE_SENDER, true, null);
-        //
-        //
-        // descriptor.setOutboundEndpoint(outProvider);
-        descriptor.setInboundEndpoint(endpoint);
+        descriptor.setOutboundEndpoint(createOutboundEndpoint());
+        descriptor.setInboundEndpoint(createInboundEndpoint());
         HashMap props = new HashMap();
         props.put("eventCallback", callback);
         descriptor.setProperties(props);
@@ -117,6 +97,29 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         ((MuleDescriptor) descriptor).initialise();
         return component;
     }
+
+    /**
+     * Implementing tests can overide this to add further configuration to the outbound endpoint
+     * @return
+     */
+    protected UMOEndpoint createOutboundEndpoint() {
+        if(getOutDest()!=null) {
+            return new MuleEndpoint("testOut", getOutDest(), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null);
+        } else {
+            return null;
+        }
+
+    }
+
+     /**
+     * Implementing tests can overide this to add further configuration to the inbound endpoint
+     * @return
+     */
+    protected UMOEndpoint createInboundEndpoint() {
+        UMOEndpoint ep = new MuleEndpoint("testIn", getInDest(), connector, null, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null);
+        ep.setSynchronous(true);
+        return ep;
+     }
 
     public static MuleDescriptor getTestDescriptor(String name, String implementation)
     {
@@ -141,8 +144,11 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
                     callbackCalled = true;
                     callbackCount++;
                 }
-                assertNull(context.getCurrentTransaction());
-
+                if(!transacted) {
+                    assertNull(context.getCurrentTransaction());
+                } else {
+                    assertNotNull(context.getCurrentTransaction());
+                }
             }
         };
         return callback;
