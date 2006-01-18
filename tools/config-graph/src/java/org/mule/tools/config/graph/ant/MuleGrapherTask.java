@@ -1,17 +1,17 @@
 package org.mule.tools.config.graph.ant;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Iterator;
-import java.util.Vector;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.types.FileSet;
 import org.mule.tools.config.graph.MuleGrapher;
 import org.mule.tools.config.graph.config.GraphConfig;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class MuleGrapherTask extends MatchingTask {
     private Vector filesets = new Vector();
@@ -46,7 +46,7 @@ public class MuleGrapherTask extends MatchingTask {
             DirectoryScanner ds = null;
             ds = fs.getDirectoryScanner(getProject());
             String[] srcFiles = ds.getIncludedFiles();
-            processMuleConfig(srcFiles);
+            processMuleConfig(ds.getBasedir(), srcFiles);
         }
 
         generateGallery();
@@ -73,11 +73,12 @@ public class MuleGrapherTask extends MatchingTask {
         }
     }
 
-    private void processMuleConfig(String[] srcFiles) {
+    private void processMuleConfig(File baseDir, String[] srcFiles) {
 
         GraphConfig config = new GraphConfig();
         for (int i = 0; i < srcFiles.length; i++) {
-            config.getFiles().add(srcFiles[i]);
+            String file = new File(baseDir, srcFiles[i]).toString();
+            config.getFiles().add(file);
         }
         config.setOutputDirectory(outputdir);
         MuleGrapher grapher = new MuleGrapher(config);
