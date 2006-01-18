@@ -1,5 +1,12 @@
 package org.mule.tools.config.graph.components;
 
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.out.GRAPHtoDOTtoGIF;
+import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.postrenderers.FileCleanerProstRenderer;
+import org.mule.tools.config.graph.postrenderers.MuleDocPostRenderer;
+import org.mule.tools.config.graph.util.DOTtoMAP;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,14 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.mule.tools.config.graph.config.GraphConfig;
-import org.mule.tools.config.graph.postrenderers.FileCleanerProstRenderer;
-import org.mule.tools.config.graph.postrenderers.MuleDocPostRenderer;
-import org.mule.tools.config.graph.util.DOTtoMAP;
-
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.out.GRAPHtoDOTtoGIF;
 
 public class GraphRenderer {
 
@@ -32,9 +31,9 @@ public class GraphRenderer {
 	public void saveGraph(Graph graph, String filename, File outFolder)
 			throws IOException {
 		// output graph to *.gif
-		final String dotFileName = outFolder + "\\" + filename + ".dot";
-		final String mapFileName = outFolder + "\\" + filename + ".cmapx";
-		final String gifFileName = outFolder + "\\" + filename + ".gif";
+		final String dotFileName = new File(outFolder, filename + ".dot").getAbsolutePath();
+		final String mapFileName = new File(outFolder, filename + ".cmapx").getAbsolutePath();
+		final String gifFileName = new File(outFolder, filename + ".gif").getAbsolutePath();
 		
 		
 		final String exeFile = getSaveExecutable();

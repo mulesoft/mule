@@ -139,21 +139,26 @@ public class GraphConfig {
     }
 
     private String getOpt(String[] args, String name, String defaultValue) {
+	String rval = defaultValue;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals(name)) {
                 if (i + 1 >= args.length) {
-                    return defaultValue;
+		    break;
                 } else {
                     String arg = args[i + 1];
                     if (arg.startsWith("-")) {
-                        return defaultValue;
+                        break;
                     } else {
-                        return arg;
+                        rval = arg;
+			break;
                     }
                 }
             }
         }
-        return defaultValue;
+	if(rval == null || rval.length() == 0) {
+	    rval = null;
+	}
+        return rval;
     }
 
     public List getFiles() {
