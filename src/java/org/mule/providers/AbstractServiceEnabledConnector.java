@@ -62,7 +62,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
     {
         if (!supportsProtocol(endpointUri.getFullScheme())) {
             throw new InitialisationException(new Message(Messages.SCHEME_X_NOT_COMPATIBLE_WITH_CONNECTOR_X,
-                                                          getProtocol(),
+                                                          endpointUri.getFullScheme(),
                                                           getClass().getName()), this);
         }
         Properties props = new Properties();

@@ -30,10 +30,10 @@ import java.util.Map;
 public class DefaultMessageAdapter extends AbstractMessageAdapter
 {
     /** The message object wrapped by this adapter */
-    private Object message;
+    protected Object message;
 
     /** A generated UUID for this message */
-    private String id = null;
+    protected String id = null;
 
     /**
      * Creates a default message adapter with properties and attachments

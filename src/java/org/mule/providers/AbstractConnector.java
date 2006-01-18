@@ -35,12 +35,21 @@ import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
-import org.mule.umo.provider.*;
+import org.mule.umo.provider.ConnectorException;
+import org.mule.umo.provider.UMOConnectable;
+import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOMessageDispatcherFactory;
+import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.WaitableBoolean;
 
 import java.beans.ExceptionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all
@@ -174,8 +183,10 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         connectionStrategy = MuleManager.getConfiguration().getConnectionStrategy();
         enableMessageEvents = MuleManager.getConfiguration().isEnableMessageEvents();
         supportedProtocols = new ArrayList();
+
         //Always add the default protocol
         supportedProtocols.add(getProtocol().toLowerCase());
+
     }
 
     /*
@@ -214,6 +225,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (initialised.get()) {
             throw new AlreadyInitialisedException("Connector '" + getName() + "'", this);
         }
+
         if (logger.isInfoEnabled()) {
             logger.info("Initialising " + getClass().getName());
         }
@@ -918,5 +930,20 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     public boolean supportsProtocol(String protocol) {
     	return supportedProtocols.contains(protocol.toLowerCase());
+    }
+
+    /**
+     * Returns an unmodifiable list of the protocols supported by this connector
+     * @return an unmodifiable list of the protocols supported by this connector
+     */
+    public List getSupportedProtocols() {
+        return Collections.unmodifiableList(supportedProtocols);
+    }
+
+    public void setSupportedProtocols(List supportedProtocols) {
+        for (Iterator iterator = supportedProtocols.iterator(); iterator.hasNext();) {
+            String s = (String) iterator.next();
+            registerSupportedProtocol(s);
+        }
     }
 }
