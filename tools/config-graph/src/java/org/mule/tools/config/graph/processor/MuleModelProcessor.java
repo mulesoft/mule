@@ -1,14 +1,13 @@
 package org.mule.tools.config.graph.processor;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.components.EndpointRegistry;
 import org.mule.tools.config.graph.config.GraphConfig;
 
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphNode;
+import java.util.Iterator;
+import java.util.List;
 
 public class MuleModelProcessor extends TagProcessor {
 
@@ -101,7 +100,7 @@ public class MuleModelProcessor extends TagProcessor {
 					+ "\n");
 		}
 		Element poolingProfile = descriptor.getChild("pooling-profile");
-		if (threadingProfile != null) {
+		if (poolingProfile != null) {
 			caption.append("exhaustedAction = "
 					+ poolingProfile.getAttributeValue("exhaustedAction")
 					+ "\n");
