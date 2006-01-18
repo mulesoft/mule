@@ -25,15 +25,13 @@ import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.providers.soap.axis.AxisMessageDispatcher;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import java.io.File;
-
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
+import java.io.File;
 
 /**
  * @author <a href="mailto:risears@gmail.com">Rick Sears</a>
@@ -83,10 +81,7 @@ public class SoapAttachmentsFunctionalTestCase extends AbstractProviderFunctiona
     {
         descriptor = getTestDescriptor("testComponent", SoapAttachmentsFunctionalTestComponent.class.getName());
 
-        initialiseComponent(descriptor,
-                            UMOTransactionConfig.ACTION_NONE,
-                            UMOTransactionConfig.ACTION_NONE,
-                            null);
+        initialiseComponent(descriptor, null);
         // Start the server
         MuleManager.getInstance().start();
 

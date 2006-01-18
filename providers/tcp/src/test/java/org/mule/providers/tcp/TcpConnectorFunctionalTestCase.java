@@ -22,12 +22,15 @@ import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
 
@@ -89,7 +92,7 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected UMOEndpointURI getOutDest()
     {
-        return getInDest();
+        return null;
     }
 
     public UMOConnector createConnector() throws Exception
@@ -107,8 +110,6 @@ public class TcpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         initialiseComponent(descriptor,
-                            UMOTransactionConfig.ACTION_NONE,
-                            UMOTransactionConfig.ACTION_NONE,
                             new EventCallback() {
                                 public void eventReceived(UMOEventContext context, Object Component) throws Exception
                                 {

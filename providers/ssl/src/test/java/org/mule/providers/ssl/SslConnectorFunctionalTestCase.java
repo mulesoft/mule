@@ -22,14 +22,17 @@ import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.umo.UMOEventContext;
-import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.net.URI;
 
@@ -60,7 +63,7 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
 
     protected UMOEndpointURI getOutDest()
     {
-        return getInDest();
+        return null;
     }
 
     public UMOConnector createConnector() throws Exception
@@ -108,8 +111,6 @@ public class SslConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         initialiseComponent(descriptor,
-                            UMOTransactionConfig.ACTION_NONE,
-                            UMOTransactionConfig.ACTION_NONE,
                             new EventCallback() {
                                 public void eventReceived(UMOEventContext context, Object Component) throws Exception
                                 {
