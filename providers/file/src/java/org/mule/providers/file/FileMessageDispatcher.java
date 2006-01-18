@@ -38,17 +38,14 @@ import java.net.URLDecoder;
 /**
  * <code>FileMessageDispatcher</code> is used to read/write files to the
  * filesystem and
- * 
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class FileMessageDispatcher extends AbstractMessageDispatcher
-{
+public class FileMessageDispatcher extends AbstractMessageDispatcher {
     private FileConnector connector;
 
-    public FileMessageDispatcher(FileConnector connector)
-    {
+    public FileMessageDispatcher(FileConnector connector) {
         super(connector);
         this.connector = connector;
     }
@@ -58,54 +55,47 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#dispatch(org.mule.umo.UMOEvent)
      */
-    public void doDispatch(UMOEvent event) throws Exception
-    {
-        try {
-            String endpoint = event.getEndpoint().getEndpointURI().getAddress();
-            Object data = event.getTransformedMessage();
-            String filename = (String) event.getProperty(FileConnector.PROPERTY_FILENAME);
+    public void doDispatch(UMOEvent event) throws Exception {
+        String endpoint = event.getEndpoint().getEndpointURI().getAddress();
+        Object data = event.getTransformedMessage();
+        String filename = (String) event.getProperty(FileConnector.PROPERTY_FILENAME);
 
-            if (filename == null) {
-                String outPattern = (String) event.getProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
-                if (outPattern == null) {
-                    outPattern = connector.getOutputPattern();
-                }
-                filename = generateFilename(event, outPattern);
+        if (filename == null) {
+            String outPattern = (String) event.getProperty(FileConnector.PROPERTY_OUTPUT_PATTERN);
+            if (outPattern == null) {
+                outPattern = connector.getOutputPattern();
             }
-
-            if (filename == null) {
-                throw new IOException("Filename is null");
-            }
-
-            File file = Utility.createFile(endpoint + "/" + filename);
-            byte[] buf;
-            if (data instanceof byte[]) {
-                buf = (byte[]) data;
-            } else {
-                buf = data.toString().getBytes();
-            }
-
-            logger.info("Writing file to: " + file.getAbsolutePath());
-            FileOutputStream fos = new FileOutputStream(file, connector.isOutputAppend());
-            try {
-                fos.write(buf);
-            } finally {
-                fos.close();
-            }
-        } catch (Exception e) {
-            getConnector().handleException(e);
+            filename = generateFilename(event, outPattern);
         }
 
+        if (filename == null) {
+            throw new IOException("Filename is null");
+        }
+
+        File file = Utility.createFile(endpoint + "/" + filename);
+        byte[] buf;
+        if (data instanceof byte[]) {
+            buf = (byte[]) data;
+        } else {
+            buf = data.toString().getBytes();
+        }
+
+        logger.info("Writing file to: " + file.getAbsolutePath());
+        FileOutputStream fos = new FileOutputStream(file, connector.isOutputAppend());
+        try {
+            fos.write(buf);
+        } finally {
+            fos.close();
+        }
     }
 
     /**
      * There is no associated session for a file connector
-     * 
+     *
      * @return
      * @throws UMOException
      */
-    public Object getDelegateSession() throws UMOException
-    {
+    public Object getDelegateSession() throws UMOException {
         return null;
     }
 
@@ -114,23 +104,22 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
      * resolves to a file name the file will be returned, otherwise the first
      * file in the directory according to the filename filter configured on the
      * connector.
-     * 
+     *
      * @param endpointUri a path to a file or directory
-     * @param timeout this is ignored when doing a receive on this dispatcher
+     * @param timeout     this is ignored when doing a receive on this dispatcher
      * @return a message containing file contents or null if there was notthing
      *         to receive
      * @throws Exception
      */
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
+    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
         File file = new File(endpointUri.getAddress());
         File result = null;
         FilenameFilter filenameFilter = null;
-            String filter = (String)endpointUri.getParams().get("filter");
-            if(filter!=null) {
-                filter = URLDecoder.decode(filter, MuleManager.getConfiguration().getEncoding());
-                filenameFilter = new FilenameWildcardFilter(filter);
-            }
+        String filter = (String) endpointUri.getParams().get("filter");
+        if (filter != null) {
+            filter = URLDecoder.decode(filter, MuleManager.getConfiguration().getEncoding());
+            filenameFilter = new FilenameWildcardFilter(filter);
+        }
         if (file.exists()) {
             if (file.isFile()) {
                 result = file;
@@ -138,15 +127,15 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 result = getNextFile(endpointUri.getAddress(), filenameFilter);
             }
             if (result != null) {
-		boolean checkFileAge = connector.getCheckFileAge();
-		if (checkFileAge) {
-		    long fileAge = connector.getFileAge();
-		    long lastMod = result.lastModified();
-		    long now = (new java.util.Date()).getTime();
-		    if ((now - lastMod) < fileAge) {
-			return null;
-		    }
-		}
+                boolean checkFileAge = connector.getCheckFileAge();
+                if (checkFileAge) {
+                    long fileAge = connector.getFileAge();
+                    long lastMod = result.lastModified();
+                    long now = (new java.util.Date()).getTime();
+                    if ((now - lastMod) < fileAge) {
+                        return null;
+                    }
+                }
 
                 MuleMessage message = new MuleMessage(connector.getMessageAdapter(result));
                 if (connector.getMoveToDirectory() != null) {
@@ -165,9 +154,8 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         return null;
     }
 
-    private File getNextFile(String dir, FilenameFilter filter) throws UMOException
-    {
-        File[] files = new File[] {};
+    private File getNextFile(String dir, FilenameFilter filter) throws UMOException {
+        File[] files = new File[]{};
         File file = new File(dir);
         File result = null;
         try {
@@ -175,7 +163,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
                 if (file.isFile()) {
                     result = file;
                 } else if (file.isDirectory()) {
-                    if(filter!=null) {
+                    if (filter != null) {
                         files = file.listFiles(filter);
                     } else {
                         files = file.listFiles();
@@ -196,8 +184,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#send(org.mule.umo.UMOEvent)
      */
-    public UMOMessage doSend(UMOEvent event) throws Exception
-    {
+    public UMOMessage doSend(UMOEvent event) throws Exception {
         doDispatch(event);
         return event.getMessage();
     }
@@ -207,8 +194,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
      * 
      * @see org.mule.umo.provider.UMOConnectorSession#getConnector()
      */
-    public UMOConnector getConnector()
-    {
+    public UMOConnector getConnector() {
         return connector;
     }
 
@@ -221,8 +207,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         return connector.getFilenameParser().getFilename(message, pattern);
     }
 
-    public void doDispose()
-    {
+    public void doDispose() {
     }
 
 }
