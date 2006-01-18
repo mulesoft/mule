@@ -13,14 +13,13 @@
  */
 package org.mule.tck;
 
-import java.io.File;
-
 import junit.framework.TestCase;
-
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.util.StringMessageHelper;
 import org.mule.util.Utility;
+
+import java.io.File;
 
 /**
  * <code>NamedTestCase</code> provides readable testcase names.
@@ -33,6 +32,9 @@ public abstract class NamedTestCase extends TestCase
 {
     protected NamedTestCase()
     {
+        if(MuleManager.isInstanciated()) {
+            MuleManager.getInstance().dispose();
+        }
         // when testing, do not set up server connections
         System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
     }
@@ -53,7 +55,7 @@ public abstract class NamedTestCase extends TestCase
 
     protected void tearDown() throws Exception
     {
-        File f = new File(".mule");
+        File f = new File(MuleManager.getConfiguration().getWorkingDirectory());
         try {
             if (f.exists()) {
                 Utility.deleteTree(f);

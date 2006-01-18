@@ -60,7 +60,7 @@ public abstract class AbstractResourceManager
     protected static final int DEFAULT_TIMEOUT_MSECS = 5000;
     protected static final int DEFAULT_COMMIT_TIMEOUT_FACTOR = 2;
 
-    protected Collection globalTransactions;
+    protected Collection globalTransactions = Collections.synchronizedCollection(new ArrayList());
     protected int operationMode = OPERATION_MODE_STOPPED;
     protected long defaultTimeout = DEFAULT_TIMEOUT_MSECS;
     protected Log logger = getLogger();
@@ -72,7 +72,6 @@ public abstract class AbstractResourceManager
     {
         logger.info("Starting ResourceManager");
         operationMode = OPERATION_MODE_STARTING;
-        globalTransactions = Collections.synchronizedCollection(new ArrayList());
         // TODO: recover and sync
         doStart();
         recover();

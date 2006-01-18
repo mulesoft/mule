@@ -24,7 +24,25 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.MultiContainerContext;
 import org.mule.impl.internal.admin.MuleAdminAgent;
-import org.mule.impl.internal.notifications.*;
+import org.mule.impl.internal.notifications.AdminNotification;
+import org.mule.impl.internal.notifications.AdminNotificationListener;
+import org.mule.impl.internal.notifications.ComponentNotification;
+import org.mule.impl.internal.notifications.ComponentNotificationListener;
+import org.mule.impl.internal.notifications.ConnectionNotification;
+import org.mule.impl.internal.notifications.ConnectionNotificationListener;
+import org.mule.impl.internal.notifications.CustomNotification;
+import org.mule.impl.internal.notifications.CustomNotificationListener;
+import org.mule.impl.internal.notifications.ManagementNotification;
+import org.mule.impl.internal.notifications.ManagementNotificationListener;
+import org.mule.impl.internal.notifications.ManagerNotification;
+import org.mule.impl.internal.notifications.ManagerNotificationListener;
+import org.mule.impl.internal.notifications.MessageNotification;
+import org.mule.impl.internal.notifications.MessageNotificationListener;
+import org.mule.impl.internal.notifications.ModelNotification;
+import org.mule.impl.internal.notifications.ModelNotificationListener;
+import org.mule.impl.internal.notifications.SecurityNotification;
+import org.mule.impl.internal.notifications.SecurityNotificationListener;
+import org.mule.impl.internal.notifications.ServerNotificationManager;
 import org.mule.impl.model.seda.SedaModel;
 import org.mule.impl.security.MuleSecurityManager;
 import org.mule.impl.work.MuleWorkManager;
@@ -34,7 +52,12 @@ import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.FatalException;
 import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.*;
+import org.mule.umo.manager.UMOAgent;
+import org.mule.umo.manager.UMOContainerContext;
+import org.mule.umo.manager.UMOManager;
+import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.manager.UMOServerNotificationListener;
+import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.security.UMOSecurityManager;
@@ -49,12 +72,19 @@ import org.mule.util.queue.QueuePersistenceStrategy;
 import org.mule.util.queue.TransactionalQueueManager;
 
 import javax.transaction.TransactionManager;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * <code>MuleManager</code> maintains and provides services for a Mule
@@ -352,6 +382,11 @@ public class MuleManager implements UMOManager
         }
         if (workManager != null) {
             workManager.dispose();
+        }
+
+        if(queueManager!=null) {
+            queueManager.close();
+            queueManager = null;
         }
 
         if(!config.isEmbedded()) {
