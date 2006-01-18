@@ -38,7 +38,8 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
     public UMOMessage route(UMOMessage message, UMOSession session, boolean synchronous) throws RoutingException
     {
         UMOMessage result = null;
-        if (endpoints == null || endpoints.size() == 0) {
+        final int endpointsCount = endpoints.size();
+        if (endpoints == null || endpointsCount == 0) {
             throw new RoutePathNotFoundException(new Message(Messages.NO_ENDPOINTS_FOR_ROUTER), message, null);
         }
         if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
@@ -47,47 +48,32 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
                 logger.debug("CorrelationId is already set, not setting Correlation group size");
             } else {
                 // the correlationId will be set by the AbstractOutboundRouter
-                message.setCorrelationGroupSize(endpoints.size());
+                message.setCorrelationGroupSize(endpointsCount);
             }
         }
 
-            UMOEndpoint endpoint;
+        // need that ref for an error message
+        UMOEndpoint endpoint = null;
         boolean success = false;
         synchronized (endpoints) {
-            for (int i = 0; i < endpoints.size(); i++) {
-                endpoint = (UMOEndpoint) endpoints.get(i);
-                if (synchronous) {
-                    // Were we have multiple outbound endpoints
-                    if (result == null) {
-                        try {
-                            result = send(session, message, endpoint);
-                            success = true;
-                            break;
-                        } catch (UMOException e) {
-                            logger.info("Failed to send to endpoint: " + endpoint.getEndpointURI().toString() +
-                                    ". Error was: " + e.getMessage() + ". Trying next endpoint");
-                        }
-                    } else {
-                        String def = (String) endpoint.getProperties().get("default");
-                        if (def != null) {
-                            try {
-                                result = send(session, message, endpoint);
-                                success = true;
-                                break;
-                            } catch (UMOException e) {
-                                logger.info("Failed to send to endpoint: " + endpoint.getEndpointURI().toString() +
-                                        ". Error was: " + e.getMessage() + ". Trying next endpoint");
-                            }
-                        } else {
-                            try {
-                                send(session, message, endpoint);
-                                success = true;
-                                break;
-                            } catch (UMOException e) {
-                                logger.info("Failed to send to endpoint: " + endpoint.getEndpointURI().toString() +
-                                        ". Error was: " + e.getMessage() + ". Trying next endpoint");
-                            }
-                        }
+            for (int i = 0; i < endpointsCount; i++) {
+                // apply endpoint URI templates if any
+                endpoint = getEndpoint(i, message);
+                boolean lastEndpoint = (i == endpointsCount - 1);
+
+                if (!lastEndpoint) {
+                    logger.info("Sync mode will be forced for " + endpoint.getEndpointURI()  +
+                                ", as there are more endpoints available.");
+                }
+
+                if (!lastEndpoint || synchronous) {
+                    try {
+                        result = send(session, message, endpoint);
+                        success = true;
+                        break;
+                    } catch (UMOException e) {
+                        logger.info("Failed to send to endpoint: " + endpoint.getEndpointURI().toString() +
+                                ". Error was: " + e.getMessage() + ". Trying next endpoint");
                     }
                 } else {
                     try {
@@ -95,15 +81,24 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
                         success = true;
                         break;
                     } catch (UMOException e) {
-                        logger.info("Failed to disparch to endpoint: " + endpoint.getEndpointURI().toString() +
+                        logger.info("Failed to dispatch to endpoint: " + endpoint.getEndpointURI().toString() +
                                 ". Error was: " + e.getMessage() + ". Trying next endpoint");
                     }
                 }
             }
         }
         if(!success) {
-            throw new CouldNotRouteOutboundMessageException(message, (UMOEndpoint) endpoints.get(0));
+            throw new CouldNotRouteOutboundMessageException(message, endpoint);
         }
         return result;
+    }
+
+    public void addEndpoint(UMOEndpoint endpoint)
+    {
+        if (!endpoint.isRemoteSync()) {
+            logger.debug("Endpoint: " + endpoint.getEndpointURI() + " registered on ExceptionBasedRouter needs to be RemoteSync enabled. Setting this property now.");
+            endpoint.setRemoteSync(true);
+        }
+        super.addEndpoint(endpoint);
     }
 }
