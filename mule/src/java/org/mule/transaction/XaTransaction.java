@@ -15,20 +15,18 @@
 
 package org.mule.transaction;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.TransactionException;
 
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-
-import org.mule.MuleManager;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.TransactionException;
-import org.mule.umo.UMOTransaction;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -38,7 +36,7 @@ import org.mule.umo.UMOTransaction;
  * @author Guillaume Nodet
  * @version $Revision$
  */
-public class XaTransaction extends AbstractTransaction implements UMOTransaction
+public class XaTransaction extends AbstractTransaction
 {
     /**
      * The inner jta transaction

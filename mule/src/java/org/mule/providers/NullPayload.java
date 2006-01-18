@@ -13,6 +13,8 @@
  */
 package org.mule.providers;
 
+import java.io.Serializable;
+
 /**
  * <code>NullPayload</code> represents a null event payload
  * 
@@ -20,6 +22,6 @@ package org.mule.providers;
  * @version $Revision$
  */
 
-public class NullPayload
+public class NullPayload implements Serializable
 {
-}
+} 
