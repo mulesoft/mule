@@ -204,7 +204,7 @@ public class ServerNotificationManager implements Work, Disposable
         for (Iterator iterator = eventsMap.entrySet().iterator(); iterator.hasNext();) {
             entry = (Map.Entry) iterator.next();
             Class eventClass = (Class) entry.getValue();
-            if (notification.getClass().isAssignableFrom(eventClass)) {
+            if (eventClass.isAssignableFrom(notification.getClass())) {
                 listenerClass = (Class) entry.getKey();
                 break;
             }
