@@ -28,12 +28,12 @@
     </dependencies>
      <build>
         <nagEmailAddress>scm@mule.codehaus.org</nagEmailAddress>
-        <sourceDirectory>${basedir}/main/src/java</sourceDirectory>
-        <unitTestSourceDirectory>${basedir}/main/test/java</unitTestSourceDirectory>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+        <unitTestSourceDirectory>${basedir}/src/test/java</unitTestSourceDirectory>
         <unitTest>
             <resources>
                 <resource>
-                    <directory>${basedir}/main/test/resources</directory>
+                    <directory>${basedir}/src/test/resources</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>
@@ -42,7 +42,7 @@
         </unitTest>
         <resources>
             <resource>
-                <directory>${basedir}/main/src/resources</directory>
+                <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>**/*</include>
                 </includes>
