@@ -1,0 +1,8 @@
+<com>
+  <j_spaces>
+        <kernel>
+        <!-- can also be set via system property using -Dcom.gs.licensekey -->
+            <licensekey>Jul 11, 2006~GS@SMVNVQSPmt9lPCNZ4RQg#EE^5.0Cache%UNBOUND</licensekey>
+       </kernel>
+  </j_spaces>
+</com>
