@@ -206,7 +206,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                     }
                 }
             } catch (Exception e) {
-                logger.error("Unable to create message for node as position " + i, e);
+                logger.error("Unable to create message for node at position " + i, e);
                 return null;
             }
         }
