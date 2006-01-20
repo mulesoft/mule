@@ -13,6 +13,7 @@
  */
 package org.mule.impl.space;
 
+import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.space.UMOSpace;
 import org.mule.umo.space.UMOSpaceException;
 import org.mule.umo.space.UMOSpaceFactory;
@@ -121,5 +122,18 @@ public abstract class DefaultSpaceFactory implements UMOSpaceFactory {
         } catch (ResourceManagerSystemException e) {
             throw new CreateSpaceException(e);
         }
+    }
+
+    /**
+     * Creates a space based on the endpoint URI and can use additional properties, transaction info,
+     * security info and filters associated with the endpoint
+     *
+     * @param endpoint the endpoint from which to construct the space
+     * @return an new Space object
+     * @throws org.mule.umo.space.UMOSpaceException
+     *
+     */
+    public UMOSpace create(UMOEndpoint endpoint) throws UMOSpaceException {
+        return create(endpoint.getEndpointURI().getAddress());
     }
 }
