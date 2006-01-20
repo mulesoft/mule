@@ -51,23 +51,23 @@
 		<dependency>
 			<groupId>commons-discovery</groupId>
 			<artifactId>commons-discovery</artifactId>
-			<version>0.2-dev</version>
+			<version>0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.0.4</version>
 		</dependency>
-		<dependency>
-			<groupId>jaxrpc</groupId>
-			<artifactId>jaxrpc</artifactId>
-			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>jaxrpc</groupId>
-			<artifactId>jaxrpc-qname-patch</artifactId>
-			<version>1.1</version>
-		</dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jaxrpc</artifactId>
+            <version>${geronimo_spec_jaxrpc_version}</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-qname</artifactId>
+            <version>${geronimo_spec_qname_version}</version>
+        </dependency>
 		<!-- Optional: used by mules default component pooling mechanism -->
 		<dependency>
 			<groupId>commons-pool</groupId>
@@ -199,10 +199,10 @@
 			<optional/>
 		</dependency>
 		<dependency>
-			<groupId>activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.0.2</version>
-		</dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-activation</artifactId>
+            <version>${geronimo_spec_activation_version}</version>
+        </dependency>
 		<dependency>
 			<groupId>ognl</groupId>
 			<artifactId>ognl</artifactId>
