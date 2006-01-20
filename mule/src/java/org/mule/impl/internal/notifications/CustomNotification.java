@@ -40,7 +40,7 @@ public class CustomNotification extends UMOServerNotification
     public CustomNotification(Object message, int action)
     {
         super(message, action);
-        if (action < CUSTOM_EVENT_ACTION_START_RANGE) {
+        if (action < CUSTOM_EVENT_ACTION_START_RANGE && action > 0) {
             throw new IllegalArgumentException("Action range must be greater than CUSTOM_ACTION_START_RANGE ("
                     + CUSTOM_EVENT_ACTION_START_RANGE + ")");
         }

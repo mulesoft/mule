@@ -13,10 +13,8 @@
  */
 package org.mule.impl.internal.notifications;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ArrayBlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
@@ -54,7 +52,7 @@ public class ServerNotificationManager implements Work, Disposable
 
     private Map listenersMap = null;
     private Map eventsMap = null;
-    private BlockingQueue eventQueue;
+    private LinkedBlockingQueue eventQueue;
     private boolean disposed = false;
 
     private Comparator comparator = new Comparator() {
@@ -78,7 +76,7 @@ public class ServerNotificationManager implements Work, Disposable
     {
         listenersMap = new ConcurrentHashMap();
         eventsMap = new ConcurrentHashMap();
-        eventQueue = new ArrayBlockingQueue(1000);
+        eventQueue = new LinkedBlockingQueue();
     }
 
     public void registerEventType(Class eventType, Class listenerType)
@@ -100,12 +98,11 @@ public class ServerNotificationManager implements Work, Disposable
         }
     }
 
-    public void registerListener(UMOServerNotificationListener listener)
-    {
+    public void registerListener(UMOServerNotificationListener listener) throws NotificationException {
         registerListener(listener, null);
     }
 
-    public void registerListener(UMOServerNotificationListener listener, String subscription)
+    public void registerListener(UMOServerNotificationListener listener, String subscription) throws NotificationException
     {
         if (subscription == null) {
             subscription = NULL_SUBSCRIPTION;
@@ -118,7 +115,13 @@ public class ServerNotificationManager implements Work, Disposable
 
     public void unregisterListener(UMOServerNotificationListener listener)
     {
-        TreeMap listeners = getListeners(listener.getClass());
+        TreeMap listeners = null;
+        try {
+            listeners = getListeners(listener.getClass());
+        } catch (NotificationException e) {
+            logger.warn(e.getMessage(), e);
+            return;
+        }
         synchronized (listeners) {
             listeners.remove(listener);
         }
@@ -129,7 +132,13 @@ public class ServerNotificationManager implements Work, Disposable
         if (listenerClass == null) {
             return;
         }
-        TreeMap listeners = getListeners(listenerClass);
+        TreeMap listeners = null;
+        try {
+            listeners = getListeners(listenerClass);
+        } catch (NotificationException e) {
+            logger.warn(e.getMessage(), e);
+            return;
+        }
         synchronized (listeners) {
             listeners.clear();
         }
@@ -147,8 +156,7 @@ public class ServerNotificationManager implements Work, Disposable
         init();
     }
 
-    protected TreeMap getListeners(Class listenerClass)
-    {
+    protected TreeMap getListeners(Class listenerClass) throws NotificationException {
         if (listenerClass == null) {
             throw new NullPointerException("Listener class cannot be null");
         }
@@ -164,10 +172,10 @@ public class ServerNotificationManager implements Work, Disposable
         if (eventType != null) {
             return (TreeMap) listenersMap.get(eventType);
         } else {
-            throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X,
+            throw new NotificationException(new Message(Messages.PROPERTY_X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X,
                                                            "Listener Type",
                                                            "Registered Type",
-                                                           listenerClass.getName()).getMessage());
+                                                           listenerClass.getName()));
         }
     }
 
@@ -181,7 +189,9 @@ public class ServerNotificationManager implements Work, Disposable
             return;
         }
         try {
+
             eventQueue.put(notification);
+
         } catch (InterruptedException e) {
             logger.error("Failed to queue notification: " + notification, e);
         }
@@ -193,6 +203,10 @@ public class ServerNotificationManager implements Work, Disposable
         clear();
     }
 
+    /**
+     * Exceptions should not be thrown from this method
+     * @param notification
+     */
     protected void notifyListeners(UMOServerNotification notification)
     {
         TreeMap listeners;
@@ -211,11 +225,18 @@ public class ServerNotificationManager implements Work, Disposable
         }
 
         if (listenerClass == null) {
-            throw new IllegalArgumentException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, notification.getClass()
-                                                                                                      .getName()).getMessage());
+            logger.error(new NotificationException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, notification.getClass()
+                                                                                                      .getName())));
+            //Todo maybe we should fire an exception event or something here??
+            return;
         }
 
-        listeners = getListeners(listenerClass);
+        try {
+            listeners = getListeners(listenerClass);
+        } catch (NotificationException e) {
+            logger.error(e.getMessage(), e);
+            return;
+        }
         UMOServerNotificationListener l;
         synchronized (listeners) {
             for (Iterator iterator = listeners.keySet().iterator(); iterator.hasNext();) {
@@ -256,12 +277,12 @@ public class ServerNotificationManager implements Work, Disposable
      */
     public void run()
 	{
-		UMOServerNotification notification;
+		UMOServerNotification notification = null;
 		while (!disposed)
 		{
 			try
 			{
-				notification = (UMOServerNotification)eventQueue.poll(5000, TimeUnit.MILLISECONDS);
+				notification = (UMOServerNotification)eventQueue.take();
 				if (notification != null)
 				{
 					notifyListeners(notification);

@@ -40,6 +40,7 @@ import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.MessageNotificationListener;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.internal.notifications.ModelNotificationListener;
+import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.impl.internal.notifications.ServerNotificationManager;
@@ -1001,7 +1002,7 @@ public class MuleManager implements UMOManager
         message.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(getStartDate()).toString()).getMessage());
         String patch = System.getProperty("sun.os.patch.level", null);
         message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
-        message.add("OS: " + System.getProperty("os.name") + (patch!=null ? " - " + patch : "") + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
+        message.add("OS: " + System.getProperty("os.name") + (patch!=null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "") + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
 
         try {
             InetAddress host = InetAddress.getLocalHost();
@@ -1166,15 +1167,13 @@ public class MuleManager implements UMOManager
     /**
      * {@inheritDoc}
      */
-    public void registerListener(UMOServerNotificationListener l)
-    {
+    public void registerListener(UMOServerNotificationListener l) throws NotificationException {
         registerListener(l, null);
     }
 
-    public void registerListener(UMOServerNotificationListener l, String resourceIdentifier)
-    {
+    public void registerListener(UMOServerNotificationListener l, String resourceIdentifier) throws NotificationException {
         if (notificationManager == null) {
-            throw new MuleRuntimeException(new Message(Messages.SERVER_EVENT_MANAGER_NOT_ENABLED));
+            throw new NotificationException(new Message(Messages.SERVER_EVENT_MANAGER_NOT_ENABLED));
         }
         notificationManager.registerListener(l, resourceIdentifier);
     }

@@ -16,7 +16,16 @@ package org.mule.impl.internal.admin;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
-import org.mule.impl.internal.notifications.*;
+import org.mule.impl.internal.notifications.AdminNotificationListener;
+import org.mule.impl.internal.notifications.ComponentNotificationListener;
+import org.mule.impl.internal.notifications.ConnectionNotificationListener;
+import org.mule.impl.internal.notifications.CustomNotificationListener;
+import org.mule.impl.internal.notifications.ManagementNotificationListener;
+import org.mule.impl.internal.notifications.ManagerNotificationListener;
+import org.mule.impl.internal.notifications.MessageNotificationListener;
+import org.mule.impl.internal.notifications.ModelNotificationListener;
+import org.mule.impl.internal.notifications.NotificationException;
+import org.mule.impl.internal.notifications.SecurityNotificationListener;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOAgent;
@@ -192,7 +201,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
                     logEvent(notification);
                 }
             };
-            manager.registerListener(l);
+            try {
+                manager.registerListener(l);
+            } catch (NotificationException e) { /* ignore */}
             listeners.add(l);
         }
         if (!ignoreModelNotifications) {
@@ -202,7 +213,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
                     logEvent(notification);
                 }
             };
-            manager.registerListener(l);
+            try {
+                manager.registerListener(l);
+            } catch (NotificationException e) { /* ignore */}
             listeners.add(l);
         }
         if (!ignoreComponentNotifications) {
@@ -212,7 +225,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
                     logEvent(notification);
                 }
             };
-            manager.registerListener(l);
+            try {
+                manager.registerListener(l);
+            } catch (NotificationException e) { /* ignore */}
             listeners.add(l);
         }
         if (!ignoreSecurityNotifications) {
@@ -222,7 +237,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
                     logEvent(notification);
                 }
             };
-            manager.registerListener(l);
+            try {
+                manager.registerListener(l);
+            } catch (NotificationException e) { /* ignore */}
             listeners.add(l);
         }
 
@@ -233,7 +250,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
                     logEvent(notification);
                 }
             };
-            manager.registerListener(l);
+            try {
+                manager.registerListener(l);
+            } catch (NotificationException e) { /* ignore */}
             listeners.add(l);
         }
 
@@ -244,7 +263,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
                     logEvent(notification);
                 }
             };
-            manager.registerListener(l);
+            try {
+                manager.registerListener(l);
+            } catch (NotificationException e) { /* ignore */}
             listeners.add(l);
         }
 
@@ -255,7 +276,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
                     logEvent(notification);
                 }
             };
-            manager.registerListener(l);
+            try {
+                manager.registerListener(l);
+            } catch (NotificationException e) { /* ignore */}
             listeners.add(l);
         }
 
@@ -266,7 +289,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
                     logEvent(notification);
                 }
             };
-            manager.registerListener(l);
+            try {
+                manager.registerListener(l);
+            } catch (NotificationException e) { /* ignore */}
             listeners.add(l);
         }
 
@@ -279,7 +304,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
                     logEvent(notification);
                 }
             };
-            manager.registerListener(l);
+            try {
+                manager.registerListener(l);
+            } catch (NotificationException e) { /* ignore */}
             listeners.add(l);
         }
 
