@@ -15,6 +15,7 @@
 
 package org.mule.umo.manager;
 
+import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOInterceptorStack;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -288,7 +289,7 @@ public interface UMOManager extends Lifecycle
      * 
      * @param l the listener to register
      */
-    void registerListener(UMOServerNotificationListener l);
+    void registerListener(UMOServerNotificationListener l) throws NotificationException;
 
     /**
      * Registers an intenal server event listener. The listener will be notified
@@ -305,7 +306,7 @@ public interface UMOManager extends Lifecycle
      *            of listener For example, the resourceName could be the name of
      *            a component if the listener was a ComponentNotificationListener
      */
-    void registerListener(UMOServerNotificationListener l, String resourceIdentifier);
+    void registerListener(UMOServerNotificationListener l, String resourceIdentifier) throws NotificationException;
 
     /**
      * Unregisters a previously registered listener. If the listener has not
