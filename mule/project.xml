@@ -75,10 +75,11 @@
             </properties>
         </dependency>
 
+        <!-- This is the Qname pach packaged by Geronimo, seems to have Namespace context fix in it too -->
         <dependency>
-            <groupId>jaxrpc</groupId>
-            <artifactId>jaxrpc-qname-patch</artifactId>
-            <version>${jaxrpc_version}</version>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-qname</artifactId>
+            <version>${geronimo_spec_qname_version}</version>
             <properties>
                 <rar.bundle>true</rar.bundle>
                 <war.bundle>true</war.bundle>
@@ -88,9 +89,9 @@
         </dependency>
 
         <dependency>
-            <groupId>jaxrpc</groupId>
-            <artifactId>jaxrpc</artifactId>
-            <version>${jaxrpc_version}</version>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jaxrpc</artifactId>
+            <version>${geronimo_spec_jaxrpc_version}</version>
             <properties>
                 <rar.bundle>true</rar.bundle>
                 <war.bundle>true</war.bundle>
@@ -392,9 +393,9 @@
             </properties>
         </dependency>
         <dependency>
-            <groupId>activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>${activation_version}</version>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-activation</artifactId>
+            <version>${geronimo_spec_activation_version}</version>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <mule.mini>true</mule.mini>

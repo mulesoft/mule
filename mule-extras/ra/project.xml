@@ -124,9 +124,9 @@
             </properties>
         </dependency>
         <dependency>
-            <groupId>javamail</groupId>
-            <artifactId>javamail</artifactId>
-            <version>${javamail_version}</version>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-javamail</artifactId>
+            <version>${geronimo_spec_javamail_version}</version>
             <url>http://java.sun.com/products/javamail/</url>
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>
@@ -153,6 +153,8 @@
             <url>http://jakarta.apache.org/commons/httpclient/index.html</url>
             <properties>
                 <war.bundle.jar>true</war.bundle.jar>
+                <mule.core.jar>false</mule.core.jar>
+                <rar.bundle>true</rar.bundle>
             </properties>
         </dependency>
         <dependency>
