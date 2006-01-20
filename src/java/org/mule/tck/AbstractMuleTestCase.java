@@ -47,14 +47,33 @@ import java.io.File;
  */
 public abstract class AbstractMuleTestCase extends NamedTestCase
 {
+    protected boolean prereqsMet = true;
+
+
     public AbstractMuleTestCase()
     {
         super();
     }
 
+    /**
+     * Use this method to do any validation such as check for an installation of a required server
+     * If the current environment does not have the preReqs of the test return false and the test will
+     * be skipped.
+     * @return
+     */
+    protected boolean checkPreReqs() {
+        return true;
+    }
+
+    public boolean isPrereqsMet() {
+        return prereqsMet;
+    }
+
      protected final void setUp() throws Exception {
         if (MuleManager.isInstanciated())
             MuleManager.getInstance().dispose();
+         prereqsMet = checkPreReqs();
+        if(!prereqsMet) return;
          doSetUp();
     }
 
