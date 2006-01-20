@@ -13,10 +13,12 @@
  */
 package org.mule.management.mbeans;
 
-import java.util.Date;
-
 import org.mule.MuleManager;
 import org.mule.umo.UMOException;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
 
 /**
  * <code>MuleService</code> exposes certain Mule server functions for
@@ -29,6 +31,26 @@ public class MuleService implements MuleServiceMBean
 {
     private String version;
     private String vendor;
+    private String jdk;
+    private String host;
+    private String ip;
+    private String os;
+
+    public MuleService() {
+        String patch = System.getProperty("sun.os.patch.level", null);
+        jdk = System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")";
+        os = System.getProperty("os.name");
+        if(patch!=null && !"unknown".equalsIgnoreCase(patch)) {
+            os += " - " + patch;
+        }
+        os += " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")";
+
+        try {
+            InetAddress iad = InetAddress.getLocalHost();
+            host = iad.getCanonicalHostName();
+            ip = iad.getHostAddress();
+        } catch (UnknownHostException e) {}
+    }
 
     public boolean isInstanciated()
     {
@@ -134,5 +156,37 @@ public class MuleService implements MuleServiceMBean
     public String getServerUrl()
     {
         return MuleManager.getConfiguration().getServerUrl();
+    }
+
+    public long getFreeMemory() {
+        return Runtime.getRuntime().freeMemory();
+    }
+
+    public long getMaxMemory() {
+        return Runtime.getRuntime().maxMemory();
+    }
+
+    public long getTotalMemory() {
+        return Runtime.getRuntime().totalMemory();
+    }
+
+    public String getServerId() {
+        return MuleManager.getInstance().getId();
+    }
+
+    public String getHostname() {
+        return host;
+    }
+
+    public String getHostIp() {
+        return ip;
+    }
+
+    public String getOSVersion() {
+        return os;
+    }
+
+    public String getJdkVersion() {
+        return jdk;
     }
 }
