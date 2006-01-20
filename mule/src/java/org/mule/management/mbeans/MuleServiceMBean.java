@@ -13,9 +13,9 @@
  */
 package org.mule.management.mbeans;
 
-import java.util.Date;
-
 import org.mule.umo.UMOException;
+
+import java.util.Date;
 
 /**
  * <code>MuleServiceMBean</code> is a JMX service interface for the UMOManager
@@ -60,4 +60,20 @@ public interface MuleServiceMBean
     String[] getConfigResources();
 
     String getServerUrl();
+
+    long getFreeMemory();
+
+    long getMaxMemory();
+
+    long getTotalMemory();
+
+    String getServerId();
+
+    String getHostname();
+
+    String getHostIp();
+
+    String getOSVersion();
+
+    String getJdkVersion();
 }
