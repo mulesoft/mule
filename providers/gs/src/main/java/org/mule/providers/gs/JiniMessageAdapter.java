@@ -30,15 +30,15 @@ import org.mule.util.Utility;
 
 public class JiniMessageAdapter extends AbstractMessageAdapter
 {
-	private JiniMessage message;
+	private Entry message;
 	
     public JiniMessageAdapter(Object message) throws MessagingException
     {
         if(message==null) {
             throw new MessageTypeNotSupportedException(message, getClass());
         }
-        if(message instanceof JiniMessage) {
-            this.message = (JiniMessage)message;
+        if(message instanceof Entry) {
+            this.message = (Entry)message;
         } else {
     	    this.message = new JiniMessage(null, message);
         }
@@ -46,12 +46,20 @@ public class JiniMessageAdapter extends AbstractMessageAdapter
 
     public String getPayloadAsString() throws Exception
     {
-        return message.getPayload().toString();
+        if(message instanceof JiniMessage) {
+            return ((JiniMessage)message).getPayload().toString();
+        } else {
+            return message.toString();
+        }
     }
 
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return Utility.objectToByteArray(message.getPayload());
+        if(message instanceof JiniMessage) {
+            return Utility.objectToByteArray(((JiniMessage)message).getPayload());
+        } else {
+            return Utility.objectToByteArray(message);
+        }
     }
 
     public Object getPayload()

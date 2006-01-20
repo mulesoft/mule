@@ -13,6 +13,7 @@
  */
 package org.mule.providers.gs.space;
 
+import com.j_spaces.core.client.ExternalEntry;
 import com.j_spaces.core.client.FinderException;
 import com.j_spaces.core.client.SpaceFinder;
 import net.jini.core.entry.Entry;
@@ -22,7 +23,6 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.space.AbstractSpace;
 import org.mule.impl.space.SpaceTransactionException;
-import org.mule.providers.gs.JiniMessage;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionNotInProgressException;
 import org.mule.umo.UMOTransaction;
@@ -38,7 +38,7 @@ import org.mule.umo.space.UMOSpaceException;
 public class GSSpace extends AbstractSpace {
 
     private JavaSpace space;
-    private Entry template;
+    private Entry entryTemplate;
 
     public GSSpace(String spaceUrl) throws FinderException {
         super(spaceUrl);
@@ -52,8 +52,6 @@ public class GSSpace extends AbstractSpace {
     protected void findSpace(String spaceUrl) throws FinderException {
         logger.info("Connecting to space: " + spaceUrl);
 	    space = (JavaSpace)SpaceFinder.find(spaceUrl);
-
-        template = new JiniMessage(spaceUrl, null);
     }
 
     public void doPut(Object value) throws UMOSpaceException {
@@ -68,7 +66,7 @@ public class GSSpace extends AbstractSpace {
             if(value instanceof Entry) {
                 space.write((Entry)value, getTransaction(), lease);
             } else {
-                space.write(new JiniMessage(name, value), getTransaction(), lease);
+                space.write(new ExternalEntry(name, new Object[]{value}), getTransaction(), lease);
 
             }
         } catch (Exception e) {
@@ -82,7 +80,7 @@ public class GSSpace extends AbstractSpace {
 
     public Object doTake(long timeout) throws UMOSpaceException {
         try {
-              return space.take(template, getTransaction(), timeout);
+              return space.take(entryTemplate, getTransaction(), timeout);
         } catch (Exception e) {
             throw new GSSpaceException(e);
         }
@@ -90,7 +88,7 @@ public class GSSpace extends AbstractSpace {
 
     public Object doTakeNoWait() throws UMOSpaceException {
         try {
-              return space.takeIfExists(template, getTransaction(), 1);
+              return space.takeIfExists(entryTemplate, getTransaction(), 1);
         } catch (Exception e) {
             throw new GSSpaceException(e);
         }
@@ -152,5 +150,13 @@ public class GSSpace extends AbstractSpace {
         } else {
             return null;
         }
+    }
+
+    public Entry getEntryTemplate() {
+        return entryTemplate;
+    }
+
+    public void setEntryTemplate(Entry entryTemplate) {
+        this.entryTemplate = entryTemplate;
     }
 }

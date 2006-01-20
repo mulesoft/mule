@@ -13,6 +13,7 @@
  */
 package org.mule.providers.gs.transformers;
 
+import net.jini.core.entry.Entry;
 import org.mule.providers.gs.JiniMessage;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
@@ -29,11 +30,16 @@ import org.mule.umo.transformer.TransformerException;
 public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer {
 
     public UMOMessageToJavaSpaceEntry() {
-        setReturnClass(JiniMessage.class);
+
+        setReturnClass(Entry.class);
     }
 
     public Object transform(Object src, UMOEventContext context) throws TransformerException {
-        String destination = context.getEndpointURI().toString();
-        return new JiniMessage(destination, src);
+        if(src instanceof Entry) {
+            return src;
+        } else {
+            String destination = context.getEndpointURI().toString();
+            return new JiniMessage(destination, src);
+        }
     }
 }

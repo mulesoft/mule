@@ -15,11 +15,10 @@ package org.mule.providers.gs;
 
 import org.mule.providers.gs.space.GSSpaceFactory;
 import org.mule.providers.space.SpaceConnector;
-import org.mule.providers.space.TransactedSpaceMessageReceiver;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.provider.UMOMessageReceiver;
-
-import java.util.Iterator;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.space.UMOSpace;
+import org.mule.umo.space.UMOSpaceException;
 
 /**
  * Provides a Space connector to be used with the GigaSpaces JavaSpaces implementation
@@ -37,32 +36,6 @@ public class GSConnector extends SpaceConnector {
         setSpaceFactory(new GSSpaceFactory());
     }
 
-    public void doInitialise() throws InitialisationException {
-        super.doInitialise();
-
-        //NOTE: This code right now only sets the transaction timeout as the Space is null until
-        //The receiver hasbeen connected.  Need to find a clena way of setting the Jini Transaction
-        //Manager on the factory
-        for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
-            UMOMessageReceiver receiver = (UMOMessageReceiver) iterator.next();
-            if (receiver instanceof TransactedSpaceMessageReceiver) {
-//                GSSpace space = (GSSpace) ((TransactedSpaceMessageReceiver) receiver).getSpace();
-//                try {
-//                    transactionManager = (LocalTransactionManager)
-//                            LocalTransactionManager.getInstance((IJSpace) space.getJavaSpace());
-//                } catch (RemoteException e) {
-//                    throw new LifecycleException(e, this);
-//                }
-
-                //Because Jini uses its own transaction management we need to set the Manager on the
-                //Transaction Factory
-                JiniTransactionFactory factory = (JiniTransactionFactory) receiver.getEndpoint().getTransactionConfig().getFactory();
-                //factory.setTransactionManager(transactionManager);
-                factory.setTransactionTimeout(transactionTimeout);
-            }
-        }
-    }
-
 
     public String getProtocol() {
         return "gs";
@@ -75,4 +48,39 @@ public class GSConnector extends SpaceConnector {
     public void setTransactionTimeout(long transactionTimeout) {
         this.transactionTimeout = transactionTimeout;
     }
+
+    /**
+     * The method determines the key used to store the receiver against.
+     *
+     * @param component the component for which the endpoint is being registered
+     * @param endpoint  the endpoint being registered for the component
+     * @return the key to store the newly created receiver against
+     */
+    protected Object getReceiverKey(UMOComponent component, UMOEndpoint endpoint) {
+        return endpoint.getEndpointURI().toString() + (endpoint.getFilter()!=null ? ":" + endpoint.getFilter() : "");
+    }
+
+    /////////  Do not cahce spaces /////////
+    /**
+     * Will look up a space based on the URI.
+     * If the Space is created this method will honour the transaction information on the endpoint and
+     * set the space up accordingly
+     *
+     * @param endpoint
+     * @return
+     * @throws org.mule.umo.space.UMOSpaceException
+     *
+     */
+    public UMOSpace getSpace(UMOEndpoint endpoint) throws UMOSpaceException {
+        return getSpaceFactory().create(endpoint);
+    }
+
+    public UMOSpace getSpace(String spaceUrl) throws UMOSpaceException {
+        return getSpaceFactory().create(spaceUrl);
+    }
+
+//    protected String getSpaceKey(UMOEndpoint endpoint) {
+//        return endpoint.getEndpointURI().toString() + (endpoint.getFilter()!=null ? ":" + endpoint.getFilter() : "");
+//    }
+
 }
