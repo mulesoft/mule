@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  * Provides generic connectivity to 'Spaces' that implment the Mule Space Api, i.e.
- * Gigaspaces, JCache imples, Rio can be accessed as well as a mule file, Journal or VM space.
+ * Gigaspaces, JCache implementations, Rio can be accessed as well as a mule file, Journal or VM space.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -85,7 +85,7 @@ public class SpaceConnector extends AbstractServiceEnabledConnector {
         UMOSpace space = (UMOSpace)spaces.get(spaceUrl);
         if(space==null) {
             logger.info("Space not found, creating space: " + spaceUrl);
-            space = spaceFactory.create(spaceUrl);
+            space = spaceFactory.create(endpoint);
             spaces.put(spaceUrl, space);
             if(endpoint.getTransactionConfig().getFactory()!=null) {
                 space.setTransactionFactory(endpoint.getTransactionConfig().getFactory());
