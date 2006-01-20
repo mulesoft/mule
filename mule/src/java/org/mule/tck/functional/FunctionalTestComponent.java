@@ -16,6 +16,7 @@ package org.mule.tck.functional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageHelper;
@@ -50,6 +51,7 @@ public class FunctionalTestComponent implements Callable
         if (eventCallback != null) {
             eventCallback.eventReceived(context, this);
         }
+        MuleManager.getInstance().fireNotification(new FunctionalTestNotification(context.getComponentDescriptor().getName(), contents, FunctionalTestNotification.EVENT_RECEIVED));
         if(returnMessage!=null) {
             return returnMessage;
         } else {

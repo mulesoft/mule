@@ -71,6 +71,8 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     public void testSend() throws Exception
     {
+        if(!isPrereqsMet()) return;
+
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
         initialiseComponent(descriptor, this.createEventCallback());
