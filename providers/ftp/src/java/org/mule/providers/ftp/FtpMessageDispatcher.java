@@ -84,6 +84,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
 
             client = connector.getFtp(uri);
             connector.enterActiveOrPassiveMode(client, endpoint.getProperties());
+            connector.setupFileType(client, endpoint.getProperties());
             if (!client.changeWorkingDirectory(uri.getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
@@ -110,6 +111,7 @@ public class FtpMessageDispatcher extends AbstractMessageDispatcher
             client = connector.getFtp(endpointUri);
             // not sure this getParams() will always work, there's a todo in the code
             connector.enterActiveOrPassiveMode(client, endpointUri.getParams());
+            connector.setupFileType(client, endpointUri.getParams());
             if (!client.changeWorkingDirectory(endpointUri.getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }

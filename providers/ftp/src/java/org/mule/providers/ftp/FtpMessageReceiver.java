@@ -87,6 +87,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
         try {
             client = connector.getFtp(uri);
             connector.enterActiveOrPassiveMode(client, endpoint.getProperties());
+            connector.setupFileType(client, endpoint.getProperties());
             if (!client.changeWorkingDirectory(uri.getPath())) {
                 throw new IOException("Ftp error: " +
                         client.getReplyCode());
@@ -121,6 +122,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
         try {
             client = connector.getFtp(uri);
             connector.enterActiveOrPassiveMode(client, endpoint.getProperties());
+            connector.setupFileType(client, endpoint.getProperties());
             if (!client.changeWorkingDirectory(endpoint.getEndpointURI().getPath())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }

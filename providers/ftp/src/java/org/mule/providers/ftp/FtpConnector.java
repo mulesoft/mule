@@ -49,6 +49,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector
     public static final String PROPERTY_FILENAME = "filename";
     public static final String PROPERTY_OUTPUT_PATTERN = "outputPattern";
     public static final String PROPERTY_PASSIVE_MODE = "passive";
+    public static final String PROPERTY_BINARY_TRANSFER = "binary";
 
     /**
      * Time in milliseconds to poll. On each poll the poll() method is called
@@ -60,6 +61,8 @@ public class FtpConnector extends AbstractServiceEnabledConnector
     private FilenameParser filenameParser = new SimpleFilenameParser();
 
     private boolean passive = false;
+
+    private boolean binary = true;
 
     /**
      * Whether to test FTP connection on each take from pool.
@@ -177,7 +180,7 @@ public class FtpConnector extends AbstractServiceEnabledConnector
                     throw new IOException("Ftp error: " + client.getReplyCode());
                 }
                 if (!client.setFileType(FTP.BINARY_FILE_TYPE)) {
-                    throw new IOException("Ftp error");
+                    throw new IOException("Ftp error. Couldn't set BINARY transfer type.");
                 }
             } catch (Exception e) {
                 if (client.isConnected()) {
@@ -284,6 +287,8 @@ public class FtpConnector extends AbstractServiceEnabledConnector
     /**
      * Passive mode is OFF by default. The value is taken from the connector settings.
      * In case there are any overriding properties set on the endpoint, those will be used.
+     *
+     * @see #setPassive(boolean) 
      */
     public void enterActiveOrPassiveMode(FTPClient client, Map endpointProperties)
     {
@@ -341,4 +346,72 @@ public class FtpConnector extends AbstractServiceEnabledConnector
     {
         this.validateConnections = validateConnections;
     }
+
+    /**
+     * Getter for FTP transfer type.
+     *
+     * @return true if using FTP binary type
+     */
+    public boolean isBinary()
+    {
+        return binary;
+    }
+
+    /**
+     * Setter for FTP transfer type.
+     *
+     * @param binary binary type flag
+     */
+    public void setBinary(final boolean binary)
+    {
+        this.binary = binary;
+    }
+
+    /**
+     * Transfer type is BINARY by default. The value is taken from the connector settings.
+     * In case there are any overriding properties set on the endpoint, those will be used.
+     * <p/>
+     * The alternative type is ASCII.
+     * <p/>
+     *
+     * @see #setBinary(boolean)
+     */
+    public void setupFileType(FTPClient client, Map endpointProperties) throws Exception
+    {
+        int type;
+
+        // well, no endpoint URI here, as we have to use the most common denominator in API :(
+        final String binaryTransferString = (String) endpointProperties.get(FtpConnector.PROPERTY_BINARY_TRANSFER);
+        if (binaryTransferString == null) {
+            // try the connector properties then
+            if (isBinary()) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Using FTP BINARY type");
+                }
+                type = FTP.BINARY_FILE_TYPE;
+            } else {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Using FTP ASCII type");
+                }
+                type = FTP.ASCII_FILE_TYPE;
+            }
+        } else {
+            // override with endpoint's definition
+            final boolean binaryTransfer = Boolean.valueOf(binaryTransferString).booleanValue();
+            if (binaryTransfer) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Using FTP BINARY type (endpoint override)");
+                }
+                type = FTP.BINARY_FILE_TYPE;
+            } else {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Using FTP ASCII type (endpoint override)");
+                }
+                type = FTP.ASCII_FILE_TYPE;
+            }
+        }
+
+        client.setFileType(type);
+    }
+
 }
