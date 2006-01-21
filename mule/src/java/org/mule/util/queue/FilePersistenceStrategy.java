@@ -21,7 +21,13 @@ import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.util.file.DeleteException;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,8 +118,12 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy
      */
     public List restore() throws IOException
     {
+        List msgs = new ArrayList();
+        if(store==null) {
+            logger.warn("No store has be set on the File Persistence Strategy. Not restoring at this time");
+            return msgs;
+        }
         try {
-            List msgs = new ArrayList();
             restoreFiles(store, msgs);
             logger.debug("Restore retrieved " + msgs.size() + " objects");
             return msgs;
