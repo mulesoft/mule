@@ -102,38 +102,26 @@
 
             <outbound-router>
                 <catch-all-strategy className="org.mule.routing.LoggingCatchAllStrategy"/>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter" transformer="ErrorMessageToException" >
                     <endpoint address="file://../test-data/samples/errorhandler/exceptions" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML">
-                        <properties>
+                    <properties>
                             <property name="outputPattern" value="Exception-${UUID}.xml"/>
                         </properties>
-                    </endpoint>
+                        </endpoint>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.MuleException"/>
-                    <properties>
-                        <property name="transformer" value="ErrorMessageToException"/>
-                    </properties>
-                </router>
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
-                    <endpoint address="smtp://exceptions@symphonysoft.com" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage">
-                        <properties>
-                            <property name="ccAddresses" value="anotheremail@symphonysoft.com"/>
-                        </properties>
-                    </endpoint>
-                    <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.umo.lifecycle.FatalException"/>
-                    <properties>
-                        <property name="transformer" value="ErrorMessageToException"/>
-                    </properties>
                 </router>
 
-                <router className="org.mule.routing.outbound.FilteringOutboundRouter">
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter" transformer="ErrorMessageToException">
+                    <endpoint address="smtp://exceptions@symphonysoft.com" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML StringToEmailMessage"/>
+                    <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.umo.lifecycle.FatalException"/>
+                </router>
+
+                <router className="org.mule.routing.outbound.FilteringOutboundRouter" transformer="ErrorMessageToException">
                     <endpoint address="jms://exception.queue" transformers="ErrorMessageToExceptionBean ExceptionBeanToXML ObjectToJMSMessage"/>
                     <filter className="org.mule.routing.filters.PayloadTypeFilter" expectedType="org.mule.samples.errorhandler.exceptions.BusinessException"/>
-                    <properties>
-                        <property name="transformer" value="ErrorMessageToException"/>
-                    </properties>
                 </router>
             </outbound-router>
-
             <interceptor name="default"/>
         </mule-descriptor>
 
