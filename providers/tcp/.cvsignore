@@ -4,3 +4,4 @@ target
 bin
 junit*.properties
 mule-tcp-provider.iml
+mule-tcp-provider.jar

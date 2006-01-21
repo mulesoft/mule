@@ -174,7 +174,9 @@ public class JmxAgent implements UMOAgent
 
         try {
                 MuleManager.getInstance().registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+        } catch (NotificationException e) {
+            throw new InitialisationException(e, this);
+        }
         initialized = true;
     }
 
