@@ -56,6 +56,9 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
     private static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA = "http://apache.org/xml/features/validation/schema";
     private static final String APACHE_XML_FEATURES_VALIDATION_SCHEMA_FULL_CHECKING = "http://apache.org/xml/features/validation/schema-full-checking";
 
+    // JAXP property for specifying external XSD location
+    private static final String JAXP_PROPERTIES_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
+
     private static ThreadLocal properties = new ThreadLocal();
     private static ThreadLocal nodes = new ThreadLocal();
     private String splitExpression = "";
@@ -96,7 +99,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
     /**
      * Set classpath location of the XSD to check against. If the resource
      * cannot be found, an exception will be thrown at runtime.
-     * 
+     *
      * @param externalSchemaLocation location of XSD
      */
     public void setExternalSchemaLocation(String externalSchemaLocation)
@@ -141,7 +144,7 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
                 }
 
                 // Need this one to map schemaLocation to a physical location
-                reader.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource", xsdAsStream);
+                reader.setProperty(JAXP_PROPERTIES_SCHEMA_SOURCE, xsdAsStream);
 
                 dom4jDoc = reader.read(new StringReader(xml));
             } else if (src instanceof org.dom4j.Document) {
