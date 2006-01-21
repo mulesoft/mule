@@ -18,6 +18,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
+import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.CouldNotRouteOutboundMessageException;
 import org.mule.umo.routing.RoutePathNotFoundException;
@@ -72,8 +73,13 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
                 if (!lastEndpoint || synchronous) {
                     try {
                         result = send(session, message, endpoint);
-                        success = true;
-                        break;
+                        if (!exceptionPayloadAvailable(result)) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Successful invocation detected, stopping further processing.");
+                            }
+                            success = true;
+                            break;
+                        }
                     } catch (UMOException e) {
                         logger.info("Failed to send to endpoint: " + endpoint.getEndpointURI().toString() +
                                 ". Error was: " + e.getMessage() + ". Trying next endpoint");
@@ -103,5 +109,25 @@ public class ExceptionBasedRouter extends FilteringOutboundRouter
             endpoint.setRemoteSync(true);
         }
         super.addEndpoint(endpoint);
+    }
+
+    /**
+     *
+     * @param message message to check
+     * @return true if there was an exception payload set
+     */
+    protected boolean exceptionPayloadAvailable(UMOMessage message)
+    {
+        if (message == null) {
+            return false;
+        }
+
+        final UMOExceptionPayload exceptionPayload = message.getExceptionPayload();
+        if (exceptionPayload != null) {
+            logger.info("Failure returned, will try next endpoint. Exception payload is: " + exceptionPayload);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

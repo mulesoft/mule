@@ -16,6 +16,7 @@ package org.mule.test.routing.outbound;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleMessage;
+import org.mule.impl.message.ExceptionPayload;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -207,4 +208,40 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
         mockSession.verify();
     }
 
+    /**
+     * The first endpoint contains exception payload in return message, second succeeds.
+     * Events are being sent synchronously.
+     */
+    public void testFirstHadExceptionPayloadSuccessSecondSyncWithExceptionPayload() throws Exception
+    {
+        Mock mockSession = getMockSession();
+
+        UMOEndpoint endpoint1 = getTestEndpoint("TestFailEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint1.setEndpointURI(new MuleEndpointURI("test://Failure"));
+        UMOEndpoint endpoint2 = getTestEndpoint("TestSuccessEndpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint2.setEndpointURI(new MuleEndpointURI("test://Success"));
+
+        ExceptionBasedRouter router = new ExceptionBasedRouter();
+        router.addEndpoint(endpoint1);
+        router.addEndpoint(endpoint2);
+
+        UMOMessage message = new MuleMessage("test event");
+        UMOMessage expectedResultMessage = new MuleMessage("Return event");
+
+        assertTrue(router.isMatch(message));
+
+        // remote endpoint failed and set an exception payload on the returned message
+        UMOMessage exPayloadMessage = new MuleMessage("there was a failure");
+        exPayloadMessage.setExceptionPayload(new ExceptionPayload(new RuntimeException()));
+
+        final UMOSession session = (UMOSession) mockSession.proxy();
+        // 1st failure
+        mockSession.expectAndReturn("sendEvent", C.args(C.eq(message), C.eq(endpoint1)), exPayloadMessage);
+        // next endpoint
+        mockSession.expectAndReturn("sendEvent", C.args(C.eq(message), C.eq(endpoint2)), expectedResultMessage);
+        UMOMessage actualResultMessage = router.route(message, session, true);
+        mockSession.verify();
+
+        assertEquals("Got an invalid return message.", expectedResultMessage, actualResultMessage);
+    }
 }
