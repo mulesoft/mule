@@ -33,6 +33,7 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.internal.notifications.ModelNotificationListener;
+import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.providers.service.ConnectorFactory;
@@ -155,7 +156,11 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             registerSupportedProtocol(s);
         }
 
-        MuleManager.getInstance().registerListener(this);
+        try {
+            MuleManager.getInstance().registerListener(this);
+        } catch (NotificationException nex) {
+            throw new InitialisationException(nex, this);
+        }
 
         if (serverConfig == null)
             serverConfig = DEFAULT_MULE_AXIS_SERVER_CONFIG;
