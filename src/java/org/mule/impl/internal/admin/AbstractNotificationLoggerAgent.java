@@ -203,7 +203,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try {
                 manager.registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+            } catch (NotificationException e) {
+                throw new InitialisationException(e, this);
+            }
             listeners.add(l);
         }
         if (!ignoreModelNotifications) {
@@ -215,7 +217,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try {
                 manager.registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+            } catch (NotificationException e) {
+                throw new InitialisationException(e, this);
+            }
             listeners.add(l);
         }
         if (!ignoreComponentNotifications) {
@@ -227,7 +231,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try {
                 manager.registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+            } catch (NotificationException e) {
+                throw new InitialisationException(e, this);
+            }
             listeners.add(l);
         }
         if (!ignoreSecurityNotifications) {
@@ -239,7 +245,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try {
                 manager.registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+            } catch (NotificationException e) {
+                throw new InitialisationException(e, this);
+            }
             listeners.add(l);
         }
 
@@ -252,7 +260,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try {
                 manager.registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+            } catch (NotificationException e) {
+                throw new InitialisationException(e, this);
+            }
             listeners.add(l);
         }
 
@@ -265,7 +275,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try {
                 manager.registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+            } catch (NotificationException e) {
+                throw new InitialisationException(e, this);
+            }
             listeners.add(l);
         }
 
@@ -278,7 +290,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try {
                 manager.registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+            } catch (NotificationException e) {
+                throw new InitialisationException(e, this);
+            }
             listeners.add(l);
         }
 
@@ -291,7 +305,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try {
                 manager.registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+            } catch (NotificationException e) {
+                throw new InitialisationException(e, this);
+            }
             listeners.add(l);
         }
 
@@ -306,7 +322,9 @@ public abstract class AbstractNotificationLoggerAgent implements UMOAgent
             };
             try {
                 manager.registerListener(l);
-            } catch (NotificationException e) { /* ignore */}
+            } catch (NotificationException e) {
+                throw new InitialisationException(e, this);
+            }
             listeners.add(l);
         }
 
