@@ -17,6 +17,7 @@ import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.outbound.FilteringXmlMessageSplitter;
@@ -36,54 +37,131 @@ import java.util.Map;
 
 public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 {
-    public void testXmlMessageSplitter() throws Exception
-    {
-        Mock session = getMockSession();
+    private UMOEndpoint endpoint1;
+    private UMOEndpoint endpoint2;
+    private UMOEndpoint endpoint3;
+    private FilteringXmlMessageSplitter xmlSplitter;
 
-        UMOEndpoint endpoint1 = getTestEndpoint("Test1Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+    protected void doSetUp() throws Exception
+    {
+        // setup endpoints
+        endpoint1 = getTestEndpoint("Test1Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
-        UMOEndpoint endpoint2 = getTestEndpoint("Test2Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint2 = getTestEndpoint("Test2Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint2.setEndpointURI(new MuleEndpointURI("test://endpointUri.2"));
-        UMOEndpoint endpoint3 = getTestEndpoint("Test3Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint3 = getTestEndpoint("Test3Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint3.setEndpointURI(new MuleEndpointURI("test://endpointUri.3"));
 
-        FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
-        splitter.setValidateSchema(true);
-        splitter.setExternalSchemaLocation("purchase-order.xsd");
+        // setup splitter
+        xmlSplitter = new FilteringXmlMessageSplitter();
+        xmlSplitter.setValidateSchema(true);
+        xmlSplitter.setExternalSchemaLocation("purchase-order.xsd");
 
         // The xml document declares a default namespace, thus
         // we need to workaround it by specifying it both in
         // the namespaces and in the splitExpression
         Map namespaces = new HashMap();
         namespaces.put("e", "http://www.example.com");
-        splitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
-        splitter.setNamespaces(namespaces);
-        splitter.addEndpoint(endpoint1);
-        splitter.addEndpoint(endpoint2);
-        splitter.addEndpoint(endpoint3);
+        xmlSplitter.setSplitExpression("/e:purchaseOrder/e:items/e:item");
+        xmlSplitter.setNamespaces(namespaces);
+        xmlSplitter.addEndpoint(endpoint1);
+        xmlSplitter.addEndpoint(endpoint2);
+        xmlSplitter.addEndpoint(endpoint3);
+    }
 
+    public void testStringPayloadXmlMessageSplitter() throws Exception
+    {
         String payload = Utility.loadResourceAsString("purchase-order.xml", getClass());
+        internalTestSuccessfulXmlSplitter(payload);
+    }
+
+    public void testDom4JDocumentPayloadXmlMessageSplitter() throws Exception
+    {
+        String payload = Utility.loadResourceAsString("purchase-order.xml", getClass());
+        Document doc = DocumentHelper.parseText(payload);
+        internalTestSuccessfulXmlSplitter(doc);
+    }
+
+    public void testByteArrayPayloadXmlMessageSplitter() throws Exception
+    {
+        String payload = Utility.loadResourceAsString("purchase-order.xml", getClass());
+        internalTestSuccessfulXmlSplitter(payload.getBytes());
+    }
+
+
+    private void internalTestSuccessfulXmlSplitter(Object payload) throws Exception
+    {
+        Mock session = getMockSession();
 
         UMOMessage message = new MuleMessage(payload);
 
-        assertTrue(splitter.isMatch(message));
+        assertTrue(xmlSplitter.isMatch(message));
         final ItemNodeConstraint itemNodeConstraint = new ItemNodeConstraint();
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
         session.expect("dispatchEvent", C.args(itemNodeConstraint, C.eq(endpoint1)));
-        splitter.route(message, (UMOSession) session.proxy(), false);
+        xmlSplitter.route(message, (UMOSession) session.proxy(), false);
         session.verify();
 
         message = new MuleMessage(payload);
 
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint1)), message);
         session.expectAndReturn("sendEvent", C.args(itemNodeConstraint, C.eq(endpoint1)), message);
-        UMOMessage result = splitter.route(message, (UMOSession) session.proxy(), true);
+        UMOMessage result = xmlSplitter.route(message, (UMOSession) session.proxy(), true);
         assertNotNull(result);
         assertEquals(message, result);
         session.verify();
     }
 
-    public void testInvalidPayloadThrowsException() throws Exception {
+
+    public void testXsdNotFoundThrowsException() throws Exception
+    {
+        final String invalidSchemaLocation = "non-existent.xsd";
+        Mock session = getMockSession();
+
+        UMOEndpoint endpoint1 = getTestEndpoint("Test1Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
+        endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
+
+        FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
+        splitter.setValidateSchema(true);
+        splitter.setExternalSchemaLocation(invalidSchemaLocation);
+
+        String payload = Utility.loadResourceAsString("purchase-order.xml", getClass());
+
+        UMOMessage message = new MuleMessage(payload);
+
+        assertTrue(splitter.isMatch(message));
+        try {
+            splitter.route(message, (UMOSession) session.proxy(), false);
+            fail("Should have thrown an exception, because XSD is not found.");
+        } catch (IllegalArgumentException iaex) {
+            assertTrue("Wrong exception?",
+                    iaex.getMessage().indexOf("Couldn't find schema at " + invalidSchemaLocation) != -1);
+        }
+        session.verify();
+    }
+
+
+    public void testUnsupportedTypePayloadIsIgnored() throws Exception
+    {
+        Exception unsupportedPayload = new Exception();
+
+        Mock session = getMockSession();
+
+        UMOMessage message = new MuleMessage(unsupportedPayload);
+
+        assertTrue(xmlSplitter.isMatch(message));
+        xmlSplitter.route(message, (UMOSession) session.proxy(), false);
+        session.verify();
+
+        message = new MuleMessage(unsupportedPayload);
+
+        UMOMessage result = xmlSplitter.route(message, (UMOSession) session.proxy(), true);
+        assertNull(result);
+        session.verify();
+    }
+
+
+    public void testInvalidXmlPayloadThrowsException() throws Exception {
         Mock session = getMockSession();
 
         FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
