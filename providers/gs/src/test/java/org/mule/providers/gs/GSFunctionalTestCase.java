@@ -53,14 +53,14 @@ public class GSFunctionalTestCase extends FunctionalTestCase implements Function
 
     }
 
-    public void testUnprocessMessageReceived() throws Exception {
+    public void testReceivesWithTemplates() throws Exception {
         if(!isPrereqsMet()) return;
 
         MuleClient client = new MuleClient();
         Order order = new Order();
         order.setProcessed(Boolean.FALSE);
         client.send("gs:java://localhost/mule-space_container/mule-space?schema=cache", order, null);
-        Thread.sleep(300000L);
+        Thread.sleep(2000L);
 
         assertEquals(1, unprocessedCount);
         assertEquals(0, processedCount);
@@ -69,23 +69,16 @@ public class GSFunctionalTestCase extends FunctionalTestCase implements Function
         assertEquals(2, unprocessedCount);
         assertEquals(0, processedCount);
 
-    }
-
-    public void testProcessMessageReceived() throws Exception {
-
-        if(!isPrereqsMet()) return;
-
-        MuleClient client = new MuleClient();
-        Order order = new Order();
         order.setProcessed(Boolean.TRUE);
         client.send("gs:java://localhost/mule-space_container/mule-space?schema=cache", order, null);
-        Thread.sleep(3000L);
+        Thread.sleep(1000L);
         assertEquals(1, processedCount);
-        assertEquals(0, unprocessedCount);
+        assertEquals(2, unprocessedCount);
         client.send("gs:java://localhost/mule-space_container/mule-space?schema=cache", order, null);
         Thread.sleep(1000L);
         assertEquals(2, processedCount);
-        assertEquals(0, unprocessedCount);
+        assertEquals(2, unprocessedCount);
+
     }
 
 

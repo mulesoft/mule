@@ -23,8 +23,8 @@ import net.jini.core.entry.Entry;
  */
 public class Order implements Entry {
 
-    private String orderId;
-    private Boolean processed = Boolean.FALSE;
+    public String orderId;
+    public Boolean processed = Boolean.FALSE;
 
     public String getOrderId() {
         return orderId;
