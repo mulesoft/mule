@@ -75,7 +75,7 @@ public class StringMessageHelper
     {
         int size;
         StringBuffer buf = new StringBuffer(messages.size() * maxlength);
-        int trimLength = maxlength - 4;
+        int trimLength = maxlength - ( c == ' ' ? 2 : 4);
 
         for (int i = 0; i < messages.size(); i++) {
             size = messages.get(i).toString().length();
@@ -109,11 +109,11 @@ public class StringMessageHelper
             }
         }
         buf.append(Utility.CRLF);
-        buf.append(charString(c, maxlength));
+        if(c != ' ' ) buf.append(charString(c, maxlength));
 
         for (int i = 0; i < messages.size(); i++) {
             buf.append(Utility.CRLF);
-            buf.append(c);
+             if(c != ' ' ) buf.append(c);
             buf.append(" ");
             buf.append(messages.get(i));
 
@@ -128,10 +128,10 @@ public class StringMessageHelper
                 buf.append(charString(' ', padding));
             }
             buf.append(" ");
-            buf.append(c);
+             if(c != ' ' ) buf.append(c);
         }
         buf.append(Utility.CRLF);
-        buf.append(charString(c, maxlength));
+         if(c != ' ' ) buf.append(charString(c, maxlength));
         return buf.toString();
     }
 
