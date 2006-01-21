@@ -22,6 +22,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.ConnectionNotificationListener;
+import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.ConnectException;
 import org.mule.providers.ReplyToHandler;
@@ -123,7 +124,11 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
     public void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        MuleManager.getInstance().registerListener(this, getName());
+        try {
+            MuleManager.getInstance().registerListener(this, getName());
+        } catch (NotificationException nex) {
+            throw new InitialisationException(nex, this);
+        }
     }
 
     protected void initJndiContext() throws NamingException, InitialisationException
@@ -167,7 +172,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     protected Connection createConnection() throws NamingException, JMSException, InitialisationException
     {
-        Connection connection = null;
+        Connection connection;
         if (connectionFactory == null) {
             connectionFactory = createConnectionFactory();
         }
