@@ -93,6 +93,12 @@ public class FilteringXmlMessageSplitter extends AbstractMessageSplitter
         return externalSchemaLocation;
     }
 
+    /**
+     * Set classpath location of the XSD to check against. If the resource
+     * cannot be found, an exception will be thrown at runtime.
+     * 
+     * @param externalSchemaLocation location of XSD
+     */
     public void setExternalSchemaLocation(String externalSchemaLocation)
     {
         this.externalSchemaLocation = externalSchemaLocation;
