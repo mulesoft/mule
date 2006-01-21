@@ -4,7 +4,7 @@
     <extend>${basedir}/../project2.xml</extend>
     <pomVersion>3</pomVersion>
     <artifactId>mule-space-provider</artifactId>
-    <name>Mule Sapce Provider</name>
+    <name>Mule Space Provider</name>
     <description>Allows Mule to send and receive events via the Mule Space API.  This enables interation with JCache, Jini, Rio or other 'space' types using a common interface.</description>
     <shortDescription>space</shortDescription>
     <url>http://www.muleumo.org/doc/providers/space/</url>
