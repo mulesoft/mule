@@ -407,6 +407,11 @@ public class MuleConfiguration
         return getManifestProperty("Implementation-Title");
     }
 
+    public String getBuildDate()
+    {
+        return getManifestProperty("Build-Date");
+    }
+
     public Manifest getManifest()
     {
         if (manifest == null) {
