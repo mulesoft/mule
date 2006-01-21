@@ -13,9 +13,14 @@
  */
 package org.mule.management.mbeans;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.umo.UMOException;
+import org.mule.util.StringMessageHelper;
+import org.mule.util.Utility;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -29,12 +34,21 @@ import java.util.Date;
  */
 public class MuleService implements MuleServiceMBean
 {
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     private String version;
     private String vendor;
     private String jdk;
     private String host;
     private String ip;
     private String os;
+    private String buildDate;
+    //todo
+    private String copyright = "Copyright (c) 2003-2006 SymphonySoft Limited. All rights reserved.";
+    private String license;
 
     public MuleService() {
         String patch = System.getProperty("sun.os.patch.level", null);
@@ -45,6 +59,7 @@ public class MuleService implements MuleServiceMBean
         }
         os += " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")";
 
+        buildDate = MuleManager.getConfiguration().getBuildDate();
         try {
             InetAddress iad = InetAddress.getLocalHost();
             host = iad.getCanonicalHostName();
@@ -182,11 +197,34 @@ public class MuleService implements MuleServiceMBean
         return ip;
     }
 
-    public String getOSVersion() {
+    public String getOsVersion() {
         return os;
     }
 
     public String getJdkVersion() {
         return jdk;
+    }
+
+    public String getCopyright() {
+        return copyright;
+    }
+
+    public String getLicense() {
+        if(license==null) {
+            try {
+                license = Utility.loadResourceAsString("LICENSE.txt", getClass());
+                license = StringMessageHelper.getBoilerPlate(license, ' ', 80);
+            } catch (IOException e) {
+                logger.warn("Failed to load LICENSE.txt", e);
+            }
+            if(license==null) {
+                license = "Failed to load license";
+            }
+        }
+        return license;
+    }
+
+    public String getBuildDate() {
+        return buildDate;
     }
 }

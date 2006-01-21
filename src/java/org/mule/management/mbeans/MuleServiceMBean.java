@@ -73,7 +73,13 @@ public interface MuleServiceMBean
 
     String getHostIp();
 
-    String getOSVersion();
+    String getOsVersion();
 
     String getJdkVersion();
+
+    String getCopyright();
+
+    String getLicense();
+
+    String getBuildDate();
 }
