@@ -1,4 +1,4 @@
-Copyright (c) 2002-2004 SymphonySoft Limited. All rights reserved.
+Copyright (c) 2002-2006 SymphonySoft Limited. All rights reserved.
 http://www.symphonysoft.com
 
 Redistribution and use in source and binary forms, with or without modification, are permitted 
