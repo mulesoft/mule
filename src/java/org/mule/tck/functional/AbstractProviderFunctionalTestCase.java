@@ -66,7 +66,9 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     protected void doTearDown() throws Exception
     {
-        connector.dispose();
+        if (connector != null) {
+            connector.dispose();
+        }
     }
 
     public void testSend() throws Exception
