@@ -135,6 +135,8 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy
     protected void restoreFiles(File dir, List msgs) throws IOException, ClassNotFoundException
     {
         File[] files = dir.listFiles();
+        if(files==null) return;
+
         for (int i = 0; i < files.length; i++) {
             if (files[i].isDirectory()) {
                 restoreFiles(files[i], msgs);
