@@ -58,7 +58,6 @@ public class MuleObjectNameProcessor implements BeanPostProcessor
                 if (((UMOModel) o).getName() == null || overwrite)
                     ((UMOModel) o).setName(s);
             } else if (o instanceof UMOAgent) {
-                if (((UMOAgent) o).getName() == null || overwrite)
                     ((UMOAgent) o).setName(s);
             }
         }
