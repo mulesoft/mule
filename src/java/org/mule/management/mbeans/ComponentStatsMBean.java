@@ -13,11 +13,12 @@
  */
 package org.mule.management.mbeans;
 
-import javax.management.ObjectName;
+
 
 /**
  * <code>ComponentStatsMBean</code> TODO
- * 
+ *
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
  */
@@ -25,10 +26,6 @@ public interface ComponentStatsMBean
 {
 
     void clearStatistics();
-
-    ObjectName getRouterInbound();
-
-    ObjectName getRouterOutbound();
 
     long getAverageExecutionTime();
 
