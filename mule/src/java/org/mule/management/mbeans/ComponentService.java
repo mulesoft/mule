@@ -50,10 +50,6 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     private ObjectName objectName;
 
-
-    private ObjectName inboundName;
-    private ObjectName outboundName;
-
     private ComponentStatistics statistics;
 
     public ComponentService(String name)
@@ -170,15 +166,13 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
                 if (this.server.isRegistered(statsName)) {
                 	this.server.unregisterMBean(statsName);
                 }
+
 				this.server.registerMBean(new ComponentStats(getComponent()
 						.getStatistics()), this.statsName);
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error post-registering the MBean", e);
 		}
-
-        //component stats
-
 	}
 
     /*
@@ -205,26 +199,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
      */
     public void postDeregister()
     {
-        try
-        {
-            if (this.server.isRegistered(inboundName)) {
-                this.server.unregisterMBean(inboundName);
-            }
-        } catch(Exception ex)
-        {
-            LOGGER.error("Error unregistering ComponentStats child " + inboundName.getCanonicalName(),
-                        ex);
-        }
-        try
-        {
-            if (this.server.isRegistered(outboundName)) {
-                this.server.unregisterMBean(outboundName);
-            }
-        } catch(Exception ex)
-        {
-            LOGGER.error("Error unregistering ComponentStats child " + inboundName.getCanonicalName(),
-                        ex);
-        }
+
     }
 
     private AbstractComponent getComponent()
@@ -389,26 +364,5 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
     public long getTotalExecutionTime()
     {
         return statistics.getTotalExecutionTime();
-    }
-
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.management.mbeans.ComponentStatsMBean#getInboundRouter()
-     */
-    public ObjectName getRouterInbound()
-    {
-        return this.inboundName;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.mule.management.mbeans.ComponentStatsMBean#getOutboundRouter()
-     */
-    public ObjectName getRouterOutbound()
-    {
-        return this.outboundName;
     }
 }

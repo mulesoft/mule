@@ -44,7 +44,7 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
         System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
 
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance("org.mule:*"), null);
-        assertEquals("Unexpected number of components registered in the domain.", 4, mbeans.size());
+        assertEquals("Unexpected number of components registered in the domain.", 5, mbeans.size());
 
         manager.dispose();
 
