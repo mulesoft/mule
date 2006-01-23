@@ -27,5 +27,12 @@ public interface StatisticsServiceMBean extends Statistics
 
     void logCSVSummary();
 
+    /**
+     *
+     * @return
+     * @deprecated use getHtmlSummary
+     */
     String printHtmlSummary();
+
+    String getHtmlSummary();
 }

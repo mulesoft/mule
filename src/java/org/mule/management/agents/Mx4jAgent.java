@@ -13,7 +13,15 @@
  */
 package org.mule.management.agents;
 
-import java.net.URI;
+import mx4j.log.CommonsLogger;
+import mx4j.log.Log;
+import mx4j.tools.adaptor.http.HttpAdaptor;
+import mx4j.tools.adaptor.http.XSLTProcessor;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOAgent;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -21,17 +29,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-
-import mx4j.log.CommonsLogger;
-import mx4j.log.Log;
-import mx4j.tools.adaptor.http.HttpAdaptor;
-import mx4j.tools.adaptor.http.XSLTProcessor;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
+import java.net.URI;
 
 /**
  * <code>Mx4jAgent</code> configures an Mx4J Http Adaptor for Jmx management,
@@ -43,7 +41,7 @@ import org.mule.umo.manager.UMOAgent;
 public class Mx4jAgent implements UMOAgent
 {
 
-    private String name;
+    private String name = "MX4j  Agent";
     private String jmxAdaptorUrl = "http://localhost:9999";
     private Object adaptor;
     private MBeanServer mBeanServer;

@@ -1055,6 +1055,11 @@ public class MuleManager implements UMOManager
         }
     }
 
+    public UMOAgent lookupAgent(String name) {
+        return (UMOAgent)agents.get(name);
+    }
+
+
     /**
      * {@inheritDoc}
      */

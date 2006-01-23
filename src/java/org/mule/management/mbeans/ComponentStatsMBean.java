@@ -24,7 +24,7 @@ import javax.management.ObjectName;
 public interface ComponentStatsMBean
 {
 
-    void clear();
+    void clearStatistics();
 
     ObjectName getRouterInbound();
 

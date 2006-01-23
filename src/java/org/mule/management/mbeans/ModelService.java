@@ -84,4 +84,8 @@ public class ModelService implements ModelServiceMBean
     {
         return model.getName();
     }
+
+    public String getType() {
+        return model.getType();
+    }
 }

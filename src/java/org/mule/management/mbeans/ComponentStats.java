@@ -52,7 +52,7 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
     /**
      * 
      */
-    public void clear()
+    public void clearStatistics()
     {
         statistics.clear();
     }
@@ -221,28 +221,52 @@ public class ComponentStats implements ComponentStatsMBean, MBeanRegistration
      */
     public void postRegister(Boolean registrationDone)
     {
+//        try {
+//            RouterStatistics is = this.statistics.getInboundRouterStat();
+//            if (is != null) {
+//                inboundName = new ObjectName(name.toString() + ",router=inbound");
+//                // unregister old version if exists
+//                if (this.server.isRegistered(inboundName)) {
+//                	this.server.unregisterMBean(inboundName);
+//                }
+//                this.server.registerMBean(new RouterStats(is), this.inboundName);
+//            }
+//            RouterStatistics os = this.statistics.getOutboundRouterStat();
+//            if (os != null) {
+//                outboundName = new ObjectName(name.toString() + ",router=outbound");
+//                // unregister old version if exists
+//                if (this.server.isRegistered(outboundName)) {
+//                	this.server.unregisterMBean(outboundName);
+//                }
+//                this.server.registerMBean(new RouterStats(os), this.outboundName);
+//            }
+//        } catch (Exception e) {
+//            LOGGER.error("Error post-registering MBean", e);
+//        }
+
         try {
-            RouterStatistics is = this.statistics.getInboundRouterStat();
-            if (is != null) {
-                inboundName = new ObjectName(name.toString() + ",router=inbound");
-                // unregister old version if exists
-                if (this.server.isRegistered(inboundName)) {
-                	this.server.unregisterMBean(inboundName);
+                    RouterStatistics is = this.statistics.getInboundRouterStat();
+                    if (is != null) {
+                        inboundName = new ObjectName(name.getDomain() + ":type=org.mule.Statistics,component=" + statistics.getName() + ",router=inbound");
+                        // unregister old version if exists
+                        if (this.server.isRegistered(inboundName)) {
+                            this.server.unregisterMBean(inboundName);
+                        }
+                        this.server.registerMBean(new RouterStats(is), this.inboundName);
+                    }
+                    RouterStatistics os = this.statistics.getOutboundRouterStat();
+                    if (os != null) {
+                        outboundName = new ObjectName(name.getDomain() + ":type=org.mule.Statistics,component=" + statistics.getName() + ",router=outbound");
+                        // unregister old version if exists
+                        if (this.server.isRegistered(outboundName)) {
+                            this.server.unregisterMBean(outboundName);
+                        }
+                        this.server.registerMBean(new RouterStats(os), this.outboundName);
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Error post-registering MBean", e);
                 }
-                this.server.registerMBean(new RouterStats(is), this.inboundName);
-            }
-            RouterStatistics os = this.statistics.getOutboundRouterStat();
-            if (os != null) {
-                outboundName = new ObjectName(name.toString() + ",router=outbound");
-                // unregister old version if exists
-                if (this.server.isRegistered(outboundName)) {
-                	this.server.unregisterMBean(outboundName);
-                }
-                this.server.registerMBean(new RouterStats(os), this.outboundName);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error post-registering MBean", e);
-        }
+
     }
 
     /*

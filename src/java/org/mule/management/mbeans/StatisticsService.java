@@ -13,9 +13,6 @@
  */
 package org.mule.management.mbeans;
 
-import java.io.StringWriter;
-import java.util.Collection;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -23,6 +20,9 @@ import org.mule.management.stats.AllStatistics;
 import org.mule.management.stats.printers.CSVPrinter;
 import org.mule.management.stats.printers.HtmlTablePrinter;
 import org.mule.umo.manager.UMOManager;
+
+import java.io.StringWriter;
+import java.util.Collection;
 
 /**
  * <code>StatisicsService</code> exposes Mule processing statistics
@@ -93,11 +93,20 @@ public class StatisticsService implements StatisticsServiceMBean
         stats.logSummary(printer);
     }
 
+    /**
+     *
+     * @return
+     * @deprecated Use getHtmlSummary
+     */
     public String printHtmlSummary()
     {
         StringWriter w = new StringWriter();
         HtmlTablePrinter printer = new HtmlTablePrinter(w);
         stats.logSummary(printer);
         return w.toString();
+    }
+
+    public String getHtmlSummary() {
+        return printHtmlSummary();
     }
 }

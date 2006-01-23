@@ -42,7 +42,7 @@ public class RmiRegistryAgent  implements UMOAgent
     protected transient Log logger = LogFactory.getLog(getClass());
 
     public static final String DEFAULT_SERVER_URI = "rmi://localhost:1099";
-    private String name;
+    private String name = "RMI Agent";
     private Registry rmiRegistry;
     private String serverUri = DEFAULT_SERVER_URI;
     private boolean createRegistry = true;

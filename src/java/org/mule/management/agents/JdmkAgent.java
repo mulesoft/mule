@@ -13,7 +13,12 @@
  */
 package org.mule.management.agents;
 
-import java.net.URI;
+import com.sun.jdmk.comm.HtmlAdaptorServer;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
+import org.mule.umo.UMOException;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.manager.UMOAgent;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -21,14 +26,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
-import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.InitialisationException;
-import org.mule.umo.manager.UMOAgent;
-
-import com.sun.jdmk.comm.HtmlAdaptorServer;
+import java.net.URI;
 
 /**
  * <code>JdmkAgent</code> configures an Jdmk Http Adaptor for Jmx management,
@@ -40,7 +38,7 @@ import com.sun.jdmk.comm.HtmlAdaptorServer;
 public class JdmkAgent implements UMOAgent
 {
 
-    private String name;
+    private String name = "JDMK Agent";
     private String jmxAdaptorUrl = "http://localhost:9092";
     private Object adaptor;
     private MBeanServer mBeanServer;

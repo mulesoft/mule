@@ -38,6 +38,7 @@ public class EndpointService implements EndpointServiceMBean
     private UMOEndpoint endpoint;
     private UMOMessageReceiver receiver;
     private String name;
+    private String componentName;
 
     public EndpointService(UMOEndpoint endpoint)
     {
@@ -52,6 +53,7 @@ public class EndpointService implements EndpointServiceMBean
         }
         this.endpoint = receiver.getEndpoint();
         this.receiver = receiver;
+        this.componentName = receiver.getComponent().getDescriptor().getName();
         init();
     }
 
@@ -120,6 +122,14 @@ public class EndpointService implements EndpointServiceMBean
     public String getType()
     {
         return endpoint.getType();
+    }
+
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
     }
 
 }

@@ -15,9 +15,6 @@ package org.mule.management.mbeans;
 
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
-import org.mule.config.PoolingProfile;
-import org.mule.config.QueueProfile;
-import org.mule.config.ThreadingProfile;
 
 /**
  * <code>MuleConfigurationService</code> exposes the MuleConfiguration
@@ -28,80 +25,97 @@ import org.mule.config.ThreadingProfile;
  */
 public class MuleConfigurationService implements MuleConfigurationServiceMBean
 {
-    private final MuleConfiguration config = MuleManager.getConfiguration();
+    private final MuleConfiguration muleConfiguration = MuleManager.getConfiguration();
 
-    public boolean isSynchronous()
-    {
-        return config.isSynchronous();
+    public boolean isSynchronous() {
+        return muleConfiguration.isSynchronous();
     }
 
-    public void setSynchronous(boolean synchronous)
-    {
-        config.setSynchronous(synchronous);
+    public void setSynchronous(boolean synchronous) {
+        muleConfiguration.setSynchronous(synchronous);
     }
 
-    public ThreadingProfile getMessageDispatcherThreadingProfile()
-    {
-        return config.getMessageDispatcherThreadingProfile();
+    public int getSynchronousEventTimeout() {
+        return muleConfiguration.getSynchronousEventTimeout();
     }
 
-    public ThreadingProfile getMessageReceiverThreadingProfile()
-    {
-        return config.getMessageReceiverThreadingProfile();
+    public void setSynchronousEventTimeout(int synchronousEventTimeout) {
+        muleConfiguration.setSynchronousEventTimeout(synchronousEventTimeout);
     }
 
-    public ThreadingProfile getComponentThreadingProfile()
-    {
-        return config.getComponentThreadingProfile();
+    public boolean isRemoteSync() {
+        return muleConfiguration.isRemoteSync();
     }
 
-    public ThreadingProfile getDefaultThreadingProfile()
-    {
-        return config.getDefaultThreadingProfile();
+    public void setRemoteSync(boolean remoteSync) {
+        muleConfiguration.setRemoteSync(remoteSync);
     }
 
-    public PoolingProfile getPoolingProfile()
-    {
-        return config.getPoolingProfile();
+    public boolean isRecoverableMode() {
+        return muleConfiguration.isRecoverableMode();
     }
 
-    public int getSynchronousEventTimeout()
-    {
-        return config.getSynchronousEventTimeout();
+    public void setRecoverableMode(boolean recoverableMode) {
+        muleConfiguration.setRecoverableMode(recoverableMode);
     }
 
-    public void setSynchronousEventTimeout(int synchronousEventTimeout)
-    {
-        config.setSynchronousEventTimeout(synchronousEventTimeout);
+    public String getWorkingDirectory() {
+        return muleConfiguration.getWorkingDirectory();
     }
 
-    public boolean isSynchronousReceive()
-    {
-        return config.isRemoteSync();
+    public void setWorkingDirectory(String workingDirectory) {
+        muleConfiguration.setWorkingDirectory(workingDirectory);
     }
 
-    public QueueProfile getQueueProfile()
-    {
-        return config.getQueueProfile();
+    public String[] getConfigResources() {
+        return muleConfiguration.getConfigResources();
     }
 
-    public boolean isRecoverableMode()
-    {
-        return config.isRecoverableMode();
+    public String getServerUrl() {
+        return muleConfiguration.getServerUrl();
     }
 
-    public String getWorkingDirectory()
-    {
-        return config.getWorkingDirectory();
+    public void setServerUrl(String serverUrl) {
+        muleConfiguration.setServerUrl(serverUrl);
     }
 
-    public String[] getConfigResources()
-    {
-        return config.getConfigResources();
+    public int getTransactionTimeout() {
+        return muleConfiguration.getTransactionTimeout();
     }
 
-    public String getServerUrl()
-    {
-        return config.getServerUrl();
+    public void setTransactionTimeout(int transactionTimeout) {
+        muleConfiguration.setTransactionTimeout(transactionTimeout);
+    }
+
+    public boolean isClientMode() {
+        return muleConfiguration.isClientMode();
+    }
+
+    public void setClientMode(boolean clientMode) {
+        muleConfiguration.setClientMode(clientMode);
+    }
+
+    public boolean isEmbedded() {
+        return muleConfiguration.isEmbedded();
+    }
+
+    public void setEmbedded(boolean embedded) {
+        muleConfiguration.setEmbedded(embedded);
+    }
+
+    public String getEncoding() {
+        return muleConfiguration.getEncoding();
+    }
+
+    public void setEncoding(String encoding) {
+        muleConfiguration.setEncoding(encoding);
+    }
+
+    public boolean isEnableMessageEvents() {
+        return muleConfiguration.isEnableMessageEvents();
+    }
+
+    public void setEnableMessageEvents(boolean enableMessageEvents) {
+        muleConfiguration.setEnableMessageEvents(enableMessageEvents);
     }
 }
