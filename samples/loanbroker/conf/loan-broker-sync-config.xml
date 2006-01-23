@@ -14,20 +14,9 @@
     <mule-environment-properties synchronous="true" serverUrl=""/>
 
     <agents>
-        <!-- starts an RMI registry on the default port 1099 for JMX Remoting -->
-        <agent name="RMI" className="org.mule.management.agents.RmiRegistryAgent"/>
-        <agent name="JMX" className="org.mule.management.agents.JmxAgent">
-            <properties>
-                <property name="connectorServerUrl" value="service:jmx:rmi:///jndi/rmi://localhost:1099/server"/>
-                <map name="connectorServerProperties">
-                    <property name="jmx.remote.jndi.rebind" value="true"/>
-                </map>
-            </properties>
-        </agent>
-        <!-- Also provider local Jmx access. Use default http://localhost:9092 -->
-        <agent name="Jdmk" className="org.mule.management.agents.JdmkAgent"/>
-        <!-- register Log4j configuration JMX beans -->
-        <agent name="Log4j" className="org.mule.management.agents.Log4jAgent"/>
+        <!-- starts an RMI registry on the default port 1099 for JMX Remoting and then sets up
+             all the default Jmx support agents in Mule -->
+        <agent name="JMX" className="org.mule.management.agents.DefaultJmxSupportAgent"/>
     </agents>
 
     <!-- for some reason Axis auto typing doesn't always work and you need to define the top-level

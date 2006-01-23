@@ -13,7 +13,7 @@
  */
 package org.mule.management.mbeans;
 
-import org.mule.config.QueueProfile;
+
 
 /**
  * <code>MuleConfigurationServiceMBean</code> is a JMx service interface for
@@ -24,36 +24,49 @@ import org.mule.config.QueueProfile;
  */
 public interface MuleConfigurationServiceMBean
 {
+    public boolean isSynchronous();
 
-    // ThreadingProfile getMessageDispatcherThreadingProfile();
+    public void setSynchronous(boolean synchronous);
 
-    // ThreadingProfile getMessageReceiverThreadingProfile();
+    public int getSynchronousEventTimeout();
 
-    // ThreadingProfile getComponentThreadingProfile();
+    public void setSynchronousEventTimeout(int synchronousEventTimeout);
 
-    // ThreadingProfile getDefaultThreadingProfile();
+    public boolean isRemoteSync();
 
-    // PoolingProfile getPoolingProfile();
+    public void setRemoteSync(boolean remoteSync);
 
-    // QueueProfile getQueueProfile();
+    public boolean isRecoverableMode();
 
-    boolean isSynchronous();
+    public void setRecoverableMode(boolean recoverableMode);
 
-    void setSynchronous(boolean synchronous);
+    public String getWorkingDirectory();
 
-    int getSynchronousEventTimeout();
+    public void setWorkingDirectory(String workingDirectory);
 
-    void setSynchronousEventTimeout(int synchronousEventTimeout);
+    public String[] getConfigResources();
 
-    boolean isSynchronousReceive();
+    public String getServerUrl();
 
-    QueueProfile getQueueProfile();
+    public void setServerUrl(String serverUrl);
 
-    boolean isRecoverableMode();
+    public int getTransactionTimeout();
 
-    String getWorkingDirectory();
+    public void setTransactionTimeout(int transactionTimeout);
 
-    String[] getConfigResources();
+    public boolean isClientMode();
 
-    String getServerUrl();
+    public void setClientMode(boolean clientMode);
+
+    public boolean isEmbedded();
+
+    public void setEmbedded(boolean embedded);
+
+    public String getEncoding();
+
+    public void setEncoding(String encoding);
+
+    public boolean isEnableMessageEvents();
+
+    public void setEnableMessageEvents(boolean enableMessageEvents);
 }

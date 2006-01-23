@@ -40,7 +40,7 @@ import java.util.Set;
 public class Log4jAgent implements UMOAgent
 {
 
-    private String name;
+    private String name = "Log4j Agent";
     private MBeanServer mBeanServer;
     public static final String JMX_OBJECT_NAME = "log4j:type=Hierarchy";
 

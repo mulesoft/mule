@@ -26,7 +26,7 @@ import javax.management.ObjectName;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public interface ComponentServiceMBean extends Stoppable, Startable
+public interface ComponentServiceMBean extends Stoppable, Startable, ComponentStatsMBean
 {
     /**
      * The statistics for this component

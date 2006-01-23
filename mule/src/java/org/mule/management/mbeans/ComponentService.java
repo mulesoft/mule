@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.impl.model.AbstractComponent;
 import org.mule.impl.model.seda.SedaComponent;
+import org.mule.management.stats.ComponentStatistics;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
@@ -33,7 +34,7 @@ import javax.management.ObjectName;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ComponentService implements ComponentServiceMBean, MBeanRegistration
+public class ComponentService implements ComponentServiceMBean, MBeanRegistration, ComponentStatsMBean
 {
 
 	/**
@@ -49,15 +50,17 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 
     private ObjectName objectName;
 
+
+    private ObjectName inboundName;
+    private ObjectName outboundName;
+
+    private ComponentStatistics statistics;
+
     public ComponentService(String name)
     {
         this.name = name;
+        this.statistics = getComponent().getStatistics();
 
-    }
-
-    public String getName()
-    {
-        return name;
     }
 
     public int getQueueSize()
@@ -162,7 +165,7 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 		try {
 			if (getComponent().getStatistics() != null) {
 				statsName = new ObjectName(objectName.getDomain()
-						+ ":type=statistics,name=" + getName());
+						+ ":type=org.mule.Statistics,component=" + getName());
                 // unregister old version if exists
                 if (this.server.isRegistered(statsName)) {
                 	this.server.unregisterMBean(statsName);
@@ -173,6 +176,9 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
 		} catch (Exception e) {
 			LOGGER.error("Error post-registering the MBean", e);
 		}
+
+        //component stats
+
 	}
 
     /*
@@ -199,6 +205,26 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
      */
     public void postDeregister()
     {
+        try
+        {
+            if (this.server.isRegistered(inboundName)) {
+                this.server.unregisterMBean(inboundName);
+            }
+        } catch(Exception ex)
+        {
+            LOGGER.error("Error unregistering ComponentStats child " + inboundName.getCanonicalName(),
+                        ex);
+        }
+        try
+        {
+            if (this.server.isRegistered(outboundName)) {
+                this.server.unregisterMBean(outboundName);
+            }
+        } catch(Exception ex)
+        {
+            LOGGER.error("Error unregistering ComponentStats child " + inboundName.getCanonicalName(),
+                        ex);
+        }
     }
 
     private AbstractComponent getComponent()
@@ -209,5 +235,180 @@ public class ComponentService implements ComponentServiceMBean, MBeanRegistratio
         } else {
             return (AbstractComponent)session.getComponent();
         }
+    }
+
+    /////// Component stats impl /////////
+
+    /**
+     *
+     */
+    public void clearStatistics()
+    {
+        statistics.clear();
+    }
+
+    /**
+     * @return
+     */
+    public long getAsyncEventsReceived()
+    {
+        return statistics.getAsyncEventsReceived();
+    }
+
+    /**
+     * @return
+     */
+    public long getAsyncEventsSent()
+    {
+        return statistics.getAsyncEventsSent();
+    }
+
+    /**
+     * @return
+     */
+    public long getAverageExecutionTime()
+    {
+        return statistics.getAverageExecutionTime();
+    }
+
+    /**
+     * @return
+     */
+    public long getAverageQueueSize()
+    {
+        return statistics.getAverageQueueSize();
+    }
+
+    /**
+     * @return
+     */
+    public long getExecutedEvents()
+    {
+        return statistics.getExecutedEvents();
+    }
+
+    /**
+     * @return
+     */
+    public long getExecutionErrors()
+    {
+        return statistics.getExecutionErrors();
+    }
+
+    /**
+     * @return
+     */
+    public long getFatalErrors()
+    {
+        return statistics.getFatalErrors();
+    }
+
+    /**
+     * @return
+     */
+    public long getMaxExecutionTime()
+    {
+        return statistics.getMaxExecutionTime();
+    }
+
+    /**
+     * @return
+     */
+    public long getMaxQueueSize()
+    {
+        return statistics.getMaxQueueSize();
+    }
+
+    /**
+     * @return
+     */
+    public long getMinExecutionTime()
+    {
+        return statistics.getMinExecutionTime();
+    }
+
+    /**
+     * @return
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * @return
+     */
+    public long getQueuedEvents()
+    {
+        return statistics.getQueuedEvents();
+    }
+
+    /**
+     * @return
+     */
+    public long getReplyToEventsSent()
+    {
+        return statistics.getReplyToEventsSent();
+    }
+
+    /**
+     * @return
+     */
+    public long getSyncEventsReceived()
+    {
+        return statistics.getSyncEventsReceived();
+    }
+
+    /**
+     * @return
+     */
+    public long getSyncEventsSent()
+    {
+        return statistics.getSyncEventsSent();
+    }
+
+    /**
+     * @return
+     */
+    public long getTotalEventsReceived()
+    {
+        return statistics.getTotalEventsReceived();
+    }
+
+    /**
+     * @return
+     */
+    public long getTotalEventsSent()
+    {
+        return statistics.getTotalEventsSent();
+    }
+
+    /**
+     * @return
+     */
+    public long getTotalExecutionTime()
+    {
+        return statistics.getTotalExecutionTime();
+    }
+
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.management.mbeans.ComponentStatsMBean#getInboundRouter()
+     */
+    public ObjectName getRouterInbound()
+    {
+        return this.inboundName;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.mule.management.mbeans.ComponentStatsMBean#getOutboundRouter()
+     */
+    public ObjectName getRouterOutbound()
+    {
+        return this.outboundName;
     }
 }

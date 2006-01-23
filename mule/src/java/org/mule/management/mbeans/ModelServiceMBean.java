@@ -44,4 +44,6 @@ public interface ModelServiceMBean
     void unregisterComponent(String name) throws UMOException;
 
     String getName();
+
+    String getType();
 }

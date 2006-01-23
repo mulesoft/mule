@@ -128,51 +128,6 @@ public class MuleService implements MuleServiceMBean
         MuleManager.getInstance().dispose();
     }
 
-    public boolean isSynchronous()
-    {
-        return MuleManager.getConfiguration().isSynchronous();
-    }
-
-    public void setSynchronous(boolean synchronous)
-    {
-        MuleManager.getConfiguration().setSynchronous(synchronous);
-    }
-
-    public int getSynchronousEventTimeout()
-    {
-        return MuleManager.getConfiguration().getSynchronousEventTimeout();
-    }
-
-    public void setSynchronousEventTimeout(int synchronousEventTimeout)
-    {
-        MuleManager.getConfiguration().setSynchronousEventTimeout(synchronousEventTimeout);
-    }
-
-    public boolean isSynchronousReceive()
-    {
-        return MuleManager.getConfiguration().isRemoteSync();
-    }
-
-    public boolean isRecoverableMode()
-    {
-        return MuleManager.getConfiguration().isRecoverableMode();
-    }
-
-    public String getWorkingDirectory()
-    {
-        return MuleManager.getConfiguration().getWorkingDirectory();
-    }
-
-    public String[] getConfigResources()
-    {
-        return MuleManager.getConfiguration().getConfigResources();
-    }
-
-    public String getServerUrl()
-    {
-        return MuleManager.getConfiguration().getServerUrl();
-    }
-
     public long getFreeMemory() {
         return Runtime.getRuntime().freeMemory();
     }
@@ -226,5 +181,9 @@ public class MuleService implements MuleServiceMBean
 
     public String getBuildDate() {
         return buildDate;
+    }
+
+    public String getInstanceId() {
+        return MuleManager.getInstance().getId();
     }
 }

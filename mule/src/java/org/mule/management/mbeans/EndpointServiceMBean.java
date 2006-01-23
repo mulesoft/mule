@@ -37,4 +37,6 @@ public interface EndpointServiceMBean
     String getType();
 
     boolean isSynchronous();
+
+    String getComponentName();
 }

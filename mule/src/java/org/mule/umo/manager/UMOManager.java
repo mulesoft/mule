@@ -270,6 +270,13 @@ public interface UMOManager extends Lifecycle
     void registerAgent(UMOAgent agent) throws UMOException;
 
     /**
+     * Will find a registered agent using its name, which is unique for all registered agents
+     * @param name the name of the Agent to find
+     * @return the Agent or null if there is not agent registered with the given name
+     */
+    UMOAgent lookupAgent(String name);
+
+    /**
      * Removes and destroys a registered agent
      * 
      * @param name the agent name

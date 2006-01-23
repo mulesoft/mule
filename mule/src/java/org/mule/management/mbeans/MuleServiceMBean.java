@@ -43,24 +43,6 @@ public interface MuleServiceMBean
 
     void dispose() throws UMOException;
 
-    boolean isSynchronous();
-
-    void setSynchronous(boolean synchronous);
-
-    int getSynchronousEventTimeout();
-
-    void setSynchronousEventTimeout(int synchronousEventTimeout);
-
-    boolean isSynchronousReceive();
-
-    boolean isRecoverableMode();
-
-    String getWorkingDirectory();
-
-    String[] getConfigResources();
-
-    String getServerUrl();
-
     long getFreeMemory();
 
     long getMaxMemory();
@@ -82,4 +64,6 @@ public interface MuleServiceMBean
     String getLicense();
 
     String getBuildDate();
+
+    String getInstanceId();
 }

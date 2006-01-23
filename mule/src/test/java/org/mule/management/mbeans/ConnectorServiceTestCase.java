@@ -31,26 +31,24 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
     public void testUndeploy() throws Exception
     {
-        final String domainOriginal = "TEST_DOMAIN_1";
-
         System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
         final UMOManager manager = getManager();
         final UMOConnector connector = getTestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();
-        jmxAgent.setDomain(domainOriginal);
+        jmxAgent.setUseInstanceIdAsDomain(false);
         manager.registerConnector(connector);
         manager.registerAgent(jmxAgent);
 
         manager.start();
         System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
 
-        Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
+        Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance("org.mule:*"), null);
         assertEquals("Unexpected number of components registered in the domain.", 4, mbeans.size());
 
         manager.dispose();
 
-        mbeans = mBeanServer.queryMBeans(ObjectName.getInstance(domainOriginal + ":*"), null);
+        mbeans = mBeanServer.queryMBeans(ObjectName.getInstance("org.mule:*"), null);
         assertEquals("There should be no MBeans left in the domain", 0, mbeans.size());
     }
 }
