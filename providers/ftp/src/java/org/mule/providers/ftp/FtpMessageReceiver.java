@@ -19,6 +19,7 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.PollingMessageReceiver;
+import org.mule.providers.file.FileConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -131,7 +132,7 @@ public class FtpMessageReceiver extends PollingMessageReceiver {
                 throw new IOException("Ftp error: " + client.getReplyCode());
             }
             UMOMessage message = new MuleMessage(connector.getMessageAdapter(baos.toByteArray()));
-            message.setProperty(FtpConnector.PROPERTY_FILENAME, file.getName());
+            message.setProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
             routeMessage(message);
             if (!client.deleteFile(file.getName())) {
                 throw new IOException("Ftp error: " + client.getReplyCode());
