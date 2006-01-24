@@ -66,6 +66,9 @@ public class WildcardFilterTestCase extends NamedTestCase
 
         filter.setPattern("*.*");
         assertTrue(filter.accept("test.xml"));
+
+        filter.setPattern("*.txt");
+        assertTrue(filter.accept("test.txt"));
     }
 
     public void testWildcardFilterMultiplePatterns()
