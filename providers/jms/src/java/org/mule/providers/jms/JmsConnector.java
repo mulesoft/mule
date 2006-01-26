@@ -25,6 +25,8 @@ import org.mule.impl.internal.notifications.ConnectionNotificationListener;
 import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.ConnectException;
+import org.mule.providers.ConnectionStrategy;
+import org.mule.providers.FatalConnectException;
 import org.mule.providers.ReplyToHandler;
 import org.mule.providers.jms.xa.ConnectionFactoryWrapper;
 import org.mule.transaction.TransactionCoordination;
@@ -41,6 +43,7 @@ import org.mule.util.ClassHelper;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.jms.XAConnectionFactory;
@@ -192,6 +195,26 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         if (clientId != null) {
             connection.setClientID(getClientId());
         }
+
+        // Register a JMS exception listener to detect failed connections.
+        // Existing connection strategy will be used to recover.
+
+        final ConnectionStrategy connectionStrategy = getConnectionStrategy();
+        if (connectionStrategy != null && connection != null) {
+            connection.setExceptionListener(new ExceptionListener() {
+                public void onException(JMSException jmsException) {
+                    logger.debug("About to dispose of myself due to a JMS connection shutdown.");
+                    JmsConnector.this.doDispose();
+
+                    try {
+                        connectionStrategy.connect(JmsConnector.this);
+                    } catch (FatalConnectException e) {
+                        logger.fatal("Pizdets.");
+                    }
+                }
+            });
+        }
+
         return connection;
     }
 
@@ -350,6 +373,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             } catch (NamingException e) {
                 logger.error("Jms connector failed to dispose properly: ", e);
             }
+            // need this line to flag for reinitialization in ConnectionStrategy
+            jndiContext = null;
         }
     }
 

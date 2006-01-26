@@ -17,11 +17,13 @@ import java.util.Enumeration;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.TextMessage;
+import javax.jms.ExceptionListener;
 
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.provider.UMOConnector;
 
 import com.mockobjects.dynamic.Mock;
+import com.mockobjects.dynamic.C;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -46,6 +48,7 @@ public class JmsConnectorTestCase extends AbstractConnectorTestCase
             Mock connectionFactory = new Mock(ConnectionFactory.class);
             Mock connection = new Mock(Connection.class);
             connectionFactory.expectAndReturn("createConnection", connection.proxy());
+            connection.expect("setExceptionListener", C.isA(ExceptionListener.class));
             connection.expect("close");
             connection.expect("start");
             connection.expect("stop");
