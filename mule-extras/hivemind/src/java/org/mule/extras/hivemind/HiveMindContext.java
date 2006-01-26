@@ -18,6 +18,7 @@ import java.io.Reader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hivemind.ApplicationRuntimeException;
 import org.apache.hivemind.Registry;
 import org.apache.hivemind.impl.RegistryBuilder;
 import org.mule.config.i18n.Message;
@@ -48,11 +49,12 @@ public class HiveMindContext extends AbstractContainerContext
     public HiveMindContext()
     {
         super("hivemind");
+        logger.debug("HiveMindContext built");
     }
     
     protected Registry getRegistry()
     {
-    		return this.registry;
+	return this.registry;
     }
 
     /*
@@ -62,6 +64,7 @@ public class HiveMindContext extends AbstractContainerContext
      */
     public Object getComponent(Object key) throws ObjectNotFoundException
     {
+	
         if (registry == null) {
             throw new IllegalStateException("HiveMind registry has not been set");
         }
@@ -73,16 +76,22 @@ public class HiveMindContext extends AbstractContainerContext
         
         if (key instanceof String) {
             try {
-                Class keyClass = ClassHelper.loadClass((String) key, getClass());
-                component = registry.getService(keyClass);
-            } catch (ClassNotFoundException e) {
-            	   throw new ObjectNotFoundException("Component class not found: " + key.toString());
+                component = registry.getService((String)key, Object.class);
+                logger.debug("Called " + key + " obtained  " + component.getClass().getName());
+            } catch (ApplicationRuntimeException are) {
+                throw new ObjectNotFoundException("Component not found for " + key, are);
             }
         } else if (key instanceof Class) {
-            component = registry.getService((Class) key);
+            try {
+                component = registry.getService((Class) key);
+                logger.debug("Called " + ((Class) key).getName() + " obtained  " + component.getClass().getName());
+            } catch (ApplicationRuntimeException are) {
+                throw new ObjectNotFoundException("Component not found for " + key, are);
+            }
         }
         
         if (component == null) {
+            logger.debug("Component not found for key" + key);
             throw new ObjectNotFoundException("Component not found for key: " + key.toString());
         }
         return component;
@@ -104,12 +113,16 @@ public class HiveMindContext extends AbstractContainerContext
     public void initialise() throws InitialisationException, RecoverableException
     {
     	   if (registry == null) {
+    	        logger.debug("About to initilise the registry...");
     	    	try {
     	    		registry = RegistryBuilder.constructDefaultRegistry();
     	    		
     	    	} catch (Exception e) {
     	    		throw new InitialisationException(new Message(Messages.FAILED_TO_CONFIGURE_CONTAINER),e,this);
     	    	}
+    	        logger.debug(" ... registry initialized");
+    	   } else {
+    	        logger.debug("Registry already initialized...");
     	   }
     }
 
@@ -121,6 +134,7 @@ public class HiveMindContext extends AbstractContainerContext
     {
         if (registry != null) {
             registry.shutdown();
+            logger.debug("Registry halted");
         }
     }
 }

@@ -1,4 +1,4 @@
-<module id="tck" version="1.0.0" package="org.mule.tck.testmodels.fruit">
+<module id="org.mule.tck.testmodels.fruit" version="1.0.0">
     <service-point id="Apple"/>
     <service-point id="Banana"/>
     <service-point id="FruitBowl"/>

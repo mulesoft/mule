@@ -19,6 +19,7 @@ import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
+import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
 /**
@@ -32,8 +33,8 @@ public class HiveMindContextTestCase extends AbstractContainerContextTestCase
 
     protected void doSetUp() throws Exception
     {
-    		context = new HiveMindContext();
-    		context.initialise();
+	context = new HiveMindContext();
+	context.initialise();
     }
     /*
     * (non-Javadoc)
@@ -42,6 +43,7 @@ public class HiveMindContextTestCase extends AbstractContainerContextTestCase
     */
     public UMOContainerContext getContainerContext()
     {
+/*
     	    Registry registry = context.getRegistry();
     	    
         boolean x = registry.containsService(FruitBowl.class);
@@ -51,6 +53,27 @@ public class HiveMindContextTestCase extends AbstractContainerContextTestCase
         System.err.println("bowl contiene: " + bowl.getApple());
         
         
+*/
         return context;
     }
+
+    public void testContainerNotNull() throws Exception
+    {
+	assertNotNull(getContainerContext());
+    }
+
+    public void testFruitBowl() throws Exception
+    {
+	FruitBowl result = null;
+	try {
+            result = (FruitBowl) context.getComponent(FruitBowl.class.getName());
+            assertNotNull("Component FruitBwol should exist in container", result);
+            Apple apple = result.getApple();
+            assertNotNull("Component Apple should be in FruitBowl", apple);
+        } catch (ObjectNotFoundException e) {
+            fail("Component should exist in the container");
+        }
+    }
+
+    
 }
