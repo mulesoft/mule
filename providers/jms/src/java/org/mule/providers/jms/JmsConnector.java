@@ -209,7 +209,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
                     try {
                         connectionStrategy.connect(JmsConnector.this);
                     } catch (FatalConnectException e) {
-                        logger.fatal("Pizdets.");
+                        logger.fatal("Failed to reconnect to JMS server. I'm giving up.");
                     }
                 }
             });
