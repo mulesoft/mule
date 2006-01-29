@@ -3,3 +3,5 @@ target
 .project
 bin
 mule-quartz-provider.iml
+.fbprefs
+.fbwarnings

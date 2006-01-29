@@ -5,3 +5,5 @@ xdoc
 .project
 bin
 mule-extras-spring.iml
+.fbprefs
+.fbwarnings

@@ -4,3 +4,5 @@ target
 bin
 .mule
 mule-soap-provider.iml
+.fbprefs
+.fbwarnings

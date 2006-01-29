@@ -4,3 +4,5 @@ xdoc
 .project
 bin
 mule-extras-picocontainer.iml
+.fbprefs
+.fbwarnings

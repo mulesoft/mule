@@ -4,3 +4,5 @@ maven.log
 target
 bin
 mule-jms-provider.iml
+.fbprefs
+.fbwarnings

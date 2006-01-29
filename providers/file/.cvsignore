@@ -6,3 +6,5 @@ test
 target
 bin
 mule-file-provider.iml
+.fbprefs
+.fbwarnings

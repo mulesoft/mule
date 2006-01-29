@@ -7,3 +7,5 @@ mule-extras-client.iws
 target
 bin
 .mule
+.fbprefs
+.fbwarnings

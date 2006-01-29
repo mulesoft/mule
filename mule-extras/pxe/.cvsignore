@@ -5,3 +5,5 @@ axis.log
 .project
 target
 mule-extras-pxe.iml
+.fbprefs
+.fbwarnings

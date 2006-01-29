@@ -3,3 +3,5 @@
 target
 bin
 mule-rmi-provider.iml
+.fbprefs
+.fbwarnings

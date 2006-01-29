@@ -5,3 +5,5 @@ bin
 junit*.properties
 mule-tcp-provider.iml
 mule-tcp-provider.jar
+.fbprefs
+.fbwarnings

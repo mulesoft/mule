@@ -3,3 +3,5 @@
 bin
 mule-xmpp-provider.iml
 target
+.fbprefs
+.fbwarnings

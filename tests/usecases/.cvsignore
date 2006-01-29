@@ -5,3 +5,5 @@ target
 .classpath
 mule-usecases.iml
 mule-tests-usecases.iml
+.fbprefs
+.fbwarnings

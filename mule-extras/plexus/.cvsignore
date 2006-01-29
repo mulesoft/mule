@@ -3,3 +3,5 @@ target
 .project
 bin
 mule-extras-plexus.iml
+.fbprefs
+.fbwarnings

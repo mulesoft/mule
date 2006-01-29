@@ -4,3 +4,5 @@ xdoc
 .project
 bin
 mule-ra.iml
+.fbprefs
+.fbwarnings

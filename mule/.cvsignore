@@ -29,3 +29,5 @@ checkout
 bin
 .mule
 mule-core.iml
+.fbprefs
+.fbwarnings

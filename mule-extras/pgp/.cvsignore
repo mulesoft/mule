@@ -3,3 +3,5 @@ bin
 .project
 .classpath
 mule-extras-pgp.iml
+.fbprefs
+.fbwarnings

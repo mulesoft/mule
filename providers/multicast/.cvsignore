@@ -4,3 +4,5 @@ target
 bin
 mule-multicast-provider.iml
 .mule
+.fbprefs
+.fbwarnings
