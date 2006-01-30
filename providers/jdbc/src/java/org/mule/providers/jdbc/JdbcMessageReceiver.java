@@ -26,6 +26,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.MuleManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -105,7 +106,16 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             // rethrow
             throw ex;
         } finally {
-            JdbcUtils.close(con);
+            if (MuleManager.getInstance().getTransactionManager() != null) {
+                // We are running in an XA transaction.
+                // This call is required here for compatibility with strict XA DataSources
+                // implementations, as is the case for WebSphere AS and Weblogic.
+                // Failure to do it here may result in a connection leak.
+                // The close() call will NOT close the connection, neither will it return it to the pool.
+                // It will notify the XA driver's ConnectionEventListener that the XA connection
+                // is no longer used by the application and is ready for the 2PC commit.
+                JdbcUtils.close(con);
+            }
         }
     }
 
