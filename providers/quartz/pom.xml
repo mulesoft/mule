@@ -15,14 +15,16 @@
     <description>A Mule provider for Quartz. This provider supplies a receiver for jobs scheduled with Quartz.</description>
     <dependencies>
         <dependency>
-            <groupId>org.codehaus.mule</groupId>
-            <artifactId>mule-extras-client</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
             <groupId>quartz</groupId>
             <artifactId>quartz</artifactId>
             <version>1.4.0</version>
+        </dependency>
+
+		<!-- The Mule client is needed for MuleClientReceiveJob and MuleClientDispatchJob -->
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
         </dependency>
     </dependencies>
 </project>

@@ -13,4 +13,38 @@
 	<packaging>jar</packaging>
     <name>GigaSpaces Provider</name>
     <description>Allows Mule to send and receive events via the GigaSpaces Jini implementation.</description>
+    <dependencies>
+        <!-- This transport is based on the Spaces transport -->
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-space-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+	
+ 	<dependency>
+            <groupId>jini</groupId>
+            <artifactId>jini-core</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>jini</groupId>
+            <artifactId>jini-ext</artifactId>
+            <version>2.1</version>
+        </dependency>
+	<!--
+        <dependency>
+            <groupId>jini</groupId>
+            <artifactId>JSpaces</artifactId>
+            <version>0</version>
+        </dependency>
+	-->
+
+        <!-- Needed for unit tests only -->
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+	    <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

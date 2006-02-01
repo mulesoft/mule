@@ -21,12 +21,6 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>geronimo-spec</groupId>
-            <artifactId>geronimo-spec-javamail</artifactId>
-            <version>${geronimo_spec_javamail_version}</version>
-            <url>http://java.sun.com/products/javamail/</url>
-        </dependency>
-        <dependency>
             <groupId>glue</groupId>
             <artifactId>glue</artifactId>
             <version>5.0.2</version>

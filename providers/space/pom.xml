@@ -13,4 +13,13 @@
 	<packaging>jar</packaging>
     <name>Space Provider</name>
     <description>Allows Mule to send and receive events via the Mule Space API.  This enables interation with JCache, Jini, Rio or other 'space' types using a common interface.</description>
+    <dependencies>
+        <!-- Needed for unit tests only -->
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+	    <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

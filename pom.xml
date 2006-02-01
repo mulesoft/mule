@@ -67,25 +67,28 @@
 	    </site>
 	  </distributionManagement>
 	<repositories>
-	    <repository>
-	      <id>local</id>
-	      <name>Local repository</name>
-	      <url>file:///export/home/carlson/mule/lib</url>
-	      <layout>legacy</layout>
-	    </repository>
+		<repository>
+			<id>mule</id>
+			<name>Mule Dependencies</name>
+			<url>http://dist.codehaus.org/mule/dependencies</url>
+		</repository>
+		<!--
 		<repository>
 			<id>codehaus</id>
-			<name>codehaus</name>
-			<url>dist.codehaus.org</url>
-			<layout>legacy</layout>
+			<name>Codehaus</name>
+			<url>http://dist.codehaus.org</url>
 		</repository>
   		<repository>
 			<id>ibiblio</id>
-			<name>ibiblio</name>
-			<url>www.ibiblio.org/maven2</url>
+			<name>Ibiblio</name>
+			<url>http://www.ibiblio.org/maven2</url>
 		</repository>
+		-->
 	</repositories>
-	<build>
+    	<issueManagement>
+		<url>http://jira.symphonysoft.com</url>
+    	</issueManagement>
+    	<build>
 		<!-- Directory layout -->
 		<sourceDirectory>src/java</sourceDirectory>
 		<resources>
@@ -108,9 +111,35 @@
 					<target>1.4</target>
 				</configuration>
 			</plugin>
-		</plugins>
+			<plugin>
+			    <groupId>org.codehaus.mojo</groupId>
+			    <artifactId>changes-maven-plugin</artifactId>
+			    <configuration>
+					<toAddresses>
+					    <toAddress implementation="java.lang.String">tcarlson@codehaus.org</toAddress>
+					</toAddresses>
+			    </configuration>
+			</plugin>
+        	</plugins>
 	</build>
 
+	<!-- Reports -->
+    	<reporting>
+      		<plugins>
+        		<plugin>
+          			<groupId>org.codehaus.mojo</groupId>
+          			<artifactId>changes-maven-plugin</artifactId>
+            			<reportSets>
+              				<reportSet>
+                				<reports>
+                  					<report>jira-report</report>
+                				</reports>
+              				</reportSet>
+           			</reportSets>
+        		</plugin>
+      		</plugins>
+    	</reporting>
+    
 	<!-- Subprojects -->
 	<modules>
 		<module>mule</module>

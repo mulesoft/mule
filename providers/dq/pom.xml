@@ -16,7 +16,7 @@
 		<dependency>
             <groupId>as400dq</groupId>
 			<artifactId>jt400</artifactId>
-			<version>1</version>
+			<version>0</version>
 			<optional>true</optional>
 		</dependency>
     </dependencies>

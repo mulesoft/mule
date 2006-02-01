@@ -11,15 +11,13 @@
 	</parent>
     <artifactId>mule-ra</artifactId>
     <name>Mule Resource Adapter</name>
-	<packaging>rar</packaging>
+    <packaging>rar</packaging>
     <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a J2EE application server and exposes Mule services via the JCA connector architecture.</description>   
     <dependencies>
         <dependency>
             <groupId>org.codehaus.mule</groupId>
             <artifactId>mini-mule</artifactId>
             <version>${version}</version>
-            <!-- This is a workaround until http://jira.codehaus.org/browse/MNG-??? is fixed -->
-            <classifier>mini</classifier>
         </dependency>
     </dependencies>
 </project>

@@ -11,11 +11,14 @@
 	</parent>
 	<artifactId>mule-distributions</artifactId>
 	<packaging>pom</packaging>
-    <name>Mule Distributions</name>
+    	<name>Mule Distributions</name>
 
 	<modules>
 		<module>full</module>
 		<module>mini</module>
+		<!-- TODO mini-mule must be installed before the RA will build properly (problem with 
+			the build sequence).
 		<module>ra</module>
+		-->
 	</modules>
 </project>

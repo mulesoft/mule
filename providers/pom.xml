@@ -19,6 +19,9 @@
 		<module>email</module>
 		<module>file</module>
 		<module>ftp</module>
+		<!-- TODO Unit tests don't compile
+		<module>gs</module>
+		-->
 		<module>http</module>
 		<module>jbi</module>
 		<module>jdbc</module>
@@ -28,6 +31,9 @@
 		<module>quartz</module>
 		<module>rmi</module>
 		<module>soap</module>
+		<!-- TODO Unit tests don't compile
+		<module>space</module>
+		-->
 		<module>ssl</module>
 		<module>stream</module>
 		<module>tcp</module>

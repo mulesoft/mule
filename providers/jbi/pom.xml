@@ -21,15 +21,5 @@
             <version>1.2</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>jaxrpc</groupId>
-            <artifactId>jaxrpc-qname-patch</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>jaxrpc</groupId>
-            <artifactId>jaxrpc</artifactId>
-            <version>1.1</version>
-        </dependency>
     </dependencies>
 </project>
