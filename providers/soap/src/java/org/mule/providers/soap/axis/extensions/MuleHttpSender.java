@@ -519,11 +519,13 @@ public class MuleHttpSender extends BasicHandler
                     out = new TeeOutputStream(out, baos);
                 }
                 reqMessage.writeTo(out);
-            } catch (SOAPException e) {
-                log.error(Messages.getMessage("exception00"), e);
+            } catch(SOAPException e) {
+                throw e;
+            } finally {
+               // Flush ONLY once.
+               out.flush();
             }
-            // Flush ONLY once.
-            out.flush();
+
         }
         if (log.isDebugEnabled()) {
             log.debug(header + new String(baos.toByteArray()));
