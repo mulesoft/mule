@@ -33,6 +33,7 @@ public class GSConnector extends SpaceConnector {
     public GSConnector() {
         registerSupportedProtocol("rmi");
         registerSupportedProtocol("java");
+        registerSupportedProtocol("jini");
         setSpaceFactory(new GSSpaceFactory());
     }
 
