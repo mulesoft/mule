@@ -197,7 +197,7 @@
                 <exclude>**/FtpConnectorFunctionalTestCase.*</exclude>
 
                 <!-- TODO Failing with wierd error right now, need to investigate -->
-                <exclude>**/SoapAttachementsFunctionalTestCase.*</exclude>
+                <exclude>**/SoapAttachmentsFunctionalTestCase.*</exclude>
                 <!-- INTEGRATION TEST CASES -->
                 <!-- requires a server -->
                 <exclude>**/EmailFunctionalTestCase.*</exclude>
@@ -224,18 +224,12 @@
                     <includes>
                         <include>**/*</include>
                     </includes>
-                    <excludes>
-                        <exclude>**/log4j.properties</exclude>
-                    </excludes>
                 </resource>
                 <resource>
                     <directory>${basedir}/src/conf</directory>
                     <includes>
                         <include>**/*</include>
                     </includes>
-                    <excludes>
-                        <exclude>**/log4j.properties</exclude>
-                    </excludes>
                 </resource>
             </resources>
         </unitTest>

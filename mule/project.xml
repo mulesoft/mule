@@ -442,6 +442,7 @@
                     <exclude>**/*Keystore</exclude>
                     <exclude>**/*.groovy</exclude>
                     <exclude>**/log4j.properties</exclude>
+                    <exclude>**/.keep</exclude>
                 </excludes>
             </resource>
         </resources>
