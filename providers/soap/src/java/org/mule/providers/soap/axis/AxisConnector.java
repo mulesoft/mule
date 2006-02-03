@@ -28,6 +28,7 @@ import org.apache.axis.wsdl.fromJava.Types;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.ExceptionHelper;
 import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -71,7 +72,13 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AxisConnector extends AbstractServiceEnabledConnector implements ModelNotificationListener {
+public class AxisConnector extends AbstractServiceEnabledConnector implements ModelNotificationListener
+ {
+    /* Register the AxisFault Exception reader if this class gets loaded*/
+    static {
+        ExceptionHelper.registerExceptionReader(new AxisFaultExceptionReader());
+    }
+
     public static final QName QNAME_MULE_PROVIDER = new QName(WSDDConstants.URI_WSDD_JAVA, "Mule");
     public static final QName QNAME_MULE_TYPE_MAPPINGS = new QName("http://www.muleumo.org/ws/mappings", "Mule");
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
@@ -118,6 +125,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     private List supportedSchemes;
 
     private boolean doAutoTypes = true;
+
 
     public AxisConnector() {
         super();
