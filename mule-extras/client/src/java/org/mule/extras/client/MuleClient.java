@@ -385,7 +385,7 @@ public class MuleClient implements Disposable
     public FutureMessageResult sendAsync(final String url, final UMOMessage message)
             throws UMOException
     {
-        return sendAsync(url, message, MuleManager.getConfiguration().getSynchronousEventTimeout());
+        return sendAsync(url, message, UMOEvent.TIMEOUT_NOT_SET_VALUE);
     }
 
     /**
@@ -521,7 +521,7 @@ public class MuleClient implements Disposable
      */
     public UMOMessage send(String url, Object payload, Map messageProperties) throws UMOException
     {
-        return send(url, payload, messageProperties, MuleManager.getConfiguration().getSynchronousEventTimeout());
+        return send(url, payload, messageProperties, UMOEvent.TIMEOUT_NOT_SET_VALUE);
     }
 
     /**
@@ -537,7 +537,7 @@ public class MuleClient implements Disposable
      */
     public UMOMessage send(String url, UMOMessage message) throws UMOException
     {
-        return send(url, message, MuleManager.getConfiguration().getSynchronousEventTimeout());
+        return send(url, message, UMOEvent.TIMEOUT_NOT_SET_VALUE);
     }
 
     /**
