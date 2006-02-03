@@ -13,6 +13,7 @@
     <name>Mule Resource Adapter</name>
     <packaging>rar</packaging>
     <description>A Resource Adapter implementation that allows a Mule instance to be deployed to a J2EE application server and exposes Mule services via the JCA connector architecture.</description>   
+
     <dependencies>
         <dependency>
             <groupId>org.codehaus.mule</groupId>
