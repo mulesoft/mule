@@ -221,6 +221,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             properties.putAll(endpointUri.getParams());
         }
 
+        remoteSyncTimeout = new Integer(source.getRemoteSyncTimeout());
+        remoteSync = new Boolean(source.isRemoteSync());
+
+        filter = source.getFilter();
+        securityFilter = source.getSecurityFilter();
     }
 
     /*
@@ -300,10 +305,15 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         clone.setTransactionConfig(transactionConfig);
         clone.setFilter(filter);
         clone.setSecurityFilter(securityFilter);
+
+        if(remoteSync!=null) clone.setRemoteSync(isRemoteSync());
+        if(remoteSyncTimeout!=null) clone.setRemoteSyncTimeout(getRemoteSyncTimeout());
+
         if (synchronous != null) {
             clone.setSynchronous(synchronous.booleanValue());
         }
         clone.setDeleteUnacceptedMessages(deleteUnacceptedMessages);
+
         clone.setInitialState(initialState);
         if(initialised.get()) {
             try {
@@ -333,7 +343,8 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
                 + transformer + ", name='" + name + "'" + ", type='" + type + "'" + ", properties=" + properties
                 + ", transactionConfig=" + transactionConfig + ", filter=" + filter + ", deleteUnacceptedMessages="
                 + deleteUnacceptedMessages + ", initialised=" + initialised + ", securityFilter=" + securityFilter
-                + ", synchronous=" + synchronous + ", initialState=" + initialState + ", createConnector=" + createConnector + "}";
+                + ", synchronous=" + synchronous + ", initialState=" + initialState + ", createConnector=" + createConnector
+                + ", remoteSync=" + remoteSync + ", remoteSyncTimeout=" + remoteSyncTimeout + "}";
     }
 
     /*
@@ -575,6 +586,18 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             securityFilter.setEndpoint(this);
             securityFilter.initialise();
         }
+
+        //Allow remote sync values to be set as params on the endpoint URI
+        String rs = (String)endpointUri.getParams().remove("remoteSync");
+        if(rs!=null) {
+            remoteSync = Boolean.valueOf(rs);
+        }
+
+        String rsTimeout = (String)endpointUri.getParams().remove("remoteSyncTimeout");
+        if(rsTimeout!=null) {
+            remoteSyncTimeout = Integer.valueOf(rsTimeout);
+        }
+
         initialised.set(true);
     }
 

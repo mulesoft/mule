@@ -73,7 +73,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     private boolean synchronous = false;
 
-    private int timeout = TIMEOUT_WAIT_FOREVER;
+    private int timeout = TIMEOUT_NOT_SET_VALUE;
 
     private transient ResponseOutputStream outputStream = null;
 
@@ -127,7 +127,6 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.session = session;
         this.id = generateEventId();
         this.synchronous = synchronous;
-        this.timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
         this.outputStream = outputStream;
         fillProperties(null);
     }
@@ -148,7 +147,6 @@ public class MuleEvent extends EventObject implements UMOEvent
         this.session = session;
         this.id = eventId;
         this.synchronous = synchronous;
-        this.timeout = MuleManager.getConfiguration().getSynchronousEventTimeout();
         fillProperties(null);
     }
 
@@ -487,6 +485,10 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     public int getTimeout()
     {
+        if(timeout == TIMEOUT_NOT_SET_VALUE) {
+            //If this is not set it will use the default timeout value
+            timeout = endpoint.getRemoteSyncTimeout();
+        }
         return timeout;
     }
 
