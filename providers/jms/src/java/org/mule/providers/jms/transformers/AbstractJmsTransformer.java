@@ -49,11 +49,6 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
 
     protected boolean requireNewSession = true;
 
-    /**
-     * logger used by this class
-     */
-    private static transient Log logger = LogFactory.getLog(AbstractJmsTransformer.class);
-
     private Session session = null;
 
     public AbstractJmsTransformer()
@@ -121,27 +116,7 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
                 return msg;
             }
 
-            Map props = ctx.getProperties();
-            props = PropertiesHelper.getPropertiesWithoutPrefix(props, "JMS");
-            Map.Entry entry;
-            String key;
-            for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
-                entry = (Map.Entry) iterator.next();
-                key = entry.getKey().toString();
-                if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key)) {
-                    msg.setJMSCorrelationID(entry.getValue().toString());
-                }
-                //We dont want to set the ReplyTo property again as it will be set using JMSReplyTo
-                if(!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && entry.getValue() instanceof Destination)) {
-                    try {
-                        msg.setObjectProperty(encodeHeader(key), entry.getValue());
-                    } catch (JMSException e) {
-                        //Various Jms servers have slightly different rules to what can be set as an object property on the message
-                        //As such we have to take a hit n' hope approach
-                        if(logger.isDebugEnabled()) logger.debug("Unable to set property '" + encodeHeader(key) + "' of type " +  entry.getValue().getClass().getName() + "': " + e.getMessage());
-                    }
-                }
-            }
+            setJmsProperties(ctx.getProperties(), msg);
 
             return msg;
             // }
@@ -150,6 +125,28 @@ public abstract class AbstractJmsTransformer extends AbstractTransformer impleme
         }
     }
 
+    protected void setJmsProperties(Map props, Message msg) throws JMSException {
+        props = PropertiesHelper.getPropertiesWithoutPrefix(props, "JMS");
+        Map.Entry entry;
+        String key;
+        for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
+            entry = (Map.Entry) iterator.next();
+            key = entry.getKey().toString();
+            if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(key)) {
+                msg.setJMSCorrelationID(entry.getValue().toString());
+            }
+            //We dont want to set the ReplyTo property again as it will be set using JMSReplyTo
+            if(!(MuleProperties.MULE_REPLY_TO_PROPERTY.equals(key) && entry.getValue() instanceof Destination)) {
+                try {
+                    msg.setObjectProperty(encodeHeader(key), entry.getValue());
+                } catch (JMSException e) {
+                    //Various Jms servers have slightly different rules to what can be set as an object property on the message
+                    //As such we have to take a hit n' hope approach
+                    if(logger.isDebugEnabled()) logger.debug("Unable to set property '" + encodeHeader(key) + "' of type " +  entry.getValue().getClass().getName() + "': " + e.getMessage());
+                }
+            }
+        }
+    }
     /**
      * Encode a string so that is is a valid java identifier
      * 
