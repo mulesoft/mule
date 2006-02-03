@@ -1,16 +1,21 @@
+<!-- 
+Assembly descriptor for the mini-Mule distribution. 
+-->
 <assembly>
   <formats>
     <format>tar.gz</format>
+    <format>zip</format>
   </formats>
+  
+  <!-- Once http://jira.codehaus.org/browse/MNG-1734 is fixed, paths in this file 
+  should be relative to _this_ project (e.g., "../resources/bin").  Currently the path is 
+  relative to the current directory (i.e., the directory from which the build is 
+  executed.  Since we usually build from the root directory, we'll base the path
+  on the root directory for now. -->
   <fileSets>
 
     <!-- The composite jar file -->
     <fileSet>
-      <!-- Once http://jira.codehaus.org/browse/MNG-1734 is fixed the path should be 
-      relative to _this_ project (in this case, "jar/target").  Currently the path is 
-      relative to the current directory (i.e., the directory from which the build is 
-      executed.  Since we usually build from the root directory, we'll base the path
-      on the root directory for now. -->
       <directory>distributions/mini/target</directory>
       <includes>
       	<include>*.jar</include>
@@ -18,10 +23,17 @@
       <outputDirectory>lib</outputDirectory>
     </fileSet>
 
+	<!-- Other resources -->
+    <fileSet>
+      <directory>distributions/mini/resources</directory>
+      <includes>
+      	<include>README.txt</include>
+      </includes>
+      <outputDirectory></outputDirectory>
+    </fileSet>
     <fileSet>
       <directory>distributions/mini/../resources</directory>
       <includes>
-      	<include>README.txt</include>
       	<include>LICENSE.txt</include>
       </includes>
       <outputDirectory></outputDirectory>
@@ -29,6 +41,7 @@
     <fileSet>
       <directory>distributions/mini/../resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
+      <!-- Make the scripts executable -->
       <fileMode>744</fileMode>
     </fileSet>
     <fileSet>
@@ -40,7 +53,7 @@
       <outputDirectory>lib/licenses</outputDirectory>
     </fileSet>
   </fileSets>
-
+  
   <dependencySets>
   	<!-- Include all the transitive dependencies in lib/opt but none of the primary dependencies 
   	     (the primary dependencies are all in the composite jar). -->
@@ -53,7 +66,7 @@
 	   Until then, we have to list all of the dependencies explicitly. :-(
        -->
       <excludes>
-      		<exclude>org.codehaus.mule:mule-core</exclude>
+		<exclude>org.codehaus.mule:mule-core</exclude>
 
 		<exclude>org.codehaus.mule:mule-dq-provider</exclude>
 		<exclude>org.codehaus.mule:mule-ejb-provider</exclude>
@@ -84,7 +97,6 @@
 		<exclude>org.codehaus.mule:mule-extras-picocontainer</exclude>
 		<exclude>org.codehaus.mule:mule-extras-plexus</exclude>
 		<!-- <exclude>org.codehaus.mule:mule-extras-pxe</exclude> -->
-		<exclude>org.codehaus.mule:mule-extras-ra</exclude>
 		<exclude>org.codehaus.mule:mule-extras-spring</exclude>
       </excludes>
       <outputDirectory>lib/opt</outputDirectory>

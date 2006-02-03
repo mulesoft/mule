@@ -1,16 +1,21 @@
+<!-- 
+Assembly descriptor for the full Mule distribution. 
+-->
 <assembly>
   <formats>
     <format>tar.gz</format>
+    <format>zip</format>
   </formats>
+  
+  <!-- Once http://jira.codehaus.org/browse/MNG-1734 is fixed, paths in this file 
+  should be relative to _this_ project (e.g., "../resources/bin").  Currently the path is 
+  relative to the current directory (i.e., the directory from which the build is 
+  executed.  Since we usually build from the root directory, we'll base the path
+  on the root directory for now. -->
   <fileSets>
 
     <!-- The composite jar file -->
     <fileSet>
-      <!-- Once http://jira.codehaus.org/browse/MNG-1734 is fixed the path should be 
-      relative to _this_ project (in this case, "jar/target").  Currently the path is 
-      relative to the current directory (i.e., the directory from which the build is 
-      executed.  Since we usually build from the root directory, we'll base the path
-      on the root directory for now. -->
       <directory>distributions/full/target</directory>
       <includes>
       	<include>*.jar</include>
@@ -18,6 +23,46 @@
       <outputDirectory>lib</outputDirectory>
     </fileSet>
 
+    <!-- The source code -->
+    <fileSet>
+      <directory>distributions/full/../resources/src</directory>
+      <includes>
+      	<include>README.txt</include>
+      </includes>
+      <outputDirectory>src</outputDirectory>
+    </fileSet>
+    <fileSet> 
+      <directory>mule</directory>
+      <outputDirectory>src/mule</outputDirectory>
+      <includes>
+      	<include>src/java/**/*</include>
+      	<include>src/conf/**/*</include>
+      	<include>src/main/java/**/*</include>
+      	<include>src/main/resources/**/*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>providers</directory>
+      <outputDirectory>src/providers</outputDirectory>
+      <includes>
+      	<include>**/src/java/**/*</include>
+      	<include>**/src/conf/**/*</include>
+      	<include>src/main/java/**/*</include>
+      	<include>src/main/resources/**/*</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>mule-extras</directory>
+      <outputDirectory>src/mule-extras</outputDirectory>
+      <includes>
+      	<include>**/src/java/**/*</include>
+      	<include>**/src/conf/**/*</include>
+      	<include>src/main/java/**/*</include>
+      	<include>src/main/resources/**/*</include>
+      </includes>
+    </fileSet>
+
+	<!-- Other resources -->
     <fileSet>
       <directory>distributions/full/../resources</directory>
       <includes>
@@ -29,6 +74,7 @@
     <fileSet>
       <directory>distributions/full/../resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
+      <!-- Make the scripts executable -->
       <fileMode>744</fileMode>
     </fileSet>
     <fileSet>
@@ -53,7 +99,7 @@
 	   Until then, we have to list all of the dependencies explicitly. :-(
        -->
       <excludes>
-      		<exclude>org.codehaus.mule:mule-core</exclude>
+		<exclude>org.codehaus.mule:mule-core</exclude>
 
 		<exclude>org.codehaus.mule:mule-dq-provider</exclude>
 		<exclude>org.codehaus.mule:mule-ejb-provider</exclude>
