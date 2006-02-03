@@ -5,6 +5,8 @@
 
 <mule-configuration id="endpoint_test" version="1.0">
 
+    <mule-environment-properties synchronousEventTimeout="1001"/>
+
     <connector name="testConnector" className="org.mule.providers.vm.VMConnector"/>
     <connector name="testConnector2" className="org.mule.providers.vm.VMConnector"/>
 

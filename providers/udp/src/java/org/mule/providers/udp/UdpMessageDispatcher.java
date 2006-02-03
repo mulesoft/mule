@@ -88,7 +88,7 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
         doDispatch(event);
         // If we're doing sync receive try and read return info from socket
         if (event.getEndpoint().isRemoteSync()) {
-            DatagramPacket result = receive(socket, event.getEndpoint().getRemoteSyncTimeout());
+            DatagramPacket result = receive(socket, event.getTimeout());
             if (result == null)
                 return null;
             UMOMessage message = new MuleMessage(connector.getMessageAdapter(result));

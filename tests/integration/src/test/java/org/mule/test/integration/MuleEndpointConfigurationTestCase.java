@@ -14,11 +14,16 @@
 package org.mule.test.integration;
 
 import org.mule.MuleManager;
+import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.MuleSession;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformers.simple.StringToByteArray;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToObject;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEvent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOOutboundRouter;
@@ -245,4 +250,26 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // test inbound
         assertNull(descriptor.getInboundEndpoint());
     }
+
+    public void testEndpointFromURI() throws Exception
+    {
+        MuleEndpoint ep = new MuleEndpoint("test://hello?remoteSync=true&remoteSyncTimeout=2002", true);
+        ep.initialise();
+
+        assertTrue(ep.isRemoteSync());
+        assertEquals(2002, ep.getRemoteSyncTimeout());
+        assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
+
+        //Test Event timeout proporgation
+        UMOEvent event = new MuleEvent(new MuleMessage("hello", null), ep, new MuleSession(), false);
+        assertEquals(2002, event.getTimeout());
+
+
+        event = new MuleEvent(new MuleMessage("hello", null), new MuleEndpoint("test://hello", true), new MuleSession(), true);
+        //default event timeout set in the test config file
+        assertEquals(1001, event.getTimeout());
+
+
+    }
+
 }

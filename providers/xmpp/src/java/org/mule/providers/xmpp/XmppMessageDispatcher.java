@@ -107,9 +107,9 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
         if(useRemoteSync(event)) {
             Message response=null;
             if(groupChat!=null) {
-                response = groupChat.nextMessage(event.getEndpoint().getRemoteSyncTimeout());
+                response = groupChat.nextMessage(event.getTimeout());
             } else {
-                response = chat.nextMessage(event.getEndpoint().getRemoteSyncTimeout());
+                response = chat.nextMessage(event.getTimeout());
             }
 
             if(response!=null) {

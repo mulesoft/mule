@@ -37,8 +37,9 @@ import java.util.Map;
  */
 public interface UMOEvent
 {
-    int TIMEOUT_WAIT_FOREVER = 0;
-    int TIMEOUT_DO_NOT_WAIT = -1;
+    public static final int TIMEOUT_WAIT_FOREVER = 0;
+    public static final int TIMEOUT_DO_NOT_WAIT = -1;
+    public static final int TIMEOUT_NOT_SET_VALUE = Integer.MIN_VALUE;
 
     /**
      * Returns the message payload for this event

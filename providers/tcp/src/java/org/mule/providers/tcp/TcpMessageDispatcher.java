@@ -97,7 +97,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
         if (useRemoteSync(event)) {
             try {
-                byte[] result = receive(connectedSocket, event.getEndpoint().getRemoteSyncTimeout());
+                byte[] result = receive(connectedSocket, event.getTimeout());
                 if (result == null) {
                     return null;
                 }

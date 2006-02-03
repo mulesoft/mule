@@ -181,7 +181,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
                 connector.getJmsSupport().send(producer, msg, persistent, priority, ttl);
 
-                int timeout = event.getEndpoint().getRemoteSyncTimeout();
+                int timeout = event.getTimeout();
                 logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
                 l.await(timeout, TimeUnit.MILLISECONDS);
                 consumer.setMessageListener(null);
@@ -197,7 +197,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             } else {
                 connector.getJmsSupport().send(producer, msg, persistent, priority, ttl);
                 if (consumer != null) {
-                    int timeout = event.getEndpoint().getRemoteSyncTimeout();
+                    int timeout = event.getTimeout();
                     logger.debug("Waiting for return event for: " + timeout + " ms on " + replyTo);
                     Message result = consumer.receive(timeout);
                     if (result == null) {
