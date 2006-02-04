@@ -10,6 +10,8 @@ import java.util.List;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.IAccessRule;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 import org.mule.ide.core.exception.MuleModelException;
@@ -87,6 +89,11 @@ public class MuleClasspathUtils {
 		IPath basePath = new Path(location);
 		IPath libPath = basePath.append("lib");
 		IPath sourcePath = basePath.append("src").append("java");
+		IPath javadocPath = basePath.append("docs").append("apidocs");
+		String javadocPathURI = javadocPath.toFile().toURI().toString();
+		IClasspathAttribute jdocAttr = JavaCore.newClasspathAttribute(
+				IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, javadocPathURI);
+		IClasspathAttribute[] muleAttrs = new IClasspathAttribute[] { jdocAttr };
 		File externalRoot = libPath.toFile();
 		if (!externalRoot.exists()) {
 			throw new MuleModelException(MuleCorePlugin.getDefault().createErrorStatus(
@@ -98,8 +105,10 @@ public class MuleClasspathUtils {
 			File file = members[i];
 			if (file.getPath().endsWith(".jar")) {
 				IPath source = (isMuleJar(file.getName())) ? sourcePath : null;
+				IClasspathAttribute[] attrs = (isMuleJar(file.getName())) ? muleAttrs
+						: new IClasspathAttribute[0];
 				IClasspathEntry entry = JavaCore.newLibraryEntry(new Path(file.getPath()), source,
-						null);
+						null, new IAccessRule[0], attrs, false);
 				entries.add(entry);
 			}
 		}
