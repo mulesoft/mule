@@ -1,23 +1,18 @@
-package org.mule.ide.internal.core.classpath;
+package org.mule.ide.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
-import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.exception.MuleModelException;
-import org.mule.ide.core.nature.MuleNature;
 
 /**
  * Utility functions for establishing the Mule classpath
@@ -25,15 +20,6 @@ import org.mule.ide.core.nature.MuleNature;
  * @author Derek Adams
  */
 public class MuleClasspathUtils {
-
-	/**
-	 * Create a container entry for the Mule classpath manager.
-	 * 
-	 * @return the classpath entry
-	 */
-	public static IClasspathEntry createMuleClasspathContainerEntry() {
-		return JavaCore.newContainerEntry(new Path(MuleCorePlugin.ID_MULE_CLASSPATH_CONTAINER));
-	}
 
 	/**
 	 * Create classpath entries for all jars in the "lib" folder of the plugin.
@@ -92,50 +78,50 @@ public class MuleClasspathUtils {
 	/**
 	 * Get the libraries located in an external Mule installation folder.
 	 * 
-	 * @param project the project that will contain the classpath entries
+	 * @param location the path to the external Mule folder
 	 * @return the classpath entries for libraries in the install folder
 	 * @throws MuleModelException if there is a problem accessing the external location
 	 */
-	public static IClasspathEntry[] getExternalMuleLibraries(IProject project)
+	public static IClasspathEntry[] getExternalMuleLibraries(String location)
 			throws MuleModelException {
-		// Make sure the external root folder is specified in preferences.
-		if (!MuleCorePlugin.getDefault().hasExternalMuleRootVariable()) {
-			MuleCorePlugin.getDefault().updateExternalMuleRootVariable();
-		}
-
-		// Load the Mule nature for the project.
-		MuleNature nature = MuleCorePlugin.getDefault().getMuleNature(project);
-		if (nature == null) {
+		IPath basePath = new Path(location);
+		IPath libPath = basePath.append("lib");
+		IPath sourcePath = basePath.append("src").append("java");
+		File externalRoot = libPath.toFile();
+		if (!externalRoot.exists()) {
 			throw new MuleModelException(MuleCorePlugin.getDefault().createErrorStatus(
-					"Project does not have a Mule nature.", null));
+					"External Mule root is invalid", null));
 		}
-
-		// Get the linked folder and create the classpath from its jars.
-		IFolder folder = nature.getExternalLibFolder();
-		if (!folder.exists()) {
-			throw new MuleModelException(MuleCorePlugin.getDefault().createErrorStatus(
-					"External Mule lib folder not found", null));
-		}
-		try {
-			List entries = new ArrayList();
-			IResource[] members = folder.members();
-			for (int i = 0; i < members.length; i++) {
-				if ((members[i].getType() == IResource.FILE)
-						&& ("jar".equals(members[i].getFileExtension()))) {
-					IClasspathEntry entry = JavaCore.newLibraryEntry(members[i].getRawLocation(),
-							null, null);
-					entries.add(entry);
-				}
-			}
-
-			// Add the core library to the classpath.
-			IClasspathEntry entry = getMuleCoreLibraryEntry();
-			if (entry != null) {
+		List entries = new ArrayList();
+		File[] members = externalRoot.listFiles();
+		for (int i = 0; i < members.length; i++) {
+			File file = members[i];
+			if (file.getPath().endsWith(".jar")) {
+				IPath source = (isMuleJar(file.getName())) ? sourcePath : null;
+				IClasspathEntry entry = JavaCore.newLibraryEntry(new Path(file.getPath()), source,
+						null);
 				entries.add(entry);
 			}
-			return (IClasspathEntry[]) entries.toArray(new IClasspathEntry[entries.size()]);
-		} catch (CoreException e) {
-			throw new MuleModelException(e.getStatus());
 		}
+
+		// Add the core library to the classpath.
+		IClasspathEntry entry = getMuleCoreLibraryEntry();
+		if (entry != null) {
+			entries.add(entry);
+		}
+		return (IClasspathEntry[]) entries.toArray(new IClasspathEntry[entries.size()]);
+	}
+
+	/**
+	 * Checks whether a jar is the main Mule jar.
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	protected static boolean isMuleJar(String fileName) {
+		if ((fileName.startsWith("mule-")) && (fileName.endsWith(".jar"))) {
+			return true;
+		}
+		return false;
 	}
 }

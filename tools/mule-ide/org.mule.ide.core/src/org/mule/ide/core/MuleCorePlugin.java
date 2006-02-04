@@ -33,13 +33,11 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.jobs.UpdateMarkersForEcoreResourceJob;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.core.nature.MuleNature;
 import org.mule.ide.core.preferences.IPreferenceConstants;
-import org.mule.ide.internal.core.classpath.MuleClasspathUtils;
 
 /**
  * @author Jesper
@@ -208,15 +206,6 @@ public class MuleCorePlugin extends Plugin {
 			}
 		}
 		return (IProject[]) result.toArray(new IProject[result.size()]);
-	}
-
-	/**
-	 * Creates a classpath entry for the Mule libraries container.
-	 * 
-	 * @return the classpath entry
-	 */
-	public static IClasspathEntry createMuleClasspathContainerEntry() {
-		return MuleClasspathUtils.createMuleClasspathContainerEntry();
 	}
 
 	/**

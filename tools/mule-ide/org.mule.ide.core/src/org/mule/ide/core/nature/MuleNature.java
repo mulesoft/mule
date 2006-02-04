@@ -17,36 +17,26 @@ package org.mule.ide.core.nature;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.Collections;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.jdt.core.ClasspathContainerInitializer;
-import org.eclipse.jdt.core.IClasspathContainer;
-import org.eclipse.jdt.core.JavaCore;
 import org.mule.ide.DocumentRoot;
 import org.mule.ide.MuleIDEFactory;
 import org.mule.ide.MuleIdeConfigType;
 import org.mule.ide.core.IMuleDefaults;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.builder.MuleConfigBuilder;
-import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.model.IMuleModel;
-import org.mule.ide.internal.core.classpath.MuleClasspathContainer;
 import org.mule.ide.internal.core.model.MuleModel;
 import org.mule.ide.internal.core.model.MuleModelDeltaListener;
 import org.mule.ide.util.MuleIDEResourceFactoryImpl;
@@ -155,68 +145,6 @@ public class MuleNature implements IProjectNature {
 				MuleCorePlugin.getDefault().createMarker(getProject(), IMarker.SEVERITY_ERROR,
 						ERROR_CREATING_CONFIG_FILE);
 				MuleCorePlugin.getDefault().logException(ERROR_CREATING_CONFIG_FILE, e);
-			}
-		}
-	}
-
-	/**
-	 * Checks for existence of the external Mule libraries link folder.
-	 * 
-	 * @return true if it exists, false if not
-	 */
-	public boolean hasExternalLibFolder() {
-		return getProject().getFolder(EXTERNAL_LIBS_LINK_DIR).exists();
-	}
-
-	/**
-	 * Removes the linked folder that maps to the external Mule install directory.
-	 * 
-	 * @throws MuleModelException
-	 */
-	public void removeExternalLibFolder() throws MuleModelException {
-		try {
-			getExternalLibFolder().delete(true, new NullProgressMonitor());
-		} catch (CoreException e) {
-			throw new MuleModelException(e.getStatus());
-		}
-	}
-
-	/**
-	 * Get the folder that links to the external Mule libraries.
-	 * 
-	 * @return the folder (handle only)
-	 */
-	public IFolder getExternalLibFolder() throws MuleModelException {
-		IFolder folder = getProject().getFolder(EXTERNAL_LIBS_LINK_DIR);
-		if (!folder.exists()) {
-			IPath location = new Path(MuleCorePlugin.ID_MULE_EXTERNAL_ROOT + File.separator + "lib");
-			IStatus status = ResourcesPlugin.getWorkspace().validateLinkLocation(folder, location);
-			if (!status.isOK()) {
-				throw new MuleModelException(status);
-			}
-			try {
-				folder.createLink(location, IResource.NONE, null);
-			} catch (CoreException e) {
-				throw new MuleModelException(e.getStatus());
-			}
-		}
-		return folder;
-	}
-
-	/**
-	 * Refresh the contents of the Mule classpath container.
-	 * 
-	 * @throws MuleModelException
-	 */
-	public void refreshMuleClasspathContainer() throws MuleModelException {
-		ClasspathContainerInitializer initializer = JavaCore
-				.getClasspathContainerInitializer(MuleCorePlugin.ID_MULE_CLASSPATH_CONTAINER);
-		if (initializer != null) {
-			try {
-				initializer.requestClasspathContainerUpdate(MuleClasspathContainer.PATH, JavaCore
-						.create(getProject()), (IClasspathContainer) null);
-			} catch (CoreException e) {
-				throw new MuleModelException(e.getStatus());
 			}
 		}
 	}
