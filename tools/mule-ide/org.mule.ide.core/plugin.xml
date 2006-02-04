@@ -14,6 +14,7 @@
 -->
 
 <plugin>
+   <extension-point id="samples" name="Mule Sample Projects" schema="schema/samples.exsd"/>
      <extension
          id="xmlProblem"
          name="Mule Configuration File Problem"
@@ -77,12 +78,6 @@
        </describer>
       </content-type>
    </extension>
-   <extension
-         point="org.eclipse.jdt.core.classpathContainerInitializer">
-      <classpathContainerInitializer
-            class="org.mule.ide.internal.core.classpath.MuleClasspathContainerInitializer"
-            id="org.mule.ide.core.MULE_CONTAINER"/>
-   </extension> 
 
 
 </plugin>
