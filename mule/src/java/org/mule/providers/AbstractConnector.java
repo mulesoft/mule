@@ -62,6 +62,21 @@ import java.util.Map;
  * This functionality is controlled with the <i> doThreading</i> property on
  * the threadingProfiles for dispachers and receivers.
  *
+ * The lifecycle for a connector is -
+ *
+ * 1. Create
+ * 2. Initialise
+ * 3. Connect
+ * 3a. Connect receivers
+ * 4. Start
+ * 4a. Start Receivers
+ * 5. Stop
+ * 5a. Stop Receivers
+ * 6. Disconnect
+ * 6a. Disconnect Receivers
+ * 7. Dispose
+ * 7a. Dispose Receivers
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -166,8 +181,11 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
     protected WaitableBoolean connecting = new WaitableBoolean(false);
 
-    /** keeps arecord of whether the connecter should be started once it is reconnected */
-    protected WaitableBoolean startedBeforeDisconnect = new WaitableBoolean(false);
+    /**
+     * If the connect method was called via the start method, this will be set so that when the connector comes on line
+     * it will be started
+     */
+    protected WaitableBoolean startOnConnect = new WaitableBoolean(false);
 
     /** Whether to fire message notifications for every message that is sent or received from this connector */
     private boolean enableMessageEvents = false;
@@ -251,12 +269,16 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         }
         if (!started.get()) {
             if(!isConnected()) {
+                startOnConnect.set(true);
                 getConnectionStrategy().connect(this);
+                //Only start once we are connected
+                return;
             }
             if (logger.isInfoEnabled()) {
                 logger.info("Starting Connector: " + getClass().getName());
             }
             doStart();
+            started.set(true);
             for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
                 AbstractMessageReceiver amr = (AbstractMessageReceiver) iterator.next();
                 if (logger.isDebugEnabled()) {
@@ -264,7 +286,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
                 }
                 amr.start();
             }
-            started.set(true);
+
             if (logger.isInfoEnabled()) {
                 logger.info("Connector: " + getClass().getName() + " has been started");
             }
@@ -288,15 +310,16 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     public final void stopConnector() throws UMOException
     {
-        if (isDisposed()) {
-            return; // throw new MuleException("Cannot stop a connector once it
-            // has been disposing");
-        }
+        if (isDisposed()) return;
+
         if (started.get()) {
             if (logger.isInfoEnabled()) {
                 logger.info("Stopping Connector: " + getClass().getName());
             }
             doStop();
+            started.set(false);
+
+            //Stop all the receivers on this connector (this will cause them to disconnect too)
             for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
             	UMOMessageReceiver mr = (UMOMessageReceiver) iterator.next();
                 if (logger.isDebugEnabled()) {
@@ -304,17 +327,17 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
                 }
                 mr.stop();
             }
-            started.set(false);
-            if(isConnected()) {
-                try {
-                    disconnect();
-                } catch (Exception e) {
-                    logger.error("Failed to disconnect: " + e.getMessage(), e);
-                }
+        }
+
+        if(isConnected()) {
+            try {
+                disconnect();
+            } catch (Exception e) {
+                logger.error("Failed to disconnect: " + e.getMessage(), e);
             }
-            if (logger.isInfoEnabled()) {
-                logger.info("Connector " + getClass().getName() + " has been stopped");
-            }
+        }
+        if (logger.isInfoEnabled()) {
+            logger.info("Connector " + getClass().getName() + " has been stopped");
         }
     }
 
@@ -780,6 +803,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         if (connecting.commit(false, true)) {
             connectionStrategy.connect(this);
             logger.info("Connected: " + getConnectionDescription());
+            //This method calls itself so the the connecting vflag is set first, the the connection is made on the second call
             return;
         }
 
@@ -796,17 +820,30 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         }
         connected.set(true);
         connecting.set(false);
-        if(startedBeforeDisconnect.get()) {
+        if(startOnConnect.get()) {
             startConnector();
+        } else {
+            for (Iterator iterator = receivers.values().iterator(); iterator.hasNext();) {
+                AbstractMessageReceiver amr = (AbstractMessageReceiver) iterator.next();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Connecting receiver on endpoint: " + amr.getEndpoint().getEndpointURI());
+                }
+                amr.connect();
+            }
         }
     }
 
     public void disconnect() throws Exception {
-        startedBeforeDisconnect.set(isStarted());
+        startOnConnect.set(isStarted());
         fireNotification(new ConnectionNotification(this, getConnectEventId(), ConnectionNotification.CONNECTION_DISCONNECTED));
         connected.set(false);
-        doDisconnect();
-        stopConnector();
+        try {
+            doDisconnect();
+        } finally  {
+            stopConnector();
+
+        }
+        
         logger.info("Disconnected: " + getConnectionDescription());
     }
 

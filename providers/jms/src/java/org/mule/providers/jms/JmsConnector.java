@@ -204,7 +204,11 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             connection.setExceptionListener(new ExceptionListener() {
                 public void onException(JMSException jmsException) {
                     logger.debug("About to dispose of myself due to a JMS connection shutdown.");
-                    JmsConnector.this.doDispose();
+                    try {
+                        JmsConnector.this.stopConnector();
+                    } catch (UMOException e) {
+                        logger.warn(e.getMessage(), e);
+                    }
 
                     try {
                         connectionStrategy.connect(JmsConnector.this);

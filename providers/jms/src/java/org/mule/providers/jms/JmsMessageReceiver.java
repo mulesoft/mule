@@ -37,7 +37,6 @@ import javax.jms.Topic;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
- * @author <a href=mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  *
  */
@@ -48,6 +47,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
     protected RedeliveryHandler redeliveryHandler;
     protected MessageConsumer consumer;
     protected Session session;
+    protected boolean startOnConnect = false;
 
 
     public JmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
@@ -67,6 +67,9 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
     public void doConnect() throws Exception
     {
 		createConsumer();
+        if(startOnConnect) {
+            doStart();
+        }
     }
 
     public void doDisconnect() throws Exception
@@ -106,7 +109,16 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
 
     public void doStart() throws UMOException {
         try {
-            consumer.setMessageListener(this);
+            //We ned to register the listener when start is called in order to only start receiving messages after
+            //start/
+            //If the consumer is null it means that the connection strategy is being run in a separate thread
+            //And hasn't managed to connect yet.
+            if(consumer==null)  {
+                startOnConnect=true;
+            } else {
+                startOnConnect=false;
+                consumer.setMessageListener(this);
+            }
         } catch (JMSException e) {
             throw new LifecycleException(e, this);
         }
@@ -114,7 +126,7 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
 
     public void doStop() throws UMOException {
         try {
-            consumer.setMessageListener(null);
+            if(consumer!=null) consumer.setMessageListener(null);
         } catch (JMSException e) {
             throw new LifecycleException(e, this);
         }

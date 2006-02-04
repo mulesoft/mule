@@ -88,7 +88,11 @@ public class ServerTools
         final JavaTask java = new JavaTask();
         java.setProject(project);
         java.setClasspath(path);
-        java.setClassname("org.activemq.broker.impl.Main");
+        if(activeMqHome.indexOf("4.") > -1) {
+            java.setClassname("org.apache.activemq.broker.Main");
+        } else {
+            java.setClassname("org.activemq.broker.impl.Main");
+        }
         java.setArgs(brokerUrl);
         java.setFork(true);
         java.setDir(new File(activeMqHome));
