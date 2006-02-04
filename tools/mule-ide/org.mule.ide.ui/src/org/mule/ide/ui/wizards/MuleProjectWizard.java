@@ -1,8 +1,6 @@
 package org.mule.ide.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -17,7 +15,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+import org.mule.ide.core.MuleClasspathUtils;
 import org.mule.ide.core.MuleCorePlugin;
+import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.ui.MulePlugin;
 
 /**
@@ -63,7 +63,7 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 			// Add the Mule classpath container.
 			IProject project = projectPage.getProjectHandle();
 			IJavaProject javaProject = JavaCore.create(project);
-			addMuleClasspathContainer(javaProject);
+			addMuleLibraries(javaProject);
 			return true;
 		} catch (InvocationTargetException e) {
 			if (e.getCause() instanceof CoreException) {
@@ -78,28 +78,24 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * Add the Mule classpath container to the project classpath.
+	 * Add the Mule libraries to the project classpath.
 	 * 
 	 * @param muleProject the mule project
 	 * @throws JavaModelException
 	 */
-	protected void addMuleClasspathContainer(IJavaProject muleProject) throws JavaModelException {
-		IClasspathEntry[] entries = muleProject.getRawClasspath();
-		IClasspathEntry muleContainer = MuleCorePlugin.createMuleClasspathContainerEntry();
-		List newEntries = new ArrayList();
-		boolean addedMuleContainer = false;
-		for (int i = 0; i < entries.length; i++) {
-			newEntries.add(entries[i]);
-			if (entries[i].getEntryKind() == IClasspathEntry.CPE_CONTAINER) {
-				newEntries.add(muleContainer);
-				addedMuleContainer = true;
-			}
+	protected void addMuleLibraries(IJavaProject muleProject) throws JavaModelException,
+			MuleModelException {
+		IClasspathEntry[] initial = muleProject.getRawClasspath();
+		IClasspathEntry[] entries;
+		if (projectPage.isChoosingLibsFromPlugin()) {
+			entries = MuleClasspathUtils.getMulePluginLibraryEntries();
+		} else {
+			entries = MuleClasspathUtils.getExternalMuleLibraries(projectPage.getExternalRoot());
 		}
-		if (!addedMuleContainer) {
-			newEntries.add(muleContainer);
-		}
-		muleProject.setRawClasspath((IClasspathEntry[]) newEntries
-				.toArray(new IClasspathEntry[newEntries.size()]), new NullProgressMonitor());
+		IClasspathEntry[] result = new IClasspathEntry[initial.length + entries.length];
+		System.arraycopy(initial, 0, result, 0, initial.length);
+		System.arraycopy(entries, 0, result, initial.length, entries.length);
+		muleProject.setRawClasspath(result, new NullProgressMonitor());
 	}
 
 	/*

@@ -1,0 +1,169 @@
+package org.mule.ide.ui.panels;
+
+import org.eclipse.core.runtime.Preferences;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Text;
+import org.mule.ide.core.MuleCorePlugin;
+import org.mule.ide.core.preferences.IPreferenceConstants;
+
+/**
+ * Widgets needed to choose the location from which Mule libraries are loaded.
+ * 
+ * @author Derek Adams
+ */
+public class MuleClasspathChooser {
+
+	/** Button for loading libs from plugin classpath */
+	private Button buttonPlugin;
+
+	/** Button for loading libs from an external location */
+	private Button buttonExternal;
+
+	/** Text field for external root value */
+	private Text textExternalRoot;
+
+	/** Choice for location of libraries */
+	private int libLocationChoice;
+
+	/** Value for external root choice */
+	private String externalRoot;
+
+	/** Constant that indicates to load libs from the core plugin */
+	public static final int LOAD_FROM_PLUGIN = 0;
+
+	/** Constant that indicates to load libs from an external path */
+	public static final int LOAD_FROM_EXTERNAL = 1;
+
+	/**
+	 * Initialize the values from the preferences store.
+	 */
+	public void initializeFromPreferences() {
+		setExternalRoot(MuleCorePlugin.getDefault().getExternalMuleRoot());
+		if (MuleCorePlugin.getDefault().isPluginLibMuleClasspath()) {
+			setLibLocationChoice(LOAD_FROM_PLUGIN);
+		} else {
+			setLibLocationChoice(LOAD_FROM_EXTERNAL);
+		}
+	}
+
+	/**
+	 * Save the values into the preference store.
+	 * 
+	 * @param preferences the preference store
+	 */
+	public void saveToPreferences(Preferences preferences) {
+		if (getLibLocationChoice() == LOAD_FROM_PLUGIN) {
+			preferences.setValue(IPreferenceConstants.MULE_CLASSPATH_TYPE,
+					IPreferenceConstants.MULE_CLASSPATH_TYPE_PLUGIN);
+		} else {
+			preferences.setValue(IPreferenceConstants.MULE_CLASSPATH_TYPE,
+					IPreferenceConstants.MULE_CLASSPATH_TYPE_EXTERNAL);
+		}
+		preferences.setValue(IPreferenceConstants.EXTERNAL_MULE_ROOT, getExternalRoot());
+	}
+
+	/**
+	 * Create the widgets on a parent composite.
+	 * 
+	 * @param parent the parent composite
+	 * @return the created composite
+	 */
+	public Composite createControl(Composite parent) {
+		Group cpGroup = new Group(parent, SWT.NONE);
+		cpGroup.setText("Choose where Eclipse will look for Mule libraries");
+		GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
+		cpGroup.setLayout(layout);
+		cpGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		buttonPlugin = new Button(cpGroup, SWT.RADIO);
+		buttonPlugin.setText("Mule plugin (jars included with Mini-Mule distribution)");
+		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.horizontalSpan = 2;
+		buttonPlugin.setLayoutData(data);
+		buttonPlugin.addSelectionListener(new SelectionListener() {
+
+			public void widgetSelected(SelectionEvent e) {
+				setLibLocationChoice(LOAD_FROM_PLUGIN);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				setLibLocationChoice(LOAD_FROM_PLUGIN);
+			}
+		});
+
+		buttonExternal = new Button(cpGroup, SWT.RADIO);
+		buttonExternal.setText("External location specified here");
+		buttonExternal.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
+		buttonExternal.addSelectionListener(new SelectionListener() {
+
+			public void widgetSelected(SelectionEvent e) {
+				setLibLocationChoice(LOAD_FROM_EXTERNAL);
+			}
+
+			public void widgetDefaultSelected(SelectionEvent e) {
+				setLibLocationChoice(LOAD_FROM_EXTERNAL);
+			}
+		});
+
+		textExternalRoot = new Text(cpGroup, SWT.BORDER);
+		textExternalRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		initializeFromPreferences();
+		return cpGroup;
+	}
+
+	/**
+	 * @return Returns the externalRoot.
+	 */
+	public String getExternalRoot() {
+		return externalRoot;
+	}
+
+	/**
+	 * @param externalRoot The externalRoot to set.
+	 */
+	public void setExternalRoot(String externalRoot) {
+		if (externalRoot == null) {
+			externalRoot = "";
+		}
+		this.externalRoot = externalRoot;
+		if (!textExternalRoot.isDisposed()) {
+			textExternalRoot.setText(externalRoot);
+		}
+	}
+
+	/**
+	 * @return Returns the libLocationChoice.
+	 */
+	public int getLibLocationChoice() {
+		return libLocationChoice;
+	}
+
+	/**
+	 * @param libLocationChoice The libLocationChoice to set.
+	 */
+	public void setLibLocationChoice(int libLocationChoice) {
+		this.libLocationChoice = libLocationChoice;
+		if (libLocationChoice == LOAD_FROM_PLUGIN) {
+			if (!buttonPlugin.isDisposed()) {
+				buttonPlugin.setSelection(true);
+				buttonExternal.setSelection(false);
+				textExternalRoot.setEnabled(false);
+			}
+		} else {
+			if (!buttonExternal.isDisposed()) {
+				buttonPlugin.setSelection(false);
+				buttonExternal.setSelection(true);
+				textExternalRoot.setEnabled(true);
+			}
+		}
+	}
+}

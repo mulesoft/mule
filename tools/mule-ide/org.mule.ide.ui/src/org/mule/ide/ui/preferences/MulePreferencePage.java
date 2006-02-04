@@ -15,71 +15,43 @@
 
 package org.mule.ide.ui.preferences;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.jface.preference.DirectoryFieldEditor;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
+import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.mule.ide.core.MuleCorePlugin;
-import org.mule.ide.core.exception.MuleModelException;
-import org.mule.ide.core.nature.MuleNature;
-import org.mule.ide.core.preferences.IPreferenceConstants;
 import org.mule.ide.ui.MulePlugin;
+import org.mule.ide.ui.panels.MuleClasspathChooser;
 
 /**
  * Preference page for Mule setttings.
  */
-public class MulePreferencePage extends FieldEditorPreferencePage implements
-		IWorkbenchPreferencePage {
+public class MulePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
-	/** The radio button group for classpath type */
-	private RadioGroupFieldEditor classpathType;
-
-	/** Field editor for external Mule root directory */
-	private DirectoryFieldEditor externalMuleRoot;
-
-	/** Holds the initial value of the classpath type */
-	private String initialClasspathType;
-
-	/** Holds the initial value of the external mule root folder */
-	private String initialExternalMuleRoot;
+	/** Widget for choosing classpath */
+	private MuleClasspathChooser classpathChooser;
 
 	public MulePreferencePage() {
-		super(GRID);
 		setPreferenceStore(MulePlugin.getDefault().getPreferenceStore());
 		setDescription("Default settings for Mule UMO projects");
-		updateInitialValues();
-	}
-
-	/**
-	 * Update the initial values.
-	 */
-	protected void updateInitialValues() {
-		setInitialClasspathType(getPreferenceStore().getString(
-				IPreferenceConstants.MULE_CLASSPATH_TYPE));
-		setInitialExternalMuleRoot(getPreferenceStore().getString(
-				IPreferenceConstants.EXTERNAL_MULE_ROOT));
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#createFieldEditors()
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
 	 */
-	public void createFieldEditors() {
-
-		classpathType = new RadioGroupFieldEditor(IPreferenceConstants.MULE_CLASSPATH_TYPE,
-				"Choose where Eclipse will look for Mule libraries:", 1, new String[][] {
-						{ "Mule plugin (jars included with Mini-Mule distribution)",
-								IPreferenceConstants.MULE_CLASSPATH_TYPE_PLUGIN },
-						{ "External location specified below",
-								IPreferenceConstants.MULE_CLASSPATH_TYPE_EXTERNAL } },
-				getFieldEditorParent(), true);
-		addField(classpathType);
-		externalMuleRoot = new DirectoryFieldEditor(IPreferenceConstants.EXTERNAL_MULE_ROOT,
-				"&Mule installation folder:", getFieldEditorParent());
-		addField(externalMuleRoot);
+	protected Control createContents(Composite parent) {
+		Composite composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(new GridLayout());
+		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		classpathChooser = new MuleClasspathChooser();
+		classpathChooser.createControl(composite);
+		return composite;
 	}
 
 	/*
@@ -97,71 +69,16 @@ public class MulePreferencePage extends FieldEditorPreferencePage implements
 	 */
 	protected void performApply() {
 		super.performApply();
-		updateInitialValues();
+		classpathChooser.saveToPreferences(MuleCorePlugin.getDefault().getPluginPreferences());
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#performOk()
+	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
 	public boolean performOk() {
-		boolean ok = super.performOk();
-		if (ok) {
-			// Handle external Mule root change.
-			String newExternalMuleRoot = getPreferenceStore().getString(
-					IPreferenceConstants.EXTERNAL_MULE_ROOT);
-			boolean externalMuleRootChanged = ((getInitialExternalMuleRoot() == null) || (!getInitialExternalMuleRoot()
-					.equals(newExternalMuleRoot)));
-			if (externalMuleRootChanged) {
-				try {
-					MuleCorePlugin.getDefault().updateExternalMuleRootVariable();
-				} catch (MuleModelException e) {
-					MulePlugin.getDefault().showError(e.getMessage(), e.getStatus());
-				}
-			}
-
-			// Handle classpath type change.
-			String newClasspathType = getPreferenceStore().getString(
-					IPreferenceConstants.MULE_CLASSPATH_TYPE);
-			boolean classpathTypeChanged = ((getInitialClasspathType() == null) || (!getInitialClasspathType()
-					.equals(newClasspathType)));
-			if (classpathTypeChanged) {
-				updateClasspathForMuleProjects();
-			}
-		}
-		return ok;
-	}
-
-	/**
-	 * Updates the Mule libraries classpath for all Mule projects. This will be changing to a
-	 * project setting rather than a general preference soon.
-	 */
-	protected void updateClasspathForMuleProjects() {
-		IProject[] projects = MuleCorePlugin.getDefault().getMuleProjects();
-		for (int i = 0; i < projects.length; i++) {
-			MuleNature config = MuleCorePlugin.getDefault().getMuleNature(projects[i]);
-			try {
-				config.refreshMuleClasspathContainer();
-			} catch (MuleModelException e) {
-				MuleCorePlugin.getDefault().getLog().log(e.getStatus());
-			}
-		}
-	}
-
-	protected void setInitialClasspathType(String initialClasspathType) {
-		this.initialClasspathType = initialClasspathType;
-	}
-
-	protected String getInitialClasspathType() {
-		return initialClasspathType;
-	}
-
-	protected void setInitialExternalMuleRoot(String initialExternalMuleRoot) {
-		this.initialExternalMuleRoot = initialExternalMuleRoot;
-	}
-
-	protected String getInitialExternalMuleRoot() {
-		return initialExternalMuleRoot;
+		classpathChooser.saveToPreferences(MuleCorePlugin.getDefault().getPluginPreferences());
+		return true;
 	}
 }
