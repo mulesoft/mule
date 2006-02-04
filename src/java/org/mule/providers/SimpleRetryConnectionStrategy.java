@@ -16,6 +16,7 @@ package org.mule.providers;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.config.ExceptionHelper;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
@@ -52,7 +53,13 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                                                                 getClass().getName(),
                                                                 getDescription(connectable)), e, connectable);
                 }
-                logger.warn("Failed to connect/reconnect on endpoint: " + getDescription(connectable));
+                if(logger.isErrorEnabled()) {
+                    StringBuffer msg = new StringBuffer();
+                    msg.append("Failed to connect/reconnect on endpoint: ").append(getDescription(connectable));
+                    Throwable t = ExceptionHelper.getRootException(e);
+                    msg.append(". Root Exception was: ").append(ExceptionHelper.writeException(t));
+                    logger.error(msg.toString(), e);
+                }
                 if (logger.isDebugEnabled()) {
                 	logger.debug("Waiting for " + frequency + "ms before reconnecting");
                 }

@@ -239,7 +239,8 @@ public class ServerNotificationManager implements Work, Disposable
         }
         UMOServerNotificationListener l;
         synchronized (listeners) {
-            for (Iterator iterator = listeners.keySet().iterator(); iterator.hasNext();) {
+            int i = 1;
+            for (Iterator iterator = listeners.keySet().iterator(); iterator.hasNext(); i++) {
                 l = (UMOServerNotificationListener) iterator.next();
                 subscription = (String) listeners.get(l);
                 if (subscription == null) {
@@ -253,9 +254,11 @@ public class ServerNotificationManager implements Work, Disposable
                         || new WildcardFilter(subscription).accept(notification.getResourceIdentifier())) {
                     l.onNotification(notification);
                 } else {
-                    logger.trace("Resource id '" + subscription + "' for listener " + l.getClass().getName()
+                    if(logger.isTraceEnabled()) {
+                        logger.trace("Resource id '" + subscription + "' for listener " + l.getClass().getName()
                             + " does not match Resource id '" + notification.getResourceIdentifier()
-                            + "' for notificationication, not firing notificationication for this listener");
+                            + "' for notificationication, not firing notificationication for this listener. Listener " + i + " of " + listeners.size());
+                    }
                 }
             }
         }

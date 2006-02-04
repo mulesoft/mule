@@ -100,6 +100,7 @@ public class ExceptionHelper {
             }
 
             registerExceptionReader(new UMOExceptionReader());
+            registerExceptionReader(new NamingExceptionReader());
             J2SE_VERSION = System.getProperty("java.specification.version");
 
             InputStream is = SpiHelper.findServiceDescriptor("org/mule/config",
@@ -395,5 +396,12 @@ public class ExceptionHelper {
             }
         }
         return defaultExceptionReader;
+    }
+
+    public static String writeException(Throwable t) {
+        ExceptionReader er = getExceptionReader(t);
+        StringBuffer msg = new StringBuffer();
+        msg.append(er.getMessage(t)).append(". Type: ").append(t.getClass());
+        return msg.toString();
     }
 }

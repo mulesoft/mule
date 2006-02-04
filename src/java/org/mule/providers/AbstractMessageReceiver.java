@@ -129,10 +129,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
             }
         }
         connectionStrategy = this.connector.getConnectionStrategy();
-//         if(connectionStrategy instanceof AbstractConnectionStrategy) {
-//         ((AbstractConnectionStrategy)connectionStrategy).setDoThreading(
-//         this.connector.getReceiverThreadingProfile().isDoThreading());
-//         }
     }
 
     /*
@@ -392,33 +388,23 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
     }
 
     public final void stop() {
+         try {
+                if(connected.get()) disconnect();
+             } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+             }
+
         if (stopped.commit(false, true)) {
             try {
                 doStop();
             } catch (UMOException e) {
                 logger.error(e.getMessage(), e);
             }
-            // try {
-            // if(connected.get()) disconnect();
-            // } catch (Exception e) {
-            // logger.error(e.getMessage(), e);
-            // }
+
         }
     }
 
-    public abstract void doConnect() throws Exception;
-
-    public abstract void doDisconnect() throws Exception;
-
-    public void doStart() throws UMOException {
-
-    }
-
-    public void doStop() throws UMOException {
-
-    }
-
-    public boolean isConnected() {
+    public final boolean isConnected() {
         return connected.get();
     }
 
@@ -529,5 +515,17 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         }
         return returnMessage;
     }
+
+    public void doStart() throws UMOException {
+
+    }
+
+    public void doStop() throws UMOException {
+
+    }
+
+    public abstract void doConnect() throws Exception;
+
+    public abstract void doDisconnect() throws Exception;
 
 }
