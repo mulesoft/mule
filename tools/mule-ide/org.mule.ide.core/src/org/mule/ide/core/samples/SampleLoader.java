@@ -37,12 +37,23 @@ public class SampleLoader {
 	/** Configuration path attribute for a sample */
 	private static final String SAMPLE_ATTR_CONFIG_DIR = "confdir";
 
+	/** Sub element for a config set associated with the sample */
+	private static final String SAMPLE_ELM_CONFIGSET = "configset";
+
+	/** Name attribute for a config set element */
+	private static final String CONFIGSET_ATTR_NAME = "name";
+
+	/** Config path attribute for a config set element */
+	private static final String CONFIGSET_ATTR_CONFIGPATH = "configpath";
+
+	/** Config name attribute for a config set element */
+	private static final String CONFIGSET_ATTR_CONFIGNAME = "configname";
+
 	/**
 	 * Private singleton constructor.
 	 */
 	private SampleLoader() {
 		setSamples(loadSamples());
-		System.out.println();
 	}
 
 	/**
@@ -78,10 +89,29 @@ public class SampleLoader {
 				sample.setRoot(element.getAttribute(SAMPLE_ATTR_ROOT));
 				sample.setSourcePath(SAMPLE_ATTR_SOURCE_DIR);
 				sample.setConfigPath(SAMPLE_ATTR_CONFIG_DIR);
+				sample.setConfigSets(createConfigSets(element.getChildren(SAMPLE_ELM_CONFIGSET)));
 				samples.add(sample);
 			}
 		}
 		return (Sample[]) samples.toArray(new Sample[samples.size()]);
+	}
+
+	/**
+	 * Create config set data elements for all of the configset elements.
+	 * 
+	 * @param configElements the configuration elements
+	 * @return the config set data objects
+	 */
+	protected ConfigSet[] createConfigSets(IConfigurationElement[] configElements) {
+		List configSets = new ArrayList();
+		for (int i=0; i<configElements.length; i++) {
+			ConfigSet set = new ConfigSet();
+			set.setName(configElements[i].getAttribute(CONFIGSET_ATTR_NAME));
+			set.setConfigPath(configElements[i].getAttribute(CONFIGSET_ATTR_CONFIGPATH));
+			set.setConfigName(configElements[i].getAttribute(CONFIGSET_ATTR_CONFIGNAME));
+			configSets.add(set);
+		}
+		return (ConfigSet[]) configSets.toArray(new ConfigSet[configSets.size()]);
 	}
 
 	/**
