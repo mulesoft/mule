@@ -114,11 +114,6 @@ public class TestConnector extends AbstractConnector
             public void doDisconnect() throws Exception
             {
             }
-
-            public boolean isConnected()
-            {
-                return false;
-            }
         };
         return receiver;
     }
