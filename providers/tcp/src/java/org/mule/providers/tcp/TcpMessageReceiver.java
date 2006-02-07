@@ -88,7 +88,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         // this will cause the server thread to quit
         disposing.set(true);
         try {
-            serverSocket.close();
+            if(serverSocket!=null) serverSocket.close();
         } catch (IOException e) {
             logger.warn("Failed to close server socket: " + e.getMessage(), e);
         }
