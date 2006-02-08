@@ -220,7 +220,7 @@ if [ -n "$JAVA_HOME" ] ; then
   fi
 fi
 
-if [ -n "$MULE_OPTS" ] ; then
+if [ -z "$MULE_OPTS" ] ; then
   MULE_OPTS="-Xmx512M"
 fi
 
