@@ -3,6 +3,7 @@ package org.mule.ide.ui.wizards;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.mule.ide.ui.panels.MuleClasspathChooser;
+import org.mule.ide.ui.panels.ProjectContentChooser;
 
 /**
  * First page of the wizard to create a new Mule project
@@ -13,6 +14,9 @@ public class MuleWizardProjectPage extends WizardNewProjectCreationPage {
 
 	/** Widgets needed to choose Mule lib locations */
 	private MuleClasspathChooser classpathChooser;
+
+	/** Widgets needed to choose the initial project content */
+	private ProjectContentChooser contentChooser;
 
 	/** Naming constant for project page */
 	private static final String PAGE_PROJECT = "muleWizardProjectPage";
@@ -33,6 +37,8 @@ public class MuleWizardProjectPage extends WizardNewProjectCreationPage {
 		Composite existing = (Composite) getControl();
 		classpathChooser = new MuleClasspathChooser();
 		classpathChooser.createControl(existing);
+		contentChooser = new ProjectContentChooser();
+		contentChooser.createControl(existing);
 	}
 
 	/**
@@ -60,5 +66,14 @@ public class MuleWizardProjectPage extends WizardNewProjectCreationPage {
 	 */
 	public String getExternalRoot() {
 		return classpathChooser.getExternalRoot();
+	}
+
+	/**
+	 * Gets the chosen sample project name or null of "empty" or none chosen.
+	 * 
+	 * @return the sample project description or null
+	 */
+	public String getSelectedSampleProject() {
+		return contentChooser.getChosenSampleDescription();
 	}
 }

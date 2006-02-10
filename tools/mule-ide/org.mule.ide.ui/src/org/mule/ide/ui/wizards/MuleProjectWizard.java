@@ -1,11 +1,14 @@
 package org.mule.ide.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Enumeration;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -18,7 +21,10 @@ import org.eclipse.ui.IWorkbench;
 import org.mule.ide.core.MuleClasspathUtils;
 import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.core.exception.MuleModelException;
+import org.mule.ide.core.samples.Sample;
+import org.mule.ide.core.samples.SampleLoader;
 import org.mule.ide.ui.MulePlugin;
+import org.osgi.framework.Bundle;
 
 /**
  * Wizard for creating a new Mule project.
@@ -42,8 +48,7 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		projectPage = new MuleWizardProjectPage();
 		addPage(projectPage);
-		javaPage = new NewJavaProjectWizardPage(ResourcesPlugin.getWorkspace().getRoot(),
-				projectPage);
+		javaPage = new NewJavaProjectWizardPage(ResourcesPlugin.getWorkspace().getRoot(), projectPage);
 		addPage(javaPage);
 	}
 
@@ -64,6 +69,10 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 			IProject project = projectPage.getProjectHandle();
 			IJavaProject javaProject = JavaCore.create(project);
 			addMuleLibraries(javaProject);
+			String sampleChosen = projectPage.getSelectedSampleProject();
+			if (sampleChosen != null) {
+				addFromSample(SampleLoader.getInstance().getSampleByDescription(sampleChosen));
+			}
 			return true;
 		} catch (InvocationTargetException e) {
 			if (e.getCause() instanceof CoreException) {
@@ -83,8 +92,7 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 	 * @param muleProject the mule project
 	 * @throws JavaModelException
 	 */
-	protected void addMuleLibraries(IJavaProject muleProject) throws JavaModelException,
-			MuleModelException {
+	protected void addMuleLibraries(IJavaProject muleProject) throws JavaModelException, MuleModelException {
 		IClasspathEntry[] initial = muleProject.getRawClasspath();
 		IClasspathEntry[] entries;
 		if (projectPage.isChoosingLibsFromPlugin()) {
@@ -96,6 +104,25 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 		System.arraycopy(initial, 0, result, 0, initial.length);
 		System.arraycopy(entries, 0, result, initial.length, entries.length);
 		muleProject.setRawClasspath(result, new NullProgressMonitor());
+	}
+
+	/**
+	 * Add the files from the sample project.
+	 * 
+	 * @param sample the sample
+	 */
+	protected void addFromSample(Sample sample) {
+		if (sample == null) {
+			return;
+		}
+		Bundle bundle = Platform.getBundle(sample.getPluginId());
+		if (bundle == null) {
+			return;
+		}
+		String src = IPath.SEPARATOR + sample.getRoot() + IPath.SEPARATOR + sample.getSourcePath();
+		String conf = IPath.SEPARATOR + sample.getRoot() + IPath.SEPARATOR + sample.getConfigPath();
+		Enumeration srcs = bundle.findEntries(src, "*", true);
+		Enumeration confs = bundle.findEntries(conf, "*", true);
 	}
 
 	/*

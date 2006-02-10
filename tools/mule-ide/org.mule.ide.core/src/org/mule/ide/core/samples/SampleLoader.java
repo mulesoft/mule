@@ -87,8 +87,8 @@ public class SampleLoader {
 				sample.setPluginId(extension.getNamespace());
 				sample.setDescription(element.getAttribute(SAMPLE_ATTR_DESC));
 				sample.setRoot(element.getAttribute(SAMPLE_ATTR_ROOT));
-				sample.setSourcePath(SAMPLE_ATTR_SOURCE_DIR);
-				sample.setConfigPath(SAMPLE_ATTR_CONFIG_DIR);
+				sample.setSourcePath(element.getAttribute(SAMPLE_ATTR_SOURCE_DIR));
+				sample.setConfigPath(element.getAttribute(SAMPLE_ATTR_CONFIG_DIR));
 				sample.setConfigSets(createConfigSets(element.getChildren(SAMPLE_ELM_CONFIGSET)));
 				samples.add(sample);
 			}
@@ -104,7 +104,7 @@ public class SampleLoader {
 	 */
 	protected ConfigSet[] createConfigSets(IConfigurationElement[] configElements) {
 		List configSets = new ArrayList();
-		for (int i=0; i<configElements.length; i++) {
+		for (int i = 0; i < configElements.length; i++) {
 			ConfigSet set = new ConfigSet();
 			set.setName(configElements[i].getAttribute(CONFIGSET_ATTR_NAME));
 			set.setConfigPath(configElements[i].getAttribute(CONFIGSET_ATTR_CONFIGPATH));
@@ -112,6 +112,36 @@ public class SampleLoader {
 			configSets.add(set);
 		}
 		return (ConfigSet[]) configSets.toArray(new ConfigSet[configSets.size()]);
+	}
+
+	/**
+	 * Get the list of sample descriptions.
+	 * 
+	 * @return
+	 */
+	public String[] getSampleDescriptions() {
+		Sample[] samples = getSamples();
+		String[] result = new String[samples.length];
+		for (int i = 0; i < samples.length; i++) {
+			result[i] = samples[i].getDescription();
+		}
+		return result;
+	}
+
+	/**
+	 * Get a Sample given its description.
+	 * 
+	 * @param description the description
+	 * @return the sample or null if no match
+	 */
+	public Sample getSampleByDescription(String description) {
+		Sample[] samples = getSamples();
+		for (int i = 0; i < samples.length; i++) {
+			if (samples[i].getDescription().equals(description)) {
+				return samples[i];
+			}
+		}
+		return null;
 	}
 
 	/**
