@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.mule.ide.core.samples">
+      <sample
+            confdir="conf"
+            description="Hello Sample Application"
+            root="hello"
+            srcdir="src">
+         <configset
+               configname="Hello Config"
+               configpath="hello-mule-config.xml"
+               name="Hello"/>
+         <configset
+               configname="Hello Http Config"
+               configpath="hello-http-mule-config.xml"
+               name="Hello Http"/>
+      </sample>
+   </extension>
+
+</plugin>
