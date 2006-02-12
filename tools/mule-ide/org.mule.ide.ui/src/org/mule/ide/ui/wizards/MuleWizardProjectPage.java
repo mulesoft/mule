@@ -39,6 +39,7 @@ public class MuleWizardProjectPage extends WizardNewProjectCreationPage {
 		classpathChooser.createControl(existing);
 		contentChooser = new ProjectContentChooser();
 		contentChooser.createControl(existing);
+		contentChooser.setChoice(ProjectContentChooser.LOAD_FROM_EMPTY);
 	}
 
 	/**
