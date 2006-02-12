@@ -181,7 +181,7 @@ public class WaitableBooleanTestCase extends TestCase
 			}
 		};
 
-		new Thread(switcher).run();
+		new Thread(switcher).start();
 		blocker.whenFalse(action);
 		assertFalse(blocker.get());
 		assertTrue(actionPerformed.get());
@@ -234,7 +234,7 @@ public class WaitableBooleanTestCase extends TestCase
 			}
 		};
 
-		new Thread(switcher).run();
+		new Thread(switcher).start();
 		blocker.whenTrue(action);
 		assertTrue(blocker.get());
 		assertTrue(actionPerformed.get());
