@@ -155,6 +155,10 @@ public class MuleManager implements UMOManager
      * True once the Mule Manager is initialised
      */
     private AtomicBoolean initialised = new AtomicBoolean(false);
+
+    /**
+     * True while the Mule Manager is initialising
+     */
     private AtomicBoolean initialising = new AtomicBoolean(false);
 
     /**
@@ -231,6 +235,18 @@ public class MuleManager implements UMOManager
         containerContext = new MultiContainerContext();
         securityManager = new MuleSecurityManager();
         Runtime.getRuntime().addShutdownHook(new ShutdownThread());
+
+        // create the event manager
+        notificationManager = new ServerNotificationManager();
+        notificationManager.registerEventType(ManagerNotification.class, ManagerNotificationListener.class);
+        notificationManager.registerEventType(ModelNotification.class, ModelNotificationListener.class);
+        notificationManager.registerEventType(ComponentNotification.class, ComponentNotificationListener.class);
+        notificationManager.registerEventType(SecurityNotification.class, SecurityNotificationListener.class);
+        notificationManager.registerEventType(ManagementNotification.class, ManagementNotificationListener.class);
+        notificationManager.registerEventType(AdminNotification.class, AdminNotificationListener.class);
+        notificationManager.registerEventType(CustomNotification.class, CustomNotificationListener.class);
+        notificationManager.registerEventType(ConnectionNotification.class, ConnectionNotificationListener.class);
+
     }
 
     /**
@@ -519,21 +535,6 @@ public class MuleManager implements UMOManager
      */
     public void registerEndpointIdentifier(String logicalName, String endpoint)
     {
-        // Set the name of the endpoint is it is a Url. This helps when viewing
-        // Jmx stats
-        // if(MuleEndpointURI.isMuleUri(endpoint)) {
-        // if(endpoint.indexOf(UMOEndpointURI.PROPERTY_ENDPOINT_NAME) == -1) {
-        // String endpointName = logicalName + "(" + endpoint.substring(0,
-        // endpoint.indexOf(":")) + ")";
-        // if(endpoint.indexOf('?') == -1) {
-        // endpoint += "?" + UMOEndpointURI.PROPERTY_ENDPOINT_NAME + "=" +
-        // endpointName;
-        // } else {
-        // endpoint += "&" + UMOEndpointURI.PROPERTY_ENDPOINT_NAME + "=" +
-        // endpointName;
-        // }
-        // }
-        // }
         endpointIdentifiers.put(logicalName, endpoint);
     }
 
@@ -623,16 +624,11 @@ public class MuleManager implements UMOManager
                 workManager.start();
             }
 
-            // create the event manager
-            notificationManager = new ServerNotificationManager(workManager);
-            notificationManager.registerEventType(ManagerNotification.class, ManagerNotificationListener.class);
-            notificationManager.registerEventType(ModelNotification.class, ModelNotificationListener.class);
-            notificationManager.registerEventType(ComponentNotification.class, ComponentNotificationListener.class);
-            notificationManager.registerEventType(SecurityNotification.class, SecurityNotificationListener.class);
-            notificationManager.registerEventType(ManagementNotification.class, ManagementNotificationListener.class);
-            notificationManager.registerEventType(AdminNotification.class, AdminNotificationListener.class);
-            notificationManager.registerEventType(CustomNotification.class, CustomNotificationListener.class);
-            notificationManager.registerEventType(ConnectionNotification.class, ConnectionNotificationListener.class);
+            //Start the event manager
+            notificationManager.start(workManager);
+
+            //Fire message notifications if the option is set.  This will fire inbound and outbound message events that can
+            //consume resources in high throughput systems
             if(config.isEnableMessageEvents()) {
                 notificationManager.registerEventType(MessageNotification.class, MessageNotificationListener.class);
             }
@@ -689,7 +685,7 @@ public class MuleManager implements UMOManager
         // Allows users to disable all server components and connections
         // this can be useful for testing
         boolean disable = PropertiesHelper.getBooleanProperty(System.getProperties(),
-                                                              MuleProperties.DISABLE_SERVER_CONNECTIONS,
+                                                              MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY,
                                                               false);
 
         // if endpointUri is null do not setup server components
