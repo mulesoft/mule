@@ -70,7 +70,7 @@ public class EjbConnectorUtil
         try {
             Object ref = connector.getJndiContext(inetAddress.getHostAddress() + ":" + port).lookup(serviceName);
 
-            Method method = ClassHelper.getMethod("create", ref.getClass());
+            Method method = ClassHelper.getMethod("create", null, ref.getClass());
 
             remoteObj = (EJBObject) method.invoke(ref, ClassHelper.NO_ARGS);
         }

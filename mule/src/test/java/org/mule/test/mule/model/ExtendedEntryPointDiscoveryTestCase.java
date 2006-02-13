@@ -98,7 +98,7 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         try {
 
             RequestContext.setEvent(getTestEvent("Hello"));
-            ep.invoke(new MultipleEventContextsTestObject(), RequestContext.getEventContext(), null);
+            ep.invoke(new MultipleEventContextsTestObject(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint.");
         } catch (InvocationTargetException itex) {
             final Throwable cause = itex.getCause();
@@ -129,7 +129,7 @@ public class ExtendedEntryPointDiscoveryTestCase extends AbstractEntryPointDisco
         try {
 
             RequestContext.setEvent(getTestEvent("Hello"));
-            ep.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext(), null);
+            ep.invoke(new MultiplePayloadsTestObject(), RequestContext.getEventContext());
             fail("Should have failed to find entrypoint.");
 
         } catch (InvocationTargetException itex) {

@@ -56,7 +56,7 @@ public class EjbContainerContext extends RmiContainerContext
             throw new ObjectNotFoundException(key.toString());
         } else if(homeObject instanceof EJBHome) {
 
-            Method method = ClassHelper.getMethod("create", homeObject.getClass());
+            Method method = ClassHelper.getMethod("create", null, homeObject.getClass());
             if(method==null) {
                 throw new ObjectNotFoundException(key.toString(),
                         new IllegalArgumentException(new Message(Messages.EJB_OBJECT_X_MISSING_CREATE, key).toString()));

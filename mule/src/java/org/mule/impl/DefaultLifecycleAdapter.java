@@ -165,16 +165,9 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
     {
         Object result = null;
         try {
-            // Check for method override
-            Object methodOverride = event.removeProperty(MuleProperties.MULE_METHOD_PROPERTY);
-            Method method = null;
-            if (methodOverride instanceof Method) {
-                method = (Method) methodOverride;
-            } else if (methodOverride != null) {
-                method = ClassHelper.getMethod(methodOverride.toString(), component.getClass());
-            }
+
             // Invoke method
-            result = entryPoint.invoke(component, RequestContext.getEventContext(), method);
+            result = entryPoint.invoke(component, RequestContext.getEventContext());
 
             UMOMessage resultMessage = null;
             if (result == null && entryPoint.isVoid()) {
