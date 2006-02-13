@@ -319,7 +319,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             logger.debug("Retrieving jms session from current transaction");
             return session;
         }
-        logger.debug("Retrieving new jms session from connection");
+        if(logger.isDebugEnabled()) logger.debug("Retrieving new jms session from connection: topic=" + topic + ", transacted=" + (transacted || tx != null) + ", ack mode="+ acknowledgementMode + ", nolocal=" + noLocal);
+
         session = jmsSupport.createSession(connection, topic, transacted || tx != null, acknowledgementMode, noLocal);
         if (tx != null) {
             logger.debug("Binding session to current transaction");
