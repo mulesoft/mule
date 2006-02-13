@@ -22,6 +22,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.LifecycleException;
 import org.mule.umo.manager.UMOServerNotification;
 import org.mule.umo.manager.UMOServerNotificationListener;
 import org.mule.umo.manager.UMOWorkManager;
@@ -62,14 +63,9 @@ public class ServerNotificationManager implements Work, Disposable
         }
     };
 
-    public ServerNotificationManager(UMOWorkManager workManager)
+    public ServerNotificationManager()
     {
         init();
-        try {
-            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, null);
-        } catch (WorkException e) {
-            throw new MuleRuntimeException(new Message(Messages.FAILED_TO_SCHEDULE_WORK), e);
-        }
     }
 
     private synchronized void init()
@@ -77,6 +73,14 @@ public class ServerNotificationManager implements Work, Disposable
         listenersMap = new ConcurrentHashMap();
         eventsMap = new ConcurrentHashMap();
         eventQueue = new LinkedBlockingQueue();
+    }
+
+    public void start(UMOWorkManager workManager) throws LifecycleException {
+        try {
+            workManager.scheduleWork(this, WorkManager.INDEFINITE, null, null);
+        } catch (WorkException e) {
+            throw new LifecycleException(e, this);
+        }
     }
 
     public void registerEventType(Class eventType, Class listenerType)
@@ -181,9 +185,8 @@ public class ServerNotificationManager implements Work, Disposable
 
     public void fireEvent(UMOServerNotification notification)
     {
-        if (disposed) {
-            return;
-        }
+        if (disposed) return;
+        
         if (notification instanceof BlockingServerEvent) {
             notifyListeners(notification);
             return;
@@ -209,6 +212,8 @@ public class ServerNotificationManager implements Work, Disposable
      */
     protected void notifyListeners(UMOServerNotification notification)
     {
+        if(disposed) return;
+
         TreeMap listeners;
         String subscription = null;
         Class listenerClass = null;
@@ -268,6 +273,7 @@ public class ServerNotificationManager implements Work, Disposable
     {
         dispose();
     }
+
 
     /**
      * When an object implementing interface <code>Runnable</code> is used to
