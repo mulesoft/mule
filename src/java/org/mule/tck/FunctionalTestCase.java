@@ -28,7 +28,7 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
 
     protected final void doSetUp() throws Exception {
         doPreFunctionalSetUp();
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "false");
         ConfigurationBuilder builder = getBuilder();
         builder.configure(getConfigResources());
         doPostFunctionalSetUp();

@@ -17,6 +17,8 @@ package org.mule.tck.functional;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
+import org.mule.MuleException;
+import org.mule.config.i18n.Message;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.util.StringMessageHelper;
@@ -37,10 +39,11 @@ public class FunctionalTestComponent implements Callable
 
     private EventCallback eventCallback;
     private String returnMessage = null;
+    private boolean throwException = false;
 
     public Object onCall(UMOEventContext context) throws Exception
     {
-        String contents = context.getMessageAsString();
+        String contents = context.getTransformedMessageAsString();
         String msg = null;
         msg = StringMessageHelper.getBoilerPlate("Message Received in component: "
                 + context.getComponentDescriptor().getName() + ". Content is: "
@@ -51,7 +54,12 @@ public class FunctionalTestComponent implements Callable
         if (eventCallback != null) {
             eventCallback.eventReceived(context, this);
         }
+
         MuleManager.getInstance().fireNotification(new FunctionalTestNotification(context.getComponentDescriptor().getName(), contents, FunctionalTestNotification.EVENT_RECEIVED));
+
+        if(throwException) {
+            throw new MuleException(Message.createStaticMessage("Functional Test Component Exception"));
+        }
         if(returnMessage!=null) {
             return returnMessage;
         } else {
@@ -76,5 +84,13 @@ public class FunctionalTestComponent implements Callable
 
     public void setReturnMessage(String returnMessage) {
         this.returnMessage = returnMessage;
+    }
+
+    public boolean isThrowException() {
+        return throwException;
+    }
+
+    public void setThrowException(boolean throwException) {
+        this.throwException = throwException;
     }
 }
