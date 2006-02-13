@@ -29,6 +29,7 @@ import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.model.UMOEntryPoint;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassHelper;
+import org.mule.config.MuleProperties;
 
 /**
  * <code>DynamicEntryPoint</code> is used to detemine the entry point on a
@@ -59,10 +60,22 @@ public class DynamicEntryPoint implements UMOEntryPoint
         return currentMethod.getParameterTypes()[0];
     }
 
-    public Object invoke(Object component, UMOEventContext context, Method method) throws InvocationTargetException,
+    public Object invoke(Object component, UMOEventContext context) throws InvocationTargetException,
             IllegalAccessException, TransformerException
     {
         Object payload = null;
+
+        // Check for method override and remove it from the event
+        Object methodOverride = context.getProperties().remove(MuleProperties.MULE_METHOD_PROPERTY);
+        Method method = null;
+        if (methodOverride instanceof Method) {
+            method = (Method) methodOverride;
+        } else if (methodOverride != null) {
+            payload = context.getTransformedMessage();
+            //Get the method that matches the method name with the current argument types
+            method = ClassHelper.getMethod(methodOverride.toString(), ClassHelper.getClassTypes(payload), component.getClass());
+        }
+
         if (method == null) {
             if (component instanceof Callable) {
                 method = Callable.class.getMethods()[0];

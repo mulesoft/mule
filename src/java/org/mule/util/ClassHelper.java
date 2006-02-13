@@ -34,7 +34,6 @@ import java.util.List;
  * tolerant manner that works across different applications servers.
  * The resource and classloading methods are SecurityManager friendly.
  *
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author $Author$
  * @version $Revision$
@@ -217,7 +216,7 @@ public class ClassHelper {
                 }
             });
         }
-        if(clazz==null) {
+        if (clazz == null) {
             throw new ClassNotFoundException(className);
         }
         return clazz;
@@ -301,11 +300,24 @@ public class ClassHelper {
         return new Class[]{};
     }
 
-    public static Method getMethod(String name, Class clazz) {
+    /**
+     * Returns a matching method for the given name and parameters on the given class
+     * If the parameterTypes arguments is null it will return the first matching method on the class
+     *
+     * @param name           the method name to find
+     * @param parameterTypes an array of argument types or null
+     * @param clazz          the class to find the method on
+     * @return the Method object or null if none was found
+     */
+    public static Method getMethod(String name, Class[] parameterTypes, Class clazz) {
         Method[] methods = clazz.getMethods();
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().equals(name)) {
-                return methods[i];
+                if (parameterTypes == null) {
+                    return methods[i];
+                } else if (Arrays.equals(methods[i].getParameterTypes(), parameterTypes)) {
+                    return methods[i];
+                }
             }
         }
         return null;
@@ -420,11 +432,11 @@ public class ClassHelper {
             return false;
         }
         for (int i = 0; i < c1.length; i++) {
-            if(c1[i].equals(Object.class) && !matchOnObject) {
+            if (c1[i].equals(Object.class) && !matchOnObject) {
                 return false;
             }
             if (!c1[i].isAssignableFrom(c2[i])) {
-                
+
                 return false;
             }
         }

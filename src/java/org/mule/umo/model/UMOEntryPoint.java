@@ -29,7 +29,7 @@ public interface UMOEntryPoint
 {
     Class getParameterType();
 
-    Object invoke(Object component, UMOEventContext context, Method method) throws InvocationTargetException,
+    Object invoke(Object component, UMOEventContext context) throws InvocationTargetException,
             IllegalAccessException, TransformerException;
 
     boolean isVoid();
