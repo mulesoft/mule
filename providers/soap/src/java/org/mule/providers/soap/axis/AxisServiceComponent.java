@@ -690,16 +690,16 @@ public class AxisServiceComponent implements Initialisable, Callable
     {
         String soapAction = (String) context.getProperty("SOAPAction");
         if (logger.isDebugEnabled()) {
-            logger.debug("HEADER_SOAP_ACTION:" + soapAction);
+            logger.debug("Header Soap Action:" + soapAction);
         }
-        if (soapAction == null) {
-            AxisFault af = new AxisFault("Client.NoSOAPAction",
-                                         Messages.getMessage("noHeader00", "SOAPAction"),
-                                         null,
-                                         null);
-            exceptionLog.error(Messages.getMessage("genFault00"), af);
-            throw af;
-        }
+//        if (soapAction == null) {
+//            AxisFault af = new AxisFault("Client.NoSOAPAction",
+//                                         Messages.getMessage("noHeader00", "SOAPAction"),
+//                                         null,
+//                                         null);
+//            exceptionLog.error(Messages.getMessage("genFault00"), af);
+//            throw af;
+//        }
         if (soapAction.length() == 0) {
             soapAction = context.getEndpointURI().getAddress();
         }
