@@ -34,51 +34,23 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
+import javax.resource.spi.work.Work;
 
 /**
+ *
+ * Registers a single JmsMessage listene but uses a thread pool to process incoming messages
+ * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
- *
  */
-public class JmsMessageReceiver extends AbstractMessageReceiver implements MessageListener
-{
-
-    protected JmsConnector connector;
-    protected RedeliveryHandler redeliveryHandler;
-    protected MessageConsumer consumer;
-    protected Session session;
-    protected boolean startOnConnect = false;
-
-
+public class JmsMessageReceiver extends SingleJmsMessageReceiver
+ {
     public JmsMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
-            throws InitialisationException
-    {
+            throws InitialisationException {
         super(connector, component, endpoint);
-        this.connector = (JmsConnector) connector;
-
-        try {
-            redeliveryHandler = this.connector.createRedeliveryHandler();
-            redeliveryHandler.setConnector(this.connector);
-        } catch (Exception e) {
-            throw new InitialisationException(e, this);
-        }
     }
 
-    public void doConnect() throws Exception
-    {
-		createConsumer();
-        if(startOnConnect) {
-            doStart();
-        }
-    }
-
-    public void doDisconnect() throws Exception
-    {
-    	closeConsumer();
-    }
-
-    public void onMessage(Message message)
-    {
+    public void onMessage(Message message) {
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("Message received it is of type: " + message.getClass().getName());
@@ -99,97 +71,34 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
                 }
                 redeliveryHandler.handleRedelivery(message);
             }
-
-            UMOMessageAdapter adapter = connector.getMessageAdapter(message);
-            routeMessage(new MuleMessage(adapter));
+            getWorkManager().scheduleWork(new Worker(message));
         } catch (Exception e) {
             handleException(e);
         }
     }
 
-    public void doStart() throws UMOException {
-        try {
-            //We ned to register the listener when start is called in order to only start receiving messages after
-            //start/
-            //If the consumer is null it means that the connection strategy is being run in a separate thread
-            //And hasn't managed to connect yet.
-            if(consumer==null)  {
-                startOnConnect=true;
-            } else {
-                startOnConnect=false;
-                consumer.setMessageListener(this);
+    private class Worker implements Work {
+        private Message message;
+
+        public Worker(Message message) {
+            this.message = message;
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see java.lang.Runnable#run()
+         */
+        public void run() {
+            try {
+                UMOMessageAdapter adapter = connector.getMessageAdapter(message);
+                routeMessage(new MuleMessage(adapter));
+            } catch (Exception e) {
+                getConnector().handleException(e);
             }
-        } catch (JMSException e) {
-            throw new LifecycleException(e, this);
+        }
+
+        public void release() {
         }
     }
-
-    public void doStop() throws UMOException {
-        try {
-            if(consumer!=null) consumer.setMessageListener(null);
-        } catch (JMSException e) {
-            throw new LifecycleException(e, this);
-        }
-    }
-
-    protected void closeConsumer()
-    {
-        JmsUtils.closeQuietly(consumer);
-        consumer = null;
-        JmsUtils.closeQuietly(session);
-        session = null;
-    }
-
-    /**
-     * Create a consumer for the jms destination
-     *
-     * @throws Exception
-     */
-    protected void createConsumer() throws Exception
-    {
-    	try {
-	        JmsSupport jmsSupport = this.connector.getJmsSupport();
-	        // Create session if none exists
-	        if (session == null) {
-	    		session = this.connector.getSession(endpoint);
-	        }
-
-	        // Create destination
-	        String resourceInfo = endpoint.getEndpointURI().getResourceInfo();
-	        boolean topic = (resourceInfo != null && "topic".equalsIgnoreCase(resourceInfo));
-
-            //todo MULE20 remove resource Info support
-            if(!topic) topic = PropertiesHelper.getBooleanProperty(endpoint.getProperties(), "topic", false);
-
-	        Destination dest = jmsSupport.createDestination(session, endpoint.getEndpointURI().getAddress(), topic);
-
-	        // Extract jms selector
-	        String selector = null;
-	        if (endpoint.getFilter() != null && endpoint.getFilter() instanceof JmsSelectorFilter) {
-	            selector = ((JmsSelectorFilter) endpoint.getFilter()).getExpression();
-	        } else if (endpoint.getProperties() != null) {
-	            // still allow the selector to be set as a property on the endpoint
-	            // to be backward compatable
-	            selector = (String) endpoint.getProperties().get(JmsConstants.JMS_SELECTOR_PROPERTY);
-	        }
-	        String tempDurable = (String) endpoint.getProperties().get("durable");
-	        boolean durable = connector.isDurable();
-	        if (tempDurable != null)
-	            durable = Boolean.valueOf(tempDurable).booleanValue();
-
-	        // Get the durable subscriber name if there is one
-	        String durableName = (String) endpoint.getProperties().get("durableName");
-	        if (durableName == null && durable && dest instanceof Topic) {
-	            durableName = "mule." + connector.getName() + "." + endpoint.getEndpointURI().getAddress();
-	            logger.debug("Jms Connector for this receiver is durable but no durable name has been specified. Defaulting to: "
-	                    + durableName);
-	        }
-
-	        // Create consumer
-	        consumer = jmsSupport.createConsumer(session, dest, selector, connector.isNoLocal(), durableName);
-    	} catch (JMSException e) {
-    		throw new ConnectException(e, this);
-    	}
-    }
-
 }

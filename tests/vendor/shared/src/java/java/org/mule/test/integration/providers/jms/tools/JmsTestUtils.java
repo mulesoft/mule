@@ -23,6 +23,7 @@ import javax.naming.Reference;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileNotFoundException;
 import java.util.Properties;
 
 /**
@@ -78,7 +79,9 @@ public class JmsTestUtils
     {
         String providerUrl = props.getProperty(Context.PROVIDER_URL);
         if (providerUrl != null && !providerUrl.startsWith("file:") && providerUrl.indexOf(':') < 0) {
-            providerUrl = "file:" + File.separator + Utility.getResourcePath(providerUrl, JmsTestUtils.class);
+            String path = Utility.getResourcePath(providerUrl, JmsTestUtils.class);
+            if(path==null) throw new FileNotFoundException(providerUrl);
+            providerUrl = "file:" + File.separator + path;
             System.out.println("Setting provider url to: " + providerUrl);
             props.setProperty(Context.PROVIDER_URL, providerUrl);
         }
