@@ -21,6 +21,7 @@ import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ReaderResource;
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.UMOManager;
@@ -111,7 +112,11 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
                 CompiledScript script = compileScript(configResource.getReader());
                 script.eval(ns);
             }
-            if(!manager.isStarted()) manager.start();
+
+            if(System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true").equalsIgnoreCase("true")) {
+                if(!manager.isStarted()) manager.start();
+            }
+
         } catch (Exception e) {
             throw new ConfigurationException(e);
         }

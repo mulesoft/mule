@@ -204,7 +204,9 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
             setContainerProperties();
             setTransformers();
             setGlobalEndpoints();
-            manager.start();
+            if(System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true").equalsIgnoreCase("true")) {
+                manager.start();
+            }
         } catch (Exception e) {
             throw new ConfigurationException(new Message(Messages.X_FAILED_TO_INITIALISE, "MuleManager"), e);
         }
