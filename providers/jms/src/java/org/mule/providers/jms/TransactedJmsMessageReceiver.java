@@ -87,7 +87,7 @@ public class TransactedJmsMessageReceiver extends TransactedPollingMessageReceiv
         super(connector, component, endpoint, new Long(0));
         this.connector = (JmsConnector) connector;
 
-        this.frequency = PropertiesHelper.getLongProperty(endpoint.getProperties(), "frequency", 10000L);
+        this.frequency = endpoint.getTransactionConfig().getTimeout();
         // If reconnection is set, default reuse strategy to false
         // as some jms brokers will not detect lost connections if the
         // same consumer / session is used 
