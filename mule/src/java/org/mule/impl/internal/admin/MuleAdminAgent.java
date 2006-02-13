@@ -36,7 +36,7 @@ import org.mule.umo.provider.UMOConnector;
  */
 public class MuleAdminAgent implements UMOAgent
 {
-    public static final String DEFAULT_MANAGER_PROVIDER = "_muleManagerProvider";
+    public static final String DEFAULT_MANAGER_ENDPOINT = "_muleManagerEndpoint";
 
     public static final String AGENT_NAME = "Mule Admin";
 
@@ -118,7 +118,7 @@ public class MuleAdminAgent implements UMOAgent
             if (manager.getModel().isComponentRegistered(MuleManagerComponent.MANAGER_COMPONENT_NAME)) {
                 logger.info("Mule manager component has already been initialised, ignoring server url");
             } else {
-                if (manager.lookupConnector(DEFAULT_MANAGER_PROVIDER) != null) {
+                if (manager.lookupConnector(DEFAULT_MANAGER_ENDPOINT) != null) {
                     throw new AlreadyInitialisedException("Server Components", this);
                 }
 
@@ -127,7 +127,7 @@ public class MuleAdminAgent implements UMOAgent
                 // If this connector has already been initialised i.e. it's a
                 // pre-existing connector not not reinit
                 if (manager.lookupConnector(connector.getName()) == null) {
-                    connector.setName(DEFAULT_MANAGER_PROVIDER);
+                    connector.setName(DEFAULT_MANAGER_ENDPOINT);
                     connector.initialise();
                     manager.registerConnector(connector);
                 }
