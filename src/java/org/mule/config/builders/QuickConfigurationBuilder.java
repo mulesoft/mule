@@ -23,7 +23,6 @@ import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.ModelFactory;
-import org.mule.impl.model.ModelServiceNotFoundException;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
@@ -50,6 +49,8 @@ import java.util.Map;
  */
 public class QuickConfigurationBuilder implements ConfigurationBuilder
 {
+    private static final String MODEL_NOT_SET = "not set";
+
     private UMOManager manager;
 
     /**
@@ -109,7 +110,9 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
         }
         MuleManager.getConfiguration().setServerUrl(serverUrl);
         MuleManager.getConfiguration().setSynchronous(synchronous);
-        manager.setModel(ModelFactory.createModel(modeltype));
+        if(!MODEL_NOT_SET.equals(modeltype)) {
+            manager.setModel(ModelFactory.createModel(modeltype));
+        }
         manager.start();
         return manager;
     }
@@ -127,7 +130,7 @@ public class QuickConfigurationBuilder implements ConfigurationBuilder
      */
     public UMOManager createStartedManager(boolean synchronous, String serverUrl) throws UMOException
     {
-        return createStartedManager(synchronous, serverUrl, MuleManager.getConfiguration().getModelType());
+        return createStartedManager(synchronous, serverUrl, MODEL_NOT_SET);
     }
     /**
      * Configures a started manager. This method will throw
