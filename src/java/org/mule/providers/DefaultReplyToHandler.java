@@ -66,6 +66,9 @@ public class DefaultReplyToHandler implements ReplyToHandler
 
         // get the endpoint for this url
         UMOEndpoint endpoint = getEndpoint(event, replyToEndpoint);
+        if(transformer==null) {
+            transformer = event.getEndpoint().getResponseTransformer();
+        }
         if (transformer != null) {
             endpoint.setTransformer(transformer);
         }
