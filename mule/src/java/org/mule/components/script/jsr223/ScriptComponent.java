@@ -19,6 +19,7 @@ import org.mule.umo.UMOEventContext;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
+import org.mule.MuleManager;
 
 import javax.script.Namespace;
 
@@ -57,6 +58,7 @@ public class ScriptComponent extends Scriptable implements Callable {
 
     protected void populateNamespace(Namespace namespace, UMOEventContext context) {
         namespace.put("eventContext", context);
+        namespace.put("managementContext", MuleManager.getInstance());
         namespace.put("message", context.getMessage());
         namespace.put("descriptor", context.getComponentDescriptor());
         namespace.put("componentNamespace", this.namespace);
