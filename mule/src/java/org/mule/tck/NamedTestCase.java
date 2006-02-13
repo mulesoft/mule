@@ -36,7 +36,7 @@ public abstract class NamedTestCase extends TestCase
             MuleManager.getInstance().dispose();
         }
         // when testing, do not set up server connections
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "true");
     }
 
     public String getName()

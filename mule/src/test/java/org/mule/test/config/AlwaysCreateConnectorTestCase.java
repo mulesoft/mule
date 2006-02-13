@@ -29,10 +29,10 @@ public class AlwaysCreateConnectorTestCase extends NamedTestCase
         if (MuleManager.isInstanciated()) {
             MuleManager.getInstance().dispose();
         }
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "true");
         MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
         builder.configure("always-create-connector-config.xml");
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
+        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "false");
     }
 
     public void testConnectorConfig() throws Exception

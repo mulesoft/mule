@@ -68,14 +68,14 @@ public abstract class AbstractScriptConfigBuilderTestCase extends NamedTestCase
     {
         super.setUp();
         if (!initialised) {
-            System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "true");
+            System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "true");
 
             if (MuleManager.isInstanciated())
                 MuleManager.getInstance().dispose();
             ConfigurationBuilder configBuilder = getConfigBuilder();
             configBuilder.configure(getConfigResource());
             initialised = true;
-            System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS, "false");
+            System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "false");
 
         }
     }
