@@ -597,7 +597,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     public ReplyToHandler getReplyToHandler()
     {
-        return new JmsReplyToHandler(this, defaultOutboundTransformer);
+        return new JmsReplyToHandler(this, defaultResponseTransformer);
     }
 
     public String getUsername()
