@@ -11,8 +11,9 @@
 # MD5 checksums.  
 #
 
-DEPENDENCIES=/home/projects/mule/dist/dependencies
-MD5=/home/projects/mule/bin/md5
+DEPENDENCIES="/home/projects/mule/dist/dependencies"
+# Use the -l option to generate hexadecimal letters as lowercase (expected by Maven).
+MD5="/home/projects/mule/bin/md5 -l"
 
 if [ $# = 1 ]
 then
