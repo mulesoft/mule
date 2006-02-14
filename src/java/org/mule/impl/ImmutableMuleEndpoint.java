@@ -125,10 +125,28 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
      */
     protected Boolean synchronous = null;
 
+    /**
+     * Determines whether a synchronous call should block to obtain a response from a remote server (if the transport
+     * supports it). For example for Jms endpoints, setting remote sync will cause a temporary destination to be set up as a
+     * replyTo destination and will send the message a wait for a response on the replyTo destination.
+     * If the JMSReplyTo isalready set on the message set that destination will be used instead.
+     */
     protected Boolean remoteSync = null;
 
+    /**
+     * How long to block when performing a remote synchronisation to a remote host.  This property is optional
+     * and will be set to the default Synchonous Event time out value if not set
+     */
     protected Integer remoteSyncTimeout = null;
 
+    /**
+     * Determines whether the endpoint should deal with requests as streams
+     */
+    protected boolean streaming = false;
+
+    /**
+     * The state that the endpoint is initialised in such as started or stopped
+     */
     protected String initialState = INITIAL_STATE_STARTED;
 
     /**
@@ -684,5 +702,14 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
 
     public UMOTransformer getResponseTransformer() {
         return responseTransformer;
+    }
+
+    /**
+     * Determines whether the endpoint should deal with requests as streams
+     *
+     * @return true if the request should be streamed
+     */
+    public boolean isStreaming() {
+        return streaming;
     }
 }

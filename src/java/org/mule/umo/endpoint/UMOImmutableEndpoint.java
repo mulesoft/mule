@@ -238,4 +238,10 @@ public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialis
      * @return the endpoint starting state
      */
     String getInitialState();
+
+    /**
+     * Determines whether the endpoint should deal with requests as streams
+     * @return true if the request should be streamed
+     */
+    boolean isStreaming();
 }

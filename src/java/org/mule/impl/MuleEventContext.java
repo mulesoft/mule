@@ -822,4 +822,13 @@ public class MuleEventContext implements UMOEventContext
         if(result==null) result = defaultValue;
         return result;
     }
+
+    /**
+     * Determines whether the event flow is being streamed
+     *
+     * @return true if the request should be streamed
+     */
+    public boolean isStreaming() {
+        return event.getEndpoint().isStreaming();
+    }
 }

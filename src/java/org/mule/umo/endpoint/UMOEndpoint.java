@@ -181,4 +181,10 @@ public interface UMOEndpoint extends UMOImmutableEndpoint
      * @param state
      */
     void setInitialState(String state);
+
+    /**
+     * Determines whether the endpoint should deal with requests as streams
+     * @param stream true if the request should be streamed
+     */
+    void setStreaming(boolean stream);
 }

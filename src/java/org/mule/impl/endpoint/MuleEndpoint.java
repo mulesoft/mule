@@ -279,4 +279,13 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
     public void setResponseTransformer(UMOTransformer trans) {
         responseTransformer = trans;
     }
+
+    /**
+     * Determines whether the endpoint should deal with requests as streams
+     *
+     * @param stream true if the request should be streamed
+     */
+    public void setStreaming(boolean stream) {
+        this.streaming = stream;
+    }
 }
