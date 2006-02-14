@@ -15,13 +15,16 @@
 package org.mule.impl;
 
 import org.mule.MuleException;
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.security.MuleCredentials;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
@@ -584,5 +587,14 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     public void setStringProperty(String name, String value) {
         setProperty(name, value);
+    }
+
+    /**
+     * Determines whether the event flow is being streamed
+     *
+     * @return true if the request should be streamed
+     */
+    public boolean isStreaming() {
+        return endpoint.isStreaming();
     }
 }

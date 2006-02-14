@@ -365,4 +365,10 @@ public interface UMOEvent
      */
     Object removeProperty(Object key);
 
+    /**
+     * Determines whether the event flow is being streamed
+     * @return true if the request should be streamed
+     */
+    boolean isStreaming();
+
 }

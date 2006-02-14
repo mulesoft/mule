@@ -579,4 +579,10 @@ public interface UMOEventContext
      */
     int getTimeout();
 
+    /**
+     * Determines whether the event flow is being streamed
+     * @return true if the request should be streamed
+     */
+    boolean isStreaming();
+
 }
