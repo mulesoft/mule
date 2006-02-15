@@ -39,6 +39,7 @@ import org.mule.ide.core.nature.MuleNature;
 import org.mule.ide.core.samples.ConfigSet;
 import org.mule.ide.core.samples.Sample;
 import org.mule.ide.core.samples.SampleLoader;
+import org.mule.ide.ui.IMuleImages;
 import org.mule.ide.ui.MulePlugin;
 import org.osgi.framework.Bundle;
 
@@ -65,6 +66,9 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 	 * @see org.eclipse.jface.wizard.IWizard#addPages()
 	 */
 	public void addPages() {
+		setWindowTitle("New Mule Project");
+		setDefaultPageImageDescriptor(MulePlugin.getDefault().getImageRegistry().getDescriptor(
+				IMuleImages.KEY_MULE_WIZARD_BANNER));
 		projectPage = new MuleWizardProjectPage();
 		addPage(projectPage);
 		javaPage = new NewJavaProjectWizardPage(ResourcesPlugin.getWorkspace().getRoot(), projectPage);

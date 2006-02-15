@@ -65,7 +65,11 @@
             icon="META-INF/icons/mule16.gif"
             id="org.mule.ide.ui.MuleProjectWizard"
             name="Mule Project"
-            project="true"/>
+            project="true">
+         <description>
+            Create a Mule project
+         </description>
+      </wizard>
    </extension>
 
 </plugin>

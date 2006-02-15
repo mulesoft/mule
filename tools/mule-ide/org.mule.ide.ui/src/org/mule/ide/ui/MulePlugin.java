@@ -38,18 +38,17 @@ public class MulePlugin extends AbstractUIPlugin {
 	private static MulePlugin plugin;
 
 	/**
-	 * Returns the preference store for this UI plug-in. This preference store is used to hold
-	 * persistent settings for this plug-in in the context of a workbench. Some of these settings
-	 * will be user controlled, whereas others may be internal setting that are never exposed to the
-	 * user.
+	 * Returns the preference store for this UI plug-in. This preference store is used to hold persistent
+	 * settings for this plug-in in the context of a workbench. Some of these settings will be user
+	 * controlled, whereas others may be internal setting that are never exposed to the user.
 	 * <p>
-	 * If an error occurs reading the preference store, an empty preference store is quietly
-	 * created, initialized with defaults, and returned.
+	 * If an error occurs reading the preference store, an empty preference store is quietly created,
+	 * initialized with defaults, and returned.
 	 * </p>
 	 * <p>
-	 * <strong>NOTE:</strong> As of Eclipse 3.1 this method is no longer referring to the core
-	 * runtime compatibility layer and so plug-ins relying on Plugin#initializeDefaultPreferences
-	 * will have to access the compatibility layer themselves.
+	 * <strong>NOTE:</strong> As of Eclipse 3.1 this method is no longer referring to the core runtime
+	 * compatibility layer and so plug-ins relying on Plugin#initializeDefaultPreferences will have to access
+	 * the compatibility layer themselves.
 	 * </p>
 	 * 
 	 * @return the preference store
@@ -63,8 +62,8 @@ public class MulePlugin extends AbstractUIPlugin {
 	 */
 	public IPreferenceStore getPreferenceStore() {
 		if (myPreferenceStore == null) {
-			myPreferenceStore = new ScopedPreferenceStore(new InstanceScope(),
-					MuleCorePlugin.getDefault().getBundle().getSymbolicName());
+			myPreferenceStore = new ScopedPreferenceStore(new InstanceScope(), MuleCorePlugin.getDefault()
+					.getBundle().getSymbolicName());
 		}
 		return myPreferenceStore;
 	}
@@ -121,6 +120,7 @@ public class MulePlugin extends AbstractUIPlugin {
 		super.initializeImageRegistry(reg);
 		reg.put(IMuleImages.KEY_MULE_LOGO, getImageDescriptor(IMuleImages.PATH_MULE_LOGO));
 		reg.put(IMuleImages.KEY_MULE_CONFIG, getImageDescriptor(IMuleImages.PATH_MULE_CONFIG));
+		reg.put(IMuleImages.KEY_MULE_WIZARD_BANNER, getImageDescriptor(IMuleImages.PATH_MULE_WIZARD_BANNER));
 	}
 
 	/**
@@ -140,8 +140,8 @@ public class MulePlugin extends AbstractUIPlugin {
 	 */
 	public void showError(String message, IStatus status) {
 		if (getWorkbench().getActiveWorkbenchWindow() != null) {
-			ErrorDialog.openError(getWorkbench().getActiveWorkbenchWindow().getShell(), "Error",
-					message, status);
+			ErrorDialog.openError(getWorkbench().getActiveWorkbenchWindow().getShell(), "Error", message,
+					status);
 		}
 	}
 }
