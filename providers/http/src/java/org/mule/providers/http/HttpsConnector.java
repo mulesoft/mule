@@ -81,7 +81,7 @@ public class HttpsConnector extends HttpConnector
                 throw new FileNotFoundException(new Message(Messages.CANT_LOAD_X_FROM_CLASSPATH_FILE, "Keystore: "
                         + getKeyStore()).getMessage());
             }
-            keystore.load(is, getKeyPassword().toCharArray());
+            keystore.load(is, getStorePassword().toCharArray());
         } catch (Exception e) {
             throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "KeyStore: " + getKeyStore()),
                                               e,
