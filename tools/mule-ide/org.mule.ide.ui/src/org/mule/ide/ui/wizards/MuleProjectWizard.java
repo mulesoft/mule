@@ -92,6 +92,9 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 			if (sampleChosen != null) {
 				Sample sample = SampleLoader.getInstance().getSampleByDescription(sampleChosen);
 				addFromSample(sample, javaProject);
+			} else {
+				Sample sample = createEmptyProject();
+				addFromSample(sample, javaProject);
 			}
 			return true;
 		} catch (InvocationTargetException e) {
@@ -104,6 +107,26 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 			MulePlugin.getDefault().showError("Unable to create project.", e.getStatus());
 		}
 		return false;
+	}
+
+	/**
+	 * A sample that creates the content for an empty project
+	 * 
+	 * @return the sample
+	 */
+	protected Sample createEmptyProject() {
+		Sample sample = new Sample();
+		sample.setPluginId(MulePlugin.PLUGIN_ID);
+		sample.setDescription("Empty Project");
+		sample.setRoot("empty");
+		sample.setSourcePath("src");
+		sample.setConfigPath("conf");
+		ConfigSet set = new ConfigSet();
+		set.setName("Default");
+		set.setConfigPath("mule-config.xml");
+		set.setConfigName("Default Mule Config");
+		sample.setConfigSets(new ConfigSet[] { set });
+		return sample;
 	}
 
 	/**
@@ -152,9 +175,11 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 		// Copy source files.
 		try {
 			IContainer sourceFolder = getSourceContainer(project);
-			while (srcs.hasMoreElements()) {
-				URL url = (URL) srcs.nextElement();
-				copyIntoProject(url, sourceFolder);
+			if (srcs != null) {
+				while (srcs.hasMoreElements()) {
+					URL url = (URL) srcs.nextElement();
+					copyIntoProject(url, sourceFolder);
+				}
 			}
 		} catch (JavaModelException e) {
 			MuleCorePlugin.getDefault().logException("Unable to find a source folder.", e);
@@ -165,11 +190,13 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 			IFolder configFolder = project.getProject().getFolder(CONFIG_FOLDER_NAME);
 			configFolder.create(true, true, new NullProgressMonitor());
 			Map configs = new HashMap();
-			while (confs.hasMoreElements()) {
-				URL url = (URL) confs.nextElement();
-				IResource config = copyIntoProject(url, configFolder);
-				if (config != null) {
-					configs.put(config.getName(), config);
+			if (confs != null) {
+				while (confs.hasMoreElements()) {
+					URL url = (URL) confs.nextElement();
+					IResource config = copyIntoProject(url, configFolder);
+					if (config != null) {
+						configs.put(config.getName(), config);
+					}
 				}
 			}
 			addConfigSets(sample, configs, project.getProject());

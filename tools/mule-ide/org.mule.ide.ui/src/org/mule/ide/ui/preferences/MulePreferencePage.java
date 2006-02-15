@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.mule.ide.core.MuleCorePlugin;
 import org.mule.ide.ui.MulePlugin;
 import org.mule.ide.ui.panels.MuleClasspathChooser;
 
@@ -68,7 +67,7 @@ public class MulePreferencePage extends PreferencePage implements IWorkbenchPref
 	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
 	public boolean performOk() {
-		classpathChooser.saveToPreferences(MuleCorePlugin.getDefault().getPluginPreferences());
+		classpathChooser.saveToPreferences();
 		return true;
 	}
 }

@@ -1,6 +1,5 @@
 package org.mule.ide.ui.panels;
 
-import org.eclipse.core.runtime.Preferences;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -62,10 +61,8 @@ public class MuleClasspathChooser {
 
 	/**
 	 * Save the values into the preference store.
-	 * 
-	 * @param preferences the preference store
 	 */
-	public void saveToPreferences(Preferences preferences) {
+	public void saveToPreferences() {
 		if (getLibLocationChoice() == LOAD_FROM_EXTERNAL) {
 			MulePreferences.setDefaultClasspathChoice(IPreferenceConstants.MULE_CLASSPATH_TYPE_EXTERNAL);
 		} else {
