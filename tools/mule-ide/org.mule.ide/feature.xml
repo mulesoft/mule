@@ -105,7 +105,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
          unpack="false"/>
 
    <plugin
-         id="org.miule.ide.samples"
+         id="org.mule.ide.samples"
          download-size="0"
          install-size="0"
          version="1.2.1"
