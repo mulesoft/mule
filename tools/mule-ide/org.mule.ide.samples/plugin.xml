@@ -17,6 +17,20 @@
                configpath="hello-http-mule-config.xml"
                name="Hello Http"/>
       </sample>
+      <sample
+            confdir="conf"
+            description="Loan Broker Sample Application"
+            root="loanbroker"
+            srcdir="src">
+         <configset
+               configname="Loan Broker Sync Config"
+               configpath="loan-broker-sync-config.xml"
+               name="Loan Broker Sync"/>
+         <configset
+               configname="Loan Broker Async Config"
+               configpath="loan-broker-async-config.xml"
+               name="Loan Broker Async"/>
+      </sample>
    </extension>
 
 </plugin>
