@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
-import org.mule.ide.core.MuleCorePlugin;
-import org.mule.ide.core.preferences.IPreferenceConstants;
+import org.mule.ide.ui.preferences.IPreferenceConstants;
+import org.mule.ide.ui.preferences.MulePreferences;
 
 /**
  * Widgets needed to choose the location from which Mule libraries are loaded.
@@ -51,37 +51,33 @@ public class MuleClasspathChooser {
 	 * Initialize the values from the preferences store.
 	 */
 	public void initializeFromPreferences() {
-		setExternalRoot(MuleCorePlugin.getDefault().getExternalMuleRoot());
-		if (MuleCorePlugin.getDefault().isPluginLibMuleClasspath()) {
-			setLibLocationChoice(LOAD_FROM_PLUGIN);
-		} else {
+		setExternalRoot(MulePreferences.getDefaultExternalMuleRoot());
+		String cpType = MulePreferences.getDefaultClasspathChoice();
+		if (IPreferenceConstants.MULE_CLASSPATH_TYPE_EXTERNAL.equals(cpType)) {
 			setLibLocationChoice(LOAD_FROM_EXTERNAL);
+		} else {
+			setLibLocationChoice(LOAD_FROM_PLUGIN);
 		}
 	}
 
 	/**
 	 * Save the values into the preference store.
 	 * 
-	 * @param preferences
-	 *            the preference store
+	 * @param preferences the preference store
 	 */
 	public void saveToPreferences(Preferences preferences) {
-		if (getLibLocationChoice() == LOAD_FROM_PLUGIN) {
-			preferences.setValue(IPreferenceConstants.MULE_CLASSPATH_TYPE,
-					IPreferenceConstants.MULE_CLASSPATH_TYPE_PLUGIN);
+		if (getLibLocationChoice() == LOAD_FROM_EXTERNAL) {
+			MulePreferences.setDefaultClasspathChoice(IPreferenceConstants.MULE_CLASSPATH_TYPE_EXTERNAL);
 		} else {
-			preferences.setValue(IPreferenceConstants.MULE_CLASSPATH_TYPE,
-					IPreferenceConstants.MULE_CLASSPATH_TYPE_EXTERNAL);
+			MulePreferences.setDefaultClasspathChoice(IPreferenceConstants.MULE_CLASSPATH_TYPE_PLUGIN);
 		}
-		preferences.setValue(IPreferenceConstants.EXTERNAL_MULE_ROOT,
-				getExternalRoot());
+		MulePreferences.setDefaultExternalMuleRoot(getExternalRoot());
 	}
 
 	/**
 	 * Create the widgets on a parent composite.
 	 * 
-	 * @param parent
-	 *            the parent composite
+	 * @param parent the parent composite
 	 * @return the created composite
 	 */
 	public Composite createControl(Composite parent) {
@@ -93,8 +89,7 @@ public class MuleClasspathChooser {
 		cpGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		buttonPlugin = new Button(cpGroup, SWT.RADIO);
-		buttonPlugin
-				.setText("Mule plugin (jars included with Mini-Mule distribution)");
+		buttonPlugin.setText("Mule plugin (jars included with Mini-Mule distribution)");
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		data.horizontalSpan = 3;
 		buttonPlugin.setLayoutData(data);
@@ -111,8 +106,7 @@ public class MuleClasspathChooser {
 
 		buttonExternal = new Button(cpGroup, SWT.RADIO);
 		buttonExternal.setText("External installation");
-		buttonExternal.setLayoutData(new GridData(
-				GridData.HORIZONTAL_ALIGN_BEGINNING));
+		buttonExternal.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
 		buttonExternal.addSelectionListener(new SelectionListener() {
 
 			public void widgetSelected(SelectionEvent e) {
@@ -140,7 +134,7 @@ public class MuleClasspathChooser {
 		initializeFromPreferences();
 		return cpGroup;
 	}
-	
+
 	/**
 	 * Browse for the external root.
 	 */
@@ -160,8 +154,7 @@ public class MuleClasspathChooser {
 	}
 
 	/**
-	 * @param externalRoot
-	 *            The externalRoot to set.
+	 * @param externalRoot The externalRoot to set.
 	 */
 	public void setExternalRoot(String externalRoot) {
 		if (externalRoot == null) {
@@ -181,8 +174,7 @@ public class MuleClasspathChooser {
 	}
 
 	/**
-	 * @param libLocationChoice
-	 *            The libLocationChoice to set.
+	 * @param libLocationChoice The libLocationChoice to set.
 	 */
 	public void setLibLocationChoice(int libLocationChoice) {
 		this.libLocationChoice = libLocationChoice;

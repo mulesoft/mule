@@ -54,10 +54,6 @@
       </builder>
    </extension>
    
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer class="org.mule.ide.core.preferences.PreferenceInitializer"/>
-   </extension>
 
    <extension point="org.eclipse.core.runtime.contentTypes"> 
       <content-type id="org.mule.ide.core.muleConfigXml"

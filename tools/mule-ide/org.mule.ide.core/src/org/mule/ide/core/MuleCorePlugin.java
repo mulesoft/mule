@@ -18,17 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -37,14 +33,13 @@ import org.mule.ide.core.exception.MuleModelException;
 import org.mule.ide.core.jobs.UpdateMarkersForEcoreResourceJob;
 import org.mule.ide.core.model.IMuleModel;
 import org.mule.ide.core.nature.MuleNature;
-import org.mule.ide.core.preferences.IPreferenceConstants;
 
 /**
- * @author Jesper
- * 
+ * Plugin for all Mule IDE core functionality.
  */
 public class MuleCorePlugin extends Plugin {
 
+	/** Plugin instance */
 	static private MuleCorePlugin defaultPlugin = null;
 
 	/** Eclipse plugin id */
@@ -72,39 +67,6 @@ public class MuleCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Loads the external Mule root path from the preference value and sets a variable for it.
-	 * 
-	 * @throws MuleModelException if the Mule root can not be updated
-	 */
-	public void updateExternalMuleRootVariable() throws MuleModelException {
-		String rawPath = getPluginPreferences().getString(IPreferenceConstants.EXTERNAL_MULE_ROOT);
-		IPath rootPath = new Path(rawPath);
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPathVariableManager varManager = workspace.getPathVariableManager();
-		if ((varManager.validateName(ID_MULE_EXTERNAL_ROOT).isOK())
-				&& (varManager.validateValue(rootPath).isOK())) {
-			try {
-				varManager.setValue(ID_MULE_EXTERNAL_ROOT, rootPath);
-			} catch (CoreException e) {
-				throw new MuleModelException(e.getStatus());
-			}
-		} else {
-			throw new MuleModelException(createErrorStatus("External Mule root is invalid.", null));
-		}
-	}
-
-	/**
-	 * Indicates whether the external Mule root location variable is set.
-	 * 
-	 * @return true if the variable is set, false if not.
-	 */
-	public boolean hasExternalMuleRootVariable() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IPathVariableManager varManager = workspace.getPathVariableManager();
-		return (varManager.getValue(ID_MULE_EXTERNAL_ROOT) != null);
-	}
-
-	/**
 	 * Sets or clears the Mule UMO Configuration nature to this project
 	 * 
 	 * @param project The project to set.
@@ -113,8 +75,7 @@ public class MuleCorePlugin extends Plugin {
 	 */
 	public void setMuleNature(IProject project, boolean setIt) throws CoreException {
 		/*
-		 * Four possible outcomes: A - transition to on B - already on C - transition to off D -
-		 * already off
+		 * Four possible outcomes: A - transition to on B - already on C - transition to off D - already off
 		 */
 		if (project == null)
 			return;
@@ -188,8 +149,8 @@ public class MuleCorePlugin extends Plugin {
 			throw new MuleModelException(createErrorStatus("Mule model is null for project: "
 					+ project.getName(), null));
 		}
-		throw new MuleModelException(createErrorStatus(
-				"Project does not have the Mule nature configured: " + project.getName(), null));
+		throw new MuleModelException(createErrorStatus("Project does not have the Mule nature configured: "
+				+ project.getName(), null));
 	}
 
 	/**
@@ -306,46 +267,16 @@ public class MuleCorePlugin extends Plugin {
 	}
 
 	/**
-	 * Gets the errors and warnings for the Ecore resource and adds them as markers for the given
-	 * Eclipse resource. Runs as a background job so that workspace locks do not prevent adding
-	 * markers.
+	 * Gets the errors and warnings for the Ecore resource and adds them as markers for the given Eclipse
+	 * resource. Runs as a background job so that workspace locks do not prevent adding markers.
 	 * 
 	 * @param eclipseResource the Eclipse resource
 	 * @param ecoreResource the Ecore resource wrapper
 	 */
 	public void updateMarkersForEcoreResource(IResource eclipseResource, Resource ecoreResource) {
-		UpdateMarkersForEcoreResourceJob job = new UpdateMarkersForEcoreResourceJob(
-				eclipseResource, ecoreResource);
+		UpdateMarkersForEcoreResourceJob job = new UpdateMarkersForEcoreResourceJob(eclipseResource,
+				ecoreResource);
 		job.setPriority(Job.SHORT);
 		job.schedule();
-	}
-
-	/**
-	 * Gets the preferences setting for the external Mule root folder.
-	 * 
-	 * @return the path or null if not set
-	 */
-	public String getExternalMuleRoot() {
-		return getPluginPreferences().getString(IPreferenceConstants.EXTERNAL_MULE_ROOT);
-	}
-
-	/**
-	 * Indicates whether the default for Mule classpath is the core plugin libraries.
-	 * 
-	 * @return true if loaded from plugin, false if external
-	 */
-	public boolean isPluginLibMuleClasspath() {
-		String type = getPluginPreferences().getString(IPreferenceConstants.MULE_CLASSPATH_TYPE);
-		return IPreferenceConstants.MULE_CLASSPATH_TYPE_PLUGIN.equals(type);
-	}
-
-	/**
-	 * Indicates whether the default for Mule classpath is the external libraries.
-	 * 
-	 * @return true if loaded from external, false if from plugin
-	 */
-	public boolean isExternalLibMuleClasspath() {
-		String type = getPluginPreferences().getString(IPreferenceConstants.MULE_CLASSPATH_TYPE);
-		return IPreferenceConstants.MULE_CLASSPATH_TYPE_EXTERNAL.equals(type);
 	}
 }

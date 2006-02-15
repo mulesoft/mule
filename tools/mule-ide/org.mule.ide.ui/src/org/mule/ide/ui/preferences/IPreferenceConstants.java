@@ -13,7 +13,7 @@
  * the LICENSE.txt file.
  */
 
-package org.mule.ide.core.preferences;
+package org.mule.ide.ui.preferences;
 
 /**
  * Constant definitions for plug-in preferences

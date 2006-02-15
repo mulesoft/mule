@@ -3,7 +3,6 @@ package org.mule.ide.ui.wizards;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -68,8 +67,7 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		projectPage = new MuleWizardProjectPage();
 		addPage(projectPage);
-		javaPage = new NewJavaProjectWizardPage(ResourcesPlugin.getWorkspace().getRoot(),
-				projectPage);
+		javaPage = new NewJavaProjectWizardPage(ResourcesPlugin.getWorkspace().getRoot(), projectPage);
 		addPage(javaPage);
 	}
 
@@ -114,8 +112,7 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 	 * @param muleProject the mule project
 	 * @throws JavaModelException
 	 */
-	protected void addMuleLibraries(IJavaProject muleProject) throws JavaModelException,
-			MuleModelException {
+	protected void addMuleLibraries(IJavaProject muleProject) throws JavaModelException, MuleModelException {
 		IClasspathEntry[] initial = muleProject.getRawClasspath();
 		IClasspathEntry[] entries;
 		if (projectPage.isChoosingLibsFromPlugin()) {
@@ -207,7 +204,7 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 	protected IResource copyIntoProject(URL input, IContainer parent) {
 		try {
 			URL local = Platform.asLocalURL(input);
-			File inputFile = new File(local.toURI());
+			File inputFile = new File(local.getPath());
 			IPath relative = new Path(input.getFile());
 			relative = relative.removeFirstSegments(2);
 
@@ -231,8 +228,6 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 			}
 		} catch (IOException e) {
 			MuleCorePlugin.getDefault().logException("Unable to copy sample resource.", e);
-		} catch (URISyntaxException e) {
-			MuleCorePlugin.getDefault().logException("Unable to get URI for sample resource.", e);
 		} catch (CoreException e) {
 			MuleCorePlugin.getDefault().logException("Unable to create resource.", e);
 		}
@@ -247,8 +242,7 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 	 * @param project the project
 	 * @throws MuleModelException
 	 */
-	protected void addConfigSets(Sample sample, Map resources, IProject project)
-			throws MuleModelException {
+	protected void addConfigSets(Sample sample, Map resources, IProject project) throws MuleModelException {
 		MuleNature nature = MuleCorePlugin.getDefault().getMuleNature(project);
 		IMuleModel model = nature.getMuleModel().createWorkingCopy();
 		ConfigSet[] configs = sample.getConfigSets();
@@ -256,8 +250,8 @@ public class MuleProjectWizard extends Wizard implements INewWizard {
 			ConfigSet config = configs[i];
 			IFile file = (IFile) resources.get(config.getConfigPath());
 			if (file != null) {
-				IMuleConfiguration newConfig = model.createNewMuleConfiguration(config
-						.getConfigName(), file.getProjectRelativePath().toString());
+				IMuleConfiguration newConfig = model.createNewMuleConfiguration(config.getConfigName(), file
+						.getProjectRelativePath().toString());
 				model.addMuleConfiguration(newConfig);
 				IMuleConfigSet newSet = model.createNewMuleConfigSet(config.getName());
 				newSet.addConfiguration(newConfig);

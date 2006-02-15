@@ -65,16 +65,6 @@ public class MulePreferencePage extends PreferencePage implements IWorkbenchPref
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.preference.PreferencePage#performApply()
-	 */
-	protected void performApply() {
-		super.performApply();
-		classpathChooser.saveToPreferences(MuleCorePlugin.getDefault().getPluginPreferences());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.eclipse.jface.preference.IPreferencePage#performOk()
 	 */
 	public boolean performOk() {
