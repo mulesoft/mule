@@ -14,6 +14,7 @@
 package org.mule.config;
 
 import javax.naming.NamingException;
+import javax.naming.Name;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -24,6 +25,12 @@ import java.util.HashMap;
  * @version $Revision$
  */
 public class NamingExceptionReader implements ExceptionReader {
+
+    /**
+     * Displayed when no remaining or resolved name found.
+     */
+    protected static final String MISSING_NAME_DISPLAY_VALUE = "<none>";
+
     public String getMessage(Throwable t) {
         NamingException e = (NamingException)t;
         return e.toString(true);
@@ -47,8 +54,10 @@ public class NamingExceptionReader implements ExceptionReader {
     public Map getInfo(Throwable t) {
         NamingException e = (NamingException)t;
         Map info = new HashMap();
-        info.put("Remaining Name", e.getRemainingName().toString());
-        info.put("Resolved Name", e.getResolvedName().toString());
+        final Name remainingName = e.getRemainingName();
+        final Name resolvedName = e.getResolvedName();
+        info.put("Remaining Name", remainingName == null ? MISSING_NAME_DISPLAY_VALUE : remainingName.toString());
+        info.put("Resolved Name", resolvedName == null ? MISSING_NAME_DISPLAY_VALUE : resolvedName.toString());
         return info;
     }
 }
