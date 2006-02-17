@@ -28,7 +28,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  * for execution or times out.
  * 
  * Generously snipped from the jsr166 repository at:
- * http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/main/java/util/concurrent/ThreadPoolExecutor.java
+ * <a href="http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/main/java/util/concurrent/ThreadPoolExecutor.java"></a>.
  * 
  */
 public class WaitPolicy implements RejectedExecutionHandler
@@ -47,11 +47,12 @@ public class WaitPolicy implements RejectedExecutionHandler
 
 	/**
 	 * Constructs a <tt>WaitPolicy</tt> with timeout.
+     * A negative <code>time</code> value is interpreted as <code>Long.MAX_VALUE</code>. 
 	 */
 	public WaitPolicy(long time, TimeUnit timeUnit)
 	{
 		super();
-		_time = time;
+		_time = (time < 0 ? Long.MAX_VALUE : time);
 		_timeUnit = timeUnit;
 	}
 
