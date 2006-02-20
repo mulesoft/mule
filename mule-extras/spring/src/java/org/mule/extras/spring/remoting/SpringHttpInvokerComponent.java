@@ -1,16 +1,15 @@
-/*
- * $Header:
- * /cvsroot/mule/mule/src/test/org/mule/test/mule/AbstractMuleTestCase.java,v
- * 1.7 2003/11/24 09:58:47 rossmason Exp $ $Revision$ $Date: 2003/11/24
- * 09:58:47 $
+/**
+ * $Header$
+ * $Revision$
+ * $Date$
  * ------------------------------------------------------------------------------------------------------
  *
- * Copyright (c) SymphonySoft Limited. All rights reserved. http://www.symphonysoft.com
+ * Copyright (c) SymphonySoft Limited. All rights reserved.
+ * http://www.symphonysoft.com
  *
- * The software in this package is published under the terms of the BSD style
- * license a copy of which has been included with this distribution in the
- * LICENSE.txt file.
- *
+ * The software in this package is published under the terms of the BSD
+ * style license a copy of which has been included with this distribution in
+ * the LICENSE.txt file.
  */
 package org.mule.extras.spring.remoting;
 
