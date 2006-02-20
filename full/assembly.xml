@@ -14,6 +14,24 @@ Assembly descriptor for the full Mule distribution.
   on the root directory for now. -->
   <fileSets>
 
+	<!-- Copy resources -->
+    <fileSet>
+      <directory>distributions/full/../resources</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+
+    <!-- Make the scripts executable -->
+    <fileSet>
+      <directory>distributions/full/../resources/bin</directory>
+      <includes>
+      	<include>mule</include>
+      	<include>*.sh</include>
+      	<include>*.bat</include>
+      </includes>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>744</fileMode>
+    </fileSet>
+
     <!-- The composite jar file -->
     <fileSet>
       <directory>distributions/full/target</directory>
@@ -23,14 +41,16 @@ Assembly descriptor for the full Mule distribution.
       <outputDirectory>lib</outputDirectory>
     </fileSet>
 
-    <!-- The source code -->
+    <!-- The launcher tool -->
     <fileSet>
-      <directory>distributions/full/../resources/src</directory>
+      <directory>distributions/launcher/target</directory>
       <includes>
-      	<include>README.txt</include>
+      	<include>*.jar</include>
       </includes>
-      <outputDirectory>src</outputDirectory>
-    </fileSet>
+      <outputDirectory>bin</outputDirectory>
+    </fileSet> 
+
+    <!-- The source code -->
     <fileSet> 
       <directory>mule</directory>
       <outputDirectory>src/mule</outputDirectory>
@@ -61,30 +81,6 @@ Assembly descriptor for the full Mule distribution.
       	<include>src/main/resources/**/*</include>
       </includes>
     </fileSet>
-
-	<!-- Other resources -->
-    <fileSet>
-      <directory>distributions/full/../resources</directory>
-      <includes>
-      	<include>README.txt</include>
-      	<include>LICENSE.txt</include>
-      </includes>
-      <outputDirectory></outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>distributions/full/../resources/bin</directory>
-      <outputDirectory>bin</outputDirectory>
-      <!-- Make the scripts executable -->
-      <fileMode>744</fileMode>
-    </fileSet>
-    <fileSet>
-      <directory>distributions/full/../resources/conf</directory>
-      <outputDirectory>conf</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>distributions/full/../resources/licenses</directory>
-      <outputDirectory>lib/licenses</outputDirectory>
-    </fileSet>
   </fileSets>
   
   <dependencySets>
@@ -99,6 +95,8 @@ Assembly descriptor for the full Mule distribution.
 	   Until then, we have to list all of the dependencies explicitly. :-(
        -->
       <excludes>
+		<exclude>org.codehaus.mule:mule-tools-launcher</exclude>
+
 		<exclude>org.codehaus.mule:mule-core</exclude>
 
 		<exclude>org.codehaus.mule:mule-dq-provider</exclude>

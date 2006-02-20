@@ -11,7 +11,7 @@
 	</parent>
     <artifactId>mini-mule</artifactId>
     <packaging>jar</packaging>
-    <name>Mule Distribution: Mini</name>
+    <name>Mini Distribution</name>
     <description>A light-weight mini distribution of Mule that includes the core plus any providers that do not have other dependencies, such as vm, tcp, udp, multicst, file, jms, stream, servlet, ssl and the Mule client</description>
 
     <build>
@@ -33,7 +33,7 @@
    					-->
     				<execution>
     					<id>unpack</id>
-    					<phase>compile</phase>
+    					<phase>package</phase>
     					<goals>
     						<goal>unpack</goal>
     					</goals>
@@ -160,6 +160,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-tools-launcher</artifactId>
+            <version>${version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.codehaus.mule</groupId>
             <artifactId>mule-core</artifactId>
