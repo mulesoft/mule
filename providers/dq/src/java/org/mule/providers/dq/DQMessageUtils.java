@@ -19,7 +19,8 @@ import com.ibm.as400.access.CharacterFieldDescription;
 import com.ibm.as400.access.Record;
 import com.ibm.as400.access.RecordFormat;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -37,7 +38,7 @@ public final class DQMessageUtils
     /**
      * Logger for this class
      */
-    private static final Logger LOGGER = Logger.getLogger(DQMessageUtils.class);
+	private static Log log = LogFactory.getLog(DQMessageUtils.class);
 
     public static final String RECORD_DESCRIPTOR_KEY = "recordDescriptor";
 
@@ -112,9 +113,7 @@ public final class DQMessageUtils
     public static synchronized RecordFormat getRecordFormat(final String recordDescriptor, final AS400 as400)
             throws Exception
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Record descriptor :" + recordDescriptor);
-        }
+        log.debug("Record descriptor :" + recordDescriptor);
 
         if (recordDescriptor == null) {
             throw new Exception("Failed to read record descriptor : recordDescriptor property is not set ");
