@@ -133,7 +133,13 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                     HttpResponse response = null;
                     if (receiver != null) {
                         UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), /*todo*/ null);
-                        response  = (HttpResponse)returnMessage.getPayload();
+                        Object tempResponse = returnMessage.getPayload();
+                        //This remoes the need for users to explicitly adding the response transformer ObjectToHttpResponse in their config
+                        if(tempResponse instanceof HttpResponse) {
+                            response = (HttpResponse)tempResponse;
+                        } else {
+                            response = (HttpResponse)connector.getDefaultResponseTransformer().transform(tempResponse);
+                        }
                         response.disableKeepAlive(!((HttpConnector)connector).isKeepAlive());
                     } else {
                         String failedPath = endpoint.getEndpointURI().getScheme() + "://" +
