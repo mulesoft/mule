@@ -30,13 +30,13 @@ import org.mule.util.ClassHelper;
  */
 public class TcpConnector extends AbstractServiceEnabledConnector
 {
-    public static final int DEFAULT_SOCKET_TIMEOUT = 5000;
+    public static final int DEFAULT_SOCKET_TIMEOUT = INT_VALUE_NOT_SET;
 
-    public static final int DEFAULT_BUFFER_SIZE = 64 * 1024;
+    public static final int DEFAULT_BUFFER_SIZE = INT_VALUE_NOT_SET;
 
     public static final long DEFAULT_POLLING_FREQUENCY = 10;
 
-    public static final int DEFAULT_BACKLOG = 256;
+    public static final int DEFAULT_BACKLOG = INT_VALUE_NOT_SET;
 
     private int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
 

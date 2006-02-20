@@ -32,6 +32,8 @@ import java.beans.ExceptionListener;
  */
 public interface UMOConnector extends Disposable, Initialisable
 {
+    public static final int INT_VALUE_NOT_SET = -1;
+    
     /**
      * This creates a <code>UMOMessageReceiver</code> associated with this
      * endpoint and registers it with the connector
