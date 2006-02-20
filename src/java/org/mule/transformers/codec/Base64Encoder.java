@@ -13,10 +13,8 @@
  */
 package org.mule.transformers.codec;
 
-import org.mule.transformers.NoActionTransformer;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
-
 import sun.misc.BASE64Encoder;
 
 /**
@@ -43,7 +41,7 @@ public class Base64Encoder extends AbstractTransformer
      * 
      * @see org.mule.umo.transformer.UMOTransformer#transform(java.lang.Object)
      */
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         byte[] buf;
         if (src instanceof String) {

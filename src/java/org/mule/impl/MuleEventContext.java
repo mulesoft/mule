@@ -1,7 +1,13 @@
 /*
+<<<<<<< MuleEventContext.java
  * $Header$
  * $Revision$
  * $Date$
+=======
+ * $Header$
+ * $Revision$
+ * $Date$
+>>>>>>> 1.15.2.1
  * ------------------------------------------------------------------------------------------------------
  *
  * Copyright (c) SymphonySoft Limited. All rights reserved.
@@ -150,6 +156,35 @@ public class MuleEventContext implements UMOEventContext
      *             in the transformer
      * @see org.mule.umo.transformer.UMOTransformer
      */
+    public String getTransformedMessageAsString(String encoding) throws TransformerException
+    {
+        return event.getTransformedMessageAsString(encoding);
+    }
+
+    /**
+     * Returns the message contents as a string
+     * 
+     * @return the message contents as a string
+     * @throws org.mule.umo.UMOException if the message cannot be converted into
+     *             a string
+     */
+    public String getMessageAsString(String encoding) throws UMOException
+    {
+        return event.getMessageAsString(encoding);
+    }
+
+    /**
+     * Returns the message transformed into it's recognised or expected format
+     * and then into a String. The transformer used is the one configured on the
+     * endpoint through which this event was received.
+     * This method will use the default encoding on the event
+     *
+     * @return the message transformed into it's recognised or expected format
+     *         as a Strings.
+     * @throws org.mule.umo.transformer.TransformerException if a failure occurs
+     *             in the transformer
+     * @see org.mule.umo.transformer.UMOTransformer
+     */
     public String getTransformedMessageAsString() throws TransformerException
     {
         return event.getTransformedMessageAsString();
@@ -157,7 +192,8 @@ public class MuleEventContext implements UMOEventContext
 
     /**
      * Returns the message contents as a string
-     * 
+     * This method will use the default encoding on the event
+     *
      * @return the message contents as a string
      * @throws org.mule.umo.UMOException if the message cannot be converted into
      *             a string
@@ -839,6 +875,6 @@ public class MuleEventContext implements UMOEventContext
      * @return the encoding for this message.  This method must never return null
      */
     public String getEncoding() {
-        return event.getMessage().getEncoding();
+        return event.getEncoding();
     }
 }

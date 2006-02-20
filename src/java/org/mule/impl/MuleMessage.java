@@ -124,6 +124,18 @@ public class MuleMessage implements UMOMessage
     }
 
     /**
+     * Converts the message implementation into a String representation
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
+     */
+    public String getPayloadAsString(String encoding) throws Exception {
+        return adapter.getPayloadAsString(encoding);
+    }
+
+    /**
      * @return all properties on this payload
      */
     public Iterator getPropertyNames()

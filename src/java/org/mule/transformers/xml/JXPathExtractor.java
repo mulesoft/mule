@@ -36,7 +36,7 @@ public class JXPathExtractor extends AbstractTransformer
      * the result. If the given object is a string, it assumes it is an valid
      * xml and parses it before evaluating the xpath expression.
      */
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try {
             Object o = null;

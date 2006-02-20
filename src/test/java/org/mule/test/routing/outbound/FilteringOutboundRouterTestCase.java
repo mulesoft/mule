@@ -81,7 +81,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertTrue(!router.isMatch(message));
 
         router.setTransformer(new AbstractTransformer() {
-            public Object doTransform(Object src) throws TransformerException
+            public Object doTransform(Object src, String encoding) throws TransformerException
             {
                 return ((Exception) src).getMessage();
             }

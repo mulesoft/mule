@@ -163,6 +163,8 @@ public interface UMOImmutableDescriptor
      */
     UMOTransformer getResponseTransformer();
 
+    String getEncoding();
+    
     /**
      * Determines if only a single instance of this component is created.  This is useful when a
      * component hands off event processing to another engine such as Rules processing or Bpel

@@ -15,6 +15,7 @@
 package org.mule.impl;
 
 import org.mule.MuleException;
+import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -294,7 +296,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      */
     public String getTransformedMessageAsString() throws TransformerException
     {
-        return new String(getTransformedMessageAsBytes());
+        return getTransformedMessageAsString(getEncoding());
     }
 
     /*
@@ -302,10 +304,41 @@ public class MuleEvent extends EventObject implements UMOEvent
      * 
      * @see org.mule.umo.UMOEvent#getPayloadAsString()
      */
-    public String getMessageAsString() throws MuleException
+    public String getMessageAsString() throws UMOException
     {
+        return getMessageAsString(getEncoding());
+    }
+
+    /**
+     * Returns the message transformed into it's recognised or expected format
+     * and then into a String. The transformer used is the one configured on the
+     * endpoint through which this event was received.
+     *
+     * @param encoding the encoding to use when converting the message to string
+     * @return the message transformed into it's recognised or expected format
+     *         as a Strings.
+     * @throws org.mule.umo.transformer.TransformerException
+     *          if a failure occurs in the transformer
+     * @see org.mule.umo.transformer.UMOTransformer
+     */
+    public String getTransformedMessageAsString(String encoding) throws TransformerException {
         try {
-            return message.getPayloadAsString();
+            return new String(getTransformedMessageAsBytes(), encoding);
+        } catch (UnsupportedEncodingException e) {
+            throw new TransformerException(endpoint.getTransformer(), e);
+        }
+    }
+
+    /**
+     * Returns the message contents as a string
+     *
+     * @param encoding the encoding to use when converting the message to string
+     * @return the message contents as a string
+     * @throws org.mule.umo.UMOException if the message cannot be converted into a string
+     */
+    public String getMessageAsString(String encoding) throws UMOException {
+        try {
+            return message.getPayloadAsString(encoding);
         } catch (Exception e) {
             throw new MuleException(new Message(Messages.CANT_READ_PAYLOAD_AS_STRING_TYPE_IS_X, message.getClass()
                                                                                                        .getName()), e);
@@ -588,6 +621,13 @@ public class MuleEvent extends EventObject implements UMOEvent
         }
     }
 
+    /**
+     * Will retrieve a string proerty form the event. If the property does not exist it will be substituted
+     * with the default value
+     * @param name the name of the proerty to get
+     * @param defaultValue the default value to return if the proerty is not set
+     * @return the property value or the defaultValue if the proerty is not set
+     */
     public String getStringProperty(String name, String defaultValue) {
         return PropertiesHelper.getStringProperty(properties, name, defaultValue);
     }
@@ -603,5 +643,23 @@ public class MuleEvent extends EventObject implements UMOEvent
      */
     public boolean isStreaming() {
         return endpoint.isStreaming();
+    }
+
+    /**
+     * Gets the encoding for this message. First it looks to see if encoding has been set on the endpoint, if
+     * not it will check the message itself and finally it will fall back to the Mule global configuration for
+     * encoding which cannot be null.
+     * @return the encoding for the event
+     */
+    public String getEncoding() {
+        String encoding = endpoint.getEndpointEncoding();
+        if(encoding==null) {
+            encoding = message.getEncoding();
+        }
+        if(encoding==null) {
+            encoding = MuleManager.getConfiguration().getEncoding();
+        }
+        return encoding;
+
     }
 }

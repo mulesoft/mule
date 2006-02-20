@@ -74,7 +74,7 @@ public class XsltTransformer extends AbstractTransformer {
      * @param src The source String
      * @return The result String
      */
-    public Object doTransform(Object src) throws TransformerException {
+    public Object doTransform(Object src, String encoding) throws TransformerException {
         try {
             DocumentSource sourceDoc = null;
             DocumentResult resultDoc = new DocumentResult();

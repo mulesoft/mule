@@ -49,6 +49,9 @@ public interface MuleProperties
     /** Default Ecoding used by the server */
     public final String MULE_ENCODING_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + "encoding";
 
+    /** The operatirng system encoding */
+    String MULE_OS_ENCODING_SYSTEM_PROPERTY = "org.mule.osEncoding";
+
     /** whether a configuration builder should start the server after it has been configured, The default is true*/
     public final String MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY = SYSTEM_PROPERTY_PREFIX + ".start.after.config";
 

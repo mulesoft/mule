@@ -55,9 +55,9 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
     public boolean accept(UMOMessage message)
     {
     	try {
-    		return accept(message.getPayloadAsString());
+    		return accept(message.getPayloadAsString(null));
     	} catch (Exception e) {
-    		LOGGER.warn("An exception occured while filering", e);
+    		LOGGER.warn("An exception occured while filtering", e);
     		return false;
     	}
     }

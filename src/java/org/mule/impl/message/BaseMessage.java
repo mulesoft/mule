@@ -42,7 +42,7 @@ public class BaseMessage implements Serializable
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString() throws Exception
+    public String getPayloadAsString(String encoding) throws Exception
     {
         return message.toString();
     }
@@ -55,7 +55,7 @@ public class BaseMessage implements Serializable
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return getPayloadAsString().getBytes();
+        return getPayloadAsString(null).getBytes();
     }
 
     /**

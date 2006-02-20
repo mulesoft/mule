@@ -76,6 +76,7 @@ import javax.transaction.TransactionManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -612,6 +613,7 @@ public class MuleManager implements UMOManager
     public synchronized void initialise() throws UMOException
     {
         validateEncoding();
+        validateOSEncoding();
 
         if (!initialised.get()) {
             initialising.set(true);
@@ -680,7 +682,21 @@ public class MuleManager implements UMOManager
             throw new FatalException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "encoding", config.getEncoding()), this);
         }
     }
-
+    protected void validateOSEncoding() throws FatalException
+    {
+        String encoding = System.getProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY);
+        if(encoding==null) {
+            encoding = config.getOSEncoding();
+            System.setProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY, encoding);
+        } else {
+            config.setOSEncoding(encoding);
+        }
+        //Check we have a valid and supported encoding
+        if(!Charset.isSupported(config.getOSEncoding())) {
+            throw new FatalException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "osEncoding", config.getOSEncoding()), this);
+        }
+    }
+    
     protected void registerAdminAgent() throws UMOException {
         // Allows users to disable all server components and connections
         // this can be useful for testing
@@ -995,8 +1011,9 @@ public class MuleManager implements UMOManager
             message.add(new Message(Messages.VERSION_INFO_NOT_SET).getMessage());
         }
         message.add(" ");
-        message.add(new Message(Messages.SERVER_STARTED_AT_X, new Date(getStartDate()).toString()).getMessage());
         String patch = System.getProperty("sun.os.patch.level", null);
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL);
+        message.add(new Message(Messages.SERVER_STARTED_AT_X, df.format(new Date(getStartDate())).toString()).getMessage());
         message.add("JDK: " + System.getProperty("java.version") + " (" + System.getProperty("java.vm.info") + ")");
         message.add("OS: " + System.getProperty("os.name") + (patch!=null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : "") + " (" + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + ")");
 
@@ -1026,14 +1043,15 @@ public class MuleManager implements UMOManager
     {
         List message = new ArrayList(2);
         long currentTime = System.currentTimeMillis();
-        message.add(new Message(Messages.SHUTDOWN_NORMALLY_ON_X, new Date().toString()).getMessage());
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL);
+        message.add(new Message(Messages.SHUTDOWN_NORMALLY_ON_X, df.format(new Date()).toString()).getMessage());
         long duration = 10;
         if (startDate > 0) {
             duration = currentTime - startDate;
         }
         message.add(new Message(Messages.SERVER_WAS_UP_FOR_X, Utility.getFormattedDuration(duration)).getMessage());
 
-        return StringMessageHelper.getBoilerPlate(message, '*', 80);
+        return StringMessageHelper.getBoilerPlate(message, '*', 78);
     }
 
     /**

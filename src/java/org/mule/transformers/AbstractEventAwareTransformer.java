@@ -30,16 +30,17 @@ import org.mule.umo.transformer.TransformerException;
  * payload. Transformers should always work on the src object not the message
  * payload.
  * 
- * @see UMOMessage
- * @see MuleMessage
+ * @see org.mule.umo.UMOMessage
+ * @see org.mule.impl.MuleMessage
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
+
  */
 
 public abstract class AbstractEventAwareTransformer extends AbstractTransformer
 {
-    public final Object doTransform(Object src) throws TransformerException
+    public final Object doTransform(Object src, String encoding) throws TransformerException
     {
         UMOEventContext event = RequestContext.getEventContext();
         if (event == null) {
@@ -47,6 +48,6 @@ public abstract class AbstractEventAwareTransformer extends AbstractTransformer
         }
         return transform(src, event);
     }
-
+    
     public abstract Object transform(Object src, UMOEventContext context) throws TransformerException;
 }

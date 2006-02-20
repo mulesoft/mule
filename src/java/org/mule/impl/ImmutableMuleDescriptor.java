@@ -16,14 +16,6 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
-import java.beans.ExceptionListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
@@ -43,6 +35,13 @@ import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
+
+import java.beans.ExceptionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>MuleDescriptor</code> describes all the properties for a Mule UMO.
@@ -167,6 +166,8 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
 
     protected List initialisationCallbacks = new ArrayList();
 
+    protected String encoding = null;
+    
     /**
      * Default constructor. Initalises common properties for the
      * MuleConfiguration object
@@ -186,6 +187,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         intecerptorList = descriptor.getInterceptors();
         properties = (HashMap) descriptor.getProperties();
         name = descriptor.getName();
+        encoding = descriptor.getEncoding();
 
         threadingProfile = descriptor.getThreadingProfile();
         poolingProfile = descriptor.getPoolingProfile();
@@ -287,6 +289,11 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
     {
         return intecerptorList;
     }
+    
+    public String getEncoding()
+    {
+    	return encoding;
+    }
 
     /*
      * (non-Javadoc)
@@ -301,6 +308,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         buffer.append(", send transformer=" + outboundTransformer);
         buffer.append(", inbound endpointUri=" + inboundEndpoint);
         buffer.append(", receive transformer=" + inboundTransformer);
+        buffer.append(", encoding=" + encoding);
         return buffer.toString();
     }
 

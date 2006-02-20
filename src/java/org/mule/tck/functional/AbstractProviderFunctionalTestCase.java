@@ -109,7 +109,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
      */
     protected UMOEndpoint createOutboundEndpoint() {
         if(getOutDest()!=null) {
-            return new MuleEndpoint("testOut", getOutDest(), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null);
+            return new MuleEndpoint("testOut", getOutDest(), connector, null, UMOEndpoint.ENDPOINT_TYPE_SENDER, 0, null, null);
         } else {
             return null;
         }
@@ -121,7 +121,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
      * @return
      */
     protected UMOEndpoint createInboundEndpoint() {
-        UMOEndpoint ep = new MuleEndpoint("testIn", getInDest(), connector, null, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null);
+        UMOEndpoint ep = new MuleEndpoint("testIn", getInDest(), connector, null, UMOEndpoint.ENDPOINT_TYPE_RECEIVER, 0, null, null);
         ep.setSynchronous(true);
         return ep;
      }
