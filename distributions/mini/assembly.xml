@@ -14,6 +14,32 @@ Assembly descriptor for the mini-Mule distribution.
   on the root directory for now. -->
   <fileSets>
 
+	<!-- Copy resources -->
+    <fileSet>
+      <directory>distributions/mini/../resources</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+    <!-- The Mini distribution has its own README.txt -->
+    <fileSet>
+      <directory>distributions/mini/resources</directory>
+      <includes>
+      	<include>README.txt</include>
+      </includes>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+
+    <!-- Make the scripts executable -->
+    <fileSet>
+      <directory>distributions/mini/../resources/bin</directory>
+      <includes>
+      	<include>mule</include>
+      	<include>*.sh</include>
+      	<include>*.bat</include>
+      </includes>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>744</fileMode>
+    </fileSet>
+
     <!-- The composite jar file -->
     <fileSet>
       <directory>distributions/mini/target</directory>
@@ -23,34 +49,13 @@ Assembly descriptor for the mini-Mule distribution.
       <outputDirectory>lib</outputDirectory>
     </fileSet>
 
-	<!-- Other resources -->
+    <!-- The launcher tool -->
     <fileSet>
-      <directory>distributions/mini/resources</directory>
+      <directory>distributions/launcher/target</directory>
       <includes>
-      	<include>README.txt</include>
+      	<include>*.jar</include>
       </includes>
-      <outputDirectory></outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>distributions/mini/../resources</directory>
-      <includes>
-      	<include>LICENSE.txt</include>
-      </includes>
-      <outputDirectory></outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>distributions/mini/../resources/bin</directory>
       <outputDirectory>bin</outputDirectory>
-      <!-- Make the scripts executable -->
-      <fileMode>744</fileMode>
-    </fileSet>
-    <fileSet>
-      <directory>distributions/mini/../resources/conf</directory>
-      <outputDirectory>conf</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>distributions/mini/../resources/licenses</directory>
-      <outputDirectory>lib/licenses</outputDirectory>
     </fileSet>
   </fileSets>
   
@@ -66,6 +71,8 @@ Assembly descriptor for the mini-Mule distribution.
 	   Until then, we have to list all of the dependencies explicitly. :-(
        -->
       <excludes>
+		<exclude>org.codehaus.mule:mule-tools-launcher</exclude>
+
 		<exclude>org.codehaus.mule:mule-core</exclude>
 
 		<exclude>org.codehaus.mule:mule-dq-provider</exclude>

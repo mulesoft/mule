@@ -11,7 +11,7 @@
 	</parent>
     <artifactId>mule</artifactId>
     <packaging>jar</packaging>
-    <name>Mule Distribution: Full</name>
+    <name>Full Distribution</name>
     <description>Includes the Mule server with all its providers and extras.</description>
 
     <build>
@@ -33,7 +33,7 @@
    					-->
     				<execution>
     					<id>unpack</id>
-    					<phase>compile</phase>
+    					<phase>package</phase>
     					<goals>
     						<goal>unpack</goal>
     					</goals>
@@ -247,6 +247,12 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-tools-launcher</artifactId>
+            <version>${version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.codehaus.mule</groupId>
             <artifactId>mule-core</artifactId>
