@@ -14,7 +14,7 @@
 package org.mule.test.config;
 
 import org.mule.config.converters.QNameConverter;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 import javax.xml.namespace.QName;
 
@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
  * @version $Revision$
  */
 
-public class QNameConverterTestCase extends NamedTestCase
+public class QNameConverterTestCase extends AbstractMuleTestCase
 {
     protected QNameConverter converter = new QNameConverter();
 

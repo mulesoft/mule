@@ -13,6 +13,7 @@
  */
 package org.mule.test.integration.service;
 
+import org.mule.impl.RequestContext;
 import org.mule.util.StringMessageHelper;
 
 import javax.jms.TextMessage;
@@ -29,6 +30,8 @@ public class TestReceiver
     {
         System.out.println(StringMessageHelper.getBoilerPlate("Received: " + message + " Number: " + inc() + " in thread: "
                 + Thread.currentThread().getName()));
+        System.out.println("Message ID is: " + RequestContext.getEventContext().getMessage().getCorrelationId());
+
         return "Received: " + message;
     }
 
@@ -36,6 +39,8 @@ public class TestReceiver
     {
         System.out.println("Received: " + message.getText() + " Number: " + inc() + " in thread: "
                 + Thread.currentThread().getName());
+        System.out.println("Message ID is: " + message.getJMSMessageID());
+
         return "Received: " + message.getText();
     }
 

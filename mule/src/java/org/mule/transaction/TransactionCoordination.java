@@ -24,8 +24,6 @@ import org.mule.umo.UMOTransaction;
 
 /**
  * <p>
- * <code>TransactionCoordination</code> TODO (document class)
- * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author Guillaume Nodet
  * @version $Revision$
@@ -72,7 +70,7 @@ public class TransactionCoordination
     public void unbindTransaction(UMOTransaction transaction) throws TransactionException
     {
         UMOTransaction oldTx = (UMOTransaction) transactions.get();
-        if (oldTx != transaction) {
+        if (oldTx!=null && !oldTx.equals(transaction)) {
             throw new IllegalTransactionStateException(new Message(Messages.TX_CANT_UNBIND));
         }
         transactions.set(null);

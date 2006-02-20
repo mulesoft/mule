@@ -38,7 +38,7 @@ import java.io.File;
 
 public class ServerTools
 {
-    private static final String ACTIVEMQ_HOME = "org.activemq.home";
+    public static final String ACTIVEMQ_HOME = "org.activemq.home";
 
     private static KillableWatchdog activemq;
     private static ActiveMQConnectionFactory embeddedFactory = null;

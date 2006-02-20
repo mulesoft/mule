@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project2.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-glue-provider</artifactId>
+    <name>Mule Glue Provider</name>
+    <description>A Mule provider for Soap Connectivity using Glue. for more information see the
+        <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
+    </description>
+    <shortDescription>glue</shortDescription>
+    <url>http://www.muleumo.org/doc/providers/glue/</url>
+    <dependencies>
+        <dependency>
+            <artifactId>glue</artifactId>
+            <groupId>glue</groupId>
+            <version>${glue_version}</version>
+            <properties>
+                <!-- cannot ship Glue jar due to license restrictions -->
+                <ignore>true</ignore>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-soap-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <!-- needed by the Glue client calls -->
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-http-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>commons-httpclient</id>
+            <version>${commons_httpclient_version}</version>
+            <url>http://jakarta.apache.org/commons/httpclient/index.html</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>commons-codec</id>
+            <version>${commons_codec_version}</version>
+            <url>http://jakarta.apache.org/commons/codec/index.html</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-tcp-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+   </dependencies>
+</project>

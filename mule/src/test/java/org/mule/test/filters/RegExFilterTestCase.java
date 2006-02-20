@@ -14,14 +14,14 @@
 package org.mule.test.filters;
 
 import org.mule.routing.filters.RegExFilter;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class RegExFilterTestCase extends NamedTestCase
+public class RegExFilterTestCase extends AbstractMuleTestCase
 {
     public void testWildcardFilter()
     {

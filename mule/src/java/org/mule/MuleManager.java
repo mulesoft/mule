@@ -406,7 +406,7 @@ public class MuleManager implements UMOManager
             queueManager = null;
         }
 
-        if(!config.isEmbedded()) {
+        if(!config.isEmbedded() && startDate > 0) {
             if (logger.isInfoEnabled()) {
                 logger.info(getEndSplash());
             } else {
@@ -689,7 +689,7 @@ public class MuleManager implements UMOManager
                                                               false);
 
         // if endpointUri is null do not setup server components
-        if (config.getServerUrl() == null || "".equals(config.getServerUrl().trim())) {
+        if (config.getServerUrl() == null || Utility.EMPTY_STRING.equals(config.getServerUrl().trim())) {
             logger.info("Server endpointUri is null, not registering Mule Admin agent");
             disable = true;
         }

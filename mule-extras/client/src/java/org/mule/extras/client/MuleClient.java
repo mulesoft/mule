@@ -14,7 +14,6 @@
 package org.mule.extras.client;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -33,6 +32,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMODescriptor;
@@ -235,9 +235,59 @@ public class MuleClient implements Disposable
      */
     public void dispatch(String url, UMOMessage message) throws UMOException
     {
-        UMOEvent event = getEvent(message, url, false);
+        UMOEvent event = getEvent(message, url, false, false);
         try {
             event.getSession().dispatchEvent(event);
+        } catch (UMOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
+        }
+    }
+
+    /**
+     * Dispatches a Stream event asynchronously to a endpointUri via a mule server.
+     * the Url determines where to dispathc the event to, this can be in the
+     * form of
+     *
+     * @param url the Mule url used to determine the destination and transport
+     *            of the message
+     * @param message the message to send
+     * @throws org.mule.umo.UMOException
+     */
+    public void dispatchStream(String url, StreamMessageAdapter message) throws UMOException
+    {
+        UMOEvent event = getEvent(new MuleMessage(message), url, false, true);
+        try {
+            event.getSession().dispatchEvent(event);
+        } catch (UMOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DispatchException(new Message("client", 1), event.getMessage(), event.getEndpoint(), e);
+        }
+    }
+
+    public void sendStream(String url, StreamMessageAdapter message) throws UMOException
+    {
+        sendStream(url, message, UMOEvent.TIMEOUT_NOT_SET_VALUE);
+    }
+    /**
+     * Sends a streaming event synchronously to a endpointUri via a mule server and a
+     * resulting stream is set on the passed Stream Mesage Adapter.
+     *
+     * @param url the Mule url used to determine the destination and transport
+     *            of the message
+     * @param message The message to send
+     * @param timeout The time in milliseconds the the call should block waiting
+     *            for a response
+     * @throws org.mule.umo.UMOException
+     */
+    public void sendStream(String url, StreamMessageAdapter message, int timeout) throws UMOException
+    {
+        UMOEvent event = getEvent(new MuleMessage(message), url, true, true);
+        event.setTimeout(timeout);
+        try {
+            event.getSession().sendEvent(event);
         } catch (UMOException e) {
             throw e;
         } catch (Exception e) {
@@ -583,7 +633,7 @@ public class MuleClient implements Disposable
      */
     public UMOMessage send(String url, UMOMessage message, int timeout) throws UMOException
     {
-        UMOEvent event = getEvent(message, url, true);
+        UMOEvent event = getEvent(message, url, true, false);
         event.setTimeout(timeout);
         UMOMessage result = null;
         try {
@@ -666,15 +716,17 @@ public class MuleClient implements Disposable
      * @param message the event payload
      * @param uri the destination endpointUri
      * @param synchronous whether the event will be synchronously processed
+     * @param streaming
      * @return the UMOEvent
      * @throws UMOException
      */
-    protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous) throws UMOException
+    protected UMOEvent getEvent(UMOMessage message, String uri, boolean synchronous, boolean streaming) throws UMOException
     {
         UMOEndpoint endpoint = getEndpoint(uri, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         if (!endpoint.getConnector().isStarted() && manager.isStarted()) {
             endpoint.getConnector().startConnector();
         }
+        endpoint.setStreaming(streaming);
         try {
             MuleSession session = new MuleSession();
             if (user != null) {
@@ -751,7 +803,7 @@ public class MuleClient implements Disposable
         }
         messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "false");
         UMOMessage message = new MuleMessage(payload, messageProperties);
-        UMOEvent event = getEvent(message, url, true);
+        UMOEvent event = getEvent(message, url, true, false);
         try {
             event.getSession().sendEvent(event);
         } catch (UMOException e) {

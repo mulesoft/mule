@@ -13,21 +13,21 @@
  */
 package org.mule.test.routing.outbound;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.outbound.AbstractMessageSplitter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.util.Utility;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -38,7 +38,7 @@ public class MessageSplitterRouterTestCase extends AbstractMuleTestCase
 {
     public void testMessageSpltterRouter() throws Exception
     {
-        Mock session = getMockSession();
+        Mock session = MuleTestUtils.getMockSession();
 
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Provider", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));

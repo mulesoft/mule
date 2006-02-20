@@ -76,11 +76,6 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
     private String replyTo;
 
     /**
-     * determines whether a mailbox connection is active
-     */
-    private boolean connected = false;
-
-    /**
      * Holds value of default subject
      */
     private String defaultSubject = "[No Subject]";
@@ -225,11 +220,6 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
         return "smtp";
     }
 
-    public boolean isConnected()
-    {
-        return this.connected;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -257,7 +247,7 @@ public class SmtpConnector extends AbstractServiceEnabledConnector implements Ma
      */
     public void doStop() throws UMOException
     {
-        connected = false;
+
     }
 
     /*

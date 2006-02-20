@@ -15,14 +15,14 @@
 package org.mule.providers.oracle.jms;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class OracleJmsEndpointTestCase extends NamedTestCase
+public class OracleJmsEndpointTestCase extends AbstractMuleTestCase
 {
     public void testWithoutPayloadFactory() throws Exception {
     	UMOEndpointURI url = 

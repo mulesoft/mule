@@ -14,12 +14,9 @@
 
 package org.mule.providers.tcp.protocols;
 
+import org.mule.tck.AbstractMuleTestCase;
+
 import java.io.ByteArrayInputStream;
-
-import org.mule.util.StringMessageHelper;
-import org.mule.tck.NamedTestCase;
-
-import junit.framework.TestCase;
 
 /**
  * Test by reading characters from a fixed string buffer instead of
@@ -28,19 +25,17 @@ import junit.framework.TestCase;
  * @author <a href="mailto:rlucente@xecu.net">Rich Lucente</a>
  * @version $Revision$
  */
-public class XmlMessageProtocolTestCase extends NamedTestCase
+public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
 {
-    private XmlMessageProtocol xmp = new XmlMessageProtocol();
+    private XmlMessageProtocol xmp;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         xmp = new XmlMessageProtocol();
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
-        super.tearDown();
         xmp = null;
     }
 

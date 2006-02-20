@@ -183,7 +183,11 @@ public class MuleEvent extends EventObject implements UMOEvent
         }
         if (endpoint != null && endpoint.getProperties() != null) {
             properties.putAll(endpoint.getProperties());
+            if (endpoint.getEndpointURI().getParams() != null) {
+                properties.putAll(endpoint.getEndpointURI().getParams());
+            }
         }
+
         properties.putAll(message.getProperties());
         //Todo I think the replyTO header lingers when ther is more than one replyTo used in a single request
         //will investigate further after 1.1
@@ -246,6 +250,9 @@ public class MuleEvent extends EventObject implements UMOEvent
      */
     public Object getTransformedMessage() throws TransformerException
     {
+        if(isStreaming()) {
+            return message.getAdapter();
+        }
         if (transformedMessage == null) {
             UMOTransformer tran = endpoint.getTransformer();
             if (tran != null) {

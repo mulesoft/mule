@@ -585,4 +585,11 @@ public interface UMOEventContext
      */
     boolean isStreaming();
 
+    /**
+     * Gets the encoding for the current message. For potocols that send encoding
+     * Information with the message, this method should be overriden to expose the
+     * transport encoding, otherwise the default encoding in the Mule configuration will be used
+     * @return the encoding for this message.  This method must never return null
+     */
+    public String getEncoding();
 }

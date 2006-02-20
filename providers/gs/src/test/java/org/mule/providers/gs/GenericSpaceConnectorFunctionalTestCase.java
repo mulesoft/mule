@@ -23,7 +23,6 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.util.StringMessageHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,14 +38,13 @@ public class GenericSpaceConnectorFunctionalTestCase extends AbstractProviderFun
     //private String URL = "jini:java://localhost/?address=/./mule-space?schema=cache";
     //private String URL = "jini:java://localhost:10098/ross-laptop/JavaSpaces";
 
-    protected boolean checkPreReqs() {
+    protected String checkPreReqs() {
         if(System.getProperty("com.gs.home", null) != null) {
             System.setProperty("com.gs.security.enabled", "false");
             System.setProperty("java.security.policy", System.getProperty("com.gs.home") + "/bin/policy.all");
-            return true;
+            return null;
         }
-        System.out.println(StringMessageHelper.getBoilerPlate("com.gs.home parameter not set, not Testing GigaSpaces. Test Method: " + toString(), '@', 80));
-        return false;
+        return "com.gs.home VM parameter not set.";
     }
 
     protected void sendTestData(int iterations) throws Exception {

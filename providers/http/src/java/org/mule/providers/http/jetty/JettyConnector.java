@@ -13,7 +13,7 @@
  */
 package org.mule.providers.http.jetty;
 
-import org.mule.providers.AbstractServiceEnabledConnector;
+import org.mule.providers.http.HttpConnector;
 
 /**
  * <code>ServletConnector</code> is a channel adapter between Mule and a
@@ -23,7 +23,7 @@ import org.mule.providers.AbstractServiceEnabledConnector;
  * @version $Revision$
  */
 
-public class JettyConnector extends AbstractServiceEnabledConnector
+public class JettyConnector extends HttpConnector
 {
     public JettyConnector() {
         super();

@@ -42,6 +42,7 @@
         <property name="queueProfile"><ref local="queueProfile"/></property>
         <property name="synchronous"><value>true</value></property>
         <property name="model"><value>test-model</value></property>
+        <property name="serverUrl"><value></value></property>
 	    <property name="persistenceStrategy"><ref local="queuePS"/></property>
     </bean>
 

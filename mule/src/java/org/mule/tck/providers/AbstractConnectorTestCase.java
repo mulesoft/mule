@@ -26,7 +26,7 @@ import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
@@ -57,7 +57,8 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
      */
     protected void doSetUp() throws Exception
     {
-        descriptor = getTestDescriptor("orange", Orange.class.getName());
+        getManager(true);
+        descriptor = getTestDescriptor("apple", Apple.class.getName());
         MuleManager.getInstance().start();
         connector = getConnector();
     }
@@ -135,7 +136,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     {
         assertNotNull(connector);
 
-        MuleDescriptor d = getTestDescriptor("anOrange", Orange.class.getName());
+        MuleDescriptor d = getTestDescriptor("anApple", Apple.class.getName());
 
         UMOComponent component = MuleManager.getInstance().getModel().registerComponent(d);
         UMOEndpoint endpoint = new MuleEndpoint("test",

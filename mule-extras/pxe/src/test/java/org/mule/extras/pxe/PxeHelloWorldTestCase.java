@@ -24,7 +24,7 @@ import org.dom4j.io.XMLWriter;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.ClassHelper;
 import org.w3c.dom.Document;
@@ -33,7 +33,7 @@ import org.w3c.dom.Document;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class PxeHelloWorldTestCase extends NamedTestCase
+public class PxeHelloWorldTestCase extends AbstractMuleTestCase
 {
     public void setUp() throws Exception
     {

@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+
+<project>
+    <extend>${basedir}/../project2.xml</extend>
+    <pomVersion>3</pomVersion>
+    <artifactId>mule-axis-provider</artifactId>
+    <name>Mule Axis Provider</name>
+    <description>A Mule provider for Soap Connectivity using Axis. for more information see the
+        <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
+    </description>
+    <shortDescription>axis</shortDescription>
+    <url>http://www.muleumo.org/doc/providers/axis/</url>
+    <dependencies>
+        <dependency>
+            <artifactId>axis</artifactId>
+            <groupId>axis</groupId>
+            <version>${axis_version}</version>
+            <url>http://ws.apache.org</url>
+        </dependency>
+        <!-- USING THE GERONIMO SPEC VERSIONS OF SAAJ AND JAXRPC -->
+        <!-- THERES SHOULD BE NO DIFFERENCE, BUT IF THERE IS ANY FUNNY BEHAVIOUR, TRY REVERTING BACK -->
+<!--        <dependency>-->
+<!--            <artifactId>axis-jaxrpc</artifactId>-->
+<!--            <groupId>axis</groupId>-->
+<!--            <version>${axis_jaxrpc_version}</version>-->
+<!--            <url>http://ws.apache.org</url>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <artifactId>axis-saaj</artifactId>-->
+<!--            <groupId>axis</groupId>-->
+<!--            <version>${axis_saaj_version}</version>-->
+<!--            <url>http://ws.apache.org</url>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-saaj</artifactId>
+            <version>${geronimo_spec_saaj_version}</version>
+            <url>http://java.sun.com/products/saaj/</url>
+        </dependency>
+        <dependency>
+            <artifactId>axis-wsdl4j</artifactId>
+            <groupId>axis</groupId>
+            <version>${axis_wsdl4j_version}</version>
+            <url>http://ws.apache.org</url>
+        </dependency>
+        <!-- needed by the Axis Service component -->
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-http-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-soap-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>commons-httpclient</id>
+            <version>${commons_httpclient_version}</version>
+            <url>http://jakarta.apache.org/commons/httpclient/index.html</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>commons-codec</id>
+            <version>${commons_codec_version}</version>
+            <url>http://jakarta.apache.org/commons/codec/index.html</url>
+            <properties>
+                <war.bundle.jar>true</war.bundle.jar>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-tcp-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://www.muleumo.org</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-javamail</artifactId>
+            <version>${geronimo_spec_javamail_version}</version>
+            <url>http://java.sun.com/products/javamail/</url>
+        </dependency>
+
+   </dependencies>
+</project>

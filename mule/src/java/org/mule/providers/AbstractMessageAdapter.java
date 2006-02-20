@@ -17,6 +17,7 @@ package org.mule.providers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.provider.UMOMessageAdapter;
@@ -260,5 +261,9 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
 
     public Set getAttachmentNames() {
         return attachments.keySet();
+    }
+
+    public String getEncoding() {
+        return MuleManager.getConfiguration().getEncoding();
     }
 }

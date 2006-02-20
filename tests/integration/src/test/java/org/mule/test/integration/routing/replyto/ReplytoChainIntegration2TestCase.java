@@ -15,7 +15,7 @@ package org.mule.test.integration.routing.replyto;
 
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
-import org.mule.test.integration.IntegrationTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
@@ -26,10 +26,10 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class ReplytoChainIntegration2TestCase extends IntegrationTestCase
+public class ReplytoChainIntegration2TestCase extends FunctionalTestCase
 {
     public ReplytoChainIntegration2TestCase() {
-        embbededActiveMQ=true;
+        setDisposeManagerPerSuite(true);
     }
 
     protected String getConfigResources() {

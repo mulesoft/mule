@@ -22,6 +22,7 @@ import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.ChainingRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -46,7 +47,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        session = getMockSession();
+        session = MuleTestUtils.getMockSession();
         router = new ChainingRouter();
 
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();

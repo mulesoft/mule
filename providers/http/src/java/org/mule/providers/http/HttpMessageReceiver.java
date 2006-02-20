@@ -1,4 +1,4 @@
-/* 
+/*
  * $Header$
  * $Revision$
  * $Date$
@@ -14,13 +14,13 @@
  */
 package org.mule.providers.http;
 
-import org.apache.commons.httpclient.ChunkedInputStream;
-import org.mule.config.MuleProperties;
+import org.apache.commons.httpclient.Header;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.*;
+import org.mule.impl.MuleMessage;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
+import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.providers.tcp.TcpMessageReceiver;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOMessage;
@@ -28,15 +28,13 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
-import org.mule.util.PropertiesHelper;
-import org.mule.util.monitor.Expirable;
 
 import javax.resource.spi.work.Work;
-import java.io.*;
+import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used
@@ -46,17 +44,13 @@ import java.util.StringTokenizer;
  * @version $Revision$
  */
 public class HttpMessageReceiver extends TcpMessageReceiver {
-    //private ExpiryMonitor keepAliveMonitor;
 
     public HttpMessageReceiver(UMOConnector connector, UMOComponent component, UMOEndpoint endpoint)
             throws InitialisationException {
         super(connector, component, endpoint);
-//        if (((HttpConnector) connector).isKeepAlive()) {
-//            keepAliveMonitor = new ExpiryMonitor(1000);
-//        }
     }
 
-    protected Work createWork(Socket socket) throws SocketException {
+    protected Work createWork(Socket socket) throws IOException {
         return new HttpWorker(socket);
     }
 
@@ -84,112 +78,90 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
         return true;
     }
 
-    public void doDispose() {
-//        if (keepAliveMonitor != null) {
-//            keepAliveMonitor.dispose();
-//        }
-        super.doDispose();
-    }
+    private class HttpWorker implements Work {
 
-    private class HttpWorker extends TcpWorker implements Expirable {
-
-        public HttpWorker(Socket socket) throws SocketException {
-            super(socket);
-            boolean keepAlive = ((HttpConnector) connector).isKeepAlive();
-            if (keepAlive) {
-                socket.setKeepAlive(true);
-                socket.setSoTimeout(((HttpConnector) connector).getKeepAliveTimeout());
-            }
-
+        HttpServerConnection conn = null;
+        public HttpWorker(Socket socket) throws IOException {
+            conn = new HttpServerConnection(socket);
         }
 
         public void run() {
-            boolean keepAlive = ((HttpConnector) connector).isKeepAlive();
-            try {
-                dataIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-                dataOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-                do {
-                    Properties headers = new Properties();
-                    Object payload = parseRequest(dataIn, headers);
-                    if (payload == null) {
-                        break;
-                    }
-                    UMOMessageAdapter adapter = connector.getMessageAdapter(new Object[]{payload, headers});
-                    //Removed the keep alive monitoring stuff for now
-                    //nstead just wait for the client to disconnect
-                    //keepAlive = adapter.getBooleanProperty(HttpConstants.HEADER_KEEP_ALIVE, keepAlive);
-//                    if (keepAlive && !keepAliveRegistered) {
-//                        keepAliveRegistered = true;
-//                        if (keepAliveMonitor != null) {
-//                            keepAliveMonitor.addExpirable(((HttpConnector) connector).getKeepAliveTimeout(), this);
-//                        } else {
-//                            logger.info("Request has Keep alive set but the HttpConnector has keep alive disables");
-//                            keepAlive = false;
-//                        }
-//                    }
 
+            try {
+                do {
+                    conn.setKeepAlive(false);
+                    HttpRequest request = conn.readRequest();
+                    if(request==null) break;
+                    
+                    Properties headers = new Properties();
+                    for (int i = 0; i < request.getHeaders().length; i++) {
+                        Header header = request.getHeaders()[i];
+                        String headerName = header.getName();
+                        if(headerName.startsWith("X-MULE")) {
+                            headerName = headerName.replaceAll("X-MULE", "MULE");
+                        }
+                        headers.setProperty(headerName, header.getValue());
+                    }
+                    headers.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getRequestLine().getMethod());
+                    headers.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request.getRequestLine().getUri());
+                    headers.setProperty(HttpConnector.HTTP_VERSION_PROPERTY, request.getRequestLine().getHttpVersion().toString());
+
+                    //todo Mule 2.0 generic way to set stream message adapter
+                    UMOMessageAdapter adapter;
+                    Object body = null;
+                    if(endpoint.isStreaming() && request.getBody()!=null) {
+                        adapter = new StreamMessageAdapter(request.getBody(), conn.getOutputStream());
+                        for (Iterator iterator = headers.entrySet().iterator(); iterator.hasNext();) {
+                            Map.Entry entry = (Map.Entry) iterator.next();
+                            adapter.setProperty(entry.getKey(), entry.getValue());
+                        }
+                    } else {
+                        body = request.getBodyBytes();
+                        if(body==null) body = request.getRequestLine().getUri();
+                        adapter = connector.getMessageAdapter(new Object[]{body, headers});
+                    }
                     UMOMessage message = new MuleMessage(adapter);
 
                     if (logger.isDebugEnabled()) {
                         logger.debug(message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
                     }
-                    OutputStream os = new ResponseOutputStream(dataOut, socket);
 
                     //determine if the request path on this request denotes a different receiver
                     AbstractMessageReceiver receiver = getTargetReceiver(message, endpoint);
 
-                    UMOMessage returnMessage = null;
                     //the respone only needs to be transformed explicitly if A) the request was not served or a null result was returned
-                    boolean transformResponse = false;
+                    HttpResponse response = null;
                     if (receiver != null) {
-                        returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), os);
-                        if (returnMessage == null) {
-                            returnMessage = new MuleMessage("");
-                            transformResponse = true;
-                            RequestContext.rewriteEvent(returnMessage);
-                        }
+                        UMOMessage returnMessage = receiver.routeMessage(message, endpoint.isSynchronous(), /*todo*/ null);
+                        response  = (HttpResponse)returnMessage.getPayload();
+                        response.disableKeepAlive(!((HttpConnector)connector).isKeepAlive());
                     } else {
-                        transformResponse = true;
                         String failedPath = endpoint.getEndpointURI().getScheme() + "://" +
                                 endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort() +
                                 getRequestPath(message);
 
-                        logger.debug("Failed to bind to " + failedPath);
-                        returnMessage = new MuleMessage(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, failedPath).toString());
-                        returnMessage.setIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_NOT_FOUND);
-                        RequestContext.setEvent(new MuleEvent(returnMessage, endpoint, new MuleSession(), true));
-                    }
-                    Object response = returnMessage.getPayload();
-                    if(transformResponse) {
-                        response = connector.getDefaultResponseTransformer().transform(response);
+                        if(logger.isDebugEnabled()) logger.debug("Failed to bind to " + failedPath);
+
+                        response = new HttpResponse();
+                        response.setStatusLine(request.getRequestLine().getHttpVersion(), HttpConstants.SC_NOT_FOUND);
+                        response.setBodyString(new Message(Messages.CANNOT_BIND_TO_ADDRESS_X, failedPath).toString());
+                        //The DefaultResponse Transformer will set the necessary Headers
+                        response = (HttpResponse)connector.getDefaultResponseTransformer().transform(response);
                     }
 
-                    if (response instanceof byte[]) {
-                        dataOut.write((byte[]) response);
-                    } else {
-                        dataOut.write(response.toString().getBytes());
-                    }
-                    dataOut.flush();
-//                        if (keepAliveMonitor != null) {
-//                            keepAliveMonitor.resetExpirable(this);
-//                        }
-                } while (!socket.isClosed() && !disposing.get() && keepAlive);
-                if (logger.isDebugEnabled() && socket.isClosed()) {
-                    logger.debug("Peer closed connection");
-                }
+                   conn.writeResponse(response);
+                } while (conn.isKeepAlive());
             } catch (Exception e) {
                 handleException(e);
             } finally {
-//                if (keepAliveMonitor != null) {
-//                    keepAliveMonitor.removeExpirable(this);
-//                }
-                dispose();
+                conn.close();
+                conn=null;
             }
         }
 
-        public void expired() {
-            logger.debug("Keep alive timed out");
-            dispose();
+        public void release() {
+            conn.close();
+            conn=null;
         }
     }
 
@@ -226,130 +198,5 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
             receiver = connector.getReceiver(requestUri.toString());
         }
         return receiver;
-    }
-
-    protected Object parseRequest(InputStream is, Properties p) throws IOException {
-        RequestInputStream req = new RequestInputStream(is);
-        Object payload = null;
-        String startLine = null;
-        do {
-            try {
-                startLine = req.readline();
-            } catch (IOException e) {
-                logger.debug(e.getMessage());
-            }
-            if (startLine == null) return null;
-        } while (startLine.trim().length() == 0);
-
-        StringTokenizer tokenizer = new StringTokenizer(startLine);
-        String method = tokenizer.nextToken();
-        String request = tokenizer.nextToken();
-        String httpVersion = tokenizer.nextToken();
-
-        p.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, method);
-        p.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request);
-        p.setProperty(HttpConnector.HTTP_VERSION_PROPERTY, httpVersion);
-
-        // Read headers from the request as set them as properties on the event
-        readHeaders(req, p);
-
-        if (method.equals(HttpConstants.METHOD_GET)) {
-            payload = request.getBytes();
-        } else {
-            boolean multipart = p.getProperty(HttpConstants.HEADER_CONTENT_TYPE, "").indexOf("multipart/related") > -1;
-            String contentLengthHeader = p.getProperty(HttpConstants.HEADER_CONTENT_LENGTH, null);
-            String chunkedString = PropertiesHelper.getStringProperty(p, HttpConstants.HEADER_TRANSFER_ENCODING, null);
-            boolean chunked = "chunked".equalsIgnoreCase(chunkedString);
-            if (contentLengthHeader == null && !chunked) {
-                throw new IllegalStateException(HttpConstants.HEADER_CONTENT_LENGTH + " header must be set");
-            }
-
-            if (chunked) {
-                byte[] buffer = new byte[1024 * 32];
-                int length = -1;
-                ChunkedInputStream cis = new ChunkedInputStream(req);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                int offset = cis.read(buffer);
-                if(offset==-1) return null;
-                baos.write(buffer, 0, offset);
-                while (offset >= 0) {
-                    length = cis.read(buffer, offset, buffer.length);
-                    if (length == -1) {
-                        break;
-                    }
-                    baos.write(buffer, offset, length);
-                    offset += length;
-                }
-                payload = baos.toByteArray();
-            } else {
-                int contentLength = Integer.parseInt(contentLengthHeader);
-
-                if (multipart) {
-                    byte[] buffer = new byte[1024];
-
-                    payload = File.createTempFile("mime", ".att");
-                    ((File) payload).deleteOnExit();
-                    FileOutputStream os = new FileOutputStream((File) payload);
-
-                    int length = -1;
-                    int offset = 0;
-                    while (offset != contentLength) {
-                        buffer = new byte[1024];
-                        length = is.read(buffer);
-                        if (length != -1) {
-                            os.write(buffer, 0, length);
-                            offset += length;
-                        }
-                    }
-                    os.close();
-                } else {
-                    byte[] buffer = new byte[contentLength];
-
-                    int length = -1;
-                    int offset = req.read(buffer);
-                    while (offset >= 0 && offset < buffer.length) {
-                        length = req.read(buffer, offset, buffer.length - offset);
-                        if (length == -1) {
-                            break;
-                        }
-                        offset += length;
-                    }
-                    payload = buffer;
-                }
-            }
-        }
-        return payload;
-    }
-
-    private void readHeaders(RequestInputStream is, Properties p) throws IOException {
-        String currentKey = null;
-        while (true) {
-            String line = is.readline();
-            if ((line == null) || (line.length() == 0)) {
-                break;
-            }
-
-            if (!Character.isSpaceChar(line.charAt(0))) {
-                int index = line.indexOf(':');
-                if (index >= 0) {
-                    currentKey = line.substring(0, index).trim();
-                    if (currentKey.startsWith("X-" + MuleProperties.PROPERTY_PREFIX)) {
-                        currentKey = currentKey.substring(2);
-                    } else {
-                        // normalize incoming header if necessary
-                        String normalizedKey = (String) HttpConstants.ALL_HEADER_NAMES.get(currentKey);
-                        if (normalizedKey != null) {
-                            currentKey = normalizedKey;
-                        }
-                    }
-                    String value = line.substring(index + 1).trim();
-                    p.setProperty(currentKey, value);
-                }
-            } else if (currentKey != null) {
-                String value = p.getProperty(currentKey);
-                p.setProperty(currentKey, value + "\r\n\t" + line.trim());
-            }
-        }
-
     }
 }

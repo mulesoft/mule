@@ -13,7 +13,6 @@
  */
 package org.mule.management.mbeans;
 
-import org.mule.config.MuleProperties;
 import org.mule.management.agents.JmxAgent;
 import org.mule.tck.AbstractMuleJmxTestCase;
 import org.mule.umo.manager.UMOManager;
@@ -31,17 +30,14 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
     public void testUndeploy() throws Exception
     {
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "true");
-        final UMOManager manager = getManager();
+        final UMOManager manager = getManager(true);
         final UMOConnector connector = getTestConnector();
         connector.setName("TEST_CONNECTOR");
         final JmxAgent jmxAgent = new JmxAgent();
         jmxAgent.setUseInstanceIdAsDomain(false);
         manager.registerConnector(connector);
         manager.registerAgent(jmxAgent);
-
         manager.start();
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "false");
 
         Set mbeans = mBeanServer.queryMBeans(ObjectName.getInstance("org.mule:*"), null);
         assertEquals("Unexpected number of components registered in the domain.", 5, mbeans.size());

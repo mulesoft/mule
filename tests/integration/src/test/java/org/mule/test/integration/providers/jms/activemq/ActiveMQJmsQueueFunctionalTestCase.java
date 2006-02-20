@@ -14,12 +14,13 @@
 package org.mule.test.integration.providers.jms.activemq;
 
 import org.activemq.ActiveMQConnectionFactory;
+import org.activemq.broker.impl.BrokerContainerFactoryImpl;
+import org.activemq.store.vm.VMPersistenceAdapter;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsConstants;
 import org.mule.test.integration.providers.jms.AbstractJmsQueueFunctionalTestCase;
-import org.mule.umo.provider.UMOConnector;
 
-import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import java.util.HashMap;
 
 /**
@@ -29,20 +30,30 @@ import java.util.HashMap;
 
 public class ActiveMQJmsQueueFunctionalTestCase extends AbstractJmsQueueFunctionalTestCase
 {
-    protected ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+    protected ActiveMQConnectionFactory factory = null;
 
-    public Connection getConnection() throws Exception
+    public ConnectionFactory getConnectionFactory() throws Exception
     {
-        factory.setUseEmbeddedBroker(true);
-        factory.setBrokerURL("vm://localhost");
-        return factory.createQueueConnection();
+        if(factory==null) {
+            factory = new ActiveMQConnectionFactory();
+            factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
+            factory.setUseEmbeddedBroker(true);
+            factory.setBrokerURL("vm://localhost");
+            factory.start();
+        }
+        return factory;
     }
 
-    public UMOConnector createConnector() throws Exception
+    protected void doTearDown() throws Exception {
+        factory.stop();
+        factory=null;
+        super.doTearDown();
+    }
+
+    public JmsConnector createConnector() throws Exception
     {
         JmsConnector connector = new JmsConnector();
         connector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
-        connector.setConnectionFactory(factory);
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
 

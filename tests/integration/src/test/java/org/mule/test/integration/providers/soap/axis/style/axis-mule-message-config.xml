@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
+                                "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
+
+<mule-configuration id="Test_Server" version="1.0">
+	<mule-environment-properties synchronous="true"
+		serverUrl="http://localhost:60505" />
+	<agents>
+		<agent name="admin"
+			className="org.mule.impl.internal.admin.MuleAdminAgent" />
+		<agent name="RMI"
+			className="org.mule.management.agents.RmiRegistryAgent" />
+		<agent name="JMX"
+			className="org.mule.management.agents.JmxAgent">
+			<properties>
+				<property name="connectorServerUrl"
+					value="service:jmx:rmi:///jndi/rmi://localhost:1099/test-server"/>
+				<map name="connectorServerProperties">
+					<property name="jmx.remote.jndi.rebind"
+						value="true" />
+				</map>
+			</properties>
+		</agent>
+	</agents>
+
+	<model name="WebService_Test">
+		<!--
+			A Mule descriptor defines all the necessary information about how =our components will
+			interact with the framework, other components in the system and =xternal sources.
+			Please refer to the Configuration Guide for a full description of all =he parameters.
+		-->
+		<mule-descriptor name="ServiceEntryPoint"
+			implementation="org.mule.test.integration.providers.soap.axis.style.DefaultMessageService"
+			inboundEndpoint="axis:http://localhost:8088">
+			<properties>
+				<property name="style" value="Message" />
+		        <map name="axisOptions">
+		            <property name="wsdlServiceElement" value="testService"/>
+		        </map>
+   			</properties>
+		</mule-descriptor>
+	</model>
+</mule-configuration>

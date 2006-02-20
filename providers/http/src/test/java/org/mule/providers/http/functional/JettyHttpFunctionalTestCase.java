@@ -49,12 +49,7 @@ public class JettyHttpFunctionalTestCase extends HttpFunctionalTestCase
 
     protected UMOEndpointURI getOutDest()
     {
-        try {
-            return new MuleEndpointURI("jetty:http://localhost:60199");
-        } catch (MalformedEndpointException e) {
-            fail(e.getMessage());
-            return null;
-        }
+        return null;
     }
 
     protected UMOConnector createConnector() throws Exception

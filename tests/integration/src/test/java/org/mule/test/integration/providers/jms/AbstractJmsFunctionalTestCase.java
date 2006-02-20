@@ -20,15 +20,16 @@ import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaModel;
+import org.mule.providers.jms.JmsConnector;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpointURI;
-import org.mule.umo.provider.UMOConnector;
 
 import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.QueueConnection;
@@ -53,7 +54,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
     public static final long LOCK_WAIT = 20000;
 
-    protected UMOConnector connector;
+    protected JmsConnector connector;
     protected boolean callbackCalled = false;
     protected Connection cnn;
     protected Message currentMsg;
@@ -75,19 +76,26 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 
         MuleManager.getInstance().setModel(new SedaModel());
         callbackCalled = false;
-        cnn = getConnection();
+        ConnectionFactory cf = getConnectionFactory();
+
+        cnn = getSenderConnection();
         cnn.start();
         //drainDestinations();
         connector = createConnector();
+        connector.setConnectionFactory(cf);
         MuleManager.getInstance().registerConnector(connector);
         currentMsg = null;
         eventCount = 0;
     }
 
+    protected Connection getSenderConnection() throws Exception {
+        return getConnectionFactory().createConnection();
+    }
+
     protected void doTearDown() throws Exception
     {
         try {
-            cnn.close();
+            if(cnn!=null) cnn.close();
         } catch (JMSException e) {
         }
     }
@@ -104,7 +112,7 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
 //
 //    }
 
-    public abstract Connection getConnection() throws Exception;
+    public abstract ConnectionFactory getConnectionFactory() throws Exception;
 
     public void initialiseComponent(EventCallback callback) throws Exception
     {
@@ -182,5 +190,5 @@ public abstract class AbstractJmsFunctionalTestCase extends AbstractMuleTestCase
         return false;
     }
 
-    public abstract UMOConnector createConnector() throws Exception;
+    public abstract JmsConnector createConnector() throws Exception;
 }

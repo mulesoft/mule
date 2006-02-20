@@ -16,7 +16,7 @@ package org.mule.providers.jms;
 import org.mule.MuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 import javax.jms.JMSException;
 import java.io.IOException;
@@ -28,13 +28,12 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JmsExceptionReaderTestCase extends NamedTestCase {
+public class JmsExceptionReaderTestCase extends AbstractMuleTestCase {
 
     /**
      * Print the name of this test to standard output
      */
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void doSetUp() throws Exception {
         ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
     }
 

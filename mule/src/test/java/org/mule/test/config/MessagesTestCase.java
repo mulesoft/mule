@@ -13,17 +13,17 @@
  */
 package org.mule.test.config;
 
-import java.util.MissingResourceException;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
+
+import java.util.MissingResourceException;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class MessagesTestCase extends NamedTestCase
+public class MessagesTestCase extends AbstractMuleTestCase
 {
     public void testMessageLoading() throws Exception
     {

@@ -25,11 +25,11 @@ import org.mule.tck.AbstractScriptConfigBuilderTestCase;
  */
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
-    public String getConfigResource() {
+    public String getConfigResources() {
         return "org/mule/test/integration/config/mule-config.groovy";
     }
 
-    public ConfigurationBuilder getConfigBuilder() {
+    public ConfigurationBuilder getBuilder() {
        ScriptConfigurationBuilder builder = new ScriptConfigurationBuilder("groovy");
         return builder;
     }

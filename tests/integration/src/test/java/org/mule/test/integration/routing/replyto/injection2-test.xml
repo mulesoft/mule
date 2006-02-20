@@ -4,6 +4,32 @@
 
 <mule-configuration id="InjectionProblem" version="1.0">
 
+     <!-- embed Spring configuration to create a Jms Connection factory -->
+    <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                <bean id="jmsConnectionFactory"
+		class="org.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL"><value>vm://localhost</value></property>
+		<property name="useEmbeddedBroker"><value>true</value></property>
+	</bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
+
+    <!-- Testing with ActiveMq -->
+    <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
+        <properties>
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
+            <property name="specification" value="1.1"/>
+        </properties>
+    </connector>
+
     <!--
         The Mule model initialises and manages your UMO components
     -->
@@ -11,20 +37,7 @@
         <mule-descriptor name="pojo1"
             implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="vm://pojo1" remoteSync="true" remoteSyncTimeout="2000000"/>
-            </inbound-router>
-
-            <outbound-router>
-                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
-                    <endpoint address="jms://pojo1b"/>
-                </router>
-            </outbound-router>
-        </mule-descriptor>
-
-        <mule-descriptor name="pojo1b"
-            implementation="org.mule.components.simple.EchoComponent">
-            <inbound-router>
-                <endpoint address="jms://pojo1b" synchronous="true"/>
+                <endpoint address="vm://pojo1" remoteSync="true" remoteSyncTimeout="10000"/>
             </inbound-router>
 
             <outbound-router>
@@ -32,31 +45,45 @@
                     <endpoint address="jms://pojo2"/>
                 </router>
             </outbound-router>
-
-            <response-router timeout="1800000">
-                <endpoint address="jms://response"/>
-                <router className="org.mule.routing.response.SingleResponseRouter"/>
-            </response-router>
         </mule-descriptor>
 
         <mule-descriptor name="pojo2"
             implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
-                <endpoint address="jms://pojo2"/>
+                <endpoint address="jms://pojo2" synchronous="true"/>
             </inbound-router>
 
             <outbound-router>
                 <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
                     <endpoint address="jms://pojo3"/>
+                </router>
+            </outbound-router>
+
+            <response-router timeout="7000">
+                <endpoint address="jms://response"/>
+                <router className="org.mule.routing.response.SingleResponseRouter"/>
+            </response-router>
+        </mule-descriptor>
+
+        <mule-descriptor name="pojo3"
+            implementation="org.mule.components.simple.EchoComponent">
+            <inbound-router>
+                <endpoint address="jms://pojo3"/>
+            </inbound-router>
+
+            <outbound-router>
+                <router className="org.mule.routing.outbound.OutboundPassThroughRouter">
+                    <endpoint address="jms://pojo4"/>
                     <reply-to address="jms://response"/>
                 </router>
             </outbound-router>
         </mule-descriptor>
 
-        <mule-descriptor name="pojo3"
+        <!-- This component will append " Received" to the message so we know we're getting the correct one -->
+        <mule-descriptor name="pojo4"
             implementation="org.mule.test.integration.service.TestReceiver">
             <inbound-router>
-                <endpoint address="jms://pojo3"/>
+                <endpoint address="jms://pojo4"/>
             </inbound-router>
         </mule-descriptor>
     </model>

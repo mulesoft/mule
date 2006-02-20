@@ -14,13 +14,13 @@
 package org.mule.test.filters;
 
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class WildcardFilterTestCase extends NamedTestCase
+public class WildcardFilterTestCase extends AbstractMuleTestCase
 {
     public void testWildcardFilterPostfix()
     {

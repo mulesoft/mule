@@ -18,14 +18,14 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.filters.logic.OrFilter;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class LogicFiltersTestCase extends NamedTestCase
+public class LogicFiltersTestCase extends AbstractMuleTestCase
 {
     public void testAndFilter()
     {

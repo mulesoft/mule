@@ -17,7 +17,7 @@ import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 import org.apache.commons.beanutils.Converter;
 import org.mule.MuleManager;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.manager.UMOManager;
 
 /**
@@ -25,9 +25,8 @@ import org.mule.umo.manager.UMOManager;
  * @version $Revision$
  */
 
-public abstract class AbstractConverterTestCase extends NamedTestCase
+public abstract class AbstractConverterTestCase extends AbstractMuleTestCase
 {
-    protected Mock mockManager = new Mock(UMOManager.class);
 
     public void testnullConverter()
     {
@@ -50,18 +49,23 @@ public abstract class AbstractConverterTestCase extends NamedTestCase
 
     public void testValidConversion()
     {
+        Mock mockManager = new Mock(UMOManager.class);
+        try {
+            MuleManager.setInstance((UMOManager) mockManager.proxy());
+            Object obj = getValidConvertedType();
+            mockManager.expectAndReturn(getLookupMethod(), C.eq("test://Test"), obj);
+            Object result = getConverter().convert(obj.getClass(), "test://Test");
 
-        MuleManager.setInstance((UMOManager) mockManager.proxy());
-        Object obj = getValidConvertedType();
-        mockManager.expectAndReturn(getLookupMethod(), C.eq("test://Test"), obj);
-        Object result = getConverter().convert(obj.getClass(), "test://Test");
-
-        assertNotNull(result);
-        mockManager.verify();
+            assertNotNull(result);
+            mockManager.verify();
+        } finally {
+            MuleManager.setInstance(null);
+        }
     }
 
     public void testInvalidConversion()
     {
+        Mock mockManager = new Mock(UMOManager.class);        
         MuleManager.setInstance((UMOManager) mockManager.proxy());
         Object obj = getValidConvertedType();
         mockManager.expectAndReturn(getLookupMethod(), C.eq("TestBad"), null);
@@ -71,6 +75,8 @@ public abstract class AbstractConverterTestCase extends NamedTestCase
         } catch (Exception e) {
             // exprected
             mockManager.verify();
+        } finally {
+            MuleManager.setInstance(null);
         }
 
     }

@@ -16,7 +16,9 @@ package org.mule.providers.http.servlet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.providers.WriterMessageAdapter;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.HttpResponse;
 import org.mule.umo.UMOMessage;
 
 import javax.servlet.ServletConfig;
@@ -46,7 +48,7 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     public static final String DEFAULT_PAYLOAD_PARAMETER_NAME = "payload";
 
 
-    public static final long DEFAULT_GET_TIMEOUT = 20000L;
+    public static final long DEFAULT_GET_TIMEOUT = 10000L;
 
     protected String payloadParameterName;
     protected long timeout = DEFAULT_GET_TIMEOUT;
@@ -98,29 +100,37 @@ public abstract class AbstractReceiverServlet extends HttpServlet
     }
 
 
-    protected void writeResponse(HttpServletResponse response, UMOMessage message) throws Exception
+    protected void writeResponse(HttpServletResponse servletResponse, UMOMessage message) throws Exception
     {
         if (message == null) {
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            servletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
             if (feedback) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write("Action was processed successfully. There was no result");
+                servletResponse.setStatus(HttpServletResponse.SC_OK);
+                servletResponse.getWriter().write("Action was processed successfully. There was no result");
             }
         } else {
-            String contentType = (String) message.getProperty("Content-Type");
+            HttpResponse httpResponse = null;
+            if(message.getAdapter() instanceof WriterMessageAdapter) {
+                WriterMessageAdapter adapter = (WriterMessageAdapter)message.getAdapter();
+                httpResponse = new HttpResponse();
+                httpResponse.setBodyString(adapter.getPayloadAsString());
+            } else {
+                httpResponse = (HttpResponse)message.getPayload();
+            }
+
+            String contentType = httpResponse.getFirstHeader("Content-Type").getValue();
             if (contentType == null)
                 contentType = defaultContentType;
             if (!contentType.startsWith("text")) {
-                response.setContentType(contentType);
-                response.getOutputStream().write(message.getPayloadAsBytes());
+                servletResponse.setContentType(contentType);
+                servletResponse.getOutputStream().write(httpResponse.getBodyBytes());
             } else {
-                response.setContentType(contentType);
-                response.getWriter().write(message.getPayloadAsString());
+                servletResponse.setContentType(contentType);
+                servletResponse.getWriter().write(httpResponse.getBodyString());
             }
-            response.setStatus(HttpServletResponse.SC_OK);
+            servletResponse.setStatus(HttpServletResponse.SC_OK);
         }
     }
-
 
     protected void handleException(Throwable exception, String message, HttpServletResponse response)
     {

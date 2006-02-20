@@ -13,9 +13,8 @@
  */
 package org.mule.test.routing.outbound;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleMessage;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.routing.LoggingCatchAllStrategy;
@@ -23,14 +22,15 @@ import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.routing.RoutingException;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -41,7 +41,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 {
     public void testOutboundMessageRouter() throws Exception
     {
-        Mock session = getMockSession();
+        Mock session = MuleTestUtils.getMockSession();
         session.expectAndReturn("getComponent", getTestComponent(getTestDescriptor("test", "blah")));
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());

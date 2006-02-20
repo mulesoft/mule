@@ -13,34 +13,23 @@
  */
 package org.mule.extras.pgp;
 
+import org.mule.extras.client.MuleClient;
+import org.mule.tck.FunctionalTestCase;
+import org.mule.umo.security.UnauthorisedException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
-
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
-import org.mule.umo.security.UnauthorisedException;
 
 /**
  * @author ariva
  * 
  */
-public class PGPSecurityFilterTestCase extends NamedTestCase
+public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
 
-    public void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("test-pgp-encrypt-config.xml");
-    }
-
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
+    protected String getConfigResources() {
+        return "test-pgp-encrypt-config.xml";
     }
 
     public void testAuthenticationAuthorised() throws Exception

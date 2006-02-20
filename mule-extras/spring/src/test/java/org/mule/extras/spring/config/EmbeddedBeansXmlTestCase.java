@@ -14,9 +14,7 @@
 package org.mule.extras.spring.config;
 
 import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.manager.ObjectNotFoundException;
 import org.mule.umo.manager.UMOContainerContext;
 
@@ -24,22 +22,21 @@ import org.mule.umo.manager.UMOContainerContext;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EmbeddedBeansXmlTestCase extends NamedTestCase
+public class EmbeddedBeansXmlTestCase extends FunctionalTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        System.setProperty("org.mule.xml.validate", "false");
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("test-embedded-spring-config.xml");
+
+    protected String getConfigResources() {
+        return "test-embedded-spring-config.xml";
     }
 
-    protected void tearDown() throws Exception
+    protected void doFunctionalSetUp() throws Exception
+    {
+        System.setProperty("org.mule.xml.validate", "false");
+    }
+
+    protected void doFunctionalTearDown() throws Exception
     {
         System.setProperty("org.mule.xml.validate", "true");
-        super.tearDown();
     }
 
     public void testContainer() throws Exception

@@ -13,10 +13,9 @@
  */
 package org.mule.management.mbeans;
 
-import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.AbstractMuleJmxTestCase;
+import org.mule.umo.manager.UMOManager;
 
 import javax.management.ObjectName;
 import java.util.Set;
@@ -32,16 +31,12 @@ public class ComponentServiceTestCase extends AbstractMuleJmxTestCase
     {
         final String domainOriginal = "TEST_DOMAIN_1";
 
-
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "true");
-        MuleManager manager = (MuleManager) getManager();
+        UMOManager manager = getManager(true);
         final MuleDescriptor descriptor = new MuleDescriptor("TEST_SERVICE");
         descriptor.setImplementation(new Object());
         manager.getModel().registerComponent(descriptor);
 
         manager.start();
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "false");
-
         final ComponentService service = new ComponentService("TEST_SERVICE");
         final ObjectName name = ObjectName.getInstance(domainOriginal + ":type=TEST_SERVICE");
         mBeanServer.registerMBean(service, name);

@@ -20,7 +20,6 @@ import org.mule.umo.MessagingException;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-
 import java.util.Collections;
 import java.util.Map;
 
@@ -84,7 +83,7 @@ public class DefaultRedeliveryHandler implements RedeliveryHandler
                         + " times, which exceeds the maxRedelivery setting on the connector");
             }
             JmsMessageAdapter adapter = (JmsMessageAdapter) connector.getMessageAdapter(message);
-            throw new MessageRedeliveredException(adapter);
+            throw new MessageRedeliveredException(new org.mule.config.i18n.Message("jms", 11, id, String.valueOf(i.intValue() + 1)), adapter);
 
         } else {
             messages.put(id, new Integer(i.intValue() + 1));

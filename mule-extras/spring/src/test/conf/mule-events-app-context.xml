@@ -17,6 +17,9 @@
 -->
 <beans>
 
+    <bean id="environmentProperties" class="org.mule.config.MuleConfiguration">
+          <property name="serverUrl" value=""/>
+    </bean>
     <!-- The Mule implementation of ApplicationEventMulticaster.  On startup the application
     context will look in the container for a bean called applicationEventMulticaster and
     register it as the spring context event multicaster -->

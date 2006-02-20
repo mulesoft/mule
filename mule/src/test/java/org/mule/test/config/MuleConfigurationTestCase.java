@@ -15,7 +15,7 @@ package org.mule.test.config;
 
 import org.mule.config.MuleConfiguration;
 import org.mule.config.PoolingProfile;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.ObjectPool;
 
 /**
@@ -23,7 +23,7 @@ import org.mule.util.ObjectPool;
  * @version $Revision$
  */
 
-public class MuleConfigurationTestCase extends NamedTestCase
+public class MuleConfigurationTestCase extends AbstractMuleTestCase
 {
     public void testconfigurationDefaults()
     {

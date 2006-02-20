@@ -22,6 +22,7 @@ import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.routing.outbound.OutboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
@@ -42,7 +43,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 {
     public void testFilteringOutboundRouter() throws Exception
     {
-        Mock session = getMockSession();
+        Mock session = MuleTestUtils.getMockSession();
         OutboundMessageRouter messageRouter = new OutboundMessageRouter();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());
 

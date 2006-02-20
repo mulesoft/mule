@@ -13,13 +13,12 @@
  */
 package org.mule.test.integration.models;
 
-import org.mule.MuleManager;
 import org.mule.components.simple.EchoComponent;
 import org.mule.components.simple.StaticComponent;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.vm.VMConnector;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.model.UMOModel;
 
@@ -34,15 +33,8 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractPipelineTestCase extends NamedTestCase
+public abstract class AbstractPipelineTestCase extends AbstractMuleTestCase
 {
-    protected void setUp() throws Exception {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-    }
-
-    protected void tearDown() throws Exception {
-        MuleManager.getInstance().dispose();
-    }
 
     protected abstract String getModelType();
 

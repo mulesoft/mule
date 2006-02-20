@@ -14,14 +14,14 @@
 package org.mule.test.providers.email;
 
 import org.mule.providers.email.MailUtils;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 import javax.mail.internet.InternetAddress;
 
 /**
  * @author <a href="mailto:aperepel@itci.com">Andrew Perepelytsya</a>
  */
-public class MailUtilsTestCase extends NamedTestCase
+public class MailUtilsTestCase extends AbstractMuleTestCase
 {
     private static final String EMAIL_1 = "vasya@pupkin.com";
     private static final String EMAIL_2 = "zhora@buryakov.com";
@@ -31,9 +31,8 @@ public class MailUtilsTestCase extends NamedTestCase
     private static final String MULTIPLE_EMAILS_WITHOUT_WHITESPACE = EMAIL_1 + "," + EMAIL_2;
 
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         inetAddress1 = new InternetAddress(EMAIL_1);
         inetAddress2 = new InternetAddress(EMAIL_2);
     }

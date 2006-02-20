@@ -14,27 +14,21 @@
 
 package org.mule.test.usecases.http;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
- * TODO: document this class 
- *
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpPostTestCase extends NamedTestCase {
+public class HttpPostTestCase extends FunctionalTestCase {
 
-    protected void setUp() throws Exception
-    {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("http-post.xml");
+
+    protected String getConfigResources() {
+        return "http-post.xml";
     }
-	
+
     public void testPost() throws Exception
     {
         MuleClient client = new MuleClient();

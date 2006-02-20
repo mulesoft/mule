@@ -15,14 +15,14 @@ package org.mule.providers.space;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
  * @version $Revision$
  */
 
-public class SpaceConnectorFactoryTestCase extends NamedTestCase
+public class SpaceConnectorFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreateFromFactory() throws Exception
     {

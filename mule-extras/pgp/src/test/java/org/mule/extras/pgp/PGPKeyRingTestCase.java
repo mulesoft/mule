@@ -13,29 +13,26 @@
  */
 package org.mule.extras.pgp;
 
-import java.net.URL;
-
-import org.mule.tck.NamedTestCase;
-
 import cryptix.pki.KeyBundle;
+import org.mule.tck.AbstractMuleTestCase;
+
+import java.net.URL;
 
 /**
  * @author ariva
  * 
  */
-public class PGPKeyRingTestCase extends NamedTestCase
+public class PGPKeyRingTestCase extends AbstractMuleTestCase
 {
     private PGPKeyRing keyManager;
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.tck.NamedTestCase#setUp()
+     * @see org.mule.tck.AbstractMuleTestCase#setUp()
      */
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
-
         PGPKeyRingImpl keyM = new PGPKeyRingImpl();
         URL url;
 
@@ -55,13 +52,10 @@ public class PGPKeyRingTestCase extends NamedTestCase
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.tck.NamedTestCase#tearDown()
+     * @see org.mule.tck.AbstractMuleTestCase#tearDown()
      */
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
-        // TODO Auto-generated method stub
-        super.tearDown();
-
         keyManager = null;
     }
 

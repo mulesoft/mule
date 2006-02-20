@@ -17,7 +17,7 @@
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-javamail</artifactId>
-            <version>1.3.1-rc4</version>
+            <version>1.3.1-rc5</version>
         </dependency>
     </dependencies>
 </project>

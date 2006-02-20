@@ -19,7 +19,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.SynchronousQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.mule.impl.work.MuleWorkManager;
 import org.mule.umo.manager.UMOWorkManager;
 import org.mule.util.concurrent.WaitPolicy;
@@ -253,6 +252,7 @@ public class ThreadingProfile
 
     public void configurePool(ThreadPoolExecutor pool)
     {
+        if(maxThreadsActive < maxThreadsIdle) maxThreadsIdle = maxThreadsActive;
         pool.setCorePoolSize(maxThreadsIdle);
         pool.setMaximumPoolSize(maxThreadsActive);
         pool.setKeepAliveTime(threadTTL, TimeUnit.MILLISECONDS);

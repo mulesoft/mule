@@ -14,13 +14,11 @@
 */
 package org.mule.test.usecases.axis;
 
-import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.soap.NamedParameter;
 import org.mule.providers.soap.SoapMethod;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import javax.xml.namespace.QName;
@@ -34,17 +32,13 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AxisClientWithComplexTypesTestCase extends NamedTestCase
+public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
  {
     private Trade trade = null;
     private String uri = "axis:http://localhost:8081/services/BackOfficeImplBindingImplUMO?method=submitTrade";
 
-    protected void setUp() throws Exception
+    protected void doFunctionalSetUp() throws Exception
     {
-        if (MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("axis-client-test.xml");
-
         trade = new Trade();
         trade.setAccountID(11);
         trade.setCusip("33");
@@ -52,6 +46,10 @@ public class AxisClientWithComplexTypesTestCase extends NamedTestCase
         trade.setTradeID(22);
         trade.setTransaction(11);
 
+    }
+
+    protected String getConfigResources() {
+        return "axis-client-test.xml";
     }
 
     public void testSendComplexDOCLIT() throws Exception {

@@ -17,7 +17,7 @@ import com.fs.utils.DOMUtils;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.util.ClassHelper;
 import org.w3c.dom.Document;
@@ -32,7 +32,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class PxeAsyncTestCase extends NamedTestCase
+public class PxeAsyncTestCase extends AbstractMuleTestCase
 {
     public void setUp() throws Exception
     {

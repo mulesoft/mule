@@ -14,6 +14,7 @@
  */
 package org.mule.providers.jms;
 
+import org.mule.config.i18n.Message;
 import org.mule.umo.MessagingException;
 
 /**
@@ -26,5 +27,11 @@ public class MessageRedeliveredException extends MessagingException
     {
         super(new org.mule.config.i18n.Message("jms", 7, (jmsMessage == null ? "[null message]"
                 : jmsMessage.getUniqueId())), jmsMessage);
+    }
+
+    public MessageRedeliveredException(Message message, JmsMessageAdapter jmsMessage)
+    {
+        super(message.setNextMessage(new org.mule.config.i18n.Message("jms", 7, (jmsMessage == null ? "[null message]"
+                : jmsMessage.getUniqueId()))), jmsMessage);
     }
 }

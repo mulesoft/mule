@@ -13,7 +13,7 @@
  */
 package org.mule.extras.tyrex;
 
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.ClassHelper;
 
 import javax.transaction.TransactionManager;
@@ -24,7 +24,7 @@ import java.io.InputStream;
  * @version $Revision$
  */
 
-public class TyrexTransactionManagerFactoryTestCase extends NamedTestCase
+public class TyrexTransactionManagerFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreateTransactionManager() throws Exception
     {

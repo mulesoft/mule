@@ -16,6 +16,9 @@ package org.mule.test.integration.providers.jms.activemq;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.activemq.ActiveMQConnectionFactory;
+import org.activemq.broker.impl.BrokerContainerFactoryImpl;
+import org.activemq.store.vm.VMPersistenceAdapter;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -29,30 +32,23 @@ import org.mule.impl.model.seda.SedaModel;
 import org.mule.providers.SimpleRetryConnectionStrategy;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.providers.jms.JmsConstants;
-import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.test.integration.ServerTools;
 import org.mule.test.integration.providers.jms.AbstractJmsFunctionalTestCase;
-import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
-import org.mule.test.integration.service.TestReceiver;
 import org.mule.umo.UMOComponent;
-import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.manager.UMOServerNotification;
-import org.mule.umo.provider.UMOConnector;
 
-import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * This test needs the path to an activemq distribution.
  *
- * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
+ * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  */
 public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase implements ConnectionNotificationListener {
 
@@ -61,6 +57,19 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
 
     private long TIME_OUT = 10000L;
     public static final String BROKER_URL = "tcp://localhost:56312";
+
+    protected ActiveMQConnectionFactory factory = null;
+
+    public ConnectionFactory getConnectionFactory() throws Exception
+    {
+        if(factory==null) {
+            factory = new ActiveMQConnectionFactory();
+            factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
+            factory.setBrokerURL(BROKER_URL);
+            factory.start();
+        }
+        return factory;
+    }
 
     protected void doSetUp() throws Exception {
         // By default the JmsTestUtils use the openjms config, though you can
@@ -83,23 +92,33 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         builder.registerComponent(FunctionalTestComponent.class.getName(), "testJmsReconnection", getRecieverEndpoint("jms://reconnect.queue"), null, null);
     }
 
-    protected UMOEndpoint getRecieverEndpoint(String URI) throws UMOException {
-        return new MuleEndpoint(URI, true);
+    /**
+     * Use this method to do any validation such as check for an installation of a required server
+     * If the current environment does not have the preReqs of the test return false and the test will
+     * be skipped.
+     *
+     * @return
+     */
+    protected String checkPreReqs() {
+        if(System.getProperty(ServerTools.ACTIVEMQ_HOME, null)!=null) {
+            return null;
+        } else {
+            return "You must set the " + ServerTools.ACTIVEMQ_HOME + " system property to the root path of an ActiveMq distribution (v3.0 and greater) before running these tests";
+        }
     }
 
     protected void doTearDown() throws Exception {
         ServerTools.killActiveMq();
     }
 
-    public UMOConnector createConnector() throws Exception {
+    protected UMOEndpoint getRecieverEndpoint(String URI) throws UMOException {
+        return new MuleEndpoint(URI, true);
+    }
+
+    public JmsConnector createConnector() throws Exception {
         connector = new JmsConnector();
         connector.setSpecification(JmsConstants.JMS_SPECIFICATION_11);
-        Properties props = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
-        connector.setConnectionFactoryJndiName("JmsQueueConnectionFactory");
-        Properties factoryProps = new Properties();
-        factoryProps.setProperty("brokerURL", BROKER_URL);
-        connector.setJndiProviderProperties(props);
-        connector.setConnectionFactoryProperties(factoryProps);
+        connector.setConnectionFactory(getConnectionFactory());
         connector.setName(CONNECTOR_NAME);
         connector.getDispatcherThreadingProfile().setDoThreading(false);
 
@@ -112,15 +131,10 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         return connector;
     }
 
-    public Connection getConnection() throws Exception {
-        // default to ActiveMq for Jms 1.1 support
-        Properties p = JmsTestUtils.getJmsProperties(JmsTestUtils.ACTIVE_MQ_JMS_PROPERTIES);
-        p.setProperty("brokerURL", BROKER_URL);
-        return JmsTestUtils.getQueueConnection(p);
-    }
-
     public void testReconnection() throws Exception {
 
+        if(!isPrereqsMet("org.mule.test.integration.providers.jms.activemq.JmsReconnectionTestCase.testReconnection()")) return;
+        
         MuleDescriptor d = getTestDescriptor("anOrange", Orange.class.getName());
 
         UMOComponent component = MuleManager.getInstance().getModel().registerComponent(d);
@@ -140,7 +154,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         // Check that connection fails
         t0 = System.currentTimeMillis();
         while (true) {
-            ConnectionNotification event = (ConnectionNotification) events.take();
+            ConnectionNotification event = (ConnectionNotification) events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
             if (event == null) {
                 fail("no notification event was received");
             }
@@ -158,7 +172,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         // Check that connection succeed
         t0 = System.currentTimeMillis();
         while (true) {
-            ConnectionNotification event = (ConnectionNotification) events.take();
+            ConnectionNotification event = (ConnectionNotification)  events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
             if (event.getAction() == ConnectionNotification.CONNECTION_CONNECTED) {
                 break;
             }
@@ -188,7 +202,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         // Check that the connection is lost
         t0 = System.currentTimeMillis();
         while (true) {
-            ConnectionNotification event = (ConnectionNotification) events.take();
+            ConnectionNotification event = (ConnectionNotification)  events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
             if (event.getAction() == ConnectionNotification.CONNECTION_DISCONNECTED) {
                 break;
             }
@@ -202,7 +216,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
         // Check that connection succeed
         t0 = System.currentTimeMillis();
         while (true) {
-            ConnectionNotification event = (ConnectionNotification) events.take();
+            ConnectionNotification event = (ConnectionNotification) events.poll(TIME_OUT, TimeUnit.MILLISECONDS);
             if (event.getAction() == ConnectionNotification.CONNECTION_CONNECTED) {
                 break;
             }

@@ -15,7 +15,7 @@ package org.mule.impl.space;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.space.UMOSpace;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.TransactionalQueueManager;
@@ -25,7 +25,7 @@ import org.mule.util.xa.AbstractResourceManager;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class AbstractLocalSpaceTestCase extends NamedTestCase {
+public abstract class AbstractLocalSpaceTestCase extends AbstractMuleTestCase {
 
     /**
      * logger used by this class

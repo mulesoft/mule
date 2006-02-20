@@ -13,29 +13,26 @@
  */
 package org.mule.extras.pgp;
 
-import java.io.FileInputStream;
-import java.net.URL;
-
-import org.mule.tck.NamedTestCase;
-import org.mule.umo.security.UMOAuthentication;
-
 import cryptix.message.Message;
 import cryptix.message.MessageFactory;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.umo.security.UMOAuthentication;
+
+import java.io.FileInputStream;
+import java.net.URL;
 
 /**
  * @author ariva
  * 
  */
-public class PGPSecurityProviderTestCase extends NamedTestCase
+public class PGPSecurityProviderTestCase extends AbstractMuleTestCase
 {
     private PGPSecurityProvider securityProvider;
 
     private Message message;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
-
         PGPKeyRingImpl keyM = new PGPKeyRingImpl();
         URL url;
 
@@ -66,13 +63,10 @@ public class PGPSecurityProviderTestCase extends NamedTestCase
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.tck.NamedTestCase#tearDown()
+     * @see org.mule.tck.AbstractMuleTestCase#tearDown()
      */
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
-        // TODO Auto-generated method stub
-        super.tearDown();
-
         securityProvider = null;
         message = null;
     }

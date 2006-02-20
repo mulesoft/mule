@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.codehaus.mule</groupId>
+		<artifactId>mule-providers</artifactId>
+		<relativePath>../pom.xml</relativePath>
+		<version>2.0-SNAPSHOT</version>
+	</parent>
+    <artifactId>mule-glue-provider</artifactId>
+	<packaging>jar</packaging>
+    <name>Glue Provider</name>
+    <description>A Mule provider for Soap Connectivity using Web Methods Glue. for more information see the
+        <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.</description>
+    <dependencies>
+        <!-- needed by the Axis Service component -->
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-soap-provider</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>glue</groupId>
+            <artifactId>glue</artifactId>
+            <version>5.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+	</dependencies>
+</project>

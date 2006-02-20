@@ -17,7 +17,7 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.email.Pop3Connector;
 import org.mule.providers.email.SmtpConnector;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.provider.UMOConnector;
 
 /**
@@ -25,7 +25,7 @@ import org.mule.umo.provider.UMOConnector;
  * @version $Revision$
  */
 
-public class ConnectorFactoryTestCase extends NamedTestCase
+public class ConnectorFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreatePop3Connector() throws Exception
     {

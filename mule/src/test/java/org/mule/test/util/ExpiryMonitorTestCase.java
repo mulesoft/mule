@@ -13,7 +13,7 @@
  */
 package org.mule.test.util;
 
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
@@ -21,11 +21,11 @@ import org.mule.util.monitor.ExpiryMonitor;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ExpiryMonitorTestCase extends NamedTestCase
+public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 {
     private boolean expired = false;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
         expired = false;
     }

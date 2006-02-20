@@ -49,12 +49,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected UMOEndpointURI getOutDest()
     {
-        try {
-            return new MuleEndpointURI("http://localhost:60199");
-        } catch (MalformedEndpointException e) {
-            fail(e.getMessage());
-            return null;
-        }
+       return null;
     }
 
     protected UMOConnector createConnector() throws Exception

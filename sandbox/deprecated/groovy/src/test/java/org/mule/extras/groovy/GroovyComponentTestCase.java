@@ -16,7 +16,7 @@ package org.mule.extras.groovy;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
@@ -24,7 +24,7 @@ import org.mule.umo.UMOMessage;
  * @version $Revision$
  * 
  */
-public class GroovyComponentTestCase extends NamedTestCase
+public class GroovyComponentTestCase extends AbstractMuleTestCase
 {
     public void setUp() throws Exception
     {

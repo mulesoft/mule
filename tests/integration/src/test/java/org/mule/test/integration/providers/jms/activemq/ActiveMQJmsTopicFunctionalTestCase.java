@@ -22,8 +22,6 @@ package org.mule.test.integration.providers.jms.activemq;
 
 public class ActiveMQJmsTopicFunctionalTestCase extends ActiveMQJmsQueueFunctionalTestCase
 {
-     
-
     public boolean useTopics()
     {
         return true;

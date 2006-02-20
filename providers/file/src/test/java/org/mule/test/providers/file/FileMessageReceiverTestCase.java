@@ -18,6 +18,7 @@ package org.mule.test.providers.file;
 import com.mockobjects.dynamic.Mock;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.file.FileMessageReceiver;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.AbstractMessageReceiverTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -35,7 +36,7 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     File read = new File("testcasedata/read");
     File move = new File("testcasedata/move");
-    Mock session = getMockSession();
+    Mock session = MuleTestUtils.getMockSession();
 
     public void testReceiver() throws Exception
     {

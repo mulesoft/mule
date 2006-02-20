@@ -13,16 +13,15 @@
  */
 package org.mule.extras.spring.transaction;
 
-import org.mule.tck.NamedTestCase;
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOTransaction;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
-public class SpringTransactionFactoryTestCase extends NamedTestCase
+public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
 {
 
     public void testCommit() throws Exception

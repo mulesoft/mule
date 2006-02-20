@@ -41,7 +41,7 @@ import java.util.Map;
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
- * @AutowireUMOManagerFactoryBean
+ * @see AutowireUMOManagerFactoryBean
  */
 public class UMOManagerFactoryBean implements FactoryBean, InitializingBean, DisposableBean
 {

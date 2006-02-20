@@ -13,30 +13,27 @@
  */
 package org.mule.extras.pgp;
 
+import org.mule.tck.AbstractMuleTestCase;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
-
-import org.mule.tck.NamedTestCase;
 
 /**
  * @author ariva
  * 
  */
-public class KeyBasedEncryptionStrategyTestCase extends NamedTestCase
+public class KeyBasedEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
     private KeyBasedEncryptionStrategy kbStrategy;
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.tck.NamedTestCase#setUp()
+     * @see org.mule.tck.AbstractMuleTestCase#setUp()
      */
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        // TODO Auto-generated method stub
-        super.setUp();
-
         PGPKeyRingImpl keyM = new PGPKeyRingImpl();
         URL url;
 
@@ -53,19 +50,15 @@ public class KeyBasedEncryptionStrategyTestCase extends NamedTestCase
         kbStrategy = new KeyBasedEncryptionStrategy();
         kbStrategy.setKeyManager(keyM);
         kbStrategy.initialise();
-
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.mule.tck.NamedTestCase#tearDown()
+     * @see org.mule.tck.AbstractMuleTestCase#tearDown()
      */
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
-        // TODO Auto-generated method stub
-        super.tearDown();
-
         kbStrategy = null;
     }
 

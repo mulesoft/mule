@@ -20,9 +20,9 @@ import net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider;
 import net.sf.acegisecurity.providers.dao.User;
 import net.sf.acegisecurity.providers.dao.memory.InMemoryDaoImpl;
 import net.sf.acegisecurity.providers.dao.memory.UserMap;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.mule.components.simple.EchoComponent;
 import org.mule.config.ConfigurationBuilder;
@@ -54,8 +54,6 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
         QuickConfigurationBuilder builder = null;
         builder = new QuickConfigurationBuilder(true);
         UMOManager manager = builder.createStartedManager(true, "");
-        manager.setProperty("http.keepAlive", "true");
-        manager.setProperty("http.keepAliveTimeout", "1000");
         manager.setSecurityManager(sm);
         UMODescriptor d = builder.createDescriptor(EchoComponent.class.getName(),
                                                    "echo",
@@ -95,7 +93,7 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
     public void testAuthenticationFailureNoContext() throws Exception
     {
         HttpClient client = new HttpClient();
-        client.getState().setAuthenticationPreemptive(true);
+        client.getParams().setAuthenticationPreemptive(true);
         GetMethod get = new GetMethod("http://localhost:4567/index.html");
 
         get.setDoAuthentication(false);
@@ -146,18 +144,13 @@ public class HttpBasicEndpointFilterTestCase extends FunctionalTestCase
                            int result) throws Exception
     {
         HttpClient client = new HttpClient();
-
-        client.getState().setAuthenticationPreemptive(preemtive);
-
-        client.getState().setCredentials(realm, host, new UsernamePasswordCredentials(user, pass));
-
+        client.getParams().setAuthenticationPreemptive(preemtive);
+        client.getState().setCredentials(new AuthScope(host, -1, realm), new UsernamePasswordCredentials(user, pass));
         GetMethod get = new GetMethod(url);
-
         get.setDoAuthentication(handshake);
 
         try {
             int status = client.executeMethod(get);
-
             assertEquals(result, status);
             System.out.println(status + Utility.CRLF + get.getResponseBodyAsString());
 

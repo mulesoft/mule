@@ -14,14 +14,14 @@
 package org.mule.providers.space;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
  * @version $Revision$
  */
 
-public class SpaceEndpointTestCase extends NamedTestCase
+public class SpaceEndpointTestCase extends AbstractMuleTestCase
 {
     public void testHostPortUrl() throws Exception
     {

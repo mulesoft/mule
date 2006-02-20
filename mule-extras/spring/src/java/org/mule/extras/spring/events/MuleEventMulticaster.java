@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.MuleRuntimeException;
+import org.mule.config.MuleConfiguration;
 import org.mule.config.ThreadingProfile;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.config.i18n.Message;
@@ -462,6 +463,10 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                 return;
             }
             UMOManager manager = MuleManager.getInstance();
+            Map map = applicationContext.getBeansOfType(MuleConfiguration.class);
+            if(map!=null && map.size() > 0) {
+                MuleManager.setConfiguration((MuleConfiguration)map.values().iterator().next());
+            }
             if (!manager.isStarted()) {
                 MuleManager.getConfiguration().setSynchronous(!asynchronous);
                 // register any endpointUri mappings

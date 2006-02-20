@@ -25,8 +25,7 @@
         <mule-descriptor name="EchoUMO"
             inboundEndpoint="test://in"
             outboundEndpoint="test://out"
-            implementation="org.mule.components.simple.EchoComponent"
-            containerManaged="false">
+            implementation="org.mule.components.simple.EchoComponent">
         </mule-descriptor>
     </model>
 </mule-configuration>

@@ -13,20 +13,23 @@
  */
 package org.mule.providers.http.transformers;
 
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpVersion;
 import org.mule.MuleManager;
 import org.mule.config.MuleProperties;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
 import org.mule.providers.http.HttpConstants;
+import org.mule.providers.http.HttpResponse;
 import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -35,18 +38,18 @@ import java.util.Map;
 /**
  * <code>UMOMessageToHttpResponse</code> converts a UMOMEssage into an Http
  * response.
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
-{
+public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer {
+
+    public static final String CUSTOM_HEADER_PREFIX = "X-";
     private SimpleDateFormat format = null;
     private String server = null;
 
-    public UMOMessageToHttpResponse()
-    {
+    public UMOMessageToHttpResponse() {
         registerSourceType(Object.class);
         setReturnClass(Object.class);
 
@@ -54,61 +57,103 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
 
         //When running with the source code, Meta information is not set
         //so product name and version are not available, hence we hard code
-        if(MuleManager.getConfiguration().getProductName()==null) {
+        if (MuleManager.getConfiguration().getProductName() == null) {
             server = "Mule/SNAPSHOT";
         } else {
             server = MuleManager.getConfiguration().getProductName() + "/"
-                + MuleManager.getConfiguration().getProductVersion();
+                    + MuleManager.getConfiguration().getProductVersion();
         }
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException
-    {
+    public Object transform(Object src, UMOEventContext context) throws TransformerException {
         //Note this transformer excepts Null as we must always return a result from the Http
         //connector if a response transformer is present
-        if(src instanceof NullPayload) src = Utility.EMPTY_STRING;
+        if (src instanceof NullPayload) src = Utility.EMPTY_STRING;
+
+        try {
+            HttpResponse response = null;
+            if(src instanceof HttpResponse) {
+                response = (HttpResponse)src;
+            } else {
+                response = createResponse(src, context);
+            }
+
+            // Ensure there's a content type header
+            if (!response.containsHeader(HttpConstants.HEADER_CONTENT_TYPE)) {
+                response.addHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE));
+            }
+
+            // Ensure there's a content length or transfer encoding header
+            if (!response.containsHeader(HttpConstants.HEADER_CONTENT_LENGTH) && !response.containsHeader(HttpConstants.HEADER_TRANSFER_ENCODING)) {
+                InputStream content = response.getBody();
+                if (content != null) {
+                    long len = response.getContentLength();
+                    if (len < 0) {
+                        if (response.getHttpVersion().lessEquals(HttpVersion.HTTP_1_0)) {
+                            throw new IOException("Chunked encoding not supported for HTTP version "
+                                    + response.getHttpVersion());
+                        }
+                        Header header = new Header(HttpConstants.HEADER_TRANSFER_ENCODING, "chunked");
+                        response.addHeader(header);
+                    } else {
+                        Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, Long.toString(len));
+                        response.setHeader(header);
+                    }
+                } else {
+                    Header header = new Header(HttpConstants.HEADER_CONTENT_LENGTH, "0");
+                    response.addHeader(header);
+                }
+            }
+
+            if (!response.containsHeader(HttpConstants.HEADER_CONNECTION)) {
+                // See if the the client explicitly handles connection persistence
+                String connHeader = context.getStringProperty(HttpConstants.HEADER_CONNECTION);
+                if (connHeader != null) {
+                    if (connHeader.equalsIgnoreCase("keep-alive")) {
+                        Header header = new Header(HttpConstants.HEADER_CONNECTION, "keep-alive");
+                        response.addHeader(header);
+                        response.setKeepAlive(true);
+                    }
+                    if (connHeader.equalsIgnoreCase("close")) {
+                        Header header = new Header(HttpConstants.HEADER_CONNECTION, "close");
+                        response.addHeader(header);
+                        response.setKeepAlive(false);
+                    }
+                } else {
+                    // Use protocol default connection policy
+                    if (response.getHttpVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
+                        response.setKeepAlive(true);
+                    } else {
+                        response.setKeepAlive(false);
+                    }
+                }
+            }
+            if ("HEAD".equalsIgnoreCase(context.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY))) {
+                // this is a head request, we don't want to send the actualy content
+                response.setBody(null);
+            }
+            return response;
+        } catch (IOException e) {
+            throw new TransformerException(this, e);
+        }
+
+    }
+
+    protected HttpResponse createResponse(Object src, UMOEventContext context) throws IOException {
+        HttpResponse response = new HttpResponse();
+
         int status = context.getIntProperty(HttpConnector.HTTP_STATUS_PROPERTY, HttpConstants.SC_OK);
         String version = context.getStringProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
         String date = format.format(new Date());
-        byte[] response = null;
         String contentType = context.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE);
 
-        if (src instanceof byte[]) {
-            response = (byte[]) src;
-        } else if (contentType.startsWith("text/")) {
-            response = src.toString().getBytes();
-        } else {
-            try {
-                response = Utility.objectToByteArray(src);
-            } catch (IOException e) {
-                throw new TransformerException(new Message(Messages.TRANSFORM_FAILED_FROM_X_TO_X, "Object", "byte[]"),
-                                               this,
-                                               e);
-            }
-        }
-
-        StringBuffer httpMessage = new StringBuffer(512);
-
-        httpMessage.append(version).append(" ");
-        httpMessage.append(status).append(HttpConstants.CRLF);
-        httpMessage.append(HttpConstants.HEADER_DATE);
-        httpMessage.append(": ").append(date).append(HttpConstants.CRLF);
-        httpMessage.append(HttpConstants.HEADER_SERVER);
-        httpMessage.append(": ").append(server).append(HttpConstants.CRLF);
+        response.setStatusLine(HttpVersion.parse(version), status);
+        response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, contentType));
+        response.setHeader(new Header(HttpConstants.HEADER_DATE, date));
+        response.setHeader(new Header(HttpConstants.HEADER_SERVER, server));
         if (context.getProperty(HttpConstants.HEADER_EXPIRES) == null) {
-            httpMessage.append(HttpConstants.HEADER_EXPIRES);
-            httpMessage.append(": ").append(date).append(HttpConstants.CRLF);
+            response.setHeader(new Header(HttpConstants.HEADER_EXPIRES, date));
         }
-
-        httpMessage.append(HttpConstants.HEADER_CONTENT_TYPE);
-        if (contentType == null) {
-            httpMessage.append(": ").append(HttpConstants.DEFAULT_CONTENT_TYPE).append(HttpConstants.CRLF);
-        } else {
-            httpMessage.append(": ").append(contentType).append(HttpConstants.CRLF);
-        }
-
-        httpMessage.append(HttpConstants.HEADER_CONTENT_LENGTH);
-        httpMessage.append(": ").append(response.length).append(HttpConstants.CRLF);
 
         String headerName;
         String value;
@@ -116,8 +161,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
             headerName = (String) iterator.next();
             value = context.getStringProperty(headerName);
             if (value != null) {
-                httpMessage.append(headerName).append(": ").append(value);
-                httpMessage.append(HttpConstants.CRLF);
+                response.setHeader(new Header(headerName, value));
             }
         }
         // Custom responseHeaderNames
@@ -126,8 +170,9 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
             Map.Entry entry;
             for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();) {
                 entry = (Map.Entry) iterator.next();
-                httpMessage.append(entry.getKey()).append(": ").append(entry.getValue());
-                httpMessage.append(HttpConstants.CRLF);
+                if (entry.getValue() != null) {
+                    response.setHeader(new Header(entry.getKey().toString(), entry.getValue().toString()));
+                }
             }
         }
 
@@ -135,41 +180,24 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer
         UMOMessage m = context.getMessage();
         String user = (String) m.getProperty(MuleProperties.MULE_USER_PROPERTY);
         if (user != null) {
-            httpMessage.append("X-" + MuleProperties.MULE_USER_PROPERTY).append(": ").append(user);
-            httpMessage.append(HttpConstants.CRLF);
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_USER_PROPERTY, user));
         }
         if (m.getCorrelationId() != null) {
-            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_ID_PROPERTY)
-                       .append(": ")
-                       .append(m.getCorrelationId());
-            httpMessage.append(HttpConstants.CRLF);
-            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY)
-                       .append(": ")
-                       .append(m.getCorrelationGroupSize());
-            httpMessage.append(HttpConstants.CRLF);
-            httpMessage.append("X-" + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY)
-                       .append(": ")
-                       .append(m.getCorrelationSequence());
-            httpMessage.append(HttpConstants.CRLF);
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_ID_PROPERTY, m.getCorrelationId()));
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, String.valueOf(m.getCorrelationGroupSize())));
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, String.valueOf(m.getCorrelationSequence())));
         }
         if (m.getReplyTo() != null) {
-            httpMessage.append("X-" + MuleProperties.MULE_REPLY_TO_PROPERTY)
-            			.append(": ")
-            			.append(m.getReplyTo().toString());
-            httpMessage.append(HttpConstants.CRLF);
+            response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MuleProperties.MULE_REPLY_TO_PROPERTY, m.getReplyTo().toString()));
         }
-
-        // End header
-        httpMessage.append(HttpConstants.CRLF);
-        byte[] resultPayload = new byte[httpMessage.length() + response.length];
-        System.arraycopy(httpMessage.toString().getBytes(), 0, resultPayload, 0, httpMessage.length());
-        System.arraycopy(response, 0, resultPayload, httpMessage.length(), response.length);
-
-        if(contentType.startsWith("text/")) {
-            return new String(resultPayload);
+        if(src instanceof InputStream) {
+            response.setBody((InputStream)src);
+        } else if (src instanceof String) {
+            response.setBodyString(src.toString());
         } else {
-           return resultPayload;
+            response.setBody(new ByteArrayInputStream(Utility.objectToByteArray(src)));
         }
+        return response;
     }
 
     public boolean isAcceptNull() {

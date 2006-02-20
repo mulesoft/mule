@@ -25,6 +25,10 @@ import org.mule.umo.UMOMessage;
  */
 public class MuleClientRemotingJmsTestCase extends FunctionalTestCase
 {
+    public MuleClientRemotingJmsTestCase() {
+        setDisposeManagerPerSuite(true);
+    }
+
     protected String getConfigResources() {
         return "org/mule/test/integration/client/test-client-mule-config-remote-jms.xml";
     }

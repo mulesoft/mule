@@ -184,38 +184,17 @@
                 <exclude>**/PxeHelloWorldTestCase.*</exclude>
 		        <exclude>**/PxeAsyncTestCase.*</exclude>
 
-                <!-- deprecated groovy components don't work with latest Groovy -->
-                <!-- should remove from codebase -->
-                <exclude>**/GroovyMessageBuilderTestCase.*</exclude>
-                <exclude>**/GroovyTransformerTestCase.*</exclude>
-
-                <!-- currently failing. do to interdependenncy I think
-                 will fix tomorrow -->
-                <exclude>**/MuleBeanDefinitionReaderTestCase.*</exclude>
-
                 <!-- Disable ftp because it needs a server -->
                 <exclude>**/FtpConnectorFunctionalTestCase.*</exclude>
 
-                <!-- TODO Failing with wierd error right now, need to investigate -->
+                <!-- TODO Failing with  error "javax.activation.UnsupportedDataTypeException: no object DCH for MIME type multipart/related; type="text/xml";" right now, need to investigate -->
                 <exclude>**/SoapAttachmentsFunctionalTestCase.*</exclude>
                 <!-- INTEGRATION TEST CASES -->
                 <!-- requires a server -->
                 <exclude>**/EmailFunctionalTestCase.*</exclude>
-                <!-- Causes NPE in ActiveMQ. TODO retry with 4.0  -->
-                <exclude>**/JmsReconnectionTestCase.*</exclude>
+
                 <!-- TODO Does not find the server -->
                 <exclude>**/XmppFunctionalTestCase.*</exclude>
-                <!-- TODO Fix -->
-                <exclude>**/JmsPipelineTestCase.*</exclude>
-                <!-- Seems to be a problem with the endpoint: TODO investigate -->
-                <exclude>**/JdbcTransactionalJdbcFunctionalTestCase.*</exclude>
-                <!-- Seems to be a problem with the endpoint: TODO investigate -->
-                <exclude>**/JdbcTransactionalXAFunctionalTestCase.*</exclude>
-
-                <!-- requires a Jms server running -->
-                <exclude>**/ActiveMQJmsTransactionalFunctionalTestCase.*</exclude>
-                <exclude>**/ActiveMQJmsXATransactionFunctionalTestCase.*</exclude>
-                <exclude>**/JmsClientAcknowledgeTransactionFunctionalTestCase.*</exclude>
             </excludes>
 
             <resources>

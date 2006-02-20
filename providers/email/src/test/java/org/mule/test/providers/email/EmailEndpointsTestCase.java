@@ -14,13 +14,13 @@
 package org.mule.test.providers.email;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class EmailEndpointsTestCase extends NamedTestCase
+public class EmailEndpointsTestCase extends AbstractMuleTestCase
 {
     public void testPop3Url() throws Exception
     {

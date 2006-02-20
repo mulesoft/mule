@@ -14,14 +14,14 @@
 package org.mule.providers.gs;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
  * @version $Revision$
  */
 
-public class GSEndpointTestCase extends NamedTestCase
+public class GSEndpointTestCase extends AbstractMuleTestCase
 {
     public void testHostPortUrl() throws Exception
     {

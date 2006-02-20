@@ -13,32 +13,25 @@
  */
 package org.mule.test.integration.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.mule.MuleManager;
 import org.mule.extras.client.MuleClient;
 import org.mule.providers.soap.axis.AxisConnector;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class MuleClientAxisExternalTestCase extends NamedTestCase
+public class MuleClientAxisExternalTestCase extends AbstractMuleTestCase
 {
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-    }
-
     public void testRequestResponse() throws Throwable
     {
+        if(isOffline("org.mule.test.integration.client.MuleClientAxisExternalTestCase.testRequestResponse()")) return;
+
         String input =  "IBM";
         Map properties = new HashMap();
         properties.put(AxisConnector.WSDL_URL_PROPERTY, "http://services.xmethods.net/soap/urn:xmethods-delayed-quotes.wsdl");

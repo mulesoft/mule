@@ -13,23 +13,18 @@
  */
 package org.mule.test.usecases.sync;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class TcpJmsResponseTestCase extends NamedTestCase {
+public class TcpJmsResponseTestCase extends FunctionalTestCase {
 
-    protected void setUp() throws Exception
-    {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("tcp-jms-response.xml");
+    protected String getConfigResources() {
+        return "tcp-jms-response.xml";
     }
 
     public void testSyncResponse() throws Exception

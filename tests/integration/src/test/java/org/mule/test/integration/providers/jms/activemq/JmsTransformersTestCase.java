@@ -29,6 +29,8 @@
 package org.mule.test.integration.providers.jms.activemq;
 
 import org.activemq.ActiveMQConnectionFactory;
+import org.activemq.broker.impl.BrokerContainerFactoryImpl;
+import org.activemq.store.vm.VMPersistenceAdapter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.RequestContext;
@@ -58,18 +60,20 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
 {
 
     private static Session session = null;
-
     /**
      * logger used by this class
      */
     private static transient Log logger = LogFactory.getLog(JmsTransformersTestCase.class);
 
-    protected ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory();
+    protected ActiveMQConnectionFactory factory = null;
 
-        protected void doSetUp() throws Exception {
+
+
+        protected void suitePreSetUp() throws Exception {
             factory = new ActiveMQConnectionFactory();
+            factory.setBrokerContainerFactory(new BrokerContainerFactoryImpl(new VMPersistenceAdapter()));
+            factory.setUseEmbeddedBroker(true);
             factory.setBrokerURL("vm://localhost");
-            factory.setUseEmbeddedBroker(false);
             factory.start();
 
             session = factory.createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -77,14 +81,14 @@ public class JmsTransformersTestCase extends AbstractMuleTestCase
 
         protected void doTearDown() throws Exception {
             RequestContext.setEvent(null);
+        }
+
+     protected void suitePostTearDown() throws Exception {
             try {
                 session.close();
             } catch (JMSException e) {
 
             }
-            factory.stop();
-            factory=null;
-            super.doTearDown();
         }
 
     public void testTransObjectMessage() throws Exception

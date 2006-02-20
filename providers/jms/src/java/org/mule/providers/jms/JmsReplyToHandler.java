@@ -21,7 +21,12 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import javax.jms.*;
+import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.Topic;
 
 /**
  * <code>JmsReplyToHandler</code> will process a Jms replyTo or hand off to
@@ -57,7 +62,12 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
             Object payload = returnMessage.getPayload();
             if (getTransformer() != null) {
                 getTransformer().setEndpoint(getEndpoint(event, "jms://temporary"));
-                payload = getTransformer().transform(payload);
+                if(getTransformer().isSourceTypeSupported(payload.getClass())) {
+                    payload = getTransformer().transform(payload);
+                } else if(logger.isDebugEnabled()) {
+                    logger.debug("transformer for replyTo Handler: " + getTransformer().toString() + 
+                            " does not support source type: "  + payload.getClass() + ". Not doing a transform");
+                }
             }
             session = connector.getSession(false, replyToDestination instanceof Topic);
             Message replyToMessage = JmsMessageUtils.getMessageForObject(payload, session);

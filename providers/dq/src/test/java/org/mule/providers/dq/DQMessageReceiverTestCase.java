@@ -32,9 +32,7 @@ public class DQMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
     public UMOMessageReceiver getMessageReceiver() throws Exception
     {
-
-        MuleManager.getInstance().start();
-
+        getManager(true);
         Mock mockComponent = new Mock(UMOComponent.class);
         AS400 system = ((DQConnector)endpoint.getConnector()).getSystem();
         return new DQMessageReceiver((AbstractConnector) endpoint.getConnector(),
@@ -52,6 +50,7 @@ public class DQMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         c.setUsername("xxx");
         c.setPassword("xxx");
         c.setHostname("localhost");
+        c.initialise();
         MuleManager.getInstance().registerConnector(c);
         return new MuleEndpoint("dq://QSYS.LIB/L701QUEUE.DTAQ?createConnector=NEVER", true);
     }

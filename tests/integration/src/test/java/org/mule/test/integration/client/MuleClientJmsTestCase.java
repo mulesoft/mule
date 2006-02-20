@@ -28,8 +28,11 @@ import java.util.Map;
  */
 public class MuleClientJmsTestCase extends FunctionalTestCase
 {
+    public MuleClientJmsTestCase() {
+        setDisposeManagerPerSuite(true);
+    }
 
-    protected String getConfigResources() {
+     protected String getConfigResources() {
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
     }
 

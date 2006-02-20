@@ -15,7 +15,7 @@ package org.mule.providers.gs;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
@@ -23,7 +23,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
  * @version $Revision$
  */
 
-public class GSConnectorFactoryTestCase extends NamedTestCase
+public class GSConnectorFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreateFromFactory() throws Exception
     {

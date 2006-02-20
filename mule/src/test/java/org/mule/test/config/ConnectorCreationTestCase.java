@@ -15,7 +15,7 @@ package org.mule.test.config;
 
 import org.mule.components.simple.EchoComponent;
 import org.mule.config.builders.QuickConfigurationBuilder;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 
@@ -23,7 +23,7 @@ import org.mule.umo.UMOException;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ConnectorCreationTestCase extends NamedTestCase
+public class ConnectorCreationTestCase extends AbstractMuleTestCase
 {
     public void testAlwaysCreateUsingParamString() throws Exception
     {

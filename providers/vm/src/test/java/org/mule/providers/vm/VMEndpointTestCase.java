@@ -14,14 +14,14 @@
 package org.mule.providers.vm;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class VMEndpointTestCase extends NamedTestCase
+public class VMEndpointTestCase extends AbstractMuleTestCase
 {
     public void testUrlWithConnector() throws Exception
     {

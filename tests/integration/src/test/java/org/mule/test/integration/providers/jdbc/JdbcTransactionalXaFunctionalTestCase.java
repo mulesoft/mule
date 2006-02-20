@@ -34,7 +34,6 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
 
     protected void doSetUp() throws Exception
     {
-        super.doSetUp();
         // check for already active JOTM instance
         txManager = Current.getCurrent();
         // if none found, create new local JOTM instance
@@ -42,7 +41,7 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
             new Jotm(true, false);
             txManager = Current.getCurrent();
         }
-        super.setUp();
+        super.doSetUp();
         manager.setTransactionManager(txManager);
     }
 

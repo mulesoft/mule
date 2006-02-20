@@ -15,15 +15,16 @@
 
 package org.mule.providers.http;
 
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HeaderElement;
+import org.apache.commons.httpclient.NameValuePair;
+import org.mule.MuleManager;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
-import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 
-import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -33,7 +34,8 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class HttpMessageAdapter extends AbstractMessageAdapter {
+public class HttpMessageAdapter extends AbstractMessageAdapter
+ {
     private Object message = null;
     private UMOTransformer trans = new SerializableToByteArray();
 
@@ -114,5 +116,30 @@ public class HttpMessageAdapter extends AbstractMessageAdapter {
         } else {
             return super.getProperty(key);
         }
+    }
+
+    public String getEncoding() {
+        String charset = null;
+        Header contenttype = getHeader(HttpConstants.HEADER_CONTENT_TYPE);
+        if (contenttype != null) {
+            HeaderElement values[] = contenttype.getElements();
+            if (values.length == 1) {
+                NameValuePair param = values[0].getParameterByName("charset");
+                if (param != null) {
+                    charset = param.getValue();
+                }
+            }
+        }
+        if (charset != null) {
+            return charset;
+        } else {
+            return MuleManager.getConfiguration().getEncoding();
+        }
+    }
+
+    public Header getHeader(String name) {
+        String value = (String)getProperty(name);
+        if(value==null) return null;
+        return new Header(name, value);
     }
 }

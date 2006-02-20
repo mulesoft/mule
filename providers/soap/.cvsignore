@@ -6,3 +6,4 @@ bin
 mule-soap-provider.iml
 .fbprefs
 .fbwarnings
+mule.log

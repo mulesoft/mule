@@ -26,12 +26,12 @@ import org.mule.umo.manager.UMOManager;
 public class SpringAutowireConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
 
-    public String getConfigResource()
+    public String getConfigResources()
     {
         return "test-mule-autowire-app-context.xml,test-application-context.xml";
     }
 
-    public ConfigurationBuilder getConfigBuilder()
+    public ConfigurationBuilder getBuilder()
     {
         return new SpringConfigurationBuilder();
     }

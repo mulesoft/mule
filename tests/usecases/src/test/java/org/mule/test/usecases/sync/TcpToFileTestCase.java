@@ -13,25 +13,20 @@
  */
 package org.mule.test.usecases.sync;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class TcpToFileTestCase extends NamedTestCase {
+public class TcpToFileTestCase extends FunctionalTestCase {
 
-    protected void setUp() throws Exception
-    {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("tcp-to-file.xml");
+    protected String getConfigResources() {
+        return "tcp-to-file.xml";
     }
-	
+
     public void testSyncResponse() throws Exception
     {
         MuleClient client = new MuleClient();

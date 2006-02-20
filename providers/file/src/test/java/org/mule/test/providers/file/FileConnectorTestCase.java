@@ -18,6 +18,7 @@ package org.mule.test.providers.file;
 import com.mockobjects.dynamic.Mock;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FileMessageReceiver;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -66,7 +67,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     {
         UMOConnector connector = getConnector();
 
-        Mock session = getMockSession();
+        Mock session = MuleTestUtils.getMockSession();
         UMOEndpoint endpoint = getTestEndpoint("simple", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         UMOComponent component = getTestComponent(descriptor);
         UMOEvent event = getTestEvent("TestData");

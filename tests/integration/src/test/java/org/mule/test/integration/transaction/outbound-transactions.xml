@@ -4,7 +4,24 @@
 
 <mule-configuration id="test" version="1.0">
 
-    <mule-environment-properties synchronous="false" synchronousEventTimeout="5000"/>
+    <mule-environment-properties synchronous="false" synchronousEventTimeout="5000" serverUrl="" />
+
+   <container-context className="org.mule.extras.spring.SpringContainerContext">
+        <properties>
+            <text-property name="configuration">
+                <![CDATA[
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+                <beans>
+                <bean id="jmsConnectionFactory"
+		class="org.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL"><value>vm://localhost</value></property>
+		<property name="useEmbeddedBroker"><value>true</value></property>
+	</bean>
+                </beans>
+                ]]>
+            </text-property>
+        </properties>
+    </container-context>
 
     <!-- Transaction manager -->
     <transaction-manager
@@ -13,12 +30,8 @@
     <!-- Testing with ActiveMq -->
     <connector name="jmsConnector" className="org.mule.providers.jms.JmsConnector">
         <properties>
-            <property name="connectionFactoryJndiName" value="ConnectionFactory"/>
-            <property name="jndiInitialFactory" value="org.activemq.jndi.ActiveMQInitialContextFactory"/>
+            <container-property name="connectionFactory" reference="jmsConnectionFactory"/>
             <property name="specification" value="1.1"/>
-			<map name="connectionFactoryProperties">
-				<property name="brokerURL" value="tcp://localhost:61616"/>
-			</map>
         </properties>
     </connector>
 

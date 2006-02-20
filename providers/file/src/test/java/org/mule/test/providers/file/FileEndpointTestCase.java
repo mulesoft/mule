@@ -14,7 +14,7 @@
 package org.mule.test.providers.file;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
@@ -23,7 +23,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  * @version $Revision$
  */
 
-public class FileEndpointTestCase extends NamedTestCase
+public class FileEndpointTestCase extends AbstractMuleTestCase
 {
     public void testFileUrl() throws Exception
     {

@@ -15,10 +15,9 @@
 package org.mule.providers.quartz;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.CountDownLatch;
 
 /**
@@ -26,23 +25,9 @@ import org.mule.util.concurrent.CountDownLatch;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class QuartzReceiverFunctionalTestCase extends NamedTestCase
+public class QuartzReceiverFunctionalTestCase extends AbstractMuleTestCase
 {
-
     protected static CountDownLatch countDown;
-
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-        super.tearDown();
-    }
 
     public void testMuleReceiverJob() throws Exception
     {

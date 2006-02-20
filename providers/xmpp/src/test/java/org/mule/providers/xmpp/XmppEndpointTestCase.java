@@ -14,14 +14,14 @@
 package org.mule.providers.xmpp;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.MalformedEndpointException;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class XmppEndpointTestCase extends NamedTestCase
+public class XmppEndpointTestCase extends AbstractMuleTestCase
 {
     public void testMalformedXmppUrl() throws Exception
     {

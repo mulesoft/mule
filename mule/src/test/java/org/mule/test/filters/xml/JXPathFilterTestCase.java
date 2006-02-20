@@ -13,24 +13,40 @@
  */
 package org.mule.test.filters.xml;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.xml.JXPathFilter;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformers.xml.XmlToDomDocument;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 /**
  * @author <a href="mailto:S.Vanmeerhaege@gfdi.be">Vanmeerhaeghe Stéphane</a>
  * @version $Revision$
  */
-public class JXPathFilterTestCase extends NamedTestCase
+public class JXPathFilterTestCase extends AbstractMuleTestCase
 {
     private String xmlData = null;
 
     private JXPathFilter myFilter = null;
     private XmlToDomDocument transformer = null;
+
+    protected void doSetUp() throws Exception
+    {
+        // Read Xml file
+        BufferedReader br = new BufferedReader(new FileReader("src/test/conf/cdcatalog.xml"));
+        String nextLine = "";
+        StringBuffer sb = new StringBuffer();
+        while ((nextLine = br.readLine()) != null) {
+            sb.append(nextLine);
+        }
+        xmlData = sb.toString();
+
+        // new UMOFilter
+        myFilter = new JXPathFilter();
+        transformer = new XmlToDomDocument();
+    }
 
     public void testFilter1() throws Exception
     {
@@ -71,21 +87,5 @@ public class JXPathFilterTestCase extends NamedTestCase
         boolean res = myFilter.accept(new MuleMessage(d));
         assertTrue(res);
 
-    }
-
-    protected void setUp() throws Exception
-    {
-        // Read Xml file
-        BufferedReader br = new BufferedReader(new FileReader("src/test/conf/cdcatalog.xml"));
-        String nextLine = "";
-        StringBuffer sb = new StringBuffer();
-        while ((nextLine = br.readLine()) != null) {
-            sb.append(nextLine);
-        }
-        xmlData = sb.toString();
-
-        // new UMOFilter
-        myFilter = new JXPathFilter();
-        transformer = new XmlToDomDocument();
     }
 }

@@ -16,7 +16,6 @@ package org.mule.tck;
 
 import org.mule.MuleException;
 import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.ThreadingProfile;
@@ -364,17 +363,4 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals("this was set from the manager properties!", props.get("beanProperty1"));
         assertNotNull(props.get("OS Version"));
     }
-
-    // leave this last
-    public void testTearDown() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        initialised = false;
-    }
-
-    public abstract String getConfigResource();
-
-    public abstract ConfigurationBuilder getConfigBuilder();
-
 }

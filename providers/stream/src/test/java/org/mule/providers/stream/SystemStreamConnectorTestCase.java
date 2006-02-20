@@ -14,6 +14,7 @@ package org.mule.providers.stream;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.AbstractConnectorTestCase;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -58,7 +59,7 @@ public class SystemStreamConnectorTestCase extends AbstractConnectorTestCase
 
         UMOEndpoint endpoint = getTestEndpoint("test", UMOImmutableEndpoint.ENDPOINT_TYPE_SENDER);
         UMOComponent component = getTestComponent(descriptor);
-        Mock event = getMockEvent();
+        Mock event = MuleTestUtils.getMockEvent();
 
         // event.expectAndReturn("getMessage", new MuleMessage("Hello", null));
         event.expect("setSynchronous", C.IS_FALSE);

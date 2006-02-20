@@ -15,7 +15,7 @@
 package org.mule.providers.jms;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
@@ -23,7 +23,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  * @version $Revision$
  */
 
-public class JmsEndpointTestCase extends NamedTestCase
+public class JmsEndpointTestCase extends AbstractMuleTestCase
 {
     public void testWithoutFullUrl() throws Exception
     {

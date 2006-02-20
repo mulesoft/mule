@@ -15,8 +15,6 @@
 package org.mule.tck;
 
 import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.MuleProperties;
 import org.mule.impl.AbstractExceptionListener;
 import org.mule.impl.MuleDescriptor;
 import org.mule.interceptors.LoggingInterceptor;
@@ -53,32 +51,13 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public abstract class AbstractScriptConfigBuilderTestCase extends NamedTestCase
+public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTestCase
 {
-    protected static boolean initialised = false;
-
     protected AbstractScriptConfigBuilderTestCase()
     {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        initialised = false;
+        setDisposeManagerPerSuite(true);
     }
 
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        if (!initialised) {
-            System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "true");
-
-            if (MuleManager.isInstanciated())
-                MuleManager.getInstance().dispose();
-            ConfigurationBuilder configBuilder = getConfigBuilder();
-            configBuilder.configure(getConfigResource());
-            initialised = true;
-            System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "false");
-
-        }
-    }
 
     public void testManagerConfig() throws Exception
     {
@@ -310,17 +289,4 @@ public abstract class AbstractScriptConfigBuilderTestCase extends NamedTestCase
         UMOAgent agent = MuleManager.getInstance().unregisterAgent("jmxAgent");
         assertNotNull(agent);
     }
-
-    // leave this last
-    public void testTearDown() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        initialised = false;
-    }
-
-    public abstract String getConfigResource();
-
-    public abstract ConfigurationBuilder getConfigBuilder();
-
 }

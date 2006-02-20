@@ -42,9 +42,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -333,7 +333,7 @@ public class Utility
     }
 
     public static boolean deleteTree(File dir) {
-        if (dir == null) {
+        if (dir == null || !dir.exists()) {
             return true;
         }
         File[] files = dir.listFiles();

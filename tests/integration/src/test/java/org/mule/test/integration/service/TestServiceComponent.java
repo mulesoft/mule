@@ -79,8 +79,8 @@ public class TestServiceComponent extends FunctionalTestComponent implements Ech
         if (person == null || person.getFirstName() == null || person.getLastName() == null) {
             throw new IllegalArgumentException("null person, first name or last name");
         }
-        if (person.getFirstName().equals("Nodet")) {
-            throw new Exception("Nodet is banned");
+        if (person.getFirstName().equals("Ross")) {
+            throw new Exception("Ross is banned");
         }
         people.put(person.getFirstName(), person);
         logger.info("Added Person: " + person);

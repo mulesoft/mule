@@ -13,10 +13,10 @@
  */
 package org.mule.test.integration.routing.replyto;
 
+import org.activemq.message.ActiveMQTextMessage;
 import org.mule.config.MuleProperties;
 import org.mule.extras.client.MuleClient;
-import org.mule.test.integration.IntegrationTestCase;
-import org.mule.umo.UMOException;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import java.util.HashMap;
@@ -27,17 +27,17 @@ import java.util.Map;
  * @version $Revision$
  */
 
-public class ReplytoChainIntegrationTestCase extends IntegrationTestCase
+public class ReplytoChainIntegrationTestCase extends FunctionalTestCase
 {
     public ReplytoChainIntegrationTestCase() {
-        embbededActiveMQ=true;
+        setDisposeManagerPerSuite(true);
     }
 
     protected String getConfigResources() {
         return "org/mule/test/integration/routing/replyto/injection-test.xml";
     }
 
-    public void testReplyToChain() throws UMOException
+    public void testReplyToChain() throws Exception
     {
         String message = "test";
 
@@ -47,6 +47,6 @@ public class ReplytoChainIntegrationTestCase extends IntegrationTestCase
         UMOMessage result = client.send("vm://pojo1", message, null);
         assertNotNull(result);
         // Te
-        assertEquals("Received: " + message, result.getPayload());
+        assertEquals("Received: " + message, ((ActiveMQTextMessage)result.getPayload()).getText());
     }
 }

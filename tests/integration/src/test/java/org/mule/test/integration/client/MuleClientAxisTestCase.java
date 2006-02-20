@@ -53,19 +53,19 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient();
 
-        String[] args = new String[] { "Ross", "Mason" };
+        String[] args = new String[] { "Betty", "Rubble" };
         UMOMessage result = client.send("axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson", args, null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Ross", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Mason", ((Person) result.getPayload()).getLastName());
+        assertEquals("Betty", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Rubble", ((Person) result.getPayload()).getLastName());
 
         // do a receive
-        result = client.send("axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Ross", null);
+        result = client.send("axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Betty", null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Ross", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Mason", ((Person) result.getPayload()).getLastName());
+        assertEquals("Betty", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Rubble", ((Person) result.getPayload()).getLastName());
 
     }
 

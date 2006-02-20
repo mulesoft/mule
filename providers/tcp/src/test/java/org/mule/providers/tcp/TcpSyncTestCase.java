@@ -15,13 +15,12 @@
 package org.mule.providers.tcp;
 
 import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
 
@@ -31,17 +30,13 @@ import java.util.Arrays;
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class TcpSyncTestCase extends NamedTestCase
+public class TcpSyncTestCase extends FunctionalTestCase
 {
 
     private static final String endpointUri = "tcp://localhost:4544";
 
-    protected void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("tcp-sync.xml");
+    protected String getConfigResources() {
+        return "tcp-sync.xml";
     }
 
     protected UMOMessage send(Object payload) throws Exception

@@ -14,9 +14,6 @@
 package org.mule.test.integration.providers.jdbc;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
-import java.util.HashMap;
-
 import org.mule.MuleManager;
 import org.mule.impl.DefaultExceptionStrategy;
 import org.mule.impl.MuleDescriptor;
@@ -31,6 +28,8 @@ import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
 
+import java.util.HashMap;
+
 /**
  * @author Guillaume Nodet
  * @version $Revision$
@@ -42,6 +41,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
 
     protected void doSetUp() throws Exception
     {
+        super.doSetUp();
         currentTx = null;
     }
 

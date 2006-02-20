@@ -4,6 +4,8 @@
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <mule-configuration id="endpoint_test" version="1.0">
+    <mule-environment-properties serverUrl=""/>
+    
     <container-context className="org.mule.extras.spring.SpringContainerContext">
         <properties>
             <text-property name="configuration">

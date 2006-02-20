@@ -6,10 +6,6 @@
 
 <mule-configuration id="Test_Mule_Properties" version="1.0">
 
-    <environment-properties>
-        <property name="http.keepAlive" value="true"/>
-    </environment-properties>
-    
     <mule-environment-properties serverUrl=""/>
 
     <container-context className="org.mule.extras.spring.SpringContainerContext">
@@ -28,8 +24,7 @@
     
     <model name="test">
         <mule-descriptor name="echo" 
-            implementation="org.mule.components.simple.EchoComponent"
-            containerManaged="false">
+            implementation="org.mule.components.simple.EchoComponent">
             <inbound-router>
                 <endpoint address="http://localhost:4567">
                     <security-filter className="org.mule.extras.acegi.filters.http.HttpBasicAuthenticationFilter">

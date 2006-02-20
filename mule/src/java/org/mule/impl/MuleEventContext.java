@@ -14,7 +14,6 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -830,5 +829,16 @@ public class MuleEventContext implements UMOEventContext
      */
     public boolean isStreaming() {
         return event.getEndpoint().isStreaming();
+    }
+
+    /**
+     * Gets the encoding for the current message. For potocols that send encoding
+     * Information with the message, this method should be overriden to expose the
+     * transport encoding, otherwise the default encoding in the Mule configuration will be used
+     *
+     * @return the encoding for this message.  This method must never return null
+     */
+    public String getEncoding() {
+        return event.getMessage().getEncoding();
     }
 }

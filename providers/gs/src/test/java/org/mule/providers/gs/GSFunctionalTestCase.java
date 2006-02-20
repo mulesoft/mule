@@ -19,11 +19,8 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.umo.manager.UMOServerNotification;
-import org.mule.util.StringMessageHelper;
 
 /**
- * todo document
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
@@ -32,14 +29,13 @@ public class GSFunctionalTestCase extends FunctionalTestCase implements Function
     private static int unprocessedCount = 0;
     private static int processedCount = 0;
 
-    protected boolean checkPreReqs() {
+    protected String checkPreReqs() {
         if(System.getProperty("com.gs.home", null) != null) {
             System.setProperty("com.gs.security.enabled", "false");
             System.setProperty("java.security.policy", System.getProperty("com.gs.home") + "/bin/policy.all");
-            return true;
+            return null;
         }
-        System.out.println(StringMessageHelper.getBoilerPlate("com.gs.home parameter not set, not Testing GigaSpaces. Test Method: " + toString(), '@', 80));
-        return false;
+        return "com.gs.home VM parameter not set.";
     }
 
     protected void doPostFunctionalSetUp() throws Exception {
@@ -54,7 +50,7 @@ public class GSFunctionalTestCase extends FunctionalTestCase implements Function
     }
 
     public void testReceivesWithTemplates() throws Exception {
-        if(!isPrereqsMet()) return;
+        if(!isPrereqsMet("org.mule.providers.gs.GSFunctionalTestCase.testReceivesWithTemplates()")) return;
 
         MuleClient client = new MuleClient();
         Order order = new Order();

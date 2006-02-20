@@ -13,10 +13,8 @@
  */
 package org.mule.test.usecases.routing;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import java.util.ArrayList;
@@ -26,13 +24,10 @@ import java.util.List;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ForwardingMessageSplitterTestCase extends NamedTestCase
+public class ForwardingMessageSplitterTestCase extends FunctionalTestCase
 {
-    protected void setUp() throws Exception
-    {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("forwarding-message-splitter.xml");
+    protected String getConfigResources() {
+        return "forwarding-message-splitter.xml";
     }
 
     public void testSyncResponse() throws Exception

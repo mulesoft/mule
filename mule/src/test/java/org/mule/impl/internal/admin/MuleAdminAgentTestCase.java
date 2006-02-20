@@ -29,7 +29,7 @@ public class MuleAdminAgentTestCase extends AbstractMuleTestCase
      */
     protected void doSetUp() throws Exception
     {
-        getManager();
+        getManager(false);
     }
 
 

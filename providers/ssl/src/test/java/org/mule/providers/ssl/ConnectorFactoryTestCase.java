@@ -15,7 +15,7 @@ package org.mule.providers.ssl;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpoint;
 
 /**
@@ -23,7 +23,7 @@ import org.mule.umo.endpoint.UMOEndpoint;
  * @version $Revision$
  */
 
-public class ConnectorFactoryTestCase extends NamedTestCase
+public class ConnectorFactoryTestCase extends AbstractMuleTestCase
 {
     public void testCreate() throws Exception
     {

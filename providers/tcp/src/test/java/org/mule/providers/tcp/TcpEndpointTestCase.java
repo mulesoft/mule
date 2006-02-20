@@ -14,7 +14,7 @@
 package org.mule.providers.tcp;
 
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.endpoint.UMOEndpointURI;
 
 /**
@@ -22,7 +22,7 @@ import org.mule.umo.endpoint.UMOEndpointURI;
  * @version $Revision$
  */
 
-public class TcpEndpointTestCase extends NamedTestCase
+public class TcpEndpointTestCase extends AbstractMuleTestCase
 {
     public void testHostPortUrl() throws Exception
     {

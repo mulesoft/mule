@@ -1,23 +1,18 @@
 package org.mule.test.filters.xml;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.xml.IsXmlFilter;
-import org.mule.routing.filters.xml.JXPathFilter;
-import org.mule.tck.NamedTestCase;
-import org.mule.transformers.xml.XmlToDomDocument;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.Utility;
 
 /**
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
-public class IsXmlFilterTestCase extends NamedTestCase {
+public class IsXmlFilterTestCase extends AbstractMuleTestCase {
 
 	IsXmlFilter filter;
 
-    protected void setUp() throws Exception {
+    protected void doSetUp() throws Exception {
     	filter = new IsXmlFilter();
     }
 

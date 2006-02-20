@@ -32,7 +32,7 @@ import org.mule.providers.http.HttpConnector;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.NotFilter;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.UMOException;
 import org.mule.umo.endpoint.EndpointException;
 import org.mule.umo.endpoint.MalformedEndpointException;
@@ -48,17 +48,14 @@ import java.net.URISyntaxException;
  * @author Jack Hung
  * @version $Revision$
  */
-public class HttpRequestWildcardFilterTestCase extends NamedTestCase {
+public class HttpRequestWildcardFilterTestCase extends AbstractMuleTestCase {
 
 	private static final String HTTP_LOCALHOST_60198 = "http://localhost:60198";
 	private static final String TEST_MESSAGE = "Hello=World";
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-		if (MuleManager.isInstanciated()) {
-			MuleManager.getInstance().dispose();
-		}
-		UMOManager manager = MuleManager.getInstance();
+	protected void doSetUp() throws Exception {
+
+		UMOManager manager = getManager(true);
 		MuleManager.getConfiguration().setSynchronous(true);
         MuleManager.getConfiguration().getPoolingProfile()
                    .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_ONE_COMPONENT);

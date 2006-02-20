@@ -14,7 +14,7 @@
 package org.mule.providers.jbi;
 
 import org.mule.providers.jbi.components.MuleReceiver;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class ReceiverComponentTestCase extends NamedTestCase
+public class ReceiverComponentTestCase extends AbstractMuleTestCase
 {
     public void testX() throws Exception {
         ComponentContext ctx = new DummyComponentContext();

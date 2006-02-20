@@ -34,6 +34,8 @@ import org.mule.umo.routing.UMOResponseMessageRouter;
 
 //set global properties
 manager.setProperty("doCompression", "true");
+//disable the admin agent
+Manager.getConfiguration().setServerUrl("");
 
 //Set a dummy TX manager
 manager.setTransactionManager(new TestTransactionManagerFactory().create());

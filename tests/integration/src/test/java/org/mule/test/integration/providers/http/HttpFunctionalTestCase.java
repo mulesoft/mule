@@ -14,24 +14,20 @@
 
 package org.mule.test.integration.providers.http;
 
-import org.apache.commons.httpclient.HttpConnection;
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.extras.client.MuleClient;
 import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.NullPayload;
 import org.mule.providers.http.HttpConnector;
 import org.mule.tck.functional.AbstractProviderFunctionalTestCase;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.MalformedEndpointException;
-import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
 
-import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -41,7 +37,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 {
     protected static final String TEST_MESSAGE = "Test Http Request";
 
-    private HttpConnection cnn;
+    private List results = new ArrayList();
 
     protected UMOEndpointURI getInDest()
     {
@@ -55,12 +51,7 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected UMOEndpointURI getOutDest()
     {
-        try {
-            return new MuleEndpointURI("http://localhost:60199");
-        } catch (MalformedEndpointException e) {
-            fail(e.getMessage());
-            return null;
-        }
+        return null;
     }
 
     protected UMOConnector createConnector() throws Exception
@@ -73,25 +64,22 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     protected void sendTestData(int iterations) throws Exception
     {
-        URI uri = getInDest().getUri();
-        PostMethod postMethod = new PostMethod(uri.toString());
-        postMethod.setRequestEntity(new StringRequestEntity(TEST_MESSAGE));
-        cnn = new HttpConnection(uri.getHost(), uri.getPort());
-        cnn.open();
-        postMethod.execute(new HttpState(), cnn);
+        MuleClient client = new MuleClient();
+        for (int i = 0; i < iterations; i++) {
+            UMOMessage m = client.send(getInDest().toString(), TEST_MESSAGE + i, null);
+            assertNotNull(m);
+            results.add(m.getPayload());
+        }
     }
 
     protected void receiveAndTestResults() throws Exception
     {
-        byte[] buf = new byte[1024 * 4];
-        int len = cnn.getResponseInputStream().read(buf);
-        if (len < 1) {
-            fail("Nothing was sent back in the response");
+        int i=0;
+        for (Iterator iterator = results.iterator(); iterator.hasNext();i++) {
+            String result = (String) iterator.next();
+            assertNotNull(result);
+            assertEquals(TEST_MESSAGE + i + " Received", result);
         }
-        String msg = new String(buf, 0, len);
-
-        assertNotNull(msg);
-        assertEquals(TEST_MESSAGE + " Received", msg);
     }
 
     protected String getClientUrl()
@@ -101,31 +89,28 @@ public class HttpFunctionalTestCase extends AbstractProviderFunctionalTestCase
 
     public void testClient() throws Exception
     {
-        UMOEndpointURI request = new MuleEndpointURI(getClientUrl());
-        HttpConnector c = (HttpConnector) createConnector();
-        c.initialise();
-        UMOMessageDispatcher d = c.getDispatcher(request.getAddress());
-        UMOEvent e = getTestEvent(new NullPayload(), new MuleEndpoint("test",
-                                                                      request,
-                                                                      c,
-                                                                      null,
-                                                                      UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                                      0,
-                                                                      null));
-        UMOMessage m = d.send(e);
+        if(isOffline("org.mule.test.integration.providers.http.HttpFunctionalTestCase.testClient()")) return;
+
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        props.put("http.method", "GET");
+        UMOMessage m = client.send(getClientUrl(), null, props);
         assertNotNull(m);
         assertNotNull(m.getPayload());
+        System.out.println(m.getPayloadAsString());
         assertTrue(m.getPayloadAsString().indexOf("google") > -1);
     }
 
     public void testClientWithPath() throws Exception
     {
-        String requestAddress = "http://mule.codehaus.org/docs/apidocs/?http.method=GET";
-        UMOEndpoint ep =new MuleEndpoint(requestAddress, false);
-        ep.initialise();
-        UMOMessageDispatcher d = ep.getConnector().getDispatcher(requestAddress);
-        UMOEvent e = getTestEvent(new NullPayload(), ep);
-        UMOMessage m = d.send(e);
+        if(isOffline("org.mule.test.integration.providers.http.HttpFunctionalTestCase.testClientWithPath()")) return;
+
+        String requestAddress = "http://mule.codehaus.org/docs/apidocs/";
+        MuleClient client = new MuleClient();
+        Map props = new HashMap();
+        props.put("http.method", "GET");
+
+        UMOMessage m = client.send(requestAddress, null, props);
         assertNotNull(m);
         assertNotNull(m.getPayload());
         assertTrue(m.getPayloadAsString().indexOf("javadoc") > -1);

@@ -14,13 +14,13 @@
 package org.mule.test.mule.security;
 
 import org.mule.impl.security.SecretKeyEncryptionStrategy;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SecretKeyEncryptionStrategyTestCase extends NamedTestCase
+public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
     public void testRoundTripEncryptionBlowfish() throws Exception
     {

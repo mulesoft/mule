@@ -21,6 +21,10 @@
 
     <bean id="muleNameProcessor" class="org.mule.extras.spring.config.MuleObjectNameProcessor"/>
 
+    <bean id="environmentProperties" class="org.mule.config.MuleConfiguration">
+          <property name="serverUrl" value=""/>
+    </bean>
+
     <bean id="muleEnvironmentProperties" class="java.util.HashMap">
         <constructor-arg>
             <map>
@@ -28,6 +32,7 @@
             </map>
         </constructor-arg>
     </bean>
+
 
     <!-- The Mule implementation of ApplicationEventMulticaster.  On startup the application
     context will look in the container for a bean called applicationEventMulticaster and

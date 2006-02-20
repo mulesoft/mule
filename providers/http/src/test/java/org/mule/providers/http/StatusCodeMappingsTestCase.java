@@ -16,7 +16,7 @@ package org.mule.providers.http;
 import org.mule.MuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.routing.RoutingException;
 import org.mule.umo.security.UnauthorisedException;
 
@@ -25,7 +25,7 @@ import org.mule.umo.security.UnauthorisedException;
  * @version $Revision$
  */
 
-public class StatusCodeMappingsTestCase extends NamedTestCase
+public class StatusCodeMappingsTestCase extends AbstractMuleTestCase
 {
     public void testErrorMappings()
     {

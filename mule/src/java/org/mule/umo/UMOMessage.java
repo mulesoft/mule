@@ -13,9 +13,9 @@
  */
 package org.mule.umo;
 
-import java.util.Map;
-
 import org.mule.umo.provider.UMOMessageAdapter;
+
+import java.util.Map;
 
 /**
  * <code>UMOMessage</code> represents a message payload. The Message comprises
@@ -45,4 +45,6 @@ public interface UMOMessage extends UMOMessageAdapter
      * @return a map of all properties on this message
      */
     Map getProperties();
+
+    UMOMessageAdapter getAdapter();
 }

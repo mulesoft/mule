@@ -14,25 +14,16 @@
 package org.mule.test.config;
 
 import org.mule.MuleManager;
-import org.mule.config.MuleProperties;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class AlwaysCreateConnectorTestCase extends NamedTestCase
+public class AlwaysCreateConnectorTestCase extends FunctionalTestCase
 {
-    public void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated()) {
-            MuleManager.getInstance().dispose();
-        }
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "true");
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("always-create-connector-config.xml");
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "false");
+    protected String getConfigResources() {
+        return "always-create-connector-config.xml";
     }
 
     public void testConnectorConfig() throws Exception

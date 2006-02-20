@@ -16,25 +16,22 @@ package org.mule.providers.jdbc;
 import org.mule.MuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 /**
- * todo document
- *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class SqlExceptionReaderTestCase extends NamedTestCase {
+public class SqlExceptionReaderTestCase extends AbstractMuleTestCase {
 
     /**
      * Print the name of this test to standard output
      */
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void doSetUp() throws Exception {
         ExceptionHelper.registerExceptionReader(new SQLExceptionReader());
     }
 

@@ -14,19 +14,15 @@
 package org.mule.test.integration.providers.soap;
 
 import org.mule.extras.client.MuleClient;
-import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.impl.endpoint.MuleEndpointURI;
-import org.mule.providers.service.ConnectorFactory;
+import org.mule.providers.http.HttpConnector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.service.Person;
-import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.endpoint.UMOEndpoint;
-import org.mule.umo.provider.UMOConnector;
-import org.mule.umo.provider.UMOMessageDispatcher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -34,6 +30,9 @@ import java.util.List;
  */
 public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 {
+    protected AbstractSoapFunctionalTestCase() {
+        setDisposeManagerPerSuite(true);
+    }
 
     protected abstract String getRequestResponseEndpoint();
     
@@ -53,16 +52,20 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
     protected abstract String getTestExceptionEndpoint();
 
-    abstract String getProtocol();
+    protected abstract String getWsdlEndpoint();
 
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient();
 
         List results = new ArrayList();
-        int number = 100;
+        int number = 1;
+        Map props = new HashMap();
         for (int i = 0; i < number; i++) {
-            results.add(client.send(getRequestResponseEndpoint(), "Message " + i, null).getPayload());
+            props.put("X-Message-Number", String.valueOf(i));
+            UMOMessage msg = client.send(getRequestResponseEndpoint(), "Message " + i, props);
+            assertNotNull(msg);
+            results.add(msg.getPayload());
         }
 
         assertEquals(number, results.size());
@@ -73,11 +76,8 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
     public void testReceive() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
-        assertNotNull(c);
-        UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOMessage result = dispatcher.receive(new MuleEndpointURI(getReceiveEndpoint()),
-                                               0);
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.receive(getReceiveEndpoint(), 0);
         assertNotNull(result);
         assertNotNull(result.getPayload());
         assertTrue(result.getPayload().toString().length() > 0);
@@ -85,16 +85,14 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
     public void testReceiveComplex() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
-        assertNotNull(c);
-        UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOMessage result = dispatcher.receive(new MuleEndpointURI(getReceiveComplexEndpoint()), 0);
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.receive(getReceiveComplexEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Fred", ((Person) result.getPayload()).getFirstName());
         assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
 
-        result = dispatcher.receive(new MuleEndpointURI(getReceiveComplexEndpoint()), 0);
+        result = client.receive(getReceiveComplexEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Fred", ((Person) result.getPayload()).getFirstName());
@@ -103,94 +101,68 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
     public void testSendAndReceiveComplex() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
-        assertNotNull(c);
-        UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOEndpoint endpoint = new MuleEndpoint("test",
-                                                new MuleEndpointURI(getSendReceiveComplexEndpoint1()),
-                                                c,
-                                                null,
-                                                UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                0,
-                                                null);
-        UMOEvent event = getTestEvent(new Person("Ross", "Mason"), endpoint);
-
-        UMOMessage result = dispatcher.send(event);
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.send(getSendReceiveComplexEndpoint1(), new Person("Dino", "Flintstone"), null);
         assertNull(result);
 
-        //Note with Axis 1.2.1  we get an error if we reuse the same dispatcher with a different operation
-        //thus we dispose it here.  Mule itself caches dispachers on the full uri so this doesn;t happen
-        dispatcher.dispose();
-        dispatcher = c.getDispatcher("ANY");
-        // lets get our newly added person
-        result = dispatcher.receive(new MuleEndpointURI(getSendReceiveComplexEndpoint2()), 0);
+        result = client.receive(getSendReceiveComplexEndpoint2(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Ross", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Mason", ((Person) result.getPayload()).getLastName());
+        assertEquals("Dino", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Flintstone", ((Person) result.getPayload()).getLastName());
     }
 
     public void testReceiveComplexCollection() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
-        assertNotNull(c);
-        UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOMessage result = dispatcher.receive(new MuleEndpointURI(getReceiveComplexCollectionEndpoint()),
-                                               0);
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.receive(getReceiveComplexCollectionEndpoint(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person[]);
-        assertEquals(3, ((Person[]) result.getPayload()).length);
+        assertEquals(4, ((Person[]) result.getPayload()).length);
     }
 
     public void testDispatchAsyncComplex() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
-        assertNotNull(c);
-        UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOEndpoint endpoint = new MuleEndpoint("test",
-                                                new MuleEndpointURI(getDispatchAsyncComplexEndpoint1()),
-                                                c,
-                                                null,
-                                                UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                0,
-                                                null);
-        UMOEvent event = getTestEvent(new Person("Joe", "Blow"), endpoint);
+        MuleClient client = new MuleClient();
 
-        dispatcher.dispatch(event);
-        Thread.sleep(2000);
-
-        //Note with Axis 1.2.1  we get an error if we reuse the same dispatcher with a different operation
-        //thus we dispose it here.  Mule itself caches dispachers on the full uri so this doesn;t happen
-        dispatcher.dispose();
-        dispatcher = c.getDispatcher("ANY");
+        client.dispatch(getDispatchAsyncComplexEndpoint1(),new Person("Betty", "Rubble"), null);
+        Thread.sleep(4000);
 
         // lets get our newly added person
-        UMOMessage result = dispatcher.receive(new MuleEndpointURI(getDispatchAsyncComplexEndpoint2()),
-                                               0);
+        UMOMessage result = client.receive(getDispatchAsyncComplexEndpoint2(), 0);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
-        assertEquals("Joe", ((Person) result.getPayload()).getFirstName());
-        assertEquals("Blow", ((Person) result.getPayload()).getLastName());
+        assertEquals("Betty", ((Person) result.getPayload()).getFirstName());
+        assertEquals("Rubble", ((Person) result.getPayload()).getLastName());
     }
 
     public void testException() throws Throwable
     {
-        UMOConnector c = ConnectorFactory.getConnectorByProtocol(getProtocol());
-        assertNotNull(c);
-        UMOMessageDispatcher dispatcher = c.getDispatcher("ANY");
-        UMOEndpoint endpoint = new MuleEndpoint("test",
-                                                new MuleEndpointURI(getTestExceptionEndpoint()),
-                                                c,
-                                                null,
-                                                UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                0,
-                                                null);
-        UMOEvent event = getTestEvent(new Person("Nodet", "Guillaume"), endpoint);
+        MuleClient client = new MuleClient();
         try {
-            dispatcher.send(event);
+            client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
             fail("An Fault should have been raised");
-        } catch (Exception f) {
-            // This is ok
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    public void testLocationUrlInWSDL() throws Exception {
+        Map props = new HashMap();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+        MuleClient client = new MuleClient();
+        UMOMessage result = client.send(getWsdlEndpoint(), null, props);
+        assertNotNull(result);
+        System.out.println(result.getPayloadAsString());
+
+        String location = getWsdlEndpoint();
+        location = location.substring(0, location.length() - 5);
+        if(location.endsWith("/")) location = location.substring(0, location.length() - 1);
+        if(result.getPayloadAsString().indexOf("location=\"" + location) == -1) {
+            assertTrue(result.getPayloadAsString().indexOf("location='" + location) > -1);
+        } else {
+            assertTrue(result.getPayloadAsString().indexOf("location=\"" + location) > -1);
+        }
+        System.out.println(result.getPayloadAsString());
     }
 }

@@ -6,7 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.providers.AbstractConnector;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.umo.manager.UMOManager;
 
 /**
@@ -14,7 +14,7 @@ import org.mule.umo.manager.UMOManager;
  * 
  * @author <a href="mailto:carlson@hotpop.com">Travis Carlson</a>
  */
-public class InitialStateStoppedTestCase extends NamedTestCase {
+public class InitialStateStoppedTestCase extends AbstractMuleTestCase {
 	
 	private UMOManager manager;
     

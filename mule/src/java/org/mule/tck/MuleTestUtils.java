@@ -13,9 +13,14 @@
  */
 package org.mule.tck;
 
+import com.mockobjects.dynamic.Mock;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
-import org.mule.impl.*;
+import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.impl.MuleDescriptor;
+import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.model.seda.SedaComponent;
@@ -23,33 +28,44 @@ import org.mule.impl.model.seda.SedaModel;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOSession;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
+import org.mule.util.Utility;
 
 /**
- * Todo Document class
+ * Utilities for creating test and Mock Mule objects
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleTestUtils {
-    public static UMOManager getManager() throws Exception
+    public static UMOManager getManager(boolean disableAdminService) throws Exception
     {
         UMOManager manager;
-        if (MuleManager.isInstanciated())
+        if (MuleManager.isInstanciated()) {
             MuleManager.getInstance().dispose();
+        }
         manager = MuleManager.getInstance();
+        if(disableAdminService) {
+            MuleManager.getConfiguration().setServerUrl(Utility.EMPTY_STRING);
+        }
         manager.setModel(new SedaModel());
         MuleManager.getConfiguration().setSynchronous(true);
         MuleManager.getConfiguration()
                    .getPoolingProfile()
                    .setInitialisationPolicy(PoolingProfile.POOL_INITIALISE_NO_COMPONENTS);
+
         return manager;
     }
 
@@ -145,4 +161,43 @@ public class MuleTestUtils {
         return manager;
     }
 
+    public static Mock getMockSession() {
+        return new Mock(UMOSession.class, "umoSession");
+    }
+
+    public static Mock getMockMessageDispatcher() {
+        return new Mock(UMOMessageDispatcher.class, "umoConnectorSession");
+    }
+
+    public static Mock getMockConnector() {
+        return new Mock(UMOConnector.class, "umoConnector");
+    }
+
+    public static Mock getMockEvent() {
+        return new Mock(UMOEvent.class, "umoEvent");
+    }
+
+    public static Mock getMockManager() {
+        return new Mock(MuleManager.class, "muleManager");
+    }
+
+    public static Mock getMockEndpoint() {
+        return new Mock(UMOEndpoint.class, "umoEndpoint");
+    }
+
+    public static Mock getMockEndpointURI() {
+        return new Mock(UMOEndpointURI.class, "umoEndpointUri");
+    }
+
+    public static Mock getMockDescriptor() {
+        return new Mock(UMODescriptor.class, "umoDescriptor");
+    }
+
+    public static Mock getMockTransaction() {
+        return new Mock(UMOTransaction.class, "umoTransaction");
+    }
+
+    public static Mock getMockTransactionFactory() {
+        return new Mock(UMOTransactionFactory.class, "umoTransactionFactory");
+    }
 }

@@ -13,11 +13,9 @@
  */
 package org.mule.test.usecases.dlq;
 
-import org.mule.MuleManager;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.extras.client.MuleClient;
 import org.mule.impl.message.ExceptionMessage;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import javax.jms.ObjectMessage;
@@ -26,14 +24,12 @@ import javax.jms.ObjectMessage;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class DLQExceptionHandlerTestCase extends NamedTestCase
+public class DLQExceptionHandlerTestCase extends FunctionalTestCase
 {
-    protected void setUp() throws Exception
-    {
-        if(MuleManager.isInstanciated()) MuleManager.getInstance().dispose();
-        MuleXmlConfigurationBuilder builder = new MuleXmlConfigurationBuilder();
-        builder.configure("exception-dlq.xml");
+    protected String getConfigResources() {
+        return "exception-dlq.xml";
     }
+
     public void testDLQ() throws Exception
     {
         MuleClient client = new MuleClient();
