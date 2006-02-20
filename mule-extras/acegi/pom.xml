@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>org.codehaus.mule</groupId>
-            <artifactId>mule-extras-client</artifactId>
+            <artifactId>mule-http-provider</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -28,6 +28,14 @@
             <groupId>acegisecurity</groupId>
             <artifactId>acegi-security</artifactId>
             <version>0.7.0</version>
+        </dependency>
+
+		<!-- For unit tests only -->
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

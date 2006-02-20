@@ -14,27 +14,30 @@
     <name>Mule Client</name>
     <description>MuleClient is a simple interface for Mule clients to send and receive events from local or remote Mule Servers.</description>   
     <dependencies>
-        <!-- optional: used by the http remoting test case -->
+    	<!-- Dependencies are for unit tests only -->
         <dependency>
             <groupId>org.codehaus.mule</groupId>
             <artifactId>mule-http-provider</artifactId>
             <version>${version}</version>
-            <optional/>
+	    <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.mule</groupId>
             <artifactId>mule-vm-provider</artifactId>
             <version>${version}</version>
+	    <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.mule</groupId>
             <artifactId>mule-stream-provider</artifactId>
             <version>${version}</version>
+	    <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.mule</groupId>
             <artifactId>mule-tcp-provider</artifactId>
             <version>${version}</version>
+	    <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

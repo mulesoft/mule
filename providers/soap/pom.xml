@@ -14,11 +14,15 @@
     <name>Soap Provider</name>
     <description>A Mule provider for Soap Connectivity. The provider will use Axis or Glue depending on which is on the classpath.</description>
     <dependencies>
-        <!-- needed by the Axis Service component -->
         <dependency>
             <groupId>org.codehaus.mule</groupId>
-            <artifactId>mule-extras-client</artifactId>
+            <artifactId>mule-http-provider</artifactId>
             <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.3</version>
         </dependency>
         <dependency>
             <groupId>glue</groupId>
@@ -26,10 +30,11 @@
             <version>5.0.2</version>
             <scope>provided</scope>
         </dependency>
+        <!-- needed by the Axis Service component -->
         <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>1.3</version>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
         </dependency>
 	</dependencies>
 </project>

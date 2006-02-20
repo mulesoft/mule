@@ -32,7 +32,7 @@
         <dependency>
             <groupId>jetty</groupId>
             <artifactId>org.mortbay.jetty</artifactId>
-            <version>5.1.3</version>
+            <version>5.1.10</version>
         </dependency>
     </dependencies>
 </project>
