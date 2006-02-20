@@ -35,6 +35,7 @@ import org.mule.umo.lifecycle.DisposeException;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOServerNotification;
+import org.mule.umo.manager.UMOWorkManager;
 import org.mule.umo.provider.ConnectorException;
 import org.mule.umo.provider.UMOConnectable;
 import org.mule.umo.provider.UMOConnector;
@@ -81,8 +82,7 @@ import java.util.Map;
  * @version $Revision$
  */
 public abstract class AbstractConnector implements UMOConnector, ExceptionListener, UMOConnectable
-{
-    /**
+{    /**
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -191,6 +191,38 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     private boolean enableMessageEvents = false;
 
     private List supportedProtocols;
+
+    /**
+     * A shared work manager for all receivers registered with this connector if <code>useSingleReceiverThreadPool</code>
+     * is set to true
+     */
+    private UMOWorkManager receiverWorkManager = null;
+
+    /**
+     * A shared work manager for all dispatchers created for this connector if <code>useSingleDispatcherThreadPool</code>
+     * is set to true
+     */
+    private UMOWorkManager dispatcherWorkManager = null;
+
+    /**
+     * Should a single receiver thread pool be created for all recievers
+     * It is recommended that if you have a lot of receivers being registered per connector that this should be set
+     * to true
+     */
+    private boolean useSingleReceiverThreadPool = false;
+
+    /**
+     * Should a single dispatcher thread pool be created for all distachers
+     * It is recommended that if you have a lot of dispatcher being created per connector that this should be set
+     * to true i.e. many different outbound endpoints
+     */
+    private boolean useSingleDispatcherThreadPool = false;
+
+    /**
+     * The flag determines if the connector is being used on the server side or client.
+     * If true receiver threads will be given a slightly higher priority.
+     */
+    protected boolean serverSide = true;
 
     public AbstractConnector()
     {
@@ -977,10 +1009,117 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         return Collections.unmodifiableList(supportedProtocols);
     }
 
+    /**
+     * Sets A list of protocols that the connector can accept
+     * @param supportedProtocols
+     */
     public void setSupportedProtocols(List supportedProtocols) {
         for (Iterator iterator = supportedProtocols.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
             registerSupportedProtocol(s);
         }
+    }
+
+    /**
+     * Creates a work manager for a Message receiver.  If <code>useSingleReceiverThreadPool</code> has been set the
+     * same workManager of all receivers will be used
+     * @param name The name to associate with the thread pool.  No that the connector name will be prepended and ".receiver"
+     * will be appended
+     * @return A new work manager of an existing one if the work manager is being shared
+     */
+    UMOWorkManager createReceiverWorkManager(String name) {
+        UMOWorkManager wm = null;
+        if(useSingleReceiverThreadPool && receiverWorkManager!=null) {
+            wm = receiverWorkManager;
+        } else {
+            ThreadingProfile tp = getReceiverThreadingProfile();
+            if (serverSide) {
+                tp.setThreadPriority(Thread.NORM_PRIORITY + 2);
+            }
+            wm = tp.createWorkManager(getName() + "." + name + ".receiver");
+            if(useSingleReceiverThreadPool) {
+                receiverWorkManager = wm;
+            }
+        }
+        return wm;
+    }
+
+    /**
+     * Creates a work manager for a Message dispatcher.  If <code>useSingleDispatcherThreadPool</code> has been set the
+     * same workManager of all dispatchers will be used
+     * @param name The name to associate with the thread pool.  No that the connector name will be prepended and ".dispatcher"
+     * will be appended
+     * @return A new work manager of an existing one if the work manager is being shared
+     */
+    UMOWorkManager createDispatcherWorkManager(String name) {
+        UMOWorkManager wm = null;
+        if(useSingleDispatcherThreadPool && dispatcherWorkManager!=null) {
+            wm = dispatcherWorkManager;
+        } else {
+            ThreadingProfile tp = getReceiverThreadingProfile();
+            wm = tp.createWorkManager(getName() + "." + name + ".dispatcher");
+            if(useSingleDispatcherThreadPool) {
+                dispatcherWorkManager = wm;
+            }
+        }
+        return wm;
+    }
+
+    /**
+     * Should a single receiver thread pool be created for all recievers
+     * It is recommended that if you have a lot of receivers being registered per connector that this should be set
+     * to true
+     * @return true is a single thread pool is being used for all recievers on this connector
+     */
+    public boolean isUseSingleReceiverThreadPool() {
+        return useSingleReceiverThreadPool;
+    }
+
+    /**
+     * Should a single dispatcher thread pool be created for all recivers
+     * It is recommended that if you have a lot of receivers being registered per connector that this should be set
+     * to true
+     * @param useSingleReceiverThreadPool true is a single thread pool is being used for all receivers on this connector
+     */
+    public void setUseSingleReceiverThreadPool(boolean useSingleReceiverThreadPool) {
+        this.useSingleReceiverThreadPool = useSingleReceiverThreadPool;
+    }
+
+    /**
+     * Should a single dispatcher thread pool be created for all distachers
+     * It is recommended that if you have a lot of dispatcher being created per connector that this should be set
+     * to true i.e. many different outbound endpoints
+     * @return true is a single thread pool is being used for all dispatchers on this connector
+     */
+    public boolean isUseSingleDispatcherThreadPool() {
+        return useSingleDispatcherThreadPool;
+    }
+
+    /**
+     * Should a single dispatcher thread pool be created for all distachers
+     * It is recommended that if you have a lot of dispatcher being created per connector that this should be set
+     * to true i.e. many different outbound endpoints
+     * @param useSingleDispatcherThreadPool true is a single thread pool is being used for all dispatchers on this connector
+     */
+    public void setUseSingleDispatcherThreadPool(boolean useSingleDispatcherThreadPool) {
+        this.useSingleDispatcherThreadPool = useSingleDispatcherThreadPool;
+    }
+
+    /**
+     * The flag determines if the connector is being used on the server side or client.
+     * If true receiver threads will be given a slightly higher priority.
+     * @return true if running on the server side (default)
+     */
+    public boolean isServerSide() {
+        return serverSide;
+    }
+
+    /**
+     * The flag determines if the connector is being used on the server side or client.
+     * If true receiver threads will be given a slightly higher priority.
+     * @param serverSide true if running on the server side
+     */
+    public void setServerSide(boolean serverSide) {
+        this.serverSide = serverSide;
     }
 }

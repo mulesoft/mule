@@ -19,15 +19,23 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.ThreadingProfile;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.*;
+import org.mule.impl.MuleEvent;
+import org.mule.impl.MuleMessage;
+import org.mule.impl.MuleSession;
+import org.mule.impl.RequestContext;
+import org.mule.impl.ResponseOutputStream;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.impl.internal.notifications.MessageNotification;
 import org.mule.impl.internal.notifications.SecurityNotification;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
+import org.mule.umo.UMOTransaction;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -72,8 +80,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
      */
     protected AbstractConnector connector = null;
 
-    protected boolean serverSide = true;
-
     protected AtomicBoolean disposing = new AtomicBoolean(false);
 
     protected WaitableBoolean connected = new WaitableBoolean(false);
@@ -116,18 +122,14 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         setEndpoint(endpoint);
         listener = new DefaultInternalMessageListener();
         endpointUri = endpoint.getEndpointURI();
-        if (connector instanceof AbstractConnector) {
-            ThreadingProfile tp = ((AbstractConnector) connector).getReceiverThreadingProfile();
-            if (serverSide) {
-                tp.setThreadPriority(Thread.NORM_PRIORITY + 2);
-            }
-            workManager = tp.createWorkManager(connector.getName() + "." + endpoint.getName() + ".receiver");
-            try {
-                workManager.start();
-            } catch (UMOException e) {
-                throw new InitialisationException(e, this);
-            }
+
+        workManager = this.connector.createReceiverWorkManager(endpoint.getName());
+        try {
+            workManager.start();
+        } catch (UMOException e) {
+            throw new InitialisationException(e, this);
         }
+
         connectionStrategy = this.connector.getConnectionStrategy();
     }
 
@@ -318,14 +320,6 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
 
     public UMOEndpointURI getEndpointURI() {
         return endpointUri;
-    }
-
-    public boolean isServerSide() {
-        return serverSide;
-    }
-
-    public void setServerSide(boolean serverSide) {
-        this.serverSide = serverSide;
     }
 
     protected UMOWorkManager getWorkManager() {

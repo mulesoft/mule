@@ -73,7 +73,7 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             ThreadingProfile profile = connector.getDispatcherThreadingProfile();
             doThreading = profile.isDoThreading();
             if (doThreading) {
-                workManager = profile.createWorkManager(connector.getName() + ".dispatcher");
+                workManager = connector.createDispatcherWorkManager("");
                 try {
                     workManager.start();
                 } catch (UMOException e) {
