@@ -1,0 +1,7 @@
+connector=org.mule.providers.soap.xfire.XFireConnector
+dispatcher.factory=org.mule.providers.soap.xfire.XFireMessageDispatcherFactory
+message.receiver=org.mule.providers.soap.xfire.XFireMessageReceiver
+message.adapter=org.mule.providers.soap.xfire.XFireMessageAdapter
+inbound.transformer=
+outbound.transformer=
+endpoint.builder=org.mule.impl.endpoint.UrlEndpointBuilder
