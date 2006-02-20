@@ -15,8 +15,6 @@
 
 package org.mule.test.mule;
 
-import java.util.Properties;
-
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
@@ -25,13 +23,14 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
-import org.mule.transformers.NoActionTransformer;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.security.UMOCredentials;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.Properties;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -47,7 +46,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         MuleEvent event = (MuleEvent) getTestEvent(data, descriptor);
 
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
-        assertEquals("Event data should equal " + data, data, event.getMessageAsString());
+        assertEquals("Event data should equal " + data, data, event.getMessageAsString(null));
         assertEquals("Event data should equal " + data, data, event.getTransformedMessage());
         assertEquals("Event data should be a byte array 9 bytes in length",
                      9,
@@ -75,7 +74,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         UMOEvent event = getTestEvent(data, endpoint);
 
         assertEquals("Event data should equal " + data, data, event.getMessage().getPayload());
-        assertEquals("Event data should equal " + data, data, event.getMessageAsString());
+        assertEquals("Event data should equal " + data, data, event.getMessageAsString(null));
         assertEquals("Event data should equal 'Transformed Test Data'",
                      "Transformed Test Data",
                      event.getTransformedMessage());
@@ -101,7 +100,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertNotNull(event.getEndpoint());
         assertNotNull(event.getOutputStream());
         assertNotNull(event.getMessage());
-        assertEquals(data, event.getMessageAsString());
+        assertEquals(data, event.getMessageAsString(null));
 
         UMOEvent event2 = new MuleEvent(new MuleMessage("New Data"), event);
         assertNotNull(event2.getId());
@@ -110,7 +109,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertNotNull(event2.getEndpoint());
         assertNotNull(event2.getOutputStream());
         assertNotNull(event2.getMessage());
-        assertEquals("New Data", event2.getMessageAsString());
+        assertEquals("New Data", event2.getMessageAsString(null));
 
     }
 
@@ -182,7 +181,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
          * 
          * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
          */
-        public Object doTransform(Object src) throws TransformerException
+        public Object doTransform(Object src, String encoding) throws TransformerException
         {
             return "Transformed Test Data";
         }

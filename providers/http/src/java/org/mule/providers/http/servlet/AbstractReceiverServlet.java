@@ -125,7 +125,9 @@ public abstract class AbstractReceiverServlet extends HttpServlet
                 servletResponse.setContentType(contentType);
                 servletResponse.getOutputStream().write(httpResponse.getBodyBytes());
             } else {
+
                 servletResponse.setContentType(contentType);
+                //Encoding: tis method will check the charset on the content type
                 servletResponse.getWriter().write(httpResponse.getBodyString());
             }
             servletResponse.setStatus(HttpServletResponse.SC_OK);

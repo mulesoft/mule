@@ -14,11 +14,9 @@
  */
 package org.mule.providers.jms.transformers;
 
-import javax.jms.Message;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.umo.transformer.TransformerException;
+
+import javax.jms.Message;
 
 /**
  * <code>JMSMessageToObject</code> Will convert a
@@ -47,7 +45,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
         registerSourceType(Message.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Object result = null;
 

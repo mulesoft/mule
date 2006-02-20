@@ -1,5 +1,5 @@
 /*
- * $Header$ 
+ * $Header$
  * $Revision$ 
  * $Date$
  * ------------------------------------------------------------------------------------------------------
@@ -849,6 +849,7 @@ public class MuleXmlConfigurationBuilder extends AbstractDigesterConfiguration i
                                                               responseTrans,
                                                               createConnector,
                                                               digester.peek());
+                String encoding = attributes.getValue("encoding");
                 digester.push(ref);
             }
 

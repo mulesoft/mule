@@ -13,13 +13,13 @@
  */
 package org.mule.providers.file.transformers;
 
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>FileToByteArray</code> reads the contents of a files as a byte array
@@ -35,7 +35,7 @@ public class FileToByteArray extends AbstractTransformer
         setReturnClass(byte[].class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         File file = (File) src;
         byte[] buf = new byte[8 * 1024];

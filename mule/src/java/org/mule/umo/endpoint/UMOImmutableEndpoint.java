@@ -69,6 +69,7 @@ public interface UMOImmutableEndpoint extends Serializable, Cloneable, Initialis
      * @return the endpointUri on which the endpoint sends or receives data
      */
     UMOEndpointURI getEndpointURI();
+    String getEndpointEncoding();
 
     /**
      * Determines whether the message endpoint is a sender or receiver or both.

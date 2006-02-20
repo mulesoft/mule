@@ -32,7 +32,7 @@ public class ExceptionBeanToErrorMessage extends AbstractTransformer
     /* (non-Javadoc)
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try
         {

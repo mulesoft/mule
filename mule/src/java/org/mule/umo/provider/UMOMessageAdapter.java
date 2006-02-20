@@ -53,13 +53,22 @@ public interface UMOMessageAdapter extends Serializable {
      */
     Object removeProperty(Object key);
 
-    /**
+     /**
      * Converts the message implementation into a String representation
-     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     * used when converting from a byte array
      * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    String getPayloadAsString() throws Exception;
+    public String getPayloadAsString(String encoding) throws Exception;
+
+    /**
+     * Converts the message implementation into a String representation. If encoding is required it will
+     * use the encoding set on the message
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
+     */
+    public String getPayloadAsString() throws Exception;
 
     /**
      * @return all properties on this message

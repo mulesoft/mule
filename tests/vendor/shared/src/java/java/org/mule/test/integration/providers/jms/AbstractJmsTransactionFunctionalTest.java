@@ -30,7 +30,14 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOTransaction;
+import org.mule.umo.UMOTransactionConfig;
+import org.mule.umo.UMOTransactionFactory;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
@@ -38,7 +45,14 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.util.concurrent.CountDownLatch;
 
-import javax.jms.*;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.QueueConnection;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.TopicConnection;
 import java.util.HashMap;
 
 /**
@@ -287,7 +301,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                                                 inTrans,
                                                 UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
                                                 0,
-                                                null);
+                                                null, null);
 
         UMOTransactionConfig txConfig = new MuleTransactionConfig();
         txConfig.setFactory(getTransactionFactory());
@@ -299,7 +313,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                                                    outTrans,
                                                    UMOEndpoint.ENDPOINT_TYPE_SENDER,
                                                    0,
-                                                   null);
+                                                   null, null);
 
         endpoint.setTransactionConfig(txConfig);
 

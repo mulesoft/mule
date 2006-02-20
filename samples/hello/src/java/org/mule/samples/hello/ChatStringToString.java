@@ -15,7 +15,6 @@
 
 package org.mule.samples.hello;
 
-import org.mule.transformers.NoActionTransformer;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
@@ -40,7 +39,7 @@ public class ChatStringToString extends AbstractTransformer
     /* (non-Javadoc)
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         ChatString string = (ChatString) src;
         return string.toString();

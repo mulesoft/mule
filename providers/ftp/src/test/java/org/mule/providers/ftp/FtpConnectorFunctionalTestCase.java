@@ -14,8 +14,6 @@
  */
 package org.mule.providers.ftp;
 
-import java.io.FileOutputStream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.impl.endpoint.MuleEndpoint;
@@ -28,6 +26,8 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
+
+import java.io.FileOutputStream;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
@@ -55,7 +55,7 @@ public class FtpConnectorFunctionalTestCase extends AbstractProviderFunctionalTe
                                                                       null,
                                                                       UMOEndpoint.ENDPOINT_TYPE_SENDER,
                                                                       0,
-                                                                      null));
+                                                                      null, null));
         d.dispatch(e);
     }
 

@@ -107,7 +107,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
                                                 null,
                                                 UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
                                                 0,
-                                                null);
+                                                null, null);
 
         UMOTransactionFactory tf = getTransactionFactory();
         UMOTransactionConfig txConfig = new MuleTransactionConfig();
@@ -120,7 +120,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
                                                    null,
                                                    UMOEndpoint.ENDPOINT_TYPE_SENDER,
                                                    0,
-                                                   null);
+                                                   null, null);
 
         endpoint.setTransactionConfig(txConfig);
 

@@ -18,15 +18,12 @@ package org.mule.providers.email;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
-import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 
-import javax.mail.Address;
 import javax.mail.Header;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.Part;
-import javax.mail.internet.MimeMultipart;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -82,12 +79,15 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
         return contentBuffer;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#getPayloadAsString()
+    /**
+     * Converts the message implementation into a String representation
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString() throws Exception {
+    public String getPayloadAsString(String encoding) throws Exception {
         if (contentBuffer == null) {
             String contentType = messagePart.getContentType();
 
@@ -108,7 +108,7 @@ public class MailMessageAdapter extends AbstractMessageAdapter {
                 contentBuffer = getPayloadAsBytes();
             }
         }
-        return new String(contentBuffer);
+        return new String(contentBuffer, encoding);
     }
 
     /*

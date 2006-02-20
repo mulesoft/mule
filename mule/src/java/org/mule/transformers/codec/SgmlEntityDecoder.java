@@ -18,6 +18,8 @@ import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.SgmlCodec;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * Decodes a string containing SGML entities
  *
@@ -33,10 +35,18 @@ public class SgmlEntityDecoder extends AbstractTransformer
         setReturnClass(String.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         if(src instanceof byte[]) {
-            return SgmlCodec.decodeString(new String((byte[])src));
+           if (encoding != null) {
+              try {
+                return SgmlCodec.decodeString(new String((byte[])src, encoding));
+              } catch (UnsupportedEncodingException ex){
+            	return SgmlCodec.decodeString(new String((byte[])src));
+              }
+            } else {
+              return SgmlCodec.decodeString(new String((byte[])src));
+            }
         } else {
             return SgmlCodec.decodeString(src.toString());
         }

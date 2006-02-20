@@ -15,12 +15,11 @@
 
 package org.mule.providers.email.transformers;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.internet.MimeMultipart;
-
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+
+import javax.mail.Message;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * <code>EmailMessageToString</code> extracts a java mail Message contents and
@@ -43,7 +42,7 @@ public class EmailMessageToString extends AbstractTransformer
      * 
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Message msg = (Message) src;
         try {

@@ -27,7 +27,8 @@ import javax.xml.soap.SOAPMessage;
 import java.util.Iterator;
 
 /**
- * <code>AxisMessageAdapter</code> TODO
+ * <code>AxisMessageAdapter</code> wraps a soap message.  The payload of the adapter is the raw message received
+ * from the transport, but you also have access to the SOAPMessage object by using <code>adapter.getSOAPMessage()</code>
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -82,14 +83,15 @@ public class AxisMessageAdapter extends AbstractMessageAdapter
     }
 
     /**
-     * Converts the payload implementation into a String representation
-     * 
-     * @return String representation of the payload payload
+     * Converts the message implementation into a String representation
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
      * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString() throws Exception
-    {
-        return new String(getPayloadAsBytes());
+    public String getPayloadAsString(String encoding) throws Exception {
+        return new String(getPayloadAsBytes(), encoding);        
     }
 
     /**

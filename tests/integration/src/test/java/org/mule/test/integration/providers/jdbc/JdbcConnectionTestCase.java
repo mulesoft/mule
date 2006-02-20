@@ -13,10 +13,6 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import java.util.HashMap;
-
-import javax.sql.DataSource;
-
 import org.hsqldb.jdbc.jdbcDataSource;
 import org.mule.MuleManager;
 import org.mule.impl.MuleDescriptor;
@@ -28,6 +24,9 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.UMOConnector;
+
+import javax.sql.DataSource;
+import java.util.HashMap;
 
 /**
  * 
@@ -73,7 +72,7 @@ public class JdbcConnectionTestCase extends AbstractJdbcFunctionalTestCase {
                                                 connector,
                                                 null,
                                                 UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                0,
+                                                0, null,
                                                 new HashMap());
         MuleManager.getInstance().start();
         connector.registerListener(component, endpoint);

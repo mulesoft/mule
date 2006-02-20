@@ -35,6 +35,7 @@ import java.util.List;
 public class StringMessageHelper
 {
     public static final String DEFAULT_ENCODING = "UTF-8";
+    public static final String DEFAULT_OS_ENCODING = System.getProperty("file.encoding");
 
     public static String getFormattedMessage(String msg, Object[] arguments)
     {
@@ -119,10 +120,10 @@ public class StringMessageHelper
 
             int padding;
             try {
-                padding = trimLength - messages.get(i).toString().getBytes(getEncoding()).length;
+                padding = trimLength - messages.get(i).toString().getBytes(getOSEncoding()).length;
             } catch (UnsupportedEncodingException ueex) {
                 throw new MuleRuntimeException(
-                        new Message(CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING, getEncoding()));
+                        new Message(CoreMessageConstants.FAILED_TO_CONVERT_STRING_USING_X_ENCODING, getOSEncoding()));
             }
             if (padding > 0) {
                 buf.append(charString(' ', padding));
@@ -177,10 +178,25 @@ public class StringMessageHelper
         }
     }
 
+    public static String getString(byte[] bytes,String encoding) {
+        try {
+            return new String(bytes, encoding);
+        } catch (UnsupportedEncodingException e) {
+            //We can ignore this as the encoding is validated on start up
+            return null;
+        }
+    }
+    
     private static String getEncoding() {
         //Note that the org.mule.encoding property will not be set by Mule until the MuleManager.initialise
         //method is called, thus if you need to set an encoding other than UTF-8 before the Manager is invoked,
         //you can set this property on the JVM
         return System.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, DEFAULT_ENCODING);
+    }
+    private static String getOSEncoding() {
+        //Note that the org.mule.encoding property will not be set by Mule until the MuleManager.initialise
+        //method is called, thus if you need to set an encoding other than UTF-8 before the Manager is invoked,
+        //you can set this property on the JVM
+        return System.getProperty(MuleProperties.MULE_OS_ENCODING_SYSTEM_PROPERTY, DEFAULT_OS_ENCODING);
     }
 }

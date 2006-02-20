@@ -598,6 +598,11 @@ Jndi
 -->
 <!ATTLIST endpoint remoteSyncTimeout	NMTOKEN			#IMPLIED>
 
+<!--
+    encoding
+    explicitly specify the encoding used by this endpoint
+-->
+<!ATTLIST endpoint encoding  		CDATA                 #IMPLIED>
 
 <!--
 	Deterimes how mule will allocate a connector for this endpoint.  By default
@@ -658,6 +663,11 @@ Jndi
 -->
 <!ATTLIST global-endpoint remoteSyncTimeout	NMTOKEN			#IMPLIED>
 
+<!--
+    encoding
+    explicitly specify the encoding used by this endpoint
+-->
+<!ATTLIST endpoint encoding  		CDATA                 #IMPLIED>
 
 <!--
 A security filter ensures that all requestsmade via an endpoint will be authenticated

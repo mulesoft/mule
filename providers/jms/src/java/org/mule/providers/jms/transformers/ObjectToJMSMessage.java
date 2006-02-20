@@ -38,7 +38,12 @@ import org.mule.umo.transformer.TransformerException;
 
 public class ObjectToJMSMessage extends AbstractJmsTransformer
 {
-    public Object doTransform(Object src) throws TransformerException
+    /**
+     * logger used by this class
+     */
+    private static transient Log logger = LogFactory.getLog(ObjectToJMSMessage.class);
+
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Object result = null;
 

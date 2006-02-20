@@ -144,7 +144,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
                                                 connector,
                                                 null,
                                                 UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                0,
+                                                0, null,
                                                 new HashMap());
 
         try {

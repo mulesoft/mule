@@ -1,6 +1,7 @@
 /*
  * Project: mule-extras-pgp
- * Author : ariva
+ * @author ariva
+ * @version 1.0 
  * Created on 14-apr-2005
  *
  */
@@ -23,7 +24,7 @@ public class EchoMsg implements Callable
      */
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
-        return eventContext.getMessageAsString();
+        return eventContext.getMessageAsString(null);
     }
 
 }

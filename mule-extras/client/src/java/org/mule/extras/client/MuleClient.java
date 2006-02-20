@@ -776,7 +776,7 @@ public class MuleClient implements Disposable
                                         null,
                                         UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
                                         0,
-                                        null);
+                                        null, null);
         }
         if (endpoint != null) {
             manager.registerEndpoint(endpoint);

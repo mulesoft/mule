@@ -22,6 +22,8 @@ import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.security.CryptoFailureException;
 import org.mule.umo.transformer.TransformerException;
 
+import java.io.UnsupportedEncodingException;
+
 /**
  * <code>EncryptionTransformer</code> will transform an array of bytes or
  * string into an encrypted array of bytes
@@ -42,7 +44,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
         setReturnClass(byte[].class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         byte[] buf;
         if (src instanceof String) {
@@ -51,12 +53,20 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
             buf = (byte[]) src;
         }
         try {
-            byte[] result = getTransformedBytes(buf);
-            if (getReturnClass().equals(String.class)) {
-                return new String(result);
+          byte[] result = getTransformedBytes(buf);
+          if (getReturnClass().equals(String.class)) {
+            if (encoding != null) {
+              try {
+                return new String(result, encoding);
+              } catch (UnsupportedEncodingException ex){
+            	return new String(result);
+              }
             } else {
-                return result;
+              return new String(result);
             }
+          } else {
+            return result;
+          }
         } catch (CryptoFailureException e) {
             throw new TransformerException(this, e);
         }

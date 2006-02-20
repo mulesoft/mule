@@ -9,7 +9,7 @@
     <organization>
         <name>SymphonySoft Limited</name>
         <url>http://www.symphonysoft.com</url>
-        <!--<logo>/images/symphonysoft-logo.gif</logo-->
+        <logo>http://www.symphonysoft.com/images/stories/logo_250.gif</logo>
     </organization>
 
     <inceptionYear>2003</inceptionYear>
@@ -20,7 +20,7 @@
         light-weight, event-driven component technology that handles communication with disparate systems transparently
         providing a simple component interface.</description>
     <url>http://www.muleumo.org</url>
-    <issueTrackingUrl>http://jira.muleumo.org</issueTrackingUrl>
+    <issueTrackingUrl>http://jira.symphonysoft.com</issueTrackingUrl>
 <!--    <siteAddress>www.muleumo.org</siteAddress>-->
 <!--    <siteDirectory>/var/www/html/muleumo.org/</siteDirectory>-->
     <distributionSite>dist.codehaus.org</distributionSite>
@@ -62,6 +62,11 @@
             <id>rossmason</id>
             <email>ross.mason@symphonysoft.com</email>
             <organization>SymphonySoft Limited</organization>
+        </developer>
+        <developer>
+            <name>Hitoshi Ozawa</name>
+            <id>hozawa</id>
+            <email>h_ozawa@s4.dion.ne.jp</email>
         </developer>
         <developer>
             <name>Guillaume Nodet</name>

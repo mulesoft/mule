@@ -1,13 +1,13 @@
 package org.mule.providers.dq.transformers;
 
-import java.util.Iterator;
-
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.mule.providers.dq.DQMessage;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.Iterator;
 
 /**
  * <code> XmlToDQMessage</code> Will convert an xml string to a DQMessage.
@@ -28,9 +28,9 @@ public class XmlToDQMessage extends AbstractTransformer
     }
 
     /**
-     * @see org.mule.transformers.AbstractTransformer#doTransform(Object)
+     * @see org.mule.transformers.AbstractTransformer#doTransform(Object, String)
      */
-    public final Object doTransform(final Object src) throws TransformerException
+    public final Object doTransform(final Object src, String encoding) throws TransformerException
     {
 
         String xml = (String) src;

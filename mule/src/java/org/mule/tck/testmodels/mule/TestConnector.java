@@ -158,7 +158,7 @@ public class TestConnector extends AbstractConnector
          * 
          * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsString()
          */
-        public String getPayloadAsString() throws Exception
+        public String getPayloadAsString(String encoding) throws Exception
         {
             return message.toString();
         }

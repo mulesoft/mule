@@ -16,9 +16,10 @@
 package org.mule.samples.hello;
 
 import org.mule.config.i18n.Message;
-import org.mule.transformers.NoActionTransformer;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * <code>NameStringToChatString</code> This is test class only for use with the Hello world
@@ -42,11 +43,19 @@ public class HttpRequestToString extends AbstractTransformer
     /* (non-Javadoc)
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
-    	String param;
+    	String param = null;
     	if (src instanceof byte[]) {
-    		param = new String((byte[]) src);
+          if (encoding != null) {
+        	try {   
+    	      param = new String((byte[]) src, encoding);
+        	} catch (UnsupportedEncodingException ex){
+        		param = new String((byte[]) src);
+        	}
+           } else {
+    	      param = new String((byte[]) src);
+           }
     	} else {
         	param = src.toString();
     	}

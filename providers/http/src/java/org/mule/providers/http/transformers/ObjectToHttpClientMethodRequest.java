@@ -92,13 +92,13 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
 
     public Object transform(Object src, UMOEventContext context) throws TransformerException
     {
+    	String encoding = (String) context.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, null);
         String endpoint = (String) context.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
         if (endpoint == null) {
             throw new TransformerException(new Message(Messages.EVENT_PROPERTY_X_NOT_SET_CANT_PROCESS_REQUEST,
                                                        MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
         String method = (String) context.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
-
         try {
             URI uri = new URI(endpoint);
             HttpMethod httpMethod = null;
@@ -108,7 +108,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                 setHeaders(httpMethod, context);
                 String paramName = (String) context.getProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
                                                                 HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
-
                 String query = uri.getQuery();
                 if(!(src instanceof NullPayload) && !Utility.EMPTY_STRING.equals(src)) {
                     if (query == null) {
@@ -131,7 +130,11 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
                     //can control if a POST body is posted explicitly
                     if(!(context.getMessage().getPayload() instanceof NullPayload)) {
                         if (src instanceof String) {
-                            postMethod.setRequestEntity(new ByteArrayRequestEntity(src.toString().getBytes()));
+                        	if (encoding != null){
+                              postMethod.setRequestEntity(new ByteArrayRequestEntity(src.toString().getBytes(encoding)));
+                        	} else {
+                        		postMethod.setRequestEntity(new ByteArrayRequestEntity(src.toString().getBytes()));
+                        	}
                         } else if (src instanceof InputStream) {
 	                        postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream) src));
                         } else {

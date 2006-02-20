@@ -1,12 +1,11 @@
 package org.mule.samples.loanbroker.esb.transformers;
 
-import org.mule.transformers.AbstractTransformer;
-import org.mule.umo.transformer.TransformerException;
-import org.mule.samples.loanbroker.esb.message.CreditProfile;
-import org.mule.config.i18n.Message;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.mule.samples.loanbroker.esb.message.CreditProfile;
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.transformer.TransformerException;
 
 /**
  * Extracts the customer credit profile info from Xml returned from the CreditAgency EJB App.
@@ -21,7 +20,7 @@ public class CreditProfileXmlToCreditProfile extends AbstractTransformer {
         setReturnClass(CreditProfile.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException {
+    public Object doTransform(Object src, String encoding) throws TransformerException {
         Document doc = null;
         if(src instanceof Document) {
             doc = (Document)src;

@@ -14,6 +14,8 @@
 package org.mule.util;
 
 import org.mule.MuleManager;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -374,10 +376,10 @@ public class Utility
         mills = mills - (secs * 1000);
 
         StringBuffer bf = new StringBuffer();
-        bf.append(days).append(" days, ");
-        bf.append(hours).append(" hours, ");
-        bf.append(mins).append(" mins, ");
-        bf.append(secs).append(".").append(mills).append(" sec");
+        bf.append(days).append(" ").append(new Message(Messages.DAYS).getMessage()).append(", ");
+        bf.append(hours).append(" ").append(new Message(Messages.HOURS).getMessage()).append(", ");
+        bf.append(mins).append(" ").append(new Message(Messages.MINS).getMessage()).append(", ");
+        bf.append(secs).append(".").append(mills).append(" ").append(new Message(Messages.SEC).getMessage());
         return bf.toString();
     }
 

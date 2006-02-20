@@ -33,11 +33,15 @@ public class ByteArrayToString extends AbstractTransformer
         setReturnClass(String.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         if (src instanceof String) {
             return src;
         }
-        return StringMessageHelper.getString((byte[])src);
+        if (encoding != null) {
+        	return StringMessageHelper.getString((byte[])src, encoding);
+        } else {
+        	return StringMessageHelper.getString((byte[])src);
+        }
     }
 }

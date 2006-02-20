@@ -43,13 +43,14 @@ public class VMMessageAdapter extends AbstractMessageAdapter
 
     /**
      * Converts the message implementation into a String representation
-     * 
-     * @return String representation of the message
-     * @throws Exception Implemetation may throw an endpoint specific exception
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString() throws Exception
-    {
-        return message.getPayload().toString();
+    public String getPayloadAsString(String encoding) throws Exception {
+        return message.getPayloadAsString(encoding);
     }
 
     /**

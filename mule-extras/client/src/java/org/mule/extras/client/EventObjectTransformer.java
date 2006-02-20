@@ -13,10 +13,10 @@
  */
 package org.mule.extras.client;
 
-import java.util.EventObject;
-
 import org.mule.impl.MuleMessage;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.EventObject;
 
 /**
  * <code>EventObjectTransformer</code> converts a
@@ -39,7 +39,7 @@ public class EventObjectTransformer extends AbstractEventTransformer
         registerSourceType(EventObject.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         EventObject event = (EventObject) src;
         return new MuleMessage(event.getSource());

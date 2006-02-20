@@ -30,7 +30,7 @@ public class TestCompressionTransformer extends AbstractCompressionTransformer
 
     private int beanProperty2;
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         return null;
     }

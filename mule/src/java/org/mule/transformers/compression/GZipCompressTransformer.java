@@ -34,7 +34,7 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
         setReturnClass(byte[].class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         return compressMessage(src);
     }

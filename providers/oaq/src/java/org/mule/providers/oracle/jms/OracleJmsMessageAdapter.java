@@ -16,7 +16,6 @@ package org.mule.providers.oracle.jms;
 
 import oracle.jms.AdtMessage;
 import oracle.xdb.XMLType;
-
 import org.mule.providers.jms.JmsMessageAdapter;
 import org.mule.umo.MessagingException;
 
@@ -58,15 +57,27 @@ public class OracleJmsMessageAdapter extends JmsMessageAdapter {
      * Any other message is handled by the standard {@code JmsMessageAdapter}
      * 
      * @see JmsMessageAdapter#getPayloadAsString */
-    public String getPayloadAsString() throws Exception {
-    	Object jmsMessage = getPayload();
+
+    /**
+     * Converts the message implementation into a String representation
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
+     */
+    public String getPayloadAsString(String encoding) throws Exception {
+        Object jmsMessage = getPayload();
     	if (jmsMessage instanceof AdtMessage) {
     		Object adtMessage = ((AdtMessage) jmsMessage).getAdtPayload();
     		if (adtMessage instanceof XMLType) {
     			return ((XMLType) adtMessage).getStringVal();
     		}
     		else return adtMessage.toString();
-    	} 
-    	else return super.getPayloadAsString();
+    	}
+    	else {
+            return super.getPayloadAsString(encoding);
+        }
     }
+
 }

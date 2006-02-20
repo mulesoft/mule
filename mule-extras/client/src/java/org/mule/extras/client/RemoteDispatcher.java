@@ -27,7 +27,11 @@ import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.security.MuleCredentials;
 import org.mule.providers.service.ConnectorFactory;
-import org.mule.umo.*;
+import org.mule.umo.FutureMessageResult;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -271,7 +275,7 @@ public class RemoteDispatcher implements Disposable
                 return null;
             }
             if (result != null) {
-                String resultXml = result.getPayloadAsString();
+                String resultXml = result.getPayloadAsString(null);
                 if (resultXml != null && resultXml.length() > 0) {
                     // System.out.println("Remote dispatcher received result:\n"
                     // + resultXml);

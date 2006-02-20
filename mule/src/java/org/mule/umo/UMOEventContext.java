@@ -89,7 +89,8 @@ public interface UMOEventContext
      * Returns the message transformed into it's recognised or expected format
      * and then into a String. The transformer used is the one configured on the
      * endpoint through which this event was received.
-     * 
+     * This method will use the encoding set on the event
+     *
      * @return the message transformed into it's recognised or expected format
      *         as a Strings.
      * @throws TransformerException if a failure occurs in the transformer
@@ -99,11 +100,32 @@ public interface UMOEventContext
 
     /**
      * Returns the message contents as a string
+     * This method will use the encoding set on the event
      * 
      * @return the message contents as a string
      * @throws UMOException if the message cannot be converted into a string
      */
     String getMessageAsString() throws UMOException;
+
+    /**
+     * Returns the message transformed into it's recognised or expected format
+     * and then into a String. The transformer used is the one configured on the
+     * endpoint through which this event was received.
+     * @param encoding The encoding to use when transforming the message
+     * @return the message transformed into it's recognised or expected format
+     *         as a Strings.
+     * @throws TransformerException if a failure occurs in the transformer
+     * @see org.mule.umo.transformer.UMOTransformer
+     */
+    String getTransformedMessageAsString(String encoding) throws TransformerException;
+
+    /**
+     * Returns the message contents as a string
+     * @param encoding The encoding to use when transforming the message
+     * @return the message contents as a string
+     * @throws UMOException if the message cannot be converted into a string
+     */
+    String getMessageAsString(String encoding) throws UMOException;
 
     /**
      * Returns the current transaction (if any) for the session

@@ -190,7 +190,12 @@ public abstract class AbstractTransformer implements UMOTransformer
                                                        endpoint.getEndpointURI()), this);
             }
         } else {
-            result = doTransform(src);
+            String encoding = null;
+            if (endpoint != null && endpoint.getEndpointEncoding() != null) {
+               encoding = endpoint.getEndpointEncoding();
+            }
+            result = doTransform(src,encoding);
+
             result = checkReturnClass(result);
             if (transformer != null) {
                 result = transformer.transform(result);
@@ -220,7 +225,7 @@ public abstract class AbstractTransformer implements UMOTransformer
 
     }
 
-    public abstract Object doTransform(Object src) throws TransformerException;
+    protected abstract Object doTransform(Object src, String encoding) throws TransformerException;
 
     /*
      * (non-Javadoc)

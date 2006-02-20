@@ -13,12 +13,12 @@
  */
 package org.mule.transformers.simple;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Collection;
-
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>ObjectToString</code> transformer is useful for debugging.
@@ -37,7 +37,7 @@ public class ObjectToString extends AbstractTransformer
         setReturnClass(String.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
 	String output = "";
         if (src instanceof Map) {

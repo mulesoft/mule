@@ -266,4 +266,15 @@ public abstract class AbstractMessageAdapter implements UMOMessageAdapter {
     public String getEncoding() {
         return MuleManager.getConfiguration().getEncoding();
     }
+
+    /**
+     * Converts the message implementation into a String representation. If encoding is required it will
+     * use the encoding set on the message
+     *
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
+     */
+    public final String getPayloadAsString() throws Exception {
+        return getPayloadAsString(getEncoding());
+    }
 }

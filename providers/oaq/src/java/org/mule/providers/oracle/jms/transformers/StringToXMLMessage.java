@@ -14,20 +14,16 @@
  */
 package org.mule.providers.oracle.jms.transformers;
 
-import java.sql.SQLException;
-
-import javax.jms.JMSException;
-import javax.jms.Session;
-
 import oracle.jms.AQjmsSession;
 import oracle.jms.AdtMessage;
 import oracle.xdb.XMLType;
-
 import org.mule.config.i18n.Message;
 import org.mule.providers.oracle.jms.OracleJmsConnector;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.UMOException;
 import org.mule.umo.transformer.TransformerException;
+
+import javax.jms.Session;
 
 /**
  * Transformer for use with the Oracle Jms Connector.
@@ -52,7 +48,7 @@ public class StringToXMLMessage extends AbstractTransformer {
      * @param xml - String containing properly-formed XML.
      * @return JMS message whose payload is Oracle's native XML data type 
      */
-    public Object doTransform(Object xml) throws TransformerException {
+    public Object doTransform(Object xml, String encoding) throws TransformerException {
         Session session = null;
         AdtMessage message = null;
         XMLType xmltype = null;
@@ -72,7 +68,7 @@ public class StringToXMLMessage extends AbstractTransformer {
                             		  		(String) xml);
             } else if (xml instanceof byte[]) {
                     xmltype = XMLType.createXML(((AQjmsSession) session).getDBConnection(),
-                                		  		new String((byte[]) xml));
+                                		  		new String((byte[]) xml, encoding));
             } else {
             	throw new TransformerException(Message.createStaticMessage("Object to transform is not one of the supported types for this transformer."), this);
             }
@@ -81,9 +77,7 @@ public class StringToXMLMessage extends AbstractTransformer {
             message = ((AQjmsSession) session).createAdtMessage();
             message.setAdtPayload(xmltype);
 
-        } catch (JMSException e) {
-            throw new TransformerException(this, e);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new TransformerException(this, e);
         }
         return message;

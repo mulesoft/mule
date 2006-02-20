@@ -175,5 +175,7 @@ public interface UMODescriptor extends UMOImmutableDescriptor
      * @param state the initial state of this component
      */
     void setInitialState(String state);
+    
+    void setEncoding(String encoding);
 
 }

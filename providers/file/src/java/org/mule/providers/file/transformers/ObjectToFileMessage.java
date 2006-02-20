@@ -48,7 +48,7 @@ public class ObjectToFileMessage extends AbstractTransformer
      * 
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         return src;
     }

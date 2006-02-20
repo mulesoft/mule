@@ -13,9 +13,9 @@
  */
 package org.mule.providers.jdbc;
 
-import java.util.Map;
-
 import org.mule.providers.AbstractMessageAdapter;
+
+import java.util.Map;
 
 /**
  * @author Guillaume Nodet
@@ -31,13 +31,15 @@ public class JdbcMessageAdapter extends AbstractMessageAdapter
         this.map = (Map) obj;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsString()
+    /**
+     * Converts the message implementation into a String representation
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString() throws Exception
-    {
+    public String getPayloadAsString(String encoding) throws Exception {
         return map.toString();
     }
 

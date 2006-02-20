@@ -14,17 +14,15 @@
  */
 package org.mule.providers.oracle.jms.transformers;
 
-import java.sql.SQLException;
-
-import javax.jms.JMSException;
-
 import oracle.jms.AdtMessage;
 import oracle.xdb.XMLType;
-
 import org.mule.config.i18n.Message;
+import org.mule.providers.oracle.jms.OracleJmsConnector;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
-import org.mule.providers.oracle.jms.OracleJmsConnector;
+
+import javax.jms.JMSException;
+import java.sql.SQLException;
 
 /**
  * Transformer for use with the Oracle Jms Connector.
@@ -49,7 +47,7 @@ public class XMLMessageToString extends AbstractTransformer {
      * @param adtMessage - JMS message whose payload is Oracle's native XML data type.
      * @return the XML as a String. 
      * */
-    public Object doTransform(Object adtMessage) throws TransformerException {
+    public Object doTransform(Object adtMessage, String encoding) throws TransformerException {
         Object payload = null;
         String xml = null;
 

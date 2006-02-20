@@ -55,6 +55,8 @@ public interface UMOEndpoint extends UMOImmutableEndpoint
      */
     void setEndpointURI(UMOEndpointURI endpointUri) throws EndpointException;
 
+    void setEncoding(String endpointEncoding);
+    
     /**
      * Determines whether the message endpoint is a sender or receiver or both.
      * The possible values are-

@@ -157,7 +157,7 @@ public class MuleSoapHeaders
         if (replyTo != null) {
             Element e = (Element) muleHeader.addChildElement(MuleProperties.MULE_REPLY_TO_PROPERTY,
                                                                            MULE_NAMESPACE);
-            String enc = (String)encoder.doTransform(replyTo);
+            String enc = (String)encoder.transform(replyTo);
             e.setNodeValue(enc);
         }
     }

@@ -56,7 +56,7 @@ public abstract class AbstractSDBTransformer extends AbstractTransformer {
     }
 
 
-    public Object doTransform(Object src) throws TransformerException {
+    public Object doTransform(Object src, String encoding) throws TransformerException {
 
         try {
             return trans(src, getEntryIterator(src));

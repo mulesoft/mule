@@ -143,7 +143,7 @@ public class JmsReconnectionTestCase extends AbstractJmsFunctionalTestCase imple
                 connector,
                 null,
                 UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                0,
+                0, null,
                 new HashMap());
         MuleManager.getInstance().start();
         MuleManager.getInstance().registerListener(this);

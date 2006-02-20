@@ -42,7 +42,7 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
         setReturnClass(UMOMessage.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Object msg;
         HttpMethod httpMethod = (HttpMethod) src;

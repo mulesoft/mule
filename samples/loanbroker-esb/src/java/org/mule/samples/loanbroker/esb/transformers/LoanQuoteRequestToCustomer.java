@@ -30,7 +30,7 @@ public class LoanQuoteRequestToCustomer extends AbstractTransformer {
         registerSourceType(LoanQuoteRequest.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException {
+    public Object doTransform(Object src, String encoding) throws TransformerException {
 
         return ((LoanQuoteRequest)src).getCustomerRequest().getCustomer();
     }

@@ -13,15 +13,14 @@
  */
 package org.mule.providers.jbi;
 
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.activation.DataHandler;
-import javax.jbi.messaging.NormalizedMessage;
-
 import org.mule.providers.AbstractMessageAdapter;
 import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
+
+import javax.activation.DataHandler;
+import javax.jbi.messaging.NormalizedMessage;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <code>JbiMessageAdapter</code> translates a JBI NormalizedMessage
@@ -54,14 +53,27 @@ public class JbiMessageAdapter extends AbstractMessageAdapter
         message.setProperty(key.toString(), value);
     }
 
-    public String getPayloadAsString() throws Exception
-    {
-        return new String();
+
+    /**
+     * Converts the message implementation into a String representation
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
+     */
+    public String getPayloadAsString(String encoding) throws Exception {
+        throw new UnsupportedOperationException("getPayloadAsString");
     }
 
-    public byte[] getPayloadAsBytes() throws Exception
-    {
-        return new byte[0];
+    /**
+     * Converts the message implementation into a String representation
+     *
+     * @return String representation of the message
+     * @throws Exception Implemetation may throw an endpoint specific exception
+     */
+    public byte[] getPayloadAsBytes() throws Exception {
+        throw new UnsupportedOperationException("getPayloadAsBytes");
     }
 
     public Object getPayload()

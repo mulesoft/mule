@@ -39,7 +39,7 @@ public class HttpTransformTestCase extends FunctionalTestCase {
 		GZipUncompressTransformer gu = new GZipUncompressTransformer();
         assertNotNull(message.getPayload());
 		assertTrue(message.getPayload() instanceof byte[]);
-		byte[] r = (byte[]) gu.doTransform(message.getPayload());
+		byte[] r = (byte[]) gu.transform(message.getPayload());
 		String result = new String(r);
         assertEquals("<string>payload</string>", result);
     }
@@ -53,7 +53,7 @@ public class HttpTransformTestCase extends FunctionalTestCase {
 		ByteArrayToSerializable bas = new ByteArrayToSerializable();
 		assertNotNull(message.getPayload());
 		assertTrue(message.getPayload() instanceof byte[]);
-		Object result = bas.doTransform(message.getPayload());
+		Object result = bas.transform(message.getPayload());
 		assertEquals(payload, result);
 	}
 	
@@ -66,7 +66,7 @@ public class HttpTransformTestCase extends FunctionalTestCase {
 		ByteArrayToSerializable bas = new ByteArrayToSerializable();
 		assertNotNull(message.getPayload());
 		assertTrue(message.getPayload() instanceof byte[]);
-		Object result = bas.doTransform(message.getPayload());
+		Object result = bas.transform(message.getPayload());
 		assertEquals(payload, result);
 	}	
 }

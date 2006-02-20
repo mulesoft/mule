@@ -45,7 +45,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
      */
     public MuleEndpoint()
     {
-        super(null, null, null, null, ENDPOINT_TYPE_SENDER_AND_RECEIVER, 0, new HashMap());
+        super(null, null, null, null, ENDPOINT_TYPE_SENDER_AND_RECEIVER, 0,null, new HashMap());
     }
 
     public MuleEndpoint(String name,
@@ -54,9 +54,10 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
                         UMOTransformer transformer,
                         String type,
                         int createConnector,
+                        String endpointEncoding,
                         Map properties)
     {
-        super(name, endpointUri, connector, transformer, type, createConnector, properties);
+        super(name, endpointUri, connector, transformer, type, createConnector, endpointEncoding, properties);
     }
 
     public MuleEndpoint(UMOImmutableEndpoint endpoint)
@@ -84,6 +85,10 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
         this.endpointUri = endpointUri;
     }
 
+    public void setEncoding(String endpointEncoding)
+    {
+     	this.endpointEncoding = endpointEncoding;
+    }
     /*
      * (non-Javadoc)
      * 
@@ -157,7 +162,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
      * 
      * @return read-only copy
      */
-    public UMOImmutableEndpoint getImmutableProvider()
+    public UMOImmutableEndpoint getImmutableEndpoint()
     {
         UMOImmutableEndpoint result = new ImmutableMuleEndpoint(name,
                                                                 endpointUri,
@@ -165,6 +170,7 @@ public class MuleEndpoint extends ImmutableMuleEndpoint implements UMOEndpoint
                                                                 transformer,
                                                                 type,
                                                                 createConnector,
+                                                                endpointEncoding,
                                                                 properties);
 
         return result;

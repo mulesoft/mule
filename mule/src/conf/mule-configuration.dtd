@@ -63,6 +63,10 @@
      Added default encoding to use for general parsing of strings
 -->
 <!ATTLIST mule-environment-properties encoding  		CDATA                 #IMPLIED>
+<!--
+     Added default os encoding to use for general system message formatting and web service and servlet encoding
+-->
+<!ATTLIST mule-environment-properties osEncoding  		CDATA                 #IMPLIED>
 
 <!--
      Default transaction timeout
@@ -586,6 +590,12 @@ Jndi
 <!ATTLIST endpoint synchronous	(true|false)			#IMPLIED>
 
 <!--
+    encoding
+    explicitly specify the encoding used by this endpoint
+-->
+<!ATTLIST endpoint encoding  		CDATA                 #IMPLIED>
+
+<!--
     remoteSync
     Determines whether when running synchronously, return events are received before
     returning the call. i.e. in jms wait for a replyTo or tcp/http reply on the outputStream.
@@ -659,6 +669,11 @@ Jndi
 -->
 <!ATTLIST global-endpoint remoteSyncTimeout	NMTOKEN			#IMPLIED>
 
+<!--
+    encoding
+    explicitly specify the encoding used by this endpoint
+-->
+<!ATTLIST global-endpoint encoding  		CDATA                 #IMPLIED>
 
 <!--
 A security filter ensures that all requestsmade via an endpoint will be authenticated

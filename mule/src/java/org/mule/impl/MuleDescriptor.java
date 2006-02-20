@@ -410,4 +410,8 @@ public class MuleDescriptor extends ImmutableMuleDescriptor implements UMODescri
     public void setInitialState(String state) {
         this.initialState = state;
     }
+    
+    public void setEncoding(String encoding) {
+    	this.encoding = encoding;
+    }
 }

@@ -60,11 +60,15 @@ public class DQMessageAdapter extends AbstractMessageAdapter
     }
 
     /**
-     * @see org.mule.umo.provider.UMOMessageAdapter#getPayloadAsString()
+     * Converts the message implementation into a String representation
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public final String getPayloadAsString() throws Exception
-    {
-        return new String(getPayloadAsBytes());
+    public String getPayloadAsString(String encoding) throws Exception {
+        return new String(getPayloadAsBytes(), encoding);        
     }
 
 }

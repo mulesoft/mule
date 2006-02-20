@@ -15,7 +15,6 @@
 
 package org.mule.tck.testmodels.fruit;
 
-import org.mule.transformers.NoActionTransformer;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
 
@@ -28,7 +27,7 @@ public class ObjectToFruitLover extends AbstractTransformer
         this.registerSourceType(FruitLover.class);
     }
 
-    public Object doTransform(Object src) throws TransformerException
+    public Object doTransform(Object src, String encoding) throws TransformerException
     {
         if (src instanceof FruitLover) {
             return src;

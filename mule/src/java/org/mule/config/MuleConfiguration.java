@@ -67,6 +67,11 @@ public class MuleConfiguration
     public static final String SYNCHRONOUS_PROPERTY = "synchronous";
 
     public static final String DEFAULT_ENCODING = "UTF-8";
+    /**
+     * Default encoding used in OS running Mule
+     */
+    public static final String DEFAULT_OS_ENCODING = System.getProperty("file.encoding");
+
     // /**
     // * Determines the default inboundProvider that Mule uses to communicate
     // between MuelUMO's when an
@@ -128,6 +133,8 @@ public class MuleConfiguration
 
     private String encoding = DEFAULT_ENCODING;
 
+    private String osEncoding = DEFAULT_OS_ENCODING;
+    
     private PoolingProfile poolingProfile = new PoolingProfile();
 
     /**
@@ -534,6 +541,14 @@ public class MuleConfiguration
         this.encoding = encoding;
     }
 
+    public String getOSEncoding() {
+        return osEncoding;
+    }
+
+    public void setOSEncoding(String osEncoding) {
+        this.osEncoding = osEncoding;
+    }
+    
     public boolean isEnableMessageEvents() {
         return enableMessageEvents;
     }

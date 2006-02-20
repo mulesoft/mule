@@ -28,6 +28,7 @@ import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest.RollbackExceptionListener;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
@@ -300,7 +301,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                                                 connector,
                                                 inTrans,
                                                 UMOEndpoint.ENDPOINT_TYPE_RECEIVER,
-                                                0,
+                                                0, null,
                                                 null);
 
         UMOTransactionConfig txConfig = new MuleTransactionConfig();
@@ -312,7 +313,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
                                                    connector,
                                                    outTrans,
                                                    UMOEndpoint.ENDPOINT_TYPE_SENDER,
-                                                   0,
+                                                   0, null,
                                                    null);
 
         endpoint.setTransactionConfig(txConfig);

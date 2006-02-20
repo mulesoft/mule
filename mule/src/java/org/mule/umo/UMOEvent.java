@@ -86,7 +86,8 @@ public interface UMOEvent
      * Returns the message transformed into it's recognised or expected format
      * and then into a String. The transformer used is the one configured on the
      * endpoint through which this event was received.
-     * 
+     * If necessary this will use the encoding set on the event
+     *
      * @return the message transformed into it's recognised or expected format
      *         as a Strings.
      * @throws TransformerException if a failure occurs in the transformer
@@ -96,11 +97,33 @@ public interface UMOEvent
 
     /**
      * Returns the message contents as a string
-     * 
+     * If necessary this will use the encoding set on the event
+     *
      * @return the message contents as a string
      * @throws UMOException if the message cannot be converted into a string
      */
     String getMessageAsString() throws UMOException;
+
+    /**
+     * Returns the message transformed into it's recognised or expected format
+     * and then into a String. The transformer used is the one configured on the
+     * endpoint through which this event was received.
+     * @param encoding the encoding to use when converting the message to string
+     *
+     * @return the message transformed into it's recognised or expected format
+     *         as a Strings.
+     * @throws TransformerException if a failure occurs in the transformer
+     * @see org.mule.umo.transformer.UMOTransformer
+     */
+    String getTransformedMessageAsString(String encoding) throws TransformerException;
+
+    /**
+     * Returns the message contents as a string
+     * @param encoding the encoding to use when converting the message to string
+     * @return the message contents as a string
+     * @throws UMOException if the message cannot be converted into a string
+     */
+    String getMessageAsString(String encoding) throws UMOException;
 
     /**
      * Every event in the system is assigned a universally unique id (UUID).
@@ -370,5 +393,11 @@ public interface UMOEvent
      * @return true if the request should be streamed
      */
     boolean isStreaming();
+
+    /**
+     * Gets the encoding for this message.
+     * @return the encoding for the event. This must never return null.
+     */
+    String getEncoding() ;
 
 }

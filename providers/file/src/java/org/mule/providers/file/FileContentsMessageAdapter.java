@@ -15,8 +15,6 @@
 
 package org.mule.providers.file;
 
-import java.io.File;
-
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.AbstractMessageAdapter;
@@ -25,6 +23,8 @@ import org.mule.umo.MessagingException;
 import org.mule.umo.provider.MessageTypeNotSupportedException;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.umo.transformer.TransformerException;
+
+import java.io.File;
 
 /**
  * <code>FileMessageAdapter</code> provides a wrapper for a message. Users can
@@ -71,14 +71,16 @@ public class FileContentsMessageAdapter extends AbstractMessageAdapter
         return message;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.providers.UMOMessageAdapter#getPayloadAsString()
+    /**
+     * Converts the message implementation into a String representation
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString() throws Exception
-    {
-        return new String(getPayloadAsBytes());
+    public String getPayloadAsString(String encoding) throws Exception {
+        return new String(getPayloadAsBytes(), encoding);
     }
 
     /*

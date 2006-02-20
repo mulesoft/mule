@@ -25,7 +25,6 @@ import org.mule.util.Utility;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -93,14 +92,17 @@ public class HttpRequestMessageAdapter extends AbstractMessageAdapter {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mule.umo.providers.UMOMessageAdapter#getMessageAsString()
+    /**
+     * Converts the message implementation into a String representation
+     *
+     * @param encoding The encoding to use when transforming the message (if necessary). The parameter is
+     *                 used when converting from a byte array
+     * @return String representation of the message payload
+     * @throws Exception Implementation may throw an endpoint specific exception
      */
-    public String getPayloadAsString() throws Exception {
+    public String getPayloadAsString(String encoding) throws Exception {
         if (isBinary()) {
-            return new String((byte[]) message);
+            return new String((byte[]) message, encoding);
         } else {
             return (String) message;
         }
