@@ -19,6 +19,7 @@ import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
 import org.mule.config.ThreadingProfile;
+import org.mule.config.MuleProperties;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.providers.AbstractConnector;
@@ -66,6 +67,7 @@ public class MuleResourceAdapter implements ResourceAdapter
 
     public MuleResourceAdapter()
     {
+        MuleManager.getConfiguration().setModelType("jca");        
     }
 
     /**
@@ -74,7 +76,6 @@ public class MuleResourceAdapter implements ResourceAdapter
     public void start(BootstrapContext bootstrapContext) throws ResourceAdapterInternalException
     {
         this.bootstrapContext = bootstrapContext;
-        MuleManager.getConfiguration().setModelType("jca");
         if (info.getConfigurations() != null) {
             if (MuleManager.isInstanciated()) {
                 throw new ResourceAdapterInternalException("A manageris already configured, cannot configure a new one using the configurations set on the Resource Adapter");
