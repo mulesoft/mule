@@ -40,12 +40,10 @@ import java.net.URISyntaxException;
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @author <a href="mailto:tsuppari@yahoo.co.uk">P.Oikari</a>
- *
  * @version $Revision$
  */
 
-public class TcpMessageDispatcher extends AbstractMessageDispatcher
-{
+public class TcpMessageDispatcher extends AbstractMessageDispatcher {
     /////////////////////////////////////////////////////////////////
     // keepSocketOpen option variables
     /////////////////////////////////////////////////////////////////
@@ -60,39 +58,40 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
 
     private TcpConnector connector;
 
-    public TcpMessageDispatcher(TcpConnector connector)
-    {
+    public TcpMessageDispatcher(TcpConnector connector) {
         super(connector);
         this.connector = connector;
     }
 
-    protected Socket initSocket(String endpoint) throws IOException, URISyntaxException
-    {
+    protected Socket initSocket(String endpoint) throws IOException, URISyntaxException {
         URI uri = new URI(endpoint);
         int port = uri.getPort();
         InetAddress inetAddress = InetAddress.getByName(uri.getHost());
         Socket socket = createSocket(port, inetAddress);
         socket.setReuseAddress(true);
-        socket.setReceiveBufferSize(connector.getBufferSize());
-        socket.setSendBufferSize(connector.getBufferSize());
-        socket.setSoTimeout(connector.getSendTimeout());
+        if (connector.getBufferSize() != UMOConnector.INT_VALUE_NOT_SET && socket.getReceiveBufferSize() != connector.getBufferSize()) {
+            socket.setReceiveBufferSize(connector.getBufferSize());
+        }
+        if (connector.getBufferSize() != UMOConnector.INT_VALUE_NOT_SET && socket.getSendBufferSize() != connector.getBufferSize()) {
+            socket.setSendBufferSize(connector.getBufferSize());
+        }
+        if (connector.getReceiveTimeout() != UMOConnector.INT_VALUE_NOT_SET && socket.getSoTimeout() != connector.getReceiveTimeout()) {
+            socket.setSoTimeout(connector.getReceiveTimeout());
+        }
         return socket;
     }
 
-    public void doDispatch(UMOEvent event) throws Exception
-    {
+    public void doDispatch(UMOEvent event) throws Exception {
         try {
             doInternalDispatch(event);
-        }
-        finally {
+        } finally {
             if (!connector.isKeepSendSocketOpen()) {
                 doDispose();
             }
         }
     }
 
-    public UMOMessage doSend(UMOEvent event) throws Exception
-    {
+    public UMOMessage doSend(UMOEvent event) throws Exception {
         doInternalDispatch(event);
 
         if (useRemoteSync(event)) {
@@ -102,8 +101,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                     return null;
                 }
                 return new MuleMessage(connector.getMessageAdapter(result));
-            }
-            catch (SocketTimeoutException e) {
+            } catch (SocketTimeoutException e) {
                 // we don't necessarily expect to receive a response here
                 logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
                         + event.getEndpoint().getEndpointURI());
@@ -137,8 +135,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         try {
             write(connectedSocket, payload);
             // If we're doing sync receive try and read return info from socket
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             if (keepSendSocketOpen) {
                 logger.warn("Write raised exception: '" + e.getMessage() + "' attempting to reconnect.");
 
@@ -152,13 +149,11 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    protected Socket createSocket(int port, InetAddress inetAddress) throws IOException
-    {
+    protected Socket createSocket(int port, InetAddress inetAddress) throws IOException {
         return new Socket(inetAddress, port);
     }
 
-    protected void write(Socket socket, Object data) throws IOException
-    {
+    protected void write(Socket socket, Object data) throws IOException {
         TcpProtocol protocol = connector.getTcpProtocol();
         byte[] binaryData;
         if (data instanceof String) {
@@ -173,8 +168,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         bos.flush();
     }
 
-    protected byte[] receive(Socket socket, int timeout) throws IOException
-    {
+    protected byte[] receive(Socket socket, int timeout) throws IOException {
         DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         if (timeout >= 0) {
             socket.setSoTimeout(timeout);
@@ -182,8 +176,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         return connector.getTcpProtocol().read(dis);
     }
 
-    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
-    {
+    public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception {
         Socket socket = null;
         try {
             socket = initSocket(endpointUri.getAddress());
@@ -207,25 +200,21 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
         }
     }
 
-    public Object getDelegateSession() throws UMOException
-    {
+    public Object getDelegateSession() throws UMOException {
         return null;
     }
 
-    public UMOConnector getConnector()
-    {
+    public UMOConnector getConnector() {
         return connector;
     }
 
-    public void doDispose()
-    {
+    public void doDispose() {
         if (null != connectedSocket && !connectedSocket.isClosed()) {
             try {
                 connectedSocket.close();
 
                 connectedSocket = null;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 logger.warn("ConnectedSocked close raised exception. Reason: " + e.getMessage());
             }
         }
@@ -234,8 +223,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     /////////////////////////////////////////////////////////////////
     // New keepSocketOpen option methods by P.Oikari
     /////////////////////////////////////////////////////////////////
-    public boolean reconnect(UMOEvent event, int maxRetries) throws Exception
-    {
+    public boolean reconnect(UMOEvent event, int maxRetries) throws Exception {
         if (null != connectedSocket) {
             // We already have a connected socket
             return true;
@@ -252,8 +240,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                 success = true;
 
                 connector.setSendSocketValid(true);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 success = false;
 
                 connector.setSendSocketValid(false);
@@ -263,13 +250,12 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                 }
 
                 logger.warn("run() warning at host: '" + event.getEndpoint().getEndpointURI().getAddress() +
-                            "'. Reason: " + e.getMessage());
+                        "'. Reason: " + e.getMessage());
 
                 if (retryCount < maxRetries) {
                     try {
                         Thread.sleep(connector.getReconnectMillisecs());
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         logger.warn("SocketConnector threadsleep interrupted. Reason: " + ex.getMessage());
                     }
                 } else {

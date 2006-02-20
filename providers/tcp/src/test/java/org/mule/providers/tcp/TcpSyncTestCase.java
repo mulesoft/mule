@@ -61,6 +61,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
     public void testSyncResponseOfBufferSize() throws Exception
     {
         TcpConnector tcp = (TcpConnector) MuleManager.getInstance().lookupConnector("tcpConnector");
+        tcp.setBufferSize(1024 * 16);
         byte[] data = new byte[tcp.getBufferSize()];
         UMOMessage message = send(data);
         assertNotNull(message);
