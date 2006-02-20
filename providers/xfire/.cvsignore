@@ -1,4 +1,5 @@
 mule-xfire-provider.iml
 target
 .mule
-
+.classpath
+.project
