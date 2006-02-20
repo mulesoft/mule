@@ -16,6 +16,8 @@
 package org.mule.tck;
 
 import junit.framework.TestCase;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.impl.MuleDescriptor;
@@ -43,6 +45,12 @@ import java.util.Map;
  * @version $Revision$
  */
 public abstract class AbstractMuleTestCase extends TestCase {
+
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
+
     //This should be set to a string message describing any prerequisites not met
     protected String prereqs = null;
     private boolean offline = System.getProperty("org.mule.offline", "false").equalsIgnoreCase("true");
@@ -95,7 +103,7 @@ public abstract class AbstractMuleTestCase extends TestCase {
     }
 
     private void log(String s) {
-        System.out.println(s);
+        logger.info(s);
     }
 
     public String getName() {
