@@ -95,7 +95,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return getPayloadAsString(null).getBytes();
+        return getPayloadAsString().getBytes();
     }
 
     /**

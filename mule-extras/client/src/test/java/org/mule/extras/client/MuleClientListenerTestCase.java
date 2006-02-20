@@ -58,7 +58,7 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
 
         UMOMessage message = client.send(urlString, "Test Client Send message", null);
         assertNotNull(message);
-        assertEquals("Received: Test Client Send message", message.getPayloadAsString(null));
+        assertEquals("Received: Test Client Send message", message.getPayloadAsString());
         client.unregisterComponent(name);
 
         assertTrue(!MuleManager.getInstance().getModel().isComponentRegistered(name));

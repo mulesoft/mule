@@ -275,7 +275,7 @@ public class RemoteDispatcher implements Disposable
                 return null;
             }
             if (result != null) {
-                String resultXml = result.getPayloadAsString(null);
+                String resultXml = result.getPayloadAsString();
                 if (resultXml != null && resultXml.length() > 0) {
                     // System.out.println("Remote dispatcher received result:\n"
                     // + resultXml);

@@ -55,7 +55,7 @@ public class BaseMessage implements Serializable
      */
     public byte[] getPayloadAsBytes() throws Exception
     {
-        return getPayloadAsString(null).getBytes();
+        return getPayloadAsString(message.toString()).getBytes();
     }
 
     /**

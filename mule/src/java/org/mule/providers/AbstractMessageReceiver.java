@@ -250,7 +250,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
         }
         if (logger.isTraceEnabled()) {
             try {
-                logger.trace("Message Payload: \n" + message.getPayloadAsString(null));
+                logger.trace("Message Payload: \n" + message.getPayloadAsString());
             } catch (Exception e) {
                 // ignore
             }
