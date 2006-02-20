@@ -45,5 +45,12 @@
             <version>${version}</version>
 	    	<scope>test</scope>
         </dependency>
+        <!-- required by http -->
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-tcp-provider</artifactId>
+            <version>${version}</version>
+	    	<scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
