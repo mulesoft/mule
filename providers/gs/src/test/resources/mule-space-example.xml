@@ -9,7 +9,7 @@
         <mule-descriptor name="unprocessedOrders" implementation="org.mule.tck.functional.FunctionalTestComponent">
             <inbound-router>
                 <endpoint address="gs:java://localhost/mule-space_container/mule-space?schema=cache">
-                    <filter className="org.mule.providers.gs.filters.JiniEntryFilter" expectedType="org.mule.providers.gs.Order" >
+                    <filter className="org.mule.providers.gs.filters.JavaSpaceTemplateFilter" expectedType="org.mule.providers.gs.Order" >
                         <properties>
                             <map name="fields">
                                 <property name="processed" value="false"/>
@@ -31,7 +31,7 @@
                 <endpoint address="jms://processed"/>
                 <endpoint address="gs:java://localhost/mule-space_container/mule-space?schema=cache">
                     <transaction factory="org.mule.providers.gs.JiniTransactionFactory"/>
-                    <filter className="org.mule.providers.gs.filters.JiniEntryFilter" expectedType="org.mule.providers.gs.Order" >
+                    <filter className="org.mule.providers.gs.filters.JavaSpaceTemplateFilter" expectedType="org.mule.providers.gs.Order" >
                         <properties>
                             <map name="fields">
                                 <property name="processed" value="true"/>

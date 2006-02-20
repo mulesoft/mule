@@ -32,7 +32,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JiniEntryFilter implements UMOFilter {
+public class JavaSpaceTemplateFilter implements UMOFilter {
 
     public static final String NULL_VALUE = "null";
 
@@ -40,11 +40,11 @@ public class JiniEntryFilter implements UMOFilter {
     private Map fields = new HashMap();
     private Entry entry = null;
 
-    public JiniEntryFilter()
+    public JavaSpaceTemplateFilter()
     {
     }
 
-    public JiniEntryFilter(String expectedType)
+    public JavaSpaceTemplateFilter(String expectedType)
     {
         setExpectedType(expectedType);
     }

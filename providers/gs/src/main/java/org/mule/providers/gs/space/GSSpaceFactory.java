@@ -26,7 +26,7 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.space.CreateSpaceException;
 import org.mule.providers.gs.GSConnector;
 import org.mule.providers.gs.JiniTransactionFactory;
-import org.mule.providers.gs.filters.JiniEntryFilter;
+import org.mule.providers.gs.filters.JavaSpaceTemplateFilter;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.space.UMOSpace;
@@ -92,8 +92,8 @@ public class GSSpaceFactory implements UMOSpaceFactory {
             //Now set the Entry template on the space
             if(endpoint.getFilter()!=null) {
                 UMOFilter filter = endpoint.getFilter();
-                if(filter instanceof JiniEntryFilter) {
-                    space.setEntryTemplate(((JiniEntryFilter)filter).getEntry());
+                if(filter instanceof JavaSpaceTemplateFilter) {
+                    space.setEntryTemplate(((JavaSpaceTemplateFilter)filter).getEntry());
                 } else {
                     logger.warn("Filter on endpoint " + endpoint.getEndpointURI().toString() + " Was not a JiniEntryFilter. Endpoint will match all entries of all types for this endpoint");
                     space.setEntryTemplate(createDefaultEntry(endpoint.getEndpointURI().toString()));
