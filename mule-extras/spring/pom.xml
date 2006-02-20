@@ -39,5 +39,11 @@
             <version>${version}</version>
 	    	<scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-http-provider</artifactId>
+            <version>${version}</version>
+	    	<scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
