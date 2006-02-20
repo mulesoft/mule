@@ -49,7 +49,7 @@ public abstract class AbstractMuleTestCase extends TestCase {
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static transient Log logger = LogFactory.getLog(AbstractMuleTestCase.class);
 
     //This should be set to a string message describing any prerequisites not met
     protected String prereqs = null;
