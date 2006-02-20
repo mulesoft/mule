@@ -13,25 +13,41 @@
  */
 package org.mule.test.filters.xml;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.xml.JXPathMessageFilter;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformers.xml.XmlToDomDocument;
 import org.mule.umo.UMOMessage;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public class JXPathMessageFilterTestCase extends NamedTestCase
+public class JXPathMessageFilterTestCase extends AbstractMuleTestCase
 {
     private String xmlData = null;
 
     private JXPathMessageFilter myFilter = null;
     private XmlToDomDocument transformer = null;
+
+    protected void doSetUp() throws Exception
+    {
+        // Read Xml file
+        BufferedReader br = new BufferedReader(new FileReader("src/test/conf/cdcatalog.xml"));
+        String nextLine = "";
+        StringBuffer sb = new StringBuffer();
+        while ((nextLine = br.readLine()) != null) {
+            sb.append(nextLine);
+        }
+        xmlData = sb.toString();
+
+        // new UMOFilter
+        myFilter = new JXPathMessageFilter();
+        transformer = new XmlToDomDocument();
+    }
 
     public void testFilter1() throws Exception
     {
@@ -74,21 +90,5 @@ public class JXPathMessageFilterTestCase extends NamedTestCase
         boolean res = myFilter.accept(message);
         assertTrue(res);
 
-    }
-
-    protected void setUp() throws Exception
-    {
-        // Read Xml file
-        BufferedReader br = new BufferedReader(new FileReader("src/test/conf/cdcatalog.xml"));
-        String nextLine = "";
-        StringBuffer sb = new StringBuffer();
-        while ((nextLine = br.readLine()) != null) {
-            sb.append(nextLine);
-        }
-        xmlData = sb.toString();
-
-        // new UMOFilter
-        myFilter = new JXPathMessageFilter();
-        transformer = new XmlToDomDocument();
     }
 }

@@ -1,10 +1,6 @@
 package org.mule.test.config;
 
-import java.util.List;
-import java.util.Map;
-
 import junit.framework.Assert;
-
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
@@ -24,18 +20,21 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ObjectPool;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleXmlConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
-    public String getConfigResource()
+    public String getConfigResources()
     {
         return "test-xml-mule-config.xml,test-xml-mule-config-split.xml,test-xml-mule-config-split-properties.xml";
     }
 
-    public ConfigurationBuilder getConfigBuilder()
+    public ConfigurationBuilder getBuilder()
     {
         try {
             return new MuleXmlConfigurationBuilder();

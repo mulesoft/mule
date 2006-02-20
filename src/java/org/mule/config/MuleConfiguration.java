@@ -16,12 +16,15 @@
 package org.mule.config;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.util.ClassHelper;
+import org.mule.util.Utility;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.mule.util.queue.QueuePersistenceStrategy;
 
@@ -40,6 +43,11 @@ import java.util.jar.Manifest;
  */
 public class MuleConfiguration
 {
+    /**
+     * logger used by this class
+     */
+    protected transient Log logger = LogFactory.getLog(getClass());
+    
     /**
      * The default serverUrl used to receive incoming requests from clients
      */
@@ -519,6 +527,10 @@ public class MuleConfiguration
     }
 
     public void setEncoding(String encoding) {
+        if(encoding==null || Utility.EMPTY_STRING.equals(encoding)) {
+            logger.warn("Cannot set encoding to null or empty String");
+            return;
+        }
         this.encoding = encoding;
     }
 

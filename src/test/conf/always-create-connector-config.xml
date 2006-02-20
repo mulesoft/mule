@@ -4,6 +4,9 @@
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
 <mule-configuration version="1.0">
+    
+    <mule-environment-properties serverUrl=""/>
+
     <global-endpoints>
         <endpoint name="inbound" address="test:/inbound" createConnector="ALWAYS_CREATE"/>
         <endpoint name="outbound" address="test://outbound" createConnector="ALWAYS_CREATE"/>

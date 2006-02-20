@@ -17,7 +17,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleRuntimeException;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.routing.filters.WildcardFilter;
@@ -237,6 +236,7 @@ public class ServerNotificationManager implements Work, Disposable
         }
 
         try {
+            if(disposed) return;
             listeners = getListeners(listenerClass);
         } catch (NotificationException e) {
             logger.error(e.getMessage(), e);

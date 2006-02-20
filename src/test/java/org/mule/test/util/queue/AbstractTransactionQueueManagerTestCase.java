@@ -16,9 +16,7 @@ package org.mule.test.util.queue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleManager;
-import org.mule.tck.NamedTestCase;
-import org.mule.util.Utility;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueConfiguration;
@@ -26,14 +24,13 @@ import org.mule.util.queue.QueueSession;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.xa.AbstractResourceManager;
 
-import java.io.File;
 import java.util.Random;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>
  * @version $Revision$
  */
-public abstract class AbstractTransactionQueueManagerTestCase extends NamedTestCase
+public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMuleTestCase
 {
 
     /**
@@ -44,10 +41,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends NamedTestC
     protected abstract TransactionalQueueManager createQueueManager() throws Exception;
 
     protected abstract boolean isPersistent();
-
-    protected void setUp() throws Exception {
-        Utility.deleteTree(new File(MuleManager.getConfiguration().getWorkingDirectory()));
-    }
 
     public void testPutTake() throws Exception
     {

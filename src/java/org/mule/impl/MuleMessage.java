@@ -13,15 +13,15 @@
  */
 package org.mule.impl;
 
+import org.mule.MuleRuntimeException;
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.DefaultMessageAdapter;
 import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 import org.mule.util.PropertiesHelper;
-import org.mule.MuleRuntimeException;
-import org.mule.config.i18n.Message;
-import org.mule.config.i18n.Messages;
 
 import javax.activation.DataHandler;
 import java.util.Collections;
@@ -394,5 +394,16 @@ public class MuleMessage implements UMOMessage
 
     public Set getAttachmentNames() {
         return adapter.getAttachmentNames();
+    }
+
+    /**
+     * Gets the encoding for the current message. For potocols that send encoding
+     * Information with the message, this method should be overriden to expose the
+     * transport encoding, otherwise the default encoding in the Mule configuration will be used
+     *
+     * @return the encoding for this message.  This method must never return null
+     */
+    public String getEncoding() {
+        return adapter.getEncoding();
     }
 }

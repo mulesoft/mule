@@ -34,7 +34,7 @@ public class MuleManagerTestCase extends AbstractMuleTestCase
      */
     protected void doSetUp() throws Exception
     {
-        manager = getManager();
+        manager = getManager(true);
     }
 
     public void testRemoveNonExistentAgent() throws Exception

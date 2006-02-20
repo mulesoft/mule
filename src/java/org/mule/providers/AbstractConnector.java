@@ -851,7 +851,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
         return toString();
     }
 
-    public boolean isConnected() {
+    public final boolean isConnected() {
        return connected.get();
     }
 

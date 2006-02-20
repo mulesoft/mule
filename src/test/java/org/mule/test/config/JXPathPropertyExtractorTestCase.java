@@ -16,7 +16,7 @@ package org.mule.test.config;
 
 import org.mule.config.JXPathPropertyExtractor;
 import org.mule.impl.MuleMessage;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
@@ -30,7 +30,7 @@ import java.util.Map;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class JXPathPropertyExtractorTestCase extends NamedTestCase{
+public class JXPathPropertyExtractorTestCase extends AbstractMuleTestCase{
 
     public void testWithExpressions() {
         Apple apple = new Apple();

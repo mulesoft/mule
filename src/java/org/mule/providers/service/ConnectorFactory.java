@@ -260,7 +260,7 @@ public class ConnectorFactory
                     csd.setOverrides(overrides);
                     if (csd.getServiceFinder() != null) {
                         ConnectorServiceFinder finder = csd.createServiceFinder();
-                        csd = finder.findService(protocol);
+                        csd = finder.findService(protocol, csd);
                     }
                     csdCache.put(new CSDKey(csd.getProtocol(), overrides), csd);
                 } else {

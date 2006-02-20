@@ -14,7 +14,6 @@
 package org.mule.tck;
 
 import org.mule.config.ConfigurationBuilder;
-import org.mule.config.MuleProperties;
 import org.mule.config.builders.MuleXmlConfigurationBuilder;
 
 /**
@@ -23,15 +22,26 @@ import org.mule.config.builders.MuleXmlConfigurationBuilder;
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public abstract class FunctionalTestCase extends AbstractMuleTestCase
-{
+public abstract class FunctionalTestCase extends AbstractMuleTestCase {
 
     protected final void doSetUp() throws Exception {
         doPreFunctionalSetUp();
-        System.setProperty(MuleProperties.DISABLE_SERVER_CONNECTIONS_SYSTEM_PROPERTY, "false");
+        //Should we set up te manager for every method?
+        if (!getTestInfo().isDisposeManagerPerSuite()) {
+            setupManager();
+        }
+        doPostFunctionalSetUp();
+    }
+
+    protected void suitePreSetUp() throws Exception {
+        if(getTestInfo().isDisposeManagerPerSuite()) {
+            setupManager();
+        }
+    }
+
+    private void setupManager() throws Exception {
         ConfigurationBuilder builder = getBuilder();
         builder.configure(getConfigResources());
-        doPostFunctionalSetUp();
     }
 
     protected final void doTearDown() throws Exception {

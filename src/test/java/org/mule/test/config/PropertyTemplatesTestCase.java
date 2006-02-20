@@ -13,35 +13,25 @@
  */
 package org.mule.test.config;
 
-import java.util.List;
-import java.util.Map;
-
 import org.mule.MuleManager;
-import org.mule.config.ConfigurationBuilder;
-import org.mule.config.builders.MuleXmlConfigurationBuilder;
 import org.mule.providers.AbstractConnector;
 import org.mule.providers.SimpleRetryConnectionStrategy;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
-public class PropertyTemplatesTestCase extends NamedTestCase
+public class PropertyTemplatesTestCase extends FunctionalTestCase
 {
-    protected void setUp() throws Exception
-    {
-        if (MuleManager.isInstanciated())
-            MuleManager.getInstance().dispose();
-        ConfigurationBuilder configBuilder = new MuleXmlConfigurationBuilder();
-        configBuilder.configure("test-xml-property-templates.xml");
-    }
 
-    protected void tearDown() throws Exception
-    {
-        MuleManager.getInstance().dispose();
+    protected String getConfigResources() {
+        return "test-xml-property-templates.xml";
     }
 
     public void testProperties()

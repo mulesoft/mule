@@ -15,7 +15,7 @@ package org.mule.test.filters;
 
 import org.mule.impl.MuleMessage;
 import org.mule.routing.filters.OGNLFilter;
-import org.mule.tck.NamedTestCase;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.test.filters.xml.Dummy;
 import org.mule.umo.UMOMessage;
 
@@ -23,20 +23,18 @@ import org.mule.umo.UMOMessage;
  * @author Holger Hoffstaette
  */
 
-public class OGNLFilterTestCase extends NamedTestCase
+public class OGNLFilterTestCase extends AbstractMuleTestCase
 {
     private OGNLFilter filter;
 
-    protected void setUp() throws Exception
+    protected void doSetUp() throws Exception
     {
-        super.setUp();
         filter = new OGNLFilter();
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         filter = null;
-        super.tearDown();
     }
 
     public void testNewFilter()

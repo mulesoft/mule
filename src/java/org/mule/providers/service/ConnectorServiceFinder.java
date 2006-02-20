@@ -26,5 +26,5 @@ package org.mule.providers.service;
  */
 public interface ConnectorServiceFinder
 {
-    ConnectorServiceDescriptor findService(String service) throws ConnectorFactoryException;
+    ConnectorServiceDescriptor findService(String service, ConnectorServiceDescriptor csd) throws ConnectorFactoryException;
 }

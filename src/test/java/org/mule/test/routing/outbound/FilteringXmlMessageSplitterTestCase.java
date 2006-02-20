@@ -22,6 +22,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.routing.outbound.FilteringXmlMessageSplitter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -91,7 +92,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 
     private void internalTestSuccessfulXmlSplitter(Object payload) throws Exception
     {
-        Mock session = getMockSession();
+        Mock session = MuleTestUtils.getMockSession();
 
         UMOMessage message = new MuleMessage(payload);
 
@@ -116,7 +117,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     public void testXsdNotFoundThrowsException() throws Exception
     {
         final String invalidSchemaLocation = "non-existent.xsd";
-        Mock session = getMockSession();
+        Mock session = MuleTestUtils.getMockSession();
 
         UMOEndpoint endpoint1 = getTestEndpoint("Test1Endpoint", UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint1.setEndpointURI(new MuleEndpointURI("test://endpointUri.1"));
@@ -145,7 +146,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
     {
         Exception unsupportedPayload = new Exception();
 
-        Mock session = getMockSession();
+        Mock session = MuleTestUtils.getMockSession();
 
         UMOMessage message = new MuleMessage(unsupportedPayload);
 
@@ -162,7 +163,7 @@ public class FilteringXmlMessageSplitterTestCase extends AbstractMuleTestCase
 
 
     public void testInvalidXmlPayloadThrowsException() throws Exception {
-        Mock session = getMockSession();
+        Mock session = MuleTestUtils.getMockSession();
 
         FilteringXmlMessageSplitter splitter = new FilteringXmlMessageSplitter();
 

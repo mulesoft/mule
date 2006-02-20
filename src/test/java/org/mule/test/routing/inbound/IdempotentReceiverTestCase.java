@@ -13,12 +13,15 @@
  */
 package org.mule.test.routing.inbound;
 
+import com.mockobjects.dynamic.C;
+import com.mockobjects.dynamic.Mock;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.inbound.IdempotentReceiver;
 import org.mule.routing.inbound.InboundMessageRouter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOEvent;
@@ -27,9 +30,6 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOInboundRouter;
-
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
@@ -53,7 +53,7 @@ public class IdempotentReceiverTestCase extends AbstractMuleTestCase
 
     private void doTestIdempotentReceiver(UMOInboundRouter router) throws Exception
     {
-        Mock session = getMockSession();
+        Mock session = MuleTestUtils.getMockSession();
         UMOComponent testComponent = getTestComponent(getTestDescriptor("test", Apple.class.getName()));
 
         UMOInboundMessageRouter messageRouter = new InboundMessageRouter();

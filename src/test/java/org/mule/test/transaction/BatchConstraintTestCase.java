@@ -13,19 +13,18 @@
  */
 package org.mule.test.transaction;
 
-import org.mule.tck.NamedTestCase;
+import com.mockobjects.dynamic.Mock;
+import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transaction.constraints.BatchConstraint;
 import org.mule.transaction.constraints.ConstraintFilter;
 import org.mule.umo.UMOEvent;
-
-import com.mockobjects.dynamic.Mock;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 
-public class BatchConstraintTestCase extends NamedTestCase
+public class BatchConstraintTestCase extends AbstractMuleTestCase
 {
     public void testConstraintFilter() throws Exception
     {

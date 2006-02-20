@@ -61,7 +61,8 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
         callbackCount = 0;
         connector = createConnector();
         // Start the server
-        MuleManager.getInstance().start();
+        MuleManager.getConfiguration().setServerUrl("");
+        manager.start();
     }
 
     protected void doTearDown() throws Exception
@@ -73,7 +74,7 @@ public abstract class AbstractProviderFunctionalTestCase extends AbstractMuleTes
 
     public void testSend() throws Exception
     {
-        if(!isPrereqsMet()) return;
+        if(!isPrereqsMet("org.mule.tck.functional.AbstractProviderFunctionalTestCase.testSend()")) return;
 
         descriptor = getTestDescriptor("testComponent", FunctionalTestComponent.class.getName());
 
