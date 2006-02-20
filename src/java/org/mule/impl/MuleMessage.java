@@ -132,7 +132,11 @@ public class MuleMessage implements UMOMessage
      * @throws Exception Implementation may throw an endpoint specific exception
      */
     public String getPayloadAsString(String encoding) throws Exception {
-        return adapter.getPayloadAsString(encoding);
+        if(encoding==null) {
+            return adapter.getPayloadAsString();
+        } else {
+            return adapter.getPayloadAsString(encoding);
+        }
     }
 
     /**
