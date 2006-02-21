@@ -82,7 +82,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 
         HttpServerConnection conn = null;
         public HttpWorker(Socket socket) throws IOException {
-            conn = new HttpServerConnection(socket);
+            if(endpoint.getEncoding() != null) {
+                conn = new HttpServerConnection(socket, endpoint.getEncoding());
+            } else {
+                conn = new HttpServerConnection(socket);                
+            }
         }
 
         public void run() {

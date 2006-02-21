@@ -19,6 +19,7 @@ import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.httpclient.StatusLine;
+import org.mule.MuleManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,16 +33,16 @@ import java.util.Iterator;
  * A connection to the SimpleHttpServer.
  */
 public class HttpServerConnection {
-
-    private static final String HTTP_ELEMENT_CHARSET = "US-ASCII";
-
     private Socket socket = null;
     private InputStream in = null;
     private OutputStream out = null;
     private boolean keepAlive = false;
+    private String encoding;    
 
-    public HttpServerConnection(final Socket socket)
-    throws IOException {
+     public HttpServerConnection(final Socket socket) throws IOException {
+         this(socket, MuleManager.getConfiguration().getEncoding());
+     }
+    public HttpServerConnection(final Socket socket, String encoding) throws IOException {
         super();
         if (socket == null) {
             throw new IllegalArgumentException("Socket may not be null");
@@ -50,6 +51,7 @@ public class HttpServerConnection {
         this.socket.setTcpNoDelay(true);
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
+        this.encoding = encoding;
     }
 
     public synchronized void close() {
@@ -97,7 +99,7 @@ public class HttpServerConnection {
        String line = null;
         try {
             do {
-                line = HttpParser.readLine(in, HTTP_ELEMENT_CHARSET);
+                line = HttpParser.readLine(in, encoding);
             } while (line != null && line.length() == 0);
 
             if (line == null) {
@@ -106,7 +108,7 @@ public class HttpServerConnection {
             }
             HttpRequest request = new HttpRequest(
                     RequestLine.parseLine(line),
-                    HttpParser.parseHeaders(this.in, HTTP_ELEMENT_CHARSET),
+                    HttpParser.parseHeaders(this.in, encoding),
                     this.in);
             return request;
         } catch (IOException e) {
@@ -120,7 +122,7 @@ public class HttpServerConnection {
         try {
             String line = null;
             do {
-                line = HttpParser.readLine(in, HTTP_ELEMENT_CHARSET);
+                line = HttpParser.readLine(in, encoding);
             } while (line != null && line.length() == 0);
 
             if (line == null) {
@@ -129,7 +131,7 @@ public class HttpServerConnection {
             }
             HttpResponse response = new HttpResponse(
                     new StatusLine(line),
-                    HttpParser.parseHeaders(this.in, HTTP_ELEMENT_CHARSET),
+                    HttpParser.parseHeaders(this.in, encoding),
                     this.in);
             return response;
         } catch (IOException e) {
@@ -142,7 +144,7 @@ public class HttpServerConnection {
         if (request == null) {
             return;
         }
-        ResponseWriter writer = new ResponseWriter(this.out, HTTP_ELEMENT_CHARSET);
+        ResponseWriter writer = new ResponseWriter(this.out, encoding);
         writer.println(request.getRequestLine().toString());
         Iterator item = request.getHeaderIterator();
         while (item.hasNext()) {
@@ -180,26 +182,19 @@ public class HttpServerConnection {
             return;
         }
         setKeepAlive(response.isKeepAlive());
-        ResponseWriter writer = new ResponseWriter(this.out, HTTP_ELEMENT_CHARSET);
+        ResponseWriter writer = new ResponseWriter(this.out, encoding);
         OutputStream outsream = this.out;
-//        outsream.write(response.getStatusLine().getBytes());
-//        outsream.write(Utility.CRLF.getBytes());
         writer.println(response.getStatusLine());
         Iterator item = response.getHeaderIterator();
         while (item.hasNext()) {
             Header header = (Header) item.next();
-//            outsream.write(header.toExternalForm().getBytes());
-//            outsream.write(Utility.CRLF.getBytes());
             writer.print(header.toExternalForm());
         }
         writer.println();
         writer.flush();
-        //outsream.write(Utility.CRLF.getBytes());
 
         InputStream content = response.getBody();
         if (content != null) {
-//            outsream.write("Howdie".getBytes());
-//            outsream.flush();
             Header transferenc = response.getFirstHeader("Transfer-Encoding");
             if (transferenc != null) {
                 response.removeHeaders("Content-Length");
@@ -209,7 +204,6 @@ public class HttpServerConnection {
                     byte[] tmp = new byte[1024];
                     int i = 0;
                     while ((i = content.read(tmp)) >= 0) {
-                        //System.out.println(new String(tmp, 0, i));
                         outsream.write(tmp, 0, i);
                     }
                     if (outsream instanceof ChunkedOutputStream) {
