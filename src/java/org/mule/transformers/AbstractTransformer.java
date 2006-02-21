@@ -17,6 +17,7 @@ package org.mule.transformers;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOMessage;
@@ -175,7 +176,9 @@ public abstract class AbstractTransformer implements UMOTransformer
     public final Object transform(Object src) throws TransformerException
     {
         Object result;
+        String encoding = null;
         if (src instanceof UMOMessage) {
+            encoding = ((UMOMessage) src).getEncoding();
             src = ((UMOMessage) src).getPayload();
         }
 
@@ -190,11 +193,13 @@ public abstract class AbstractTransformer implements UMOTransformer
                                                        endpoint.getEndpointURI()), this);
             }
         } else {
-            String encoding = null;
-            if (endpoint != null && endpoint.getEndpointEncoding() != null) {
-               encoding = endpoint.getEndpointEncoding();
+            if (endpoint != null && endpoint.getEncoding()!=null) {
+               encoding = endpoint.getEncoding();
             }
-            result = doTransform(src,encoding);
+            if(encoding==null) {
+                encoding = MuleManager.getConfiguration().getEncoding();
+            }
+            result = doTransform(src, encoding);
 
             result = checkReturnClass(result);
             if (transformer != null) {
