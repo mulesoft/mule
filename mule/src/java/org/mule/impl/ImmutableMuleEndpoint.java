@@ -216,7 +216,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
             this.endpointUri = source.getEndpointURI();
         }
         if (this.endpointEncoding == null) {
-            this.endpointEncoding = source.getEndpointEncoding();
+            this.endpointEncoding = source.getEncoding();
         }
         if (this.connector == null) {
             this.connector = source.getConnector();
@@ -261,7 +261,7 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return endpointUri;
     }
 
-    public String getEndpointEncoding()
+    public String getEncoding()
     {
     	return endpointEncoding;
     }

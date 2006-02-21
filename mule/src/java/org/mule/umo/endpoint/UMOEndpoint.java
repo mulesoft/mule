@@ -55,6 +55,11 @@ public interface UMOEndpoint extends UMOImmutableEndpoint
      */
     void setEndpointURI(UMOEndpointURI endpointUri) throws EndpointException;
 
+    /**
+     * Sets the encoding to be used for events received by this endpoint
+     * @param endpointEncoding the encoding set on the endpoint. If not set the encoding will be
+     * taken from the manager config
+     */
     void setEncoding(String endpointEncoding);
     
     /**

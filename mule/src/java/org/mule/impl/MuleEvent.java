@@ -652,7 +652,7 @@ public class MuleEvent extends EventObject implements UMOEvent
      * @return the encoding for the event
      */
     public String getEncoding() {
-        String encoding = endpoint.getEndpointEncoding();
+        String encoding = endpoint.getEncoding();
         if(encoding==null) {
             encoding = message.getEncoding();
         }

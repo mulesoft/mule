@@ -491,6 +491,11 @@
                 <fileset file="${mule.release.dist.dir}/*.jar"/>
             </copy>
 
+            <echo> Copying full jar from ${mule.release.dir}/lib</echo>
+            <copy todir="${pom.siteDirectory}/../dist/lib">
+                <fileset file="${mule.release.dir}/lib/mule-*.jar"/>
+            </copy>
+
             <echo> Copying rars from ${mule.release.dist.dir}</echo>
             <copy todir="${pom.siteDirectory}/../dist/rars">
                 <fileset file="${mule.release.dist.dir}/*.rar"/>
