@@ -64,6 +64,19 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     public void dispatch(UMOSession session, UMOMessage message, UMOEndpoint endpoint) throws UMOException
     {
         setMessageProperties(session, message, endpoint);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Message Being sent from: " + endpoint.getEndpointURI());
+            logger.debug(message);
+        }
+        if (logger.isTraceEnabled()) {
+            try {
+                logger.trace("Send Message Payload: \n" + message.getPayloadAsString());
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+
         session.dispatchEvent(message, endpoint);
         if (routerStatistics != null) {
             if (routerStatistics.isEnabled()) {
@@ -76,16 +89,39 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
     {
 
         if (replyTo != null) {
-            logger.debug("event was dispatched synchronously, but there is a ReplyTo endpoint set, so using ");
+            logger.debug("event was dispatched synchronously, but there is a ReplyTo endpoint set, so using asynchronous dispatch");
             dispatch(session, message, endpoint);
             return null;
         }
         setMessageProperties(session, message, endpoint);
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("Message Being sent from: " + endpoint.getEndpointURI());
+            logger.debug(message);
+        }
+        if (logger.isTraceEnabled()) {
+            try {
+                logger.trace("Send Message Payload: \n" + message.getPayloadAsString());
+            } catch (Exception e) {
+                // ignore
+            }
+        }
         UMOMessage result = session.sendEvent(message, endpoint);
         if (routerStatistics != null) {
             if (routerStatistics.isEnabled()) {
                 routerStatistics.incrementRoutedMessage(endpoint);
+            }
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Response Message from sending on: " + endpoint.getEndpointURI());
+            logger.debug(message);
+        }
+         if (logger.isTraceEnabled()) {
+            try {
+                logger.trace("Response Message Payload: \n" + message.getPayloadAsString());
+            } catch (Exception e) {
+                // ignore
             }
         }
         return result;
