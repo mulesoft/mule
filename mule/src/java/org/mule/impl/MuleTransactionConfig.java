@@ -113,6 +113,20 @@ public class MuleTransactionConfig implements UMOTransactionConfig
         }
     }
 
+    public String getActionAsString()
+    {
+        switch(action) {
+            case ACTION_ALWAYS_BEGIN:
+               return ACTION_ALWAYS_BEGIN_STRING;
+            case ACTION_ALWAYS_JOIN:
+                return ACTION_ALWAYS_JOIN_STRING;
+            case ACTION_JOIN_IF_POSSIBLE:
+                return ACTION_JOIN_IF_POSSIBLE_STRING;
+            default:
+                return ACTION_NONE_STRING;
+        }
+    }
+
     public boolean isTransacted()
     {
         if (factory != null) {
@@ -150,5 +164,12 @@ public class MuleTransactionConfig implements UMOTransactionConfig
     public void setTimeout(int timeout)
     {
         this.timeout = timeout;
+    }
+
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("Transaction{factory=").append(factory).append(", action=").append(getActionAsString())
+                .append(", timeout=").append(timeout).append("}");
+        return buf.toString();
     }
 }
