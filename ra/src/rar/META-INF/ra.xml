@@ -9,10 +9,10 @@
     <display-name>Mule Universal Resource Adapter</display-name>
     <vendor-name>SymphonySoft Ltd</vendor-name>
     <eis-type>MULE</eis-type>
-    <resourceadapter-version>1.0</resourceadapter-version>
+    <resourceadapter-version>1.3</resourceadapter-version>
     <license>
         <description>
-            Copyright 2005 (c) SymphonySoft Limited. All rights reserved.
+            Copyright (c) SymphonySoft Limited. All rights reserved.
             http://www.symphonysoft.com
 
             The software in this package is published under the terms of the BSD
