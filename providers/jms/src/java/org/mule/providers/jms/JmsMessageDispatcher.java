@@ -51,6 +51,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     private JmsConnector connector;
     private Session delegateSession;
+    private Session cachedSession;
+    private boolean cacheSession = false;
 
     public JmsMessageDispatcher(JmsConnector connector) {
         super(connector);
@@ -78,12 +80,27 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         MessageConsumer consumer = null;
 
         try {
-            // Retrieve a session from the connector
-            session = connector.getSession(event.getEndpoint());
+
             // Retrieve the session for the current transaction
             // If there is one, this is up to the transaction to close the
             // session
             txSession = connector.getCurrentSession();
+
+            //Should we be caching sessions
+            cacheSession = PropertiesHelper.getBooleanProperty(event.getProperties(),
+                    JmsConstants.CACHE_JMS_SESSIONS_PROPERTY, connector.isCacheJmsSessions());
+            if(txSession!=null) {
+                cacheSession = false;
+            }
+            if(cacheSession) {
+                if(cachedSession==null) {
+                    cachedSession = connector.getSession(event.getEndpoint());
+                }
+                session = cachedSession;
+            } else {
+                // Retrieve a session from the connector
+                session = connector.getSession(event.getEndpoint());
+            }
 
             // If a transaction is running, we can not receive any messages
             // in the same transaction
@@ -121,9 +138,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
             Destination replyTo = null;
             // Some JMS implementations might not support the ReplyTo property.
-            if (connector.getJmsSupport().supportsProperty("ReplyTo")) {
+            if (connector.getJmsSupport().supportsProperty(JmsConstants.JMS_REPLY_TO)) {
 
-            	Object tempReplyTo = event.removeProperty("JMSReplyTo");
+            	Object tempReplyTo = event.removeProperty(JmsConstants.JMS_REPLY_TO);
 	            if (tempReplyTo != null) {
 	                if (tempReplyTo instanceof Destination) {
 	                    replyTo = (Destination) tempReplyTo;
@@ -155,9 +172,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
             }
 
             // QoS support
-            String ttlString = (String) event.removeProperty("TimeToLive");
-            String priorityString = (String) event.removeProperty("Priority");
-            String persistentDeliveryString = (String) event.removeProperty("PersistentDelivery");
+            String ttlString = (String) event.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
+            String priorityString = (String) event.removeProperty(JmsConstants.PRIORITY_PROPERTY);
+            String persistentDeliveryString = (String) event.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
 
             long ttl = Message.DEFAULT_TIME_TO_LIVE;
             int priority = Message.DEFAULT_PRIORITY;
@@ -308,6 +325,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     public void doDispose() {
         logger.debug("Disposing");
         JmsUtils.closeQuietly(delegateSession);
+        JmsUtils.closeQuietly(cachedSession);
     }
 
     private class ReplyToListener implements MessageListener {

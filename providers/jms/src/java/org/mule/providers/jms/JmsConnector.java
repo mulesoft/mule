@@ -114,6 +114,8 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
 
     private String redeliveryHandler = DefaultRedeliveryHandler.class.getName();
 
+    private boolean cacheJmsSessions = false;
+
     public JmsConnector()
     {
         receivers = new ConcurrentHashMap();
@@ -237,10 +239,12 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
                 forceJndiDestinations = false;
             }
 
-            if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification)) {
-                jmsSupport = new Jms102bSupport(this, jndiContext, jndiDestinations, forceJndiDestinations);
-            } else {
-                jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);
+            if(jmsSupport==null) {
+                if (JmsConstants.JMS_SPECIFICATION_102B.equals(specification)) {
+                    jmsSupport = new Jms102bSupport(this, jndiContext, jndiDestinations, forceJndiDestinations);
+                } else {
+                    jmsSupport = new Jms11Support(this, jndiContext, jndiDestinations, forceJndiDestinations);
+                }
             }
             if (connectionFactory == null) {
             	connectionFactory = createConnectionFactory();
@@ -668,5 +672,13 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
             //Remove all dispatchers as any cached session will be invalidated
             disposeDispatchers();
         }
+    }
+
+    public boolean isCacheJmsSessions() {
+        return cacheJmsSessions;
+    }
+
+    public void setCacheJmsSessions(boolean cacheJmsSessions) {
+        this.cacheJmsSessions = cacheJmsSessions;
     }
 }

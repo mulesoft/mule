@@ -20,7 +20,6 @@ package org.mule.providers.jms;
 
 public class JmsConstants
 {
-	public static final String JMS_SELECTOR_PROPERTY = "selector";
 	public static final String JMS_SPECIFICATION_102B = "1.0.2b";
 	public static final String JMS_SPECIFICATION_11 = "1.1";
 
@@ -34,5 +33,13 @@ public class JmsConstants
 	public static final String JMS_REPLY_TO = "JMSReplyTo";
 	public static final String JMS_TIMESTAMP = "JMSTimestamp";
 	public static final String JMS_TYPE = "JMSType";
+
+    //QoS properties
+    public static final String TIME_TO_LIVE_PROPERTY = "timeToLive";
+    public static final String PERSISTENT_DELIVERY_PROPERTY = "persistentDelivery";
+    public static final String PRIORITY_PROPERTY = "priority";
+    public static final String JMS_SELECTOR_PROPERTY = "selector";
+    public static final String CACHE_JMS_SESSIONS_PROPERTY = "cacheJmsSessions";
+
 
 }
