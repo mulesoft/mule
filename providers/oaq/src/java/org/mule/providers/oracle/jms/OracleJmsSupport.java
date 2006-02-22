@@ -14,9 +14,14 @@
  */
 package org.mule.providers.oracle.jms;
 
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Map;
+import oracle.jms.AQjmsQueueConnectionFactory;
+import oracle.jms.AQjmsSession;
+import oracle.jms.AQjmsTopicConnectionFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.providers.jms.Jms102bSupport;
+import org.mule.providers.jms.JmsConnector;
+import org.mule.providers.jms.JmsConstants;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -29,15 +34,9 @@ import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.TopicSession;
 import javax.naming.Context;
-
-import oracle.jms.AQjmsQueueConnectionFactory;
-import oracle.jms.AQjmsSession;
-import oracle.jms.AQjmsTopicConnectionFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.providers.jms.Jms102bSupport;
-import org.mule.providers.jms.JmsConnector;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's 
@@ -69,7 +68,7 @@ public class OracleJmsSupport extends Jms102bSupport {
      * "standard" properties are used.
      */
     public boolean supportsProperty(String property) {
-    	return (property.equalsIgnoreCase("ReplyTo") == false);
+    	return (property.equalsIgnoreCase(JmsConstants.JMS_REPLY_TO) == false);
     }
     
 	/** The Oracle JMS implementation requires a JDBC Connection to be created prior to 

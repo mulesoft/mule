@@ -108,6 +108,7 @@ public abstract class AbstractServiceEnabledConnector extends AbstractConnector
             defaultOutboundTransformer = serviceDescriptor.createOutboundTransformer();
             defaultResponseTransformer = serviceDescriptor.createResponseTransformer();
 
+            sessionHandler = serviceDescriptor.createSessionHandler();
             // set any manager default properties for the connector
             // these are set on the Manager with a protocol i.e.
             // jms.specification=1.1

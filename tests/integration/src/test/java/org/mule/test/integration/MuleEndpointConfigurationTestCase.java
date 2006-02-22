@@ -14,11 +14,11 @@
 package org.mule.test.integration;
 
 import org.mule.MuleManager;
-import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
+import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.transformers.simple.StringToByteArray;
 import org.mule.transformers.xml.ObjectToXml;
 import org.mule.transformers.xml.XmlToObject;
@@ -261,11 +261,11 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals(UMOEndpoint.ENDPOINT_TYPE_RECEIVER, ep.getType());
 
         //Test Event timeout proporgation
-        UMOEvent event = new MuleEvent(new MuleMessage("hello", null), ep, new MuleSession(), false);
+        UMOEvent event = new MuleEvent(new MuleMessage("hello", null), ep, MuleTestUtils.getTestSession(), false);
         assertEquals(2002, event.getTimeout());
 
 
-        event = new MuleEvent(new MuleMessage("hello", null), new MuleEndpoint("test://hello", true), new MuleSession(), true);
+        event = new MuleEvent(new MuleMessage("hello", null), new MuleEndpoint("test://hello", true), MuleTestUtils.getTestSession(), true);
         //default event timeout set in the test config file
         assertEquals(1001, event.getTimeout());
 

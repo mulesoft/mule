@@ -14,6 +14,8 @@
  */
 package org.mule.providers.http;
 
+import org.mule.config.i18n.Message;
+import org.mule.config.i18n.Messages;
 import org.mule.providers.tcp.TcpConnector;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.endpoint.UMOEndpoint;
@@ -61,6 +63,13 @@ public class HttpConnector extends TcpConnector
     public static final String DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY = "body";
     public static final String HTTP_POST_BODY_PARAM_PROPERTY = "http.post.body.param";
 
+    public static final String HTTP_COOKIE_SPEC_PROPERTY = "cookieSpec";
+    public static final String HTTP_COOKIES_PROPERTY = "cookies";
+    public static final String HTTP_ENABLE_COOKIES_PROPERTY = "enableCookies";
+
+    public static final String COOKIE_SPEC_NETSCAPE = "netscape";
+    public static final String COOKIE_SPEC_RFC2109 = "rcf2109";
+
     private String proxyHostname = null;
 
     private int proxyPort = HttpConstants.DEFAULT_HTTP_PORT;
@@ -72,6 +81,10 @@ public class HttpConnector extends TcpConnector
     private int keepAliveTimeout = 1000;
 
     private boolean keepAlive = false;
+
+    private String cookieSpec;
+
+    private boolean enableCookies = false;
 
     /**
      * @see UMOConnector#registerListener(UMOComponent, UMOEndpoint)
@@ -194,5 +207,24 @@ public class HttpConnector extends TcpConnector
 
     public Map getReceivers() {
         return this.receivers;
+    }
+
+    public String getCookieSpec() {
+        return cookieSpec;
+    }
+
+    public void setCookieSpec(String cookieSpec) {
+        if(!(cookieSpec.equalsIgnoreCase(COOKIE_SPEC_NETSCAPE) && cookieSpec.equalsIgnoreCase(COOKIE_SPEC_RFC2109))) {
+            throw new IllegalArgumentException(new Message(Messages.PROPERTY_X_HAS_INVALID_VALUE_X, "cookieSpec", cookieSpec).toString());
+        }
+        this.cookieSpec = cookieSpec;
+    }
+
+    public boolean isEnableCookies() {
+        return enableCookies;
+    }
+
+    public void setEnableCookies(boolean enableCookies) {
+        this.enableCookies = enableCookies;
     }
 }

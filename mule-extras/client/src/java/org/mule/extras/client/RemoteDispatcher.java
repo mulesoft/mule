@@ -26,12 +26,12 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.internal.notifications.AdminNotification;
 import org.mule.impl.security.MuleCredentials;
+import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.FutureMessageResult;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.MalformedEndpointException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.Disposable;
@@ -255,7 +255,8 @@ public class RemoteDispatcher implements Disposable
         message.addProperties(action.getProperties());
         UMOEndpoint endpoint = ConnectorFactory.createEndpoint(serverEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         endpoint.setRemoteSync(synchronous);
-        UMOSession session = new MuleSession();
+        MuleSession session = new MuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
+
         UMOEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(timeout);
         if (logger.isDebugEnabled()) {

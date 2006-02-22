@@ -15,6 +15,7 @@ package org.mule.providers.jbi.components;
 
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleSession;
+import org.mule.providers.AbstractConnector;
 import org.mule.providers.jbi.JbiUtils;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOMessage;
@@ -45,7 +46,9 @@ public class MuleDispatcher extends AbstractEndpointComponent implements Message
             if(logger.isDebugEnabled()) {
                 logger.debug("Dispatching Message via Mule: " + message);
             }
-            UMOEvent event = new MuleEvent(message, muleEndpoint, new MuleSession(), muleEndpoint.isSynchronous());
+            MuleSession session = new MuleSession(message, ((AbstractConnector)muleEndpoint.getConnector()).getSessionHandler());
+
+            UMOEvent event = new MuleEvent(message, muleEndpoint, session, muleEndpoint.isSynchronous());
             if (muleEndpoint.isSynchronous()) {
                 logger.debug("Dispatching to: " + muleEndpoint.getEndpointURI());
                 logger.debug("Payload is: " + event.getMessageAsString());

@@ -15,6 +15,7 @@
 
 package org.mule.providers.http;
 
+import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -173,10 +174,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
     protected HttpMethod execute(UMOEvent event, HttpMethod httpMethod, boolean closeConnection) throws Exception
     {
 
+        //todo set connection timeout buffer etc
         try {
             URI uri = event.getEndpoint().getEndpointURI().getUri();
 
             try {
+                processCookies(event);
                 client.executeMethod(getHostConfig(uri), httpMethod);
             } catch(Exception e) {
                 logger.error(e, e);
@@ -187,6 +190,15 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         } finally {
             if (httpMethod != null && closeConnection)
                 httpMethod.releaseConnection();
+        }
+    }
+
+    protected void processCookies(UMOEvent event) {
+        Cookie[] cookies = (Cookie[])event.removeProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+        if(cookies!=null && cookies.length > 0) {
+            client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(
+                    (String)event.removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY)));
+            client.getState().addCookies(cookies);
         }
     }
 

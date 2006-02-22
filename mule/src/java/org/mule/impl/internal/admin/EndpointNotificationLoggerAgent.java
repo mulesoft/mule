@@ -18,8 +18,11 @@ import org.mule.config.i18n.Messages;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.NullSessionHandler;
 import org.mule.impl.endpoint.MuleEndpoint;
+import org.mule.providers.NullPayload;
 import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
@@ -38,7 +41,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
 
     private String endpointAddress;
     private UMOEndpoint logEndpoint = null;
-    private UMOSession session = null;
+    private UMOSession session;
 
     protected void doInitialise() throws InitialisationException
     {
@@ -46,11 +49,11 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         try {
             if (endpointAddress != null) {
                 logEndpoint = MuleEndpoint.getOrCreateEndpointForUri(endpointAddress, UMOEndpoint.ENDPOINT_TYPE_SENDER);
-                // Create a session for sending notifications
-                session = new MuleSession();
             } else {
                 throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "endpointAddress"), this);
-                    }
+            }
+             // Create a session for sending notifications
+            session = new MuleSession(new MuleMessage(new NullPayload()), new NullSessionHandler());
         } catch (Exception e) {
             throw new InitialisationException(e, this);
         }
@@ -61,7 +64,8 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         if (logEndpoint != null) {
             try {
                 UMOMessageDispatcher dispatcher = logEndpoint.getConnector().getDispatcher("ANY");
-                UMOEvent event = new MuleEvent(new MuleMessage(e.toString()), logEndpoint, session, false);
+                UMOMessage msg = new MuleMessage(e.toString());
+                UMOEvent event = new MuleEvent(msg, logEndpoint, session, false);
                 dispatcher.dispatch(event);
             } catch (Exception e1) {
                 logger.error("Failed to dispatch event: " + e.toString() + " over endpoint: " + logEndpoint

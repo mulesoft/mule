@@ -18,6 +18,7 @@ import org.mule.MuleManager;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
+import org.mule.impl.NullSessionHandler;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.tck.FunctionalTestCase;
@@ -44,7 +45,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
         UMOMessage message = new MuleMessage(payload);
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(new MuleEndpointURI(endpointUri),
                                                                       UMOEndpoint.ENDPOINT_TYPE_SENDER);
-        MuleSession session = new MuleSession();
+        MuleSession session = new MuleSession(message, new NullSessionHandler());
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
         event.setTimeout(60000);
         return event.getSession().sendEvent(event);

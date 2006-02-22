@@ -13,22 +13,22 @@
  */
 package org.mule.test.integration.providers.jdbc;
 
-import java.util.HashMap;
-
-import javax.sql.DataSource;
-
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.mule.MuleManager;
 import org.mule.config.builders.QuickConfigurationBuilder;
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.functional.EventCallback;
 import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
+
+import javax.sql.DataSource;
+import java.util.HashMap;
 
 /**
  * @author Guillaume Nodet
@@ -63,7 +63,7 @@ public class JdbcNonTransactionalFunctionalTestCase extends AbstractJdbcFunction
         UMOEndpointURI muleEndpoint = new MuleEndpointURI(DEFAULT_OUT_URI);
         UMOEndpoint endpoint = MuleEndpoint.getOrCreateEndpointForUri(muleEndpoint, UMOEndpoint.ENDPOINT_TYPE_SENDER);
         UMOMessage message = new MuleMessage(DEFAULT_MESSAGE);
-        MuleSession session = new MuleSession();
+        UMOSession session = MuleTestUtils.getTestSession();
         MuleEvent event = new MuleEvent(message, endpoint, session, true);
         session.dispatchEvent(event);
 

@@ -16,9 +16,7 @@ package org.mule.providers.http;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.mule.util.CollectionUtil;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,6 +70,8 @@ public class HttpConstants
     public static final String HEADER_CONTENT_MD5 = "Content-MD5";// [Entity]
     public static final String HEADER_CONTENT_RANGE = "Content-Range";// [Entity]
     public static final String HEADER_CONTENT_TYPE = "Content-Type";// [Entity]
+    public static final String HEADER_COOKIE = "Cookie";// [Request]
+    public static final String HEADER_COOKIE_SET = "Set-Cookie";// [Response]
     public static final String HEADER_DATE = "Date";// [General]
     public static final String HEADER_ETAG = "ETag";// [Response]
     public static final String HEADER_EXPECT = "Expect";// [Request]
@@ -165,7 +165,7 @@ public class HttpConstants
 		{
 			String[] strings = new String[]{HEADER_ACCEPT,HEADER_ACCEPT_CHARSET,HEADER_ACCEPT_ENCODING,
 				HEADER_ACCEPT_LANGUAGE,HEADER_AUTHORIZATION,HEADER_CACHE_CONTROL,HEADER_CONNECTION,
-				HEADER_DATE,HEADER_EXPECT,HEADER_FROM,HEADER_HOST,HEADER_IF_MATCH,
+				HEADER_COOKIE, HEADER_DATE,HEADER_EXPECT,HEADER_FROM,HEADER_HOST,HEADER_IF_MATCH,
 				HEADER_IF_MODIFIED_SINCE,HEADER_IF_NONE_MATCH,HEADER_IF_RANGE,
 				HEADER_IF_UNMODIFIED_SINCE,HEADER_MAX_FORWARDS,HEADER_PRAGMA,HEADER_PROXY_AUTHORIZATION,
 				HEADER_RANGE,HEADER_REFERER,HEADER_TE,HEADER_TRAILER,HEADER_TRANSFER_ENCODING,
@@ -175,7 +175,7 @@ public class HttpConstants
 					CaseInsensitiveMap.class, strings, strings));
 
 			strings = new String[]{HEADER_ACCEPT_RANGES,HEADER_AGE,HEADER_ALLOW,HEADER_CACHE_CONTROL,
-				HEADER_CONNECTION,HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE,
+				HEADER_CONNECTION,HEADER_CONTENT_ENCODING,HEADER_CONTENT_LANGUAGE, HEADER_COOKIE_SET,
 				HEADER_CONTENT_LOCATION,HEADER_CONTENT_MD5,HEADER_CONTENT_RANGE,HEADER_DATE,HEADER_ETAG,
 				HEADER_EXPIRES,HEADER_LAST_MODIFIED,HEADER_LOCATION,HEADER_PRAGMA,
 				HEADER_PROXY_AUTHENTICATE,HEADER_RETRY_AFTER,HEADER_SERVER,HEADER_TRAILER,

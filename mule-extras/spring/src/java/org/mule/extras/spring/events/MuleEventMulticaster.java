@@ -29,6 +29,7 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.AbstractConnector;
 import org.mule.routing.filters.ObjectFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.umo.UMOComponent;
@@ -418,7 +419,7 @@ public class MuleEventMulticaster implements ApplicationEventMulticaster, Applic
                     applicationEvent.getMuleEventContext().setStopFurtherProcessing(true);
                     applicationEvent.getMuleEventContext().dispatchEvent(message, endpoint);
                 } else {
-                    UMOSession session = new MuleSession(component, null);
+                    UMOSession session = new MuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler(), component);
                     RequestContext.setEvent(new MuleEvent(message, endpoint, session, false));
                     // transform if necessary
                     if (endpoint.getTransformer() != null) {

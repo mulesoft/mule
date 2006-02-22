@@ -28,7 +28,6 @@ import org.mule.providers.jms.transformers.JMSMessageToObject;
 import org.mule.providers.jms.transformers.ObjectToJMSMessage;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.test.integration.providers.jms.AbstractJmsTransactionFunctionalTest.RollbackExceptionListener;
 import org.mule.test.integration.providers.jms.tools.JmsTestUtils;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
@@ -419,7 +418,7 @@ public abstract class AbstractJmsTransactionFunctionalTest extends AbstractJmsFu
 
     public abstract UMOTransactionFactory getTransactionFactory();
 //
-    private class RollbackExceptionListener extends DefaultExceptionStrategy
+    public class RollbackExceptionListener extends DefaultExceptionStrategy
     {
         private CountDownLatch countDown;
 

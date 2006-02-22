@@ -31,6 +31,7 @@ import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.impl.security.MuleCredentials;
+import org.mule.providers.AbstractConnector;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.FutureMessageResult;
@@ -728,7 +729,8 @@ public class MuleClient implements Disposable
         }
         endpoint.setStreaming(streaming);
         try {
-            MuleSession session = new MuleSession();
+            MuleSession session = new MuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
+
             if (user != null) {
                 message.setProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
             }

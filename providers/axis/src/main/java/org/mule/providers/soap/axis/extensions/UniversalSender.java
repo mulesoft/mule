@@ -29,6 +29,7 @@ import org.mule.impl.MuleMessage;
 import org.mule.impl.MuleSession;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.AbstractConnector;
 import org.mule.providers.http.HttpConstants;
 import org.mule.providers.soap.axis.AxisConnector;
 import org.mule.umo.UMODescriptor;
@@ -122,9 +123,10 @@ public class UniversalSender extends BasicHandler {
             if (contentLength > 0) {
             	props.put(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(contentLength)); // necessary for supporting httpclient
             }
+            UMOMessage message = new MuleMessage(payload, props);
+            UMOSession session = new MuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
 
-            UMOSession session = new MuleSession();
-            UMOEvent dispatchEvent = new MuleEvent(new MuleMessage(payload, props), endpoint, session, sync);
+            UMOEvent dispatchEvent = new MuleEvent(message, endpoint, session, sync);
             logger.info("Making Axis soap request on: " + uri);
             if(logger.isDebugEnabled()) {
                 logger.debug("Soap request is:\n" + payload.toString());

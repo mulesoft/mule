@@ -14,6 +14,7 @@
  */
 package org.mule.providers.http;
 
+import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -28,13 +29,14 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
+import org.mule.util.PropertiesHelper;
 
 import javax.resource.spi.work.Work;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * <code>HttpMessageReceiver</code> is a simple http server that can be used
@@ -80,13 +82,21 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 
     private class HttpWorker implements Work {
 
-        HttpServerConnection conn = null;
+        private HttpServerConnection conn = null;
+        private String cookieSpec;
+        private boolean enableCookies = false;
+
         public HttpWorker(Socket socket) throws IOException {
             if(endpoint.getEncoding() != null) {
                 conn = new HttpServerConnection(socket, endpoint.getEncoding());
             } else {
-                conn = new HttpServerConnection(socket);                
+                conn = new HttpServerConnection(socket);
             }
+            cookieSpec = PropertiesHelper.getStringProperty(endpoint.getProperties(),
+                    HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, ((HttpConnector)connector).getCookieSpec());
+
+            enableCookies = PropertiesHelper.getBooleanProperty(endpoint.getProperties(),
+                    HttpConnector.HTTP_ENABLE_COOKIES_PROPERTY, ((HttpConnector)connector).isEnableCookies());
         }
 
         public void run() {
@@ -97,18 +107,26 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                     HttpRequest request = conn.readRequest();
                     if(request==null) break;
                     
-                    Properties headers = new Properties();
+                    Map headers = new HashMap();
                     for (int i = 0; i < request.getHeaders().length; i++) {
                         Header header = request.getHeaders()[i];
                         String headerName = header.getName();
                         if(headerName.startsWith("X-MULE")) {
                             headerName = headerName.replaceAll("X-MULE", "MULE");
                         }
-                        headers.setProperty(headerName, header.getValue());
+                        //Parse cookies
+                        if(headerName.equals(HttpConstants.HEADER_COOKIE) && enableCookies) {
+                            Cookie[] cookies = CookieHelper.parseCookies(header, cookieSpec);
+                            if(cookies.length > 0) {
+                                headers.put(HttpConnector.HTTP_COOKIES_PROPERTY, cookies);
+                            }
+                        }
+                        headers.put(headerName, header.getValue());
                     }
-                    headers.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getRequestLine().getMethod());
-                    headers.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, request.getRequestLine().getUri());
-                    headers.setProperty(HttpConnector.HTTP_VERSION_PROPERTY, request.getRequestLine().getHttpVersion().toString());
+                    headers.put(HttpConnector.HTTP_METHOD_PROPERTY, request.getRequestLine().getMethod());
+                    headers.put(HttpConnector.HTTP_REQUEST_PROPERTY, request.getRequestLine().getUri());
+                    headers.put(HttpConnector.HTTP_VERSION_PROPERTY, request.getRequestLine().getHttpVersion().toString());
+                    headers.put(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY, cookieSpec);
 
                     //todo Mule 2.0 generic way to set stream message adapter
                     UMOMessageAdapter adapter;
