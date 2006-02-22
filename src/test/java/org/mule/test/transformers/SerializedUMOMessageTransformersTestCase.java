@@ -15,9 +15,9 @@ package org.mule.test.transformers;
 
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.MuleSession;
 import org.mule.impl.RequestContext;
 import org.mule.tck.AbstractTransformerTestCase;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.simple.ByteArrayToSerializable;
 import org.mule.transformers.simple.SerializableToByteArray;
@@ -40,7 +40,7 @@ public class SerializedUMOMessageTransformersTestCase extends AbstractTransforme
     private UMOMessage testObject = null;
 
     protected void doSetUp() throws Exception {
-        RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"), new MuleSession(), true));
+        RequestContext.setEvent(new MuleEvent(testObject, getTestEndpoint("test", "sender"), MuleTestUtils.getTestSession(), true));
     }
 
     protected void doTearDown() throws Exception {

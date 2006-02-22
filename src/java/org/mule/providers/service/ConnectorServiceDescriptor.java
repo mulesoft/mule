@@ -18,9 +18,11 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.endpoint.EndpointBuilder;
 import org.mule.impl.endpoint.UrlEndpointBuilder;
 import org.mule.providers.NullPayload;
+import org.mule.providers.streaming.StreamMessageAdapter;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransactionConfig;
@@ -30,6 +32,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
 import org.mule.util.ObjectFactory;
@@ -81,9 +84,11 @@ public class ConnectorServiceDescriptor
     private String dispatcherFactory;
     private String transactionFactory;
     private String messageAdapter;
+    private String streamMessageAdapter;
     private String messageReceiver;
     private String transactedMessageReceiver;
     private String endpointBuilder;
+    private String sessionHandler;
     private String defaultInboundTransformer;
     private String defaultOutboundTransformer;
     private String defaultResponseTransformer;
@@ -109,11 +114,13 @@ public class ConnectorServiceDescriptor
         messageReceiver = removeProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS);
         transactedMessageReceiver = removeProperty(MuleProperties.CONNECTOR_TRANSACTED_MESSAGE_RECEIVER_CLASS);
         messageAdapter = removeProperty(MuleProperties.CONNECTOR_MESSAGE_ADAPTER);
+        streamMessageAdapter = removeProperty(MuleProperties.CONNECTOR_STREAM_MESSAGE_ADAPTER);
         defaultInboundTransformer = removeProperty(MuleProperties.CONNECTOR_INBOUND_TRANSFORMER);
         defaultOutboundTransformer = removeProperty(MuleProperties.CONNECTOR_OUTBOUND_TRANSFORMER);
         defaultResponseTransformer = removeProperty(MuleProperties.CONNECTOR_RESPONSE_TRANSFORMER);
         endpointBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER);
         serviceFinder = removeProperty(MuleProperties.CONNECTOR_SERVICE_FINDER);
+        sessionHandler = removeProperty(MuleProperties.CONNECTOR_SESSION_HANDLER);
     }
 
     void setOverrides(Properties props)
@@ -239,6 +246,22 @@ public class ConnectorServiceDescriptor
         return serviceFinder;
     }
 
+    public String getStreamMessageAdapter() {
+        return streamMessageAdapter;
+    }
+
+    public String getTransactionFactory() {
+        return transactionFactory;
+    }
+
+    public ConnectorServiceFinder getConnectorServiceFinder() {
+        return connectorServiceFinder;
+    }
+
+    public String getSessionHandler() {
+        return sessionHandler;
+    }
+
     public ConnectorServiceFinder createServiceFinder() throws ConnectorServiceException
     {
         if (serviceFinder == null) {
@@ -262,21 +285,47 @@ public class ConnectorServiceDescriptor
 
     public UMOMessageAdapter createMessageAdapter(Object message) throws ConnectorServiceException
     {
+        return createMessageAdapter(message, messageAdapter);
+    }
+
+    public UMOMessageAdapter createStreamMessageAdapter(Object message) throws ConnectorServiceException
+    {
+        if(getStreamMessageAdapter()==null) {
+            streamMessageAdapter = StreamMessageAdapter.class.getName();
+            if(logger.isDebugEnabled()) logger.debug("No stream.message.adapter set in service description, defaulting to: " + streamMessageAdapter);
+        }
+        return createMessageAdapter(message, streamMessageAdapter);
+    }
+
+    protected UMOMessageAdapter createMessageAdapter(Object message, String clazz) throws ConnectorServiceException
+    {
         if (message == null) {
             message = new NullPayload();
         }
         if (messageAdapter != null) {
             try {
-                return (UMOMessageAdapter) ClassHelper.instanciateClass(messageAdapter, new Object[] { message });
+                return (UMOMessageAdapter) ClassHelper.instanciateClass(clazz, new Object[] { message });
             } catch (Exception e) {
                 throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X,
                                                                 "Message Adapter",
-                                                                messageAdapter), e);
+                                                                clazz), e);
             }
         } else {
             throw new ConnectorServiceException(new Message(Messages.X_NOT_SET_IN_SERVICE_X,
                                                             "Message Adapter",
                                                             getProtocol()));
+        }
+    }
+
+    public UMOSessionHandler createSessionHandler() throws ConnectorServiceException {
+        if(getSessionHandler()==null) {
+            sessionHandler = MuleSessionHandler.class.getName();
+            if(logger.isDebugEnabled()) logger.debug("No session.handler set in service description, defaulting to: " + sessionHandler);
+        }
+        try {
+            return (UMOSessionHandler)ClassHelper.instanciateClass(getSessionHandler(), ClassHelper.NO_ARGS, getClass());
+        } catch (Throwable e) {
+            throw new ConnectorServiceException(new Message(Messages.FAILED_TO_CREATE_X_WITH_X, "SessionHandler", sessionHandler), e);
         }
     }
 
@@ -465,18 +514,12 @@ public class ConnectorServiceDescriptor
 
     public EndpointBuilder createEndpointBuilder() throws ConnectorFactoryException
     {
-        // if(endpointBuilderImpl!=null) return endpointBuilderImpl;
-
         if (endpointBuilder == null) {
             logger.debug("Endpoint resolver not set, Loading default resolver: " + UrlEndpointBuilder.class.getName());
             return new UrlEndpointBuilder();
         } else {
             logger.debug("Loading endpointUri resolver: " + getEndpointBuilder());
             try {
-                // endpointBuilderImpl = (EndpointBuilder)
-                // ClassHelper.instanciateClass(getEndpointBuilder(),
-                // ClassHelper.NO_ARGS);
-                // return endpointBuilderImpl;
                 return (EndpointBuilder) ClassHelper.instanciateClass(getEndpointBuilder(), ClassHelper.NO_ARGS);
             } catch (Exception e) {
                 throw new ConnectorFactoryException(new Message(Messages.FAILED_LOAD_X, "Endpoint Builder: "
@@ -485,82 +528,35 @@ public class ConnectorServiceDescriptor
         }
     }
 
-    public boolean equals(Object o)
-    {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ConnectorServiceDescriptor)) {
-            return false;
-        }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ConnectorServiceDescriptor)) return false;
 
         final ConnectorServiceDescriptor connectorServiceDescriptor = (ConnectorServiceDescriptor) o;
 
-        if (connector != null ? !connector.equals(connectorServiceDescriptor.connector)
-                : connectorServiceDescriptor.connector != null) {
-            return false;
-        }
-        if (connectorFactory != null ? !connectorFactory.equals(connectorServiceDescriptor.connectorFactory)
-                : connectorServiceDescriptor.connectorFactory != null) {
-            return false;
-        }
-        if (defaultInboundTransformer != null
-                ? !defaultInboundTransformer.equals(connectorServiceDescriptor.defaultInboundTransformer)
-                : connectorServiceDescriptor.defaultInboundTransformer != null) {
-            return false;
-        }
-        if (defaultOutboundTransformer != null
-                ? !defaultOutboundTransformer.equals(connectorServiceDescriptor.defaultOutboundTransformer)
-                : connectorServiceDescriptor.defaultOutboundTransformer != null) {
-            return false;
-        }
-        if (defaultResponseTransformer != null
-                ? !defaultResponseTransformer.equals(connectorServiceDescriptor.defaultResponseTransformer)
-                : connectorServiceDescriptor.defaultResponseTransformer != null) {
-            return false;
-        }
-        if (dispatcherFactory != null ? !dispatcherFactory.equals(connectorServiceDescriptor.dispatcherFactory)
-                : connectorServiceDescriptor.dispatcherFactory != null) {
-            return false;
-        }
-        if (endpointBuilder != null ? !endpointBuilder.equals(connectorServiceDescriptor.endpointBuilder)
-                : connectorServiceDescriptor.endpointBuilder != null) {
-            return false;
-        }
-        if (messageAdapter != null ? !messageAdapter.equals(connectorServiceDescriptor.messageAdapter)
-                : connectorServiceDescriptor.messageAdapter != null) {
-            return false;
-        }
-        if (messageReceiver != null ? !messageReceiver.equals(connectorServiceDescriptor.messageReceiver)
-                : connectorServiceDescriptor.messageReceiver != null) {
-            return false;
-        }
-        if (protocol != null ? !protocol.equals(connectorServiceDescriptor.protocol)
-                : connectorServiceDescriptor.protocol != null) {
-            return false;
-        }
-        if (serviceError != null ? !serviceError.equals(connectorServiceDescriptor.serviceError)
-                : connectorServiceDescriptor.serviceError != null) {
-            return false;
-        }
-        if (serviceFinder != null ? !serviceFinder.equals(connectorServiceDescriptor.serviceFinder)
-                : connectorServiceDescriptor.serviceFinder != null) {
-            return false;
-        }
-        if (serviceLocation != null ? !serviceLocation.equals(connectorServiceDescriptor.serviceLocation)
-                : connectorServiceDescriptor.serviceLocation != null) {
-            return false;
-        }
-        if (transactionFactory != null ? !transactionFactory.equals(connectorServiceDescriptor.transactionFactory)
-                : connectorServiceDescriptor.transactionFactory != null) {
-            return false;
-        }
+        if (connector != null ? !connector.equals(connectorServiceDescriptor.connector) : connectorServiceDescriptor.connector != null) return false;
+        if (connectorFactory != null ? !connectorFactory.equals(connectorServiceDescriptor.connectorFactory) : connectorServiceDescriptor.connectorFactory != null) return false;
+        if (defaultInboundTransformer != null ? !defaultInboundTransformer.equals(connectorServiceDescriptor.defaultInboundTransformer) : connectorServiceDescriptor.defaultInboundTransformer != null) return false;
+        if (defaultOutboundTransformer != null ? !defaultOutboundTransformer.equals(connectorServiceDescriptor.defaultOutboundTransformer) : connectorServiceDescriptor.defaultOutboundTransformer != null) return false;
+        if (defaultResponseTransformer != null ? !defaultResponseTransformer.equals(connectorServiceDescriptor.defaultResponseTransformer) : connectorServiceDescriptor.defaultResponseTransformer != null) return false;
+        if (dispatcherFactory != null ? !dispatcherFactory.equals(connectorServiceDescriptor.dispatcherFactory) : connectorServiceDescriptor.dispatcherFactory != null) return false;
+        if (endpointBuilder != null ? !endpointBuilder.equals(connectorServiceDescriptor.endpointBuilder) : connectorServiceDescriptor.endpointBuilder != null) return false;
+        if (messageAdapter != null ? !messageAdapter.equals(connectorServiceDescriptor.messageAdapter) : connectorServiceDescriptor.messageAdapter != null) return false;
+        if (messageReceiver != null ? !messageReceiver.equals(connectorServiceDescriptor.messageReceiver) : connectorServiceDescriptor.messageReceiver != null) return false;
+        if (properties != null ? !properties.equals(connectorServiceDescriptor.properties) : connectorServiceDescriptor.properties != null) return false;
+        if (protocol != null ? !protocol.equals(connectorServiceDescriptor.protocol) : connectorServiceDescriptor.protocol != null) return false;
+        if (serviceError != null ? !serviceError.equals(connectorServiceDescriptor.serviceError) : connectorServiceDescriptor.serviceError != null) return false;
+        if (serviceFinder != null ? !serviceFinder.equals(connectorServiceDescriptor.serviceFinder) : connectorServiceDescriptor.serviceFinder != null) return false;
+        if (serviceLocation != null ? !serviceLocation.equals(connectorServiceDescriptor.serviceLocation) : connectorServiceDescriptor.serviceLocation != null) return false;
+        if (sessionHandler != null ? !sessionHandler.equals(connectorServiceDescriptor.sessionHandler) : connectorServiceDescriptor.sessionHandler != null) return false;
+        if (streamMessageAdapter != null ? !streamMessageAdapter.equals(connectorServiceDescriptor.streamMessageAdapter) : connectorServiceDescriptor.streamMessageAdapter != null) return false;
+        if (transactedMessageReceiver != null ? !transactedMessageReceiver.equals(connectorServiceDescriptor.transactedMessageReceiver) : connectorServiceDescriptor.transactedMessageReceiver != null) return false;
+        if (transactionFactory != null ? !transactionFactory.equals(connectorServiceDescriptor.transactionFactory) : connectorServiceDescriptor.transactionFactory != null) return false;
 
         return true;
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         int result;
         result = (protocol != null ? protocol.hashCode() : 0);
         result = 29 * result + (serviceLocation != null ? serviceLocation.hashCode() : 0);
@@ -571,11 +567,15 @@ public class ConnectorServiceDescriptor
         result = 29 * result + (dispatcherFactory != null ? dispatcherFactory.hashCode() : 0);
         result = 29 * result + (transactionFactory != null ? transactionFactory.hashCode() : 0);
         result = 29 * result + (messageAdapter != null ? messageAdapter.hashCode() : 0);
+        result = 29 * result + (streamMessageAdapter != null ? streamMessageAdapter.hashCode() : 0);
         result = 29 * result + (messageReceiver != null ? messageReceiver.hashCode() : 0);
+        result = 29 * result + (transactedMessageReceiver != null ? transactedMessageReceiver.hashCode() : 0);
         result = 29 * result + (endpointBuilder != null ? endpointBuilder.hashCode() : 0);
+        result = 29 * result + (sessionHandler != null ? sessionHandler.hashCode() : 0);
         result = 29 * result + (defaultInboundTransformer != null ? defaultInboundTransformer.hashCode() : 0);
         result = 29 * result + (defaultOutboundTransformer != null ? defaultOutboundTransformer.hashCode() : 0);
         result = 29 * result + (defaultResponseTransformer != null ? defaultResponseTransformer.hashCode() : 0);
+        result = 29 * result + (properties != null ? properties.hashCode() : 0);
         return result;
     }
 }

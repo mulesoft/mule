@@ -14,10 +14,11 @@
  */
 package org.mule.umo;
 
-import java.io.Serializable;
-
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.security.UMOSecurityContext;
+
+import java.io.Serializable;
+import java.util.Iterator;
 
 /**
  * <code>UMOSession</code> is the context in which a request is executed. The
@@ -218,5 +219,35 @@ public interface UMOSession extends Serializable
      *         secure.
      */
     UMOSecurityContext getSecurityContext();
+
+    /**
+     * Will set a session level property.  These will either be stored and retrieved using the underlying
+     * transport mechanism of stored using a default mechanism
+     * @param key the key for the object data being stored on the session
+     * @param value the value of the session data
+     */
+    void setProperty(Object key, Object value);
+
+    /**
+     * Will retrieve a session level property.
+     * @param key the key for the object data being stored on the session
+     * @return the value of the session data or null if the property does not exist
+     */
+    Object getProperty(Object key);
+
+    /**
+     * Will retrieve a session level property and remove it from the session
+     * @param key the key for the object data being stored on the session
+     * @return the value of the session data or null if the property does not exist
+     */
+    Object removeProperty(Object key);
+
+    /**
+     * Returns an iterater of property keys for the session properties on this session
+     * @return an iterater of property keys for the session properties on this session
+     */
+    Iterator getPropertyNames();
+
+
 
 }

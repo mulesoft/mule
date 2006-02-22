@@ -424,7 +424,7 @@ public abstract class AbstractMessageReceiver implements UMOMessageReceiver {
                     ros = new ResponseOutputStream(outputStream);
                 }
             }
-            UMOSession session = new MuleSession(component, trans);
+            UMOSession session = new MuleSession(message, connector.getSessionHandler(), component);
             UMOEvent muleEvent = new MuleEvent(message, endpoint, session, synchronous, ros);
             RequestContext.setEvent(muleEvent);
 

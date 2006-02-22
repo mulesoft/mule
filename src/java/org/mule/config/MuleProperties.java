@@ -68,6 +68,8 @@ public interface MuleProperties
     public final String MULE_REPLY_TO_PROPERTY = PROPERTY_PREFIX + "REPLYTO";
     public final String MULE_USER_PROPERTY = PROPERTY_PREFIX + "USER";
     public final String MULE_REPLY_TO_REQUESTOR_PROPERTY = PROPERTY_PREFIX + "REPLYTO_REQUESTOR";
+    public final String MULE_SESSION_ID_PROPERTY = PROPERTY_PREFIX + "SESSION_ID";
+    public final String MULE_SESSION_PROPERTY = PROPERTY_PREFIX + "SESSION";
     public final String MULE_MESSAGE_ID_PROPERTY = PROPERTY_PREFIX + "MESSAGE_ID";
     public final String MULE_CORRELATION_ID_PROPERTY = PROPERTY_PREFIX + "CORRELATION_ID";
     public final String MULE_CORRELATION_GROUP_SIZE_PROPERTY = PROPERTY_PREFIX + "CORRELATION_GROUP_SIZE";
@@ -86,11 +88,13 @@ public interface MuleProperties
     public final String CONNECTOR_DISPATCHER_FACTORY = "dispatcher.factory";
     public final String CONNECTOR_TRANSACTION_FACTORY = "transaction.factory";
     public final String CONNECTOR_MESSAGE_ADAPTER = "message.adapter";
+    public final String CONNECTOR_STREAM_MESSAGE_ADAPTER = "stream.message.adapter";
     public final String CONNECTOR_INBOUND_TRANSFORMER = "inbound.transformer";
     public final String CONNECTOR_OUTBOUND_TRANSFORMER = "outbound.transformer";
     public final String CONNECTOR_RESPONSE_TRANSFORMER = "response.transformer";
     public final String CONNECTOR_ENDPOINT_BUILDER = "endpoint.builder";
     public final String CONNECTOR_SERVICE_FINDER = "service.finder";
     public final String CONNECTOR_SERVICE_ERROR = "service.error";
+    public final String CONNECTOR_SESSION_HANDLER = "session.handler";
     // End Connector Service descriptor properties
 }

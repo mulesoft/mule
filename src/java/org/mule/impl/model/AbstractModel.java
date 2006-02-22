@@ -26,7 +26,6 @@ import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.MuleSession;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.model.DynamicEntryPointResolver;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.UMOComponent;
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOException;
@@ -322,7 +321,7 @@ public abstract class AbstractModel implements UMOModel
             logger.warn("Component: " + muleName + " not found returning null session");
             return null;
         } else {
-            return new MuleSession(component, TransactionCoordination.getInstance().getTransaction());
+            return new MuleSession(component);
         }
     }
 

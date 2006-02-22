@@ -24,6 +24,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.AlreadyInitialisedException;
 import org.mule.impl.DefaultExceptionStrategy;
+import org.mule.impl.MuleSessionHandler;
 import org.mule.impl.internal.notifications.ConnectionNotification;
 import org.mule.management.mbeans.EndpointService;
 import org.mule.routing.filters.WildcardFilter;
@@ -42,6 +43,7 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.provider.UMOMessageDispatcherFactory;
 import org.mule.umo.provider.UMOMessageReceiver;
+import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.concurrent.WaitableBoolean;
 
@@ -223,6 +225,11 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      * If true receiver threads will be given a slightly higher priority.
      */
     protected boolean serverSide = true;
+
+    /**
+     * The strategy used for reading and writing session information to and fromt he transport
+     */
+    protected UMOSessionHandler sessionHandler = new MuleSessionHandler();
 
     public AbstractConnector()
     {
@@ -1121,5 +1128,13 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
      */
     public void setServerSide(boolean serverSide) {
         this.serverSide = serverSide;
+    }
+
+    public UMOSessionHandler getSessionHandler() {
+        return sessionHandler;
+    }
+
+    public void setSessionHandler(UMOSessionHandler sessionHandler) {
+        this.sessionHandler = sessionHandler;
     }
 }

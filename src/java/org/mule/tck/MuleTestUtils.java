@@ -128,7 +128,12 @@ public class MuleTestUtils {
 
     public static UMOSession getTestSession(UMOComponent component)
     {
-        return new MuleSession(component, null);
+        return new MuleSession(component);
+    }
+
+    public static UMOSession getTestSession()
+    {
+        return new MuleSession(null);
     }
 
     public static TestConnector getTestConnector()

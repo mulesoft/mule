@@ -22,15 +22,25 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.providers.AbstractConnector;
-import org.mule.umo.*;
+import org.mule.umo.UMOComponent;
+import org.mule.umo.UMOEvent;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.EndpointNotFoundException;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.provider.DispatchException;
 import org.mule.umo.provider.ReceiveException;
+import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
+import org.mule.umo.provider.UMOSessionHandler;
 import org.mule.umo.routing.UMOOutboundMessageRouter;
 import org.mule.umo.security.UMOSecurityContext;
 import org.mule.util.UUID;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <code>MuleSession</code> manages the interaction and distribution of events
@@ -61,18 +71,42 @@ public final class MuleSession implements UMOSession
 
     private UMOSecurityContext securityContext;
 
-    public MuleSession()
-    {
-        this.id = new UUID().getUUID();
+    private Map properties = null;
+
+    public MuleSession(UMOComponent component) {
+        properties = new HashMap();
+        id = new UUID().getUUID();
+        this.component = component;
     }
 
-    public MuleSession(UMOComponent component, UMOTransaction transaction)
-    {
-        this();
+    public MuleSession(UMOMessage message, UMOSessionHandler requestSessionHandler, UMOComponent component) throws UMOException {
+        this(message, requestSessionHandler);
         if (component == null) {
-            throw new IllegalArgumentException("Component cannot be null");
+            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET, "component").toString());
         }
         this.component = component;
+    }
+
+    public MuleSession(UMOMessage message, UMOSessionHandler requestSessionHandler) throws UMOException {
+
+        if (requestSessionHandler == null) {
+            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET, "requestSessionHandler").toString());
+        }
+
+        if (message == null) {
+            throw new IllegalArgumentException(new Message(Messages.PROPERTIES_X_NOT_SET, "message").toString());
+        }
+
+        properties = new HashMap();
+        requestSessionHandler.populateSession(message, this);
+        id = (String)getProperty(requestSessionHandler.getSessionIDKey());
+        if(id==null) {
+            id = new UUID().getUUID();
+            if(logger.isDebugEnabled()) logger.debug("There is no session id on the request using key: " +requestSessionHandler.getSessionIDKey() +
+                    ". Generating new session id: " + id);
+        } else if(logger.isDebugEnabled()) {
+            logger.debug("Got session with id: " + id);
+        }
     }
 
     public void dispatchEvent(UMOMessage message) throws UMOException
@@ -129,10 +163,12 @@ public final class MuleSession implements UMOSession
         UMOEvent event = createOutboundEvent(message, endpoint, RequestContext.getEvent());
         UMOMessage result = sendEvent(event);
 
-        if(endpoint.isRemoteSync() && endpoint.getResponseTransformer()!=null) {
-            Object response = endpoint.getResponseTransformer().transform(result.getPayload());
-            result = new MuleMessage(response, result.getProperties(), result); 
-        }
+        //Handles the situation where a response has been received via a remote ReplyTo channel.
+        //RM* Todo not sure we need this bit of code??
+//        if(endpoint.isRemoteSync() && endpoint.getResponseTransformer()!=null && result!=null) {
+//            Object response = endpoint.getResponseTransformer().transform(result.getPayload());
+//            result = new MuleMessage(response, result.getProperties(), result);
+//        }
         if(result!=null) RequestContext.rewriteEvent(result);
         return result;
     }
@@ -147,9 +183,16 @@ public final class MuleSession implements UMOSession
         if (event.getEndpoint().canSend()) {
             try {
                 logger.debug("dispatching event: " + event);
-                UMOMessageDispatcher dispatcher = event.getEndpoint()
-                                                       .getConnector()
-                                                       .getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+                UMOConnector connector = event.getEndpoint().getConnector();
+                UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+
+                if(connector instanceof AbstractConnector) {
+                    ((AbstractConnector)connector).getSessionHandler().writeSession(event.getMessage(), this);
+                } else {
+                    //Todo in Mule20 we'll flatten the Connector hierachy
+                    logger.warn("A session handler could not be obtained, using  default");
+                    new MuleSessionHandler().writeSession(event.getMessage(), this);
+                }
                 dispatcher.dispatch(event);
             } catch (Exception e) {
                 throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
@@ -185,9 +228,17 @@ public final class MuleSession implements UMOSession
         if (event.getEndpoint().canSend()) {
             try {
                 logger.debug("sending event: " + event);
-                UMOMessageDispatcher dispatcher = event.getEndpoint()
-                                                       .getConnector()
-                                                       .getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+
+                UMOConnector connector = event.getEndpoint().getConnector();
+                UMOMessageDispatcher dispatcher = connector.getDispatcher(event.getEndpoint().getEndpointURI().getAddress());
+
+                if(connector instanceof AbstractConnector) {
+                    ((AbstractConnector)connector).getSessionHandler().writeSession(event.getMessage(), this);
+                } else {
+                    //Todo in Mule20 we'll flatten the Connector hierachy
+                    logger.warn("A session handler could not be obtained, using  default");
+                    new MuleSessionHandler().writeSession(event.getMessage(), this);
+                }
                 return dispatcher.send(event);
             } catch (UMOException e) {
                 throw e;
@@ -320,5 +371,45 @@ public final class MuleSession implements UMOSession
     public UMOSecurityContext getSecurityContext()
     {
         return securityContext;
+    }
+
+    /**
+     * Will set a session level property.  These will either be stored and retrieved using the underlying
+     * transport mechanism of stored using a default mechanism
+     *
+     * @param key   the key for the object data being stored on the session
+     * @param value the value of the session data
+     */
+    public void setProperty(Object key, Object value) {
+        properties.put(key, value);
+    }
+
+    /**
+     * Will retrieve a session level property.
+     *
+     * @param key the key for the object data being stored on the session
+     * @return the value of the session data or null if the property does not exist
+     */
+    public Object getProperty(Object key) {
+        return properties.get(key);
+    }
+
+    /**
+     * Will retrieve a session level property and remove it from the session
+     *
+     * @param key the key for the object data being stored on the session
+     * @return the value of the session data or null if the property does not exist
+     */
+    public Object removeProperty(Object key) {
+        return properties.remove(key);
+    }
+
+    /**
+     * Returns an iterater of property keys for the session properties on this session
+     *
+     * @return an iterater of property keys for the session properties on this session
+     */
+    public Iterator getPropertyNames() {
+        return properties.keySet().iterator();
     }
 }
