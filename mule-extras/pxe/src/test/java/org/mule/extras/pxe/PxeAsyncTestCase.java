@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class PxeAsyncTestCase extends AbstractMuleTestCase
 {
-    public void setUp() throws Exception
+    public void doSetUp() throws Exception
     {
         if (MuleManager.isInstanciated()) {
             MuleManager.getInstance().dispose();
@@ -44,7 +44,7 @@ public class PxeAsyncTestCase extends AbstractMuleTestCase
         builder.configure("async-pxe-mule-config.xml");
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         MuleManager.getInstance().dispose();
     }

@@ -35,7 +35,7 @@ import org.w3c.dom.Document;
  */
 public class PxeHelloWorldTestCase extends AbstractMuleTestCase
 {
-    public void setUp() throws Exception
+    public void doSetUp() throws Exception
     {
         if (MuleManager.isInstanciated()) {
             MuleManager.getInstance().dispose();
@@ -45,7 +45,7 @@ public class PxeHelloWorldTestCase extends AbstractMuleTestCase
         builder.configure("hello-pxe-mule-config.xml");
     }
 
-    protected void tearDown() throws Exception
+    protected void doTearDown() throws Exception
     {
         MuleManager.getInstance().dispose();
     }
