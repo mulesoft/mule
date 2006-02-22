@@ -65,7 +65,17 @@ public class ChainingRouter extends FilteringOutboundRouter
                 }
                 if (!lastEndpointInChain) {
 
-                    intermediaryResult = send(session, intermediaryResult, endpoint);
+                    UMOMessage tempResult = send(session, intermediaryResult, endpoint);
+                    //Need to propergate Correlation info and replyTo. Because there is no guarantee that an external
+                    //system will preserve headers (in fact most will not)
+                    if(tempResult!=null) {
+                        tempResult.setCorrelationId(intermediaryResult.getCorrelationId());
+                        tempResult.setCorrelationSequence(intermediaryResult.getCorrelationSequence());
+                        tempResult.setCorrelationGroupSize(intermediaryResult.getCorrelationGroupSize());
+                        tempResult.setReplyTo(intermediaryResult.getReplyTo());
+                    }
+                    intermediaryResult = tempResult;
+
                     if (logger.isDebugEnabled()) {
                         logger.debug("Received Chain result '" + i + "': " + (intermediaryResult==null ? "null" : intermediaryResult.toString()));
                     }
