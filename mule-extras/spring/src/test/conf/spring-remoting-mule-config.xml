@@ -3,9 +3,7 @@
 <!DOCTYPE mule-configuration PUBLIC "-//SymphonySoft //DTD mule-configuration XML V1.0//EN"
                                 "http://www.symphonysoft.com/dtds/mule/mule-configuration.dtd">
 
-<mule-configuration id="Mule_Spring_HttpInvoker_Sample" version="1.0">
-
-    <mule-environment-properties synchronous="true"/>
+<mule-configuration id="Mule_Spring_Invoker_Sample" version="1.0">
 
     <!--
         Define a Spring context and we can have our POJOs come from there
@@ -21,7 +19,7 @@
             Transform a byte[] from an Http request into a Spring RemoteInvocation instance.
             -->
         <transformer name="springInputXform"
-            className="org.mule.extras.spring.remoting.HttpToRemoteInvocationTransformer"/>
+            className="org.mule.extras.spring.remoting.ObjectToRemoteInvocationTransformer"/>
         <!--
             Convert an Object to a Spring RemoteInvocationResult and then into a byte[]
             for return to the caller via Http.
@@ -37,7 +35,7 @@
             the requested method on a POJO specified by "serviceClass".
             -->
         <mule-descriptor name="doSomeWorkViaSpring"
-            implementation="org.mule.extras.spring.remoting.SpringHttpInvokerComponent">
+            implementation="org.mule.extras.spring.remoting.SpringRemoteInvokerComponent">
 
             <!--
                 Listen on 8003 for Http requests.
@@ -78,6 +76,27 @@
             </properties>
 
         </mule-descriptor>
+
+        <!--
+            SpringHttpInvokerComponent will receive a RemoteInvocation and execute
+            the requested method on a POJO specified by "serviceClass".
+            -->
+        <!--mule-descriptor name="doSomeWorkViaSpringUsingVm"
+            implementation="org.mule.extras.spring.remoting.SpringRemoteInvokerComponent">
+            <inbound-router>
+                <endpoint
+                    address="vm://springService"
+                    transformers="springInputXform"
+                    responseTransformers="springOutputXform"
+                    synchronous="true"/>
+            </inbound-router>
+
+            <properties>
+                <container-property name="serviceBean" reference="doSpringWork"/>
+                <property name="serviceInterface" value="org.mule.extras.spring.remoting.WorkInterface"/>
+            </properties>
+
+        </mule-descriptor-->
 
     </model>
 

@@ -28,7 +28,7 @@ import org.springframework.remoting.support.RemoteInvocationBasedExporter;
 import org.springframework.remoting.support.RemoteInvocationExecutor;
 import org.springframework.remoting.support.RemoteInvocationResult;
 
-public class SpringHttpInvokerComponent implements Initialisable, Callable
+public class SpringRemoteInvokerComponent implements Initialisable, Callable
 {
     private Delegate delegate;
     private Class serviceClass;
@@ -59,7 +59,7 @@ public class SpringHttpInvokerComponent implements Initialisable, Callable
         }
     }
 
-    public SpringHttpInvokerComponent()
+    public SpringRemoteInvokerComponent()
     {
         delegate = new Delegate();
     }

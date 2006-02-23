@@ -23,22 +23,24 @@ import org.springframework.remoting.support.RemoteInvocation;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 
-public class HttpToRemoteInvocationTransformer extends AbstractTransformer
+public class ObjectToRemoteInvocationTransformer extends AbstractTransformer
 {
     protected transient Log logger = LogFactory.getLog(getClass());
     private static final long serialVersionUID = -7067819657247418549L;
 
-    public HttpToRemoteInvocationTransformer()
+    public ObjectToRemoteInvocationTransformer()
     {
         super();
+        this.registerSourceType(RemoteInvocation.class);
         this.registerSourceType(byte[].class);
         this.setReturnClass(RemoteInvocation.class);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         if (logger.isDebugEnabled()) logger.debug("HttpToRemoteInvocation.doTransform(" + src + ")");
-
+        if(src instanceof RemoteInvocation) return src;
+        
         try
         {
             byte[] data = (byte[]) src;
