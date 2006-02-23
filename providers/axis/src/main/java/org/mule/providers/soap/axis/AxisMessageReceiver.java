@@ -73,6 +73,8 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         AxisProperties.setProperty("axis.doAutoTypes", String.valueOf(connector.isDoAutoTypes()));
         MuleDescriptor descriptor = (MuleDescriptor) component.getDescriptor();
         String style = (String) descriptor.getProperties().get("style");
+        String use = (String) descriptor.getProperties().get("use");
+        String doc = (String) descriptor.getProperties().get("documentation");
         //Check if the style is message. If so, we need to create
         //a message oriented provider
         if (style != null && style.equalsIgnoreCase("message")) {
@@ -190,10 +192,6 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             setOptionIfNotset(service, JavaProvider.OPTION_ALLOWEDMETHODS, methodNames);
         }
 
-
-        //String style = (String) descriptor.getProperties().get("style");
-        String use = (String) descriptor.getProperties().get("use");
-        String doc = (String) descriptor.getProperties().get("documentation");
         // Note that Axis has specific rules to how these two variables are
         // combined. This is handled for us
         // Set style: RPC/wrapped/Doc/Message

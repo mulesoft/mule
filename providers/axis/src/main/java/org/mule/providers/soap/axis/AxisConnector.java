@@ -126,9 +126,16 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
     private boolean doAutoTypes = true;
 
+    private boolean treatMapAsNamedParams = true;
+
 
     public AxisConnector() {
         super();
+        registerProtocols();
+
+    }
+
+    protected void registerProtocols() {
         //Default supported schemes, these can be restricted
         //through configuration
         supportedSchemes = new ArrayList();
@@ -148,9 +155,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             String s = (String) iterator.next();
             registerSupportedProtocol(s);
         }
-
     }
-
     public void doInitialise() throws InitialisationException {
         super.doInitialise();
 
@@ -589,5 +594,13 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
                                                           new BeanDeserializerFactory(clazz, xmlType));
             }
         }
+    }
+
+    public boolean isTreatMapAsNamedParams() {
+        return treatMapAsNamedParams;
+    }
+
+    public void setTreatMapAsNamedParams(boolean treatMapAsNamedParams) {
+        this.treatMapAsNamedParams = treatMapAsNamedParams;
     }
 }
