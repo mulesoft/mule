@@ -128,5 +128,12 @@
             <version>${geronimo_spec_saaj_version}</version>
             <url>http://java.sun.com/products/saaj/</url>
         </dependency>
+        
+        <!-- needed for WSDL client -->
+        <dependency>
+          <groupId>xfire</groupId>
+          <artifactId>XmlSchema</artifactId>
+          <version>20060128-patched</version>
+        </dependency>
    </dependencies>
 </project>
