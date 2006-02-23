@@ -14,25 +14,14 @@
 */
 package org.mule.providers.soap.xfire;
 
-import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.XFire;
-import org.codehaus.xfire.soap.SoapTransport;
-import org.codehaus.xfire.fault.XFireFault;
-import org.codehaus.xfire.handler.Handler;
-import org.codehaus.xfire.handler.AbstractHandler;
-import org.codehaus.xfire.handler.OutMessageSender;
-import org.codehaus.xfire.transport.http.HttpChannel;
-import org.codehaus.xfire.transport.http.HttpTransport;
-import org.codehaus.xfire.transport.http.SoapHttpTransport;
 import org.codehaus.xfire.client.Client;
 import org.codehaus.xfire.service.OperationInfo;
 import org.codehaus.xfire.service.Service;
 import org.mule.config.MuleProperties;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.endpoint.MuleEndpoint;
-import org.mule.providers.AbstractConnector;
 import org.mule.providers.AbstractMessageDispatcher;
-import org.mule.providers.soap.xfire.transport.MuleLocalTransport;
 import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
@@ -47,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Map;
 
 /**
  * todo document
@@ -60,9 +48,9 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher {
     protected XFireConnector connector;
     protected Client client;
 
-    public XFireMessageDispatcher(AbstractConnector connector) {
+    public XFireMessageDispatcher(XFireConnector connector) {
         super(connector);
-        this.connector = (XFireConnector) connector;
+        this.connector = connector;
 
     }
 
@@ -161,7 +149,7 @@ public class XFireMessageDispatcher extends AbstractMessageDispatcher {
         }
     }
 
-    protected Client getClient(UMOEvent event) {
+    protected Client getClient(UMOEvent event) throws Exception {
         if(client==null) {
             String serviceName = getService(event.getEndpoint().getEndpointURI());
 

@@ -1,0 +1,6 @@
+connector=org.mule.providers.soap.xfire.wsdl.XFireWsdlConnector
+dispatcher.factory=org.mule.providers.soap.xfire.wsdl.XFireWsdlMessageDispatcherFactory
+message.adapter=org.mule.providers.soap.xfire.XFireMessageAdapter
+inbound.transformer=
+outbound.transformer=
+endpoint.builder=org.mule.providers.soap.WsdlUrlEndpointBuilder

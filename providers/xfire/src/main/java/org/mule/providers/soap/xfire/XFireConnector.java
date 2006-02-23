@@ -51,6 +51,10 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
 
     public XFireConnector() {
         super();
+        registerProtocols();
+    }
+
+    protected void registerProtocols() {
         registerSupportedProtocol("http");
         registerSupportedProtocol("https");
         registerSupportedProtocol("jms");
