@@ -189,23 +189,26 @@ public class ConnectorFactory
         String scheme = url.getSchemeMetaInfo();
 
         UMOConnector connector = null;
-        ConnectorServiceDescriptor psd;
-
-        psd = getServiceDescriptor(scheme);
+        ConnectorServiceDescriptor csd = getServiceDescriptor(scheme);
         // Make sure we can create the endpoint/connector using this service
         // method
-        if (psd.getServiceError() != null) {
-            throw new ConnectorServiceException(Message.createStaticMessage(psd.getServiceError()));
+        if (csd.getServiceError() != null) {
+            throw new ConnectorServiceException(Message.createStaticMessage(csd.getServiceError()));
+        }
+
+        //If this is a fineder service, lets find it before trying to create it
+        if (csd.getServiceFinder() != null) {
+            csd = csd.createServiceFinder().findService(scheme, csd);
         }
         // if there is a factory, use it
         try {
-            if (psd.getConnectorFactory() != null) {
-                ObjectFactory factory = (ObjectFactory) ClassHelper.loadClass(psd.getConnectorFactory(),
+            if (csd.getConnectorFactory() != null) {
+                ObjectFactory factory = (ObjectFactory) ClassHelper.loadClass(csd.getConnectorFactory(),
                                                                               ConnectorFactory.class).newInstance();
                 connector = (UMOConnector) factory.create();
             } else {
-                if (psd.getConnector() != null) {
-                    connector = (UMOConnector) ClassHelper.loadClass(psd.getConnector(), ConnectorFactory.class)
+                if (csd.getConnector() != null) {
+                    connector = (UMOConnector) ClassHelper.loadClass(csd.getConnector(), ConnectorFactory.class)
                                                           .newInstance();
                     if (connector instanceof AbstractServiceEnabledConnector) {
                         ((AbstractServiceEnabledConnector) connector).initialiseFromUrl(url);
