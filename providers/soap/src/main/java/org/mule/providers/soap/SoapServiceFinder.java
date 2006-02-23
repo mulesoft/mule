@@ -25,6 +25,7 @@ import org.mule.util.PropertiesHelper;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * <code>SoapServiceFinder</code> finds a the connector service to use by
@@ -38,15 +39,15 @@ public class SoapServiceFinder implements ConnectorServiceFinder
 {
     public ConnectorServiceDescriptor findService(String service, ConnectorServiceDescriptor csd) throws ConnectorFactoryException
     {
-        Map finders = PropertiesHelper.getPropertiesWithPrefix(csd.getProperties(), "finder.class");
+        Map finders = new TreeMap();
+        PropertiesHelper.getPropertiesWithPrefix(csd.getProperties(), "finder.class", finders);
 
         StringBuffer buf = new StringBuffer();
         for (Iterator iterator = finders.entrySet().iterator(); iterator.hasNext();) {
             Map.Entry entry = (Map.Entry) iterator.next();
             try {
                 ClassHelper.loadClass(entry.getValue().toString(), getClass());
-                String protocol = entry.getKey().toString();
-                protocol = protocol.substring(protocol.lastIndexOf('.') + 1);
+                String protocol = getProtocolFromKey(entry.getKey().toString());
                 return ConnectorFactory.getServiceDescriptor(protocol);
             } catch (ClassNotFoundException e1)
             {
@@ -54,5 +55,9 @@ public class SoapServiceFinder implements ConnectorServiceFinder
             }
         }
        throw new ConnectorServiceException(new Message(Messages.COULD_NOT_FIND_SOAP_PROVIDER_X, buf.toString()));
+    }
+
+    protected String getProtocolFromKey(String key) {
+        return key.substring(key.lastIndexOf('.') + 1);
     }
 }
