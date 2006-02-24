@@ -568,14 +568,14 @@ Jndi
     A tranformation for an outbound event is called or when the UMO dispatchEvent()
     or sendEvent() methods are called.
 -->
-<!ATTLIST endpoint transformers	IDREFS			#IMPLIED>
+<!ATTLIST endpoint transformers	CDATA			#IMPLIED>
 
 
 <!--
     Is responsible for transforming data when it is returned from a request/response
     invocation. If the endpoint is a receiver the responseTransformers is ignored.
 -->
-<!ATTLIST endpoint responseTransformers	IDREFS			#IMPLIED>
+<!ATTLIST endpoint responseTransformers	CDATA			#IMPLIED>
 
 <!--
     synchronous
@@ -634,13 +634,13 @@ Jndi
     address
     Used to override the transformers on the global endpoint
 -->
-<!ATTLIST global-endpoint transformers	IDREFS			#IMPLIED>
+<!ATTLIST global-endpoint transformers	CDATA			#IMPLIED>
 
 <!--
     Is responsible for transforming data when it is returned from a request/response
     invocation. If the endpoint is a receiver the responseTransformers is ignored.
 -->
-<!ATTLIST global-endpoint responseTransformers	IDREFS			#IMPLIED>
+<!ATTLIST global-endpoint responseTransformers	CDATA			#IMPLIED>
 
 <!--
     synchronous
@@ -940,15 +940,15 @@ Jndi
 <!--
 	The transformer to use when receiving events on the specified inboundProvider.
 -->
-<!ATTLIST mule-descriptor inboundTransformer			IDREFS	        #IMPLIED>
+<!ATTLIST mule-descriptor inboundTransformer			CDATA	        #IMPLIED>
 <!--
 	The transformer to use when receiving events on the specified outboundProvider.
 -->
-<!ATTLIST mule-descriptor outboundTransformer			IDREFS	        #IMPLIED>
+<!ATTLIST mule-descriptor outboundTransformer			CDATA	        #IMPLIED>
 <!--
 	The transformer to use when sending events back.
 -->
-<!ATTLIST mule-descriptor responseTransformer			IDREFS	        #IMPLIED>
+<!ATTLIST mule-descriptor responseTransformer			CDATA	        #IMPLIED>
 <!--
 	The class of the object or an object reference of the component being registered as an UMO.
 	If the implementation is an object reference then it will be resolved using the component resolver
@@ -1027,9 +1027,6 @@ Whether every configured router will be matched
    associated with it meaning that marshaling from transport specific MEssage types such as
    Jms will be done automatically.
 -->
-<!-- This has been removed as you can now set the response router on the endpoint -->
-<!--<!ATTLIST response-router transformers              IDREFS           #IMPLIED>-->
-
 <!--
 	Defines the timeout for routers configure on this response-router
 -->
@@ -1075,7 +1072,7 @@ Is a fully qualified class name of the catch all strategy class
     This is the transformer chain to apply to the message before it is checked for a match.  This is useful
     where you want to filter on a subset of the message and cannot query it using a filter.
 -->
-<!ATTLIST router transformer           IDREFS           #IMPLIED>
+<!ATTLIST router transformer           CDATA           #IMPLIED>
 
 <!--
     enableCorrelation
