@@ -40,17 +40,17 @@ public class SpringRemotingTestCase extends FunctionalTestCase
         assertEquals(data.getSomeInteger(), new Integer(14));
     }
 
-    public void testVmInvokeSpringService() throws Exception
-    {
-        ComplexData cd = new ComplexData("Foo", new Integer(13));
-        HttpInvokerProxyFactoryBean invoker = new HttpInvokerProxyFactoryBean();
-        invoker.setServiceInterface(WorkInterface.class);
-        invoker.setServiceUrl(SPRING_VM_ENDPOINT);
-        invoker.afterPropertiesSet();
-        WorkInterface worker = (WorkInterface) invoker.getObject();
-        ComplexData data = worker.executeComplexity(cd);
-        assertNotNull(data);
-        assertEquals(data.getSomeString(), "Foo Received");
-        assertEquals(data.getSomeInteger(), new Integer(14));
-    }
+//    public void testVmInvokeSpringService() throws Exception
+//    {
+//        ComplexData cd = new ComplexData("Foo", new Integer(13));
+//        HttpInvokerProxyFactoryBean invoker = new HttpInvokerProxyFactoryBean();
+//        invoker.setServiceInterface(WorkInterface.class);
+//        invoker.setServiceUrl(SPRING_VM_ENDPOINT);
+//        invoker.afterPropertiesSet();
+//        WorkInterface worker = (WorkInterface) invoker.getObject();
+//        ComplexData data = worker.executeComplexity(cd);
+//        assertNotNull(data);
+//        assertEquals(data.getSomeString(), "Foo Received");
+//        assertEquals(data.getSomeInteger(), new Integer(14));
+//    }
 }
