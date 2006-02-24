@@ -877,4 +877,8 @@ public class MuleEventContext implements UMOEventContext
     public String getEncoding() {
         return event.getEncoding();
     }
+
+    public UMOSession getSession() {
+        return event.getSession();
+    }
 }

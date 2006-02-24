@@ -614,4 +614,6 @@ public interface UMOEventContext
      * @return the encoding for this message.  This method must never return null
      */
     public String getEncoding();
+
+    UMOSession getSession();
 }
