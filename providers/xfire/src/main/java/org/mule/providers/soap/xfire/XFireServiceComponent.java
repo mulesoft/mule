@@ -19,62 +19,49 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.xfire.MessageContext;
 import org.codehaus.xfire.XFire;
 import org.codehaus.xfire.XFireRuntimeException;
-import org.codehaus.xfire.soap.SoapConstants;
-import org.codehaus.xfire.attachments.JavaMailAttachments;
 import org.codehaus.xfire.attachments.Attachments;
+import org.codehaus.xfire.attachments.JavaMailAttachments;
 import org.codehaus.xfire.exchange.InMessage;
 import org.codehaus.xfire.exchange.MessageExchange;
+import org.codehaus.xfire.service.OperationInfo;
 import org.codehaus.xfire.service.Service;
 import org.codehaus.xfire.service.ServiceRegistry;
-import org.codehaus.xfire.service.OperationInfo;
+import org.codehaus.xfire.soap.SoapConstants;
 import org.codehaus.xfire.transport.Channel;
 import org.codehaus.xfire.transport.Transport;
 import org.codehaus.xfire.transport.TransportManager;
-import org.codehaus.xfire.transport.local.LocalTransport;
-import org.codehaus.xfire.transport.local.LocalChannel;
 import org.codehaus.xfire.transport.http.HtmlServiceWriter;
-import org.codehaus.xfire.transport.http.XFireHttpSession;
-import org.codehaus.xfire.transport.http.SoapHttpTransport;
+import org.codehaus.xfire.transport.local.LocalTransport;
 import org.codehaus.xfire.util.STAXUtils;
+import org.mule.MuleException;
+import org.mule.MuleManager;
+import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.MuleProperties;
-import org.mule.providers.WriterMessageAdapter;
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.providers.http.HttpConnector;
+import org.mule.providers.http.HttpConstants;
+import org.mule.providers.soap.transformers.GetRequestToSoapRequest;
 import org.mule.providers.streaming.OutStreamMessageAdapter;
 import org.mule.providers.streaming.StreamMessageAdapter;
-import org.mule.providers.streaming.OutStreamMessageAdapter;
-import org.mule.providers.http.HttpConstants;
-import org.mule.providers.http.HttpConnector;
-import org.mule.providers.soap.xfire.transport.MuleLocalTransport;
-import org.mule.providers.soap.xfire.transport.MuleUniversalTransport;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEventContext;
 import org.mule.umo.UMOException;
-import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Callable;
 import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.Lifecycle;
 import org.mule.umo.lifecycle.RecoverableException;
-import org.mule.MuleManager;
-import org.mule.MuleException;
-import org.mule.impl.endpoint.MuleEndpointURI;
 import org.mule.util.Utility;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.servlet.ServletException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.Properties;
 
 /**
  * The Xfire service component recieves requests for Xfire services it manages and marshalls requests and responses
@@ -226,9 +213,9 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
 
         MessageContext context = new MessageContext();
         context.setXFire(xfire);
-        //todo Session handling
-        // XFireHttpSession session = new XFireHttpSession(request);
-        //context.setSession(session);
+
+         XFireMuleSession session = new XFireMuleSession(eventContext.getSession());
+        context.setSession(session);
         context.setService(getService(service));
 
         OperationInfo op = context.getService().getServiceInfo().getOperation(methodName);
@@ -298,7 +285,14 @@ public class XFireServiceComponent implements Callable, Initialisable, Lifecycle
                 is = sma.getResponse();
             }
         } else {
-            is = new ByteArrayInputStream(context.getMessageAsBytes());
+            String method = context.getStringProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+            //Automatically transform get requests. Normally soap requests should be POST with s soap message
+            if(method!=null && method.equalsIgnoreCase("GET")) {
+                String data = (String)new GetRequestToSoapRequest().transform(context.getTransformedMessageAsString());
+                is = new ByteArrayInputStream(data.getBytes());
+            } else {
+                is = new ByteArrayInputStream(context.getTransformedMessageAsBytes());
+            }
         }
         return is;
     }

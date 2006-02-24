@@ -139,8 +139,23 @@ public class XFireConnector extends AbstractServiceEnabledConnector implements M
         UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
         serviceEndpoint.setSynchronous(sync);
         serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
-        // set the filter on the xfire endpoint on the real receiver endpoint
+
+        //Set the transformers on the endpoint too
+//        serviceEndpoint.setTransformer(receiver.getEndpoint().getTransformer());
+//        receiver.getEndpoint().setTransformer(null);
+//
+//        serviceEndpoint.setResponseTransformer(receiver.getEndpoint().getResponseTransformer());
+//        receiver.getEndpoint().setResponseTransformer(null);
+
+        // set the filter on the axis endpoint on the real receiver endpoint
         serviceEndpoint.setFilter(receiver.getEndpoint().getFilter());
+        //Remove the Axis filter now
+        receiver.getEndpoint().setFilter(null);
+
+        // set the Security filter on the axis endpoint on the real receiver endpoint
+        serviceEndpoint.setSecurityFilter(receiver.getEndpoint().getSecurityFilter());
+        //Remove the Axis Receiver Security filter now
+        receiver.getEndpoint().setSecurityFilter(null);
         xfireDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
     }
 
