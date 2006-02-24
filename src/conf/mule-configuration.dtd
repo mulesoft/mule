@@ -18,7 +18,7 @@
 <!--
     The id attribute allows for a unique id for this file as it is often the case that
     distributed Mule environments have their own properties
--->   	
+-->
 <!ATTLIST mule-configuration id		  	NMTOKEN         #IMPLIED>
 <!--
 	The version attribute is used to bind a mule_props.xml
@@ -263,11 +263,11 @@ threading in every connector
 <!--
    A persistence strategy defines the mechanism used to store Mule events to a persistent store.  Primarily, this
    is used for for persisting queued events to disk so that the servers internal state is mirrored on disk in case
-   the server fails and needs to be restarted.  
+   the server fails and needs to be restarted.
 -->
 <!ELEMENT persistence-strategy (properties?)>
 
-<!-- 
+<!--
     A fully qualified class name of the org.mule.util.queue.PersistenceStrategy implementation to use to store
     mule events.
 -->
@@ -368,7 +368,7 @@ Jndi
 The <i>connector</i> element specifies one or more message
   connections for Mule components.
 -->
-  
+
 <!ELEMENT connector (properties?, threading-profile?, exception-strategy?, connection-strategy?)>
 
 <!--
@@ -378,7 +378,7 @@ The <i>connector</i> element specifies one or more message
 
 <!ATTLIST connector name 				ID		#REQUIRED>
 <!--
-	The fully qualified classname to instanciate the connector with  
+	The fully qualified classname to instanciate the connector with
 -->
 <!ATTLIST connector className			NMTOKEN		#IMPLIED>
 
@@ -442,13 +442,13 @@ a connection to the underlying resource
 	outbound messages.
 	All transformers must implement <i>org.mule.transformers.Transformer</i>
 
-    	The <i>org.mule.doCompression</i> property determines whether a transformer should 
-    	compress/uncompress its data.  This attribute is ignored unless the 
-    	transformer named in the className attribute extends 
+    	The <i>org.mule.doCompression</i> property determines whether a transformer should
+    	compress/uncompress its data.  This attribute is ignored unless the
+    	transformer named in the className attribute extends
     	<i>org.mule.transformers.compression.AbstractCompressionTransformer</i>
     	This is a fairlycommon property but must be specified on the transformer
     	declaration as a property i.e.
-    	
+
     	<code>
     	&lt;transformer name="ObjectToJMSMessage" className="org.mule.transformers.ObjectToJMSMessage" returnClass="javax.jms.BytesMessage"&gt;
 			&lt;properties&gt;
@@ -462,15 +462,15 @@ a connection to the underlying resource
 
 <!--
     	name
-    	The logical name for the transformer.  When the transformer is 
+    	The logical name for the transformer.  When the transformer is
     	registered it's name will be used to reference the transformer.
-    	If this attibute is not set then it will default to it's class 
-    	name without the pakage prefix.   
+    	If this attibute is not set then it will default to it's class
+    	name without the pakage prefix.
 -->
 <!ATTLIST transformer name	                  ID    			#REQUIRED>
 <!--
     The className attribute represents the full qualified class name
-    of the Transformer implementation 
+    of the Transformer implementation
  -->
 <!ATTLIST transformer className               NMTOKEN 			#IMPLIED>
 
@@ -497,9 +497,9 @@ Jndi
 
 <!--
 	<i>global-endpoints</i> are endpoint configurations made available to all components in
-	a model through the MuleManager. This is a grouping element for individual 
+	a model through the MuleManager. This is a grouping element for individual
 	<i>endpoint</i> instances
-	
+
 -->
 <!ELEMENT global-endpoints (endpoint+)>
 
@@ -567,20 +567,20 @@ Jndi
 <!ATTLIST endpoint type		(sender | receiver | senderAndReceiver) 	"senderAndReceiver">
 
 <!--
-    Is responsible for transforming data when it is received or sent by the UMO 
+    Is responsible for transforming data when it is received or sent by the UMO
     (depending on whether this endpoint is a receiver or not). A tranformation for an
     inbound event can be forced by the user by calling the inbound event.getTransformedMessage().
     A tranformation for an outbound event is called or when the UMO dispatchEvent()
     or sendEvent() methods are called.
--->	
-<!ATTLIST endpoint transformers	IDREFS			#IMPLIED>
+-->
+<!ATTLIST endpoint transformers	CDATA			#IMPLIED>
 
 
 <!--
     Is responsible for transforming data when it is returned from a request/response
     invocation. If the endpoint is a receiver the responseTransformers is ignored.
 -->
-<!ATTLIST endpoint responseTransformers	IDREFS			#IMPLIED>
+<!ATTLIST endpoint responseTransformers	CDATA			#IMPLIED>
 
 <!--
     synchronous
@@ -640,13 +640,13 @@ Jndi
     address
     Used to override the transformers on the global endpoint
 -->
-<!ATTLIST global-endpoint transformers	IDREFS			#IMPLIED>
+<!ATTLIST global-endpoint transformers	CDATA			#IMPLIED>
 
 <!--
     Is responsible for transforming data when it is returned from a request/response
     invocation. If the endpoint is a receiver the responseTransformers is ignored.
 -->
-<!ATTLIST global-endpoint responseTransformers	IDREFS			#IMPLIED>
+<!ATTLIST global-endpoint responseTransformers	CDATA			#IMPLIED>
 
 <!--
     synchronous
@@ -710,13 +710,13 @@ A fully qualified classname of the security filter to use on this endpoint
 <!--
 	The Action attribute determise the way that the provider demarcates
 	transactions when it receives an event.
-	
+
 	NONE - tells the provider not to do anything regarding transaction management.
 	ALWAYS_BEGIN - Will always start a new transaction when an event is received.
 	BEGIN_OR_JOIN - Will join the transaction if one is in progress otherwise one will be started.
 	ALWAYS_JOIN - Expects a transaction to be in progress and joins it.
 	JOIN_IF_POSSIBLE - Will join a transaction if one is in progress others just continues processing.
-	
+
 -->
 
 <!ATTLIST transaction action 		(NONE | ALWAYS_BEGIN |
@@ -725,11 +725,11 @@ A fully qualified classname of the security filter to use on this endpoint
 
 <!--
 	The commitAction attribute determines how transactions are managed when an event is published.
-	
+
 	NONE - tells the provider not to do anything regarding transaction management.
 	ALWAYS_COMMIT - Will expect a transaction to be in process and will commit it.
 	JOIN_IF_POSSIBLE - Will commit a transaction if one is in progress others just continues processing.
-	
+
 -->
 
 <!--<!ATTLIST transaction commitAction 		(NONE | ALWAYS_COMMIT | COMMIT_IF_POSSIBLE )    		#IMPLIED>-->
@@ -757,8 +757,8 @@ A fully qualified classname of the security filter to use on this endpoint
 -->
 <!ATTLIST constraint className          NMTOKEN         #REQUIRED>
 
-<!-- 
-because I can't find a way of allowing arbitary attributes on an element, 
+<!--
+because I can't find a way of allowing arbitary attributes on an element,
 I am going to define a common set of attributes for filters but users can add their own
 or relax dtd validation on their parser.
 -->
@@ -841,7 +841,7 @@ Jndi
 
 <!ELEMENT model (description?, entry-point-resolver?, component-factory?, component-lifecycle-adapter-factory?, component-pool-factory?, exception-strategy?, mule-descriptor*, bean*)>
 
-<!--	
+<!--
 	The name to associate this mule-model with
 -->
 
@@ -884,7 +884,7 @@ The custom model can be used to specify a custom model type.  In which case you 
 -->
 <!ELEMENT component-lifecycle-adapter-factory EMPTY>
 
-<!--	
+<!--
 	The fully qualified class name of the lifecycle adapterfactory.  Custom lifecycle adapters
 	must implement <i>org.mule.umo.lifecycle.UMOLifecycleAdapterFactory</i>
 -->
@@ -941,19 +941,19 @@ Jndi
 <!ATTLIST mule-descriptor ref             		CDATA         		#IMPLIED>
 
 <!--
-	The transformer to use when receiving events on the specified inboundProvider. 
+	The transformer to use when receiving events on the specified inboundProvider.
 -->
-<!ATTLIST mule-descriptor inboundTransformer			IDREFS	        #IMPLIED>
+<!ATTLIST mule-descriptor inboundTransformer			CDATA	        #IMPLIED>
 <!--
-	The transformer to use when receiving events on the specified outboundProvider. 
+	The transformer to use when receiving events on the specified outboundProvider.
 -->
-<!ATTLIST mule-descriptor outboundTransformer			IDREFS	        #IMPLIED>
+<!ATTLIST mule-descriptor outboundTransformer			CDATA	        #IMPLIED>
 <!--
-	The transformer to use when sending events back. 
+	The transformer to use when sending events back.
 -->
-<!ATTLIST mule-descriptor responseTransformer			IDREFS	        #IMPLIED>
+<!ATTLIST mule-descriptor responseTransformer			CDATA	        #IMPLIED>
 <!--
-	The class of the object or an object reference of the component being registered as an UMO. 
+	The class of the object or an object reference of the component being registered as an UMO.
 	If the implementation is an object reference then it will be resolved using the component resolver
 	configured on the model
 -->
@@ -1088,7 +1088,7 @@ Is a fully qualified class name of the catch all strategy class
     This is the transformer chain to apply to the message before it is checked for a match.  This is useful
     where you want to filter on a subset of the message and cannot query it using a filter.
 -->
-<!ATTLIST router transformer           IDREFS           #IMPLIED>
+<!ATTLIST router transformer           CDATA           #IMPLIED>
 
 <!--
     propertyExtractor
@@ -1147,7 +1147,7 @@ short hand way of setting these properties
 <!-- see explanation for 'filter' element -->
 <!ATTLIST left-filter className                   NMTOKEN           #REQUIRED>
 <!--
-because I can't find a way of allowing arbitary attributes on an element, 
+because I can't find a way of allowing arbitary attributes on an element,
 I am going to define a common set of attributes for filters but users can add their own
 or relax dtd validation on their parser
 -->
@@ -1163,7 +1163,7 @@ or relax dtd validation on their parser
 <!-- see explanation for 'filter' element -->
 <!ATTLIST right-filter className                   NMTOKEN           #REQUIRED>
 <!--
-because I can't find a way of allowing arbitary attributes on an element, 
+because I can't find a way of allowing arbitary attributes on an element,
 I am going to define a common set of attributes for filters but users can add their own
 or relax dtd validation on their parser
 -->
@@ -1176,7 +1176,7 @@ or relax dtd validation on their parser
 <!--
   Interceptors can be executed in sequence before and/or after the Mule component.
   -->
-  
+
 <!ELEMENT interceptor (properties?)>
 
 <!--
@@ -1197,7 +1197,7 @@ or relax dtd validation on their parser
   exception handling beaviour in the system. The class specified must implement
   <i>org.mule.exception.ExceptionStrategy</i>.
   -->
-  
+
 <!ELEMENT exception-strategy (endpoint*, global-endpoint*, properties?)>
 
 <!--
@@ -1302,31 +1302,31 @@ The system property key to use when lookin up the property
 -->
 <!ATTLIST system-property defaultValue 			CDATA		#IMPLIED>
 <!--
-	Defines a set of properties for a map property	
+	Defines a set of properties for a map property
 -->
 <!ELEMENT map ((property | factory-property | container-property | system-property | map | list | file-properties)*)>
 
-<!-- 
+<!--
 	the name of the map property
 -->
 <!ATTLIST map name					CDATA		#REQUIRED>
 
 <!--
-	Defines a list of properties for a list property	
+	Defines a list of properties for a list property
 -->
 <!ELEMENT list ((entry | factory-entry | system-entry | container-entry)*)>
 
-<!-- 
+<!--
 	the name of the list property
 -->
 <!ATTLIST list name					CDATA		#REQUIRED>
 
 <!--
-	Defines an entry for a list or array property	
+	Defines an entry for a list or array property
 -->
 <!ELEMENT entry EMPTY>
 
-<!-- 
+<!--
 	the value of the entry
 -->
 <!ATTLIST entry value					CDATA		#REQUIRED>
