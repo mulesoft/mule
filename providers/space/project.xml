@@ -7,6 +7,6 @@
     <name>Mule Space Provider</name>
     <description>Allows Mule to send and receive events via the Mule Space API.  This enables interation with JCache, Jini, Rio or other 'space' types using a common interface.</description>
     <shortDescription>space</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/space/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-space-provider/</url>
     <dependencies/>
 </project>

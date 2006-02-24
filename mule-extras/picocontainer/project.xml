@@ -8,6 +8,7 @@
     <name>Pico Extensions</name>
     <shortDescription>pico</shortDescription>
     <description>Provides extensions to use PicoContainer with Mule, such as using the container as a factory for Mule managed objects. for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
+    <url>http://www.muleumo.org/docs/modules/mule-extras-picocontainer/</url>
     <dependencies>
         <dependency>
             <groupId>picocontainer</groupId>

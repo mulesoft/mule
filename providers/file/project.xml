@@ -11,6 +11,6 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>file</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/file/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-file-provider/</url>
     <dependencies/>
 </project>

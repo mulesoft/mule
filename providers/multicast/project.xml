@@ -10,7 +10,7 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>multicast</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/multicast/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-multicast-provider/</url>
     <dependencies>
         <dependency>
             <groupId>mule</groupId>

@@ -10,6 +10,6 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>udp</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/udp/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-udp-provider/</url>
     <dependencies/>
 </project>

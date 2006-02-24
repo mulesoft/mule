@@ -10,7 +10,7 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>ssl</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/ssl/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-ssl-provider/</url>
     <dependencies>
         <dependency>
             <groupId>mule</groupId>

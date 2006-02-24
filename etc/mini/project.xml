@@ -26,7 +26,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-vm-provider/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -36,7 +36,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-file-provider/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -46,7 +46,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-tcp-provider/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -56,7 +56,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-ssl-provider/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -66,7 +66,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-jms-provider/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -76,7 +76,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-udp-provider/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -86,7 +86,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-rmi-provider/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -106,7 +106,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-ejb-provider/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -126,7 +126,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-extras-client/</url>
         </dependency>
         <dependency>
             <groupId>mule</groupId>
@@ -136,7 +136,7 @@
              <properties>
                 <mule.mini>true</mule.mini>
             </properties>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
         </dependency>
         <dependency>
 			<artifactId>commons-codec</artifactId>

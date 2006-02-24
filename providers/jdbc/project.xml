@@ -9,7 +9,7 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>email</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/jdbc/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-jdbc-provider/</url>
     <siteDirectory>/home/http/symphonysoft.com/html/mule/reference/providers/jdbc/</siteDirectory>
     <dependencies>
         <dependency>

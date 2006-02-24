@@ -8,6 +8,7 @@
     <name>HiveMind Extensions</name>
     <shortDescription>hivemind</shortDescription>
     <description>Provides extensions to use HiveMind with Mule, such as using the container as a factory for Mule managed objects.</description>
+    <url>http://www.muleumo.org/docs/modules/mule-extras-hivemind/</url>
     <dependencies>
         <dependency>
             <groupId>hivemind</groupId>

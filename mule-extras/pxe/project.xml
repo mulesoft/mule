@@ -441,7 +441,7 @@
             <artifactId>mule-vm-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-vm-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -451,7 +451,7 @@
             <artifactId>mule-extras-client</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org/providers/http</url>
+            <url>http://muleumo.org/docs/modules/mule-extras-client/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <eclipse.dependency>true</eclipse.dependency>
@@ -461,7 +461,7 @@
             <artifactId>mule-extras-jotm</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org/Transactions</url>
+            <url>http://muleumo.org/docs/modules/mule-extras-jotm/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
                 <eclipse.dependency>true</eclipse.dependency>

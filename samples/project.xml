@@ -18,7 +18,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-jms-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org/providers/jms/</url>
+            <url>http://muleumo.org/docs/modules/mule-jms-provider/</url>
             <properties>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
@@ -27,7 +27,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-email-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org/providers/email/</url>
+            <url>http://www.muleumo.org/providers/jms/</url>
             <properties>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
@@ -36,7 +36,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-file-provider</artifactId>
            <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org/providers/file/</url>
+            <url>http://muleumo.org/docs/modules/mule-file-provider/</url>
             <properties>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
@@ -45,7 +45,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-vm-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org/providers/vm/</url>
+            <url>http://muleumo.org/docs/modules/mule-vm-provider/</url>
             <properties>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
@@ -54,7 +54,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-http-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org/providers/http/</url>
+            <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
             <properties>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
@@ -63,7 +63,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-stream-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org/providers/stream/</url>
+            <url>http://muleumo.org/docs/modules/mule-stream-provider/</url>
             <properties>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>
@@ -72,7 +72,25 @@
             <groupId>mule</groupId>
             <artifactId>mule-soap-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org/providers/soap/</url>
+            <url>http://muleumo.org/docs/modules/mule-soap-provider/</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-xfire-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://muleumo.org/docs/modules/mule-xfire-provider/</url>
+            <properties>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-axis-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://muleumo.org/docs/modules/mule-axis-provider/</url>
             <properties>
             	<eclipse.dependency>true</eclipse.dependency>
             </properties>

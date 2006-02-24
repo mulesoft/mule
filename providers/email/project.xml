@@ -10,7 +10,7 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>email</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/email/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-email-provider/</url>
     <siteDirectory>/home/http/symphonysoft.com/html/mule/reference/providers/email/</siteDirectory>
     <dependencies>
         <dependency>

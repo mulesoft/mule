@@ -9,7 +9,7 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>glue</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/glue/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-glue-provider/</url>
     <dependencies>
         <dependency>
             <artifactId>glue</artifactId>
@@ -24,7 +24,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-soap-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-soap-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -35,7 +35,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-http-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -45,7 +45,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-extras-client</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-extras-client/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -71,7 +71,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-tcp-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-tcp-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>

@@ -10,7 +10,7 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>http</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/http/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-http-provider/</url>
     <dependencies>
 		<dependency>
 			<artifactId>commons-codec</artifactId>

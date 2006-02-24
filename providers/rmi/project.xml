@@ -8,6 +8,6 @@
         the <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>rmi</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/rmi/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-rmi-provider/</url>
     <dependencies/>
 </project>

@@ -8,7 +8,7 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>jms</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/jms/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-jms-provider/</url>
     <dependencies>
         <dependency>
             <groupId>geronimo-spec</groupId>

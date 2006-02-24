@@ -10,6 +10,6 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>stream</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/stream/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-stream-provider/</url>
     <dependencies/>
 </project>

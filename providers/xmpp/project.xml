@@ -9,7 +9,7 @@
         <a href="http://wiki.muleumo.org/display/MULE/Providers+Guide">Providers Guide</a>.
     </description>
     <shortDescription>xmpp</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/xmpp/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-xmpp-provider/</url>
     <dependencies>
         <dependency>
             <groupId>jivesoftware</groupId>

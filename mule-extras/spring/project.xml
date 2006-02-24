@@ -8,6 +8,7 @@
     <name>Spring Extensions</name>
     <shortDescription>spring</shortDescription>
     <description>Provides extensions to use the Spring framework with Mule such as utilising the the spring container to build components managed by Mule. for more information see <a href="http://wiki.muleumo.org/display/MULE/Mule+Extras">Mule Extras</a>.</description>
+    <url>http://www.muleumo.org/docs/modules/mule-extras-spring/</url>
     <dependencies>
         <dependency>
             <artifactId>spring</artifactId>
@@ -19,7 +20,7 @@
             <artifactId>mule-extras-client</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-extras-client/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -29,7 +30,7 @@
             <artifactId>mule-http-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -40,7 +41,7 @@
             <artifactId>mule-tcp-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-tcp-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -50,7 +51,7 @@
             <artifactId>mule-vm-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-vm-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -60,7 +61,7 @@
             <artifactId>mule-http-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -70,7 +71,7 @@
             <artifactId>mule-jdbc-provider</artifactId>
             <groupId>mule</groupId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-jdbc-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>

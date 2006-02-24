@@ -9,7 +9,7 @@
         <a href="http://mule.codehaus.org/Transports+Guide">Transports Guide</a>.
     </description>
     <shortDescription>soap</shortDescription>
-    <url>http://www.muleumo.org/doc/providers/xfire/</url>
+    <url>http://www.muleumo.org/docs/modules/mule-xfire-provider/</url>
     <dependencies>
         <dependency>
             <id>commons-httpclient</id>
@@ -24,7 +24,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-soap-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-soap-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -35,7 +35,18 @@
             <groupId>mule</groupId>
             <artifactId>mule-http-provider</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-http-provider/</url>
+            <properties>
+                <mule.core.jar>true</mule.core.jar>
+            	<eclipse.dependency>true</eclipse.dependency>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>mule</groupId>
+            <artifactId>mule-tcp-provider</artifactId>
+            <version>${pom.currentVersion}</version>
+            <url>http://muleumo.org/docs/modules/mule-tcp-provider/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -46,7 +57,7 @@
             <groupId>mule</groupId>
             <artifactId>mule-extras-client</artifactId>
             <version>${pom.currentVersion}</version>
-            <url>http://www.muleumo.org</url>
+            <url>http://muleumo.org/docs/modules/mule-extras-client/</url>
             <properties>
                 <mule.core.jar>true</mule.core.jar>
             	<eclipse.dependency>true</eclipse.dependency>
@@ -128,7 +139,7 @@
             <version>${geronimo_spec_saaj_version}</version>
             <url>http://java.sun.com/products/saaj/</url>
         </dependency>
-        
+
         <!-- needed for WSDL client -->
         <dependency>
           <groupId>xfire</groupId>
