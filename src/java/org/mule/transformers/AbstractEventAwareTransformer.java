@@ -46,8 +46,8 @@ public abstract class AbstractEventAwareTransformer extends AbstractTransformer
         if (event == null) {
             throw new TransformerException(new Message(Messages.NO_CURRENT_EVENT_FOR_TRANSFORMER), this);
         }
-        return transform(src, event);
+        return transform(src, encoding, event);
     }
     
-    public abstract Object transform(Object src, UMOEventContext context) throws TransformerException;
+    public abstract Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException;
 }

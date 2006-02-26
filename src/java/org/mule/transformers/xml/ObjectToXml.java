@@ -38,7 +38,7 @@ public class ObjectToXml extends AbstractXStreamTransformer
         registerSourceType(Object.class);
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
         //If the UMOMessage source type has been registered that we can assume that the
         //whole message is to be serialised to Xml, nit just the payload.  This can be useful
         //for protocols such as tcp where the protocol does not support headers, thus the whole messgae

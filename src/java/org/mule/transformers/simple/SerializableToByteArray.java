@@ -41,7 +41,7 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
         registerSourceType(byte[].class);
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
 
         Object obj = null;
         //If the UMOMessage source type has been registered that we can assume that the
