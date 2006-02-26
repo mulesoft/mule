@@ -64,7 +64,7 @@ public class StringToEmailMessage extends AbstractEventAwareTransformer
      * 
      * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
      */
-    public Object transform(Object src, UMOEventContext context) throws TransformerException
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
         String endpointAddress = endpoint.getEndpointURI().getAddress();
         SmtpConnector connector = (SmtpConnector)endpoint.getConnector();

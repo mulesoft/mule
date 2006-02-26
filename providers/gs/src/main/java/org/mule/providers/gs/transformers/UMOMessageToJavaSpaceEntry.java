@@ -34,7 +34,7 @@ public class UMOMessageToJavaSpaceEntry extends AbstractEventAwareTransformer {
         setReturnClass(Entry.class);
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
         if(src instanceof Entry) {
             return src;
         } else {

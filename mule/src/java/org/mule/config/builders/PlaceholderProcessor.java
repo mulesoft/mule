@@ -161,11 +161,13 @@ public class PlaceholderProcessor
         logger.info("Attempting to load encryption properties from: " + path);
         Properties props = PropertiesHelper.loadProperties(path);
 
-        Map names = PropertiesHelper.getPropertiesWithPrefix(props, "name");
+        Map names = new HashMap();
+        PropertiesHelper.getPropertiesWithPrefix(props, "name", names);
         String name;
         for (Iterator iterator = names.values().iterator(); iterator.hasNext();) {
             name = (String) iterator.next();
-            Map schemeConfig = PropertiesHelper.getPropertiesWithPrefix(props, name + ".");
+            Map schemeConfig = new HashMap();
+            PropertiesHelper.getPropertiesWithPrefix(props, name + ".", schemeConfig);
             schemeConfig = PropertiesHelper.removeNamspaces(schemeConfig);
 
             String type = (String)schemeConfig.get("type");

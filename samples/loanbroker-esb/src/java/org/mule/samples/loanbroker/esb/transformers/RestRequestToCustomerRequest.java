@@ -32,7 +32,7 @@ public class RestRequestToCustomerRequest extends AbstractEventAwareTransformer 
         setReturnClass(CustomerQuoteRequest.class);
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
 
         String name = null;
         int ssn = 0;

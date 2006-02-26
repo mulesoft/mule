@@ -6,7 +6,7 @@ import org.mule.umo.transformer.TransformerException;
 
 public class DummyTransformer extends AbstractEventAwareTransformer {
 
-     public Object transform(Object src, UMOEventContext context) throws TransformerException {
+     public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
          System.out.println("org.mule.test.usecases.props.DummyTransformer");
          PropsComponent.assertEquals("param1",
                                      context.getProperty("stringParam"));

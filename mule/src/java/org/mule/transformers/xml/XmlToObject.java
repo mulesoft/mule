@@ -13,8 +13,8 @@
  */
 package org.mule.transformers.xml;
 
-import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.UMOEventContext;
+import org.mule.umo.transformer.TransformerException;
 
 /**
  * <code>XmlToObject</code> converts xml created by the ObjectToXml
@@ -40,7 +40,7 @@ public class XmlToObject extends AbstractXStreamTransformer
         registerSourceType(org.dom4j.Document.class);
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
 
         if(src instanceof byte[]) {
             return getXStream().fromXML(new String((byte[])src));

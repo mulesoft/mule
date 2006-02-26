@@ -231,8 +231,9 @@ public class ConnectorFactory
         // set any manager default properties for the connector
         // these are set on the Manager with a protocol i.e.
         // jms.specification=1.1
-        Map props = PropertiesHelper.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
-                                                             connector.getProtocol().toLowerCase());
+        Map props = new HashMap();
+        PropertiesHelper.getPropertiesWithPrefix(MuleManager.getInstance().getProperties(),
+                                                             connector.getProtocol().toLowerCase(), props);
         if (props.size() > 0) {
             props = PropertiesHelper.removeNamspaces(props);
             org.mule.util.BeanUtils.populateWithoutFail(connector, props, true);

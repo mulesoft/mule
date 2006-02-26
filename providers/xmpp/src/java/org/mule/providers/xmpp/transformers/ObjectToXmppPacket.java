@@ -37,10 +37,10 @@ public class ObjectToXmppPacket extends AbstractEventAwareTransformer {
         setReturnClass(Message.class);
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
         Message result = null;
         try {
-            result = new Message(context.getMessageAsString());
+            result = new Message(context.getMessageAsString(encoding));
         } catch (UMOException e) {
             throw new TransformerException(this, e);
         }

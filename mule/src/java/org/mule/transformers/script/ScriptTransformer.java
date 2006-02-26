@@ -39,7 +39,7 @@ public class ScriptTransformer extends AbstractEventAwareTransformer {
 
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
 
         Namespace ns = getScriptEngine().createNamespace();
         populateNamespace(ns, context, src);

@@ -38,7 +38,7 @@
             <description>
             A fully qualified classname of the configuration builder.
             Mule has Xml, Spring and Groovy configuration builders. By default This
-            ResourceAdapter will use org.mule.config.builder.MuleXmlconfigurationBuilder.
+            ResourceAdapter will use org.mule.config.builders.MuleXmlConfigurationBuilder.
             If there is a Mule instance already available to this ResourceAdapter this
             property will be ignored.
             </description>

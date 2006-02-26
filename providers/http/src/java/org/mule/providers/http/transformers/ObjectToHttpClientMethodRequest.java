@@ -90,9 +90,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractEventAwareTransform
         return parameterIndex + 1;
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException
     {
-    	String encoding = (String) context.getProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, null);
         String endpoint = (String) context.getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
         if (endpoint == null) {
             throw new TransformerException(new Message(Messages.EVENT_PROPERTY_X_NOT_SET_CANT_PROCESS_REQUEST,

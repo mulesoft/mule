@@ -17,18 +17,19 @@ import org.mule.MuleManager;
 import org.mule.providers.service.ConnectorFactory;
 import org.mule.umo.UMOException;
 import org.mule.umo.provider.UMOConnector;
+import org.mule.util.PropertiesHelper;
 import org.mule.util.timer.EventTimerTask;
 import org.mule.util.timer.TimeEvent;
 import org.mule.util.timer.TimeEventListener;
-import org.mule.util.PropertiesHelper;
 
 import java.text.NumberFormat;
-import java.util.Timer;
-import java.util.Properties;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Timer;
 
 /**
  * <code>Runner</code> is responsible for running benchmark tests
@@ -82,7 +83,8 @@ public class Runner implements TimeEventListener
                 String protocol = key.substring(0, key.indexOf("."));
                 if(!protocols.contains(protocol)) {
                     protocols.add(protocol);
-                    Map pp = PropertiesHelper.getPropertiesWithPrefix(props, protocol);
+                    Map pp = new HashMap();
+                    PropertiesHelper.getPropertiesWithPrefix(props, protocol, pp);
                     UMOConnector cnn = ConnectorFactory.getServiceDescriptor(protocol).createConnector(protocol);
                     cnn.setName(cnn.toString());
                     pp = PropertiesHelper.removeNamspaces(pp);

@@ -65,7 +65,7 @@ public class UMOMessageToHttpResponse extends AbstractEventAwareTransformer {
         }
     }
 
-    public Object transform(Object src, UMOEventContext context) throws TransformerException {
+    public Object transform(Object src, String encoding, UMOEventContext context) throws TransformerException {
         //Note this transformer excepts Null as we must always return a result from the Http
         //connector if a response transformer is present
         if (src instanceof NullPayload) src = Utility.EMPTY_STRING;
