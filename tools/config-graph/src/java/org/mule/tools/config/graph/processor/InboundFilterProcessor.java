@@ -1,12 +1,12 @@
 package org.mule.tools.config.graph.processor;
 
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphEdge;
+import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphConfig;
 import org.mule.tools.config.graph.util.MuleTag;
-
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphNode;
 
 public class InboundFilterProcessor extends TagProcessor {
 
@@ -18,11 +18,11 @@ public class InboundFilterProcessor extends TagProcessor {
 
 	public void processInboundFilter(Graph graph, Element endpoint,
 			GraphNode endpointNode, GraphNode parent) {
-		Element filter = endpoint.getChild("filter");
+		Element filter = endpoint.getChild(MuleTag.ELEMENT_FILTER);
 		boolean conditional = false;
 
 		if (filter == null) {
-			filter = endpoint.getChild("left-filter");
+			filter = endpoint.getChild(MuleTag.ELEMENT_LEFT_FILTER);
 			conditional = filter != null;
 		}
 
@@ -38,7 +38,7 @@ public class InboundFilterProcessor extends TagProcessor {
 			// this is a hack to pick up and/or filter conditions
 			// really we need a nice recursive way of doing this
 			if (conditional) {
-				filter = endpoint.getChild("right-filter");
+				filter = endpoint.getChild(MuleTag.ELEMENT_RIGHT_FILTER);
 				GraphNode filterNode2 = graph.addNode();
 				filterNode2.getInfo().setHeader(
 						filter.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
@@ -54,7 +54,11 @@ public class InboundFilterProcessor extends TagProcessor {
 			graph.addEdge(endpointNode, filterNode).getInfo().setCaption(
 					"filters on");
 		} else {
-			graph.addEdge(endpointNode, parent).getInfo().setCaption("in");
+			GraphEdge e = graph.addEdge(endpointNode, parent);
+            e.getInfo().setCaption("in");
+            if("true".equalsIgnoreCase(endpoint.getAttributeValue(MuleTag.ATTRIBUTE_SYNCHRONOUS))) {
+                e.getInfo().setArrowTailNormal();
+            }
 		}
 	}
 

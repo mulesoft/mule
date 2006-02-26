@@ -1,15 +1,15 @@
 package org.mule.tools.config.graph.processor;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphEdge;
+import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.components.EndpointRegistry;
 import org.mule.tools.config.graph.config.GraphConfig;
 import org.mule.tools.config.graph.util.MuleTag;
 
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphNode;
+import java.util.Iterator;
+import java.util.List;
 
 public class OutBoundRouterEndpointsHandler extends TagProcessor{
 
@@ -25,12 +25,13 @@ public class OutBoundRouterEndpointsHandler extends TagProcessor{
 	
 	public void processOutBoundRouterEndpoints(Graph graph, Element router,
 			GraphNode routerNode, String componentName) {
-		List epList = router.getChildren(MuleTag.TAG_ENDPOINT);
-		for (Iterator iterator = epList.iterator(); iterator.hasNext();) {
+		List epList = router.getChildren(MuleTag.ELEMENT_ENDPOINT);
+        int x=1;
+		for (Iterator iterator = epList.iterator(); iterator.hasNext(); x++) {
 			Element outEndpoint = (Element) iterator.next();
 
 			String url = outEndpoint
-					.getAttributeValue(MuleTag.TAG_ATTRIBUTE_ADDRESS);
+					.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
 			if (url != null) {
 				GraphNode out = (GraphNode) endpointRegistry.getEndpoint(url, componentName);
 				if (out == null) {
@@ -43,7 +44,15 @@ public class OutBoundRouterEndpointsHandler extends TagProcessor{
 					endpointRegistry.addEndpoint(url, out);
 					processOutboundFilter(graph, outEndpoint, out, routerNode);
 				} else {
-					graph.addEdge(routerNode, out).getInfo().setCaption("out");
+					GraphEdge e = graph.addEdge(routerNode, out);
+                    if(epList.size()==1) {
+                        e.getInfo().setCaption("out");
+                    } else {
+                        e.getInfo().setCaption("out (" + x + " of " + epList.size() + ")");
+                    }
+                    if("true".equalsIgnoreCase(outEndpoint.getAttributeValue(MuleTag.ATTRIBUTE_SYNCHRONOUS))) {
+                        e.getInfo().setArrowTailNormal();
+                    }
 				}
 			}
 

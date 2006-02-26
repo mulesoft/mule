@@ -41,11 +41,21 @@ public class GraphConfig {
     public static final String ARG_KEEP_DOT_FILES = "-keepdotfiles";
     public static final String ARG_COMBINE_FILES = "-combinefiles";
     public static final String ARG_URLS = "-urls";
-    
+    public static final String ARG_CONFIG = "-config";
+    public static final String ARG_WORKING_DIRECTORY = "-workingdir";
+
+    public static final String ARG_SHOW_CONNECTORS = "-showconnectors";
+    public static final String ARG_SHOW_MODELS = "-showmodels";
+    public static final String ARG_SHOW_CONFIG = "-showconfig";
+    public static final String ARG_SHOW_AGENTS = "-showagents";
+    public static final String ARG_SHOW_TRANSFORMERS= "-showtransformers";
+    public static final String ARG_SHOW_ALL= "-showall";
+
     private List files;
     private String executeCommand;
     private File outputDirectory;
     private String outputFilename;
+    private String workingDirectory;
     private String caption;
     private File mappingsFile;
     private File urlsFile;
@@ -55,21 +65,61 @@ public class GraphConfig {
 
     private Properties mappings = new Properties();
     private Properties urls = new Properties();
+    private Properties propsFromFile = null;
+
+    private boolean showConnectors = true;
+    private boolean showTransformers = false;
+    private boolean showModels = false;
+    private boolean showConfig = false;
+    private boolean showAgents = false;
+    private boolean showAll = false;
 
     public GraphConfig() {
         init();
     }
 
+    protected void init() {
+        files = new ArrayList();
+        ignoredAttributes = new ArrayList();
+        ignoredAttributes.add("className");
+        ignoredAttributes.add("inboundEndpoint");
+        ignoredAttributes.add("outboundEndpoint");
+        ignoredAttributes.add("responseEndpoint");
+        ignoredAttributes.add("inboundTransformer");
+        ignoredAttributes.add("outboundTransformer");
+        ignoredAttributes.add("type");
+        ignoredAttributes.add("singleton");
+        ignoredAttributes.add("containerManaged");
+        ignoredAttributes.add("address");
+        ignoredAttributes.add("transformers");
+        ignoredAttributes.add("name");
+    }
+
     public GraphConfig(String[] args) throws IOException {
         init();
+        String properties = getOpt(args, ARG_CONFIG, null);
+        if(properties!=null) {
+            loadProperties(properties);
+        }
+        workingDirectory = getOpt(args, ARG_WORKING_DIRECTORY, null);
+        if(workingDirectory!=null) {
+            File f = new File(workingDirectory);
+            if (!f.exists()) f.mkdirs();
+            workingDirectory = f.getAbsolutePath();
+            System.out.println("working directory is: " + workingDirectory);
+        }
+
         String filesString = getOpt(args, ARG_FILES, null);
         if (filesString != null) {
             files = new ArrayList();
             for (StringTokenizer stringTokenizer = new StringTokenizer(filesString, ","); stringTokenizer.hasMoreTokens();) {
-                files.add(stringTokenizer.nextToken());
+                files.add(applyWorkingDirectory(stringTokenizer.nextToken()));
             }
         }
-        String outputDir = getOpt(args, ARG_OUTPUT_DIR, ".");
+        String outputDir = getOpt(args, ARG_OUTPUT_DIR, null);
+        if(outputDir==null) {
+            outputDir = (workingDirectory==null ? "." : workingDirectory);
+        }
         outputDirectory = new File(outputDir);
         if (!outputDirectory.exists()) outputDirectory.mkdirs();
         System.out.println("Outputting graphs to: " + outputDirectory.getAbsolutePath());
@@ -84,9 +134,24 @@ public class GraphConfig {
 
         combineFiles = Boolean.valueOf(getOpt(args, ARG_COMBINE_FILES, "false")).booleanValue();
 
+        showAll = Boolean.valueOf(getOpt(args, ARG_SHOW_ALL, String.valueOf(showAll))).booleanValue();
+        if(showAll) {
+            showConfig=true;
+            showConnectors=true;
+            showAgents=true;
+            showModels=true;
+            showTransformers=true;
+        } else {
+            showConnectors = Boolean.valueOf(getOpt(args, ARG_SHOW_CONNECTORS, String.valueOf(showConnectors))).booleanValue();
+            showConfig = Boolean.valueOf(getOpt(args, ARG_SHOW_CONFIG, String.valueOf(showConfig))).booleanValue();
+            showAgents = Boolean.valueOf(getOpt(args, ARG_SHOW_AGENTS, String.valueOf(showAgents))).booleanValue();
+            showModels = Boolean.valueOf(getOpt(args, ARG_SHOW_MODELS, String.valueOf(showModels))).booleanValue();
+            showTransformers = Boolean.valueOf(getOpt(args, ARG_SHOW_TRANSFORMERS, String.valueOf(showTransformers))).booleanValue();
+        }
+
         String temp = getOpt(args, ARG_MAPPINGS, null);
         if (temp != null) {
-            mappingsFile = new File(temp);
+            mappingsFile = new File(applyWorkingDirectory(temp));
             System.out.println("Using mappings file: " + mappingsFile.getAbsolutePath());
             if (mappingsFile.exists()) {
                 mappings = new Properties();
@@ -102,7 +167,7 @@ public class GraphConfig {
 
         temp = getOpt(args, ARG_URLS, null);
         if (temp != null) {
-            urlsFile = new File(temp);
+            urlsFile = new File(applyWorkingDirectory(temp));
             System.out.println("Using urls file: " + urlsFile.getAbsolutePath());
             if (urlsFile.exists()) {
                 urls = new Properties();
@@ -116,21 +181,20 @@ public class GraphConfig {
         
     }
 
-    protected void init() {
-        files = new ArrayList();
-        ignoredAttributes = new ArrayList();
-        ignoredAttributes.add("className");
-        ignoredAttributes.add("inboundEndpoint");
-        ignoredAttributes.add("outboundEndpoint");
-        ignoredAttributes.add("responseEndpoint");
-        ignoredAttributes.add("inboundTransformer");
-        ignoredAttributes.add("outboundTransformer");
-        ignoredAttributes.add("type");
-        ignoredAttributes.add("singleton");
-        ignoredAttributes.add("address");
-        ignoredAttributes.add("transformers");
-        ignoredAttributes.add("name");
+    protected String applyWorkingDirectory(String path) {
+        if(path==null) return null;
+        if(workingDirectory==null) return path;
+        if(path.startsWith("/") || path.startsWith("\\")) {
+            return path;
+        }
+        return workingDirectory + "/" + path;
     }
+
+    protected void loadProperties(String props) throws IOException {
+        propsFromFile = new Properties();
+        propsFromFile.load(new FileInputStream(props));
+    }
+
 
     public void validate() throws IllegalStateException {
         if (files == null || files.size() == 0) {
@@ -139,7 +203,12 @@ public class GraphConfig {
     }
 
     private String getOpt(String[] args, String name, String defaultValue) {
-	String rval = defaultValue;
+
+        if(propsFromFile!=null) {
+            return propsFromFile.getProperty(name.substring(1), defaultValue);
+        }
+
+        String rval = defaultValue;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals(name)) {
                 if (i + 1 >= args.length) {
@@ -257,4 +326,51 @@ public class GraphConfig {
 		this.urlsFile = urlsFile;
 	}
 
+    public boolean isShowConnectors() {
+        return showConnectors;
+    }
+
+    public void setShowConnectors(boolean showConnectors) {
+        this.showConnectors = showConnectors;
+    }
+
+    public boolean isShowModels() {
+        return showModels;
+    }
+
+    public void setShowModels(boolean showModels) {
+        this.showModels = showModels;
+    }
+
+    public boolean isShowConfig() {
+        return showConfig;
+    }
+
+    public void setShowConfig(boolean showConfig) {
+        this.showConfig = showConfig;
+    }
+
+    public boolean isShowAgents() {
+        return showAgents;
+    }
+
+    public void setShowAgents(boolean showAgents) {
+        this.showAgents = showAgents;
+    }
+
+    public boolean isShowTransformers() {
+        return showTransformers;
+    }
+
+    public void setShowTransformers(boolean showTransformers) {
+        this.showTransformers = showTransformers;
+    }
+
+    public boolean isShowAll() {
+        return showAll;
+    }
+
+    public void setShowAll(boolean showAll) {
+        this.showAll = showAll;
+    }
 }

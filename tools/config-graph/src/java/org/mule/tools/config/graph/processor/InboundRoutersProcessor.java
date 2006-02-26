@@ -1,16 +1,15 @@
 package org.mule.tools.config.graph.processor;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.components.EndpointRegistry;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphConfig;
 import org.mule.tools.config.graph.util.MuleTag;
 
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphNode;
+import java.util.Iterator;
+import java.util.List;
 
 public class InboundRoutersProcessor extends TagProcessor {
 	private EndpointRegistry endpointRegistry;
@@ -26,13 +25,13 @@ public class InboundRoutersProcessor extends TagProcessor {
 
 	public void processInboundRouters(Graph graph, Element descriptor,
 			GraphNode node) {
-		Element inboundRouter = descriptor.getChild("inbound-router");
+		Element inboundRouter = descriptor.getChild(MuleTag.ELEMENT_INBOUND_ROUTER);
 
 		if (inboundRouter != null) {
 
 			GraphNode endpointsLink = node;
 
-			Element router = inboundRouter.getChild("router");
+			Element router = inboundRouter.getChild(MuleTag.ELEMENT_ROUTER);
 			if (router != null) {
 				GraphNode routerNode = graph.addNode();
 				routerNode.getInfo().setHeader(
@@ -45,12 +44,12 @@ public class InboundRoutersProcessor extends TagProcessor {
 			}
 
 			List inbounEndpoints = inboundRouter
-					.getChildren(MuleTag.TAG_ENDPOINT);
+					.getChildren(MuleTag.ELEMENT_ENDPOINT);
 			for (Iterator iterator = inbounEndpoints.iterator(); iterator
 					.hasNext();) {
 				Element inEndpoint = (Element) iterator.next();
 				String url = inEndpoint
-						.getAttributeValue(MuleTag.TAG_ATTRIBUTE_ADDRESS);
+						.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
 				if (url != null) {
 					GraphNode in = (GraphNode) endpointRegistry.getEndpoint(
 							url, node.getInfo().getHeader());

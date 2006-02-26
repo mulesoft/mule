@@ -1,16 +1,15 @@
 package org.mule.tools.config.graph.processor;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.components.EndpointRegistry;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphConfig;
 import org.mule.tools.config.graph.util.MuleTag;
 
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphNode;
+import java.util.Iterator;
+import java.util.List;
 
 public class OutBoundRoutersProcessor {
 
@@ -36,11 +35,11 @@ public class OutBoundRoutersProcessor {
 
 	public void processOutBoundRouters(Graph graph, Element descriptor,
 			GraphNode node) {
-		Element outboundRouter = descriptor.getChild("outbound-router");
+		Element outboundRouter = descriptor.getChild(MuleTag.ELEMENT_OUTBOUND_ROUTER);
 
 		if (outboundRouter != null) {
 			String componentName = node.getInfo().getHeader();
-			List routers = outboundRouter.getChildren("router");
+			List routers = outboundRouter.getChildren(MuleTag.ELEMENT_ROUTER);
 			exceptionStrategyProcessor.processExceptionStrategy(graph,
 					outboundRouter, node);
 
@@ -50,7 +49,7 @@ public class OutBoundRoutersProcessor {
 				if (router != null) {
 					GraphNode routerNode = graph.addNode();
 					routerNode.getInfo().setHeader(
-							router.getAttributeValue("className"));
+							router.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
 					routerNode.getInfo().setFillColor(
 							ColorRegistry.COLOR_ROUTER);
 					graph.addEdge(node, routerNode).getInfo().setCaption(
@@ -85,7 +84,7 @@ public class OutBoundRoutersProcessor {
 
 					GraphNode[] virtual = endpointRegistry
 							.getVirtualEndpoint(componentName + "."
-									+ router.getAttributeValue("className"));
+									+ router.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
 					if (virtual.length > 0) {
 						for (int i = 0; i < virtual.length; i++) {
 							graph.addEdge(routerNode, virtual[i]).getInfo()
@@ -110,10 +109,10 @@ public class OutBoundRoutersProcessor {
 
 	private void processReplyTOasElement(Graph graph, Element router,
 			GraphNode routerNode, String componentName) {
-		Element replyToElement = router.getChild("reply-to");
+		Element replyToElement = router.getChild(MuleTag.ELEMENT_REPLY_TO);
 		if (replyToElement != null) {
 			String replyTo = replyToElement
-					.getAttributeValue(MuleTag.TAG_ATTRIBUTE_ADDRESS);
+					.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
 			if (replyTo != null) {
 				GraphNode out = (GraphNode) endpointRegistry.getEndpoint(
 						replyTo, componentName);
@@ -124,14 +123,14 @@ public class OutBoundRoutersProcessor {
 
 	private void processReplyTOasProperty(Graph graph, Element router,
 			GraphNode routerNode, String componentName) {
-		Element propertiesEl = router.getChild("properties");
+		Element propertiesEl = router.getChild(MuleTag.ELEMENT_PROPERTIES);
 		if (propertiesEl != null) {
-			List properties = propertiesEl.getChildren("property");
+			List properties = propertiesEl.getChildren(MuleTag.ELEMENT_PROPERTY);
 			for (Iterator iterator = properties.iterator(); iterator.hasNext();) {
 				Element property = (Element) iterator.next();
-				String propertyName = property.getAttributeValue("name");
+				String propertyName = property.getAttributeValue(MuleTag.ATTRIBUTE_NAME);
 				if ("replyTo".equals(propertyName)) {
-					String replyTo = property.getAttributeValue("value");
+					String replyTo = property.getAttributeValue(MuleTag.ATTRIBUTE_VALUE);
 					if (replyTo != null) {
 						GraphNode out = (GraphNode) endpointRegistry
 								.getEndpoint(replyTo, componentName);

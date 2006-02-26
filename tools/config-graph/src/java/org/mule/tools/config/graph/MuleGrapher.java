@@ -1,11 +1,7 @@
 package org.mule.tools.config.graph;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphFactory;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.mule.config.MuleDtdResolver;
@@ -18,8 +14,11 @@ import org.mule.tools.config.graph.postgraphers.GalleryPostGrapher;
 import org.mule.tools.config.graph.postgraphers.MediaCopierPostGrapher;
 import org.mule.tools.config.graph.processor.TagProcessor;
 
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphFactory;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class MuleGrapher extends TagProcessor {
 
@@ -65,18 +64,10 @@ public class MuleGrapher extends TagProcessor {
 		try {
 			String filename = config.getOutputFilename();
 			if (config.isCombineFiles()) {
-				if (filename == null)
-					filename = config.getFiles().get(0).toString() + ".combined";
-				generateGraph(1, config.getFiles(), config.getOutputDirectory(), config.getCaption(), filename);
+				generateIndividual();
+                generateCombined(filename);
 			} else {
-				int ind = 0;
-				for (Iterator iterator = config.getFiles().iterator(); iterator.hasNext();) {
-					ind++;
-					String s = (String) iterator.next();
-					List list = new ArrayList(1);
-					list.add(s);
-					generateGraph(ind, list, config.getOutputDirectory(), config.getCaption(), new File(s).getName());
-				}
+				generateIndividual();
 			}
 
 			for (Iterator iter = postGraphers.iterator(); iter.hasNext();) {
@@ -92,6 +83,24 @@ public class MuleGrapher extends TagProcessor {
 
 	}
 
+    protected void generateCombined(String filename) throws IOException, JDOMException {
+        if (filename == null) {
+			filename = config.getFiles().get(0).toString() + ".combined";
+        }
+	    generateGraph(1, config.getFiles(), config.getOutputDirectory(), config.getCaption(), filename);
+    }
+
+    protected void generateIndividual() throws IOException, JDOMException {
+            int ind = 0;
+				for (Iterator iterator = config.getFiles().iterator(); iterator.hasNext();) {
+					ind++;
+					String s = (String) iterator.next();
+					List list = new ArrayList(1);
+					list.add(s);
+					generateGraph(ind, list, config.getOutputDirectory(), config.getCaption(), new File(s).getName());
+				}
+        }
+
 	protected void generateGraph(int i, List files, File outputDir, String caption, String fileName)
 			throws JDOMException, IOException {
 		SAXBuilder builder = new SAXBuilder();
@@ -100,22 +109,29 @@ public class MuleGrapher extends TagProcessor {
 		Graph graph = GraphFactory.newGraph();
 
 		builder.setIgnoringElementContentWhitespace(true);
+        MuleParser muleParser = new MuleParser(config, builder);
 		for (Iterator iterator = files.iterator(); iterator.hasNext();) {
 
 			String s = (String) iterator.next();
 			File myFile = new File(s);
 			System.out.println("**************** processing " + i + " of " + files.size() + 1 + " : "
 					+ myFile.getCanonicalPath());
-			MuleParser muleParser = new MuleParser(config, builder);
+
 			muleParser.parseMuleConfig(myFile, graph);
 			if (files.size() > 1) {
 				if (caption == null)
 					caption = "(no caption set)";
 				graph.getInfo().setCaption(caption);
 			}
-			graphRenderer.saveGraph(graph, fileName, outputDir);
-
+            if(!config.isCombineFiles()) {
+                muleParser.finalise(graph);
+			    graphRenderer.saveGraph(graph, fileName, outputDir);
+            }
 		}
+        if(config.isCombineFiles()) {
+            muleParser.finalise(graph);
+            graphRenderer.saveGraph(graph, fileName, outputDir);
+        }
 
 	}
 

@@ -1,13 +1,12 @@
 package org.mule.tools.config.graph.processor;
 
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.components.EndpointRegistry;
 import org.mule.tools.config.graph.config.ColorRegistry;
 import org.mule.tools.config.graph.config.GraphConfig;
 import org.mule.tools.config.graph.util.MuleTag;
-
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphNode;
 
 public class ExceptionStrategyProcessor extends TagProcessor{
 
@@ -17,11 +16,14 @@ public class ExceptionStrategyProcessor extends TagProcessor{
 		super(config);
 		this.registry=registry;		
 	}
-	public void processExceptionStrategy(Graph graph, Element descriptor,
-			GraphNode node) {
-		Element exceptionStrategy = descriptor.getChild("catch-all-strategy");
-		if (exceptionStrategy == null)
-			exceptionStrategy = descriptor.getChild("exception-strategy");
+	public void processExceptionStrategy(Graph graph, Element descriptor, GraphNode node) {
+		String edgeCaption = MuleTag.ELEMENT_CATCH_ALL_STRATEGY;
+        Element exceptionStrategy = descriptor.getChild(edgeCaption);
+		if (exceptionStrategy == null) {
+            edgeCaption = MuleTag.ELEMENT_EXCEPTION_STRATEGY;
+			exceptionStrategy = descriptor.getChild(edgeCaption);
+
+        }
 
 		if (exceptionStrategy != null) {
 
@@ -30,12 +32,11 @@ public class ExceptionStrategyProcessor extends TagProcessor{
 			exceptionNode.getInfo().setHeader(className);
 			exceptionNode.getInfo().setFillColor(ColorRegistry.COLOR_EXCEPTION_STRATEGY);
 
-			graph.addEdge(node, exceptionNode).getInfo().setCaption(
-					"catch-all-strategy");
+			graph.addEdge(node, exceptionNode).getInfo().setCaption(edgeCaption);
 
-			Element endpoint = exceptionStrategy.getChild(MuleTag.TAG_ENDPOINT);
+			Element endpoint = exceptionStrategy.getChild(MuleTag.ELEMENT_ENDPOINT);
 			if (endpoint != null) {
-				String url = endpoint.getAttributeValue(MuleTag.TAG_ATTRIBUTE_ADDRESS);
+				String url = endpoint.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
 				if (url != null) {
 					GraphNode out = (GraphNode) registry.getEndpoint(url, node.getInfo()
 							.getHeader());

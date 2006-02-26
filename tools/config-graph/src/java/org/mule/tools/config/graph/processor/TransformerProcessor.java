@@ -10,38 +10,34 @@ import org.mule.tools.config.graph.util.MuleTag;
 import java.util.Iterator;
 import java.util.List;
 
-public class ConnectorProcessor extends TagProcessor {
-
-    private ConnectionStrategyProcessor connectionStrategyProcessor;
-
-	public ConnectorProcessor(GraphConfig config) {
+public class TransformerProcessor extends TagProcessor {
+	public TransformerProcessor(GraphConfig config) {
 		super(config);
-        connectionStrategyProcessor = new ConnectionStrategyProcessor(config);
 	}
 
-	public void parseConnectors(Graph graph, Element root) {
-        if(!config.isShowConnectors()) return;
+	public void parseTransformers(Graph graph, Element root) {
+        if(!config.isShowTransformers()) return;
 
-		List connectorsElement = root.getChildren(MuleTag.ELEMENT_CONNECTOR);
-		for (Iterator iter = connectorsElement.iterator(); iter.hasNext();) {
+        Element transformers = root.getChild(MuleTag.ELEMENT_TRANSFORMERS);
+        if(transformers==null) return;
+
+		List agentsElement = transformers.getChildren(MuleTag.ELEMENT_TRANSFORMER);
+		for (Iterator iter = agentsElement.iterator(); iter.hasNext();) {
 			Element connector = (Element) iter.next();
 			GraphNode connectorNode = graph.addNode();
-			connectorNode.getInfo().setFillColor(ColorRegistry.COLOR_CONNECTOR);
+			connectorNode.getInfo().setFillColor(ColorRegistry.COLOR_TRANSFORMER);
 			String name = connector.getAttributeValue(MuleTag.ATTRIBUTE_NAME);
-			connectorNode.getInfo().setHeader(name);
+			String returnClass = connector.getAttributeValue(MuleTag.ATTRIBUTE_RETURN_CLASS);
+			connectorNode.getInfo().setHeader(name + ", return: " + returnClass);
 
 			StringBuffer caption = new StringBuffer();
 
 			String className = connector.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME);
 			caption.append(MuleTag.ATTRIBUTE_CLASS_NAME + " :" + className + "\n");
 
-			appendProfiles(connector, caption);
 			appendProperties(connector, caption);
 			appendDescription(connector, caption);
 			connectorNode.getInfo().setCaption(caption.toString());
-
-            //Process connection strategy
-            connectionStrategyProcessor.parseConnectionStrategy(graph, connector, connectorNode);
 		}
 	}
 }
