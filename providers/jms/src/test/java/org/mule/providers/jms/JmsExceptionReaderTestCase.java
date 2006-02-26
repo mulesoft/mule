@@ -31,13 +31,13 @@ import java.util.Map;
 public class JmsExceptionReaderTestCase extends AbstractMuleTestCase {
 
     /**
-     * Print the name of this test to standard output
+     * Print the name of this test to standard output.
      */
     protected void doSetUp() throws Exception {
         ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
     }
 
-    public void testNestedExceptionRetreval() throws Exception {
+    public void testNestedExceptionRetrieval() throws Exception {
         Exception testException = getException();
         Throwable t = ExceptionHelper.getRootException(testException);
         assertNotNull(t);
