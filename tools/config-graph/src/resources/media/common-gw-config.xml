@@ -10,7 +10,7 @@
     </environment-properties>
 
     <!-- Disable the Admin Agent (for receiving remote requests) -->
-    <mule-environment-properties serverUrl="" synchronous="true" >
+    <mule-environment-properties serverUrl="">
 
  </mule-environment-properties>
 
@@ -53,7 +53,8 @@
     <!-- The transformers used to marshal data to and from the endpoints -->
     <transformers>
         <transformer name="ByteArrayToString" className="org.mule.transformers.simple.ByteArrayToString"/>
-        <transformer name="JmsMessageToString" className="org.mule.providers.jms.transformers.JMSMessageToObject" returnClass="java.lang.String" />
+        <transformer name="MQMessageToString" className="org.mule.providers.jms.transformers.JMSMessageToObject" returnClass="java.lang.String" />
+        <transformer name="StringToMQMessage" className="org.mule.providers.jms.transformers.ObjectToJMSMessage" returnClass="javax.jms.TextMessage" />
         <transformer name="StringToHttpResponse" className="org.mule.providers.http.transformers.UMOMessageToHttpResponse" />
         <transformer name="XmlToDom" className="org.mule.transformers.xml.XmlToDomDocument" returnClass="org.dom4j.Document" />
         <transformer name="DomToXml" className="org.mule.transformers.xml.DomDocumentToXml" returnClass="java.lang.String" />
@@ -72,7 +73,7 @@
         <transformer name="FieldDecrypter" className="com.ss.framegroup.mule.gateways.RegExMessageFieldDecrypter" returnClass="java.lang.String">
             <properties>
                 <!-- The encrpytion strategy to use (configured on the security manager above)-->
-                <property name="strategyName" value="BlowfishEncryption"/>
+                <property name="strategyName" value="Base64"/>
                 <list name="fields">
                     <!-- Add the field elements that should be encrypted -->
                     <!--<entry value="creditcardNumber"/>-->

@@ -24,7 +24,7 @@
             <inbound-router>
                 <endpoint address="thinkProxyEndpoint"
                     transformers="ByteArrayToString FieldEncrypter"
-                    responseTransformers="JmsMessageToString FieldDecrpyter StringToHttpResponse"
+                    responseTransformers="MQMessageToString FieldDecrypter StringToHttpResponse"
                     synchronous="true" />
             </inbound-router>
 
