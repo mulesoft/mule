@@ -2,10 +2,11 @@ package org.mule.tools.config.graph.components;
 
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.out.GRAPHtoDOTtoGIF;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.postrenderers.FileCleanerProstRenderer;
 import org.mule.tools.config.graph.postrenderers.MuleDocPostRenderer;
 import org.mule.tools.config.graph.util.DOTtoMAP;
+import org.mule.util.EnvironmentHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,15 +16,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class GraphRenderer {
 
-	private GraphConfig config;
+	private GraphEnvironment env;
 	private List postRenderers= new ArrayList();
 	
-	public GraphRenderer(GraphConfig config) {
-		this.config = config;
-		postRenderers.add(new MuleDocPostRenderer());
+	public GraphRenderer(GraphEnvironment env) {
+		this.env = env;
+		postRenderers.add(new MuleDocPostRenderer(env));
 		postRenderers.add(new FileCleanerProstRenderer());
 		
 	}
@@ -37,10 +39,10 @@ public class GraphRenderer {
 		
 		
 		final String exeFile = getSaveExecutable();
-		System.out.println("Executing: " + exeFile);
+		env.log("Executing: " + exeFile);
 		GRAPHtoDOTtoGIF.transform(graph, dotFileName, gifFileName, exeFile);
-		System.out.println("generating MAP");
-		DOTtoMAP.transform(exeFile, dotFileName, mapFileName);
+		env.log("generating MAP");
+		DOTtoMAP.transform(exeFile, dotFileName, mapFileName, env);
 
 		Map context = new HashMap();
 		context.put("dotFileName",filename + ".dot");
@@ -51,25 +53,37 @@ public class GraphRenderer {
 
 		for (Iterator iter = postRenderers.iterator(); iter.hasNext();) {
 			PostRenderer element = (PostRenderer) iter.next();
-			element.postRender(config,context,graph);
+			element.postRender(env, context, graph);
 		}
 	}
 
+
 	private String getSaveExecutable() throws FileNotFoundException {
-		if (config.getExecuteCommand() == null) {
+		if (env.getConfig().getExecuteCommand() == null) {
 			String osName = System.getProperty("os.name").toLowerCase();
 			if (osName.startsWith("windows")) {
 				File f = new File("win32/dot.exe");
-				config.setExecuteCommand(f.getAbsolutePath());
+                if(f.exists()) {
+
+				    env.getConfig().setExecuteCommand(f.getAbsolutePath());
+                } else {
+
+                    Properties p = new EnvironmentHelper().getEnvProperties();
+                    String home = p.getProperty("MULE_HOME");
+                    if(home!=null) {
+                        f = new File(home + "/tools/config-graph/win32/dot.exe");
+                    }
+
+                }
 			} else {
 				throw new UnsupportedOperationException(
 						"Mule Graph currently only works on Windows");
 			}
 		}
-		File f = new File(config.getExecuteCommand());
+		File f = new File(env.getConfig().getExecuteCommand());
 		if (!f.exists()) {
 			throw new FileNotFoundException(f.getAbsolutePath());
 		}
-		return config.getExecuteCommand();
+		return env.getConfig().getExecuteCommand();
 	}
 }

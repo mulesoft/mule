@@ -4,21 +4,21 @@ import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class TransformerProcessor extends TagProcessor {
-	public TransformerProcessor(GraphConfig config) {
-		super(config);
+	public TransformerProcessor(GraphEnvironment environment) {
+		super(environment);
 	}
 
-	public void parseTransformers(Graph graph, Element root) {
-        if(!config.isShowTransformers()) return;
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
+        if(!environment.getConfig().isShowTransformers()) return;
 
-        Element transformers = root.getChild(MuleTag.ELEMENT_TRANSFORMERS);
+        Element transformers = currentElement.getChild(MuleTag.ELEMENT_TRANSFORMERS);
         if(transformers==null) return;
 
 		List agentsElement = transformers.getChildren(MuleTag.ELEMENT_TRANSFORMER);

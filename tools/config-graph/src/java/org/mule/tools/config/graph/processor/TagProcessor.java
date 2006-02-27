@@ -1,30 +1,36 @@
 package org.mule.tools.config.graph.processor;
 
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphEdge;
+import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Attribute;
 import org.jdom.Element;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 import org.mule.util.Utility;
 
 import java.util.Iterator;
 import java.util.List;
 
-public class TagProcessor {
+public abstract class TagProcessor {
 
-	protected final GraphConfig config;
+	protected static GraphEnvironment environment;
 
-	public TagProcessor(GraphConfig config) {
-		this.config = config;
+
+	public TagProcessor(GraphEnvironment env) {
+		environment = env;
 	}
 
-	protected void appendProperties(Element element, StringBuffer caption) {
+    public abstract void process(Graph graph, Element currentElement, GraphNode parent);
+
+	public static void appendProperties(Element element, StringBuffer caption) {
 		Element properties = element.getChild(MuleTag.ELEMENT_PROPERTIES);
 		if (properties != null) {
 			for (Iterator iterator = properties.getChildren(MuleTag.ELEMENT_PROPERTY)
 					.iterator(); iterator.hasNext();) {
 				Element property = (Element) iterator.next();
 				caption.append(property.getAttributeValue(MuleTag.ATTRIBUTE_NAME) + " :"
-						+ property.getAttributeValue(MuleTag.ATTRIBUTE_VALUE) + "\n");
+						+ lookupPropertyTemplate(property.getAttributeValue(MuleTag.ATTRIBUTE_VALUE)) + "\n");
 			}
 		}
 		for (Iterator iterator = element.getAttributes().iterator(); iterator
@@ -36,10 +42,10 @@ public class TagProcessor {
 		}
 	}
 
-	protected boolean ignoreAttribute(String name) {
+	protected static boolean ignoreAttribute(String name) {
 		if (name == null || "".equals(name))
 			return true;
-		for (Iterator iterator = config.getIgnoredAttributes().iterator(); iterator
+		for (Iterator iterator = environment.getConfig().getIgnoredAttributes().iterator(); iterator
 				.hasNext();) {
 			String s = (String) iterator.next();
 			if (name.equals(s)) {
@@ -49,7 +55,7 @@ public class TagProcessor {
 		}
 		return false;
 	}
-	protected void appendDescription(Element e, StringBuffer caption) {
+	public static void appendDescription(Element e, StringBuffer caption) {
 		Element description = e.getChild(MuleTag.ELEMENT_DESCRIPTION);
 		if (description != null) {
 			caption.append("\n-------------------\n").append(
@@ -87,6 +93,46 @@ public class TagProcessor {
     protected void appendAttribute(Element e, String name, StringBuffer caption) {
         if(e.getAttribute(name) == null) return;
         String value = e.getAttributeValue(name);
-        if(value!=null) caption.append(name + " = " + (Utility.EMPTY_STRING.equals(value) ? "\"\"" : value) + "\n");
+        if(value!=null) caption.append(name + " = " + (Utility.EMPTY_STRING.equals(value) ? "\"\"" : lookupPropertyTemplate(value)) + "\n");
+    }
+
+
+
+    public static void addEdge(Graph graph, GraphNode src, GraphNode dest, String caption, boolean twoway) {
+        GraphEdge ge = graph.addEdge(src, dest);
+        if(twoway) {
+            ge.getInfo().setArrowTailNormal();
+        }
+
+        if(caption!=null) {
+            if("in".equalsIgnoreCase(caption) && twoway) {
+                caption += " / out";
+            }else if("out".equalsIgnoreCase(caption) && twoway) {
+                caption += " / in";
+            }
+            ge.getInfo().setCaption(caption);
+        }
+    }
+
+    public static void addRelation(Graph graph, GraphNode src, GraphNode dest, String caption) {
+        GraphEdge ge = graph.addEdge(src, dest);
+        ge.getInfo().setArrowHeadNone();
+        if(caption!=null) ge.getInfo().setCaption(caption);
+    }
+
+    public boolean isTwoWay(Element e) {
+        if(e==null) return environment.isDefaultTwoWay();
+       return ("true".equalsIgnoreCase(e.getAttributeValue(MuleTag.ATTRIBUTE_SYNCHRONOUS)) || environment.isDefaultTwoWay());
+    }
+
+    protected static String lookupPropertyTemplate(String template) {
+        if(template==null) return null;
+        String value = environment.getProperties().getProperty(template, null);
+        if(value==null && template.startsWith("${")) {
+            value = environment.getProperties().getProperty(template.substring(2, template.length()-1), template);
+        } else {
+            value = template;
+        }
+        return value;
     }
 }

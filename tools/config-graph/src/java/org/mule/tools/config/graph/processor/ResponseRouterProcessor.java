@@ -3,21 +3,18 @@ package org.mule.tools.config.graph.processor;
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
-import org.mule.tools.config.graph.components.EndpointRegistry;
 import org.mule.tools.config.graph.config.ColorRegistry;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
-public class ResponseRouterProcessor {
+public class ResponseRouterProcessor extends TagProcessor {
 	
-	EndpointRegistry endpointRegistry ;
-	
-	public ResponseRouterProcessor(EndpointRegistry endpointRegistry ) {
-		this.endpointRegistry=endpointRegistry; 
+	public ResponseRouterProcessor( GraphEnvironment environment ) {
+        super(environment);
 	}
 
-	public void processResponseRouter(Graph graph, Element descriptor,
-			GraphNode node) {
-		Element responseRouterElement = descriptor.getChild(MuleTag.ELEMENT_RESPONSE_ROUTER);
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
+		Element responseRouterElement = currentElement.getChild(MuleTag.ELEMENT_RESPONSE_ROUTER);
 		if (responseRouterElement != null) {
 
 			Element router = responseRouterElement.getChild(MuleTag.ELEMENT_ROUTER);
@@ -25,15 +22,15 @@ public class ResponseRouterProcessor {
 			GraphNode responseRouter = graph.addNode();
 			responseRouter.getInfo().setFillColor(ColorRegistry.COLOR_ROUTER);
 			responseRouter.getInfo().setHeader(className);
-			graph.addEdge(responseRouter, node).getInfo().setCaption(
-					"response router");
+			addEdge(graph,responseRouter, parent, "response router", false);
+
 			Element endpoint = responseRouterElement
 					.getChild(MuleTag.ELEMENT_ENDPOINT);
 			String endpointAdress = endpoint
 					.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
-			GraphNode out = (GraphNode) endpointRegistry.getEndpoint(endpointAdress, node
+			GraphNode out = (GraphNode) environment.getEndpointRegistry().getEndpoint(endpointAdress, parent
 					.getInfo().getHeader());
-			graph.addEdge(out, responseRouter).getInfo().setCaption("in");
+			addEdge(graph, out, responseRouter, "in", isTwoWay(endpoint));
 		}
 	}
 }

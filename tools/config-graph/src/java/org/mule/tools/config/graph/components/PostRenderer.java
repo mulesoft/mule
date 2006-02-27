@@ -1,13 +1,12 @@
 package org.mule.tools.config.graph.components;
 
-import java.util.Map;
-
-import org.mule.tools.config.graph.config.GraphConfig;
-
 import com.oy.shared.lm.graph.Graph;
+import org.mule.tools.config.graph.config.GraphEnvironment;
+
+import java.util.Map;
 
 public interface PostRenderer {
 
-	public abstract void postRender(GraphConfig config, Map context,Graph graph);
+	public abstract void postRender(GraphEnvironment env, Map context,Graph graph);
 
 }

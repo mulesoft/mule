@@ -3,9 +3,8 @@ package org.mule.tools.config.graph.processor;
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
-import org.mule.tools.config.graph.components.EndpointRegistry;
 import org.mule.tools.config.graph.config.ColorRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 import java.util.Iterator;
@@ -23,33 +22,24 @@ public class DescriptorProcessor extends TagProcessor {
 
 	private final OutBoundRoutersProcessor outBoundRoutersProcessor;
 
-	public DescriptorProcessor(final EndpointRegistry endpointRegistry,
-			final GraphConfig config) {
-		super(config);
-		this.shortestNotationHandler = new ShortestNotationHandler(
-				endpointRegistry);
-		this.inboundRoutersProcessor = new InboundRoutersProcessor(
-				endpointRegistry, config);
-		this.responseRouterProcessor = new ResponseRouterProcessor(
-				endpointRegistry);
-		exceptionStrategyProcessor = new ExceptionStrategyProcessor(
-				endpointRegistry, config);
-		OutBoundRouterEndpointsHandler outBoundRouterEndpointsHandler = new OutBoundRouterEndpointsHandler(
-				endpointRegistry, config);
+	public DescriptorProcessor( GraphEnvironment environment) {
+		super(environment);
+		this.shortestNotationHandler = new ShortestNotationHandler(environment);
+		this.inboundRoutersProcessor = new InboundRoutersProcessor(environment);
+		this.responseRouterProcessor = new ResponseRouterProcessor(environment);
+		exceptionStrategyProcessor = new ExceptionStrategyProcessor(environment);
 
-		this.outBoundRoutersProcessor = new OutBoundRoutersProcessor(config,
-				exceptionStrategyProcessor, outBoundRouterEndpointsHandler,
-				endpointRegistry);
+		this.outBoundRoutersProcessor = new OutBoundRoutersProcessor(environment);
 
 	}
 
-	public void parseModel(Graph graph, Element model) {
-		if (model == null) {
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
+		if (currentElement == null) {
 			System.err.println("model is null");
 			return;
 		}
 
-		List descriptors = model.getChildren(MuleTag.ELEMENT_MULE_DESCRIPTOR);
+		List descriptors = currentElement.getChildren(MuleTag.ELEMENT_MULE_DESCRIPTOR);
 		for (Iterator iter = descriptors.iterator(); iter.hasNext();) {
 			Element descriptor = (Element) iter.next();
 			String name = descriptor.getAttributeValue(MuleTag.ATTRIBUTE_NAME);
@@ -68,20 +58,15 @@ public class DescriptorProcessor extends TagProcessor {
 
 			node.getInfo().setCaption(caption.toString());
 
-			shortestNotationHandler.processShortestNotation(graph, descriptor,
-					node);
+			shortestNotationHandler.process(graph, descriptor, node);
 
-			exceptionStrategyProcessor.processExceptionStrategy(graph,
-					descriptor, node);
+			exceptionStrategyProcessor.process(graph, descriptor, node);
 
-			inboundRoutersProcessor.processInboundRouters(graph, descriptor,
-					node);
+			inboundRoutersProcessor.process(graph, descriptor, node);
 
-			outBoundRoutersProcessor.processOutBoundRouters(graph, descriptor,
-					node);
+			outBoundRoutersProcessor.process(graph, descriptor, node);
 
-			responseRouterProcessor.processResponseRouter(graph, descriptor,
-					node);
+			responseRouterProcessor.process(graph, descriptor, node);
 
 		}
 

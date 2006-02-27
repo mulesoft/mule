@@ -1,36 +1,24 @@
 package org.mule.tools.config.graph.postrenderers;
 
+import com.oy.shared.lm.graph.Graph;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.mule.tools.config.graph.components.PostRenderer;
+import org.mule.tools.config.graph.config.GraphEnvironment;
+import org.mule.tools.config.graph.config.VelocitySupport;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.mule.tools.config.graph.components.PostRenderer;
-import org.mule.tools.config.graph.config.GraphConfig;
-import org.mule.tools.config.graph.util.VelocityLogger;
+public class MuleDocPostRenderer extends VelocitySupport implements PostRenderer {
 
-import com.oy.shared.lm.graph.Graph;
+    public MuleDocPostRenderer(GraphEnvironment env) {
+        super(env);
+    }
 
-public class MuleDocPostRenderer implements PostRenderer {
-
-	private static VelocityEngine ve;
-
-	static {
-		ve = new VelocityEngine();
-		ve.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM,
-				new VelocityLogger());
-		try {
-			ve.init();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public void postRender(GraphConfig config, Map context, Graph graph) {
+	public void postRender(GraphEnvironment env, Map context, Graph graph) {
 		
 		try {
 
@@ -47,11 +35,11 @@ public class MuleDocPostRenderer implements PostRenderer {
 			// TODO how to retrieve template using classpath ?
 			Template t = ve
 					.getTemplate("./src/resources/template/mule-config.vm");
-			File file = new File(config.getOutputDirectory() + "/"
+			File file = new File(env.getConfig().getOutputDirectory() + "/"
 					+ context.get("htmlFileName"));
 			FileWriter writer = new FileWriter(file);
 
-			System.out.println("generating " + file);
+			env.log("generating " + file);
 
 			t.merge(velocityContext, writer);
 			writer.flush();

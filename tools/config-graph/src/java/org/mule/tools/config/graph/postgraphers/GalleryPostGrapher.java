@@ -1,22 +1,26 @@
 package org.mule.tools.config.graph.postgraphers;
 
+import org.mule.tools.config.graph.config.GraphEnvironment;
+
 import java.io.File;
 
-import org.mule.tools.config.graph.config.GraphConfig;
-
 public class GalleryPostGrapher extends AbstractIndexer{
+
+    public GalleryPostGrapher(GraphEnvironment env) {
+        super(env);
+    }
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.mule.tools.config.graph.PostGrapher#postGrapher(org.mule.tools.config.graph.GraphConfig)
 	 */
-	public void postGrapher(final GraphConfig config) {
-		File[] htmlFiles = getFiles(config,".gif");
+	public void postGrapher(GraphEnvironment env) {
+		File[] htmlFiles = getFiles(env.getConfig(),".gif");
 		// TODO no more hardcoded template path
 		String template = "./src/resources/template/gallery-index.vm";
 		String targetFile = "/gallery.html";
-		doRendering(config, htmlFiles, template, targetFile);
+		doRendering(env, htmlFiles, template, targetFile);
 
 	}
 	public String getStatusTitle() {	

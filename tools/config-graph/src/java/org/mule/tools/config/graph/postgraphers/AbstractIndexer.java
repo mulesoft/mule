@@ -1,48 +1,36 @@
 package org.mule.tools.config.graph.postgraphers;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.runtime.RuntimeServices;
+import org.mule.tools.config.graph.components.PostGrapher;
+import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
+import org.mule.tools.config.graph.config.VelocitySupport;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeServices;
-import org.apache.velocity.runtime.log.LogSystem;
-import org.mule.tools.config.graph.components.PostGrapher;
-import org.mule.tools.config.graph.config.GraphConfig;
-import org.mule.tools.config.graph.util.VelocityLogger;
+public abstract class AbstractIndexer extends VelocitySupport  implements PostGrapher {
 
-public abstract class AbstractIndexer implements LogSystem, PostGrapher{
+    protected AbstractIndexer(GraphEnvironment env) {
+        super(env);
+    }
 
-	private static VelocityEngine ve;
-
-	static {
-		ve = new VelocityEngine();
-		ve.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM,
-				new VelocityLogger());
+	protected void doRendering(GraphEnvironment env, File[] htmlFiles, String template, String targetFile) {
 		try {
-			ve.init();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	protected void doRendering(GraphConfig config, File[] htmlFiles, String template, String targetFile) {
-		try {
-
+        this.env = env;
 			VelocityContext velocityContext = new VelocityContext();
 
 			velocityContext.put("fileList", Arrays.asList(htmlFiles));
 			// TODO how to retrieve template using classpath ?
-			Template t = ve
-					.getTemplate(template);
-			File file = new File(config.getOutputDirectory() + targetFile);
+			Template t = ve.getTemplate(template);
+			File file = new File(env.getConfig().getOutputDirectory() + targetFile);
 			FileWriter writer = new FileWriter(file);
 
-			System.out.println("generating " + file);
+			env.log("generating " + file);
 
 			t.merge(velocityContext, writer);
 			writer.flush();
@@ -72,11 +60,9 @@ public abstract class AbstractIndexer implements LogSystem, PostGrapher{
 		
 	}
 
-	public void logVelocityMessage(int arg0, String arg1) {
-		System.out.println(arg1);
-		
-	}
 
-	public abstract void postGrapher(GraphConfig config);
-	
+public void logVelocityMessage(int arg0, String arg1) {
+    if(env !=null) env.log(arg1);
+
+}
 }

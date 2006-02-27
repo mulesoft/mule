@@ -1,11 +1,9 @@
 package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphEdge;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
-import org.mule.tools.config.graph.components.EndpointRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 import java.util.Iterator;
@@ -13,19 +11,16 @@ import java.util.List;
 
 public class OutBoundRouterEndpointsHandler extends TagProcessor{
 
-	private final EndpointRegistry endpointRegistry;
-	private final OutboundFilterProcessor outboundFilterProcessor;
-	
-	public OutBoundRouterEndpointsHandler(EndpointRegistry endpointRegistry,GraphConfig config) {
-		super(config);
-		this.endpointRegistry = endpointRegistry;
-		this.outboundFilterProcessor = new OutboundFilterProcessor(config);
+    private String componentName;
+
+	public OutBoundRouterEndpointsHandler( GraphEnvironment environment, String componentName) {
+		super(environment);
+        this.componentName = componentName;
 
 	}
 	
-	public void processOutBoundRouterEndpoints(Graph graph, Element router,
-			GraphNode routerNode, String componentName) {
-		List epList = router.getChildren(MuleTag.ELEMENT_ENDPOINT);
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
+		List epList = currentElement.getChildren(MuleTag.ELEMENT_ENDPOINT);
         int x=1;
 		for (Iterator iterator = epList.iterator(); iterator.hasNext(); x++) {
 			Element outEndpoint = (Element) iterator.next();
@@ -33,35 +28,30 @@ public class OutBoundRouterEndpointsHandler extends TagProcessor{
 			String url = outEndpoint
 					.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
 			if (url != null) {
-				GraphNode out = (GraphNode) endpointRegistry.getEndpoint(url, componentName);
+				GraphNode out = (GraphNode) environment.getEndpointRegistry().getEndpoint(url, componentName);
 				if (out == null) {
 					out = graph.addNode();
 					StringBuffer caption = new StringBuffer();
-					caption.append(url).append("\n");
+					//caption.append(url).append("\n");
 					appendProperties(outEndpoint, caption);
 					appendDescription(outEndpoint, caption);
 					out.getInfo().setCaption(caption.toString());
-					endpointRegistry.addEndpoint(url, out);
-					processOutboundFilter(graph, outEndpoint, out, routerNode);
+					environment.getEndpointRegistry().addEndpoint(url, out);
+					processOutboundFilter(graph, outEndpoint, out, parent);
 				} else {
-					GraphEdge e = graph.addEdge(routerNode, out);
-                    if(epList.size()==1) {
-                        e.getInfo().setCaption("out");
-                    } else {
-                        e.getInfo().setCaption("out (" + x + " of " + epList.size() + ")");
+					String caption = "out";
+                    if(epList.size()>1) {
+                        caption +=" (" + x + " of " + epList.size() + ")";
                     }
-                    if("true".equalsIgnoreCase(outEndpoint.getAttributeValue(MuleTag.ATTRIBUTE_SYNCHRONOUS))) {
-                        e.getInfo().setArrowTailNormal();
-                    }
+                    addEdge(graph, parent, out, caption, isTwoWay(outEndpoint));
+
 				}
 			}
 
-			GraphNode[] virtual = endpointRegistry
-					.getVirtualEndpoint(componentName);
+			GraphNode[] virtual = environment.getEndpointRegistry().getVirtualEndpoint(componentName);
 			if (virtual.length > 0) {
 				for (int i = 0; i < virtual.length; i++) {
-					graph.addEdge(routerNode, virtual[i]).getInfo().setCaption(
-							"out (dynamic)");
+                     addEdge(graph, parent, virtual[i], "out (dynamic)", isTwoWay(outEndpoint));
 				}
 			}
 		}
@@ -70,8 +60,8 @@ public class OutBoundRouterEndpointsHandler extends TagProcessor{
 	private void processOutboundFilter(Graph graph, Element outEndpoint,
 			GraphNode out, GraphNode routerNode) {
 
-		outboundFilterProcessor.process(graph, outEndpoint, out, routerNode);
-
+        OutboundFilterProcessor processor = new OutboundFilterProcessor(environment, out);
+        processor.process(graph, outEndpoint, routerNode);
 	}
 	
 }

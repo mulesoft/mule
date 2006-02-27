@@ -1,46 +1,43 @@
 package org.mule.tools.config.graph.processor;
 
-import org.jdom.Element;
-import org.mule.tools.config.graph.components.EndpointRegistry;
-import org.mule.tools.config.graph.util.MuleTag;
-
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
+import org.jdom.Element;
+import org.mule.tools.config.graph.config.GraphEnvironment;
+import org.mule.tools.config.graph.util.MuleTag;
 
-public class ShortestNotationHandler {
+public class ShortestNotationHandler extends TagProcessor {
 
-	private EndpointRegistry endpointRegistry;
-	
-	public ShortestNotationHandler(EndpointRegistry endpointRegistry) {
-		this.endpointRegistry =endpointRegistry;
+
+	public ShortestNotationHandler(GraphEnvironment environment) {
+        super(environment);
 	}
 	
-	public void processShortestNotation(Graph graph, Element descriptor,
-			GraphNode node) {
-		String inbound = descriptor.getAttributeValue(MuleTag.ATTRIBUTE_INBOUNDENDPOINT);
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
+		String inbound = currentElement.getAttributeValue(MuleTag.ATTRIBUTE_INBOUNDENDPOINT);
 		if (inbound != null) {
-			GraphNode in = (GraphNode) endpointRegistry.getEndpoint(inbound,
-					node.getInfo().getHeader());
+			GraphNode in = (GraphNode) environment.getEndpointRegistry().getEndpoint(inbound,
+					parent.getInfo().getHeader());
 			if (in == null) {
 				in = graph.addNode();
 				in.getInfo().setCaption(inbound);
-				endpointRegistry.addEndpoint(inbound, in);
+				environment.getEndpointRegistry().addEndpoint(inbound, in);
 			}
-			graph.addEdge(in, node).getInfo().setCaption("in");
+			addEdge(graph, in, parent, "in", isTwoWay(null));
 		}
-		String outbound = descriptor.getAttributeValue(MuleTag.ATTRIBUTE_OUTBOUNDENDPOINT);
+		String outbound = currentElement.getAttributeValue(MuleTag.ATTRIBUTE_OUTBOUNDENDPOINT);
 		if (outbound != null) {
-			GraphNode out = (GraphNode) endpointRegistry.getEndpoint(outbound, node.getInfo()
+			GraphNode out = (GraphNode) environment.getEndpointRegistry().getEndpoint(outbound, parent.getInfo()
 					.getHeader());
 			if (out == null) {
 				out = graph.addNode();
 				out.getInfo().setCaption(outbound);
-				endpointRegistry.addEndpoint(outbound, out);
+				environment.getEndpointRegistry().addEndpoint(outbound, out);
 			}
-			graph.addEdge(node, out).getInfo().setCaption("out");
+			addEdge(graph, parent, out, "out", isTwoWay(null));
 		}
 
-		String inboundTransformers = descriptor
+		String inboundTransformers = currentElement
 				.getAttributeValue("inboundTransformer");
 		if (inboundTransformers != null) {
 			String[] transformers = inboundTransformers.split(" ");
@@ -49,15 +46,14 @@ public class ShortestNotationHandler {
 				caption.append("transformer " + i + " : " + transformers[i]
 						+ "\n");
 			}
-			node.getInfo().setCaption(node.getInfo().getCaption()+"\n"+caption.toString());
+			parent.getInfo().setCaption(parent.getInfo().getCaption()+"\n"+caption.toString());
 		}
 
-		GraphNode[] virtual = endpointRegistry.getVirtualEndpoint(node
+		GraphNode[] virtual = environment.getEndpointRegistry().getVirtualEndpoint(parent
 				.getInfo().getHeader());
 		if (virtual.length > 0) {
 			for (int i = 0; i < virtual.length; i++) {
-				graph.addEdge(node, virtual[i]).getInfo().setCaption(
-						"out (dynamic)");
+				addEdge(graph, parent, virtual[i], "out (dynamic)", false);
 			}
 		}
 	}

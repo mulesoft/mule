@@ -18,7 +18,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -50,6 +52,7 @@ public class GraphConfig {
     public static final String ARG_SHOW_AGENTS = "-showagents";
     public static final String ARG_SHOW_TRANSFORMERS= "-showtransformers";
     public static final String ARG_SHOW_ALL= "-showall";
+    public static final String ARG_TEMPLATE_PROPS= "-templateprops";
 
     private List files;
     private String executeCommand;
@@ -66,6 +69,7 @@ public class GraphConfig {
     private Properties mappings = new Properties();
     private Properties urls = new Properties();
     private Properties propsFromFile = null;
+    private Properties templateProps = null;
 
     private boolean showConnectors = true;
     private boolean showTransformers = false;
@@ -74,29 +78,22 @@ public class GraphConfig {
     private boolean showAgents = false;
     private boolean showAll = false;
 
+
+
     public GraphConfig() {
-        init();
-    }
-
-    protected void init() {
         files = new ArrayList();
-        ignoredAttributes = new ArrayList();
-        ignoredAttributes.add("className");
-        ignoredAttributes.add("inboundEndpoint");
-        ignoredAttributes.add("outboundEndpoint");
-        ignoredAttributes.add("responseEndpoint");
-        ignoredAttributes.add("inboundTransformer");
-        ignoredAttributes.add("outboundTransformer");
-        ignoredAttributes.add("type");
-        ignoredAttributes.add("singleton");
-        ignoredAttributes.add("containerManaged");
-        ignoredAttributes.add("address");
-        ignoredAttributes.add("transformers");
-        ignoredAttributes.add("name");
+        addIgnorredArributes();
     }
 
-    public GraphConfig(String[] args) throws IOException {
-        init();
+
+    public GraphEnvironment init() {
+        return new GraphEnvironment(this);
+    }
+
+
+    public GraphEnvironment init(String[] args) throws IOException {
+        GraphEnvironment env = new GraphEnvironment(this);
+
         String properties = getOpt(args, ARG_CONFIG, null);
         if(properties!=null) {
             loadProperties(properties);
@@ -106,7 +103,7 @@ public class GraphConfig {
             File f = new File(workingDirectory);
             if (!f.exists()) f.mkdirs();
             workingDirectory = f.getAbsolutePath();
-            System.out.println("working directory is: " + workingDirectory);
+            env.log("working directory is: " + workingDirectory);
         }
 
         String filesString = getOpt(args, ARG_FILES, null);
@@ -116,13 +113,17 @@ public class GraphConfig {
                 files.add(applyWorkingDirectory(stringTokenizer.nextToken()));
             }
         }
+
+        String templatePropsString = getOpt(args, ARG_TEMPLATE_PROPS, null);
+        loadTemplateProps(templatePropsString);
+
         String outputDir = getOpt(args, ARG_OUTPUT_DIR, null);
         if(outputDir==null) {
             outputDir = (workingDirectory==null ? "." : workingDirectory);
         }
-        outputDirectory = new File(outputDir);
+        outputDirectory = new File(applyWorkingDirectory(outputDir));
         if (!outputDirectory.exists()) outputDirectory.mkdirs();
-        System.out.println("Outputting graphs to: " + outputDirectory.getAbsolutePath());
+        env.log("Outputting graphs to: " + outputDirectory.getAbsolutePath());
 
         outputFilename = getOpt(args, ARG_OUTPUT_FILE, null);
 
@@ -152,34 +153,51 @@ public class GraphConfig {
         String temp = getOpt(args, ARG_MAPPINGS, null);
         if (temp != null) {
             mappingsFile = new File(applyWorkingDirectory(temp));
-            System.out.println("Using mappings file: " + mappingsFile.getAbsolutePath());
+            env.log("Using mappings file: " + mappingsFile.getAbsolutePath());
             if (mappingsFile.exists()) {
                 mappings = new Properties();
                 mappings.load(new FileInputStream(mappingsFile));
-                System.out.println("Using Mappings: ");
+                env.log("Using Mappings: ");
                 mappings.list(System.out);
             } else {
                 throw new FileNotFoundException("Could not find file: " + mappingsFile.getAbsolutePath());
             }
         } else {
-            System.out.println("No mappings file set");
+            env.log("No mappings file set");
         }
 
         temp = getOpt(args, ARG_URLS, null);
         if (temp != null) {
             urlsFile = new File(applyWorkingDirectory(temp));
-            System.out.println("Using urls file: " + urlsFile.getAbsolutePath());
+            env.log("Using urls file: " + urlsFile.getAbsolutePath());
             if (urlsFile.exists()) {
                 urls = new Properties();
                 urls.load(new FileInputStream(urlsFile));
-                System.out.println("Using urls: ");
+                env.log("Using urls: ");
                 urls.list(System.out);
             } 
         } else {
-            System.out.println("No urls file set");
+            env.log("No urls file set");
         }
-        
+        return env;
     }
+
+    protected void addIgnorredArributes() {
+        ignoredAttributes = new ArrayList();
+        ignoredAttributes.add("className");
+        ignoredAttributes.add("inboundEndpoint");
+        ignoredAttributes.add("outboundEndpoint");
+        ignoredAttributes.add("responseEndpoint");
+        ignoredAttributes.add("inboundTransformer");
+        ignoredAttributes.add("outboundTransformer");
+        ignoredAttributes.add("type");
+        ignoredAttributes.add("singleton");
+        ignoredAttributes.add("containerManaged");
+        //ignoredAttributes.add("address");
+        //ignoredAttributes.add("transformers");
+        ignoredAttributes.add("name");
+    }
+
 
     protected String applyWorkingDirectory(String path) {
         if(path==null) return null;
@@ -195,6 +213,24 @@ public class GraphConfig {
         propsFromFile.load(new FileInputStream(props));
     }
 
+    protected void loadTemplateProps(String props) throws IOException {
+        templateProps = new Properties();
+        if (props != null) {
+            for (StringTokenizer stringTokenizer = new StringTokenizer(props, ","); stringTokenizer.hasMoreTokens();) {
+                Properties p = new Properties();
+                p.load(new FileInputStream(applyWorkingDirectory(stringTokenizer.nextToken())));
+
+                for (Iterator iterator = p.entrySet().iterator(); iterator.hasNext();) {
+                    Map.Entry e = (Map.Entry) iterator.next();
+                    if(templateProps.getProperty(e.getKey().toString())!=null) {
+                        System.err.println("There is a properties conflict with property: " + e.getKey());
+                    } else {
+                        templateProps.put(e.getKey(), e.getValue());
+                    }
+                }
+            }
+        }
+    }
 
     public void validate() throws IllegalStateException {
         if (files == null || files.size() == 0) {
@@ -373,4 +409,5 @@ public class GraphConfig {
     public void setShowAll(boolean showAll) {
         this.showAll = showAll;
     }
+
 }

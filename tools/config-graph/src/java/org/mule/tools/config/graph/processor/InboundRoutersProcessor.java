@@ -3,33 +3,26 @@ package org.mule.tools.config.graph.processor;
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
-import org.mule.tools.config.graph.components.EndpointRegistry;
 import org.mule.tools.config.graph.config.ColorRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class InboundRoutersProcessor extends TagProcessor {
-	private EndpointRegistry endpointRegistry;
 
-	private InboundFilterProcessor inboundFilterProcessor;
+	public InboundRoutersProcessor( GraphEnvironment environment) {
+		super(environment);
 
-	public InboundRoutersProcessor(EndpointRegistry endpointRegistry,
-			GraphConfig config) {
-		super(config);
-		this.endpointRegistry = endpointRegistry;
-		this.inboundFilterProcessor = new InboundFilterProcessor(config);
 	}
 
-	public void processInboundRouters(Graph graph, Element descriptor,
-			GraphNode node) {
-		Element inboundRouter = descriptor.getChild(MuleTag.ELEMENT_INBOUND_ROUTER);
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
+		Element inboundRouter = currentElement.getChild(MuleTag.ELEMENT_INBOUND_ROUTER);
 
 		if (inboundRouter != null) {
 
-			GraphNode endpointsLink = node;
+			GraphNode endpointsLink = parent;
 
 			Element router = inboundRouter.getChild(MuleTag.ELEMENT_ROUTER);
 			if (router != null) {
@@ -38,8 +31,7 @@ public class InboundRoutersProcessor extends TagProcessor {
 						router.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
 				routerNode.getInfo().setFillColor(ColorRegistry.COLOR_ROUTER);
 
-				graph.addEdge(routerNode, node).getInfo().setCaption(
-						"inbound router");
+                addEdge(graph, routerNode, parent, "inbound router", isTwoWay(router));
 				endpointsLink = routerNode;
 			}
 
@@ -51,8 +43,8 @@ public class InboundRoutersProcessor extends TagProcessor {
 				String url = inEndpoint
 						.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
 				if (url != null) {
-					GraphNode in = (GraphNode) endpointRegistry.getEndpoint(
-							url, node.getInfo().getHeader());
+					GraphNode in = (GraphNode) environment.getEndpointRegistry().getEndpoint(
+							url, parent.getInfo().getHeader());
 					StringBuffer caption = new StringBuffer();
 					if (in == null) {
 						in = graph.addNode();
@@ -69,11 +61,15 @@ public class InboundRoutersProcessor extends TagProcessor {
 						appendProperties(inEndpoint, caption);
 						appendDescription(inEndpoint, caption);
 						in.getInfo().setCaption(caption.toString());
+                        //Mark boundary endpoints between configurations
+//                        if(environment.getConfig().isCombineFiles()) {
+//                            in.getInfo().setLineColor("red");
+//                        }
 					}
 
 					if (in != null) {
-						inboundFilterProcessor.processInboundFilter(graph,
-								inEndpoint, in, endpointsLink);
+                        InboundFilterProcessor processor = new InboundFilterProcessor(environment, endpointsLink);
+						processor.processInboundFilter(graph, inEndpoint, in, endpointsLink);
 					}
 				}
 			}

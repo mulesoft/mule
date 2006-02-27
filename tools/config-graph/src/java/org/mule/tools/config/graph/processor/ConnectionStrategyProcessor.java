@@ -4,17 +4,18 @@ import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 public class ConnectionStrategyProcessor extends TagProcessor {
-	public ConnectionStrategyProcessor(GraphConfig config) {
-		super(config);
+
+	public ConnectionStrategyProcessor( GraphEnvironment environment ) {
+		super(environment);
 	}
 
-	public void parseConnectionStrategy(Graph graph, Element connector, GraphNode parent) {
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
         //Process connection strategy
-        Element cs = connector.getChild(MuleTag.ELEMENT_CONNECTION_STRATEGY);
+        Element cs = currentElement.getChild(MuleTag.ELEMENT_CONNECTION_STRATEGY);
         if(cs!=null) {
             GraphNode csNode = graph.addNode();
             csNode.getInfo().setFillColor(ColorRegistry.COLOR_CONNECTION_STRATEGY);
@@ -24,8 +25,7 @@ public class ConnectionStrategyProcessor extends TagProcessor {
             appendProperties(cs, caption);
             appendDescription(cs, caption);
             csNode.getInfo().setCaption(caption.toString());
-            graph.addEdge(parent, csNode).getInfo().setArrowHeadNone();
-
+            addRelation(graph, parent, csNode, null);
         }
 	}
 }

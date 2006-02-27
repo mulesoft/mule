@@ -4,20 +4,27 @@ import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 public class OutboundFilterProcessor extends TagProcessor{
 
-	  public OutboundFilterProcessor(GraphConfig config) {
-		super(config);
+    private GraphNode endpointNode;
+
+	  public OutboundFilterProcessor(GraphEnvironment environment , GraphNode endpointNode) {
+		super(environment);
+          this.endpointNode = endpointNode;
 	}
+
+    public void process(Graph graph, Element currentElement, GraphNode parent) {
+        process(graph, currentElement, endpointNode, parent);
+    }
 
 	/**
 	 * 
-	 * @todo doesn't currently support And/Or logic filters
+	 * todo doesn't currently support And/Or logic filters
 	 */
-    public void process(Graph graph, Element endpoint, GraphNode endpointNode, GraphNode parent) {
+    private void process(Graph graph, Element endpoint, GraphNode endpointNode, GraphNode parent) {
     	// TODO doesn't currently support And/Or logic filters
         Element filter=endpoint.getChild(MuleTag.ELEMENT_FILTER);
         if (filter == null) filter=endpoint.getChild(MuleTag.ELEMENT_LEFT_FILTER);
@@ -32,11 +39,10 @@ public class OutboundFilterProcessor extends TagProcessor{
             filterNode.getInfo().setCaption(caption.toString());
             
             process(graph, filter, filterNode, parent);
-            graph.addEdge(filterNode, endpointNode).getInfo().setCaption("out");
+            addEdge(graph, filterNode, endpointNode, "out", isTwoWay(endpoint));
+
         } else {
-            graph.addEdge(parent, endpointNode).getInfo().setCaption("filters on");
+            addEdge(graph, parent, endpointNode, "filters on", isTwoWay(endpoint));
         }
     }
-	
-    
 }

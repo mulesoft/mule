@@ -4,7 +4,7 @@ import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 import java.util.Iterator;
@@ -12,17 +12,14 @@ import java.util.List;
 
 public class ConnectorProcessor extends TagProcessor {
 
-    private ConnectionStrategyProcessor connectionStrategyProcessor;
-
-	public ConnectorProcessor(GraphConfig config) {
-		super(config);
-        connectionStrategyProcessor = new ConnectionStrategyProcessor(config);
+	public ConnectorProcessor( GraphEnvironment environment) {
+		super(environment);
 	}
 
-	public void parseConnectors(Graph graph, Element root) {
-        if(!config.isShowConnectors()) return;
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
+        if(!environment.getConfig().isShowConnectors()) return;
 
-		List connectorsElement = root.getChildren(MuleTag.ELEMENT_CONNECTOR);
+		List connectorsElement = currentElement.getChildren(MuleTag.ELEMENT_CONNECTOR);
 		for (Iterator iter = connectorsElement.iterator(); iter.hasNext();) {
 			Element connector = (Element) iter.next();
 			GraphNode connectorNode = graph.addNode();
@@ -41,7 +38,8 @@ public class ConnectorProcessor extends TagProcessor {
 			connectorNode.getInfo().setCaption(caption.toString());
 
             //Process connection strategy
-            connectionStrategyProcessor.parseConnectionStrategy(graph, connector, connectorNode);
+            ConnectionStrategyProcessor connectionStrategyProcessor = new ConnectionStrategyProcessor(environment);
+            connectionStrategyProcessor.process(graph, connector, connectorNode);
 		}
 	}
 }

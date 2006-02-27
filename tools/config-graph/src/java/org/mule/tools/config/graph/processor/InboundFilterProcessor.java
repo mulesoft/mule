@@ -1,23 +1,26 @@
 package org.mule.tools.config.graph.processor;
 
 import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphEdge;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 public class InboundFilterProcessor extends TagProcessor {
 
-	
-	public InboundFilterProcessor(GraphConfig config) {
-		super(config);
-		
+	private GraphNode endpointNode;
+
+	public InboundFilterProcessor(GraphEnvironment environment, GraphNode endpointNode) {
+		super(environment);
+        this.endpointNode = endpointNode;
 	}
 
-	public void processInboundFilter(Graph graph, Element endpoint,
-			GraphNode endpointNode, GraphNode parent) {
+    public void process(Graph graph, Element currentElement, GraphNode parent) {
+        processInboundFilter(graph, currentElement, endpointNode, parent);
+    }
+
+	public void processInboundFilter(Graph graph, Element endpoint, GraphNode endpointNode, GraphNode parent) {
 		Element filter = endpoint.getChild(MuleTag.ELEMENT_FILTER);
 		boolean conditional = false;
 
@@ -46,19 +49,13 @@ public class InboundFilterProcessor extends TagProcessor {
 				StringBuffer caption2 = new StringBuffer();
 				appendProperties(filter, caption2);
 				filterNode2.getInfo().setCaption(caption2.toString());
-				graph.addEdge(endpointNode, filterNode2).getInfo().setCaption(
-						"filters on");
+                addEdge(graph, endpointNode, filterNode2, "filters on", isTwoWay(endpoint));
 			}
 			processInboundFilter(graph, filter, filterNode, parent);
 
-			graph.addEdge(endpointNode, filterNode).getInfo().setCaption(
-					"filters on");
+			addEdge(graph, endpointNode, filterNode, "filters on", isTwoWay(endpoint));
 		} else {
-			GraphEdge e = graph.addEdge(endpointNode, parent);
-            e.getInfo().setCaption("in");
-            if("true".equalsIgnoreCase(endpoint.getAttributeValue(MuleTag.ATTRIBUTE_SYNCHRONOUS))) {
-                e.getInfo().setArrowTailNormal();
-            }
+			addEdge(graph, endpointNode, parent, "in", isTwoWay(endpoint));
 		}
 	}
 

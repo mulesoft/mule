@@ -21,6 +21,7 @@ public interface MuleTag {
 	String ELEMENT_AGENTS = "agents";
 	String ELEMENT_CONNECTOR = "connector";
 	String ELEMENT_CONNECTION_STRATEGY = "connection-strategy";
+	String ELEMENT_ENDPOINT_IDENTFIERS = "endpoint-identifiers";
 	String ELEMENT_TRANSFORMERS = "transformers";
 	String ELEMENT_TRANSFORMER = "transformer";
 	String ELEMENT_MODEL = "model";

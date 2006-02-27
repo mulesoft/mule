@@ -1,20 +1,20 @@
 package org.mule.tools.config.graph.postprocessors;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
+import com.oy.shared.lm.graph.Graph;
+import com.oy.shared.lm.graph.GraphNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.mule.tools.config.graph.components.PostProcessor;
 import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.springframework.util.AntPathMatcher;
 
-import com.oy.shared.lm.graph.Graph;
-import com.oy.shared.lm.graph.GraphNode;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public class UrlAssignerPostProcessor implements PostProcessor {
 
@@ -62,9 +62,9 @@ public class UrlAssignerPostProcessor implements PostProcessor {
 
 	private List packagePatterns = null;
 
-	public void postProcess(Graph graph, GraphConfig config) {
+	public void postProcess(Graph graph, GraphEnvironment env) {
 
-		initPatterns(config);
+		initPatterns(env.getConfig());
 
 		GraphNode[] nodes = graph.getNodes();
 		for (int i = 0; i < nodes.length; i++) {

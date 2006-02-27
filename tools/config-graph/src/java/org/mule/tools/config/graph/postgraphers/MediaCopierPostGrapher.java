@@ -1,11 +1,11 @@
 package org.mule.tools.config.graph.postgraphers;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.commons.io.FileUtils;
 import org.mule.tools.config.graph.components.PostGrapher;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
+
+import java.io.File;
+import java.io.IOException;
 
 public class MediaCopierPostGrapher implements PostGrapher {
 
@@ -14,13 +14,12 @@ public class MediaCopierPostGrapher implements PostGrapher {
 		return "Copy Media files (logo, css,...)";
 	}
 
-	public void postGrapher(GraphConfig config) {
+	public void postGrapher(GraphEnvironment env) {
 
 		try {
-			FileUtils.copyDirectory(new File("./src/resources/media/"),config.getOutputDirectory());
+			FileUtils.copyDirectory(new File("./src/resources/media/"),env.getConfig().getOutputDirectory());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			env.logError(e.getMessage(), e);
 		
 		}
 	}

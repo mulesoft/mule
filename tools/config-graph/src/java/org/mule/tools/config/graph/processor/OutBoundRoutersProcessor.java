@@ -3,45 +3,27 @@ package org.mule.tools.config.graph.processor;
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
-import org.mule.tools.config.graph.components.EndpointRegistry;
 import org.mule.tools.config.graph.config.ColorRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 import java.util.Iterator;
 import java.util.List;
 
-public class OutBoundRoutersProcessor {
+public class OutBoundRoutersProcessor extends TagProcessor {
 
-	private final ExceptionStrategyProcessor exceptionStrategyProcessor;
-
-	private final OutBoundRouterEndpointsHandler outBoundRouterEndpointsHandler;
-
-	//TODO dead code ?
-	//private final OutboundFilterProcessor outboundFilterProcessor;
-
-	private final EndpointRegistry endpointRegistry;
-
-	public OutBoundRoutersProcessor(
-			final GraphConfig config,
-			final ExceptionStrategyProcessor exceptionStrategyProcessor,
-			final OutBoundRouterEndpointsHandler outBoundRouterEndpointsHandler,
-			final EndpointRegistry endpointRegistry) {
-		this.endpointRegistry = endpointRegistry;
-		this.outBoundRouterEndpointsHandler = outBoundRouterEndpointsHandler;
-	//	this.outboundFilterProcessor = new OutboundFilterProcessor(config);
-		this.exceptionStrategyProcessor = exceptionStrategyProcessor;
+	public OutBoundRoutersProcessor( GraphEnvironment environment) {
+        super(environment);
 	}
 
-	public void processOutBoundRouters(Graph graph, Element descriptor,
-			GraphNode node) {
-		Element outboundRouter = descriptor.getChild(MuleTag.ELEMENT_OUTBOUND_ROUTER);
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
+		Element outboundRouter = currentElement.getChild(MuleTag.ELEMENT_OUTBOUND_ROUTER);
 
 		if (outboundRouter != null) {
-			String componentName = node.getInfo().getHeader();
+			String componentName = parent.getInfo().getHeader();
 			List routers = outboundRouter.getChildren(MuleTag.ELEMENT_ROUTER);
-			exceptionStrategyProcessor.processExceptionStrategy(graph,
-					outboundRouter, node);
+            ExceptionStrategyProcessor processor = new ExceptionStrategyProcessor(environment);
+            processor.process(graph, outboundRouter, parent);
 
 			for (Iterator iterator = routers.iterator(); iterator.hasNext();) {
 				Element router = (Element) iterator.next();
@@ -50,10 +32,10 @@ public class OutBoundRoutersProcessor {
 					GraphNode routerNode = graph.addNode();
 					routerNode.getInfo().setHeader(
 							router.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
-					routerNode.getInfo().setFillColor(
-							ColorRegistry.COLOR_ROUTER);
-					graph.addEdge(node, routerNode).getInfo().setCaption(
-							"outbound router");
+					routerNode.getInfo().setFillColor(ColorRegistry.COLOR_ROUTER);
+
+
+				    addRelation(graph, parent, routerNode, "outbound router");
 					
 					// TODO  dead code ? but how to handle filter condition
 					/*Element endpointEl = router.getChild("endpoint");
@@ -72,35 +54,33 @@ public class OutBoundRoutersProcessor {
 						
 						outboundFilterProcessor.process(graph, router,
 								endpoint, routerNode);
-					}else {*/ 
-						outBoundRouterEndpointsHandler
-									.processOutBoundRouterEndpoints(graph, router,
-											routerNode, componentName);
-					
+					}else {*/
+
+                    OutBoundRouterEndpointsHandler processor2 = new OutBoundRouterEndpointsHandler(environment, componentName);
+				    processor2.process(graph, router, routerNode);
+
 					processReplyTOasElement(graph, router, routerNode,
 							componentName);
 					processReplyTOasProperty(graph, router, routerNode,
 							componentName);
 
-					GraphNode[] virtual = endpointRegistry
+					GraphNode[] virtual = environment.getEndpointRegistry()
 							.getVirtualEndpoint(componentName + "."
 									+ router.getAttributeValue(MuleTag.ATTRIBUTE_CLASS_NAME));
 					if (virtual.length > 0) {
 						for (int i = 0; i < virtual.length; i++) {
-							graph.addEdge(routerNode, virtual[i]).getInfo()
-									.setCaption("out (dynamic)");
+							addRelation(graph, routerNode, virtual[i], "out (dynamic)");
 						}
 					}
 
 				}
 			}
 
-			GraphNode[] virtual = endpointRegistry
+			GraphNode[] virtual = environment.getEndpointRegistry()
 					.getVirtualEndpoint(componentName);
 			if (virtual.length > 0) {
 				for (int i = 0; i < virtual.length; i++) {
-					graph.addEdge(node, virtual[i]).getInfo().setCaption(
-							"out (dynamic)");
+					addRelation(graph, parent, virtual[i], "out (dynamic)");
 				}
 			}
 
@@ -114,9 +94,9 @@ public class OutBoundRoutersProcessor {
 			String replyTo = replyToElement
 					.getAttributeValue(MuleTag.ATTRIBUTE_ADDRESS);
 			if (replyTo != null) {
-				GraphNode out = (GraphNode) endpointRegistry.getEndpoint(
+				GraphNode out = (GraphNode) environment.getEndpointRegistry().getEndpoint(
 						replyTo, componentName);
-				graph.addEdge(routerNode, out).getInfo().setCaption("sets");
+				addRelation(graph, routerNode, out, "sets");
 			}
 		}
 	}
@@ -132,10 +112,9 @@ public class OutBoundRoutersProcessor {
 				if ("replyTo".equals(propertyName)) {
 					String replyTo = property.getAttributeValue(MuleTag.ATTRIBUTE_VALUE);
 					if (replyTo != null) {
-						GraphNode out = (GraphNode) endpointRegistry
+						GraphNode out = (GraphNode) environment.getEndpointRegistry()
 								.getEndpoint(replyTo, componentName);
-						graph.addEdge(routerNode, out).getInfo().setCaption(
-								"sets");
+						addRelation(graph, routerNode, out, "sets");
 					}
 				}
 			}

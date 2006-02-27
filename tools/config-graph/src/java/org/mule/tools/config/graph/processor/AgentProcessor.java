@@ -4,21 +4,21 @@ import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.graph.GraphNode;
 import org.jdom.Element;
 import org.mule.tools.config.graph.config.ColorRegistry;
-import org.mule.tools.config.graph.config.GraphConfig;
+import org.mule.tools.config.graph.config.GraphEnvironment;
 import org.mule.tools.config.graph.util.MuleTag;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class AgentProcessor extends TagProcessor {
-	public AgentProcessor(GraphConfig config) {
-		super(config);
+	public AgentProcessor(GraphEnvironment environment) {
+		super(environment);
 	}
 
-	public void parseAgents(Graph graph, Element root) {
-        if(!config.isShowAgents()) return;
+	public void process(Graph graph, Element currentElement, GraphNode parent) {
+        if(!environment.getConfig().isShowAgents()) return;
 
-        Element agents = root.getChild(MuleTag.ELEMENT_AGENTS);
+        Element agents = currentElement.getChild(MuleTag.ELEMENT_AGENTS);
         if(agents==null) return;
 
 		List agentsElement = agents.getChildren(MuleTag.ELEMENT_AGENT);

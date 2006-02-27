@@ -81,7 +81,7 @@ public class MuleGrapherTask extends MatchingTask {
             config.getFiles().add(file);
         }
         config.setOutputDirectory(outputdir);
-        MuleGrapher grapher = new MuleGrapher(config);
+        MuleGrapher grapher = new MuleGrapher(config.init());
         grapher.run();
         try {
             generatedFiles.add(srcFiles);

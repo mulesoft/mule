@@ -1,23 +1,27 @@
 package org.mule.tools.config.graph.util;
 
+import org.mule.tools.config.graph.config.GraphEnvironment;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class DOTtoMAP {
 
-	DOTtoMAP() {
+    private GraphEnvironment env = null;
+	DOTtoMAP(GraphEnvironment env) {
+        this.env = env;
 	}
 
 	public static void transform(String dotExeFileName, String dotFileName,
-			String outFormat, OutputStream out) throws IOException {
-		(new DOTtoMAP()).innerTransform(dotExeFileName, dotFileName, outFormat,
+			String outFormat, OutputStream out, GraphEnvironment env) throws IOException {
+		(new DOTtoMAP(env)).innerTransform(dotExeFileName, dotFileName, outFormat,
 				out);
 	}
 
 	public static void transform(String dotExeFileName, String dotFileName,
-			String outFileName) throws IOException {
-		(new DOTtoMAP()).innerTransform(dotExeFileName, dotFileName,
+			String outFileName, GraphEnvironment env) throws IOException {
+		(new DOTtoMAP(env)).innerTransform(dotExeFileName, dotFileName,
 				outFileName);
 	}
 
@@ -52,7 +56,7 @@ public class DOTtoMAP {
 			String outFileName) throws IOException {
 		String exeCmd = dotExeFileName + " -T" + getFormatForFile(outFileName)
 				+ " " + dotFileName + " -o " + outFileName;
-		System.out.println(exeCmd);
+		env.log(exeCmd);
 		Process p = Runtime.getRuntime().exec(exeCmd);
 		try {
 			p.waitFor();
