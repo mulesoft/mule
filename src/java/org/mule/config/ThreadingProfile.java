@@ -108,13 +108,15 @@ public class ThreadingProfile
     {
         this.maxThreadsActive = tp.getMaxThreadsActive();
         this.maxThreadsIdle = tp.getMaxThreadsIdle();
+        this.maxBufferSize = tp.getMaxBufferSize();
         this.threadTTL = tp.getThreadTTL();
+        this.threadWaitTimeout = tp.getThreadWaitTimeout();
         this.poolExhaustPolicy = tp.getPoolExhaustedAction();
+        this.doThreading = tp.isDoThreading();
+        this.threadPriority = tp.getThreadPriority();        
         this.rejectedExecutionHandler = tp.getRejectedExecutionHandler();
         this.threadFactory = tp.getThreadFactory();
         this.workManagerFactory = tp.getWorkManagerFactory();
-        this.threadPriority = tp.getThreadPriority();
-        this.maxBufferSize = tp.getMaxBufferSize();
     }
 
     public int getMaxThreadsActive()
