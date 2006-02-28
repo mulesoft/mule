@@ -31,14 +31,22 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaModel;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.mule.ide.core.MuleCorePlugin;
 import org.osgi.framework.Bundle;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -121,7 +129,34 @@ public class MuleConfigBuilder extends IncrementalProjectBuilder {
 	}
 	
 	class XMLErrorHandler extends DTDResolverHandler {
+
+		private IJavaModel getJavaModel() {
+			return JavaCore.create(ResourcesPlugin.getWorkspace().getRoot());
+		}
+		private IJavaProject getJavaProject() {
+			return getJavaModel().getJavaProject(getProject().getName());
+		}
+		private IJavaProject javaProject = getJavaProject();
+		private Map className2Exists = new java.util.HashMap(); // cache
 		
+		private boolean hasClass(String className) {
+			Boolean hasClassName = (Boolean)className2Exists.get(className);
+			if (hasClassName != null) return hasClassName.booleanValue();
+
+			boolean canInstantiate = false; 
+			if ((javaProject != null) && javaProject.exists()) {
+				try {
+					IType classType = javaProject.findType(className);
+					canInstantiate = classType != null &&
+						! classType.isInterface() &&
+						! Flags.isAbstract(classType.getFlags());
+				} catch (JavaModelException e) {
+				}
+			}
+			className2Exists.put(className, canInstantiate ? Boolean.TRUE : Boolean.FALSE);
+			return canInstantiate;
+		}
+
 		private IFile file;
 		
 		public XMLErrorHandler(IFile file) {
@@ -144,6 +179,25 @@ public class MuleConfigBuilder extends IncrementalProjectBuilder {
 		public void warning(SAXParseException exception) throws SAXException {
 			addMarker(exception, IMarker.SEVERITY_WARNING);
 		}
+		
+		Locator myLocator = null;
+		
+		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+			super.startElement(uri, localName, qName, attributes);
+
+			String className = (attributes != null) ? attributes.getValue("", "className") : null;
+			if (className != null) {
+				if (! hasClass(className)) {
+					int line = (myLocator != null) ? myLocator.getLineNumber() : -1;
+					MuleConfigBuilder.this.addMarker(file, "No class '" + className + "' is present in the project '" + file.getProject().getName() + "'", line, IMarker.SEVERITY_ERROR);
+				}
+			}			
+		}
+		
+	    public void setDocumentLocator (Locator locator)
+	    {
+	    	myLocator = locator;
+	    }
 	}
 
 	class CheckValidHandler extends DTDResolverHandler {
