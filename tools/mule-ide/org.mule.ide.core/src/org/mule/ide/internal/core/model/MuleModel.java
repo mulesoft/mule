@@ -314,7 +314,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 		IStatus status = Status.OK_STATUS;
 		IFile file = getProject().getFile(IMuleDefaults.MULE_IDE_CONFIG_FILENAME);
 		try {
-			ByteArrayInputStream stream = new ByteArrayInputStream(getAsXML().getBytes());
+			ByteArrayInputStream stream = new ByteArrayInputStream(getAsXML());
 			if (file.exists()) {
 				file.setContents(stream, true, true, new NullProgressMonitor());
 			} else {
@@ -383,7 +383,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 	 * @return the XML
 	 * @throws IOException
 	 */
-	protected String getAsXML() throws IOException {
+	protected byte[] getAsXML() throws IOException {
 		Resource resource = (new MuleIDEResourceFactoryImpl()).createResource(null);
 		DocumentRoot root = MuleIDEFactory.eINSTANCE.createDocumentRoot();
 		MuleIdeConfigType config = MuleIDEFactory.eINSTANCE.createMuleIdeConfigType();
@@ -392,7 +392,7 @@ public class MuleModel extends MuleModelElement implements IMuleModel {
 		resource.getContents().add(root);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		resource.save(output, Collections.EMPTY_MAP);
-		return new String(output.toByteArray());
+		return output.toByteArray();
 	}
 
 	/*
