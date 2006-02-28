@@ -172,7 +172,9 @@ public class MuleConfigurationsPanel implements IMulePropertyPanel {
 		dialog.setPath(config.getRelativePath());
 		if (dialog.open() == Window.OK) {
 			muleModel.removeMuleConfiguration(config.getId());
-			muleModel.addMuleConfiguration(config);
+			IMuleConfiguration newConfig = muleModel.createNewMuleConfiguration(
+					dialog.getDescription(), dialog.getPath());
+			muleModel.addMuleConfiguration(newConfig);
 			getConfigsTable().refresh();
 		}
 	}
