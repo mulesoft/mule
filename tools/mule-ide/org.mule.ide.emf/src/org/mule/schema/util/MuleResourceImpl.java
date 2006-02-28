@@ -29,4 +29,13 @@ public class MuleResourceImpl extends XMLResourceImpl {
 		super(uri);
 	}
 
+	/**
+	 * Overrides the standard encoding
+	 */
+	protected void init()
+	{
+		super.init();
+		encoding = "UTF-8";
+	}
+
 } //MuleResourceImpl
