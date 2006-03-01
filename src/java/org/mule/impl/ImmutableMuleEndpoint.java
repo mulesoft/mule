@@ -660,6 +660,11 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return synchronous.booleanValue();
     }
 
+    public boolean isSynchronousSet()
+    {
+        return (synchronous != null);
+    }
+
     public boolean isSynchronousExplicitlySet()
     {
         return synchronous != null;
