@@ -85,4 +85,14 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept("simplify"));
 
     }
+
+    public void testWildcardFilterCasesensitive()
+    {
+        WildcardFilter filter = new WildcardFilter();
+        filter.setPattern("* brown fox");
+        assertFalse(filter.accept("The quick Brown fox"));
+        assertTrue(filter.accept("* brown fox"));
+        filter.setCaseSensitive(false);
+        assertTrue(filter.accept("The quick Brown fox"));
+    }
 }

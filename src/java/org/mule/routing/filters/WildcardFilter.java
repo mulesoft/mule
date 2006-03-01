@@ -42,6 +42,7 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
 	
     protected String[] patterns;
     protected String pattern;
+    private boolean caseSensitive = true;
 
     public WildcardFilter()
     {
@@ -78,6 +79,10 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
             }
             int i = pattern.indexOf("*");
 
+            if(!isCaseSensitive()) {
+                pattern = pattern.toLowerCase();
+                string = string.toLowerCase();
+            }
             if (i == -1) {
                 match = pattern.equals(string);
             } else {
@@ -106,5 +111,13 @@ public class WildcardFilter implements UMOFilter, ObjectFilter
     {
         this.pattern = pattern;
         this.patterns = Utility.split(pattern, ",");
+    }
+
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
     }
 }
