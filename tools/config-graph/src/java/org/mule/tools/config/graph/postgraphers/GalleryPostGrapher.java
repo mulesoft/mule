@@ -6,8 +6,16 @@ import java.io.File;
 
 public class GalleryPostGrapher extends AbstractIndexer{
 
-    public GalleryPostGrapher(GraphEnvironment env) {
+    public static final String DEFAULT_MULE_GALLERY_TEMPLATE = "./src/resources/template/gallery-index.vm";
+
+    private String template;
+
+    public GalleryPostGrapher(GraphEnvironment env) throws Exception {
         super(env);
+        template = env.getProperties().getProperty("muleGalleryTemplate");
+        if(template==null)  {
+            template = DEFAULT_MULE_GALLERY_TEMPLATE;
+        }
     }
 
 	/*
@@ -17,9 +25,7 @@ public class GalleryPostGrapher extends AbstractIndexer{
 	 */
 	public void postGrapher(GraphEnvironment env) {
 		File[] htmlFiles = getFiles(env.getConfig(),".gif");
-		// TODO no more hardcoded template path
-		String template = "./src/resources/template/gallery-index.vm";
-		String targetFile = "/gallery.html";
+		String targetFile = env.getConfig().applyWorkingDirectory(env.getProperty("muleGalleryOutputName", "gallery.html"));
 		doRendering(env, htmlFiles, template, targetFile);
 
 	}

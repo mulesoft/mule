@@ -3,10 +3,11 @@ package org.mule.tools.config.graph.components;
 import com.oy.shared.lm.graph.Graph;
 import com.oy.shared.lm.out.GRAPHtoDOTtoGIF;
 import org.mule.tools.config.graph.config.GraphEnvironment;
-import org.mule.tools.config.graph.postrenderers.FileCleanerProstRenderer;
+import org.mule.tools.config.graph.postrenderers.FileCleanerPostRenderer;
 import org.mule.tools.config.graph.postrenderers.MuleDocPostRenderer;
 import org.mule.tools.config.graph.util.DOTtoMAP;
 import org.mule.util.EnvironmentHelper;
+import org.mule.util.Utility;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,10 +24,10 @@ public class GraphRenderer {
 	private GraphEnvironment env;
 	private List postRenderers= new ArrayList();
 	
-	public GraphRenderer(GraphEnvironment env) {
+	public GraphRenderer(GraphEnvironment env) throws Exception {
 		this.env = env;
 		postRenderers.add(new MuleDocPostRenderer(env));
-		postRenderers.add(new FileCleanerProstRenderer());
+		postRenderers.add(new FileCleanerPostRenderer());
 		
 	}
 
@@ -45,11 +46,14 @@ public class GraphRenderer {
 		DOTtoMAP.transform(exeFile, dotFileName, mapFileName, env);
 
 		Map context = new HashMap();
-		context.put("dotFileName",filename + ".dot");
-		context.put("mapFileName",mapFileName);
-		context.put("gifFileName",filename + ".gif");
-		context.put("htmlFileName",filename + ".html");
-		context.put("outFolder",outFolder.getAbsolutePath());
+        String map = Utility.fileToString(mapFileName);
+        String path = env.getConfig().getOutputDirectory().getAbsolutePath() + File.separator;
+		context.put("dotFileName", path + filename + ".dot");
+		context.put("mapFileName", path + filename + ".cmapx");
+		context.put("mapFile", map);
+		context.put("gifFileName", filename + ".gif");
+		context.put("htmlFileName", path + filename + ".html");
+		context.put("outFolder", outFolder.getAbsolutePath());
 
 		for (Iterator iter = postRenderers.iterator(); iter.hasNext();) {
 			PostRenderer element = (PostRenderer) iter.next();

@@ -84,6 +84,18 @@ public class GraphEnvironment {
         this.properties = properties;
     }
 
+    public void setProperty(String name, String value) {
+        properties.setProperty(name, value);
+    }
+
+    public String getProperty(String name) {
+        return getProperty(name, null);
+    }
+
+    public String getProperty(String name, String defaultValue) {
+        return properties.getProperty(name, defaultValue);
+    }
+
     public void log(String message) {
        System.out.println(message);
     }

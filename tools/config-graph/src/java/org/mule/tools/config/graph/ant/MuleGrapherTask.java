@@ -46,7 +46,11 @@ public class MuleGrapherTask extends MatchingTask {
             DirectoryScanner ds = null;
             ds = fs.getDirectoryScanner(getProject());
             String[] srcFiles = ds.getIncludedFiles();
-            processMuleConfig(ds.getBasedir(), srcFiles);
+            try {
+                processMuleConfig(ds.getBasedir(), srcFiles);
+            } catch (Exception e) {
+                throw new BuildException(e);
+            }
         }
 
         generateGallery();
@@ -73,7 +77,7 @@ public class MuleGrapherTask extends MatchingTask {
         }
     }
 
-    private void processMuleConfig(File baseDir, String[] srcFiles) {
+    private void processMuleConfig(File baseDir, String[] srcFiles) throws Exception {
 
         GraphConfig config = new GraphConfig();
         for (int i = 0; i < srcFiles.length; i++) {

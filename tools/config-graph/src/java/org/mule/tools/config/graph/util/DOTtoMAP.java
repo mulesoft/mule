@@ -59,10 +59,10 @@ public class DOTtoMAP {
 		env.log(exeCmd);
 		Process p = Runtime.getRuntime().exec(exeCmd);
 		try {
-			p.waitFor();
+			int i = p.waitFor();
+            env.log("result code from process is: " + i);
 		} catch (Exception ie) {
-			System.out
-					.println("Warning: failed to wait for native process to exit...");
+			env.logError("Warning: failed to wait for native process to exit...", ie);
 		}
 	}
 }

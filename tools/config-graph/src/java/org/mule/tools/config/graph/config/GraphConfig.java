@@ -199,13 +199,13 @@ public class GraphConfig {
     }
 
 
-    protected String applyWorkingDirectory(String path) {
+    public String applyWorkingDirectory(String path) {
         if(path==null) return null;
         if(workingDirectory==null) return path;
         if(path.startsWith("/") || path.startsWith("\\")) {
             return path;
         }
-        return workingDirectory + "/" + path;
+        return workingDirectory + File.separator + path;
     }
 
     protected void loadProperties(String props) throws IOException {

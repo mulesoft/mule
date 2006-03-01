@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Map;
 
-public class FileCleanerProstRenderer implements PostRenderer{
+public class FileCleanerPostRenderer implements PostRenderer{
 
 	public void postRender(GraphEnvironment env, Map context,Graph graph) {
 		if (!env.getConfig().isKeepDotFiles()) {

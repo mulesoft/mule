@@ -10,8 +10,7 @@
       </p>
       </ul>
 	<img src="${gifFileName}" usemap="#LinguineMap" border="0" class="mulegraph">
-	#include( ${mapFileName})
+	${mapFile}
   </div>
 
 #include( "./src/resources/template/footer.html" )
-  

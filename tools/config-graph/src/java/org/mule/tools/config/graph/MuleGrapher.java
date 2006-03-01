@@ -36,17 +36,18 @@ public class MuleGrapher {
             System.exit(0);
         }
         MuleGrapher grapher = null;
+        GraphEnvironment env = null;
         try {
-            GraphEnvironment env = new GraphConfig().init(args);
+            env = new GraphConfig().init(args);
             grapher = new MuleGrapher(env);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            env.logError("MuleGrapher failed to process: " + e.getMessage(), e);
             System.exit(0);
         }
         grapher.run();
     }
 
-    public MuleGrapher(GraphEnvironment environment) {
+    public MuleGrapher(GraphEnvironment environment) throws Exception {
         env = environment;
         this.graphRenderer = new GraphRenderer(env);
         this.postGraphers.add(new DocIndexerPostGrapher(env));

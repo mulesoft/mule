@@ -14,8 +14,15 @@ import java.util.Map;
 
 public class MuleDocPostRenderer extends VelocitySupport implements PostRenderer {
 
-    public MuleDocPostRenderer(GraphEnvironment env) {
+    public static final String DEFAULT_MULE_TEMPLATE = "./src/resources/template/mule-config.vm";
+
+    protected String template;
+    public MuleDocPostRenderer(GraphEnvironment env) throws Exception {
         super(env);
+        template = env.getProperties().getProperty("muleDocTemplate");
+        if(template==null)  {
+            template = DEFAULT_MULE_TEMPLATE;
+		}
     }
 
 	public void postRender(GraphEnvironment env, Map context, Graph graph) {
@@ -31,12 +38,8 @@ public class MuleDocPostRenderer extends VelocitySupport implements PostRenderer
 			}
 			
 			velocityContext.put("graph",graph);
-			
-			// TODO how to retrieve template using classpath ?
-			Template t = ve
-					.getTemplate("./src/resources/template/mule-config.vm");
-			File file = new File(env.getConfig().getOutputDirectory() + "/"
-					+ context.get("htmlFileName"));
+			Template t = ve.getTemplate(template);
+			File file = new File(context.get("htmlFileName").toString());
 			FileWriter writer = new FileWriter(file);
 
 			env.log("generating " + file);

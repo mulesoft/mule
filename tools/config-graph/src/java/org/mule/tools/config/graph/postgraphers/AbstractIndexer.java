@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 public abstract class AbstractIndexer extends VelocitySupport  implements PostGrapher {
 
-    protected AbstractIndexer(GraphEnvironment env) {
+    protected AbstractIndexer(GraphEnvironment env) throws Exception {
         super(env);
     }
 
@@ -27,7 +27,7 @@ public abstract class AbstractIndexer extends VelocitySupport  implements PostGr
 			velocityContext.put("fileList", Arrays.asList(htmlFiles));
 			// TODO how to retrieve template using classpath ?
 			Template t = ve.getTemplate(template);
-			File file = new File(env.getConfig().getOutputDirectory() + targetFile);
+			File file = new File(targetFile);
 			FileWriter writer = new FileWriter(file);
 
 			env.log("generating " + file);

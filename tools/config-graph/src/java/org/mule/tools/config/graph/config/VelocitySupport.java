@@ -13,15 +13,11 @@ public abstract class VelocitySupport {
     protected static LogSystem logSystem;
 	
 
-    protected VelocitySupport(GraphEnvironment env) {
+    protected VelocitySupport(GraphEnvironment env) throws Exception {
         this.env = env;
         logSystem = new VelocityLogger(env);
         ve = new VelocityEngine();
 		ve.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM, logSystem);
-		try {
-			ve.init();
-		} catch (Exception e) {
-			env.logError(e.getMessage(), e);
-		}
+        ve.init();
     }
 }
