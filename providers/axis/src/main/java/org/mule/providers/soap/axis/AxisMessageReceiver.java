@@ -75,20 +75,25 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         String style = (String) descriptor.getProperties().get("style");
         String use = (String) descriptor.getProperties().get("use");
         String doc = (String) descriptor.getProperties().get("documentation");
-        //Check if the style is message. If so, we need to create
-        //a message oriented provider
-        if (style != null && style.equalsIgnoreCase("message")) {
-            logger.debug("Creating Message Provider");
-            service = new SOAPService(new MuleMsgProvider(connector));
-        } else {
-            logger.debug("Creating RPC Provider");
-            service = new SOAPService(new MuleProvider(connector));
-        }
-
-        service.setEngine(connector.getAxisServer());
-
         UMOEndpointURI uri = endpoint.getEndpointURI();
         String serviceName = component.getDescriptor().getName();
+
+        SOAPService existing = this.connector.getAxisServer().getService(serviceName);
+        if( existing != null) {
+        	service = existing;
+        	logger.debug("Using existing service for " + serviceName);
+        } else {
+            //Check if the style is message. If so, we need to create
+            //a message oriented provider
+            if (style != null && style.equalsIgnoreCase("message")) {
+                logger.debug("Creating Message Provider");
+                service = new SOAPService(new MuleMsgProvider(connector));
+            } else {
+                logger.debug("Creating RPC Provider");
+                service = new SOAPService(new MuleProvider(connector));
+            }
+            service.setEngine(connector.getAxisServer());
+        }
 
         String servicePath = uri.getPath();
         service.setOption(serviceName, this);
