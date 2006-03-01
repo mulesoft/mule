@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.codehaus.mule</groupId>
-		<artifactId>mule-project</artifactId>
-		<relativePath>../pom.xml</relativePath>
-		<version>2.0-SNAPSHOT</version>
-	</parent>
-	<artifactId>mule-core</artifactId>
-	<packaging>jar</packaging>
-	<name>Mule Core</name>
-	<description>Mule server and core classes</description>
-	<build>
-		<plugins>
-	        <plugin>
-	            <groupId>org.apache.maven.plugins</groupId>
-	            <artifactId>maven-surefire-plugin</artifactId>
-	            <configuration>
-	                <excludes>
-	                	<!-- The org.mule.tck classes are in the test directory but are not runnable tests. -->
-	                    <exclude implementation="java.lang.String">org/mule/tck/**</exclude>
-	                </excludes>
-	            </configuration>
-	         </plugin>
-		</plugins>
-	</build>             
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.codehaus.mule</groupId>
+        <artifactId>mule-project</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-core</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule Core</name>
+    <description>Mule server and core classes</description>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- The org.mule.tck classes are in the test directory but are not runnable tests. -->
+                        <exclude implementation="java.lang.String">org/mule/tck/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <dependencies>
-		<!-- 
-		**************************************************************** 
-		Required Dependencies
+        <!--
+        ****************************************************************
+        Required Dependencies
         ****************************************************************** 
         -->
-		<dependency>
-			<groupId>backport-util-concurrent</groupId>
-			<artifactId>backport-util-concurrent</artifactId>
-			<version>2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-discovery</groupId>
-			<artifactId>commons-discovery</artifactId>
-			<version>0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.0.4</version>
-		</dependency>
+        <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-discovery</groupId>
+            <artifactId>commons-discovery</artifactId>
+            <version>0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+        </dependency>
         <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-jaxrpc</artifactId>
@@ -68,156 +68,161 @@
             <artifactId>geronimo-spec-qname</artifactId>
             <version>1.1-rc4</version>
         </dependency>
-		<!-- Used by Xml based filters and transformers -->
-		<dependency>
-			<groupId>dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<!-- UUID generator -->
-		<dependency>
-			<groupId>jug</groupId>
-			<artifactId>jug</artifactId>
-			<version>1.1.2</version>
-		</dependency>	
-		<!-- Used for de/serialising objects -->
-		<dependency>
-			<groupId>xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>1.1.3</version>
-		</dependency>
-		<dependency>
-			<groupId>geronimo-spec</groupId>
-			<artifactId>geronimo-spec-jta</artifactId>
-			<version>1.0.1B-rc4</version>
-		</dependency>
-		<dependency>
-			<groupId>geronimo-spec</groupId>
-			<artifactId>geronimo-spec-j2ee-management</artifactId>
-			<version>1.0-rc4</version>
-		</dependency>
-		<dependency>
-			<groupId>geronimo-spec</groupId>
-			<artifactId>geronimo-spec-j2ee-connector</artifactId>
-			<version>1.5-rc4</version>
-		</dependency>
-		<dependency>
-			<groupId>geronimo-spec</groupId>
-			<artifactId>geronimo-spec-servlet</artifactId>
-			<version>2.4-rc4</version>
-		</dependency>
-		<dependency>
-		    <groupId>geronimo-spec</groupId>
-		    <artifactId>geronimo-spec-ejb</artifactId>
-		    <version>2.1-rc4</version>
-		</dependency>       
-		<dependency>
+        <!-- Used by Xml based filters and transformers -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <!-- UUID generator -->
+        <dependency>
+            <groupId>jug</groupId>
+            <artifactId>jug</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+        <!-- Used for de/serialising objects -->
+        <dependency>
+            <groupId>xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>xpp3</groupId>
+            <artifactId>xpp3_min</artifactId>
+            <version>1.1.3.4.O</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-jta</artifactId>
+            <version>1.0.1B-rc4</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee-management</artifactId>
+            <version>1.0-rc4</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-j2ee-connector</artifactId>
+            <version>1.5-rc4</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-servlet</artifactId>
+            <version>2.4-rc4</version>
+        </dependency>
+        <dependency>
+            <groupId>geronimo-spec</groupId>
+            <artifactId>geronimo-spec-ejb</artifactId>
+            <version>2.1-rc4</version>
+        </dependency>
+        <dependency>
             <groupId>geronimo-spec</groupId>
             <artifactId>geronimo-spec-activation</artifactId>
             <version>1.0.2-rc4</version>
         </dependency>
-		<dependency>
-			<groupId>ognl</groupId>
-			<artifactId>ognl</artifactId>
-			<version>2.6.7</version>
-		</dependency>
-		
-		<!-- 
-		**************************************************************** 
-		Optional Dependencies
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>2.6.7</version>
+        </dependency>
+
+        <!--
+        ****************************************************************
+        Optional Dependencies
         ****************************************************************** 
         -->
-		<!-- Used by mules default component pooling mechanism -->
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-			<version>1.1</version>
-			<optional>true</optional>
-		</dependency>
+        <!-- Used by mules default component pooling mechanism -->
+        <dependency>
+            <groupId>commons-pool</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>1.1</version>
+            <optional>true</optional>
+        </dependency>
 
-		<!-- For MuleXmlConfigurationBuilder -->
-		<dependency>
-			<groupId>commons-digester</groupId>
-			<artifactId>commons-digester</artifactId>
-			<version>1.5</version>
-			<optional>true</optional>
-		</dependency>
+        <!-- For MuleXmlConfigurationBuilder -->
+        <dependency>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+            <version>1.5</version>
+            <optional>true</optional>
+        </dependency>
 
-		<!-- JXPath filtering of events -->
-		<dependency>
-			<groupId>commons-jxpath</groupId>
-			<artifactId>commons-jxpath</artifactId>
-			<version>1.2</version>
-			<optional>true</optional>
-		</dependency>
+        <!-- JXPath filtering of events -->
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+            <version>1.2</version>
+            <optional>true</optional>
+        </dependency>
 
-		<!-- Used for script component support -->
-		<dependency>
-			<groupId>script</groupId>
-			<artifactId>jsr223</artifactId>
-			<version>1.0</version>
-			<optional>true</optional>
-		</dependency>
+        <!-- Used for script component support -->
+        <dependency>
+            <groupId>script</groupId>
+            <artifactId>jsr223</artifactId>
+            <version>1.0</version>
+            <optional>true</optional>
+        </dependency>
 
-		<!-- Logging -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.13</version>
-			<optional>true</optional>
-		</dependency>
+        <!-- Logging -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+            <optional>true</optional>
+        </dependency>
 
-		<!-- Management deps -->
-		<dependency>
-			<groupId>jmxri</groupId>
-			<artifactId>jmxri</artifactId>
-			<version>1.2</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>jmxri</groupId>
-			<artifactId>jmxtools</artifactId>
-			<version>1.2</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>jmxri</groupId>
-			<artifactId>jmxremoting</artifactId>
-			<version>1.2</version>
-			<optional>true</optional>
-		</dependency>
-		
-		<!-- mx4j Agent support  -->
-		<dependency>
-			<groupId>mx4j</groupId>
-			<artifactId>mx4j-jmx</artifactId>
-			<version>2.1.1</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>mx4j</groupId>
-			<artifactId>mx4j-tools</artifactId>
-			<version>2.1.1</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>mx4j</groupId>
-			<artifactId>mx4j-remote</artifactId>
-			<version>2.1.1</version>
-			<optional>true</optional>
-		</dependency>
+        <!-- Management deps -->
+        <dependency>
+            <groupId>jmxri</groupId>
+            <artifactId>jmxri</artifactId>
+            <version>1.2</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>jmxri</groupId>
+            <artifactId>jmxtools</artifactId>
+            <version>1.2</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>jmxri</groupId>
+            <artifactId>jmxremoting</artifactId>
+            <version>1.2</version>
+            <optional>true</optional>
+        </dependency>
 
-		<!-- Transactions logging system -->
-		<dependency>
-			<groupId>activeio</groupId>
-			<artifactId>activeio</artifactId>
-			<version>2.1</version>
-			<optional>true</optional>
-		</dependency>
+        <!-- mx4j Agent support  -->
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-jmx</artifactId>
+            <version>2.1.1</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-tools</artifactId>
+            <version>2.1.1</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>mx4j</groupId>
+            <artifactId>mx4j-remote</artifactId>
+            <version>2.1.1</version>
+            <optional>true</optional>
+        </dependency>
 
-		<!-- 
-		**************************************************************** 
-		Testing Dependencies
+        <!-- Transactions logging system -->
+        <dependency>
+            <groupId>activeio</groupId>
+            <artifactId>activeio</artifactId>
+            <version>2.1</version>
+            <optional>true</optional>
+        </dependency>
+
+        <!--
+        ****************************************************************
+        Testing Dependencies
         ****************************************************************** 
         -->
         <!-- These dependencies need scope="compile" for the org.mule.tck classes. -->
@@ -225,13 +230,13 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
-			<scope>compile</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>
             <version>0.09</version>
-			<scope>compile</scope>
+            <scope>compile</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 </project>
