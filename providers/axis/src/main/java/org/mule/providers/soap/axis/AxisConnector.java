@@ -14,7 +14,6 @@
 package org.mule.providers.soap.axis;
 
 import org.apache.axis.client.Call;
-import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.deployment.wsdd.WSDDConstants;
 import org.apache.axis.deployment.wsdd.WSDDProvider;
@@ -89,6 +88,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public static final String METHOD_NAMESPACE_PROPERTY = "methodNamespace";
     public static final String SOAP_ACTION_PROPERTY = "soapAction";
     public static final String AXIS_SERVICE_PROPERTY = "_axisService";
+    public static final String AXIS_CLIENT_CONFIG_PROPERTY = "clientConfig";
 
     public static final String SERVICE_PROPERTY_COMPONENT_NAME = "componentName";
     public static final String SERVICE_PROPERTY_SERVCE_PATH = "servicePath";
@@ -243,7 +243,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         }
         //Use our custom file provider that does not require services to be declared ni the WSDD.  Thi only affects the
         //client side as the client will fallback to the FileProvider when invoking a service.
-        FileProvider fileProvider = new WSDDFileProvider(config);
+        WSDDFileProvider fileProvider = new WSDDFileProvider(config);
         if (is != null) {
             fileProvider.setInputStream(is);
         } else {
