@@ -35,7 +35,7 @@ public class AxisFaultExceptionReader implements ExceptionReader {
         msg.append("(");
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
             Map.Entry entry = (Map.Entry) iterator.next();
-            msg.append(entry.getKey().toString()).append(": ").append(entry.getValue().toString()).append(", ");
+            msg.append(entry.getKey()).append(": ").append(entry.getValue()).append(", ");
         }
         msg.append(")");
         return e.getMessage() + msg.toString();
