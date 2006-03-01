@@ -14,10 +14,23 @@
  */
 package org.mule.providers.oracle.jms;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.Session;
+import javax.naming.NamingException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
+import org.mule.providers.ConnectException;
 import org.mule.providers.jms.JmsConnector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.umo.TransactionException;
@@ -25,16 +38,6 @@ import org.mule.umo.UMOException;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.LifecycleException;
-
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Session;
-import javax.naming.NamingException;
-import java.sql.DriverManager;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Extends the standard Mule JMS Provider with functionality specific to Oracle's 
@@ -103,29 +106,34 @@ public class OracleJmsConnector extends JmsConnector {
     }
 
 	public void doInitialise() throws InitialisationException {
+		try {
+			DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+		} catch (SQLException e) {
+			throw new InitialisationException(e, this);
+		}
+        super.doInitialise();
+	}
+
+    public void doConnect() throws ConnectException {
     	try {
-	    	// From AbstractServiceEnabledConnector.doInitialise()
-	        initFromServiceDescriptor(); 
-	
 	        // Set these to false so that the jndiContext will not be used by the 
 	    	// JmsSupport classes
 	        setJndiDestinations(false);
 	        setForceJndiDestinations(false);
 	
 	        setJmsSupport(new OracleJmsSupport(this, null, false, false));            
-	
-			DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
-
-    	} catch (Exception e) {
-		    throw new InitialisationException(new Message(Messages.FAILED_TO_CREATE_X, "Oracle Jms Connector"), e, this);
-		}
-	}
-
+        } catch (Exception e) {
+            throw new ConnectException(new Message(Messages.FAILED_TO_CREATE_X, "Oracle Jms Connector"), e, this);
+        }
+    }
+    
 	/** Start the connection after creating it. */
 	protected Connection createConnection() throws NamingException, JMSException, InitialisationException {
 		Connection connection = super.createConnection();
-		connection.start();
-		return connection;
+        if (started.get()) {
+        	connection.start();
+        }
+        return connection;
 	}
 	
 	/** Iterate through the open connections and close them one by one. */
@@ -152,25 +160,6 @@ public class OracleJmsConnector extends JmsConnector {
         }
     }
     
-    // The following method is apparently no longer needed.  The open connections must 
-    // get stopped implicitly someplace else.
-    
-//	/** Iterate through the open connections and stop them one by one. */
-//    public void doStop() throws UMOException {
-//    	Connection jmsConnection = null;    	
-//    	try {
-//        	// Iterate through the open connections and stop them one by one.
-//	        for (Iterator i = connections.iterator(); i.hasNext(); ) {
-//	        	jmsConnection = (Connection) i.next();
-//	            if (jmsConnection != null) {
-//	            	jmsConnection.stop();
-//	            }
-//	        }
-//        } catch (JMSException e) {
-//            throw new LifecycleException(new Message(Messages.FAILED_TO_STOP_X, "Jms Connection"), e);
-//        }
-//    }
-
 	/** Iterate through the open connections and start them one by one. */
     public void doStart() throws UMOException {
     	Connection jmsConnection = null;    	
@@ -282,6 +271,6 @@ public class OracleJmsConnector extends JmsConnector {
 	public void setPayloadFactory(String payloadFactory) {
 		this.payloadFactory = payloadFactory;
 	}
-
+	
 	private static Log log = LogFactory.getLog(OracleJmsConnector.class);
 }
