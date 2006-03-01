@@ -377,8 +377,10 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         boolean sync = receiver.getEndpoint().isSynchronous();
         if (scheme.equals("http") || scheme.equals("tcp")) {
             // if we are using a socket based endpointUri make sure it is
-            // running synchronously by default
-            sync = true;
+            // running synchronously by default unless the user has specifically set it
+            if(!receiver.getEndpoint().isSynchronousSet()) {
+                sync = true;
+            }
         }
 
         Map endpointCounters = (Map) axisDescriptor.getProperties().get(ENDPOINT_COUNTERS_PROPERTY);
