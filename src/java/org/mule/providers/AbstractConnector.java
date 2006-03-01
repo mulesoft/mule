@@ -824,6 +824,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
 
         List temp = new ArrayList();
         WildcardFilter filter = new WildcardFilter(wildcardExpression);
+        filter.setCaseSensitive(false);
         for (Iterator iterator = receivers.keySet().iterator(); iterator.hasNext();) {
             Object o =  iterator.next();
             if(filter.accept(o)) {
