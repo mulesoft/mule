@@ -68,7 +68,8 @@ public class OracleJmsSupport extends Jms102bSupport {
      * "standard" properties are used.
      */
     public boolean supportsProperty(String property) {
-    	return (property.equalsIgnoreCase(JmsConstants.JMS_REPLY_TO) == false);
+    	return (property.equalsIgnoreCase(JmsConstants.JMS_REPLY_TO) == false 
+    			&& property.equalsIgnoreCase(JmsConstants.JMS_TYPE) == false);
     }
     
 	/** The Oracle JMS implementation requires a JDBC Connection to be created prior to 
