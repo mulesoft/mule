@@ -131,21 +131,21 @@ public class MuleSoapHeaders
         }
 
         if (correlationId != null) {
-            Element e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
+            SOAPElement e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
                                                                            MULE_NAMESPACE);
-            e.setNodeValue(correlationId);
-            e = (Element) muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+            e.addTextNode(correlationId);
+            e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
                                                             MULE_NAMESPACE);
-            e.setNodeValue(correlationGroup);
+            e.addTextNode(correlationGroup);
             e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
                                                             MULE_NAMESPACE);
-            e.setNodeValue(correlationSequence);
+            e.addTextNode(correlationSequence);
         }
         if (replyTo != null) {
-            Element e = (Element) muleHeader.addChildElement(MuleProperties.MULE_REPLY_TO_PROPERTY,
+           SOAPElement e = muleHeader.addChildElement(MuleProperties.MULE_REPLY_TO_PROPERTY,
                                                                            MULE_NAMESPACE);
             String enc = (String)encoder.transform(replyTo);
-            e.setNodeValue(enc);
+            e.addTextNode(enc);
         }
     }
 
