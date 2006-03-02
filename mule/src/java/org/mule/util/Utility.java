@@ -534,4 +534,8 @@ public class Utility
         }
         return (lines);
     }
+
+    public static boolean isEmpty(String value) {
+        return (value==null || EMPTY_STRING.equals(value));
+    }
 }
