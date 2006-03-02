@@ -14,9 +14,9 @@
  */
 package org.mule.providers;
 
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.config.ExceptionHelper;
 import org.mule.umo.provider.UMOConnectable;
 
 /**
@@ -60,8 +60,8 @@ public class SimpleRetryConnectionStrategy extends AbstractConnectionStrategy
                     msg.append(". Root Exception was: ").append(ExceptionHelper.writeException(t));
                     logger.error(msg.toString(), e);
                 }
-                if (logger.isDebugEnabled()) {
-                	logger.debug("Waiting for " + frequency + "ms before reconnecting");
+                if (logger.isInfoEnabled()) {
+                	logger.info("Waiting for " + frequency + "ms before reconnecting. Failed attempt " + count + " of " + retryCount);
                 }
                 try {
                     Thread.sleep(frequency);
