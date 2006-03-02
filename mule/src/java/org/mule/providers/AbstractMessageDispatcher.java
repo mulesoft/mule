@@ -169,15 +169,11 @@ public abstract class AbstractMessageDispatcher implements UMOMessageDispatcher,
             try {
                 UMOMessage result = doSend(event);
                 if(connector.isEnableMessageEvents()) {
-                    try {
-                        String component = null;
-                        if(event.getComponent()!=null) {
-                            component = event.getComponent().getDescriptor().getName();
-                        }
-                        connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(), component, MessageNotification.MESSAGE_SENT));
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
+                    String component = null;
+                    if(event.getComponent()!=null) {
+                        component = event.getComponent().getDescriptor().getName();
                     }
+                    connector.fireNotification(new MessageNotification(event.getMessage(), event.getEndpoint(), component, MessageNotification.MESSAGE_SENT));
                 }
                 //Once a dispatcher has done its work we need to romve this property so that
                 //it is not propagated to the next request
