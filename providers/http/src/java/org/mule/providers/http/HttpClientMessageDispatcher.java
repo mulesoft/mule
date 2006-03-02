@@ -315,7 +315,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         int port = uri.getPort();
         HostConfiguration config = new HostConfiguration();
         config.setHost(host, port, protocol);
-
+        if(!Utility.isEmpty(connector.getProxyHostname())) {
+            //add proxy support
+            config.setProxy(connector.getProxyHostname(), connector.getProxyPort());
+        }
         return config;
     }
 
