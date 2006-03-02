@@ -14,6 +14,7 @@
 package org.mule.impl.internal.notifications;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,10 +30,10 @@ import org.mule.umo.manager.UMOWorkManager;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * <code>ServerNotificationManager</code> manages all server listeners for a Mule
@@ -50,17 +51,11 @@ public class ServerNotificationManager implements Work, Disposable
 
     public static final String NULL_SUBSCRIPTION = "NULL";
 
-    private Map listenersMap = null;
     private Map eventsMap = null;
     private LinkedBlockingQueue eventQueue;
     private boolean disposed = false;
+    private List listeners;
 
-    private Comparator comparator = new Comparator() {
-        public int compare(Object o1, Object o2)
-        {
-            return (o1.equals(o2) ? 0 : 1);
-        }
-    };
 
     public ServerNotificationManager()
     {
@@ -69,9 +64,10 @@ public class ServerNotificationManager implements Work, Disposable
 
     private synchronized void init()
     {
-        listenersMap = new ConcurrentHashMap();
+        //listenersMap = new ConcurrentHashMap();
         eventsMap = new ConcurrentHashMap();
         eventQueue = new LinkedBlockingQueue();
+        listeners = new CopyOnWriteArrayList();
     }
 
     public void start(UMOWorkManager workManager) throws LifecycleException {
@@ -85,8 +81,8 @@ public class ServerNotificationManager implements Work, Disposable
     public void registerEventType(Class eventType, Class listenerType)
     {
         if (UMOServerNotification.class.isAssignableFrom(eventType)) {
-            if (!listenersMap.containsKey(eventType)) {
-                listenersMap.put(eventType, new TreeMap(comparator));
+            if (!eventsMap.containsKey(listenerType)) {
+                //listenersMap.put(eventType, new TreeMap(comparator));
                 eventsMap.put(listenerType, eventType);
                 if (logger.isDebugEnabled()) {
                     logger.debug("Registered event type: " + eventType);
@@ -107,79 +103,24 @@ public class ServerNotificationManager implements Work, Disposable
 
     public void registerListener(UMOServerNotificationListener listener, String subscription) throws NotificationException
     {
-        if (subscription == null) {
-            subscription = NULL_SUBSCRIPTION;
-        }
-        TreeMap listeners = getListeners(listener.getClass());
-        synchronized (listeners) {
-            listeners.put(listener, subscription);
-        }
+        listeners.add(new Listener(listener, subscription));
     }
 
     public void unregisterListener(UMOServerNotificationListener listener)
     {
-        TreeMap listeners = null;
-        try {
-            listeners = getListeners(listener.getClass());
-        } catch (NotificationException e) {
-            logger.warn(e.getMessage(), e);
-            return;
-        }
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
-    }
-
-    public void clearListeners(Class listenerClass)
-    {
-        if (listenerClass == null) {
-            return;
-        }
-        TreeMap listeners = null;
-        try {
-            listeners = getListeners(listenerClass);
-        } catch (NotificationException e) {
-            logger.warn(e.getMessage(), e);
-            return;
-        }
-        synchronized (listeners) {
-            listeners.clear();
+        for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+            Listener l = (Listener) iterator.next();
+            if(l.equals(listener)) {
+                listeners.remove(l);
+                break;
+            }
         }
     }
 
     public void clear()
     {
-        for (Iterator iterator = listenersMap.values().iterator(); iterator.hasNext();) {
-            TreeMap set = (TreeMap) iterator.next();
-            synchronized (set) {
-                set.clear();
-            }
-        }
-        listenersMap.clear();
+        listeners.clear();
         init();
-    }
-
-    protected TreeMap getListeners(Class listenerClass) throws NotificationException {
-        if (listenerClass == null) {
-            throw new NullPointerException("Listener class cannot be null");
-        }
-        Class eventType = null;
-        for (Iterator iterator = eventsMap.keySet().iterator(); iterator.hasNext();) {
-            Class clazz = (Class) iterator.next();
-            if (clazz.isAssignableFrom(listenerClass)) {
-                eventType = (Class) eventsMap.get(clazz);
-                break;
-            }
-        }
-
-        if (eventType != null) {
-            return (TreeMap) listenersMap.get(eventType);
-        } else {
-            throw new NotificationException(new Message(Messages.PROPERTY_X_IS_NOT_SUPPORTED_TYPE_X_IT_IS_TYPE_X,
-                                                           "Listener Type",
-                                                           "Registered Type",
-                                                           listenerClass.getName()));
-        }
     }
 
     public void fireEvent(UMOServerNotification notification)
@@ -212,59 +153,10 @@ public class ServerNotificationManager implements Work, Disposable
     protected void notifyListeners(UMOServerNotification notification)
     {
         if(disposed) return;
-
-        TreeMap listeners;
-        String subscription = null;
-        Class listenerClass = null;
-
-        // determine the listewner class type for the current notification
-        Map.Entry entry = null;
-        for (Iterator iterator = eventsMap.entrySet().iterator(); iterator.hasNext();) {
-            entry = (Map.Entry) iterator.next();
-            Class eventClass = (Class) entry.getValue();
-            if (eventClass.isAssignableFrom(notification.getClass())) {
-                listenerClass = (Class) entry.getKey();
-                break;
-            }
-        }
-
-        if (listenerClass == null) {
-            logger.error(new NotificationException(new Message(Messages.EVENT_TYPE_X_NOT_RECOGNISED, notification.getClass()
-                                                                                                      .getName())));
-            //Todo maybe we should fire an exception event or something here??
-            return;
-        }
-
-        try {
-            if(disposed) return;
-            listeners = getListeners(listenerClass);
-        } catch (NotificationException e) {
-            logger.error(e.getMessage(), e);
-            return;
-        }
-        UMOServerNotificationListener l;
-        synchronized (listeners) {
-            int i = 1;
-            for (Iterator iterator = listeners.keySet().iterator(); iterator.hasNext(); i++) {
-                l = (UMOServerNotificationListener) iterator.next();
-                subscription = (String) listeners.get(l);
-                if (subscription == null) {
-                    subscription = NULL_SUBSCRIPTION;
-                }
-                // If the listener has a resource id associated with it, make
-                // sure the notification
-                // is only fired if the notification resource id and listener resource
-                // id match
-                if (NULL_SUBSCRIPTION.equals(subscription)
-                        || new WildcardFilter(subscription).accept(notification.getResourceIdentifier())) {
-                    l.onNotification(notification);
-                } else {
-                    if(logger.isTraceEnabled()) {
-                        logger.trace("Resource id '" + subscription + "' for listener " + l.getClass().getName()
-                            + " does not match Resource id '" + notification.getResourceIdentifier()
-                            + "' for notificationication, not firing notificationication for this listener. Listener " + i + " of " + listeners.size());
-                    }
-                }
+        for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+            Listener listener = (Listener) iterator.next();
+            if(listener.matches(notification)) {
+                listener.getListenerObject().onNotification(notification);
             }
         }
     }
@@ -306,4 +198,71 @@ public class ServerNotificationManager implements Work, Disposable
 			}
 		}
 	}
+
+    protected class Listener {
+
+        private UMOServerNotificationListener listener;
+        private List notificationClasses;
+        private String subscription;
+        private WildcardFilter subscriptionFilter;
+
+        public Listener(UMOServerNotificationListener listener, String subscription) {
+            this.listener = listener;
+            this.subscription = (subscription==null ? NULL_SUBSCRIPTION : subscription);
+
+            subscriptionFilter = new WildcardFilter(this.subscription);
+            subscriptionFilter.setCaseSensitive(false);
+
+            notificationClasses = new ArrayList();
+
+            for (Iterator iterator = eventsMap.keySet().iterator(); iterator.hasNext();)
+            {
+                Class clazz = (Class) iterator.next();
+                if (clazz.isAssignableFrom(listener.getClass())) {
+                    notificationClasses.add(eventsMap.get(clazz));
+                }
+            }
+        }
+
+        public UMOServerNotificationListener getListenerObject() {
+            return listener;
+        }
+
+        public List getNotificationClasses() {
+            return notificationClasses;
+        }
+
+        public String getSubscription() {
+            return subscription;
+        }
+
+        public boolean matches(UMOServerNotification notification) {
+            if(subscriptionMatches(notification)) {
+                for (Iterator iterator = notificationClasses.iterator(); iterator.hasNext();) {
+                    Class notificationClass = (Class) iterator.next();
+
+                    if (notificationClass.isAssignableFrom(notification.getClass())) {
+                        return true;
+                    }
+                }
+            } else {
+//                if(logger.isTraceEnabled()) {
+//                        logger.trace("Resource id '" + subscription + "' for listener " + l.getClass().getName()
+//                            + " does not match Resource id '" + notification.getResourceIdentifier()
+//                            + "' for notificationication, not firing notificationication for this listener. Listener " + i + " of " + listeners.size());
+//                    }
+            }
+            return false;
+        }
+
+        public boolean subscriptionMatches(UMOServerNotification notification)
+        {
+            String resourceId = notification.getResourceIdentifier();
+            if (NULL_SUBSCRIPTION.equals(subscription) || subscriptionFilter.accept(resourceId)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
 }
