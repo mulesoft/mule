@@ -40,6 +40,19 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     static final long POLLING_FREQUENCY = 1234;
     static final long POLLING_FREQUENCY_OVERRIDE = 4321;
 
+    private File validMessage;
+
+    protected void doSetUp() throws Exception {
+        super.doSetUp();
+        validMessage = File.createTempFile("simple", ".mule");
+        assertNotNull(validMessage);
+    }
+
+    protected void doTearDown() throws Exception {
+        assertTrue(validMessage.delete());
+        super.doTearDown();
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -99,7 +112,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
     public Object getValidMessage() throws Exception
     {
-        return File.createTempFile("simple", ".mule");
+        return validMessage;
     }
 
     /**
