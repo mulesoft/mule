@@ -13,4 +13,11 @@
     <packaging>jar</packaging>
     <name>Tcp Provider</name>
     <description>A Mule provider for Tcp Connectivity. This provider supplies a tcp Server and client implementation.</description>
+    <dependencies>
+        <dependency>
+            <groupId>commons-digester</groupId>
+            <artifactId>commons-digester</artifactId>
+            <version>1.7</version>
+        </dependency>
+    </dependencies>
 </project>
