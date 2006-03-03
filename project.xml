@@ -49,11 +49,38 @@
                 <mule.mini>true</mule.mini>
             </properties>
         </dependency>
+
         <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
             <version>${commons_discovery_version}</version>
             <url>http://jakarta.apache.org/commons/discovery/index.html</url>
+            <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>true</mule.mini>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons_io_version}</version>
+            <url>http://jakarta.apache.org/commons/io/index.html</url>
+            <properties>
+                <rar.bundle>true</rar.bundle>
+                <war.bundle>true</war.bundle>
+                <mule.core.jar>true</mule.core.jar>
+                <mule.mini>true</mule.mini>
+            </properties>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons_lang_version}</version>
+            <url>http://jakarta.apache.org/commons/lang/index.html</url>
             <properties>
                 <rar.bundle>true</rar.bundle>
                 <war.bundle>true</war.bundle>
