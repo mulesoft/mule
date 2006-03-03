@@ -11,6 +11,7 @@
  * style license a copy of which has been included with this distribution in
  * the LICENSE.txt file.
  */
+
 package org.mule.extras.spring.remoting;
 
 import org.mule.config.i18n.Message;
@@ -21,7 +22,6 @@ import org.mule.umo.lifecycle.Initialisable;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.lifecycle.RecoverableException;
 import org.mule.util.ClassHelper;
-import org.mule.util.Utility;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.remoting.support.RemoteInvocation;
 import org.springframework.remoting.support.RemoteInvocationBasedExporter;
@@ -66,78 +66,90 @@ public class SpringRemoteInvokerComponent implements Initialisable, Callable
 
     public void initialise() throws InitialisationException, RecoverableException
     {
-        if(serviceClass==null && serviceBean==null) {
-            throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "serviceClass or serviceBean"), this);
+        if (serviceClass == null && serviceBean == null) {
+            throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
+                    "serviceClass or serviceBean"), this);
         }
-        if(serviceInterface==null) {
-            throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET, "serviceInterface"), this);
+        if (serviceInterface == null) {
+            throw new InitialisationException(new Message(Messages.PROPERTIES_X_NOT_SET,
+                    "serviceInterface"), this);
         }
 
-        if(serviceClass!=null && !serviceClass.equals(Utility.EMPTY_STRING))
-        {
+        if (serviceClass != null) {
             Object service = null;
             try {
                 service = ClassHelper.instanciateClass(serviceClass, null);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 throw new InitialisationException(e, this);
             }
             delegate.setService(service);
-        } else if(serviceBean!=null)
-        {
+        }
+        else if (serviceBean != null) {
             delegate.setService(serviceBean);
         }
         delegate.setServiceInterface(serviceInterface);
         delegate.setRegisterTraceInterceptor(registerTraceInterceptor);
-        if(remoteInvocationExecutor!=null) {
+        if (remoteInvocationExecutor != null) {
             delegate.setRemoteInvocationExecutor(remoteInvocationExecutor);
         }
         delegate.afterPropertiesSet();
     }
 
-    public Class getServiceClass() {
+    public Class getServiceClass()
+    {
         return serviceClass;
     }
 
-    public void setServiceClass(Class serviceClass) {
+    public void setServiceClass(Class serviceClass)
+    {
         this.serviceClass = serviceClass;
     }
 
-    public Object getServiceBean() {
+    public Object getServiceBean()
+    {
         return serviceBean;
     }
 
-    public void setServiceBean(Object serviceBean) {
+    public void setServiceBean(Object serviceBean)
+    {
         this.serviceBean = serviceBean;
     }
 
-    public Class getServiceInterface() {
+    public Class getServiceInterface()
+    {
         return serviceInterface;
     }
 
-    public void setServiceInterface(Class serviceInterface) {
+    public void setServiceInterface(Class serviceInterface)
+    {
         this.serviceInterface = serviceInterface;
     }
 
-    public boolean isRegisterTraceInterceptor() {
+    public boolean isRegisterTraceInterceptor()
+    {
         return registerTraceInterceptor;
     }
 
-    public void setRegisterTraceInterceptor(boolean registerTraceInterceptor) {
+    public void setRegisterTraceInterceptor(boolean registerTraceInterceptor)
+    {
         this.registerTraceInterceptor = registerTraceInterceptor;
     }
 
-    public RemoteInvocationExecutor getRemoteInvocationExecutor() {
+    public RemoteInvocationExecutor getRemoteInvocationExecutor()
+    {
         return remoteInvocationExecutor;
     }
 
-    public void setRemoteInvocationExecutor(RemoteInvocationExecutor remoteInvocationExecutor) {
+    public void setRemoteInvocationExecutor(RemoteInvocationExecutor remoteInvocationExecutor)
+    {
         this.remoteInvocationExecutor = remoteInvocationExecutor;
     }
 
     public Object onCall(UMOEventContext eventContext) throws Exception
     {
         Object transformedMessage = eventContext.getTransformedMessage();
-        RemoteInvocation ri = (RemoteInvocation) transformedMessage;
+        RemoteInvocation ri = (RemoteInvocation)transformedMessage;
         Object rval = delegate.execute(ri);
         return rval;
     }
