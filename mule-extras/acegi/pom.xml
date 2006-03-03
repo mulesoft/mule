@@ -28,12 +28,26 @@
             <groupId>acegisecurity</groupId>
             <artifactId>acegi-security</artifactId>
             <version>0.7.0</version>
+            <exclusions>
+                <exclusion>
+                    <!-- Acegi 0.7.0 will try to pull an older Spring 1.1.3 and fail the test -->
+                    <groupId>springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+            </exclusions>
+                
         </dependency>
 
 		<!-- For unit tests only -->
         <dependency>
             <groupId>org.codehaus.mule</groupId>
             <artifactId>mule-extras-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.mule</groupId>
+            <artifactId>mule-vm-provider</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
