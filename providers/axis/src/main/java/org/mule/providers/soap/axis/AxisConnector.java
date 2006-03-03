@@ -164,10 +164,12 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             throw new InitialisationException(e, this);
         }
 
-        if (serverConfig == null)
+        if (serverConfig == null) {
             serverConfig = DEFAULT_MULE_AXIS_SERVER_CONFIG;
-        if (clientConfig == null)
+        }
+        if (clientConfig == null) {
             clientConfig = DEFAULT_MULE_AXIS_CLIENT_CONFIG;
+        }
         serverProvider = createAxisProvider(serverConfig);
         clientProvider = createAxisProvider(clientConfig);
 
@@ -188,7 +190,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         //Soap messages around
         String handlerPkgs = System.getProperty("java.protocol.handler.pkgs", null);
         if(handlerPkgs!=null) {
-            if(!handlerPkgs.endsWith("|")) handlerPkgs += "|";
+            if(!handlerPkgs.endsWith("|")) {
+                handlerPkgs += "|";
+            }
             handlerPkgs = "org.mule.providers.soap.axis.transport|" + handlerPkgs;
             System.setProperty("java.protocol.handler.pkgs", handlerPkgs);
             logger.debug("Setting java.protocol.handler.pkgs to: " + handlerPkgs);
@@ -268,9 +272,10 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         for (Iterator iterator = axisDescriptor.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();) {
             UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
-            if (endpointKey.startsWith(umoEndpoint.getEndpointURI().getAddress()))
+            if (endpointKey.startsWith(umoEndpoint.getEndpointURI().getAddress())) {
                 logger.info("Unregistering Axis endpoint: " + endpointKey + " for service: "
                         + receiver.getComponent().getDescriptor().getName());
+            }
             try {
                 umoEndpoint.getConnector().unregisterListener(receiver.getComponent(), receiver.getEndpoint());
             } catch (Exception e) {
@@ -320,7 +325,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
          } else {
             endpoint = receiver.getEndpointURI().getAddress() + "/" + serviceName;
          }
-         if(logger.isDebugEnabled()) logger.debug("Modified endpoint with " + scheme + " scheme to " + endpoint);
+         if(logger.isDebugEnabled()) {
+            logger.debug("Modified endpoint with " + scheme + " scheme to " + endpoint);
+        }
 
         boolean sync = receiver.getEndpoint().isSynchronous();
         if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")) {
@@ -352,7 +359,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     }
 
     private String getCounterEndpointKey(UMOEndpointURI endpointURI) {
-        StringBuffer endpointKey = new StringBuffer();
+        StringBuffer endpointKey = new StringBuffer(64);
 
         endpointKey.append(endpointURI.getScheme());
         endpointKey.append("://");
@@ -425,7 +432,9 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             if (!MuleManager.getInstance().getModel().isComponentRegistered(AXIS_SERVICE_COMPONENT_NAME)) {
                 try {
                     //Descriptor might be null if no inbound endpoints have been register for the Axis connector
-                    if(axisDescriptor==null) axisDescriptor = createAxisDescriptor();
+                    if(axisDescriptor==null) {
+                        axisDescriptor = createAxisDescriptor();
+                    }
                     MuleManager.getInstance().getModel().registerComponent(axisDescriptor);
                     //We have to perform a small hack here to rewrite servlet:// endpoints with the
                     //real http:// address

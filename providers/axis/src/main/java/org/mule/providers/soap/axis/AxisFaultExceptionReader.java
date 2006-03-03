@@ -31,7 +31,7 @@ public class AxisFaultExceptionReader implements ExceptionReader {
     public String getMessage(Throwable t) {
         AxisFault e = (AxisFault)t;
         Map props = getInfo(e);
-        StringBuffer msg = new StringBuffer();
+        StringBuffer msg = new StringBuffer(64);
         msg.append("(");
         for (Iterator iterator = props.entrySet().iterator(); iterator.hasNext();) {
             Map.Entry entry = (Map.Entry) iterator.next();
@@ -44,7 +44,9 @@ public class AxisFaultExceptionReader implements ExceptionReader {
     public Throwable getCause(Throwable t) {
         AxisFault e = (AxisFault)t;
         Throwable cause = e.detail;
-        if(cause==null) cause = e.getCause();
+        if(cause==null) {
+            cause = e.getCause();
+        }
         return cause;
     }
 

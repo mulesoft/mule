@@ -182,18 +182,22 @@ public class AxisServiceComponent implements Initialisable, Callable
                 populateMessageContext(msgContext, context, endpointUri);
 
                 msgContext.setProperty("transport.url", endpointUri.toString());
-                if (wsdlRequested)
+                if (wsdlRequested) {
                     processWsdlRequest(msgContext, response);
-                else if (listRequested)
+                }
+                else if (listRequested) {
                     processListRequest(response);
+                }
                 else if (true /* hasParameters */) {
                     processMethodRequest(msgContext, context, response, endpointUri);
                 } else {
                     String serviceName = (String) msgContext.getProperty("serviceName");
-                    if (pathInfo.startsWith("/"))
+                    if (pathInfo.startsWith("/")) {
                         serviceName = pathInfo.substring(1);
-                    else
+                    }
+                    else {
                         serviceName = pathInfo;
+                    }
                     SOAPService s = engine.getService(serviceName);
                     if (s == null) {
                         reportCantGetAxisService(context, response);
@@ -262,7 +266,7 @@ public class AxisServiceComponent implements Initialisable, Callable
         if (method == null) {
             method = endpointUri.getPath().substring(endpointUri.getPath().lastIndexOf("/") + 1);
         }
-        StringBuffer args = new StringBuffer();
+        StringBuffer args = new StringBuffer(64);
 
         Map.Entry entry;
         for (Iterator iterator = params.entrySet().iterator(); iterator.hasNext();) {
@@ -327,13 +331,15 @@ public class AxisServiceComponent implements Initialisable, Callable
             responseMsg = msgContext.getResponseMessage();
             response.setProperty(HTTPConstants.HEADER_CACHE_CONTROL, "no-cache");
             response.setProperty(HTTPConstants.HEADER_PRAGMA, "no-cache");
-            if (responseMsg == null)
+            if (responseMsg == null) {
                 throw new Exception(Messages.getMessage("noResponse01"));
+            }
         } catch (AxisFault fault) {
             processAxisFault(fault);
             configureResponseFromAxisFault(response, fault);
-            if (responseMsg == null)
+            if (responseMsg == null) {
                 responseMsg = new Message(fault);
+            }
         } catch (Exception e) {
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "500");
 
@@ -379,8 +385,9 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.setProperty(HTTPConstants.HEADER_CONTENT_TYPE, "text/html");
         response.write("<h2>" + Messages.getMessage("error00") + "</h2>");
         response.write("<p>" + Messages.getMessage("noWSDL00") + "</p>");
-        if (moreDetailCode != null)
+        if (moreDetailCode != null) {
             response.write("<p>" + Messages.getMessage(moreDetailCode) + "</p>");
+        }
 
     }
 
@@ -391,8 +398,9 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.setProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/html");
         response.write("<h2>And now... Some Services</h2>");
         String version = MuleManager.getConfiguration().getProductVersion();
-        if (version == null)
+        if (version == null) {
             version = "Version Not Set";
+        }
         response.write("<h5>(Mule - " + version + ")</h5>");
         Iterator i;
 
@@ -405,10 +413,12 @@ public class AxisServiceComponent implements Initialisable, Callable
             listServices(i, response);
             response.write("</td></tr></table>");
         } catch (ConfigurationException configException) {
-            if (configException.getContainedException() instanceof AxisFault)
+            if (configException.getContainedException() instanceof AxisFault) {
                 throw (AxisFault) configException.getContainedException();
-            else
+            }
+            else {
                 throw configException;
+            }
         }
 
     }
@@ -418,15 +428,16 @@ public class AxisServiceComponent implements Initialisable, Callable
         response.write("<ul>");
         while (i.hasNext()) {
             ServiceDesc sd = (ServiceDesc) i.next();
-            StringBuffer sb = new StringBuffer();
+            StringBuffer sb = new StringBuffer(512);
             sb.append("<li>");
             String name = sd.getName();
             sb.append(name);
             sb.append(" <a href=\"");
             if (sd.getEndpointURL() != null) {
                 sb.append(sd.getEndpointURL());
-                if (!sd.getEndpointURL().endsWith("/"))
+                if (!sd.getEndpointURL().endsWith("/")) {
                     sb.append("/");
+                }
             }
             sb.append(name);
             sb.append("?wsdl\"><i>(wsdl)</i></a></li>");
@@ -530,16 +541,18 @@ public class AxisServiceComponent implements Initialisable, Callable
             	((File) request).delete();
             }
             responseMsg = msgContext.getResponseMessage();
-            if (responseMsg == null)
+            if (responseMsg == null) {
                 throw new Exception(Messages.getMessage("noResponse01"));
+            }
         } catch (AxisFault fault) {
             logger.error(fault, fault);
             fault.printStackTrace(System.err);
             processAxisFault(fault);
             configureResponseFromAxisFault(response, fault);
             responseMsg = msgContext.getResponseMessage();
-            if (responseMsg == null)
+            if (responseMsg == null) {
                 responseMsg = new Message(fault);
+            }
         } catch (Exception e) {
             responseMsg = msgContext.getResponseMessage();
             response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, "500");
@@ -547,13 +560,15 @@ public class AxisServiceComponent implements Initialisable, Callable
         }
 
         contentType = responseMsg.getContentType(msgContext.getSOAPConstants());
-        if (tlog.isDebugEnabled())
+        if (tlog.isDebugEnabled()) {
             t3 = System.currentTimeMillis();
-        if (responseMsg != null)
+        }
+        if (responseMsg != null) {
             sendResponse((String) context.getProperty(HttpConnector.HTTP_STATUS_PROPERTY),
                          contentType,
                          response,
                          responseMsg);
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Response sent.");
             logger.debug("Exit: doPost()");
@@ -584,8 +599,9 @@ public class AxisServiceComponent implements Initialisable, Callable
     private void configureResponseFromAxisFault(WriterMessageAdapter response, AxisFault fault)
     {
         int status = getHttpResponseStatus(fault);
-        if (status == 401)
+        if (status == 401) {
             response.setProperty(HttpConstants.HEADER_WWW_AUTHENTICATE, "Basic realm=\"AXIS\"");
+        }
         response.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, String.valueOf(status));
     }
 
@@ -739,8 +755,9 @@ public class AxisServiceComponent implements Initialisable, Callable
             int sindex = prot.indexOf('/');
             if (-1 != sindex) {
                 String ver = prot.substring(sindex + 1);
-                if (HTTPConstants.HEADER_PROTOCOL_V11.equals(ver.trim()))
+                if (HTTPConstants.HEADER_PROTOCOL_V11.equals(ver.trim())) {
                     ret = HTTPConstants.HEADER_PROTOCOL_V11;
+                }
             }
         }
         return ret;

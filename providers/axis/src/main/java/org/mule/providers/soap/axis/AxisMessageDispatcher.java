@@ -78,7 +78,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     public void doDispose() {
-        if(service!=null) service = null;
+        if(service!=null) {
+            service = null;
+        }
     }
 
     protected Service getService(UMOEvent event) throws Exception {
@@ -418,7 +420,9 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
     private void loadCallParams(UMOEvent event, String namespace) throws ClassNotFoundException {
         callParameters = new HashMap();
         Map methodCalls = (Map) event.getProperty("soapMethods");
-        if (methodCalls == null) return;
+        if (methodCalls == null) {
+            return;
+        }
 
         Map.Entry entry;
         SoapMethod soapMethod;

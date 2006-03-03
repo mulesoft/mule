@@ -131,7 +131,7 @@ public class MuleHttpSender extends BasicHandler
             msgContext.setProperty("SOAPAction", uri);
 
             BooleanHolder useFullURL = new BooleanHolder(false);
-            StringBuffer otherHeaders = new StringBuffer();
+            StringBuffer otherHeaders = new StringBuffer(64);
             targetURL = new URL(transURL);
             String host = targetURL.getHost();
             int port = targetURL.getPort();
@@ -263,8 +263,7 @@ public class MuleHttpSender extends BasicHandler
             }
         }
         if (userID != null) {
-            StringBuffer tmpBuf = new StringBuffer();
-
+            StringBuffer tmpBuf = new StringBuffer(64);
             tmpBuf.append(userID).append(":").append((passwd == null) ? "" : passwd);
             otherHeaders.append(HTTPConstants.HEADER_AUTHORIZATION)
                         .append(": Basic ")
@@ -286,7 +285,7 @@ public class MuleHttpSender extends BasicHandler
             }
         }
 
-        StringBuffer header2 = new StringBuffer();
+        StringBuffer header2 = new StringBuffer(64);
 
         String webMethod = null;
         boolean posting = true;
@@ -432,7 +431,7 @@ public class MuleHttpSender extends BasicHandler
 
         header2.append("\r\n"); // The empty line to start the BODY.
 
-        StringBuffer header = new StringBuffer();
+        StringBuffer header = new StringBuffer(128);
 
         // If we're SOAP 1.2, allow the web method to be set from the
         // MessageContext.
@@ -528,7 +527,8 @@ public class MuleHttpSender extends BasicHandler
             }
 
         }
-        if (log.isDebugEnabled()) {
+
+        if (log.isDebugEnabled() && baos != null) {
             log.debug(header + new String(baos.toByteArray()));
         }
 

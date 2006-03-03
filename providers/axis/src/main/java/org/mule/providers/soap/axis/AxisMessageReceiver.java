@@ -124,7 +124,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
         if (endpoint.getProperties().get("soapMethods") != null) {
             Map methods = (Map) endpoint.getProperties().get("soapMethods");
             Iterator i = methods.keySet().iterator();
-            StringBuffer buf = new StringBuffer();
+            StringBuffer buf = new StringBuffer(64);
             while (i.hasNext()) {
                 String name = (String) i.next();
                 SoapMethod method = new SoapMethod(name, (String) methods.get(name));
@@ -150,7 +150,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
             methodNames = methodNames.substring(0, methodNames.length() - 1);
         } else {
             String[] methods = ServiceProxy.getMethodNames(interfaces);
-            StringBuffer buf = new StringBuffer();
+            StringBuffer buf = new StringBuffer(64);
             for (int i = 0; i < methods.length; i++) {
                 buf.append(methods[i]).append(",");
             }
@@ -270,14 +270,16 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
 
     public void doStart() throws UMOException
     {
-        if (service != null)
+        if (service != null) {
             service.start();
+        }
     }
 
     public void doStop() throws UMOException
     {
-        if (service != null)
+        if (service != null) {
             service.stop();
+        }
     }
 
     protected void setOptionIfNotset(SOAPService service, String option, Object value)

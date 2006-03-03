@@ -44,8 +44,9 @@ public class AxisInitialisationCallback implements InitialisationCallback
     public void initialise(Object component) throws InitialisationException
     {
         // only call this once
-        if (invoked)
+        if (invoked) {
             return;
+        }
         if (component instanceof AxisInitialisable) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Calling axis initialisation for component: " + component.getClass().getName());
