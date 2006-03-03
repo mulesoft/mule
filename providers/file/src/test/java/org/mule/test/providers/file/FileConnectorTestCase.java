@@ -45,8 +45,8 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
     protected void doSetUp() throws Exception {
         super.doSetUp();
-        //The working directory is delete on tearDown
-        File dir = new File(MuleManager.getConfiguration().getWorkingDirectory() + "tmp");
+        //The working directory is deleted on tearDown
+        File dir = new File(MuleManager.getConfiguration().getWorkingDirectory(), "tmp");
         if(!dir.exists()) dir.mkdirs();
         validMessage = File.createTempFile("simple", ".mule", dir);
         assertNotNull(validMessage);
