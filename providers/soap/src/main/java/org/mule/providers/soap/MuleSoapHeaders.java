@@ -13,18 +13,15 @@
  */
 package org.mule.providers.soap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
-import org.mule.transformers.codec.Base64Decoder;
 import org.mule.transformers.codec.Base64Encoder;
 import org.mule.umo.UMOEvent;
-import org.mule.umo.transformer.TransformerException;
 import org.w3c.dom.Element;
 
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import java.util.Iterator;
@@ -32,17 +29,12 @@ import java.util.Iterator;
 /**
  * <code>MuleSoapHeaders</code> is a helper class for extracting and writing
  * Mule header properties to s Soap message
- * 
+ *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
  */
 public class MuleSoapHeaders
 {
-    /**
-     * logger used by this class
-     */
-    protected transient Log logger = LogFactory.getLog(getClass());
-
     private String replyTo;
     private String correlationId;
     private String correlationGroup;
@@ -54,11 +46,10 @@ public class MuleSoapHeaders
     public static final String ENV_REQUEST_HEADERS = "MULE_REQUEST_HEADERS";
 
     private Base64Encoder encoder = new Base64Encoder();
-    private Base64Decoder decoder = new Base64Decoder();
 
     /**
      * Extracts header properties from a Mule event
-     * 
+     *
      * @param event
      */
     public MuleSoapHeaders(UMOEvent event)
@@ -71,7 +62,7 @@ public class MuleSoapHeaders
 
     /**
      * Extracts Mule header properties from a Soap message
-     * 
+     *
      * @param soapHeader
      */
     public MuleSoapHeaders(SOAPHeader soapHeader)
@@ -94,13 +85,13 @@ public class MuleSoapHeaders
         Element element;
         while (elements.hasNext()) {
                 element = (SOAPElement) elements.next();
-                if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(element.getNodeName())) {
+                if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(element.getLocalName())) {
                     correlationId = getStringValue(element);
-                } else if (MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(element.getNodeName())) {
+                } else if (MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY.equals(element.getLocalName())) {
                     correlationGroup = getStringValue(element);
-                } else if (MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(element.getNodeName())) {
+                } else if (MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY.equals(element.getLocalName())) {
                     correlationSequence = getStringValue(element);
-                } else if (MuleProperties.MULE_REPLY_TO_PROPERTY.equals(element.getNodeName())) {
+                } else if (MuleProperties.MULE_REPLY_TO_PROPERTY.equals(element.getLocalName())) {
                     replyTo = getStringValue(element);
                 }
             }
@@ -110,13 +101,9 @@ public class MuleSoapHeaders
         String value = e.getNodeValue();
         if (value == null && e.hasChildNodes()) {
             // see if the value is base64 ecoded
-            value = e.getChildNodes().item(0).getChildNodes().item(0).getNodeValue();
+            value = e.getFirstChild().getNodeValue();
             if (value != null) {
-                try {
-                    value = new String((byte[])decoder.transform(value));
-                } catch (TransformerException e1) {
-                    logger.warn("Failed to base64 decode value: " + value + ". This probably is not a problem", e1);
-                }
+                //value = new String(org.apache.axis.encoding.Base64.decode(value));
             }
         }
         return value;
@@ -124,9 +111,9 @@ public class MuleSoapHeaders
 
     /**
      * Writes the header properties to a Soap header
-     * 
+     *
      * @param env
-     * @throws javax.xml.soap.SOAPException
+     * @throws SOAPException
      */
     public void addHeaders(SOAPEnvelope env) throws Exception
     {
@@ -144,21 +131,22 @@ public class MuleSoapHeaders
         }
 
         if (correlationId != null) {
-            Element e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
+            SOAPElement e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_ID_PROPERTY,
                                                                            MULE_NAMESPACE);
-            e.setNodeValue(correlationId);
-            e = (Element) muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+            e.addTextNode(correlationId);
+            e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
                                                             MULE_NAMESPACE);
-            e.setNodeValue(correlationGroup);
+            e.addTextNode(correlationGroup);
             e = muleHeader.addChildElement(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
                                                             MULE_NAMESPACE);
-            e.setNodeValue(correlationSequence);
+            e.addTextNode(correlationSequence);
         }
         if (replyTo != null) {
-            Element e = (Element) muleHeader.addChildElement(MuleProperties.MULE_REPLY_TO_PROPERTY,
+           SOAPElement e = muleHeader.addChildElement(MuleProperties.MULE_REPLY_TO_PROPERTY,
                                                                            MULE_NAMESPACE);
-            String enc = (String)encoder.transform(replyTo);
-            e.setNodeValue(enc);
+            //String enc = (String)encoder.transform(replyTo);
+            //e.addTextNode(enc);
+            e.addTextNode(replyTo);
         }
     }
 

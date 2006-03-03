@@ -21,6 +21,7 @@ import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.httpclient.StatusLine;
 import org.mule.MuleManager;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,19 +51,19 @@ public class HttpServerConnection {
         this.socket = socket;
         this.socket.setTcpNoDelay(true);
         this.in = socket.getInputStream();
-        this.out = socket.getOutputStream();
+        this.out = new DataOutputStream(socket.getOutputStream());
         this.encoding = encoding;
     }
 
     public synchronized void close() {
         try {
             if (socket != null) {
-                in.close();
-                out.close();
+
                 socket.close();
-                socket = null;
             }
         } catch (IOException e) {
+        } finally {
+            socket=null;
         }
     }
 
@@ -184,24 +185,26 @@ public class HttpServerConnection {
         setKeepAlive(response.isKeepAlive());
         ResponseWriter writer = new ResponseWriter(this.out, encoding);
         OutputStream outsream = this.out;
+
         writer.println(response.getStatusLine());
         Iterator item = response.getHeaderIterator();
         while (item.hasNext()) {
             Header header = (Header) item.next();
             writer.print(header.toExternalForm());
+
         }
         writer.println();
         writer.flush();
 
         InputStream content = response.getBody();
         if (content != null) {
-            Header transferenc = response.getFirstHeader("Transfer-Encoding");
+            Header transferenc = response.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
             if (transferenc != null) {
-                response.removeHeaders("Content-Length");
+                response.removeHeaders(HttpConstants.HEADER_CONTENT_LENGTH);
                 if (transferenc.getValue().indexOf("chunked") != -1) {
                     outsream = new ChunkedOutputStream(outsream);
 
-                    byte[] tmp = new byte[1024];
+                    byte[] tmp = new byte[4096];
                     int i = 0;
                     while ((i = content.read(tmp)) >= 0) {
                         outsream.write(tmp, 0, i);
@@ -214,12 +217,12 @@ public class HttpServerConnection {
                 /**
                  * read the content when needed to embed content-length
                  */
-                byte[] tmp = new byte[1024];
+                byte[] tmp = new byte[4096];
                 int i = 0;
                 while ((i = content.read(tmp)) >= 0) {
+                    //assert socket.isClosed()==false;
                     outsream.write(tmp, 0, i);
                 }
-
             }
         }
         outsream.flush();

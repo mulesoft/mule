@@ -18,10 +18,10 @@ import org.apache.axis.configuration.FileProvider;
 import org.apache.axis.handlers.soap.SOAPService;
 
 import javax.xml.namespace.QName;
-import java.io.InputStream;
 
 /**
- * todo document
+ * Override the File provider to stop exceptions being thrown in Axis if the service does not exist.  Mule adds services
+ * after the WSDD has been loaded.
  *
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
@@ -46,20 +46,11 @@ public class WSDDFileProvider extends FileProvider {
     /**
      * retrieve an instance of the named service
      *
-     * @param qname XXX
-     * @return XXX
+     * @param qname the name of the service
+     * @return the service object or null if it doesn't exist
      * @throws org.apache.axis.ConfigurationException
-     *          XXX
      */
     public SOAPService getService(QName qname) throws ConfigurationException {
         return getDeployment().getService(qname);
-    }
-
-    /**
-     * Constructor which takes an input stream directly.
-     * Note: The configuration will be read-only in this case!
-     */
-    public WSDDFileProvider(InputStream is) {
-        super(is);
     }
 }

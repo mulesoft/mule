@@ -665,11 +665,6 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         return (synchronous != null);
     }
 
-    public boolean isSynchronousExplicitlySet()
-    {
-        return synchronous != null;
-    }
-
     public int getCreateConnector()
     {
         return createConnector;

@@ -62,9 +62,11 @@ import java.util.Iterator;
  * 
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>
  * @version $Revision$
+ * @deprecated Use the UniversalSender instead
  */
 public class MuleHttpSender extends BasicHandler
 {
+
     protected static Log log = LogFactory.getLog(HTTPSender.class.getName());
 
     private static final String ACCEPT_HEADERS = HTTPConstants.HEADER_ACCEPT + // Limit

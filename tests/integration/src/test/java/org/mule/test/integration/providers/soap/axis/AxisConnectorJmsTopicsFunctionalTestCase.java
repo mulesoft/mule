@@ -25,28 +25,4 @@ public class AxisConnectorJmsTopicsFunctionalTestCase extends AxisConnectorJmsFu
     public String getConfigResources() {
         return "org/mule/test/integration/providers/soap/axis/axis-jms-topics-mule-config.xml";
     }
-
-    public void testReceive() throws Throwable {
-        //todo MULE20 once the resource info stuff is removed
-    }
-
-    public void testReceiveComplex() throws Throwable {
-        //todo MULE20 once the resource info stuff is removed
-    }
-
-    public void testSendAndReceiveComplex() throws Throwable {
-        //todo MULE20 once the resource info stuff is removed
-    }
-
-    public void testReceiveComplexCollection() throws Throwable {
-        //todo MULE20 once the resource info stuff is removed
-    }
-
-    public void testDispatchAsyncComplex() throws Throwable {
-        //todo MULE20 once the resource info stuff is removed
-    }
-
-    public void testException() throws Throwable {
-        //todo MULE20 once the resource info stuff is removed
-    }
 }

@@ -51,6 +51,7 @@ public class MuleConfigProvider extends SimpleProvider
         }
     }
 
+
     public Iterator getAxisDeployedServices() throws ConfigurationException
     {
         return engineConfiguration.getDeployedServices();

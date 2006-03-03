@@ -22,7 +22,7 @@ package org.mule.test.integration.providers.soap.axis;
  */
 public class AxisConnectorJmsFunctionalTestCase extends AxisConnectorVMFunctionalTestCase
  {
-    protected String getProtocol() {
+    protected String getTransportProtocol() {
         return "jms";
     }
 }

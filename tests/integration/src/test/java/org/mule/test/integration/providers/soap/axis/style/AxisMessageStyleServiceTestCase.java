@@ -16,6 +16,8 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.umo.UMOMessage;
 
 import javax.xml.namespace.QName;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Andrew Rutter
@@ -46,7 +48,7 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase {
         call.setOperationName(new QName("document"));
         String ret = (String) call.invoke(new Object[]{expectedResult});
         assertNotNull(ret);
-        assertEquals(expectedResult, ret);
+        assertEquals(ret, expectedResult);
 
         //Now try with the MuleClient
         MuleClient client = new MuleClient();
@@ -105,15 +107,14 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase {
         assertNotNull(ret);
         assertEquals(expectedResult, ret);
 
-        //todo this currently fails with a deserialisation error. need to fix
         //Now try with the MuleClient
-//        MuleClient client = new MuleClient();
-//
-//        Map props = new HashMap();
-//        props.put("doAutoTypes", "false");
-//        UMOMessage result = client.send("axis:" + getServiceEndpoint() + "?method=soapRequestResponse", expectedResult, props);
-//        assertNotNull(result);
-//        assertEquals(expectedResult, result.getPayloadAsString());
+        MuleClient client = new MuleClient();
+
+        Map props = new HashMap();
+        props.put("doAutoTypes", "true");
+        UMOMessage result = client.send("axis:" + getServiceEndpoint() + "?method=soapRequestResponse", expectedResult, props);
+        assertNotNull(result);
+        assertEquals(expectedResult, result.getPayloadAsString());
 
     }
 }

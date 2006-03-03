@@ -17,6 +17,7 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.attachments.AttachmentPart;
 import org.mule.config.i18n.Message;
 import org.mule.providers.AbstractMessageAdapter;
+import org.mule.providers.soap.MuleSoapHeaders;
 import org.mule.transformers.simple.SerializableToByteArray;
 import org.mule.umo.MessagingException;
 import org.mule.umo.transformer.UMOTransformer;

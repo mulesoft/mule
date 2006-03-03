@@ -246,7 +246,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
             call.setSOAPActionURI(soapAction);
             call.setUseSOAPAction(Boolean.TRUE.booleanValue());
         } else {
-            //call.setSOAPActionURI(endpointUri.getAddress());
+            call.setSOAPActionURI(endpointUri.getAddress());
         }
         return call;
     }
@@ -412,6 +412,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
                 call.setReturnClass(soapMethod.getReturnClass());
             }
         }
+        call.setOperationName(soapMethod.getName());
     }
 
     private void loadCallParams(UMOEvent event, String namespace) throws ClassNotFoundException {

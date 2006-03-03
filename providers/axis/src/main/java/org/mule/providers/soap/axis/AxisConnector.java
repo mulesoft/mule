@@ -26,14 +26,11 @@ import org.apache.axis.wsdl.fromJava.Namespaces;
 import org.apache.axis.wsdl.fromJava.Types;
 import org.mule.MuleManager;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.internal.notifications.ModelNotification;
 import org.mule.impl.internal.notifications.ModelNotificationListener;
-import org.mule.impl.internal.notifications.NotificationException;
 import org.mule.providers.AbstractServiceEnabledConnector;
 import org.mule.providers.http.servlet.ServletConnector;
 import org.mule.providers.service.ConnectorFactory;
@@ -51,10 +48,6 @@ import org.mule.umo.provider.UMOMessageReceiver;
 import org.mule.util.ClassHelper;
 
 import javax.xml.namespace.QName;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -93,15 +86,11 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     public static final String SERVICE_PROPERTY_COMPONENT_NAME = "componentName";
     public static final String SERVICE_PROPERTY_SERVCE_PATH = "servicePath";
 
-    public static final String ENDPOINT_COUNTERS_PROPERTY = "endpointCounters";
-
     public static final String WSDL_URL_PROPERTY = "wsdlUrl";
 
     private String serverConfig;
     private AxisServer axisServer;
     private SimpleProvider serverProvider;
-    // Client configuration currently not used but the endpoint should
-    // probably support configuration of the client too
     private String clientConfig;
     private SimpleProvider clientProvider;
 
@@ -149,7 +138,10 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         supportedSchemes.add("smtps");
         supportedSchemes.add("pop3");
         supportedSchemes.add("pop3s");
+        supportedSchemes.add("imap");
+        supportedSchemes.add("imaps");
         supportedSchemes.add("ssl");
+        supportedSchemes.add("tcp");
 
         for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
@@ -161,18 +153,15 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
 
         axisTransportProtocols = new HashMap();
 
-        for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();) {
-            String s = (String) iterator.next();
-            if(!(s.equalsIgnoreCase("http") || s.equalsIgnoreCase("https") || s.equalsIgnoreCase("servlet"))) {
-                axisTransportProtocols.put(s, MuleTransport.class);
-            }
-            registerSupportedProtocol(s);
-        }
-
         try {
+            for (Iterator iterator = supportedSchemes.iterator(); iterator.hasNext();) {
+                String s = (String) iterator.next();
+                axisTransportProtocols.put(s, MuleTransport.getTransportClass(s));
+                registerSupportedProtocol(s);
+            }
             MuleManager.getInstance().registerListener(this);
-        } catch (NotificationException nex) {
-            throw new InitialisationException(nex, this);
+        } catch (Exception e) {
+            throw new InitialisationException(e, this);
         }
 
         if (serverConfig == null)
@@ -230,26 +219,10 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
     }
 
     protected SimpleProvider createAxisProvider(String config) throws InitialisationException {
-        InputStream is = null;
-        File f = new File(config);
-        if (f.exists()) {
-            try {
-                is = new FileInputStream(f);
-            } catch (FileNotFoundException e) {
-                // ignore
-            }
-        } else {
-            is = ClassHelper.getResourceAsStream(config, getClass());
-        }
         //Use our custom file provider that does not require services to be declared ni the WSDD.  Thi only affects the
         //client side as the client will fallback to the FileProvider when invoking a service.
         WSDDFileProvider fileProvider = new WSDDFileProvider(config);
-        if (is != null) {
-            fileProvider.setInputStream(is);
-        } else {
-            throw new InitialisationException(new Message(Messages.FAILED_LOAD_X, "Axis Configuration: " + config),
-                    this);
-        }
+        fileProvider.setSearchClasspath(true);
         /*
          * Wrap the FileProvider with a SimpleProvider so we can prgrammatically
          * configure the Axis server (you can only use wsdd descriptors with the
@@ -279,14 +252,11 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
         // this is always initialisaed as synchronous as ws invocations should
         // always execute in a single thread unless the endpont has explicitly
         // been set to run asynchronously
-        if (endpoint instanceof ImmutableMuleEndpoint
-                && !((ImmutableMuleEndpoint) endpoint).isSynchronousExplicitlySet()) {
-            if (!endpoint.isSynchronous()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
-                }
-                endpoint.setSynchronous(true);
+        if ( !endpoint.isSynchronousSet() && !endpoint.isSynchronous()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
             }
+            endpoint.setSynchronous(true);
         }
 
         return super.createReceiver(component, endpoint);
@@ -296,40 +266,18 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             throws UMOException {
         String endpointKey = getCounterEndpointKey(receiver.getEndpointURI());
 
-        Map endpointCounters = (Map) axisDescriptor.getProperties().get(ENDPOINT_COUNTERS_PROPERTY);
-        if (endpointCounters == null) {
-            logger.error("There are no endpoints registered on the Axis service descriptor");
-            return;
-        }
-
-        Integer count = (Integer) endpointCounters.get(endpointKey);
-        if (count == null) {
-            logger.error("There are no services registered on: " + endpointKey);
-            return;
-        }
-
-        if (count.intValue() > 1) {
-            logger.warn("There are '" + count.intValue() + "' services registered on endpoint: " + endpointKey
-                    + ". Not unregistering the endpoint at this time");
-            count = new Integer(count.intValue() - 1);
-            endpointCounters.put(endpointKey, count);
-            return;
-        } else {
-            endpointCounters.remove(endpointKey);
-
-            for (Iterator iterator = axisDescriptor.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();) {
-                UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
-                if (endpointKey.startsWith(umoEndpoint.getEndpointURI().getAddress()))
-                    logger.info("Unregistering Axis endpoint: " + endpointKey + " for service: "
-                            + receiver.getComponent().getDescriptor().getName());
-                try {
-                    umoEndpoint.getConnector().unregisterListener(receiver.getComponent(), receiver.getEndpoint());
-                } catch (Exception e) {
-                    logger.error("Failed to unregistering Axis endpoint: " + endpointKey + " for service: "
-                            + receiver.getComponent().getDescriptor().getName() + ". Error is: " + e.getMessage(), e);
-                }
-                break;
+        for (Iterator iterator = axisDescriptor.getInboundRouter().getEndpoints().iterator(); iterator.hasNext();) {
+            UMOEndpoint umoEndpoint = (UMOEndpoint) iterator.next();
+            if (endpointKey.startsWith(umoEndpoint.getEndpointURI().getAddress()))
+                logger.info("Unregistering Axis endpoint: " + endpointKey + " for service: "
+                        + receiver.getComponent().getDescriptor().getName());
+            try {
+                umoEndpoint.getConnector().unregisterListener(receiver.getComponent(), receiver.getEndpoint());
+            } catch (Exception e) {
+                logger.error("Failed to unregistering Axis endpoint: " + endpointKey + " for service: "
+                        + receiver.getComponent().getDescriptor().getName() + ". Error is: " + e.getMessage(), e);
             }
+            break;
         }
     }
 
@@ -375,7 +323,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
          if(logger.isDebugEnabled()) logger.debug("Modified endpoint with " + scheme + " scheme to " + endpoint);
 
         boolean sync = receiver.getEndpoint().isSynchronous();
-        if (scheme.equals("http") || scheme.equals("tcp")) {
+        if (scheme.equals("http") || scheme.equals("https") || scheme.equals("ssl") || scheme.equals("tcp")) {
             // if we are using a socket based endpointUri make sure it is
             // running synchronously by default unless the user has specifically set it
             if(!receiver.getEndpoint().isSynchronousSet()) {
@@ -383,19 +331,6 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             }
         }
 
-        Map endpointCounters = (Map) axisDescriptor.getProperties().get(ENDPOINT_COUNTERS_PROPERTY);
-        if (endpointCounters == null) {
-            endpointCounters = new HashMap();
-        }
-
-        //String endpointKey = getCounterEndpointKey(receiver.getEndpointURI());
-        //String endpointKey = receiver.getEndpointURI().toString() + "/" + serviceName;
-
-        Integer count = (Integer) endpointCounters.get(endpoint);
-        if (count == null)
-            count = new Integer(0);
-
-        if (count.intValue() == 0) {
             UMOEndpoint serviceEndpoint = new MuleEndpoint(endpoint, true);
             serviceEndpoint.setSynchronous(sync);
             serviceEndpoint.setName(ep.getScheme() + ":" + serviceName);
@@ -413,12 +348,7 @@ public class AxisConnector extends AbstractServiceEnabledConnector implements Mo
             serviceEndpoint.getProperties().putAll(receiver.getEndpoint().getProperties());
 
             axisDescriptor.getInboundRouter().addEndpoint(serviceEndpoint);
-        }
 
-        // Update the counter for this endpoint
-        count = new Integer(count.intValue() + 1);
-        endpointCounters.put(endpoint, count);
-        axisDescriptor.getProperties().put(ENDPOINT_COUNTERS_PROPERTY, endpointCounters);
     }
 
     private String getCounterEndpointKey(UMOEndpointURI endpointURI) {

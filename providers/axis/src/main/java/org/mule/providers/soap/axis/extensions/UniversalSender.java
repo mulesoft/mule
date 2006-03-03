@@ -123,6 +123,10 @@ public class UniversalSender extends BasicHandler {
             if (contentLength > 0) {
             	props.put(HttpConstants.HEADER_CONTENT_LENGTH, Integer.toString(contentLength)); // necessary for supporting httpclient
             }
+
+            if(props.get(HttpConstants.HEADER_CONTENT_TYPE)==null) {
+                props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+            }
             UMOMessage message = new MuleMessage(payload, props);
             UMOSession session = new MuleSession(message, ((AbstractConnector)endpoint.getConnector()).getSessionHandler());
 
