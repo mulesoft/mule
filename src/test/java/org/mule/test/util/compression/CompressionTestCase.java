@@ -15,15 +15,15 @@
 
 package org.mule.test.util.compression;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.util.compression.CompressionHelper;
 import org.mule.util.compression.CompressionStrategy;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
 
 /**
  * <code>TestCompression</code> TODO (document class)
@@ -87,6 +87,30 @@ public class CompressionTestCase extends TestCase
 
         assertEquals(tempLarge, new String(uncompressed));
 
+    }
+
+    public void testNullIsCompressed() throws Exception
+    {
+        logger.debug("testNullIsCompressed");
+
+        CompressionStrategy strategy = CompressionHelper.getCompressionStrategy();
+        assertFalse(strategy.isCompressed(null));
+    }
+
+    public void testCompressNullBytes() throws Exception
+    {
+        logger.debug("testCompressNull");
+
+        CompressionStrategy strategy = CompressionHelper.getCompressionStrategy();
+        assertNull(strategy.compressByteArray(null));
+    }
+
+    public void testUncompressNullBytes() throws Exception
+    {
+        logger.debug("testUncompressNull");
+
+        CompressionStrategy strategy = CompressionHelper.getCompressionStrategy();
+        assertNull(strategy.uncompressByteArray(null));
     }
 
 }
