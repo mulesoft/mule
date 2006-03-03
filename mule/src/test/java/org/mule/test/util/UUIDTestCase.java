@@ -28,9 +28,6 @@ import junit.framework.TestCase;
 public class UUIDTestCase extends TestCase
 {
 
-    /**
-     * 
-     */
     public UUIDTestCase()
     {
         super();
@@ -38,12 +35,10 @@ public class UUIDTestCase extends TestCase
 
     public void testUUID()
     {
-        UUID uuid = new UUID();
-        assertNotNull(uuid.getUUID());
-        String id = uuid.getUUID().toString();
+        assertNotNull(UUID.getUUID());
+        String id = UUID.getUUID();
         assertNotNull(id);
-        uuid = new UUID();
-        assertTrue(!id.equals(uuid.getUUID().toString()));
+        assertTrue(!id.equals(UUID.getUUID()));
     }
 
 }

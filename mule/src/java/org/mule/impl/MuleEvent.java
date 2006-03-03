@@ -442,7 +442,7 @@ public class MuleEvent extends EventObject implements UMOEvent
 
     protected String generateEventId()
     {
-        return new UUID().getUUID();
+        return UUID.getUUID();
     }
 
     public UMOSession getSession()

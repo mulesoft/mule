@@ -36,7 +36,7 @@ public class SpaceMessageAdapter extends AbstractMessageAdapter {
      * @see org.mule.providers.NullPayload
      */
     public SpaceMessageAdapter(Object message) throws MessageTypeNotSupportedException {
-        id = new UUID().getUUID();
+        id = UUID.getUUID();
         if (message == null) {
             throw new MessageTypeNotSupportedException(null, getClass());
         } else {

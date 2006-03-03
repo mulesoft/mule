@@ -247,7 +247,7 @@ public class Pop3MessageReceiver extends PollingMessageReceiver implements Messa
         if (backupFolder != null) {
             String filename = msg.getFileName();
             if (filename == null) {
-                filename = msg.getFrom()[0].toString() + "[" + new UUID().getUUID() + "]";
+                filename = msg.getFrom()[0].toString() + "[" + UUID.getUUID() + "]";
             }
             filename = Utility.prepareWinFilename(filename);
             filename = backupFolder + filename + ".msg";

@@ -80,7 +80,7 @@ public class SimpleFilenameParser implements FilenameParser
             }
             index = pattern.indexOf("$" + left + "UUID" + right);
             if (index > -1) {
-                filename = filename.replaceAll("\\$\\" + left + "UUID\\" + right, new UUID().getUUID());
+                filename = filename.replaceAll("\\$\\" + left + "UUID\\" + right, UUID.getUUID());
             }
             index = pattern.indexOf("$" + left + "SYSTIME" + right);
             if (index > -1) {
