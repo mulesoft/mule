@@ -205,7 +205,7 @@ public class JmsConnector extends AbstractServiceEnabledConnector implements Con
         if (connectionStrategy != null && connection != null) {
             connection.setExceptionListener(new ExceptionListener() {
                 public void onException(JMSException jmsException) {
-                    logger.debug("About to dispose of myself due to a JMS connection shutdown.");
+                    logger.debug("About to recycle myself due to remote JMS connection shutdown.");
                     try {
                         JmsConnector.this.stopConnector();
                     } catch (UMOException e) {
