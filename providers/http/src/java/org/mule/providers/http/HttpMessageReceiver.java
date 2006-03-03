@@ -105,7 +105,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                 do {
                     conn.setKeepAlive(false);
                     HttpRequest request = conn.readRequest();
-                    if(request==null) break;
+                    if(request==null) {
+                        break;
+                    }
                     
                     Map headers = new HashMap();
                     for (int i = 0; i < request.getHeaders().length; i++) {
@@ -139,7 +141,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                         }
                     } else {
                         body = request.getBodyBytes();
-                        if(body==null) body = request.getRequestLine().getUri();
+                        if(body==null) {
+                            body = request.getRequestLine().getUri();
+                        }
                         adapter = connector.getMessageAdapter(new Object[]{body, headers});
                     }
                     UMOMessage message = new MuleMessage(adapter);
@@ -168,7 +172,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
                                 endpoint.getEndpointURI().getHost() + ":" + endpoint.getEndpointURI().getPort() +
                                 getRequestPath(message);
 
-                        if(logger.isDebugEnabled()) logger.debug("Failed to bind to " + failedPath);
+                        if(logger.isDebugEnabled()) {
+                            logger.debug("Failed to bind to " + failedPath);
+                        }
 
                         response = new HttpResponse();
                         response.setStatusLine(request.getRequestLine().getHttpVersion(), HttpConstants.SC_NOT_FOUND);
@@ -196,7 +202,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
     protected String getRequestPath(UMOMessage message) {
         String path = (String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         int i = path.indexOf("?");
-        if (i > -1) path = path.substring(0, i);
+        if (i > -1) {
+            path = path.substring(0, i);
+        }
         return path;
     }
 
@@ -205,7 +213,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver {
 
         String path = (String) message.getProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
         int i = path.indexOf("?");
-        if (i > -1) path = path.substring(0, i);
+        if (i > -1) {
+            path = path.substring(0, i);
+        }
 
         StringBuffer requestUri = new StringBuffer();
         requestUri.append(endpoint.getProtocol()).append("://");

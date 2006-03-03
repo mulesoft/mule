@@ -15,6 +15,7 @@
 
 package org.mule.providers.http;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
@@ -30,6 +31,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.lang.StringUtils;
 import org.mule.config.i18n.Message;
 import org.mule.impl.MuleMessage;
 import org.mule.impl.message.ExceptionPayload;
@@ -47,7 +49,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.Utility;
-import sun.misc.BASE64Encoder;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -77,29 +78,29 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
         HttpState state = new HttpState();
         if (connector.getProxyUsername() != null) {
-            state.setProxyCredentials(new AuthScope( null, -1, null, null), new UsernamePasswordCredentials(connector.getProxyUsername(),
-                                                                                  connector.getProxyPassword()));
+            state.setProxyCredentials(new AuthScope(null, -1, null, null),
+                    new UsernamePasswordCredentials(connector.getProxyUsername(), connector
+                            .getProxyPassword()));
         }
         client.setState(state);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.mule.providers.AbstractConnectorSession#doDispatch(org.mule.umo.UMOEvent)
      */
     public void doDispatch(UMOEvent event) throws Exception
     {
         HttpMethod httpMethod = getMethod(event);
         execute(event, httpMethod, false);
-        //if(httpMethod!=null) {
-            httpMethod.releaseConnection();
-            if(httpMethod.getStatusCode() >= 400 ) {
-                logger.error(httpMethod.getResponseBodyAsString());
-                throw new DispatchException(event.getMessage(), event.getEndpoint(),
-                        new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText()));
-            }
-       // }
+        httpMethod.releaseConnection();
+        if (httpMethod.getStatusCode() >= 400) {
+            logger.error(httpMethod.getResponseBodyAsString());
+            throw new DispatchException(event.getMessage(), event.getEndpoint(), new Exception(
+                    "Http call returned a status of: " + httpMethod.getStatusCode() + " "
+                            + httpMethod.getStatusText()));
+        }
     }
 
     public void doStreaming(UMOEvent event, StreamMessageAdapter messageAdapter) throws Exception
@@ -135,69 +136,77 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
      */
     public UMOMessage receive(UMOEndpointURI endpointUri, long timeout) throws Exception
     {
+        if (endpointUri == null) {
+            return null;
+        }
 
-            if (endpointUri == null)
-                return null;
-
-            HttpMethod httpMethod = new GetMethod(endpointUri.getAddress());
-            httpMethod.setDoAuthentication(true);
-            if (endpointUri.getUserInfo() != null) {
-                // Add User Creds
-                StringBuffer header = new StringBuffer();
-                header.append("Basic ");
-                header.append(new BASE64Encoder().encode(endpointUri.getUserInfo().getBytes()));
-                httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
-            }
-         try {
+        HttpMethod httpMethod = new GetMethod(endpointUri.getAddress());
+        httpMethod.setDoAuthentication(true);
+        if (endpointUri.getUserInfo() != null) {
+            // Add User Creds
+            // TODO take encodings into account
+            StringBuffer header = new StringBuffer(64);
+            header.append("Basic ");
+            header.append(new String(Base64.encodeBase64(endpointUri.getUserInfo().getBytes())));
+            httpMethod.addRequestHeader(HttpConstants.HEADER_AUTHORIZATION, header.toString());
+        }
+        try {
             HttpClient client = new HttpClient();
-
             client.executeMethod(httpMethod);
-            //httpMethod.execute(state, connection);
 
             if (httpMethod.getStatusCode() == HttpStatus.SC_OK) {
-                return (UMOMessage) receiveTransformer.transform(httpMethod);
-            } else {
-                throw new ReceiveException(new Message("http", 3, httpMethod.getStatusLine().toString()),
-                                           endpointUri,
-                                           timeout);
+                return (UMOMessage)receiveTransformer.transform(httpMethod);
             }
-        } catch (ReceiveException e) {
+            else {
+                throw new ReceiveException(
+                        new Message("http", 3, httpMethod.getStatusLine().toString()), endpointUri,
+                        timeout);
+            }
+        }
+        catch (ReceiveException e) {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ReceiveException(endpointUri, timeout, e);
-        } finally {
-            if (httpMethod != null)
-                httpMethod.releaseConnection();
+        }
+        finally {
+            httpMethod.releaseConnection();
         }
     }
 
-    protected HttpMethod execute(UMOEvent event, HttpMethod httpMethod, boolean closeConnection) throws Exception
+    protected HttpMethod execute(UMOEvent event, HttpMethod httpMethod, boolean closeConnection)
+            throws Exception
     {
-
-        //todo set connection timeout buffer etc
+        // TODO set connection timeout buffer etc
         try {
             URI uri = event.getEndpoint().getEndpointURI().getUri();
 
             try {
                 processCookies(event);
                 client.executeMethod(getHostConfig(uri), httpMethod);
-            } catch(Exception e) {
+            }
+            catch (Exception e) {
                 logger.error(e, e);
             }
             return httpMethod;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-        } finally {
-            if (httpMethod != null && closeConnection)
+        }
+        finally {
+            if (httpMethod != null && closeConnection) {
                 httpMethod.releaseConnection();
+            }
         }
     }
 
-    protected void processCookies(UMOEvent event) {
+    protected void processCookies(UMOEvent event)
+    {
         Cookie[] cookies = (Cookie[])event.removeProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
-        if(cookies!=null && cookies.length > 0) {
-            client.getParams().setCookiePolicy(CookieHelper.getCookiePolicy(
-                    (String)event.removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY)));
+        if (cookies != null && cookies.length > 0) {
+            client.getParams().setCookiePolicy(
+                    CookieHelper.getCookiePolicy((String)event
+                            .removeProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY)));
             client.getState().addCookies(cookies);
         }
     }
@@ -210,7 +219,6 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
          if (body instanceof HttpMethod) {
             httpMethod = (HttpMethod) body;
-        //todo } else if ("GET".equalsIgnoreCase(method) || body instanceof NullPayload) {
         } else if ("GET".equalsIgnoreCase(method)) {
             httpMethod = new GetMethod(uri.toString());
         } else {
@@ -244,6 +252,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         }
         return httpMethod;
     }
+
     /*
      * (non-Javadoc)
      *
@@ -261,35 +270,42 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             for (int i = 0; i < headers.length; i++) {
                 h.setProperty(headers[i].getName(), headers[i].getValue());
             }
+
             String status = String.valueOf(httpMethod.getStatusCode());
 
             h.setProperty(HttpConnector.HTTP_STATUS_PROPERTY, status);
             logger.debug("Http response is: " + status);
             ExceptionPayload ep = null;
-            if(httpMethod.getStatusCode() >= 400 ) {
+            if (httpMethod.getStatusCode() >= 400) {
                 logger.error(Utility.getInputStreamAsString(httpMethod.getResponseBodyAsStream()));
                 ep = new ExceptionPayload(new DispatchException(event.getMessage(), event.getEndpoint(),
-                        new Exception("Http call returned a status of: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText())));
+                        new Exception("Http call returned a status of: " + httpMethod.getStatusCode()
+                                + " " + httpMethod.getStatusText())));
             }
             UMOMessage m = null;
             // text or binary content?
             Header header = httpMethod.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
-            if((header != null) && event.isStreaming()) {
+            if ((header != null) && event.isStreaming()) {
                 StreamMessageAdapter sp = (StreamMessageAdapter)event.getMessage().getAdapter();
                 sp.setResponse(httpMethod.getResponseBodyAsStream());
                 m = new MuleMessage(sp, h);
-            } else if ((header != null) && header.getValue().startsWith("text/")) {
+            }
+            else if ((header != null) && header.getValue().startsWith("text/")) {
                 m = new MuleMessage(httpMethod.getResponseBodyAsString(), h);
-            } else {
+            }
+            else {
                 m = new MuleMessage(httpMethod.getResponseBody(), h);
             }
             m.setExceptionPayload(ep);
             return m;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new DispatchException(event.getMessage(), event.getEndpoint(), e);
-        } finally {
-            if (httpMethod != null && !event.isStreaming())
+        }
+        finally {
+            if (httpMethod != null && !event.isStreaming()) {
                 httpMethod.releaseConnection();
+            }
         }
     }
 
@@ -307,6 +323,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         connection.setProxyPort(connector.getProxyPort());
         return connection;
     }
+
     protected HostConfiguration getHostConfig(URI uri) throws URISyntaxException
     {
         Protocol protocol = Protocol.getProtocol(uri.getScheme().toLowerCase());
@@ -315,8 +332,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         int port = uri.getPort();
         HostConfiguration config = new HostConfiguration();
         config.setHost(host, port, protocol);
-        if(!Utility.isEmpty(connector.getProxyHostname())) {
-            //add proxy support
+        if (!StringUtils.isEmpty(connector.getProxyHostname())) {
+            // add proxy support
             config.setProxy(connector.getProxyHostname(), connector.getProxyPort());
         }
         return config;
@@ -327,8 +344,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         client = null;
     }
 
-    private class StreamPayloadRequestEntity implements RequestEntity {
-
+    private class StreamPayloadRequestEntity implements RequestEntity
+    {
         private StreamMessageAdapter messageAdapter;
         private UMOEvent event;
 
@@ -337,20 +354,25 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             this.event = event;
         }
 
-        public boolean isRepeatable() {
+        public boolean isRepeatable()
+        {
             return true;
         }
 
-        public void writeRequest(OutputStream outputStream) throws IOException {
-           messageAdapter.getOutputHandler().write(event, outputStream);
+        public void writeRequest(OutputStream outputStream) throws IOException
+        {
+            messageAdapter.getOutputHandler().write(event, outputStream);
         }
 
-        public long getContentLength() {
+        public long getContentLength()
+        {
             return -1L;
         }
 
-        public String getContentType() {
+        public String getContentType()
+        {
             return event.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, null);
         }
     }
+
 }

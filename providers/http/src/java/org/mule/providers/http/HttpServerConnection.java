@@ -19,6 +19,7 @@ import org.apache.commons.httpclient.ChunkedOutputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpParser;
 import org.apache.commons.httpclient.StatusLine;
+import org.apache.commons.io.IOUtils;
 import org.mule.MuleManager;
 
 import java.io.DataOutputStream;
@@ -33,17 +34,21 @@ import java.util.Iterator;
 /**
  * A connection to the SimpleHttpServer.
  */
-public class HttpServerConnection {
+public class HttpServerConnection
+{
     private Socket socket = null;
     private InputStream in = null;
     private OutputStream out = null;
     private boolean keepAlive = false;
-    private String encoding;    
+    private String encoding;
 
-     public HttpServerConnection(final Socket socket) throws IOException {
-         this(socket, MuleManager.getConfiguration().getEncoding());
-     }
-    public HttpServerConnection(final Socket socket, String encoding) throws IOException {
+    public HttpServerConnection(final Socket socket) throws IOException
+    {
+        this(socket, MuleManager.getConfiguration().getEncoding());
+    }
+
+    public HttpServerConnection(final Socket socket, String encoding) throws IOException
+    {
         super();
         if (socket == null) {
             throw new IllegalArgumentException("Socket may not be null");
@@ -55,93 +60,103 @@ public class HttpServerConnection {
         this.encoding = encoding;
     }
 
-    public synchronized void close() {
+    public synchronized void close()
+    {
         try {
             if (socket != null) {
-
                 socket.close();
             }
-        } catch (IOException e) {
-        } finally {
-            socket=null;
+        }
+        catch (IOException e) {
+        }
+        finally {
+            socket = null;
         }
     }
 
-    public synchronized boolean isOpen() {
+    public synchronized boolean isOpen()
+    {
         return this.socket != null;
     }
 
-    public void setKeepAlive(boolean b) {
+    public void setKeepAlive(boolean b)
+    {
         this.keepAlive = b;
     }
 
-    public boolean isKeepAlive() {
+    public boolean isKeepAlive()
+    {
         return this.keepAlive;
     }
 
-    public InputStream getInputStream() {
+    public InputStream getInputStream()
+    {
         return this.in;
     }
 
-    public OutputStream getOutputStream() {
+    public OutputStream getOutputStream()
+    {
         return this.out;
     }
 
     /**
      * Returns the ResponseWriter used to write the output to the socket.
-     *
+     * 
      * @return This connection's ResponseWriter
      */
-    public ResponseWriter getWriter() throws UnsupportedEncodingException {
+    public ResponseWriter getWriter() throws UnsupportedEncodingException
+    {
         return new ResponseWriter(out);
     }
 
-    public HttpRequest readRequest() throws IOException {
-       String line = null;
+    public HttpRequest readRequest() throws IOException
+    {
+        String line = null;
         try {
             do {
                 line = HttpParser.readLine(in, encoding);
-            } while (line != null && line.length() == 0);
+            }
+            while (line != null && line.length() == 0);
 
             if (line == null) {
                 setKeepAlive(false);
                 return null;
             }
-            HttpRequest request = new HttpRequest(
-                    RequestLine.parseLine(line),
-                    HttpParser.parseHeaders(this.in, encoding),
-                    this.in);
+            HttpRequest request = new HttpRequest(RequestLine.parseLine(line),
+                    HttpParser.parseHeaders(this.in, encoding), this.in);
             return request;
-        } catch (IOException e) {
-            System.out.println(line);
+        }
+        catch (IOException e) {
             close();
             throw e;
         }
     }
 
-    public HttpResponse readResponse() throws IOException {
+    public HttpResponse readResponse() throws IOException
+    {
         try {
             String line = null;
             do {
                 line = HttpParser.readLine(in, encoding);
-            } while (line != null && line.length() == 0);
+            }
+            while (line != null && line.length() == 0);
 
             if (line == null) {
                 setKeepAlive(false);
                 return null;
             }
-            HttpResponse response = new HttpResponse(
-                    new StatusLine(line),
-                    HttpParser.parseHeaders(this.in, encoding),
-                    this.in);
+            HttpResponse response = new HttpResponse(new StatusLine(line), HttpParser.parseHeaders(
+                    this.in, encoding), this.in);
             return response;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             close();
             throw e;
         }
     }
 
-    public void writeRequest(final HttpRequest request) throws IOException {
+    public void writeRequest(final HttpRequest request) throws IOException
+    {
         if (request == null) {
             return;
         }
@@ -149,47 +164,47 @@ public class HttpServerConnection {
         writer.println(request.getRequestLine().toString());
         Iterator item = request.getHeaderIterator();
         while (item.hasNext()) {
-            Header header = (Header) item.next();
+            Header header = (Header)item.next();
             writer.print(header.toExternalForm());
         }
         writer.println();
         writer.flush();
 
-        OutputStream outsream = this.out;
+        OutputStream outstream = this.out;
         InputStream content = request.getBody();
         if (content != null) {
 
-            Header transferenc = request.getFirstHeader("Transfer-Encoding");
+            Header transferenc = request.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
             if (transferenc != null) {
-                request.removeHeaders("Content-Length");
-                if (transferenc.getValue().indexOf("chunked") != -1) {
-                    outsream = new ChunkedOutputStream(outsream);
+                request.removeHeaders(HttpConstants.HEADER_CONTENT_LENGTH);
+                if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1) {
+                    outstream = new ChunkedOutputStream(outstream);
                 }
             }
-            byte[] tmp = new byte[4096];
-            int i = 0;
-            while ((i = content.read(tmp)) >= 0) {
-                outsream.write(tmp, 0, i);
-            }
-            if (outsream instanceof ChunkedOutputStream) {
-                ((ChunkedOutputStream)outsream).finish();
+
+            IOUtils.copy(content, outstream);
+
+            if (outstream instanceof ChunkedOutputStream) {
+                ((ChunkedOutputStream)outstream).finish();
             }
         }
-        outsream.flush();
+
+        outstream.flush();
     }
 
-    public void writeResponse(final HttpResponse response) throws IOException {
+    public void writeResponse(final HttpResponse response) throws IOException
+    {
         if (response == null) {
             return;
         }
         setKeepAlive(response.isKeepAlive());
         ResponseWriter writer = new ResponseWriter(this.out, encoding);
-        OutputStream outsream = this.out;
+        OutputStream outstream = this.out;
 
         writer.println(response.getStatusLine());
         Iterator item = response.getHeaderIterator();
         while (item.hasNext()) {
-            Header header = (Header) item.next();
+            Header header = (Header)item.next();
             writer.print(header.toExternalForm());
 
         }
@@ -201,38 +216,28 @@ public class HttpServerConnection {
             Header transferenc = response.getFirstHeader(HttpConstants.HEADER_TRANSFER_ENCODING);
             if (transferenc != null) {
                 response.removeHeaders(HttpConstants.HEADER_CONTENT_LENGTH);
-                if (transferenc.getValue().indexOf("chunked") != -1) {
-                    outsream = new ChunkedOutputStream(outsream);
-
-                    byte[] tmp = new byte[4096];
-                    int i = 0;
-                    while ((i = content.read(tmp)) >= 0) {
-                        outsream.write(tmp, 0, i);
-                    }
-                    if (outsream instanceof ChunkedOutputStream) {
-                        ((ChunkedOutputStream) outsream).finish();
-                    }
-                }
-            } else {
-                /**
-                 * read the content when needed to embed content-length
-                 */
-                byte[] tmp = new byte[4096];
-                int i = 0;
-                while ((i = content.read(tmp)) >= 0) {
-                    //assert socket.isClosed()==false;
-                    outsream.write(tmp, 0, i);
+                if (transferenc.getValue().indexOf(HttpConstants.TRANSFER_ENCODING_CHUNKED) != -1) {
+                    outstream = new ChunkedOutputStream(outstream);
                 }
             }
+
+            IOUtils.copy(content, outstream);
+
+            if (outstream instanceof ChunkedOutputStream) {
+                ((ChunkedOutputStream)outstream).finish();
+            }
         }
-        outsream.flush();
+
+        outstream.flush();
     }
 
-    public int getSocketTimeout() throws SocketException {
+    public int getSocketTimeout() throws SocketException
+    {
         return this.socket.getSoTimeout();
     }
 
-    public void setSocketTimeout(int timeout) throws SocketException {
+    public void setSocketTimeout(int timeout) throws SocketException
+    {
         this.socket.setSoTimeout(timeout);
     }
 }

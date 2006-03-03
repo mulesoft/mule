@@ -143,7 +143,9 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
 
     public Header getHeader(String name) {
         String value = (String)getProperty(name);
-        if(value==null) return null;
+        if(value==null) {
+            return null;
+        }
         return new Header(name, value);
     }
 }

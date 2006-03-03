@@ -104,6 +104,9 @@ public class HttpConstants
     public static final String HEADER_WARNING = "Warning";// [General]
     public static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";// [Response]
 
+    // Chunked transfer encoding indicator
+    public static final String TRANSFER_ENCODING_CHUNKED = "chunked";
+
     // case-insenitive Maps of header names to their normalized representations
     public static final Map REQUEST_HEADER_NAMES;
     public static final Map RESPONSE_HEADER_NAMES;

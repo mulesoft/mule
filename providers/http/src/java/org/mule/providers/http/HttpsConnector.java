@@ -60,16 +60,21 @@ public class HttpsConnector extends HttpConnector
 
     public void doInitialise() throws InitialisationException
     {
-        if (getProvider() == null)
+        if (getProvider() == null) {
             throw new NullPointerException("The security provider cannot be null");
-        if (getKeyStore() == null)
+        }
+        if (getKeyStore() == null) {
             throw new NullPointerException("The KeyStore location cannot be null");
-        if (getKeyPassword() == null)
+        }
+        if (getKeyPassword() == null) {
             throw new NullPointerException("The Key password cannot be null");
-        if (getStorePassword() == null)
+        }
+        if (getStorePassword() == null) {
             throw new NullPointerException("The KeyStore password cannot be null");
-        if (getKeyManagerAlgorithm() == null)
+        }
+        if (getKeyManagerAlgorithm() == null) {
             throw new NullPointerException("The Key Manager Algorithm cannot be null");
+        }
 
         KeyStore keystore = null;
         try {
