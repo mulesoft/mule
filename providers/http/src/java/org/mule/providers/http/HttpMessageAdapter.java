@@ -48,7 +48,7 @@ public class HttpMessageAdapter extends AbstractMessageAdapter
                 properties = (Map) ((Object[]) message)[1];
             }
         } else if (message instanceof byte[]) {
-            this.message = (byte[]) message;
+            this.message = message;
         } else {
             throw new MessageTypeNotSupportedException(message, getClass());
         }

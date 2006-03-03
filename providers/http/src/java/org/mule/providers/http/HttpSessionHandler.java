@@ -62,7 +62,7 @@ public class HttpSessionHandler implements UMOSessionHandler {
             cookies.add(new Cookie(null,name.toString(), value.toString()));
         }
         if(cookies.size() > 0) {
-            message.setProperty(HttpConnector.HTTP_COOKIES_PROPERTY, (Cookie[]) cookies.toArray(new Cookie[cookies.size()]));
+            message.setProperty(HttpConnector.HTTP_COOKIES_PROPERTY, cookies.toArray(new Cookie[cookies.size()]));
         }
     }
 

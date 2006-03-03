@@ -73,7 +73,7 @@ public class ResponseWriter extends FilterWriter {
 
     public void write(byte b) throws IOException {
         super.flush();
-        outStream.write((int)b);
+        outStream.write(b);
     }
     
     public void write(byte[] b) throws IOException {
