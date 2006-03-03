@@ -131,7 +131,6 @@ public abstract class AbstractMuleTestCase extends TestCase {
         if (prereqs != null) {
             System.out.println(StringMessageHelper.getBoilerPlate("WARNING\nPrerequisites for test: " + method + " were not met. skipping test: " + prereqs, '=', 80));
         }
-        ;
         return prereqs == null;
     }
 
