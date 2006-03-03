@@ -43,7 +43,7 @@ public class DefaultMessageAdapter extends AbstractMessageAdapter
      */
     public DefaultMessageAdapter(Object message)
     {
-        id = new UUID().getUUID();
+        id = UUID.getUUID();
         if (message == null) {
             this.message = new NullPayload();
         } else {

@@ -75,7 +75,7 @@ public final class MuleSession implements UMOSession
 
     public MuleSession(UMOComponent component) {
         properties = new HashMap();
-        id = new UUID().getUUID();
+        id = UUID.getUUID();
         this.component = component;
     }
 
@@ -101,7 +101,7 @@ public final class MuleSession implements UMOSession
         requestSessionHandler.populateSession(message, this);
         id = (String)getProperty(requestSessionHandler.getSessionIDKey());
         if(id==null) {
-            id = new UUID().getUUID();
+            id = UUID.getUUID();
             if(logger.isDebugEnabled()) {
                 logger.debug("There is no session id on the request using key: " +requestSessionHandler.getSessionIDKey() +
                         ". Generating new session id: " + id);

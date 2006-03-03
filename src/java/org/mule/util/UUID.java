@@ -12,11 +12,10 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.util;
 
 import org.doomdark.uuid.UUIDGenerator;
-
-import java.io.Serializable;
 
 /**
  * <code>UUID</code> Generates a UUID using the doom dark JUG library
@@ -25,18 +24,18 @@ import java.io.Serializable;
  * @version $Revision$
  */
 
-public class UUID implements Serializable
+public class UUID
 {
-    private static UUIDGenerator gen = UUIDGenerator.getInstance();
-    String uuid = null;
+    private static UUIDGenerator generator = UUIDGenerator.getInstance();
 
-    public UUID()
+    private UUID()
     {
-        uuid = gen.generateTimeBasedUUID().toString();
+        // no go
     }
 
-    public String getUUID()
+    public static String getUUID()
     {
-        return uuid;
+        return generator.generateTimeBasedUUID().toString();
     }
+
 }

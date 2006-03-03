@@ -63,7 +63,7 @@ public class CorrelationPropertiesExtractor extends SimplePropertyExtractor
                 id = message.getUniqueId();
             }
         } catch (UniqueIdNotSupportedException e) {
-            id = new UUID().getUUID();
+            id = UUID.getUUID();
         }
         return id;
     }
