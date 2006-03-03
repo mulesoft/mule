@@ -15,6 +15,7 @@
 
 package org.mule.util;
 
+import org.apache.commons.lang.SystemUtils;
 import org.mule.MuleRuntimeException;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.CoreMessageConstants;
@@ -89,7 +90,7 @@ public class StringMessageHelper
                 while (temp.length() > 0) {
                     len=(trimLength < temp.length() ? trimLength : temp.length());
                     String msg = temp.substring(0, len);
-                    x = msg.indexOf(Utility.CRLF);
+                    x = msg.indexOf(SystemUtils.LINE_SEPARATOR);
 
                     if(x > -1) {
                         msg = msg.substring(0, x);
@@ -101,7 +102,9 @@ public class StringMessageHelper
                             len = x+1;
                         }
                     }
-                    if(msg.startsWith(" ")) msg = msg.substring(1);
+                    if(msg.startsWith(" ")) {
+                        msg = msg.substring(1);
+                    }
 
                     temp = temp.substring(len);
                     messages.add(k, msg);
@@ -109,12 +112,16 @@ public class StringMessageHelper
                 }
             }
         }
-        buf.append(Utility.CRLF);
-        if(c != ' ' ) buf.append(charString(c, maxlength));
+        buf.append(SystemUtils.LINE_SEPARATOR);
+        if(c != ' ' ) {
+            buf.append(charString(c, maxlength));
+        }
 
         for (int i = 0; i < messages.size(); i++) {
-            buf.append(Utility.CRLF);
-             if(c != ' ' ) buf.append(c);
+            buf.append(SystemUtils.LINE_SEPARATOR);
+             if(c != ' ' ) {
+                buf.append(c);
+            }
             buf.append(" ");
             buf.append(messages.get(i));
 
@@ -129,10 +136,14 @@ public class StringMessageHelper
                 buf.append(charString(' ', padding));
             }
             buf.append(" ");
-             if(c != ' ' ) buf.append(c);
+             if(c != ' ' ) {
+                buf.append(c);
+            }
         }
-        buf.append(Utility.CRLF);
-         if(c != ' ' ) buf.append(charString(c, maxlength));
+        buf.append(SystemUtils.LINE_SEPARATOR);
+         if(c != ' ' ) {
+            buf.append(charString(c, maxlength));
+        }
         return buf.toString();
     }
 

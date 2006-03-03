@@ -336,17 +336,21 @@ public class ConnectorFactory
 
         public boolean equals(Object o)
         {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (!(o instanceof CSDKey))
+            }
+            if (!(o instanceof CSDKey)) {
                 return false;
+            }
 
             final CSDKey csdKey = (CSDKey) o;
 
-            if (overrides != null ? !overrides.equals(csdKey.overrides) : csdKey.overrides != null)
+            if (overrides != null ? !overrides.equals(csdKey.overrides) : csdKey.overrides != null) {
                 return false;
-            if (!protocol.equals(csdKey.protocol))
+            }
+            if (!protocol.equals(csdKey.protocol)) {
                 return false;
+            }
 
             return true;
         }

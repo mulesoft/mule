@@ -20,14 +20,15 @@ import org.mule.MuleManager;
 import org.mule.components.script.jsr223.Scriptable;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.ConfigurationException;
-import org.mule.config.ReaderResource;
 import org.mule.config.MuleProperties;
+import org.mule.config.ReaderResource;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.manager.UMOManager;
 
 import javax.script.CompiledScript;
 import javax.script.Namespace;
+
 import java.io.IOException;
 
 /**
@@ -114,7 +115,9 @@ public class ScriptConfigurationBuilder extends Scriptable implements Configurat
             }
 
             if(System.getProperty(MuleProperties.MULE_START_AFTER_CONFIG_SYSTEM_PROPERTY, "true").equalsIgnoreCase("true")) {
-                if(!manager.isStarted()) manager.start();
+                if(!manager.isStarted()) {
+                    manager.start();
+                }
             }
 
         } catch (Exception e) {

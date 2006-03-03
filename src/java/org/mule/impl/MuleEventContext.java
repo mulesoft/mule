@@ -20,6 +20,7 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -854,7 +855,9 @@ public class MuleEventContext implements UMOEventContext
 
     public String getStringProperty(String name, String defaultValue) {
         String result = getStringProperty(name);
-        if(result==null) result = defaultValue;
+        if(result==null) {
+            result = defaultValue;
+        }
         return result;
     }
 

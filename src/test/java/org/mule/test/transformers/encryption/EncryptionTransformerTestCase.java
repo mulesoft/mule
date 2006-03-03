@@ -109,10 +109,12 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     public boolean compareResults(Object src, Object result)
     {
         if (src instanceof byte[]) {
-            if (src == null && result == null)
+            if (src == null && result == null) {
                 return true;
-            if (src == null || result == null)
+            }
+            if (src == null || result == null) {
                 return false;
+            }
             return Arrays.equals((byte[]) src, (byte[]) result);
         } else {
             return super.compareResults(src, result);

@@ -107,7 +107,9 @@ public abstract class DefaultSpaceFactory implements UMOSpaceFactory {
 
     public UMOSpace create(String name) throws UMOSpaceException {
 
-        if(capacity==0) capacity=1024;
+        if(capacity==0) {
+            capacity=1024;
+        }
         try {
             if(queueManager!=null) {
                 return new DefaultSpace(name, queueManager, enableMonitorEvents);

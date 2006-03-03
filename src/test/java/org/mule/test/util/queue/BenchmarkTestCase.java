@@ -14,10 +14,6 @@
  */
 package org.mule.test.util.queue;
 
-import java.util.Random;
-
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.util.queue.FilePersistenceStrategy;
@@ -26,6 +22,10 @@ import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.xa.AbstractResourceManager;
+
+import java.util.Random;
+
+import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

@@ -13,10 +13,10 @@
  */
 package org.mule.umo.security;
 
-import java.util.List;
-
 import org.mule.umo.UMOEncryptionStrategy;
 import org.mule.umo.lifecycle.Initialisable;
+
+import java.util.List;
 
 /**
  * <code>UMOSecurityManager</code> is responsible for managing a one or more

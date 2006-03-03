@@ -18,8 +18,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.locks.Lock;
 
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
@@ -31,6 +29,8 @@ import org.mule.umo.UMOMessage;
 import org.mule.umo.routing.ResponseTimeoutException;
 import org.mule.umo.routing.RoutingException;
 import org.mule.util.concurrent.Latch;
+
+import java.util.Map;
 
 /**
  * <code>AbstractResponseAggregator</code> provides a base class for

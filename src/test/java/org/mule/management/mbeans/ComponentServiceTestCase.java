@@ -18,6 +18,7 @@ import org.mule.tck.AbstractMuleJmxTestCase;
 import org.mule.umo.manager.UMOManager;
 
 import javax.management.ObjectName;
+
 import java.util.Set;
 
 /**

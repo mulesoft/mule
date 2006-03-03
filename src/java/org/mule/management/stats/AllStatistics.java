@@ -13,13 +13,13 @@
  */
 package org.mule.management.stats;
 
+import org.mule.management.stats.printers.AbstractTablePrinter;
+import org.mule.management.stats.printers.SimplePrinter;
+
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import org.mule.management.stats.printers.AbstractTablePrinter;
-import org.mule.management.stats.printers.SimplePrinter;
 
 /**
  * <code>AllStatistics</code> todo

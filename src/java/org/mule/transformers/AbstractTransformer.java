@@ -261,7 +261,7 @@ public abstract class AbstractTransformer implements UMOTransformer
     {
         try {
             Object c = BeanUtils.cloneBean(this);
-            return (UMOTransformer) c;
+            return c;
         } catch (Exception e) {
             throw new CloneNotSupportedException("Failed to clone transformer: " + e.getMessage());
         }

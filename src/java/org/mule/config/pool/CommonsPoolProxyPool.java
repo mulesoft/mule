@@ -20,9 +20,9 @@ import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.mule.impl.MuleDescriptor;
 import org.mule.umo.UMOException;
-import org.mule.umo.lifecycle.Stoppable;
-import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Disposable;
+import org.mule.umo.lifecycle.Startable;
+import org.mule.umo.lifecycle.Stoppable;
 import org.mule.util.ObjectFactory;
 import org.mule.util.ObjectPool;
 
@@ -96,7 +96,9 @@ public class CommonsPoolProxyPool implements ObjectPool
     private void init(MuleDescriptor descriptor, GenericObjectPool.Config config)
     {
         components = new ArrayList();
-        if(factory==null) setFactory(new CommonsPoolProxyFactory(descriptor));
+        if(factory==null) {
+            setFactory(new CommonsPoolProxyFactory(descriptor));
+        }
         pool = new GenericObjectPool((PoolableObjectFactory) factory, config);
         if(factory instanceof CommonsPoolProxyFactory) {
             ((CommonsPoolProxyFactory)factory).setPool(this);

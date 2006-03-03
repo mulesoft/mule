@@ -15,9 +15,9 @@
 
 package org.mule.test.util;
 
-import junit.framework.TestCase;
-
 import org.mule.util.UUID;
+
+import junit.framework.TestCase;
 
 /**
  * <code>UUIDTestCase</code> TODO (document class)

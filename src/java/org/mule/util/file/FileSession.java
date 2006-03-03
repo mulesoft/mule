@@ -14,13 +14,13 @@
  */
 package org.mule.util.file;
 
+import org.mule.util.xa.ResourceManagerException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
-import org.mule.util.xa.ResourceManagerException;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

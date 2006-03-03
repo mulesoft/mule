@@ -13,6 +13,9 @@
  */
 package org.mule.management.stats.printers;
 
+import org.mule.management.stats.ComponentStatistics;
+import org.mule.management.stats.RouterStatistics;
+
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -21,9 +24,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.mule.management.stats.ComponentStatistics;
-import org.mule.management.stats.RouterStatistics;
 
 /**
  * <code>HtmlTablePrinter</code> prints event processing stats as a HTML table

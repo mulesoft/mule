@@ -53,7 +53,7 @@ public class SerializableToByteArray extends AbstractEventAwareTransformer
         } else {
             obj = src;
             if (obj instanceof byte[]) {
-                return (byte[]) obj;
+                return obj;
             }
         }
 

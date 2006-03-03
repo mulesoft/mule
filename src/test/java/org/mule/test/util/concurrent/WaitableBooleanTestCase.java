@@ -15,9 +15,9 @@
 
 package org.mule.test.util.concurrent;
 
-import junit.framework.TestCase;
-
 import org.mule.util.concurrent.WaitableBoolean;
+
+import junit.framework.TestCase;
 
 /**
  * @author Holger Hoffstaette

@@ -13,14 +13,14 @@
  */
 package org.mule.routing.outbound;
 
-import java.util.List;
-
 import org.mule.umo.UMODescriptor;
 import org.mule.umo.UMOFilter;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.UMOSession;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.RoutingException;
+
+import java.util.List;
 
 /**
  * <code>InboundPassThroughRouter</code> allows outbound routing over a single

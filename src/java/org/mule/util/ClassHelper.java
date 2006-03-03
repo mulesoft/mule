@@ -336,8 +336,9 @@ public class ClassHelper {
                         match = types[x].isAssignableFrom(paramTypes[x]);
                     }
                 }
-                if (match)
+                if (match) {
                     return ctors[i];
+                }
             }
         }
         return null;

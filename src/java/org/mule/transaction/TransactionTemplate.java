@@ -14,14 +14,14 @@
  */
 package org.mule.transaction;
 
-import java.beans.ExceptionListener;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOTransaction;
 import org.mule.umo.UMOTransactionConfig;
+
+import java.beans.ExceptionListener;
 
 /**
  * @author Guillaume Nodet

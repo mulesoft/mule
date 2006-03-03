@@ -14,6 +14,7 @@
 package org.mule.routing.inbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.RouterStatistics;

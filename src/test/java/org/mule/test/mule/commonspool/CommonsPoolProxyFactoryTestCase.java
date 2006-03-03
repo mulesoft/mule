@@ -15,6 +15,7 @@ package org.mule.test.mule.commonspool;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.config.pool.CommonsPoolProxyFactory;
 import org.mule.impl.MuleDescriptor;
 import org.mule.tck.model.AbstractProxyPoolFactoryTestCase;

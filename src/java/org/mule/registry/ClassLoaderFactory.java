@@ -13,9 +13,6 @@
  */
 package org.mule.registry;
 
-import org.mule.registry.Library;
-import org.mule.registry.RegistryComponent;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -14,6 +14,7 @@
 package org.mule.management.agents;
 
 import com.sun.jdmk.comm.HtmlAdaptorServer;
+
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.umo.UMOException;
@@ -26,6 +27,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+
 import java.net.URI;
 
 /**

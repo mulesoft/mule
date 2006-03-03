@@ -15,13 +15,13 @@ package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.impl.MuleMessage;
 import org.mule.umo.UMOMessage;
 import org.mule.umo.endpoint.UMOEndpoint;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>FilteringListMessageSplitter</code> Accepts a List as a message

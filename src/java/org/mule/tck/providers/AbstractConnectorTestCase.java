@@ -18,6 +18,7 @@ package org.mule.tck.providers;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.i18n.Message;
@@ -65,8 +66,9 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
     protected void doTearDown() throws Exception
     {
-        if (!connector.isDisposed())
+        if (!connector.isDisposed()) {
             connector.dispose();
+        }
     }
 
     public void testConnectorExceptionHandling() throws Exception

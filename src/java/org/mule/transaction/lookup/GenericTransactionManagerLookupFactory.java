@@ -14,17 +14,18 @@
  */
 package org.mule.transaction.lookup;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.impl.container.JndiContextHelper;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.manager.UMOTransactionManagerFactory;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
+
 import java.util.Map;
 
 /**

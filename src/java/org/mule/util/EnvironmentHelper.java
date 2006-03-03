@@ -13,6 +13,8 @@
  */
 package org.mule.util;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,7 +69,7 @@ public class EnvironmentHelper {
                     }
                     envProps.setProperty(key, value);
                 } else {
-                    envProps.setProperty(line, Utility.EMPTY_STRING);
+                    envProps.setProperty(line, StringUtils.EMPTY);
                 }
             }
 
@@ -75,7 +77,9 @@ public class EnvironmentHelper {
             //ignore
         } finally{
             try {
-                if(in!=null) in.close();
+                if(in!=null) {
+                    in.close();
+                }
             } catch (IOException e) {}
             f.delete();
         }

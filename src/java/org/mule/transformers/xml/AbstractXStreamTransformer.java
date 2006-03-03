@@ -13,9 +13,10 @@
  */
 package org.mule.transformers.xml;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
@@ -23,10 +24,9 @@ import org.mule.transformers.AbstractEventAwareTransformer;
 import org.mule.umo.transformer.TransformerException;
 import org.mule.util.ClassHelper;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.Converter;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.io.xml.XppDriver;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>AbstractXStreamTransformer</code> is a base class for all XStream

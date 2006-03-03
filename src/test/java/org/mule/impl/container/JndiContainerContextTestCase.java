@@ -20,14 +20,14 @@ import org.mule.tck.model.AbstractContainerContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
-import org.mule.umo.manager.UMOContainerContext;
 import org.mule.umo.UMODescriptor;
+import org.mule.umo.manager.UMOContainerContext;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Collections;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

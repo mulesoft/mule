@@ -14,8 +14,8 @@
 */
 package org.mule.registry;
 
+import org.apache.commons.lang.SystemUtils;
 import org.mule.config.i18n.Message;
-import org.mule.util.Utility;
 
 import java.util.Iterator;
 import java.util.List;
@@ -41,7 +41,7 @@ public class ValidationException extends RegistryException {
         buf.append("The following validation errors occurred");
         for (Iterator iterator = vaildationErrors.iterator(); iterator.hasNext();) {
             String s = (String) iterator.next();
-            buf.append(Utility.CRLF).append(s);
+            buf.append(SystemUtils.LINE_SEPARATOR).append(s);
         }
         return buf.toString();
     }

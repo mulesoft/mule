@@ -23,6 +23,7 @@ import org.mule.util.StringMessageHelper;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.security.GeneralSecurityException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;

@@ -14,11 +14,11 @@
  */
 package org.mule.util.counters.impl;
 
+import org.mule.util.counters.CounterFactory.Type;
+
 import java.security.InvalidParameterException;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import org.mule.util.counters.CounterFactory.Type;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

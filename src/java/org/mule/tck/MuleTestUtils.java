@@ -14,6 +14,8 @@
 package org.mule.tck;
 
 import com.mockobjects.dynamic.Mock;
+
+import org.apache.commons.lang.StringUtils;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
 import org.mule.impl.DefaultExceptionStrategy;
@@ -41,7 +43,6 @@ import org.mule.umo.provider.UMOConnector;
 import org.mule.umo.provider.UMOMessageDispatcher;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.ClassHelper;
-import org.mule.util.Utility;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -58,7 +59,7 @@ public class MuleTestUtils {
         }
         manager = MuleManager.getInstance();
         if(disableAdminService) {
-            MuleManager.getConfiguration().setServerUrl(Utility.EMPTY_STRING);
+            MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
         }
         manager.setModel(new SedaModel());
         MuleManager.getConfiguration().setSynchronous(true);

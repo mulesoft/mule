@@ -17,6 +17,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.transformers.AbstractTransformer;
 import org.mule.umo.transformer.TransformerException;
+
 import sun.misc.BASE64Decoder;
 
 import java.io.IOException;

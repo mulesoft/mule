@@ -13,9 +13,6 @@
  */
 package org.mule.config.builders;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -29,6 +26,9 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.lifecycle.InitialisationException;
 import org.mule.umo.transformer.UMOTransformer;
 import org.mule.util.MuleObjectHelper;
+
+import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * <code>EndpointReference</code> maintains a endpoint reference. Endpoints

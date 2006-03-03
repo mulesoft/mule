@@ -15,6 +15,7 @@ package org.mule.test.routing.inbound;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
+
 import org.mule.impl.MuleEvent;
 import org.mule.impl.MuleMessage;
 import org.mule.routing.LoggingCatchAllStrategy;

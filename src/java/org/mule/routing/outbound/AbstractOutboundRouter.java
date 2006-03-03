@@ -14,6 +14,8 @@
 package org.mule.routing.outbound;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
+import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleManager;
@@ -27,7 +29,6 @@ import org.mule.umo.UMOSession;
 import org.mule.umo.UMOTransactionConfig;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.routing.UMOOutboundRouter;
-import org.mule.util.Utility;
 
 import java.util.Iterator;
 import java.util.List;
@@ -143,12 +144,18 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
         if (enableCorrelation != ENABLE_CORRELATION_NEVER) {
             boolean correlationSet = message.getCorrelationId() != null;
             if (correlationSet && (enableCorrelation == ENABLE_CORRELATION_IF_NOT_SET)) {
-                if(logger.isDebugEnabled()) logger.debug("CorrelationId is already set to '" + message.getCorrelationId() + "' , not setting it again");
+                if(logger.isDebugEnabled()) {
+                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId() + "' , not setting it again");
+                }
                 return;
             } else if (correlationSet) {
-                if(logger.isDebugEnabled()) logger.debug("CorrelationId is already set to '" + message.getCorrelationId() + "', but router is configured to overwrite it");
+                if(logger.isDebugEnabled()) {
+                    logger.debug("CorrelationId is already set to '" + message.getCorrelationId() + "', but router is configured to overwrite it");
+                }
             } else {
-                if(logger.isDebugEnabled()) logger.debug("No CorrelationId is set on the message, will set a new Id");
+                if(logger.isDebugEnabled()) {
+                    logger.debug("No CorrelationId is set on the message, will set a new Id");
+                }
             }
 
             String correlation = null;
@@ -201,7 +208,7 @@ public abstract class AbstractOutboundRouter implements UMOOutboundRouter
                 StringBuffer buf = new StringBuffer();
                 buf.append("Setting Correlation info on Outbound router for endpoint: ")
                    .append(endpoint.getEndpointURI());
-                buf.append(Utility.CRLF).append("Id=").append(correlation);
+                buf.append(SystemUtils.LINE_SEPARATOR).append("Id=").append(correlation);
                 // buf.append(", ").append("Seq=").append(seq);
                 // buf.append(", ").append("Group Size=").append(group);
                 logger.debug(buf.toString());

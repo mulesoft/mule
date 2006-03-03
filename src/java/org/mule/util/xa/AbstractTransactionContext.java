@@ -14,9 +14,9 @@
  */
 package org.mule.util.xa;
 
-import javax.transaction.Status;
-
 import org.doomdark.uuid.UUIDGenerator;
+
+import javax.transaction.Status;
 
 /**
  * @author <a href="mailto:gnt@codehaus.org">Guillaume Nodet</a>

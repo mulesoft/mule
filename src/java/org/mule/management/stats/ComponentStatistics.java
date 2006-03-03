@@ -1,8 +1,8 @@
 package org.mule.management.stats;
 
-import java.io.PrintWriter;
-
 import org.mule.management.stats.printers.SimplePrinter;
+
+import java.io.PrintWriter;
 
 /**
  * <code>ComponentStatistics</code> is used for capturing compenet event

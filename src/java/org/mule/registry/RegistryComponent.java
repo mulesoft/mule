@@ -13,12 +13,9 @@
  */
 package org.mule.registry;
 
-import java.io.IOException;
-import java.util.List;
-
 import javax.management.ObjectName;
 
-import org.mule.registry.RegistryException;
+import java.util.List;
 
 /**
  * 

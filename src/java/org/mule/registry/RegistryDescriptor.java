@@ -14,7 +14,6 @@
 */
 package org.mule.registry;
 
-import org.mule.registry.RegistryException;
 
 /**
  * todo document

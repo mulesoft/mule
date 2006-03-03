@@ -18,7 +18,6 @@ package org.mule.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
-import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
 import org.mule.model.DynamicEntryPoint;
@@ -36,9 +35,6 @@ import org.mule.umo.lifecycle.Startable;
 import org.mule.umo.lifecycle.Stoppable;
 import org.mule.umo.lifecycle.UMOLifecycleAdapter;
 import org.mule.umo.model.UMOEntryPointResolver;
-import org.mule.util.ClassHelper;
-
-import java.lang.reflect.Method;
 
 /**
  * <code>DefaultLifecycleAdapter</code> provides lifecycle methods for all
@@ -180,7 +176,9 @@ public class DefaultLifecycleAdapter implements UMOLifecycleAdapter
                 }
             }
             //temporary fix until the new property handing in Mule 2.0
-            if(resultMessage!=null) resultMessage.removeProperty("method");
+            if(resultMessage!=null) {
+                resultMessage.removeProperty("method");
+            }
             return resultMessage;
         } catch (Exception e) {
             throw new MessagingException(new Message(Messages.FAILED_TO_INVOKE_X, "UMO Component: "

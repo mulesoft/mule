@@ -13,10 +13,6 @@
  */
 package org.mule.util;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -31,6 +27,10 @@ import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOImmutableEndpoint;
 import org.mule.umo.manager.UMOManager;
 import org.mule.umo.transformer.UMOTransformer;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * <code>MuleObjectHelper</code> is a helper class to assist in finding mule

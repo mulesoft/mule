@@ -14,16 +14,16 @@
 
 package org.mule.test.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import junit.framework.TestCase;
-
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 import org.mule.util.Multicaster;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
 
 /**
  * <code>MulticasterTestCase</code> TODO (document class)

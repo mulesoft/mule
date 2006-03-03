@@ -56,8 +56,12 @@ public class ConnectionNotification extends UMOServerNotification
     }
 
     public String getType() {
-        if(action == CONNECTION_DISCONNECTED) return TYPE_WARNING;
-        if(action == CONNECTION_FAILED) return TYPE_ERROR;
+        if(action == CONNECTION_DISCONNECTED) {
+            return TYPE_WARNING;
+        }
+        if(action == CONNECTION_FAILED) {
+            return TYPE_ERROR;
+        }
         return TYPE_INFO;
     }
 

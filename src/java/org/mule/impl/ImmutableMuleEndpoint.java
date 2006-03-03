@@ -16,6 +16,7 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleException;
@@ -334,8 +335,12 @@ public class ImmutableMuleEndpoint implements UMOImmutableEndpoint
         clone.setFilter(filter);
         clone.setSecurityFilter(securityFilter);
 
-        if(remoteSync!=null) clone.setRemoteSync(isRemoteSync());
-        if(remoteSyncTimeout!=null) clone.setRemoteSyncTimeout(getRemoteSyncTimeout());
+        if(remoteSync!=null) {
+            clone.setRemoteSync(isRemoteSync());
+        }
+        if(remoteSyncTimeout!=null) {
+            clone.setRemoteSyncTimeout(getRemoteSyncTimeout());
+        }
 
         if (synchronous != null) {
             clone.setSynchronous(synchronous.booleanValue());

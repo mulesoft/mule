@@ -59,13 +59,21 @@ public class Apple implements Fruit, Callable
     }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final Apple apple = (Apple) o;
 
-        if (bitten != apple.bitten) return false;
-        if (washed != apple.washed) return false;
+        if (bitten != apple.bitten) {
+            return false;
+        }
+        if (washed != apple.washed) {
+            return false;
+        }
 
         return true;
     }

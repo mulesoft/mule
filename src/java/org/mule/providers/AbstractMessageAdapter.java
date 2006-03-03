@@ -24,6 +24,7 @@ import org.mule.umo.provider.UMOMessageAdapter;
 import org.mule.umo.provider.UniqueIdNotSupportedException;
 
 import javax.activation.DataHandler;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

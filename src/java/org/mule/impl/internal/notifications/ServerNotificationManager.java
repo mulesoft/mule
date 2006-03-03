@@ -16,6 +16,7 @@ package org.mule.impl.internal.notifications;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.i18n.Message;
@@ -30,6 +31,7 @@ import org.mule.umo.manager.UMOWorkManager;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -125,7 +127,9 @@ public class ServerNotificationManager implements Work, Disposable
 
     public void fireEvent(UMOServerNotification notification)
     {
-        if (disposed) return;
+        if (disposed) {
+            return;
+        }
         
         if (notification instanceof BlockingServerEvent) {
             notifyListeners(notification);
@@ -152,7 +156,9 @@ public class ServerNotificationManager implements Work, Disposable
      */
     protected void notifyListeners(UMOServerNotification notification)
     {
-        if(disposed) return;
+        if(disposed) {
+            return;
+        }
         for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
             Listener listener = (Listener) iterator.next();
             if(listener.matches(notification)) {

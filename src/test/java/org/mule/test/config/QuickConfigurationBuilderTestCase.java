@@ -14,6 +14,7 @@
 */
 package org.mule.test.config;
 
+import org.apache.commons.lang.StringUtils;
 import org.mule.MuleManager;
 import org.mule.config.ConfigurationBuilder;
 import org.mule.config.builders.QuickConfigurationBuilder;
@@ -48,7 +49,6 @@ import org.mule.umo.manager.UMOManager;
 import org.mule.umo.model.UMOModel;
 import org.mule.umo.routing.UMOInboundMessageRouter;
 import org.mule.umo.routing.UMOResponseMessageRouter;
-import org.mule.util.Utility;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ public class QuickConfigurationBuilderTestCase extends AbstractScriptConfigBuild
         QuickConfigurationBuilder builder = new QuickConfigurationBuilder();
         UMOManager m = builder.getManager();
         //Disable the admin agent
-        MuleManager.getConfiguration().setServerUrl(Utility.EMPTY_STRING);
+        MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
         try {
             //set global properties
             m.setProperty("doCompression", "true");

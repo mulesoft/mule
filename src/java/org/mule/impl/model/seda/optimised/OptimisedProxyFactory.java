@@ -13,14 +13,10 @@
  */
 package org.mule.impl.model.seda.optimised;
 
-import org.mule.config.pool.CommonsPoolProxyPool;
-import org.mule.config.pool.AbstractProxyFactory;
 import org.mule.config.pool.CommonsPoolProxyFactory;
 import org.mule.impl.MuleDescriptor;
-import org.mule.util.ObjectPool;
 import org.mule.umo.UMOException;
 import org.mule.umo.lifecycle.Callable;
-import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
  * Creates an optimised Mule proxy for pooling which does away with the

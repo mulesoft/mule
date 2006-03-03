@@ -13,9 +13,9 @@
  */
 package org.mule.umo.manager;
 
-import javax.resource.spi.work.WorkManager;
-
 import org.mule.umo.lifecycle.Lifecycle;
+
+import javax.resource.spi.work.WorkManager;
 
 /**
  * <code>UMOWorkManager</code> TODO

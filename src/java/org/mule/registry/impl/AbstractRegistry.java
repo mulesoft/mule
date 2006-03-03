@@ -13,8 +13,8 @@
  */
 package org.mule.registry.impl;
 
-import org.mule.MuleManager;
 import org.mule.ManagementContext;
+import org.mule.MuleManager;
 import org.mule.registry.Assembly;
 import org.mule.registry.ComponentType;
 import org.mule.registry.Library;
@@ -23,6 +23,7 @@ import org.mule.registry.RegistryComponent;
 import org.mule.registry.RegistryException;
 import org.mule.registry.RegistryStore;
 import org.mule.registry.Unit;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

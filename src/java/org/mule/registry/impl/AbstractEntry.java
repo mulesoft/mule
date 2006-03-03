@@ -13,8 +13,8 @@
  */
 package org.mule.registry.impl;
 
-import org.mule.registry.Registry;
 import org.mule.registry.Entry;
+import org.mule.registry.Registry;
 import org.mule.registry.RegistryException;
 
 import java.io.IOException;

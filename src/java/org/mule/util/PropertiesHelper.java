@@ -12,6 +12,8 @@
 
 package org.mule.util;
 
+import org.apache.commons.lang.SystemUtils;
+
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -297,7 +299,7 @@ public class PropertiesHelper {
         }
 
         if (newline) {
-            buf.append(Utility.CRLF);
+            buf.append(SystemUtils.LINE_SEPARATOR);
         }
 
         Object[] entries = props.entrySet().toArray();
@@ -305,7 +307,7 @@ public class PropertiesHelper {
         for (i = 0; i < numEntries - 1; i++) {
             appendMaskedProperty(buf, (Map.Entry) entries[i]);
             if (newline) {
-                buf.append(Utility.CRLF);
+                buf.append(SystemUtils.LINE_SEPARATOR);
             } else {
                 buf.append(", ");
             }
@@ -315,7 +317,7 @@ public class PropertiesHelper {
         appendMaskedProperty(buf, (Map.Entry) entries[i]);
 
         if (newline) {
-            buf.append(Utility.CRLF);
+            buf.append(SystemUtils.LINE_SEPARATOR);
         }
 
         buf.append("}");

@@ -13,10 +13,10 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import java.util.Map;
-
 import org.mule.config.PropertyFactory;
 import org.mule.tck.testmodels.fruit.Orange;
+
+import java.util.Map;
 
 /**
  * <code>TestDependentObject</code> is used as a mock dependency for an object

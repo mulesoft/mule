@@ -13,10 +13,17 @@
  */
 package org.mule.util.file;
 
+import org.apache.commons.io.IOUtils;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.DefaultXASession;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 
 /**
  * todo document
@@ -128,16 +135,12 @@ public class TransactedFileSession extends DefaultXASession implements FileSessi
             is = openInputStream(source);
             try {
                 os = openOutputStream(dest);
-                byte[] buffer = new byte[1024 * 4];
-                int n = 0;
-                while (-1 != (n = is.read(buffer))) {
-                    os.write(buffer, 0, n);
-                }
+                IOUtils.copy(is, os);
             } finally {
-                os.close();
+                IOUtils.closeQuietly(os);
             }
         } finally {
-            is.close();
+            IOUtils.closeQuietly(is);
         }
     }
 

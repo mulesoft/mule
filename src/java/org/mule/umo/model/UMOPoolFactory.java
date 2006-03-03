@@ -15,8 +15,8 @@
 package org.mule.umo.model;
 
 import org.mule.umo.UMODescriptor;
-import org.mule.util.ObjectPool;
 import org.mule.util.ObjectFactory;
+import org.mule.util.ObjectPool;
 
 /**
  * <code>UMOPoolFactory</code> is a factory interface for created a component pool instance

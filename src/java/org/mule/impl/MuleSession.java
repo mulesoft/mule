@@ -102,8 +102,10 @@ public final class MuleSession implements UMOSession
         id = (String)getProperty(requestSessionHandler.getSessionIDKey());
         if(id==null) {
             id = new UUID().getUUID();
-            if(logger.isDebugEnabled()) logger.debug("There is no session id on the request using key: " +requestSessionHandler.getSessionIDKey() +
-                    ". Generating new session id: " + id);
+            if(logger.isDebugEnabled()) {
+                logger.debug("There is no session id on the request using key: " +requestSessionHandler.getSessionIDKey() +
+                        ". Generating new session id: " + id);
+            }
         } else if(logger.isDebugEnabled()) {
             logger.debug("Got session with id: " + id);
         }
@@ -169,7 +171,9 @@ public final class MuleSession implements UMOSession
 //            Object response = endpoint.getResponseTransformer().transform(result.getPayload());
 //            result = new MuleMessage(response, result.getProperties(), result);
 //        }
-        if(result!=null) RequestContext.rewriteEvent(result);
+        if(result!=null) {
+            RequestContext.rewriteEvent(result);
+        }
         return result;
     }
 

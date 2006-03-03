@@ -14,8 +14,6 @@
  */
 package org.mule.transformers.compression;
 
-import java.io.IOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.transformers.AbstractTransformer;
@@ -23,6 +21,8 @@ import org.mule.umo.transformer.TransformerException;
 import org.mule.util.Utility;
 import org.mule.util.compression.CompressionHelper;
 import org.mule.util.compression.CompressionStrategy;
+
+import java.io.IOException;
 
 /**
  * <code>AbstractCompressionTransformer</code> Is a base class for all

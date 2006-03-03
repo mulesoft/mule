@@ -1,10 +1,10 @@
 package org.mule.test;
 
-import junit.framework.TestCase;
-
 import org.mule.MuleException;
 import org.mule.config.i18n.Message;
 import org.mule.umo.manager.ManagerException;
+
+import junit.framework.TestCase;
 
 /**
  * @author Ross Mason

@@ -26,6 +26,7 @@ import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
+
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -70,16 +71,18 @@ import java.util.jar.Attributes;
   	}
   	public Object lookup(String name) throws NamingException {
   		Object rc = bindings.get(name);
-  		if (rc == null)
-  			throw new NameNotFoundException(name);
+  		if (rc == null) {
+            throw new NameNotFoundException(name);
+        }
   		return rc;
   	}
   	public void bind(Name name, Object obj) throws NamingException {
   		bind(name.toString(), obj);
   	}
   	public void bind(String name, Object obj) throws NamingException {
-  		if (bindings.containsKey(name))
-  			throw new NameAlreadyBoundException(name);
+  		if (bindings.containsKey(name)) {
+            throw new NameAlreadyBoundException(name);
+        }
   		bindings.put(name, obj);
  	}
   	public void rebind(Name name, Object obj) throws NamingException {
@@ -92,17 +95,20 @@ import java.util.jar.Attributes;
   		unbind(name.toString());
   	}
   	public void unbind(String name) throws NamingException {
-  		if (bindings.remove(name) == null)
-  			throw new NameNotFoundException(name);
+  		if (bindings.remove(name) == null) {
+            throw new NameNotFoundException(name);
+        }
   	}
   	public void rename(Attributes.Name oldName, Attributes.Name newName) throws NamingException {
   		rename(oldName.toString(), newName.toString());
   	}
   	public void rename(String oldName, String newName) throws NamingException {
-  		if (!bindings.containsKey(oldName))
-  			throw new NameNotFoundException(oldName);
-  		if (bindings.containsKey(newName))
-  			throw new NameAlreadyBoundException(newName);
+  		if (!bindings.containsKey(oldName)) {
+            throw new NameNotFoundException(oldName);
+        }
+  		if (bindings.containsKey(newName)) {
+            throw new NameAlreadyBoundException(newName);
+        }
 
   		bindings.put(newName, bindings.remove(oldName));
   	}
@@ -110,8 +116,9 @@ import java.util.jar.Attributes;
   		return list(name.toString());
   	}
   	public NamingEnumeration list(String name) throws NamingException {
-  		if (name.length() > 0)
-  			throw new OperationNotSupportedException("subcontexts not supported");
+  		if (name.length() > 0) {
+            throw new OperationNotSupportedException("subcontexts not supported");
+        }
   		final Iterator i = bindings.entrySet().iterator();
   		return new NamingEnumeration() {
   			public Object next() {
@@ -134,8 +141,9 @@ import java.util.jar.Attributes;
  		return listBindings(name.toString());
  	}
  	public NamingEnumeration listBindings(String name) throws NamingException {
- 		if (name.length() > 0)
- 			throw new OperationNotSupportedException("subcontexts not supported");
+ 		if (name.length() > 0) {
+            throw new OperationNotSupportedException("subcontexts not supported");
+        }
  		final Iterator i = bindings.entrySet().iterator();
  		return new NamingEnumeration() {
  			public Object next() {
@@ -188,15 +196,21 @@ import java.util.jar.Attributes;
  		return result;
  	}
  	public Object addToEnvironment(String key, Object val) {
- 		if (environment == null) environment = new Hashtable();
+ 		if (environment == null) {
+            environment = new Hashtable();
+        }
  		return environment.put(key, val);
  	}
  	public Object removeFromEnvironment(String key) {
- 		if (environment == null) environment = new Hashtable();
+ 		if (environment == null) {
+            environment = new Hashtable();
+        }
  		return environment.remove(key);
  	}
  	public Hashtable getEnvironment() {
- 		if (environment == null) environment = new Hashtable();
+ 		if (environment == null) {
+            environment = new Hashtable();
+        }
  		return environment;
  	}
  	public void close() {}

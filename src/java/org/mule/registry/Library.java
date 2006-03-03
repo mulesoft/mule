@@ -13,8 +13,6 @@
  */
 package org.mule.registry;
 
-import org.mule.registry.RegistryException;
-
 import java.util.List;
 
 /**

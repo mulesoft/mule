@@ -24,22 +24,21 @@ import org.mule.impl.ImmutableMuleDescriptor;
 import org.mule.impl.InterceptorsInvoker;
 import org.mule.impl.MuleDescriptor;
 import org.mule.impl.MuleEvent;
-import org.mule.impl.RequestContext;
 import org.mule.impl.MuleMessage;
-import org.mule.impl.message.ExceptionPayload;
+import org.mule.impl.RequestContext;
 import org.mule.impl.endpoint.MuleEndpoint;
 import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.impl.message.ExceptionPayload;
 import org.mule.management.stats.ComponentStatistics;
 import org.mule.providers.AbstractConnector;
-import org.mule.providers.ReplyToHandler;
 import org.mule.providers.NullPayload;
+import org.mule.providers.ReplyToHandler;
 import org.mule.umo.MessagingException;
 import org.mule.umo.UMOEvent;
 import org.mule.umo.UMOException;
 import org.mule.umo.UMOImmutableDescriptor;
 import org.mule.umo.UMOInterceptor;
 import org.mule.umo.UMOMessage;
-import org.mule.umo.UMOExceptionPayload;
 import org.mule.umo.endpoint.UMOEndpoint;
 import org.mule.umo.endpoint.UMOEndpointURI;
 import org.mule.umo.lifecycle.Disposable;
@@ -198,7 +197,7 @@ public class DefaultMuleProxy implements MuleProxy
     public void onEvent(QueueSession session, UMOEvent event)
     {
         this.queueSession = session;
-        this.event = (MuleEvent) event;
+        this.event = event;
     }
 
     public ComponentStatistics getStatistics()
@@ -412,7 +411,7 @@ public class DefaultMuleProxy implements MuleProxy
                     stat.addExecutionTime(System.currentTimeMillis() - startTime);
                 }
                 // processResponse(result, replyTo, replyToHandler);
-                event = (MuleEvent) RequestContext.getEvent();
+                event = RequestContext.getEvent();
                 if (result != null && !event.isStopFurtherProcessing()) {
                     descriptor.getOutboundRouter().route(result, event.getSession(), event.isSynchronous());
                 }

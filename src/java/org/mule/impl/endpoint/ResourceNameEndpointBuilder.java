@@ -13,10 +13,10 @@
  */
 package org.mule.impl.endpoint;
 
+import org.mule.umo.endpoint.MalformedEndpointException;
+
 import java.net.URI;
 import java.util.Properties;
-
-import org.mule.umo.endpoint.MalformedEndpointException;
 
 /**
  * <code>ResourceNameEndpointBuilder</code> extracts a resource name from a

@@ -20,6 +20,7 @@ import org.mule.util.ClassHelper;
 
 import javax.ejb.EJBHome;
 import javax.naming.NamingException;
+
 import java.lang.reflect.Method;
 
 /**

@@ -14,6 +14,7 @@
 package org.mule.impl.space;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.mule.umo.space.UMOSpaceException;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueConfiguration;

@@ -16,6 +16,7 @@
 package org.mule.config;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleRuntimeException;
@@ -24,7 +25,6 @@ import org.mule.config.i18n.Messages;
 import org.mule.providers.ConnectionStrategy;
 import org.mule.providers.SingleAttemptConnectionStrategy;
 import org.mule.util.ClassHelper;
-import org.mule.util.Utility;
 import org.mule.util.queue.EventFilePersistenceStrategy;
 import org.mule.util.queue.QueuePersistenceStrategy;
 
@@ -471,7 +471,9 @@ public class MuleConfiguration
     public void setClientMode(boolean clientMode)
     {
         this.clientMode = clientMode;
-        if(clientMode) setServerUrl("");
+        if(clientMode) {
+            setServerUrl("");
+        }
     }
 
     public QueuePersistenceStrategy getPersistenceStrategy()
@@ -518,7 +520,9 @@ public class MuleConfiguration
 
     public void setEmbedded(boolean embedded) {
         this.embedded = embedded;
-        if(embedded) serverUrl=null;
+        if(embedded) {
+            serverUrl=null;
+        }
     }
 
     public String getModelType() {
@@ -534,7 +538,7 @@ public class MuleConfiguration
     }
 
     public void setEncoding(String encoding) {
-        if(encoding==null || Utility.EMPTY_STRING.equals(encoding)) {
+        if (StringUtils.isEmpty(encoding)) {
             logger.warn("Cannot set encoding to null or empty String");
             return;
         }

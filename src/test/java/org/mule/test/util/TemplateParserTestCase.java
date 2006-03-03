@@ -13,13 +13,14 @@
  */
 package org.mule.test.util;
 
-import junit.framework.TestCase;
 import org.mule.util.TemplateParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 /**
  * @author <a href="mailto:ross.mason@symphonysoft.com">Ross Mason</a>

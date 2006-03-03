@@ -210,11 +210,13 @@ public abstract class AbstractPoolTestCase extends AbstractMuleTestCase
         public Borrower(ObjectPool pool, long time)
         {
             super("Borrower");
-            if (pool == null)
+            if (pool == null) {
                 throw new IllegalArgumentException("Pool cannot be null");
+            }
             this.pool = pool;
-            if (time < 500)
+            if (time < 500) {
                 time = 500;
+            }
             this.time = time;
         }
 

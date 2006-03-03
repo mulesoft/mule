@@ -15,12 +15,6 @@ package org.mule.impl.security;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.umo.UMOEncryptionStrategy;
@@ -32,6 +26,12 @@ import org.mule.umo.security.UMOSecurityContext;
 import org.mule.umo.security.UMOSecurityManager;
 import org.mule.umo.security.UMOSecurityProvider;
 import org.mule.umo.security.UnknownAuthenticationTypeException;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <code>MuleSecurityManager</code> is a default implementation security

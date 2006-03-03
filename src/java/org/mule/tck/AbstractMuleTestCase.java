@@ -15,7 +15,7 @@
 
 package org.mule.tck;
 
-import junit.framework.TestCase;
+import org.apache.commons.lang.StringUtils;
 import org.mule.MuleManager;
 import org.mule.config.MuleConfiguration;
 import org.mule.impl.MuleDescriptor;
@@ -33,6 +33,8 @@ import org.mule.util.Utility;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.TestCase;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule testcases. This
@@ -97,7 +99,9 @@ public abstract class AbstractMuleTestCase extends TestCase {
     }
 
     private void log(String s) {
-        if(testLogging) System.err.println(s);
+        if(testLogging) {
+            System.err.println(s);
+        }
     }
 
     public String getName() {
@@ -135,7 +139,7 @@ public abstract class AbstractMuleTestCase extends TestCase {
     {
         System.out.println(StringMessageHelper.getBoilerPlate("Testing: " + toString(), '=', 80));
         MuleManager.getConfiguration().getDefaultThreadingProfile().setDoThreading(false);
-        MuleManager.getConfiguration().setServerUrl(Utility.EMPTY_STRING);
+        MuleManager.getConfiguration().setServerUrl(StringUtils.EMPTY);
 
         try {
             if (getTestInfo().getRunCount() == 0) {
@@ -150,7 +154,9 @@ public abstract class AbstractMuleTestCase extends TestCase {
                 //We dispose here jut in case
                 disposeManager();
             }
-            if (!isPrereqsMet(getClass().getName() + ".setUp()")) return;
+            if (!isPrereqsMet(getClass().getName() + ".setUp()")) {
+                return;
+            }
             doSetUp();
             if (getTestInfo().getRunCount() == 0) {
                 log("Post suiteSetup for test: " + getTestInfo());

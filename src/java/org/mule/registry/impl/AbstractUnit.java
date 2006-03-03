@@ -14,10 +14,10 @@
 package org.mule.registry.impl;
 
 import org.mule.registry.Assembly;
+import org.mule.registry.Registry;
 import org.mule.registry.RegistryComponent;
 import org.mule.registry.RegistryException;
 import org.mule.registry.Unit;
-import org.mule.registry.Registry;
 
 /**
  * 
@@ -56,7 +56,7 @@ public abstract class AbstractUnit extends AbstractEntry implements Unit {
             throw new RegistryException(e);
         }
         // TODO: analyse result
-		((RegistryComponent) getRegistryComponent()).addUnit(this);
+		getRegistryComponent().addUnit(this);
 		((AbstractAssembly) getAssembly()).addUnit(this);
 		setCurrentState(STOPPED);
 		return result;
@@ -151,7 +151,7 @@ public abstract class AbstractUnit extends AbstractEntry implements Unit {
             throw new RegistryException(e);
         }
         // TODO: analyse result
-		((RegistryComponent) getRegistryComponent()).removeUnit(this);
+		getRegistryComponent().removeUnit(this);
 		((AbstractAssembly) getAssembly()).removeUnit(this);
 		setCurrentState(UNKNOWN);
 		return result;

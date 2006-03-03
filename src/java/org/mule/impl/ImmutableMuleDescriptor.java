@@ -16,6 +16,7 @@
 package org.mule.impl;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.mule.MuleException;
 import org.mule.MuleManager;
 import org.mule.config.PoolingProfile;
@@ -185,7 +186,7 @@ public class ImmutableMuleDescriptor implements UMOImmutableDescriptor
         implementationReference = descriptor.getImplementation();
         version = descriptor.getVersion();
         intecerptorList = descriptor.getInterceptors();
-        properties = (HashMap) descriptor.getProperties();
+        properties = descriptor.getProperties();
         name = descriptor.getName();
         encoding = descriptor.getEncoding();
 
