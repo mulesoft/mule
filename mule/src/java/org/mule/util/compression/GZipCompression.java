@@ -12,7 +12,12 @@
  * the LICENSE.txt file. 
  *
  */
+
 package org.mule.util.compression;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,9 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>GZipCompression</code> a CompressionStrategy implementation using the
@@ -46,12 +48,18 @@ public class GZipCompression implements CompressionStrategy
      * implementaiton does not expose the GZip header so it is difficult to
      * determine if a string is compressed.
      * 
-     * @param bytes an array of bytes
-     * @return true if the array is compressed or faluse otherwise
-     * @throws java.io.IOException if the byte array couldn't be read
+     * @param bytes
+     *            an array of bytes
+     * @return true if the array is compressed or false otherwise
+     * @throws java.io.IOException
+     *             if the byte array couldn't be read
      */
     public boolean isCompressed(byte[] bytes) throws IOException
     {
+        if (bytes == null) {
+            return false;
+        }
+
         // We only need the first 2 bytes
         ByteArrayInputStream is = new ByteArrayInputStream(bytes, 0, 2);
         int b = readByte(is);
@@ -61,9 +69,11 @@ public class GZipCompression implements CompressionStrategy
     }
 
     /**
-     * @param in The InputStream to read the byte from
+     * @param in
+     *            The InputStream to read the byte from
      * @return The byte value
-     * @throws java.io.IOException if a byte could not be read
+     * @throws java.io.IOException
+     *             if a byte could not be read
      */
     private int readByte(InputStream in) throws IOException
     {
@@ -77,22 +87,37 @@ public class GZipCompression implements CompressionStrategy
     /**
      * Used for compressing a byte array into a new byte array using GZIP
      * 
-     * @param bytes An array of bytes to compress
+     * @param bytes
+     *            An array of bytes to compress
      * @return a compressed byte array
-     * @throws java.io.IOException if it fails to write to a GZIPOutputStream
+     * @throws java.io.IOException
+     *             if it fails to write to a GZIPOutputStream
      * @see java.util.zip.GZIPOutputStream
      */
     public byte[] compressByteArray(byte[] bytes) throws IOException
     {
-        logger.debug("Compressing message of size: " + bytes.length);
+        if (bytes == null) {
+            // nothing to compress
+            return null;
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Compressing message of size: " + bytes.length);
+        }
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         GZIPOutputStream gos = new GZIPOutputStream(baos);
-        // gos.setMethod(ZipOutputStream.DEFLATED);
+
         gos.write(bytes, 0, bytes.length);
         gos.finish();
         gos.close();
+
         byte[] compressedByteArray = baos.toByteArray();
-        logger.debug("Compressed message to size: " + compressedByteArray.length);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Compressed message to size: " + compressedByteArray.length);
+        }
+
         return compressedByteArray;
     }
 
@@ -100,36 +125,43 @@ public class GZipCompression implements CompressionStrategy
      * Used for uncompressing a byte array into a uncompressed byte array using
      * GZIP
      * 
-     * @param bytes An array of bytes to uncompress
+     * @param bytes
+     *            An array of bytes to uncompress
      * @return an uncompressed byte array
-     * @throws java.io.IOException if it fails to read from a GZIPInputStream
+     * @throws java.io.IOException
+     *             if it fails to read from a GZIPInputStream
      * @see java.util.zip.GZIPInputStream
      */
     public byte[] uncompressByteArray(byte[] bytes) throws IOException
     {
-        logger.debug("Uncompressing message of size: " + bytes.length);
+        if (bytes == null) {
+            // nothing to uncompress
+            return null;
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Uncompressing message of size: " + bytes.length);
+        }
+
         if (!isCompressed(bytes)) {
             // throw a specific exception here to allow users of this method to
-            // deffientiate between
-            // general IOExceptions and an Invalid format
-            logger.warn("data is not of type GZIP compressed. The data may not have been compressed in the first place");
+            // diffientiate between general IOExceptions and an invalid format
+            logger.warn("Data is not of type GZIP compressed. The data may not have been compressed in the first place.");
             throw new CompressionException("Not in GZIP format");
         }
 
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         GZIPInputStream gis = new GZIPInputStream(bais);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length * 4);
 
-        byte[] buf = new byte[2048];
-        int len;
-
-        while ((len = gis.read(buf)) != -1) {
-            baos.write(buf, 0, len);
-        }
-
+        IOUtils.copy(gis, baos);
         byte[] uncompressedByteArray = baos.toByteArray();
 
-        logger.debug("Uncompressing message to size: " + uncompressedByteArray.length);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Uncompressed message to size: " + uncompressedByteArray.length);
+        }
+
         return uncompressedByteArray;
     }
+
 }
