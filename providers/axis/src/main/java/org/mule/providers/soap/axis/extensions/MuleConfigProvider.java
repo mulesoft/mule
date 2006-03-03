@@ -45,8 +45,10 @@ public class MuleConfigProvider extends SimpleProvider
      */
     public void configureEngine(AxisEngine engine) throws ConfigurationException
     {
-        engineConfiguration.configureEngine(engine);
-        super.configureEngine(engine);
+        synchronized (this) {
+          engineConfiguration.configureEngine(engine);
+          super.configureEngine(engine);
+        }
     }
 
     public Iterator getAxisDeployedServices() throws ConfigurationException
