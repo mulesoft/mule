@@ -19,7 +19,7 @@ import org.apache.axis.handlers.BasicHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.config.MuleProperties;
-import org.mule.providers.soap.axis.MuleSoapHeaders;
+import org.mule.providers.soap.MuleSoapHeaders;
 import org.mule.umo.UMOEvent;
 
 import javax.xml.rpc.handler.soap.SOAPMessageContext;
