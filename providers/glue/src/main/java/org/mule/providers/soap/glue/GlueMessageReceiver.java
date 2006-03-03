@@ -25,7 +25,6 @@ import electric.util.interceptor.SendThreadContext;
 import org.mule.config.MuleProperties;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.Messages;
-import org.mule.impl.ImmutableMuleEndpoint;
 import org.mule.impl.MuleDescriptor;
 import org.mule.providers.AbstractMessageReceiver;
 import org.mule.providers.ConnectException;
@@ -77,12 +76,9 @@ public class GlueMessageReceiver extends AbstractMessageReceiver
             // always execute in a single thread unless the endpont has
             // explicitly
             // been set to run asynchronously
-            if (endpoint instanceof ImmutableMuleEndpoint
-                    && !((ImmutableMuleEndpoint) endpoint).isSynchronousExplicitlySet()) {
-                if (!endpoint.isSynchronous()) {
-                    logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
-                    endpoint.setSynchronous(true);
-                }
+            if (!endpoint.isSynchronousSet() && !endpoint.isSynchronous()) {
+                logger.debug("overriding endpoint synchronicity and setting it to true. Web service requests are executed in a single thread");
+                endpoint.setSynchronous(true);
             }
 
             if (createServer) {
