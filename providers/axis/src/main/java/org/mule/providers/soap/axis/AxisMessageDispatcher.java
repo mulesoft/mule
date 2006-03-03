@@ -411,8 +411,8 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
             } else if (soapMethod.getReturnClass() != null) {
                 call.setReturnClass(soapMethod.getReturnClass());
             }
+            call.setOperationName(soapMethod.getName());
         }
-        call.setOperationName(soapMethod.getName());
     }
 
     private void loadCallParams(UMOEvent event, String namespace) throws ClassNotFoundException {
