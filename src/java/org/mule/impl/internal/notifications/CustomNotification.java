@@ -46,6 +46,15 @@ public class CustomNotification extends UMOServerNotification
         }
     }
 
+    public CustomNotification(Object message, int action, String resourceId)
+    {
+        super(message, action, resourceId);
+        if (action < CUSTOM_EVENT_ACTION_START_RANGE && action > 0) {
+            throw new IllegalArgumentException("Action range must be greater than CUSTOM_ACTION_START_RANGE ("
+                    + CUSTOM_EVENT_ACTION_START_RANGE + ")");
+        }
+    }
+
     protected String getActionName(int action)
     {
         int i = action - CUSTOM_EVENT_ACTION_START_RANGE;
