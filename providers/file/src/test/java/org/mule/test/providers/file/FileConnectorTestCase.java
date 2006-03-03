@@ -16,6 +16,7 @@
 package org.mule.test.providers.file;
 
 import com.mockobjects.dynamic.Mock;
+import org.mule.MuleManager;
 import org.mule.providers.file.FileConnector;
 import org.mule.providers.file.FileMessageReceiver;
 import org.mule.tck.MuleTestUtils;
@@ -44,13 +45,11 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
     protected void doSetUp() throws Exception {
         super.doSetUp();
-        validMessage = File.createTempFile("simple", ".mule");
+        //The working directory is delete on tearDown
+        File dir = new File(MuleManager.getConfiguration().getWorkingDirectory() + "tmp");
+        if(!dir.exists()) dir.mkdirs();
+        validMessage = File.createTempFile("simple", ".mule", dir);
         assertNotNull(validMessage);
-    }
-
-    protected void doTearDown() throws Exception {
-        assertTrue(validMessage.delete());
-        super.doTearDown();
     }
 
     /*
@@ -68,7 +67,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
 
     public String getTestEndpointURI()
     {
-        return "file:///tmp";
+        return "file://" + MuleManager.getConfiguration().getWorkingDirectory();
     }
 
     /*
