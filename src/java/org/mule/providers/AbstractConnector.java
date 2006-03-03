@@ -264,7 +264,7 @@ public abstract class AbstractConnector implements UMOConnector, ExceptionListen
     public void setName(String newName)
     {
         if (newName == null) {
-            throw new IllegalArgumentException("Connector name cannot be null");
+            throw new IllegalArgumentException(new Message(Messages.X_IS_NULL, "Connector name").toString());
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Set UMOConnector name to: " + newName);
