@@ -93,7 +93,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher {
             //Allow the client config to be set on the endpoint
             String config = null;
             if(event!=null) {
-                event.getStringProperty(AxisConnector.AXIS_CLIENT_CONFIG_PROPERTY, null);
+                config = event.getStringProperty(AxisConnector.AXIS_CLIENT_CONFIG_PROPERTY, null);
             }
             if(config!=null) {
                 clientConfig = new FileProvider(config);
